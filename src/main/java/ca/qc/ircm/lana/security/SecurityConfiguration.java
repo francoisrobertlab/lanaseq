@@ -1,0 +1,150 @@
+/*
+ * Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package ca.qc.ircm.lana.security;
+
+import ca.qc.ircm.lana.user.UserRole;
+import com.vaadin.flow.server.ServletHelper.RequestType;
+import com.vaadin.flow.shared.ApplicationConstants;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+
+/**
+ * Security configuration.
+ */
+@EnableWebSecurity
+@Configuration
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+  public static final String LOGIN_PROCESSING_URL = "/signin";
+  private static final String LOGIN_FAILURE_URL = "/signin?error";
+  private static final String LOGIN_URL = "/signin";
+  private static final String LOGOUT_SUCCESS_URL = "/";
+
+  @Inject
+  private UserDetailsService userDetailsService;
+
+  /**
+   * Returns password encoder that supports password upgrades.
+   *
+   * @return password encoder that supports password upgrades
+   */
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    Map<String, PasswordEncoder> encoders = new HashMap<>();
+    PasswordEncoder defaultPasswordEncoder = new BCryptPasswordEncoder();
+    encoders.put("bcrypt", defaultPasswordEncoder);
+
+    DelegatingPasswordEncoder passworEncoder = new DelegatingPasswordEncoder("bcrypt", encoders);
+    passworEncoder.setDefaultPasswordEncoderForMatches(defaultPasswordEncoder);
+
+    return passworEncoder;
+  }
+
+  /**
+   * Registers our UserDetailsService and the password encoder to be used on login attempts.
+   */
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    super.configure(auth);
+    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+  }
+
+  /**
+   * Require login to access internal pages and configure login form.
+   */
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    // Not using Spring CSRF here to be able to use plain HTML for the login page
+    http.csrf().disable()
+
+        // Register our CustomRequestCache, that saves unauthorized access attempts, so
+        // the user is redirected after login.
+        .requestCache().requestCache(new SkipVaadinRequestCache())
+
+        // Restrict access to our application.
+        .and().authorizeRequests()
+
+        // Allow all flow internal requests.
+        .requestMatchers(SecurityConfiguration::isVaadinInternalRequest).permitAll()
+
+        // Allow all requests by logged in users.
+        .anyRequest().hasAnyAuthority(UserRole.roles())
+
+        // Configure the login page.
+        .and().formLogin().loginPage(LOGIN_URL).permitAll().loginProcessingUrl(LOGIN_PROCESSING_URL)
+        .failureUrl(LOGIN_FAILURE_URL)
+
+        // Register the success handler that redirects users to the page they last tried
+        // to access
+        .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+
+        // Configure logout
+        .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+  }
+
+  /**
+   * Allows access to static resources, bypassing Spring security.
+   */
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring().antMatchers(
+        // Vaadin Flow static resources
+        "/VAADIN/**",
+
+        // the standard favicon URI
+        "/favicon.ico",
+
+        // web application manifest
+        "/manifest.json", "/sw.js", "/offline-page.html",
+
+        // icons and images
+        "/icons/**", "/images/**",
+
+        // (development mode) static resources
+        "/frontend/**",
+
+        // (development mode) webjars
+        "/webjars/**",
+
+        // (development mode) H2 debugging console
+        "/h2-console/**",
+
+        // (production mode) static resources
+        "/frontend-es5/**", "/frontend-es6/**");
+  }
+
+  static boolean isVaadinInternalRequest(HttpServletRequest request) {
+    final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
+    return parameterValue != null
+        && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
+  }
+}
