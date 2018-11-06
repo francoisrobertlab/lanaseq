@@ -24,6 +24,10 @@ spring:
       port: 27017
       database: lana
 
+admin:
+  name: ${spring.security.user.name:lana@ircm.qc.ca}
+  password: ${spring.security.user.password}
+
 # Web server.
 server:
   port: 8080
@@ -43,6 +47,10 @@ spring:
   data:
     mongodb:
       port: 0
+
+admin:
+  name: admin@ircm.qc.ca
+  password: password
 
 vaadin:
   productionMode: false

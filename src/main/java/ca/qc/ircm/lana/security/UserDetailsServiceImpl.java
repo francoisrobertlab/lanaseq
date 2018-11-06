@@ -20,8 +20,10 @@ package ca.qc.ircm.lana.security;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Collections;
+import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,12 +31,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Implements the {@link UserDetailsService}.
+ * Implementation of {@link UserDetailsService}.
  */
 @Service
-@Primary
 public class UserDetailsServiceImpl implements UserDetailsService {
-  private final UserRepository userRepository;
+  private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+  @Inject
+  private UserRepository userRepository;
 
   @Autowired
   public UserDetailsServiceImpl(UserRepository userRepository) {
@@ -44,6 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(email).orElse(null);
+    logger.debug("user with email {}: {}", email, user);
     if (null == user) {
       throw new UsernameNotFoundException("No user with email: " + email);
     } else {
