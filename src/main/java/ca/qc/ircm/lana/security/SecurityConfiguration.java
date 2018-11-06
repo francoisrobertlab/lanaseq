@@ -44,10 +44,11 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-  public static final String LOGIN_PROCESSING_URL = "/signin";
-  private static final String LOGIN_FAILURE_URL = "/signin?error";
-  private static final String LOGIN_URL = "/signin";
-  private static final String LOGOUT_SUCCESS_URL = "/";
+  public static final String SIGNIN_PROCESSING_URL = "/signin";
+  private static final String SIGNIN_FAILURE_URL = "/signin?error";
+  private static final String SIGNIN_URL = "/signin";
+  private static final String SIGNOUT_SUCCESS_URL = "/";
+  private static final String PASSWORD_ENCRYPTION = "bcrypt";
 
   @Inject
   private UserDetailsService userDetailsService;
@@ -61,9 +62,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   public PasswordEncoder passwordEncoder() {
     Map<String, PasswordEncoder> encoders = new HashMap<>();
     PasswordEncoder defaultPasswordEncoder = new BCryptPasswordEncoder();
-    encoders.put("bcrypt", defaultPasswordEncoder);
+    encoders.put(PASSWORD_ENCRYPTION, defaultPasswordEncoder);
 
-    DelegatingPasswordEncoder passworEncoder = new DelegatingPasswordEncoder("bcrypt", encoders);
+    DelegatingPasswordEncoder passworEncoder =
+        new DelegatingPasswordEncoder(PASSWORD_ENCRYPTION, encoders);
     passworEncoder.setDefaultPasswordEncoderForMatches(defaultPasswordEncoder);
 
     return passworEncoder;
@@ -100,15 +102,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .anyRequest().hasAnyAuthority(UserRole.roles())
 
         // Configure the login page.
-        .and().formLogin().loginPage(LOGIN_URL).permitAll().loginProcessingUrl(LOGIN_PROCESSING_URL)
-        .failureUrl(LOGIN_FAILURE_URL)
+        .and().formLogin().loginPage(SIGNIN_URL).permitAll()
+        .loginProcessingUrl(SIGNIN_PROCESSING_URL).failureUrl(SIGNIN_FAILURE_URL)
 
         // Register the success handler that redirects users to the page they last tried
         // to access
         .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
 
         // Configure logout
-        .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+        .and().logout().logoutSuccessUrl(SIGNOUT_SUCCESS_URL);
   }
 
   /**
