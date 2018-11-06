@@ -60,8 +60,8 @@
     <vaadin.version>10.0.6</vaadin.version>
     <javax.inject.version>1</javax.inject.version>
     <property-names-annotation-processor.version>0.4</property-names-annotation-processor.version>
-    <flow.maven.plugin.version>1.1.0</flow.maven.plugin.version>
     <iron-form.version>2.1.3</iron-form.version>
+    <flow.maven.plugin.version>1.1.0</flow.maven.plugin.version>
     <mojolicense-maven-plugin.version>1.14</mojolicense-maven-plugin.version>
   </properties>
 
