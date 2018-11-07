@@ -19,7 +19,7 @@ package ca.qc.ircm.lana.test.config;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lana.security.UserDetailsServiceImpl;
+import ca.qc.ircm.lana.security.SpringDataUserDetailsService;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import java.util.ArrayList;
@@ -34,14 +34,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class UserDetailsServiceImplTest {
-  private UserDetailsServiceImpl userDetailsService;
+public class SpringDataUserDetailsServiceTest {
+  private SpringDataUserDetailsService userDetailsService;
   @Inject
   private UserRepository userRepository;
 
   @Before
   public void beforeTest() {
-    userDetailsService = new UserDetailsServiceImpl(userRepository);
+    userDetailsService = new SpringDataUserDetailsService(userRepository);
   }
 
   @Test

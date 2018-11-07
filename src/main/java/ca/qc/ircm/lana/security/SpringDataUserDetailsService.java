@@ -34,13 +34,13 @@ import org.springframework.stereotype.Service;
  * Implementation of {@link UserDetailsService}.
  */
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
-  private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+public class SpringDataUserDetailsService implements UserDetailsService {
+  private static final Logger logger = LoggerFactory.getLogger(SpringDataUserDetailsService.class);
   @Inject
   private UserRepository userRepository;
 
   @Autowired
-  public UserDetailsServiceImpl(UserRepository userRepository) {
+  public SpringDataUserDetailsService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
 
