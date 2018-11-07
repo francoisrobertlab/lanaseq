@@ -23,4 +23,9 @@
   <logger name="ca.qc.ircm.lana" level="DEBUG"/>
   <logger name="ca.qc.ircm.lana.security.SkipVaadinRequestCache" level="INFO"/>
   <logger name="com.vaadin" level="WARN"/>
+  <!--
+  <logger name="org.hibernate.SQL" level="DEBUG"/>
+  <logger name="org.hibernate.type" level="TRACE"/>
+  <logger name="com.zaxxer" level="DEBUG"/>
+  -->
 </configuration>
