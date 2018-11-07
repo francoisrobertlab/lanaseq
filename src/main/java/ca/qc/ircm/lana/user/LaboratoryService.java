@@ -19,11 +19,13 @@ package ca.qc.ircm.lana.user;
 
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Services for {@link Laboratory}.
  */
 @Service
+@Transactional
 public class LaboratoryService {
   @Inject
   private LaboratoryRepository repository;

@@ -23,11 +23,13 @@ import java.util.List;
 import javax.inject.Inject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Services for {@link User}.
  */
 @Service
+@Transactional
 public class UserService {
   @Inject
   private UserRepository repository;
