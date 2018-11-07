@@ -35,5 +35,5 @@ CREATE TABLE IF NOT EXISTS User (
   locale varchar(255),
   PRIMARY KEY (id),
   UNIQUE KEY email (email),
-  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
+  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES Laboratory (id) ON UPDATE CASCADE
 );

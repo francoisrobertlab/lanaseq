@@ -34,7 +34,7 @@ CREATE TABLE User (
   PRIMARY KEY (id),
   UNIQUE KEY email (email),
   KEY laboratory (laboratory_id),
-  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
+  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES Laboratory (id) ON UPDATE CASCADE
 );
 
 
