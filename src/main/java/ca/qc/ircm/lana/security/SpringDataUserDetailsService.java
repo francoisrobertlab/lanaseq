@@ -19,11 +19,12 @@ package ca.qc.ircm.lana.security;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,11 +37,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class SpringDataUserDetailsService implements UserDetailsService {
   private static final Logger logger = LoggerFactory.getLogger(SpringDataUserDetailsService.class);
+  private static final int LOCK_ATTEMPS = 5;
+  private static final Duration LOCK_DURATION = Duration.ofMinutes(2);
   @Inject
   private UserRepository userRepository;
 
-  @Autowired
-  public SpringDataUserDetailsService(UserRepository userRepository) {
+  protected SpringDataUserDetailsService() {
+  }
+
+  protected SpringDataUserDetailsService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
 
@@ -52,8 +57,14 @@ public class SpringDataUserDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException("No user with email: " + email);
     } else {
       return new org.springframework.security.core.userdetails.User(user.getEmail(),
-          user.getHashedPassword(), user.isActive(), true, true, true,
+          user.getHashedPassword(), user.isActive(), true, !user.isExpiredPassword(),
+          !accountLocked(user),
           Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())));
     }
+  }
+
+  private boolean accountLocked(User user) {
+    return user.getSignAttempts() % LOCK_ATTEMPS == 0 && user.getLastSignAttempt() != null
+        && user.getLastSignAttempt().plusMillis(LOCK_DURATION.toMillis()).isAfter(Instant.now());
   }
 }
