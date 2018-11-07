@@ -18,7 +18,7 @@
 -- // create laboratory table
 -- Migration SQL that makes the change goes here.
 
-CREATE TABLE Laboratory (
+CREATE TABLE laboratory (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   PRIMARY KEY (id)
@@ -28,4 +28,4 @@ CREATE TABLE Laboratory (
 -- //@UNDO
 -- SQL to undo the change goes here.
 
-DROP TABLE Laboratory;
+DROP TABLE laboratory;

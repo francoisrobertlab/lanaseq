@@ -18,7 +18,7 @@
 -- // create user table
 -- Migration SQL that makes the change goes here.
 
-CREATE TABLE User (
+CREATE TABLE user (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   email varchar(255) NOT NULL,
   name varchar(255),
@@ -34,11 +34,11 @@ CREATE TABLE User (
   PRIMARY KEY (id),
   UNIQUE KEY email (email),
   KEY laboratory (laboratory_id),
-  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES Laboratory (id) ON UPDATE CASCADE
+  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
 );
 
 
 -- //@UNDO
 -- SQL to undo the change goes here.
 
-DROP TABLE User;
+DROP TABLE user;

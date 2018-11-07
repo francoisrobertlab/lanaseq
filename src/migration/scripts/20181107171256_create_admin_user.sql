@@ -18,11 +18,11 @@
 -- // create admin user
 -- Migration SQL that makes the change goes here.
 
-INSERT INTO User (id, email, name, role, hashed_password, active, expired_password)
+INSERT INTO user (id, email, name, role, hashed_password, active, expired_password)
 VALUES (1, 'lana@ircm.qc.ca', 'Administrator', 'ADMIN', '$2a$10$lWDef/shwP7Tl2QAg8yDm.BITRMFWYKCZmG.MZ20cdLaf1UrxkDRO', 1, 1);
 
 -- //@UNDO
 -- SQL to undo the change goes here.
 
-DELETE FROM User
+DELETE FROM user
 WHERE id = 1;

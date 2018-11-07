@@ -18,7 +18,7 @@
 -- // create changelog table
 -- Migration SQL that makes the change goes here.
 
-CREATE TABLE Changelog (
+CREATE TABLE changelog (
   id decimal(20,0) NOT NULL,
   applied_at varchar(25) NOT NULL,
   description varchar(255) NOT NULL,
@@ -29,4 +29,4 @@ CREATE TABLE Changelog (
 -- //@UNDO
 -- SQL to undo the change goes here.
 
-DROP TABLE Changelog;
+DROP TABLE changelog;

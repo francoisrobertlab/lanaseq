@@ -16,5 +16,5 @@
 --
 
 DROP TABLE persistent_logins IF EXISTS;
-DROP TABLE User IF EXISTS;
-DROP TABLE Laboratory IF EXISTS;
+DROP TABLE user IF EXISTS;
+DROP TABLE laboratory IF EXISTS;

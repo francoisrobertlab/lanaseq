@@ -15,12 +15,12 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-CREATE TABLE IF NOT EXISTS Laboratory (
+CREATE TABLE IF NOT EXISTS laboratory (
   id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
   name varchar(255) NOT NULL,
   PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS User (
+CREATE TABLE IF NOT EXISTS user (
   id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
   email varchar(255) NOT NULL,
   name varchar(255),
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS User (
   locale varchar(255),
   PRIMARY KEY (id),
   UNIQUE KEY email (email),
-  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES Laboratory (id) ON UPDATE CASCADE
+  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
 );
 CREATE TABLE persistent_logins (
   username varchar(255) NOT NULL,
