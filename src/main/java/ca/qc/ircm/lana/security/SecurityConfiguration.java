@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,7 +37,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 /**
  * Security configuration.
@@ -49,9 +54,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private static final String SIGNIN_URL = "/signin";
   private static final String SIGNOUT_SUCCESS_URL = "/";
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
+  private static final String REMEMBER_ME_KEY = "rememberMe";
 
   @Inject
   private UserDetailsService userDetailsService;
+  @Inject
+  private DataSource dataSource;
 
   /**
    * Returns password encoder that supports password upgrades.
@@ -69,6 +77,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     passworEncoder.setDefaultPasswordEncoderForMatches(defaultPasswordEncoder);
 
     return passworEncoder;
+  }
+
+  @Bean
+  public RememberMeServices rememberMeServices() {
+    return new PersistentTokenBasedRememberMeServices(REMEMBER_ME_KEY, userDetailsService,
+        persistentTokenRepository());
+  }
+
+  /**
+   * Returns {@link PersistentTokenRepository}.
+   *
+   * @return {@link PersistentTokenRepository}
+   */
+  @Bean
+  public PersistentTokenRepository persistentTokenRepository() {
+    JdbcTokenRepositoryImpl persistentTokenRepository = new JdbcTokenRepositoryImpl();
+    persistentTokenRepository.setCreateTableOnStartup(false);
+    persistentTokenRepository.setDataSource(dataSource);
+    return persistentTokenRepository;
   }
 
   /**
@@ -110,7 +137,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
 
         // Configure logout
-        .and().logout().logoutSuccessUrl(SIGNOUT_SUCCESS_URL);
+        .and().logout().logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
+
+        // Remember me
+        .and().rememberMe().alwaysRemember(true).rememberMeServices(rememberMeServices());
   }
 
   /**

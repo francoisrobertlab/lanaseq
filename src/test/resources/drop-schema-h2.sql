@@ -15,5 +15,6 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
+DROP TABLE persistent_logins IF EXISTS;
 DROP TABLE User IF EXISTS;
 DROP TABLE Laboratory IF EXISTS;
