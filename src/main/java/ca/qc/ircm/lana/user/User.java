@@ -17,40 +17,100 @@
 
 package ca.qc.ircm.lana.user;
 
+import static javax.persistence.EnumType.STRING;
+import static javax.persistence.GenerationType.IDENTITY;
+
 import ca.qc.ircm.lana.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Map;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Locale;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 
 /**
  * User.
  */
-@Document(collection = "user")
+@Entity
 @GeneratePropertyNames
 public class User implements Data, Serializable {
-  /**
-   * Locale preference.
-   */
-  public static final String LOCALE = "locale";
   private static final long serialVersionUID = -3200958473089020837L;
   /**
    * Database identifier.
    */
   @Id
-  private String id;
-  private String name;
+  @Column(unique = true, nullable = false)
+  @GeneratedValue(strategy = IDENTITY)
+  private Long id;
+  /**
+   * User's email, also serves for signin.
+   */
+  @Column(unique = true, nullable = false)
+  @Size(max = 255)
   private String email;
+  /**
+   * User's real name.
+   */
+  @Column
+  @Size(max = 255)
+  private String name;
+  /**
+   * User's role.
+   */
+  @Column(nullable = false)
+  @Enumerated(STRING)
   private UserRole role;
+  /**
+   * User's hashed password.
+   */
+  @Column
+  @Size(max = 255)
   private String hashedPassword;
+  /**
+   * User's number of sign attempts since last success.
+   */
+  @Column
   private int signAttempts;
+  /**
+   * User's last sign attempt.
+   */
+  @Column
   private Instant lastSignAttempt;
+  /**
+   * True if user is active.
+   * <p>
+   * Inactive user cannot access application.
+   * </p>
+   */
+  @Column
   private boolean active;
+  /**
+   * True if user is a manager of his lab.
+   */
+  @Column
   private boolean manager;
+  /**
+   * True if user's password is expired.
+   */
+  @Column
+  private boolean expiredPassword;
+  /**
+   * User's lab.
+   */
+  @ManyToOne
+  @JoinColumn(name = "laboratoryId")
   private Laboratory laboratory;
-  private Map<String, String> preferences;
+  /**
+   * User's prefered locale.
+   */
+  @Column
+  private Locale locale;
 
   @Override
   public String toString() {
@@ -58,11 +118,11 @@ public class User implements Data, Serializable {
   }
 
   @Override
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -138,11 +198,19 @@ public class User implements Data, Serializable {
     this.laboratory = laboratory;
   }
 
-  public Map<String, String> getPreferences() {
-    return preferences;
+  public Locale getLocale() {
+    return locale;
   }
 
-  public void setPreferences(Map<String, String> preferences) {
-    this.preferences = preferences;
+  public void setLocale(Locale locale) {
+    this.locale = locale;
+  }
+
+  public boolean isExpiredPassword() {
+    return expiredPassword;
+  }
+
+  public void setExpiredPassword(boolean expiredPassword) {
+    this.expiredPassword = expiredPassword;
   }
 }

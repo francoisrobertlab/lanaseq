@@ -49,7 +49,7 @@ public class UserDetailsServiceImplTest {
     UserDetails userDetails = userDetailsService.loadUserByUsername("francois.robert@ircm.qc.ca");
 
     assertEquals("francois.robert@ircm.qc.ca", userDetails.getUsername());
-    assertEquals(InitializeMongoExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     assertEquals(true, userDetails.isEnabled());
     assertEquals(true, userDetails.isAccountNonExpired());
     assertEquals(true, userDetails.isAccountNonLocked());
@@ -64,7 +64,7 @@ public class UserDetailsServiceImplTest {
     UserDetails userDetails = userDetailsService.loadUserByUsername("inactive.user@ircm.qc.ca");
 
     assertEquals("inactive.user@ircm.qc.ca", userDetails.getUsername());
-    assertEquals(InitializeMongoExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     assertEquals(false, userDetails.isEnabled());
     assertEquals(true, userDetails.isAccountNonExpired());
     assertEquals(true, userDetails.isAccountNonLocked());

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class SearchUtils {
-  public static <D extends Data> Optional<D> find(Collection<D> datas, String id) {
+  public static <D extends Data> Optional<D> find(Collection<D> datas, Long id) {
     return datas.stream().filter(data -> id.equals(data.getId())).findFirst();
   }
 

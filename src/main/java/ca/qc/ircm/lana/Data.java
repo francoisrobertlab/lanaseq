@@ -26,5 +26,5 @@ public interface Data {
    *
    * @return database identifier
    */
-  public String getId();
+  public Long getId();
 }

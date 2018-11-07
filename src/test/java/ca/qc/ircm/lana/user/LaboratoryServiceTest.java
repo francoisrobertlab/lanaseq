@@ -17,14 +17,11 @@
 
 package ca.qc.ircm.lana.user;
 
-import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
-import java.util.List;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,16 +42,16 @@ public class LaboratoryServiceTest {
 
   @Test
   public void get() {
-    Laboratory laboratory = laboratoryService.get("1");
+    Laboratory laboratory = laboratoryService.get(1L);
 
     assertNotNull(laboratory);
-    assertEquals("1", laboratory.getId());
+    assertEquals((Long) 1L, laboratory.getId());
     assertEquals("Chromatin and Genomic Expression", laboratory.getName());
   }
 
   @Test
   public void get_Invalid() {
-    Laboratory laboratory = laboratoryService.get("a");
+    Laboratory laboratory = laboratoryService.get(0L);
 
     assertNull(laboratory);
   }
@@ -64,14 +61,5 @@ public class LaboratoryServiceTest {
     Laboratory laboratory = laboratoryService.get(null);
 
     assertNull(laboratory);
-  }
-
-  @Test
-  public void all() {
-    List<Laboratory> laboratories = laboratoryService.all();
-
-    assertEquals(2, laboratories.size());
-    assertTrue(find(laboratories, "1").isPresent());
-    assertTrue(find(laboratories, "2").isPresent());
   }
 }

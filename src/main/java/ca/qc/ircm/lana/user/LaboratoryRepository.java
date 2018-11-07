@@ -17,10 +17,10 @@
 
 package ca.qc.ircm.lana.user;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Repository for {@link Laboratory}.
  */
-public interface LaboratoryRepository extends MongoRepository<Laboratory, String> {
+public interface LaboratoryRepository extends JpaRepository<Laboratory, Long> {
 }

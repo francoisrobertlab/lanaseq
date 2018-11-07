@@ -17,16 +17,21 @@
 
 package ca.qc.ircm.lana.user;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import ca.qc.ircm.lana.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.validation.constraints.Size;
 
 /**
  * Laboratory.
  */
-@Document(collection = "laboratory")
+@Entity
 @GeneratePropertyNames
 public class Laboratory implements Data, Serializable {
   private static final long serialVersionUID = -1289327816693718726L;
@@ -34,7 +39,11 @@ public class Laboratory implements Data, Serializable {
    * Database identifier.
    */
   @Id
-  private String id;
+  @Column(unique = true, nullable = false)
+  @GeneratedValue(strategy = IDENTITY)
+  private Long id;
+  @Column(nullable = false)
+  @Size(max = 255)
   private String name;
 
   @Override
@@ -43,11 +52,11 @@ public class Laboratory implements Data, Serializable {
   }
 
   @Override
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

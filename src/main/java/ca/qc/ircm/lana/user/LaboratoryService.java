@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lana.user;
 
-import java.util.List;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
@@ -43,20 +42,11 @@ public class LaboratoryService {
    *          laboratory's id
    * @return laboratory having specified id
    */
-  public Laboratory get(String id) {
+  public Laboratory get(Long id) {
     if (id == null) {
       return null;
     }
 
     return repository.findById(id).orElse(null);
-  }
-
-  /**
-   * Returns all laboratories.
-   *
-   * @return all laboratories
-   */
-  public List<Laboratory> all() {
-    return repository.findAll();
   }
 }

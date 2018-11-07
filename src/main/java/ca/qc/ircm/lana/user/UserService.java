@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.user;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 
-import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,7 +53,7 @@ public class UserService {
    *          user's id
    * @return user having specified id
    */
-  public User get(String id) {
+  public User get(Long id) {
     if (id == null) {
       return null;
     }
@@ -127,9 +126,6 @@ public class UserService {
     }
     if (password != null) {
       user.setHashedPassword(passwordEncoder.encode(password));
-    }
-    if (user.getPreferences() == null) {
-      user.setPreferences(new HashMap<>());
     }
     if (user.isManager()) {
       laboratoryRepository.save(user.getLaboratory());

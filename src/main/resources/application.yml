@@ -18,15 +18,15 @@
 spring:
   application:
     name: lana
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: lana
-
-admin:
-  name: ${spring.security.user.name:lana@ircm.qc.ca}
-  password: ${spring.security.user.password}
+  datasource:
+    platform: h2
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;IGNORECASE=TRUE
+    username: sa
+    password:
+    tomcat:
+      test-on-borrow: true
+      validationQuery: SELECT 1
 
 # Web server.
 server:
@@ -47,10 +47,6 @@ spring:
   data:
     mongodb:
       port: 0
-
-admin:
-  name: admin@ircm.qc.ca
-  password: password
 
 vaadin:
   productionMode: false

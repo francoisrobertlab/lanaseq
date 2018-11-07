@@ -26,13 +26,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lana.test.config.InitializeMongoExecutionListener;
+import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,14 +60,14 @@ public class UserServiceTest {
 
   @Test
   public void get() {
-    User user = userService.get("1");
+    User user = userService.get(1L);
 
     assertNotNull(user);
-    assertEquals("1", user.getId());
+    assertEquals((Long) 1L, user.getId());
     assertEquals("Lana Administrator", user.getName());
     assertEquals("lana@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.ADMIN, user.getRole());
-    assertEquals(InitializeMongoExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
     assertEquals(1, user.getSignAttempts());
     assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
@@ -77,13 +76,12 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertNull(user.getLaboratory());
-    assertNotNull(user.getPreferences());
-    assertTrue(user.getPreferences().isEmpty());
+    assertNull(user.getLocale());
   }
 
   @Test
   public void get_Invalid() {
-    User user = userService.get("a");
+    User user = userService.get(0L);
 
     assertNull(user);
   }
@@ -100,11 +98,11 @@ public class UserServiceTest {
     User user = userService.getByEmail("francois.robert@ircm.qc.ca");
 
     assertNotNull(user);
-    assertEquals("2", user.getId());
+    assertEquals((Long) 2L, user.getId());
     assertEquals("Francois Robert", user.getName());
     assertEquals("francois.robert@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.BIOLOGIST, user.getRole());
-    assertEquals(InitializeMongoExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
@@ -112,10 +110,8 @@ public class UserServiceTest {
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
-    assertEquals("1", user.getLaboratory().getId());
-    assertNotNull(user.getPreferences());
-    assertEquals(1, user.getPreferences().size());
-    assertEquals("en", user.getPreferences().get(User.LOCALE));
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
   @Test
@@ -137,11 +133,11 @@ public class UserServiceTest {
     List<User> users = userService.all();
 
     assertEquals(5, users.size());
-    assertTrue(find(users, "1").isPresent());
-    assertTrue(find(users, "2").isPresent());
-    assertTrue(find(users, "3").isPresent());
-    assertTrue(find(users, "4").isPresent());
-    assertTrue(find(users, "5").isPresent());
+    assertTrue(find(users, 1L).isPresent());
+    assertTrue(find(users, 2L).isPresent());
+    assertTrue(find(users, 3L).isPresent());
+    assertTrue(find(users, 4L).isPresent());
+    assertTrue(find(users, 5L).isPresent());
   }
 
   @Test
@@ -167,8 +163,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertNull(user.getLaboratory());
-    assertNotNull(user.getPreferences());
-    assertTrue(user.getPreferences().isEmpty());
+    assertNull(user.getLocale());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -177,7 +172,7 @@ public class UserServiceTest {
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setRole(UserRole.ADMIN);
-    user.setLaboratory(laboratoryRepository.findById("1").get());
+    user.setLaboratory(laboratoryRepository.findById(1L).get());
 
     userService.save(user, "password");
   }
@@ -199,10 +194,8 @@ public class UserServiceTest {
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setRole(UserRole.BIOLOGIST);
-    user.setLaboratory(laboratoryRepository.findById("1").get());
-    Map<String, String> preferences = new HashMap<>();
-    preferences.put(User.LOCALE, "en");
-    user.setPreferences(preferences);
+    user.setLaboratory(laboratoryRepository.findById(1L).get());
+    user.setLocale(Locale.ENGLISH);
 
     userService.save(user, "password");
 
@@ -220,10 +213,8 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertNotNull(user.getLaboratory());
-    assertEquals("1", user.getLaboratory().getId());
-    assertNotNull(user.getPreferences());
-    assertEquals(1, user.getPreferences().size());
-    assertEquals("en", user.getPreferences().get(User.LOCALE));
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -232,9 +223,7 @@ public class UserServiceTest {
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setRole(UserRole.BIOLOGIST);
-    Map<String, String> preferences = new HashMap<>();
-    preferences.put(User.LOCALE, "en");
-    user.setPreferences(preferences);
+    user.setLocale(Locale.ENGLISH);
 
     userService.save(user, "password");
   }
@@ -269,8 +258,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertNotNull(user.getLaboratory().getId());
     assertEquals("Test Lab", user.getLaboratory().getName());
-    assertNotNull(user.getPreferences());
-    assertTrue(user.getPreferences().isEmpty());
+    assertNull(user.getLocale());
   }
 
   @Test
@@ -279,10 +267,8 @@ public class UserServiceTest {
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setRole(UserRole.BIOLOGIST);
-    user.setLaboratory(laboratoryRepository.findById("1").get());
-    Map<String, String> preferences = new HashMap<>();
-    preferences.put(User.LOCALE, "en");
-    user.setPreferences(preferences);
+    user.setLaboratory(laboratoryRepository.findById(1L).get());
+    user.setLocale(Locale.ENGLISH);
 
     userService.save(user, null);
 
@@ -299,25 +285,21 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertNotNull(user.getLaboratory());
-    assertEquals("1", user.getLaboratory().getId());
-    assertNotNull(user.getPreferences());
-    assertEquals(1, user.getPreferences().size());
-    assertEquals("en", user.getPreferences().get(User.LOCALE));
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
   @Test
   public void save_Update() {
-    User user = userRepository.findById("3").get();
+    User user = userRepository.findById(3L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    Map<String, String> preferences = new HashMap<>();
-    preferences.put(User.LOCALE, "cn");
-    user.setPreferences(preferences);
+    user.setLocale(Locale.CHINESE);
 
     userService.save(user, "newpassword");
 
-    user = userRepository.findById("3").get();
-    assertEquals("3", user.getId());
+    user = userRepository.findById(3L).get();
+    assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.BIOLOGIST, user.getRole());
@@ -331,28 +313,24 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertNotNull(user.getLaboratory());
-    assertEquals("1", user.getLaboratory().getId());
-    assertNotNull(user.getPreferences());
-    assertEquals(1, user.getPreferences().size());
-    assertEquals("cn", user.getPreferences().get(User.LOCALE));
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals(Locale.CHINESE, user.getLocale());
   }
 
   @Test
   public void save_UpdateKeepPassword() {
-    User user = userRepository.findById("3").get();
+    User user = userRepository.findById(3L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    Map<String, String> preferences = new HashMap<>();
-    preferences.put(User.LOCALE, "cn");
-    user.setPreferences(preferences);
+    user.setLocale(Locale.CHINESE);
 
     userService.save(user, null);
 
-    assertEquals("3", user.getId());
+    assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.BIOLOGIST, user.getRole());
-    assertEquals(InitializeMongoExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
     assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
@@ -361,10 +339,8 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertNotNull(user.getLaboratory());
-    assertEquals("1", user.getLaboratory().getId());
-    assertNotNull(user.getPreferences());
-    assertEquals(1, user.getPreferences().size());
-    assertEquals("cn", user.getPreferences().get(User.LOCALE));
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals(Locale.CHINESE, user.getLocale());
   }
 
   @Test(expected = NullPointerException.class)

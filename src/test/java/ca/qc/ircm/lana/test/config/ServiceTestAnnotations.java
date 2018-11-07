@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @Target({ ElementType.TYPE })
@@ -33,8 +34,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(
-    value = { InitializeMongoExecutionListener.class },
+    value = { InitializeDatabaseExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql" })
 public @interface ServiceTestAnnotations {
 
 }
