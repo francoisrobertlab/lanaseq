@@ -11,6 +11,7 @@ import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ public class SpringDataUserDetailsServiceTest {
   private SpringDataUserDetailsService userDetailsService;
   @Mock
   private UserRepository userRepository;
+  @Mock
+  private SecurityConfiguration securityConfiguration;
   private User user;
 
   /**
@@ -40,7 +43,7 @@ public class SpringDataUserDetailsServiceTest {
    */
   @Before
   public void beforeTest() {
-    userDetailsService = new SpringDataUserDetailsService(userRepository);
+    userDetailsService = new SpringDataUserDetailsService(userRepository, securityConfiguration);
     user = new User();
     user.setId(2L);
     user.setEmail("lana@ircm.qc.ca");
@@ -49,6 +52,8 @@ public class SpringDataUserDetailsServiceTest {
     user.setHashedPassword(InitializeDatabaseExecutionListener.PASSWORD_PASS1);
     user.setActive(true);
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+    when(securityConfiguration.getLockAttemps()).thenReturn(5);
+    when(securityConfiguration.getLockDuration()).thenReturn(Duration.ofMinutes(3));
   }
 
   @Test

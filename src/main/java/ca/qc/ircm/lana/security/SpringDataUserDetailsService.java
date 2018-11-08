@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.security;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,16 +38,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class SpringDataUserDetailsService implements UserDetailsService {
   private static final Logger logger = LoggerFactory.getLogger(SpringDataUserDetailsService.class);
-  private static final int LOCK_ATTEMPS = 5;
-  private static final Duration LOCK_DURATION = Duration.ofMinutes(2);
   @Inject
   private UserRepository userRepository;
+  @Inject
+  private SecurityConfiguration securityConfiguration;
 
   protected SpringDataUserDetailsService() {
   }
 
-  protected SpringDataUserDetailsService(UserRepository userRepository) {
+  protected SpringDataUserDetailsService(UserRepository userRepository,
+      SecurityConfiguration securityConfiguration) {
     this.userRepository = userRepository;
+    this.securityConfiguration = securityConfiguration;
   }
 
   @Override
@@ -71,7 +72,8 @@ public class SpringDataUserDetailsService implements UserDetailsService {
   }
 
   private boolean accountLocked(User user) {
-    return user.getSignAttempts() % LOCK_ATTEMPS == 0 && user.getLastSignAttempt() != null
-        && user.getLastSignAttempt().plusMillis(LOCK_DURATION.toMillis()).isAfter(Instant.now());
+    return user.getSignAttempts() % securityConfiguration.getLockAttemps() == 0
+        && user.getLastSignAttempt() != null && user.getLastSignAttempt()
+            .plusMillis(securityConfiguration.getLockDuration().toMillis()).isAfter(Instant.now());
   }
 }

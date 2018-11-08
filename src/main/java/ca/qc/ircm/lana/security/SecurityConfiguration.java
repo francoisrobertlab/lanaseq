@@ -17,12 +17,36 @@
 
 package ca.qc.ircm.lana.security;
 
+import java.time.Duration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Security configuration.
  */
 @Configuration
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 public class SecurityConfiguration {
+  public static final String PREFIX = "security";
   public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
+  private int lockAttemps;
+  private Duration lockDuration;
+
+  public int getLockAttemps() {
+    return lockAttemps;
+  }
+
+  public void setLockAttemps(int lockAttemps) {
+    this.lockAttemps = lockAttemps;
+  }
+
+  public Duration getLockDuration() {
+    return lockDuration;
+  }
+
+  public void setLockDuration(Duration lockDuration) {
+    this.lockDuration = lockDuration;
+  }
 }

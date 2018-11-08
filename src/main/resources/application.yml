@@ -28,12 +28,17 @@ spring:
       test-on-borrow: true
       validationQuery: SELECT 1
 
+security:
+  lock-attemps: 5
+  lock-duration: PT3M
+
 # Web server.
 server:
   port: 8080
   servlet:
     session:
       persistent: false
+
 vaadin:
   productionMode: false
   closeIdleSessions: true
