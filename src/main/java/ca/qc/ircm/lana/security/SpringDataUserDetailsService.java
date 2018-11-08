@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lana.security;
 
-import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.Duration;
@@ -64,7 +63,7 @@ public class SpringDataUserDetailsService implements UserDetailsService {
       authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
       if (user.isExpiredPassword()) {
         authorities
-            .add(new SimpleGrantedAuthority(WebSecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE));
+            .add(new SimpleGrantedAuthority(SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE));
       }
       return new org.springframework.security.core.userdetails.User(user.getEmail(),
           user.getHashedPassword(), user.isActive(), true, true, !accountLocked(user), authorities);
