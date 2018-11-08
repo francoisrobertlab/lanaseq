@@ -55,6 +55,14 @@
         </p>
       </div>
     </template>
+    <template is="dom-if" if="[[locked]]">
+      <div class="error">
+        <iron-icon icon="vaadin:exclamation-circle-o" class="error__icon"></iron-icon>
+        <p class="error__text">
+          Your account has been locked. Try again in 5 minutes.
+        </p>
+      </div>
+    </template>
    </vaadin-vertical-layout>
   </form>
  </iron-form>
@@ -68,6 +76,10 @@
             static get properties() {
                 return {
                   error: {
+                    type: Boolean,
+                    value: false
+                  },
+                  locked: {
                     type: Boolean,
                     value: false
                   }

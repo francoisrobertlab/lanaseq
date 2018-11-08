@@ -52,7 +52,8 @@ public class SpringDataUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(email).orElse(null);
-    logger.debug("user {} signin-in, database user: {}", email, user);
+    logger.debug("user {} signin-in, locked: {}, database user: {}", email,
+        user != null ? accountLocked(user) : "false", user);
     if (null == user) {
       throw new UsernameNotFoundException("No user with email: " + email);
     } else {

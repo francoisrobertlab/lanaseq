@@ -18,16 +18,19 @@
 package ca.qc.ircm.lana.security;
 
 import ca.qc.ircm.lana.user.UserRole;
+import ca.qc.ircm.lana.user.web.SigninView;
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -37,6 +40,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -47,9 +52,10 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-  public static final String SIGNIN_PROCESSING_URL = "/signin";
-  private static final String SIGNIN_FAILURE_URL = "/signin?error";
-  private static final String SIGNIN_URL = "/signin";
+  public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
+  private static final String SIGNIN_DEFAULT_FAILURE_URL = SIGNIN_PROCESSING_URL + "?error";
+  private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?locked";
+  private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
   private static final String SIGNOUT_SUCCESS_URL = "/";
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
   @Inject
@@ -88,6 +94,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   /**
+   * Returns {@link AuthenticationFailureHandler}.
+   *
+   * @return {@link AuthenticationFailureHandler}
+   */
+  @Bean
+  public AuthenticationFailureHandler authenticationFailureHandler() {
+    final Map<String, String> failureUrlMap = new HashMap<>();
+    failureUrlMap.put(LockedException.class.getName(), SIGNIN_LOCKED_URL);
+    ExceptionMappingAuthenticationFailureHandler authenticationFailureHandler =
+        new ExceptionMappingAuthenticationFailureHandler();
+    authenticationFailureHandler.setDefaultFailureUrl(SIGNIN_DEFAULT_FAILURE_URL);
+    authenticationFailureHandler.setExceptionMappings(failureUrlMap);
+    return authenticationFailureHandler;
+  }
+
+  /**
    * Registers our UserDetailsService and the password encoder to be used on login attempts.
    */
   @Override
@@ -114,12 +136,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Allow all flow internal requests.
         .requestMatchers(SecurityConfiguration::isVaadinInternalRequest).permitAll()
 
+        // Allow all login failure URLs.
+        .regexMatchers(Pattern.quote(SIGNIN_DEFAULT_FAILURE_URL)).permitAll()
+        .regexMatchers(Pattern.quote(SIGNIN_LOCKED_URL)).permitAll()
+
         // Allow all requests by logged in users.
         .anyRequest().hasAnyAuthority(UserRole.roles())
 
         // Configure the login page.
         .and().formLogin().loginPage(SIGNIN_URL).permitAll()
-        .loginProcessingUrl(SIGNIN_PROCESSING_URL).failureUrl(SIGNIN_FAILURE_URL)
+        .loginProcessingUrl(SIGNIN_PROCESSING_URL).failureHandler(authenticationFailureHandler())
 
         // Register the success handler that redirects users to the page they last tried
         // to access

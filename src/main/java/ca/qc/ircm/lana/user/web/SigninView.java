@@ -74,6 +74,8 @@ public class SigninView extends PolymerTemplate<SigninView.SigninViewModel>
   public void afterNavigation(AfterNavigationEvent event) {
     boolean error = event.getLocation().getQueryParameters().getParameters().containsKey("error");
     getModel().setError(error);
+    boolean locked = event.getLocation().getQueryParameters().getParameters().containsKey("locked");
+    getModel().setLocked(locked);
   }
 
   /**
@@ -81,5 +83,7 @@ public class SigninView extends PolymerTemplate<SigninView.SigninViewModel>
    */
   public interface SigninViewModel extends TemplateModel {
     void setError(boolean error);
+
+    void setLocked(boolean locked);
   }
 }
