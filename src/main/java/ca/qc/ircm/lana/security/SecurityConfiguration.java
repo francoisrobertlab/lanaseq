@@ -52,6 +52,7 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+  public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   private static final String SIGNIN_DEFAULT_FAILURE_URL = SIGNIN_PROCESSING_URL + "?error";
   private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?locked";

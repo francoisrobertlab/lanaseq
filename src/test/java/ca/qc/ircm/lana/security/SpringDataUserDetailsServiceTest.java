@@ -13,7 +13,9 @@ import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,11 +102,14 @@ public class SpringDataUserDetailsServiceTest {
 
     assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
-    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(1, authorities.size());
-    GrantedAuthority authority = authorities.iterator().next();
+    List<? extends GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
+    assertEquals(2, authorities.size());
+    GrantedAuthority authority = authorities.get(0);
     assertTrue(authority instanceof SimpleGrantedAuthority);
     assertEquals(UserRole.BIOLOGIST.name(), authority.getAuthority());
+    authority = authorities.get(1);
+    assertTrue(authority instanceof SimpleGrantedAuthority);
+    assertEquals(SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE, authority.getAuthority());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());

@@ -21,10 +21,12 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -57,9 +59,14 @@ public class SpringDataUserDetailsService implements UserDetailsService {
     if (null == user) {
       throw new UsernameNotFoundException("No user with email: " + email);
     } else {
+      Collection<GrantedAuthority> authorities = new ArrayList<>();
+      authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
+      if (user.isExpiredPassword()) {
+        authorities
+            .add(new SimpleGrantedAuthority(SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE));
+      }
       return new org.springframework.security.core.userdetails.User(user.getEmail(),
-          user.getHashedPassword(), user.isActive(), true, true, !accountLocked(user),
-          Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())));
+          user.getHashedPassword(), user.isActive(), true, true, !accountLocked(user), authorities);
     }
   }
 
