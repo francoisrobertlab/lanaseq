@@ -17,27 +17,15 @@
 
 package ca.qc.ircm.lana.web;
 
-import ca.qc.ircm.lana.user.web.SigninView;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Redirect to {@link JobsView}.
+ * Main layout.
  */
-@Route(MainView.VIEW_NAME)
-public class MainView extends VerticalLayout {
-  public static final String VIEW_NAME = "";
+public class MainView extends VerticalLayout implements RouterLayout {
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
-
-  @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    getUI().ifPresent(ui -> ui.beforeClientResponse(this, context -> {
-      logger.debug("Redirect to {}", SigninView.class.getSimpleName());
-      getUI().get().navigate(SigninView.class);
-    }));
-  }
 }
