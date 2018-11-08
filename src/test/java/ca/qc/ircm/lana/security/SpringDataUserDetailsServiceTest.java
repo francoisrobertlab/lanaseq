@@ -107,7 +107,7 @@ public class SpringDataUserDetailsServiceTest {
     assertEquals(UserRole.BIOLOGIST.name(), authority.getAuthority());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
-    assertFalse(userDetails.isCredentialsNonExpired());
+    assertTrue(userDetails.isCredentialsNonExpired());
     assertTrue(userDetails.isAccountNonLocked());
   }
 

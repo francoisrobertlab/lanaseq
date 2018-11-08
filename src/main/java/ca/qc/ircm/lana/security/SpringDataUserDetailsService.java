@@ -58,8 +58,7 @@ public class SpringDataUserDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException("No user with email: " + email);
     } else {
       return new org.springframework.security.core.userdetails.User(user.getEmail(),
-          user.getHashedPassword(), user.isActive(), true, !user.isExpiredPassword(),
-          !accountLocked(user),
+          user.getHashedPassword(), user.isActive(), true, true, !accountLocked(user),
           Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())));
     }
   }
