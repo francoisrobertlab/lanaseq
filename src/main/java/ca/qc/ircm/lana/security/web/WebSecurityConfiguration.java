@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.security;
+package ca.qc.ircm.lana.security.web;
 
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.SigninView;
@@ -51,7 +51,7 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
  */
 @EnableWebSecurity
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   private static final String SIGNIN_DEFAULT_FAILURE_URL = SIGNIN_PROCESSING_URL + "?error";
@@ -135,7 +135,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and().authorizeRequests()
 
         // Allow all flow internal requests.
-        .requestMatchers(SecurityConfiguration::isVaadinInternalRequest).permitAll()
+        .requestMatchers(WebSecurityConfiguration::isVaadinInternalRequest).permitAll()
 
         // Allow all login failure URLs.
         .regexMatchers(Pattern.quote(SIGNIN_DEFAULT_FAILURE_URL)).permitAll()

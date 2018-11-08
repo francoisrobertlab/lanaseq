@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.security;
+package ca.qc.ircm.lana.security.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,11 +31,11 @@ class SkipVaadinRequestCache extends HttpSessionRequestCache {
    * If the method is considered an internal request from the framework, we skip saving it.
    * </p>
    *
-   * @see SecurityConfiguration#isVaadinInternalRequest(HttpServletRequest)
+   * @see WebSecurityConfiguration#isVaadinInternalRequest(HttpServletRequest)
    */
   @Override
   public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
-    if (!SecurityConfiguration.isVaadinInternalRequest(request)) {
+    if (!WebSecurityConfiguration.isVaadinInternalRequest(request)) {
       super.saveRequest(request, response);
     }
   }

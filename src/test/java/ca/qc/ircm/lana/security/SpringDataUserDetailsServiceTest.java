@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
@@ -109,7 +110,7 @@ public class SpringDataUserDetailsServiceTest {
     assertEquals(UserRole.BIOLOGIST.name(), authority.getAuthority());
     authority = authorities.get(1);
     assertTrue(authority instanceof SimpleGrantedAuthority);
-    assertEquals(SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE, authority.getAuthority());
+    assertEquals(WebSecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE, authority.getAuthority());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
