@@ -44,7 +44,7 @@
    <vaadin-vertical-layout theme="spacing">
     <vaadin-text-field id="username" label="Username" autofocus="true" required="true" name="username"></vaadin-text-field>
     <vaadin-password-field id="password" label="Password" required="true" name="password" on-keydown="_onPasswordKeydown"></vaadin-password-field>
-    <vaadin-button id="signin" theme="primary" on-tap="dosignin">
+    <vaadin-button id="signin" theme="primary" on-click="dosignin">
       Sign In 
     </vaadin-button>
     <template is="dom-if" if="[[error]]">
