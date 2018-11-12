@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lana.security;
 
-import ca.qc.ircm.lana.user.UserRepository;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.Realm;
@@ -31,26 +31,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ShiroConfiguration {
   @Inject
-  private UserRepository userRepository;
-  @Inject
-  private SecurityConfiguration securityConfiguration;
-  @Inject
-  private LdapConfiguration ldapConfiguration;
-
-  @Bean
-  public AuthenticationService authenticationService() {
-    return new AuthenticationService(userRepository, shiroLdapService(), securityConfiguration,
-        ldapConfiguration);
-  }
-
-  @Bean
-  public ShiroLdapService shiroLdapService() {
-    return new ShiroLdapService(ldapConfiguration);
-  }
+  private Provider<AuthenticationService> authenticationServiceProvider;
 
   @Bean
   public Realm realm() {
-    return new ShiroRealm(authenticationService());
+    return new ShiroRealm(authenticationServiceProvider.get());
   }
 
   @Bean

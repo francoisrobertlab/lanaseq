@@ -30,10 +30,12 @@ import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Services for LDAP (active directory).
  */
+@Component
 public class ShiroLdapService {
   private static final Logger logger = LoggerFactory.getLogger(ShiroLdapService.class);
   private final LdapConfiguration ldapConfiguration;
