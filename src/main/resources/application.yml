@@ -29,6 +29,7 @@ spring:
       validationQuery: SELECT 1
 
 security:
+  realmName: ${spring.application.name}
   cipherKey: '0x2c9bff536d5bb8ae5550c93cdadace1b'
   passwordStrength: 10
   maximumSignAttemps: 5

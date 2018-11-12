@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.security;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.Hex;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +38,6 @@ public class SecurityConfiguration {
   private int maximumSignAttemps;
   private long maximumSignAttempsDelay;
   private int disableSignAttemps;
-  @Value("spring.application.name")
   private String realmName;
 
   public String getRealmName() {
@@ -92,5 +90,9 @@ public class SecurityConfiguration {
 
   public void setDisableSignAttemps(int disableSignAttemps) {
     this.disableSignAttemps = disableSignAttemps;
+  }
+
+  public void setRealmName(String realmName) {
+    this.realmName = realmName;
   }
 }
