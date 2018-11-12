@@ -39,7 +39,6 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -76,7 +75,6 @@ import org.apache.shiro.subject.Subject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -628,21 +626,5 @@ public class AuthenticationServiceTest {
       }
     }
     return false;
-  }
-
-  @Test
-  public void encode() throws Throwable {
-    String hashedPassword = authenticationService.encode("password");
-    assertNotNull(hashedPassword);
-    assertTrue(BCrypt.checkpw("password", hashedPassword));
-
-    hashedPassword = authenticationService.encode("unit_test");
-    assertNotNull(hashedPassword);
-    assertTrue(BCrypt.checkpw("unit_test", hashedPassword));
-  }
-
-  @Test
-  public void encode_Null() throws Throwable {
-    assertNull(authenticationService.encode(null));
   }
 }

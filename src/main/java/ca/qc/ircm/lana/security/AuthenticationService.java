@@ -23,7 +23,6 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
@@ -63,17 +62,12 @@ public class AuthenticationService {
   private SecurityConfiguration securityConfiguration;
   @Inject
   private LdapConfiguration ldapConfiguration;
-  /**
-   * Used to generate salt for passwords.
-   */
-  private SecureRandom random = new SecureRandom();
 
   protected AuthenticationService() {
   }
 
-  protected AuthenticationService(UserRepository userRepository,
-      ShiroLdapService shiroLdapService, SecurityConfiguration securityConfiguration,
-      LdapConfiguration ldapConfiguration) {
+  protected AuthenticationService(UserRepository userRepository, ShiroLdapService shiroLdapService,
+      SecurityConfiguration securityConfiguration, LdapConfiguration ldapConfiguration) {
     this.userRepository = userRepository;
     this.shiroLdapService = shiroLdapService;
     this.securityConfiguration = securityConfiguration;
@@ -314,20 +308,5 @@ public class AuthenticationService {
 
   private String realmName() {
     return securityConfiguration.getRealmName();
-  }
-
-  /**
-   * Hashes password. This method should be used before inserting password into database.
-   *
-   * @param password
-   *          password as entered by user
-   * @return hashed password
-   */
-  public String encode(String password) {
-    if (password == null) {
-      return null;
-    }
-    String salt = BCrypt.gensalt(securityConfiguration.getPasswordStrength(), random);
-    return BCrypt.hashpw(password, salt);
   }
 }

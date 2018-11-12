@@ -17,9 +17,11 @@
 
 package ca.qc.ircm.lana.user;
 
-import ca.qc.ircm.lana.security.AuthenticationService;
+import ca.qc.ircm.lana.security.SecurityConfiguration;
+import java.security.SecureRandom;
 import java.util.List;
 import javax.inject.Inject;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,16 +36,20 @@ public class UserService {
   @Inject
   private LaboratoryRepository laboratoryRepository;
   @Inject
-  private AuthenticationService authenticationService;
+  private SecurityConfiguration securityConfiguration;
+  /**
+   * Used to generate salt for passwords.
+   */
+  private SecureRandom random = new SecureRandom();
 
   protected UserService() {
   }
 
   protected UserService(UserRepository repository, LaboratoryRepository laboratoryRepository,
-      AuthenticationService authenticationService) {
+      SecurityConfiguration securityConfiguration) {
     this.repository = repository;
     this.laboratoryRepository = laboratoryRepository;
-    this.authenticationService = authenticationService;
+    this.securityConfiguration = securityConfiguration;
   }
 
   /**
@@ -125,7 +131,9 @@ public class UserService {
       user.setActive(true);
     }
     if (password != null) {
-      user.setHashedPassword(authenticationService.encode(password));
+      String salt = BCrypt.gensalt(securityConfiguration.getPasswordStrength(), random);
+      String hashedPassword = BCrypt.hashpw(password, salt);
+      user.setHashedPassword(hashedPassword);
     }
     if (user.isManager()) {
       laboratoryRepository.save(user.getLaboratory());
