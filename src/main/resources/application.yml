@@ -39,7 +39,6 @@ ldap:
   base: dc=mycompany,dc=com
   user-dn-template: uid={0},ou=people,dc=mycompany,dc=com
   user-filter: uid={0}
-  id-attribute: uid
   mail-attribute: mail
 
 shiro:

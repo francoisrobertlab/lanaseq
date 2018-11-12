@@ -45,7 +45,6 @@ public class LdapConfigurationTest {
     assertEquals("uid={0},ou=people,dc=mycompany,dc=com", ldapConfiguration.getUserDnTemplate());
     assertEquals("dc=mycompany,dc=com", ldapConfiguration.getBase());
     assertEquals("uid={0}", ldapConfiguration.getUserFilter());
-    assertEquals("uid", ldapConfiguration.getIdAttribute());
     assertEquals("mail", ldapConfiguration.getMailAttribute());
   }
 }

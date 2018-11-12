@@ -33,7 +33,6 @@ public class LdapConfiguration {
   private String base;
   private String userDnTemplate;
   private String userFilter;
-  private String idAttribute;
   private String mailAttribute;
 
   public boolean isEnabled() {
@@ -70,14 +69,6 @@ public class LdapConfiguration {
 
   public void setUserFilter(String userFilter) {
     this.userFilter = userFilter;
-  }
-
-  public String getIdAttribute() {
-    return idAttribute;
-  }
-
-  public void setIdAttribute(String idAttribute) {
-    this.idAttribute = idAttribute;
   }
 
   public String getMailAttribute() {
