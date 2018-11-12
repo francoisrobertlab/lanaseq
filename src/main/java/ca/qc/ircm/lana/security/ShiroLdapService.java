@@ -65,7 +65,7 @@ public class ShiroLdapService {
     String usernameWithDomain = usernameWithDomain(username);
     JndiLdapContextFactory ldapContextFactory = new JndiLdapContextFactory();
     ldapContextFactory.setUrl(ldapConfiguration.getUrl());
-    logger.debug("create ldap context for user {} with url {}", usernameWithDomain,
+    logger.trace("create ldap context for user {} with url {}", usernameWithDomain,
         ldapConfiguration.getUrl());
     return ldapContextFactory.getLdapContext((Object) usernameWithDomain, password);
   }
