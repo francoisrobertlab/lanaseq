@@ -550,19 +550,19 @@ public class AuthenticationServiceTest {
   }
 
   @Test
-  public void getAuthorizationInfo_4() {
+  public void getAuthorizationInfo_5() {
     AuthorizationInfo authorization =
-        authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(4L, realmName));
+        authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(5L, realmName));
 
     assertEquals(true, authorization.getRoles().contains(BIOLOGIST.name()));
     assertEquals(false, authorization.getRoles().contains(MANAGER));
     assertEquals(false, authorization.getRoles().contains(ADMIN.name()));
     assertEquals(true,
-        implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:4")));
+        implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:5")));
     assertEquals(true,
-        implies(authorization.getObjectPermissions(), new WildcardPermission("user:write:4")));
+        implies(authorization.getObjectPermissions(), new WildcardPermission("user:write:5")));
     assertEquals(true, implies(authorization.getObjectPermissions(),
-        new WildcardPermission("user:write_password:4")));
+        new WildcardPermission("user:write_password:5")));
     assertEquals(false,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:10")));
     assertEquals(false,
@@ -584,7 +584,7 @@ public class AuthenticationServiceTest {
   @Test
   public void getAuthorizationInfo_Inactive() {
     AuthorizationInfo authorization =
-        authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(5L, realmName));
+        authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(6L, realmName));
 
     assertEquals(false, authorization.getRoles().contains(BIOLOGIST.name()));
     assertEquals(false, authorization.getRoles().contains(MANAGER));

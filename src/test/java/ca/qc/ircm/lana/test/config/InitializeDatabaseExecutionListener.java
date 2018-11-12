@@ -113,7 +113,7 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setLaboratory(lab);
     userRepository.save(user);
     user = new User();
-    user.setId(4L);
+    user.setId(5L);
     user.setName("Christian Poitras");
     user.setEmail("christian.poitras@ircm.qc.ca");
     user.setRole(UserRole.BIOLOGIST);
@@ -124,7 +124,7 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setLaboratory(lab);
     userRepository.save(user);
     user = new User();
-    user.setId(5L);
+    user.setId(6L);
     user.setName("Inactive User");
     user.setEmail("inactive.user@ircm.qc.ca");
     user.setRole(UserRole.BIOLOGIST);

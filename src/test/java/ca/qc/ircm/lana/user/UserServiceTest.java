@@ -132,12 +132,13 @@ public class UserServiceTest {
   public void all() {
     List<User> users = userService.all();
 
-    assertEquals(5, users.size());
+    assertEquals(6, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
     assertTrue(find(users, 4L).isPresent());
     assertTrue(find(users, 5L).isPresent());
+    assertTrue(find(users, 6L).isPresent());
   }
 
   @Test
