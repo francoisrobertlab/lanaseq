@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.security;
 
 import java.text.MessageFormat;
 import java.util.Collection;
-import javax.inject.Inject;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -31,19 +30,13 @@ import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * Services for LDAP (active directory).
  */
-@Component
 public class ShiroLdapService {
   private static final Logger logger = LoggerFactory.getLogger(ShiroLdapService.class);
-  @Inject
-  private LdapConfiguration ldapConfiguration;
-
-  protected ShiroLdapService() {
-  }
+  private final LdapConfiguration ldapConfiguration;
 
   public ShiroLdapService(LdapConfiguration ldapConfiguration) {
     this.ldapConfiguration = ldapConfiguration;

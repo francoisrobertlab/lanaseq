@@ -86,7 +86,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ServiceTestAnnotations
 public class AuthenticationServiceTest {
   private static final String MANAGER = "MANAGER";
-  private AuthenticationServiceImpl authenticationService;
+  private AuthenticationService authenticationService;
   @Inject
   private UserRepository userRepository;
   @Mock
@@ -111,7 +111,7 @@ public class AuthenticationServiceTest {
    */
   @Before
   public void beforeTest() {
-    authenticationService = new AuthenticationServiceImpl(userRepository, shiroLdapService,
+    authenticationService = new AuthenticationService(userRepository, shiroLdapService,
         securityConfiguration, ldapConfiguration);
     when(securityConfiguration.getPasswordStrength()).thenReturn(passwordStrength);
     when(securityConfiguration.getRealmName()).thenReturn(realmName);
