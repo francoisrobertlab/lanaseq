@@ -21,7 +21,6 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import ca.qc.ircm.lana.user.UserRole;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
@@ -62,11 +61,11 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setId(1L);
     user.setName("Lana Administrator");
     user.setEmail("lana@ircm.qc.ca");
-    user.setRole(UserRole.ADMIN);
     user.setHashedPassword(PASSWORD_PASS2);
     user.setSignAttempts(1);
     user.setLastSignAttempt(Instant.now().minus(4, ChronoUnit.DAYS));
     user.setActive(true);
+    user.setAdmin(true);
     userRepository.save(user);
     Laboratory lab = new Laboratory();
     lab.setId(1L);
@@ -76,7 +75,6 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setId(2L);
     user.setName("Francois Robert");
     user.setEmail("francois.robert@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setHashedPassword(PASSWORD_PASS1);
     user.setSignAttempts(0);
     user.setLastSignAttempt(Instant.now().minus(2, ChronoUnit.HOURS));
@@ -89,7 +87,6 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setId(3L);
     user.setName("Jonh Smith");
     user.setEmail("jonh.smith@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setHashedPassword(PASSWORD_PASS1);
     user.setSignAttempts(2);
     user.setLastSignAttempt(Instant.now().minus(10, ChronoUnit.DAYS));
@@ -104,7 +101,6 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setId(4L);
     user.setName("Benoit Coulombe");
     user.setEmail("benoit.coulombe@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setHashedPassword(PASSWORD_PASS1);
     user.setActive(true);
     user.setManager(true);
@@ -116,7 +112,6 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setId(5L);
     user.setName("Christian Poitras");
     user.setEmail("christian.poitras@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setHashedPassword(PASSWORD_PASS1);
     user.setSignAttempts(3);
     user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.MINUTES));
@@ -127,7 +122,6 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setId(6L);
     user.setName("Inactive User");
     user.setEmail("inactive.user@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setHashedPassword(PASSWORD_PASS1);
     user.setSignAttempts(3);
     user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.MINUTES));

@@ -18,6 +18,8 @@
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
@@ -121,9 +123,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     if (user == null) {
       throw new NullPointerException("user cannot be null");
     }
-    getSubject().checkRole(ADMIN.name());
+    getSubject().checkRole(ADMIN);
     user = getUser(user.getId()).orElse(null);
-    if (user.getRole() == ADMIN) {
+    if (user.isAdmin()) {
       throw new UnauthorizedException("Cannot run as an admin user");
     }
 
@@ -226,17 +228,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       authorization.setObjectPermissions(new HashSet<>());
       return authorization;
     } else {
-      authorization.setRoles(selectRoles(user, user.isManager()));
-      authorization.setObjectPermissions(selectPermissions(user, user.isManager()));
+      authorization.setRoles(selectRoles(user));
+      authorization.setObjectPermissions(selectPermissions(user));
       return authorization;
     }
   }
 
-  private Set<String> selectRoles(User user, boolean manager) {
+  private Set<String> selectRoles(User user) {
     Set<String> roles = new HashSet<>();
-    roles.add(user.getRole().name());
-    if (manager) {
-      roles.add("MANAGER");
+    roles.add(USER);
+    if (user.isManager()) {
+      roles.add(MANAGER);
+    }
+    if (user.isAdmin()) {
+      roles.add(ADMIN);
     }
 
     Set<String> lowerUpperRoles = new HashSet<>();
@@ -248,18 +253,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return lowerUpperRoles;
   }
 
-  private Set<Permission> selectPermissions(User user, boolean manager) {
+  private Set<Permission> selectPermissions(User user) {
     Set<Permission> permissions = new HashSet<>();
 
     permissions.add(new WildcardPermission("user:*:" + user.getId()));
     if (user.getLaboratory() != null) {
       permissions.add(new WildcardPermission("laboratory:read:" + user.getLaboratory().getId()));
-      if (manager) {
+      if (user.isManager()) {
         permissions
             .add(new WildcardPermission("laboratory:manager:" + user.getLaboratory().getId()));
       }
     }
-    if (user.getRole() == ADMIN) {
+    if (user.isAdmin()) {
       permissions.add(new WildcardPermission("*"));
     }
     logger.trace("User {} has permissions {}", user, permissions);

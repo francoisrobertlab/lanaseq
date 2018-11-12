@@ -35,7 +35,7 @@
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.BIOLOGIST;
+import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -197,7 +197,7 @@ public class AuthenticationServiceTest {
 
     authenticationService.runAs(user);
 
-    verify(subject).checkRole(UserRole.ADMIN.name());
+    verify(subject).checkRole(UserRole.ADMIN);
     verify(subject).runAs(principalCollectionCaptor.capture());
     PrincipalCollection principalCollection = principalCollectionCaptor.getValue();
     assertEquals(user.getId(), principalCollection.getPrimaryPrincipal());
@@ -490,9 +490,9 @@ public class AuthenticationServiceTest {
     AuthorizationInfo authorization =
         authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(2L, realmName));
 
-    assertEquals(true, authorization.getRoles().contains(BIOLOGIST.name()));
+    assertEquals(true, authorization.getRoles().contains(USER));
     assertEquals(true, authorization.getRoles().contains(MANAGER));
-    assertEquals(false, authorization.getRoles().contains(ADMIN.name()));
+    assertEquals(false, authorization.getRoles().contains(ADMIN));
     assertEquals(true,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:2")));
     assertEquals(true,
@@ -522,9 +522,9 @@ public class AuthenticationServiceTest {
     AuthorizationInfo authorization =
         authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(1L, realmName));
 
-    assertEquals(false, authorization.getRoles().contains(BIOLOGIST.name()));
+    assertEquals(true, authorization.getRoles().contains(USER));
     assertEquals(false, authorization.getRoles().contains(MANAGER));
-    assertEquals(true, authorization.getRoles().contains(ADMIN.name()));
+    assertEquals(true, authorization.getRoles().contains(ADMIN));
     assertEquals(true,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:1")));
     assertEquals(true,
@@ -554,9 +554,9 @@ public class AuthenticationServiceTest {
     AuthorizationInfo authorization =
         authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(5L, realmName));
 
-    assertEquals(true, authorization.getRoles().contains(BIOLOGIST.name()));
+    assertEquals(true, authorization.getRoles().contains(USER));
     assertEquals(false, authorization.getRoles().contains(MANAGER));
-    assertEquals(false, authorization.getRoles().contains(ADMIN.name()));
+    assertEquals(false, authorization.getRoles().contains(ADMIN));
     assertEquals(true,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:5")));
     assertEquals(true,
@@ -586,9 +586,9 @@ public class AuthenticationServiceTest {
     AuthorizationInfo authorization =
         authenticationService.getAuthorizationInfo(new SimplePrincipalCollection(6L, realmName));
 
-    assertEquals(false, authorization.getRoles().contains(BIOLOGIST.name()));
+    assertEquals(false, authorization.getRoles().contains(USER));
     assertEquals(false, authorization.getRoles().contains(MANAGER));
-    assertEquals(false, authorization.getRoles().contains(ADMIN.name()));
+    assertEquals(false, authorization.getRoles().contains(ADMIN));
     assertEquals(false,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:12")));
     assertEquals(false,

@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lana.user;
 
-import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lana.Data;
@@ -27,7 +26,6 @@ import java.time.Instant;
 import java.util.Locale;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -61,12 +59,6 @@ public class User implements Data, Serializable {
   @Size(max = 255)
   private String name;
   /**
-   * User's role.
-   */
-  @Column(nullable = false)
-  @Enumerated(STRING)
-  private UserRole role;
-  /**
    * User's hashed password.
    */
   @Column
@@ -95,6 +87,11 @@ public class User implements Data, Serializable {
    */
   @Column
   private boolean manager;
+  /**
+   * True if user is an administrator.
+   */
+  @Column
+  private boolean admin;
   /**
    * True if user's password is expired.
    */
@@ -147,14 +144,6 @@ public class User implements Data, Serializable {
 
   public void setEmail(String email) {
     this.email = email;
-  }
-
-  public UserRole getRole() {
-    return role;
-  }
-
-  public void setRole(UserRole role) {
-    this.role = role;
   }
 
   public String getHashedPassword() {
@@ -219,5 +208,13 @@ public class User implements Data, Serializable {
 
   public void setExpiredPassword(boolean expiredPassword) {
     this.expiredPassword = expiredPassword;
+  }
+
+  public boolean isAdmin() {
+    return admin;
+  }
+
+  public void setAdmin(boolean admin) {
+    this.admin = admin;
   }
 }

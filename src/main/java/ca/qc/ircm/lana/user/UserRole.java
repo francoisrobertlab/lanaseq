@@ -20,24 +20,8 @@ package ca.qc.ircm.lana.user;
 /**
  * User roles.
  */
-public enum UserRole {
-  ADMIN, BIOLOGIST;
-
-  private static String[] ROLES_AS_STRING;
-  static {
-    UserRole[] roles = UserRole.values();
-    ROLES_AS_STRING = new String[UserRole.values().length];
-    for (int i = 0; i < roles.length; i++) {
-      ROLES_AS_STRING[i] = roles[i].name();
-    }
-  }
-
-  /**
-   * Returns roles as a string array.
-   *
-   * @return roles as a string array
-   */
-  public static String[] roles() {
-    return ROLES_AS_STRING.clone();
-  }
+public interface UserRole {
+  public static final String USER = "USER";
+  public static final String MANAGER = "MANAGER";
+  public static final String ADMIN = "ADMIN";
 }

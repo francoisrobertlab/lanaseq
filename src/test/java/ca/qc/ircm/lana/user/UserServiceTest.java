@@ -66,7 +66,6 @@ public class UserServiceTest {
     assertEquals((Long) 1L, user.getId());
     assertEquals("Lana Administrator", user.getName());
     assertEquals("lana@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.ADMIN, user.getRole());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
     assertEquals(1, user.getSignAttempts());
     assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
@@ -75,6 +74,7 @@ public class UserServiceTest {
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
+    assertEquals(true, user.isAdmin());
     assertNull(user.getLaboratory());
     assertNull(user.getLocale());
   }
@@ -101,7 +101,6 @@ public class UserServiceTest {
     assertEquals((Long) 2L, user.getId());
     assertEquals("Francois Robert", user.getName());
     assertEquals("francois.robert@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.BIOLOGIST, user.getRole());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS)
@@ -110,6 +109,7 @@ public class UserServiceTest {
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
+    assertEquals(false, user.isAdmin());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
   }
@@ -146,7 +146,7 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.ADMIN);
+    user.setAdmin(true);
 
     userService.save(user, "password");
 
@@ -156,13 +156,13 @@ public class UserServiceTest {
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.ADMIN, user.getRole());
     verify(authenticationService).encode("password");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
+    assertEquals(true, user.isAdmin());
     assertNull(user.getLaboratory());
     assertNull(user.getLocale());
   }
@@ -172,7 +172,7 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.ADMIN);
+    user.setAdmin(true);
     user.setLaboratory(laboratoryRepository.findById(1L).get());
 
     userService.save(user, "password");
@@ -183,7 +183,7 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.ADMIN);
+    user.setAdmin(true);
     user.setManager(true);
 
     userService.save(user, "password");
@@ -194,7 +194,6 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setLaboratory(laboratoryRepository.findById(1L).get());
     user.setLocale(Locale.ENGLISH);
 
@@ -206,13 +205,13 @@ public class UserServiceTest {
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.BIOLOGIST, user.getRole());
     verify(authenticationService).encode("password");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
@@ -223,7 +222,6 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setLocale(Locale.ENGLISH);
 
     userService.save(user, "password");
@@ -234,7 +232,6 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setManager(true);
     Laboratory laboratory = new Laboratory();
     laboratory.setName("Test Lab");
@@ -249,13 +246,13 @@ public class UserServiceTest {
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.BIOLOGIST, user.getRole());
     verify(authenticationService).encode("password");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
+    assertEquals(false, user.isAdmin());
     assertNotNull(user.getLaboratory());
     assertNotNull(user.getLaboratory().getId());
     assertEquals("Test Lab", user.getLaboratory().getName());
@@ -267,7 +264,6 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setRole(UserRole.BIOLOGIST);
     user.setLaboratory(laboratoryRepository.findById(1L).get());
     user.setLocale(Locale.ENGLISH);
 
@@ -279,12 +275,12 @@ public class UserServiceTest {
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.BIOLOGIST, user.getRole());
     assertNull(user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
@@ -303,7 +299,6 @@ public class UserServiceTest {
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.BIOLOGIST, user.getRole());
     verify(authenticationService).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
@@ -313,6 +308,7 @@ public class UserServiceTest {
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
@@ -330,7 +326,6 @@ public class UserServiceTest {
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
-    assertEquals(UserRole.BIOLOGIST, user.getRole());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
     assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
@@ -339,6 +334,7 @@ public class UserServiceTest {
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());

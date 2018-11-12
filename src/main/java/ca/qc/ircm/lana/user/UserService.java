@@ -17,8 +17,6 @@
 
 package ca.qc.ircm.lana.user;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-
 import ca.qc.ircm.lana.security.AuthenticationService;
 import java.util.List;
 import javax.inject.Inject;
@@ -105,7 +103,7 @@ public class UserService {
    *          user's unhashed password, can be null to keep previous password
    */
   public void save(User user, String password) {
-    if (user.getRole() == ADMIN) {
+    if (user.isAdmin()) {
       if (user.getLaboratory() != null) {
         throw new IllegalArgumentException("administrators cannot be in a laboratory");
       }
