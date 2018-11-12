@@ -37,10 +37,3 @@ CREATE TABLE IF NOT EXISTS user (
   UNIQUE KEY email (email),
   CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
 );
-CREATE TABLE persistent_logins (
-  username varchar(255) NOT NULL,
-  series varchar(64) NOT NULL,
-  token varchar(64) NOT NULL,
-  last_used timestamp NOT NULL,
-  PRIMARY KEY (series)
-);
