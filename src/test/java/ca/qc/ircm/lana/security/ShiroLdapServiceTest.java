@@ -20,12 +20,14 @@ package ca.qc.ircm.lana.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @NonTransactionalTestAnnotations
 public class ShiroLdapServiceTest {
   private ShiroLdapService ldapService;
-  @Inject
+  @Mock
   private LdapConfiguration ldapConfiguration;
   @Inject
   private LdapTemplate ldapTemplate;
@@ -42,22 +44,26 @@ public class ShiroLdapServiceTest {
   @Before
   public void beforeTest() {
     LdapContextSource contextSource = (LdapContextSource) ldapTemplate.getContextSource();
-    ldapConfiguration.setUrl(contextSource.getUrls()[0]);
     ldapService = new ShiroLdapService(ldapConfiguration);
+    when(ldapConfiguration.getUrl()).thenReturn(contextSource.getUrls()[0]);
+    when(ldapConfiguration.getBase()).thenReturn("dc=mycompany,dc=com");
+    when(ldapConfiguration.getUserDnTemplate()).thenReturn("uid={0},ou=people,dc=mycompany,dc=com");
+    when(ldapConfiguration.getUserFilter()).thenReturn("uid={0}");
+    when(ldapConfiguration.getMailAttribute()).thenReturn("mail");
   }
 
   @Test
-  public void isPasswordValid_True() {
+  public void isPasswordValid_Username_True() {
     assertTrue(ldapService.isPasswordValid("robertf", "secret"));
   }
 
   @Test
-  public void isPasswordValid_InvalidUser() {
+  public void isPasswordValid_Username_InvalidUser() {
     assertFalse(ldapService.isPasswordValid("invalid", "secret"));
   }
 
   @Test
-  public void isPasswordValid_InvalidPassword() {
+  public void isPasswordValid_Username_InvalidPassword() {
     assertFalse(ldapService.isPasswordValid("robertf", "secret2"));
   }
 
