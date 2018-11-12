@@ -36,9 +36,15 @@ import org.springframework.test.context.TestContext;
 public class InitializeDatabaseExecutionListener extends InjectIntoTestExecutionListener {
   private static final Logger logger =
       LoggerFactory.getLogger(InitializeDatabaseExecutionListener.class);
+  /**
+   * Matches pass1.
+   */
   @SuppressWarnings("checkstyle:linelength")
   public static final String PASSWORD_PASS1 =
       "$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq";
+  /**
+   * Matches pass2.
+   */
   @SuppressWarnings("checkstyle:linelength")
   public static final String PASSWORD_PASS2 =
       "$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu";

@@ -17,41 +17,35 @@
 
 package ca.qc.ircm.lana.security;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import javax.inject.Inject;
-import org.apache.shiro.codec.Base64;
-import org.apache.shiro.codec.Hex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
-public class SecurityConfigurationTest {
+public class LdapConfigurationTest {
   @Inject
-  private SecurityConfiguration securityConfiguration;
-  @Value("spring.application.name")
-  private String realmName;
+  private LdapConfiguration ldapConfiguration;
+  @Inject
+  private LdapTemplate ldapTemplate;
 
   @Test
   public void defaultProperties() throws Throwable {
-    assertArrayEquals(Hex.decode("2c9bff536d5bb8ae5550c93cdadace1b"),
-        securityConfiguration.getCipherKeyBytes());
-    assertEquals(realmName, securityConfiguration.getRealmName());
-    assertEquals(10, securityConfiguration.getPasswordStrength());
-    assertEquals(5, securityConfiguration.getMaximumSignAttemps());
-    assertEquals(300000, securityConfiguration.getMaximumSignAttempsDelay());
-    assertEquals(15, securityConfiguration.getDisableSignAttemps());
-  }
-
-  @Test
-  public void base64CipherKey() throws Throwable {
-    securityConfiguration.setCipherKey("AcEG7RqLxcP6enoSBJKNjA==");
-    assertArrayEquals(Base64.decode("AcEG7RqLxcP6enoSBJKNjA=="),
-        securityConfiguration.getCipherKeyBytes());
+    LdapContextSource contextSource = (LdapContextSource) ldapTemplate.getContextSource();
+    ldapConfiguration.setUrl(contextSource.getUrls()[0]);
+    assertTrue(ldapConfiguration.isEnabled());
+    assertEquals(contextSource.getUrls()[0], ldapConfiguration.getUrl());
+    assertEquals("uid={0},ou=people,dc=mycompany,dc=com", ldapConfiguration.getUserDnTemplate());
+    assertEquals("dc=mycompany,dc=com", ldapConfiguration.getBase());
+    assertEquals("uid={0}", ldapConfiguration.getUserFilter());
+    assertEquals("uid", ldapConfiguration.getIdAttribute());
+    assertEquals("mail", ldapConfiguration.getMailAttribute());
   }
 }

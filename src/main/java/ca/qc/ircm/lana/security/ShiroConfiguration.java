@@ -15,23 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.security.web;
+package ca.qc.ircm.lana.security;
 
-import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
-import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
+import javax.inject.Inject;
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.realm.Realm;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Security configuration for Web.
+ * Shiro configuration.
  */
 @Configuration
-public class WebSecurityConfiguration {
+public class ShiroConfiguration {
+  @Inject
+  private AuthenticationService authenticationService;
+
   @Bean
-  public ShiroFilterChainDefinition shiroFilterChainDefinition() {
-    DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-    // Configured via annotations.
-    chainDefinition.addPathDefinition("/**", "anon");
-    return chainDefinition;
+  public Realm realm() {
+    return new ShiroRealm(authenticationService);
+  }
+
+  @Bean
+  protected CacheManager cacheManager() {
+    return new MemoryConstrainedCacheManager();
   }
 }

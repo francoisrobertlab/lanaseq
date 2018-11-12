@@ -1,0 +1,36 @@
+dn: dc=mycompany,dc=com
+objectclass: top
+objectclass: domain
+objectclass: extensibleObject
+dc: mycompany
+
+# Organizational Units
+dn: ou=groups,dc=mycompany,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=mycompany,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+# Create people
+dn: uid=robertf,ou=people,dc=mycompany,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Francois Robert
+sn: Francois
+uid: robertf
+mail: francois.robert@ircm.qc.ca
+userPassword: secret
+
+# Create Groups
+dn: cn=developers,ou=groups,dc=mycompany,dc=com
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: developers
+ou: developer
+uniqueMember: uid=poitrasc,ou=people,dc=mycompany,dc=com

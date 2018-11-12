@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.security.AuthenticationService;
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import java.time.Instant;
@@ -37,7 +38,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,13 +49,13 @@ public class UserServiceTest {
   @Inject
   private LaboratoryRepository laboratoryRepository;
   @Mock
-  private PasswordEncoder passwordEncoder;
+  private AuthenticationService authenticationService;
   private String hashedPassword = "hashedPassword for tests";
 
   @Before
   public void beforeTest() {
-    userService = new UserService(userRepository, laboratoryRepository, passwordEncoder);
-    when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
+    userService = new UserService(userRepository, laboratoryRepository, authenticationService);
+    when(authenticationService.encode(any())).thenReturn(hashedPassword);
   }
 
   @Test
@@ -156,7 +156,7 @@ public class UserServiceTest {
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.ADMIN, user.getRole());
-    verify(passwordEncoder).encode("password");
+    verify(authenticationService).encode("password");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
@@ -206,7 +206,7 @@ public class UserServiceTest {
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.BIOLOGIST, user.getRole());
-    verify(passwordEncoder).encode("password");
+    verify(authenticationService).encode("password");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
@@ -249,7 +249,7 @@ public class UserServiceTest {
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.BIOLOGIST, user.getRole());
-    verify(passwordEncoder).encode("password");
+    verify(authenticationService).encode("password");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
@@ -303,7 +303,7 @@ public class UserServiceTest {
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(UserRole.BIOLOGIST, user.getRole());
-    verify(passwordEncoder).encode("newpassword");
+    verify(authenticationService).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
     assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)

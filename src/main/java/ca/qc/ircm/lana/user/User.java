@@ -112,6 +112,13 @@ public class User implements Data, Serializable {
   @Column
   private Locale locale;
 
+  public User() {
+  }
+
+  public User(Long id) {
+    this.id = id;
+  }
+
   @Override
   public String toString() {
     return "User [id=" + id + ", email=" + email + "]";

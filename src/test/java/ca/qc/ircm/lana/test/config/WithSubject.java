@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+ * Copyright (c) 2006 Institut de recherches cliniques de Montreal (IRCM)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,20 +21,24 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestExecutionListeners.MergeMode;
-import org.springframework.test.context.web.WebAppConfiguration;
 
-@Target({ ElementType.TYPE })
+/**
+ * Allows to select another user than the default ones for a test.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest
-@ActiveProfiles("test")
-@WebAppConfiguration
-@TestExecutionListeners(
-    value = { ShiroTestExecutionListener.class },
-    mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
-public @interface NonTransactionalTestAnnotations {
+@Target({ ElementType.METHOD, ElementType.TYPE })
+public @interface WithSubject {
+  /**
+   * Returns user id.
+   *
+   * @return user id
+   */
+  public long userId() default 1L;
 
+  /**
+   * True to ignore user id and use an anonymous user.
+   *
+   * @return ignore user id and use an anonymous user
+   */
+  public boolean anonymous() default false;
 }

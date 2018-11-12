@@ -17,7 +17,9 @@
 
 package ca.qc.ircm.lana.security;
 
-import java.time.Duration;
+import org.apache.shiro.codec.Base64;
+import org.apache.shiro.codec.Hex;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -31,22 +33,64 @@ import org.springframework.context.annotation.Configuration;
 public class SecurityConfiguration {
   public static final String PREFIX = "security";
   public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
-  private int lockAttemps;
-  private Duration lockDuration;
+  private static final String HEX_BEGIN_TOKEN = "0x";
+  private String cipherKey;
+  private int passwordStrength;
+  private int maximumSignAttemps;
+  private long maximumSignAttempsDelay;
+  private int disableSignAttemps;
+  @Value("spring.application.name")
+  private String realmName;
 
-  public int getLockAttemps() {
-    return lockAttemps;
+  public String getRealmName() {
+    return realmName;
   }
 
-  public void setLockAttemps(int lockAttemps) {
-    this.lockAttemps = lockAttemps;
+  public String getCipherKey() {
+    return cipherKey;
   }
 
-  public Duration getLockDuration() {
-    return lockDuration;
+  public void setCipherKey(String cipherKey) {
+    this.cipherKey = cipherKey;
   }
 
-  public void setLockDuration(Duration lockDuration) {
-    this.lockDuration = lockDuration;
+  public byte[] getCipherKeyBytes() {
+    if (cipherKey.startsWith(HEX_BEGIN_TOKEN)) {
+      return Hex.decode(cipherKey.substring(HEX_BEGIN_TOKEN.length()));
+    } else {
+      return Base64.decode(cipherKey);
+    }
+  }
+
+  public int getPasswordStrength() {
+    return passwordStrength;
+  }
+
+  public void setPasswordStrength(int passwordStrength) {
+    this.passwordStrength = passwordStrength;
+  }
+
+  public int getMaximumSignAttemps() {
+    return maximumSignAttemps;
+  }
+
+  public void setMaximumSignAttemps(int maximumSignAttemps) {
+    this.maximumSignAttemps = maximumSignAttemps;
+  }
+
+  public long getMaximumSignAttempsDelay() {
+    return maximumSignAttempsDelay;
+  }
+
+  public void setMaximumSignAttempsDelay(long maximumSignAttempsDelay) {
+    this.maximumSignAttempsDelay = maximumSignAttempsDelay;
+  }
+
+  public int getDisableSignAttemps() {
+    return disableSignAttemps;
+  }
+
+  public void setDisableSignAttemps(int disableSignAttemps) {
+    this.disableSignAttemps = disableSignAttemps;
   }
 }

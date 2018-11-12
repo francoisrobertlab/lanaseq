@@ -19,9 +19,9 @@ package ca.qc.ircm.lana.user;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 
+import ca.qc.ircm.lana.security.AuthenticationService;
 import java.util.List;
 import javax.inject.Inject;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,16 +36,16 @@ public class UserService {
   @Inject
   private LaboratoryRepository laboratoryRepository;
   @Inject
-  private PasswordEncoder passwordEncoder;
+  private AuthenticationService authenticationService;
 
   protected UserService() {
   }
 
   protected UserService(UserRepository repository, LaboratoryRepository laboratoryRepository,
-      PasswordEncoder passwordEncoder) {
+      AuthenticationService authenticationService) {
     this.repository = repository;
     this.laboratoryRepository = laboratoryRepository;
-    this.passwordEncoder = passwordEncoder;
+    this.authenticationService = authenticationService;
   }
 
   /**
@@ -127,7 +127,7 @@ public class UserService {
       user.setActive(true);
     }
     if (password != null) {
-      user.setHashedPassword(passwordEncoder.encode(password));
+      user.setHashedPassword(authenticationService.encode(password));
     }
     if (user.isManager()) {
       laboratoryRepository.save(user.getLaboratory());
