@@ -18,6 +18,8 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
@@ -32,6 +34,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.templatemodel.TemplateModel;
 import javax.annotation.PostConstruct;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 
 /**
@@ -40,7 +43,8 @@ import javax.inject.Inject;
 @Tag("users-view")
 @HtmlImport("src/user/users-view.html")
 @Route(value = UsersView.VIEW_NAME, layout = MainView.class)
-@RouteAlias(value = "")
+@RouteAlias(value = "", layout = MainView.class)
+@RolesAllowed({ ADMIN, MANAGER })
 public class UsersView extends PolymerTemplate<UsersView.UsersViewModel> {
   public static final String VIEW_NAME = "users";
   private static final long serialVersionUID = 2568742367790329628L;

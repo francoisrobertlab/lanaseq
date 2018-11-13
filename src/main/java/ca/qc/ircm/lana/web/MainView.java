@@ -17,15 +17,37 @@
 
 package ca.qc.ircm.lana.web;
 
+import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.user.web.SigninView;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.RouterLayout;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Main layout.
  */
-public class MainView extends VerticalLayout implements RouterLayout {
+public class MainView extends VerticalLayout implements RouterLayout, BeforeEnterObserver {
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
+  @Inject
+  private AuthorizationService authorizationService;
+
+  @Override
+  public void beforeEnter(BeforeEnterEvent event) {
+    if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
+      if (authorizationService.isAnonymous()) {
+        event.rerouteTo(SigninView.class);
+      } else {
+        logger.info("User {} does not have access to {}", authorizationService.currentUser(),
+            event.getNavigationTarget());
+        // Reroute to error.
+        logger.warn("Access denied, but no access denied view");
+        //event.rerouteToError(AccessDeniedView.class);
+      }
+    }
+  }
 }
