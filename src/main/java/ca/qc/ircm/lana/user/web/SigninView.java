@@ -99,10 +99,11 @@ public class SigninView extends Composite<VerticalLayout>
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final MessageResource resources = new MessageResource(getClass(), getLocale());
+    final MessageResource userResources = new MessageResource(User.class, getLocale());
     final MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
     header.setText(resources.message(HEADER));
-    email.setLabel(resources.message(EMAIL));
-    password.setLabel(resources.message(PASSWORD));
+    email.setLabel(userResources.message(EMAIL));
+    password.setLabel(userResources.message(PASSWORD));
     signin.setText(resources.message(SIGNIN));
     binder.forField(email).asRequired(generalResources.message(REQUIRED))
         .withValidator(emailValidator(generalResources.message(INVALID_EMAIL))).bind(EMAIL);
