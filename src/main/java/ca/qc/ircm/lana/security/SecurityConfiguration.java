@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 public class SecurityConfiguration {
   public static final String PREFIX = "security";
-  public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
   private static final String HEX_BEGIN_TOKEN = "0x";
   private String cipherKey;
   private int passwordStrength;
@@ -54,7 +53,7 @@ public class SecurityConfiguration {
 
   /**
    * Returns cipher key as a byte array.
-   * 
+   *
    * @return cipher key as a byte array
    */
   public byte[] getCipherKeyBytes() {

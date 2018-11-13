@@ -18,6 +18,7 @@
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.CHANGE_PASSWORD;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
@@ -281,6 +282,9 @@ public class AuthenticationService {
     }
     if (user.isAdmin()) {
       roles.add(ADMIN);
+    }
+    if (user.isExpiredPassword()) {
+      roles.add(CHANGE_PASSWORD);
     }
 
     Set<String> lowerUpperRoles = new HashSet<>();

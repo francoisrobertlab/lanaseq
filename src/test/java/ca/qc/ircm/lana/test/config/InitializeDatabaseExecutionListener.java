@@ -115,6 +115,7 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
     user.setHashedPassword(PASSWORD_PASS1);
     user.setSignAttempts(3);
     user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.MINUTES));
+    user.setExpiredPassword(true);
     user.setActive(true);
     user.setLaboratory(lab);
     userRepository.save(user);

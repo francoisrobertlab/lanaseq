@@ -35,6 +35,7 @@
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.CHANGE_PASSWORD;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertArrayEquals;
@@ -491,6 +492,7 @@ public class AuthenticationServiceTest {
     assertEquals(true, authorization.getRoles().contains(USER));
     assertEquals(true, authorization.getRoles().contains(MANAGER));
     assertEquals(false, authorization.getRoles().contains(ADMIN));
+    assertEquals(false, authorization.getRoles().contains(CHANGE_PASSWORD));
     assertEquals(true,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:2")));
     assertEquals(true,
@@ -523,6 +525,7 @@ public class AuthenticationServiceTest {
     assertEquals(true, authorization.getRoles().contains(USER));
     assertEquals(false, authorization.getRoles().contains(MANAGER));
     assertEquals(true, authorization.getRoles().contains(ADMIN));
+    assertEquals(false, authorization.getRoles().contains(CHANGE_PASSWORD));
     assertEquals(true,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:1")));
     assertEquals(true,
@@ -555,6 +558,7 @@ public class AuthenticationServiceTest {
     assertEquals(true, authorization.getRoles().contains(USER));
     assertEquals(false, authorization.getRoles().contains(MANAGER));
     assertEquals(false, authorization.getRoles().contains(ADMIN));
+    assertEquals(true, authorization.getRoles().contains(CHANGE_PASSWORD));
     assertEquals(true,
         implies(authorization.getObjectPermissions(), new WildcardPermission("user:read:5")));
     assertEquals(true,
