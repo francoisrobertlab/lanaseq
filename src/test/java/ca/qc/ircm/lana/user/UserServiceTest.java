@@ -73,6 +73,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(true, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNull(user.getLaboratory());
     assertNull(user.getLocale());
   }
@@ -108,6 +109,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
     assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
   }
@@ -161,6 +163,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(true, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNull(user.getLaboratory());
     assertNull(user.getLocale());
   }
@@ -210,6 +213,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
@@ -251,6 +255,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
     assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
     assertNotNull(user.getLaboratory().getId());
     assertEquals("Test Lab", user.getLaboratory().getName());
@@ -279,6 +284,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
@@ -307,6 +313,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
@@ -333,6 +340,7 @@ public class UserServiceTest {
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
