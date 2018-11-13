@@ -52,6 +52,11 @@ public class SecurityConfiguration {
     this.cipherKey = cipherKey;
   }
 
+  /**
+   * Returns cipher key as a byte array.
+   * 
+   * @return cipher key as a byte array
+   */
   public byte[] getCipherKeyBytes() {
     if (cipherKey.startsWith(HEX_BEGIN_TOKEN)) {
       return Hex.decode(cipherKey.substring(HEX_BEGIN_TOKEN.length()));

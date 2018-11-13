@@ -41,6 +41,9 @@ public class ShiroLdapServiceTest {
   @Inject
   private LdapTemplate ldapTemplate;
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     LdapContextSource contextSource = (LdapContextSource) ldapTemplate.getContextSource();
