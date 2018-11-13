@@ -26,7 +26,6 @@ import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.Hex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -34,14 +33,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SecurityConfigurationTest {
   @Inject
   private SecurityConfiguration securityConfiguration;
-  @Value("spring.application.name")
-  private String realmName;
 
   @Test
   public void defaultProperties() throws Throwable {
     assertArrayEquals(Hex.decode("2c9bff536d5bb8ae5550c93cdadace1b"),
         securityConfiguration.getCipherKeyBytes());
-    assertEquals(realmName, securityConfiguration.getRealmName());
+    assertEquals("lana", securityConfiguration.getRealmName());
     assertEquals(10, securityConfiguration.getPasswordStrength());
     assertEquals(5, securityConfiguration.getMaximumSignAttemps());
     assertEquals(300000, securityConfiguration.getMaximumSignAttempsDelay());
