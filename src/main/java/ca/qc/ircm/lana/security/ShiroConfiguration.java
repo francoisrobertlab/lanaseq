@@ -18,9 +18,6 @@
 package ca.qc.ircm.lana.security;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.Realm;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,15 +28,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ShiroConfiguration {
   @Inject
-  private Provider<AuthenticationService> authenticationServiceProvider;
+  private AuthenticationService authenticationService;
 
   @Bean
   public Realm realm() {
-    return new ShiroRealm(authenticationServiceProvider.get());
-  }
-
-  @Bean
-  protected CacheManager cacheManager() {
-    return new MemoryConstrainedCacheManager();
+    return new ShiroRealm(authenticationService);
   }
 }

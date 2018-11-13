@@ -17,21 +17,27 @@
 
 package ca.qc.ircm.lana.security.web;
 
-import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
-import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
+import org.apache.shiro.web.servlet.ShiroFilter;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Security configuration for Web.
  */
 @Configuration
-public class WebSecurityConfiguration {
+public class WebSecurityConfiguration implements WebMvcConfigurer {
+  public static final String SHIRO_FILTER_NAME = "ShiroFilter";
+
+  @Bean(name = SHIRO_FILTER_NAME)
+  public ShiroFilter shiroFilter() {
+    return new ShiroFilter();
+  }
+
   @Bean
-  public ShiroFilterChainDefinition shiroFilterChainDefinition() {
-    DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-    // Configured via annotations.
-    chainDefinition.addPathDefinition("/**", "anon");
-    return chainDefinition;
+  public ServletListenerRegistrationBean<ShiroWebEnvironmentListener>
+      shiroWebEnvironmentListener() {
+    return new ServletListenerRegistrationBean<>(new ShiroWebEnvironmentListener());
   }
 }

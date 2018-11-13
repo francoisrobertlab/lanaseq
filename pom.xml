@@ -128,7 +128,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-spring-boot-web-starter</artifactId>
+      <artifactId>shiro-core</artifactId>
+      <version>${shiro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
       <version>${shiro.version}</version>
     </dependency>
     <dependency>
