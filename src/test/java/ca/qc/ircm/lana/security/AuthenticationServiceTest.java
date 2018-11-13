@@ -35,6 +35,7 @@
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -83,7 +84,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class AuthenticationServiceTest {
-  private static final String MANAGER = "MANAGER";
   private AuthenticationService authenticationService;
   @Inject
   private UserRepository userRepository;
@@ -327,12 +327,12 @@ public class AuthenticationServiceTest {
 
   @Test
   public void getAuthenticationInfo_NotTooManyAttempts() throws Throwable {
-    UsernamePasswordToken token = new UsernamePasswordToken("francois.robert@ircm.qc.ca", "pass1");
     User user = userRepository.findById(2L).orElse(null);
     user.setSignAttempts(maximumSignAttemps - 1);
     Instant lastSignAttempt = Instant.now();
     user.setLastSignAttempt(lastSignAttempt);
     userRepository.save(user);
+    UsernamePasswordToken token = new UsernamePasswordToken("francois.robert@ircm.qc.ca", "pass1");
 
     authenticationService.getAuthenticationInfo(token);
 
@@ -367,11 +367,11 @@ public class AuthenticationServiceTest {
 
   @Test
   public void getAuthenticationInfo_CanAttemptAgain_Success() throws Throwable {
-    UsernamePasswordToken token = new UsernamePasswordToken("francois.robert@ircm.qc.ca", "pass1");
     User user = userRepository.findById(2L).orElse(null);
     user.setSignAttempts(maximumSignAttemps);
     user.setLastSignAttempt(Instant.now().minusMillis(maximumSignAttempsDelay).minusMillis(10));
     userRepository.save(user);
+    UsernamePasswordToken token = new UsernamePasswordToken("francois.robert@ircm.qc.ca", "pass1");
 
     authenticationService.getAuthenticationInfo(token);
 
