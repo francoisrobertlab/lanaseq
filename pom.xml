@@ -200,15 +200,7 @@
         <directory>src/main/java</directory>
         <includes>
           <include>**/*.properties</include>
-          <include>**/*.html</include>
         </includes>
-      </resource>
-      <resource>
-        <directory>src/main/java</directory>
-        <includes>
-          <include>**/*.xml</include>
-        </includes>
-        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
@@ -219,7 +211,6 @@
         <directory>src/test/java</directory>
         <includes>
           <include>**/*.properties</include>
-          <include>**/*.xml</include>
         </includes>
       </testResource>
       <testResource>
