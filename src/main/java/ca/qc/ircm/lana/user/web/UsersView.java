@@ -18,21 +18,30 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
+import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.MainView;
-import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.dependency.HtmlImport;
+import ca.qc.ircm.lana.web.WebConstants;
+import ca.qc.ircm.lana.web.component.BaseComponent;
+import ca.qc.ircm.text.MessageResource;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.polymertemplate.Id;
-import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import com.vaadin.flow.templatemodel.TemplateModel;
+import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -40,37 +49,74 @@ import javax.inject.Inject;
 /**
  * Users view.
  */
-@Tag("users-view")
-@HtmlImport("src/user/users-view.html")
 @Route(value = UsersView.VIEW_NAME, layout = MainView.class)
 @RouteAlias(value = "", layout = MainView.class)
 @RolesAllowed({ ADMIN, MANAGER })
-public class UsersView extends PolymerTemplate<UsersView.UsersViewModel> {
+public class UsersView extends Composite<VerticalLayout>
+    implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
   public static final String VIEW_NAME = "users";
+  public static final String HEADER = "header";
+  public static final String USERS = "users";
   private static final long serialVersionUID = 2568742367790329628L;
-  @Id("h2")
-  private H2 h2;
-  @Id("users")
-  private Grid<User> users;
+  protected H2 header = new H2();
+  protected Grid<User> users = new Grid<>();
+  protected Column<User> email;
+  protected Column<User> laboratory;
   @Inject
-  private UserService userService;
+  private transient UsersViewPresenter presenter;
 
   /**
    * Creates a new UsersView.
    */
   public UsersView() {
-    users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL).setHeader("Email");
+    VerticalLayout root = getContent();
+    root.setId(VIEW_NAME);
+    root.add(header);
+    header.addClassName(HEADER);
+    root.add(users);
+    users.addClassName(USERS);
+  }
+
+  protected UsersView(UsersViewPresenter presenter) {
+    this();
+    this.presenter = presenter;
   }
 
   @PostConstruct
-  void init() {
-    users.setItems(userService.all());
+  void initUsers() {
+    users.setSelectionMode(SelectionMode.MULTI);
+    email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL);
+    laboratory =
+        users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
+            LABORATORY).setKey(LABORATORY);
   }
 
-  /**
-   * This model binds properties between UsersView and users-view.html
-   */
-  public interface UsersViewModel extends TemplateModel {
-    // Add setters and getters for template properties here.
+  @Override
+  public void localeChange(LocaleChangeEvent event) {
+    MessageResource resources = new MessageResource(UsersView.class, getLocale());
+    MessageResource userResources = new MessageResource(User.class, getLocale());
+    header.setText(resources.message(HEADER));
+    String emailHeader = userResources.message(EMAIL);
+    email.setHeader(emailHeader).setFooter(emailHeader);
+    String laboratoryHeader = userResources.message(LABORATORY);
+    laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
+  }
+
+  @Override
+  public String getPageTitle() {
+    MessageResource resources = new MessageResource(UsersView.class, getLocale());
+    MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
+    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+    presenter.init(this);
+  }
+
+  @Override
+  protected Locale getLocale() {
+    return super.getLocale();
   }
 }

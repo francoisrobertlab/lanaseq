@@ -23,6 +23,12 @@ import static org.mockito.Mockito.verify;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.Query;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -42,5 +48,22 @@ public class VaadinTestUtils {
     verify(button).addClickListener(clickListenerCaptor.capture());
     ComponentEventListener<ClickEvent<Button>> listener = clickListenerCaptor.getValue();
     listener.onComponentEvent(mock(ClickEvent.class));
+  }
+
+  /**
+   * Returns items in grid, unsorted and non-filtered.
+   *
+   * @param grid
+   *          grid
+   * @return items in grid, unsorted and non-filtered
+   */
+  @SuppressWarnings("unchecked")
+  public static <V> List<V> items(Grid<V> grid) {
+    if (grid.getDataProvider() instanceof ListDataProvider) {
+      return new ArrayList<>(((ListDataProvider<V>) grid.getDataProvider()).getItems());
+    } else {
+      return grid.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
+          .collect(Collectors.toList());
+    }
   }
 }
