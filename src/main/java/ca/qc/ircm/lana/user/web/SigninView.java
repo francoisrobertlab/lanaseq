@@ -17,8 +17,13 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
+import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
+import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.TITLE;
+
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserProperties;
+import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
@@ -31,6 +36,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -40,11 +46,9 @@ import javax.inject.Inject;
  */
 @Route(value = SigninView.VIEW_NAME)
 public class SigninView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, BaseComponent {
+    implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
   public static final String VIEW_NAME = "signin";
   public static final String HEADER = "header";
-  public static final String EMAIL = UserProperties.EMAIL;
-  public static final String PASSWORD = UserProperties.HASHED_PASSWORD;
   public static final String SIGNIN = "signin";
   public static final String FAIL = "fail";
   public static final String DISABLED = "disabled";
@@ -63,16 +67,22 @@ public class SigninView extends Composite<VerticalLayout>
    */
   public SigninView() {
     VerticalLayout root = getContent();
+    root.setId(VIEW_NAME);
     root.add(header);
-    header.setId(HEADER);
+    header.addClassName(HEADER);
     root.add(email);
-    email.setId(EMAIL);
+    email.addClassName(EMAIL);
     root.add(password);
-    password.setId(PASSWORD);
+    password.addClassName(HASHED_PASSWORD);
     root.add(signin);
-    signin.setId(SIGNIN);
+    signin.addClassName(SIGNIN);
     root.add(error);
-    error.setVisible(false);
+    error.addClassName(FAIL);
+  }
+
+  protected SigninView(SigninViewPresenter presenter) {
+    this();
+    this.presenter = presenter;
   }
 
   @Override
@@ -81,8 +91,15 @@ public class SigninView extends Composite<VerticalLayout>
     final MessageResource userResources = new MessageResource(User.class, getLocale());
     header.setText(resources.message(HEADER));
     email.setLabel(userResources.message(EMAIL));
-    password.setLabel(userResources.message(PASSWORD));
+    password.setLabel(userResources.message(HASHED_PASSWORD));
     signin.setText(resources.message(SIGNIN));
+  }
+
+  @Override
+  public String getPageTitle() {
+    final MessageResource resources = new MessageResource(getClass(), getLocale());
+    final MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
+    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
   }
 
   @Override

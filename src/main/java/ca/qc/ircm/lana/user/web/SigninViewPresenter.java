@@ -17,11 +17,11 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
+import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
 import static ca.qc.ircm.lana.user.web.SigninView.DISABLED;
-import static ca.qc.ircm.lana.user.web.SigninView.EMAIL;
 import static ca.qc.ircm.lana.user.web.SigninView.EXCESSIVE_ATTEMPTS;
 import static ca.qc.ircm.lana.user.web.SigninView.FAIL;
-import static ca.qc.ircm.lana.user.web.SigninView.PASSWORD;
 import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 
@@ -33,6 +33,7 @@ import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -59,17 +60,28 @@ public class SigninViewPresenter {
   @Inject
   private LdapConfiguration ldapConfiguration;
 
+  protected SigninViewPresenter() {
+  }
+
+  protected SigninViewPresenter(AuthenticationService authenticationService,
+      LdapConfiguration ldapConfiguration) {
+    this.authenticationService = authenticationService;
+    this.ldapConfiguration = ldapConfiguration;
+  }
+
   void init(SigninView view) {
     logger.debug("signin view");
     this.view = view;
     final MessageResource generalResources =
         new MessageResource(WebConstants.class, view.getLocale());
+    view.error.setVisible(false);
     view.email.addKeyDownListener(Key.ENTER, e -> sign());
     view.password.addKeyDownListener(Key.ENTER, e -> sign());
     view.signin.addClickListener(e -> sign());
     binder.forField(view.email).asRequired(generalResources.message(REQUIRED))
         .withValidator(emailValidator(generalResources.message(INVALID_EMAIL))).bind(EMAIL);
-    binder.forField(view.password).asRequired(generalResources.message(REQUIRED)).bind(PASSWORD);
+    binder.forField(view.password).asRequired(generalResources.message(REQUIRED))
+        .bind(HASHED_PASSWORD);
   }
 
   private Validator<String> emailValidator(String errorMessage) {
@@ -101,5 +113,9 @@ public class SigninViewPresenter {
         view.error.setVisible(true);
       }
     }
+  }
+
+  BinderValidationStatus<User> validate() {
+    return binder.validate();
   }
 }
