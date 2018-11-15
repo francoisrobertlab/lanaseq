@@ -21,7 +21,6 @@ package ca.qc.ircm.lana.web;
  * Constants for Web.
  */
 public class WebConstants {
-  public static final String GENERAL_MESSAGES = "VaadinMessages";
   public static final String APPLICATION_NAME = "application.name";
   public static final String TITLE = "title";
   public static final String THEME = "theme";
