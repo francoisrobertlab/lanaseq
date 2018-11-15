@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.web;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.web.SigninView;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Main layout.
  */
+@HtmlImport("styles/shared-styles.html")
 public class MainView extends VerticalLayout implements RouterLayout, BeforeEnterObserver {
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
