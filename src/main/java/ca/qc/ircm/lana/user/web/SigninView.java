@@ -29,6 +29,7 @@ import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -45,6 +46,7 @@ import javax.inject.Inject;
  * Sign in view.
  */
 @Route(value = SigninView.VIEW_NAME)
+@HtmlImport("styles/shared-styles.html")
 public class SigninView extends Composite<VerticalLayout>
     implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
   public static final String VIEW_NAME = "signin";
@@ -60,7 +62,7 @@ public class SigninView extends Composite<VerticalLayout>
   protected Button signin = new Button();
   protected Div error = new Div();
   @Inject
-  private SigninViewPresenter presenter;
+  private transient SigninViewPresenter presenter;
 
   /**
    * Creates {@link SigninView}.
