@@ -89,7 +89,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void init() {
+  public void error_NotVisible() {
     presenter.init(view);
     assertFalse(view.error.isVisible());
   }
