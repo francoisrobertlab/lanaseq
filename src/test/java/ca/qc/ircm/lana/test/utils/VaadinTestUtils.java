@@ -18,13 +18,10 @@
 package ca.qc.ircm.lana.test.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventBus;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -41,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.mockito.ArgumentCaptor;
 
 /**
  * Utility methods for presenter testign.
@@ -50,32 +46,21 @@ public class VaadinTestUtils {
   private static final String ICON_ATTRIBUTE = "icon";
 
   /**
-   * Simulates a click on a previously mocked button.
-   *
-   * @param button
-   *          mocked button
-   */
-  @SuppressWarnings("unchecked")
-  public static void clickMockButton(Button button) {
-    ArgumentCaptor<ComponentEventListener<ClickEvent<Button>>> clickListenerCaptor =
-        ArgumentCaptor.forClass(ComponentEventListener.class);
-    verify(button).addClickListener(clickListenerCaptor.capture());
-    ComponentEventListener<ClickEvent<Button>> listener = clickListenerCaptor.getValue();
-    listener.onComponentEvent(mock(ClickEvent.class));
-  }
-
-  /**
    * Simulates a click on button.
    *
    * @param button
    *          button
    */
-  public static void clickButton(Button button) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method method = Component.class.getDeclaredMethod("getEventBus");
-    method.setAccessible(true);
-    ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
-    eventBus.fireEvent(new ClickEvent<>(button));
+  public static void clickButton(Button button) {
+    try {
+      Method method = Component.class.getDeclaredMethod("getEventBus");
+      method.setAccessible(true);
+      ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
+      eventBus.fireEvent(new ClickEvent<>(button));
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**

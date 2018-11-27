@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lana.user.web;
 
-import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickMockButton;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lana.user.web.SigninView.DISABLED;
 import static ca.qc.ircm.lana.user.web.SigninView.EXCESSIVE_ATTEMPTS;
@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -96,10 +95,9 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign_EmptyEmail() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.password.setValue("test");
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verifyZeroInteractions(authenticationService);
     // Necessary because required status is not updated immediately.
@@ -113,11 +111,10 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign_InvalidEmail() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.email.setValue("test");
     view.password.setValue("test");
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verifyZeroInteractions(authenticationService);
     assertEquals(generalResources.message(INVALID_EMAIL), view.email.getErrorMessage());
@@ -125,22 +122,20 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign_InvalidEmailWithLdap() {
-    view.signin = mock(Button.class);
     when(ldapConfiguration.isEnabled()).thenReturn(true);
     presenter.init(view);
     view.email.setValue("test");
     view.password.setValue("test_password");
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verify(authenticationService).sign("test", "test_password", true);
   }
 
   @Test
   public void sign_EmptyPassword() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.email.setValue("test");
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verifyZeroInteractions(authenticationService);
     // Necessary because required status is not updated immediately.
@@ -154,11 +149,10 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.email.setValue("test@ircm.qc.ca");
     view.password.setValue("test_password");
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
     verify(view).navigate("");
@@ -166,13 +160,12 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign_DisabledAccountException() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.email.setValue("test@ircm.qc.ca");
     view.password.setValue("test_password");
     doThrow(new DisabledAccountException("test")).when(authenticationService).sign(any(), any(),
         anyBoolean());
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
     assertTrue(view.error.isVisible());
@@ -181,13 +174,12 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign_ExcessiveAttemptsException() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.email.setValue("test@ircm.qc.ca");
     view.password.setValue("test_password");
     doThrow(new ExcessiveAttemptsException("test")).when(authenticationService).sign(any(), any(),
         anyBoolean());
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
     assertTrue(view.error.isVisible());
@@ -196,13 +188,12 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void sign_AuthenticationException() {
-    view.signin = mock(Button.class);
     presenter.init(view);
     view.email.setValue("test@ircm.qc.ca");
     view.password.setValue("test_password");
     doThrow(new AuthenticationException("test")).when(authenticationService).sign(any(), any(),
         anyBoolean());
-    clickMockButton(view.signin);
+    clickButton(view.signin);
 
     verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
     assertTrue(view.error.isVisible());

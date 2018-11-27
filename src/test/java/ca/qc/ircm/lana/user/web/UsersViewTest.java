@@ -180,7 +180,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void users_ColumnsValueProvider() throws Throwable {
+  public void users_ColumnsValueProvider() {
     mockColumns();
     view.initUsers();
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));
