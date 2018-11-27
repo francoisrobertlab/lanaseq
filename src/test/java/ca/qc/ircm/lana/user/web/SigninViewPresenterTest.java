@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lana.user.web;
 
-import static ca.qc.ircm.lana.test.utils.SearchUtils.findValidationStatusByField;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickMockButton;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lana.user.web.SigninView.DISABLED;
 import static ca.qc.ircm.lana.user.web.SigninView.EXCESSIVE_ATTEMPTS;
 import static ca.qc.ircm.lana.user.web.SigninView.FAIL;

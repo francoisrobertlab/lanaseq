@@ -29,6 +29,7 @@ public class WebConstants {
   public static final String CONTRAST = "contrast";
   public static final String SUCCESS = "success";
   public static final String ERROR = "error";
+  public static final String BORDER = "border";
   public static final String PLACEHOLDER = "placeholder";
   public static final String FIELD_NOTIFICATION = "field.notification";
   public static final String REQUIRED = "required";

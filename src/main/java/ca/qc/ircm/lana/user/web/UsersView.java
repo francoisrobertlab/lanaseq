@@ -31,10 +31,13 @@ import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -57,11 +60,16 @@ public class UsersView extends Composite<VerticalLayout>
   public static final String VIEW_NAME = "users";
   public static final String HEADER = "header";
   public static final String USERS = "users";
+  public static final String VIEW = "view";
+  public static final String ADD = "add";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
   protected Column<User> laboratory;
+  protected Column<User> view;
+  protected Button add = new Button();
+  protected UserDialog userDialog = new UserDialog();
   @Inject
   private transient UsersViewPresenter presenter;
 
@@ -75,6 +83,10 @@ public class UsersView extends Composite<VerticalLayout>
     header.addClassName(HEADER);
     root.add(users);
     users.addClassName(USERS);
+    HorizontalLayout buttonsLayout = new HorizontalLayout();
+    root.add(buttonsLayout);
+    buttonsLayout.add(add);
+    add.addClassName(ADD);
   }
 
   protected UsersView(UsersViewPresenter presenter) {
@@ -89,6 +101,16 @@ public class UsersView extends Composite<VerticalLayout>
     laboratory =
         users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
             LABORATORY).setKey(LABORATORY);
+    view = users.addComponentColumn(user -> viewButton(user)).setKey(VIEW);
+    add.addClickListener(e -> presenter.add());
+  }
+
+  private Button viewButton(User user) {
+    Button button = new Button();
+    button.addClassName(VIEW);
+    button.setIcon(VaadinIcon.EYE.create());
+    button.addClickListener(e -> presenter.view(user));
+    return button;
   }
 
   @Override
@@ -100,6 +122,10 @@ public class UsersView extends Composite<VerticalLayout>
     email.setHeader(emailHeader).setFooter(emailHeader);
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
+    String viewHeader = resources.message(VIEW);
+    view.setHeader(viewHeader).setFooter(viewHeader);
+    add.setText(resources.message(ADD));
+    add.setIcon(VaadinIcon.PLUS.create());
   }
 
   @Override

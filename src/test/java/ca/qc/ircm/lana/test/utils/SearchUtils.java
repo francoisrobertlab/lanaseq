@@ -18,12 +18,7 @@
 package ca.qc.ircm.lana.test.utils;
 
 import ca.qc.ircm.lana.Data;
-import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.BindingValidationStatus;
-import com.vaadin.flow.data.binder.ValidationException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public class SearchUtils {
@@ -39,20 +34,5 @@ public class SearchUtils {
   public static <V, R extends V> Optional<R> findInstanceOf(Collection<V> values, Class<R> clazz) {
     return values.stream().filter(extension -> clazz.isInstance(extension))
         .map(extension -> (R) extension).findAny();
-  }
-
-  public static Optional<BindingValidationStatus<?>>
-      findValidationStatusByField(BinderValidationStatus<?> statuses, HasValue<?, ?> field) {
-    return findValidationStatusByField(statuses.getFieldValidationErrors(), field);
-  }
-
-  public static Optional<BindingValidationStatus<?>>
-      findValidationStatusByField(ValidationException e, HasValue<?, ?> field) {
-    return findValidationStatusByField(e.getFieldValidationErrors(), field);
-  }
-
-  public static Optional<BindingValidationStatus<?>>
-      findValidationStatusByField(List<BindingValidationStatus<?>> statuses, HasValue<?, ?> field) {
-    return statuses.stream().filter(ve -> ve.getField().equals(field)).findFirst();
   }
 }

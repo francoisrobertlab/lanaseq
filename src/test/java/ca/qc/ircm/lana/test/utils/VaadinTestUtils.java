@@ -17,17 +17,29 @@
 
 package ca.qc.ircm.lana.test.utils;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventBus;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
+import com.vaadin.flow.dom.Element;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.mockito.ArgumentCaptor;
 
@@ -35,6 +47,8 @@ import org.mockito.ArgumentCaptor;
  * Utility methods for presenter testign.
  */
 public class VaadinTestUtils {
+  private static final String ICON_ATTRIBUTE = "icon";
+
   /**
    * Simulates a click on a previously mocked button.
    *
@@ -48,6 +62,20 @@ public class VaadinTestUtils {
     verify(button).addClickListener(clickListenerCaptor.capture());
     ComponentEventListener<ClickEvent<Button>> listener = clickListenerCaptor.getValue();
     listener.onComponentEvent(mock(ClickEvent.class));
+  }
+
+  /**
+   * Simulates a click on button.
+   *
+   * @param button
+   *          button
+   */
+  public static void clickButton(Button button) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method method = Component.class.getDeclaredMethod("getEventBus");
+    method.setAccessible(true);
+    ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
+    eventBus.fireEvent(new ClickEvent<>(button));
   }
 
   /**
@@ -65,5 +93,39 @@ public class VaadinTestUtils {
       return grid.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
           .collect(Collectors.toList());
     }
+  }
+
+  public static Optional<BindingValidationStatus<?>>
+      findValidationStatusByField(BinderValidationStatus<?> statuses, HasValue<?, ?> field) {
+    return findValidationStatusByField(statuses.getFieldValidationErrors(), field);
+  }
+
+  public static Optional<BindingValidationStatus<?>>
+      findValidationStatusByField(ValidationException e, HasValue<?, ?> field) {
+    return findValidationStatusByField(e.getFieldValidationErrors(), field);
+  }
+
+  public static Optional<BindingValidationStatus<?>>
+      findValidationStatusByField(List<BindingValidationStatus<?>> statuses, HasValue<?, ?> field) {
+    return statuses.stream().filter(ve -> ve.getField().equals(field)).findFirst();
+  }
+
+  /**
+   * Validates that icon is present on button.
+   *
+   * @param button
+   *          button
+   * @param icon
+   *          icon
+   */
+  public static void validateIcon(Icon icon, Button button) {
+    Element iconOnComponent;
+    if (button.isIconAfterText()) {
+      iconOnComponent = button.getElement().getChild(button.getElement().getChildCount() - 1);
+    } else {
+      iconOnComponent = button.getElement().getChild(0);
+    }
+    assertEquals(icon.getElement().getAttribute(ICON_ATTRIBUTE),
+        iconOnComponent.getAttribute(ICON_ATTRIBUTE));
   }
 }

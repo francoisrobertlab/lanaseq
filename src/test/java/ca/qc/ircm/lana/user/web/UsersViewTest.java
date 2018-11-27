@@ -17,10 +17,14 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
+import static ca.qc.ircm.lana.user.web.UsersView.ADD;
 import static ca.qc.ircm.lana.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS;
+import static ca.qc.ircm.lana.user.web.UsersView.VIEW;
 import static ca.qc.ircm.lana.user.web.UsersView.VIEW_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
@@ -40,9 +44,11 @@ import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
@@ -64,6 +70,8 @@ public class UsersViewTest extends AbstractViewTestCase {
   private UsersViewPresenter presenter;
   @Captor
   private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<ValueProvider<User, Button>> buttonProviderCaptor;
   @Inject
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
@@ -94,6 +102,10 @@ public class UsersViewTest extends AbstractViewTestCase {
         .thenReturn(view.laboratory);
     when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
     when(view.laboratory.setHeader(any(String.class))).thenReturn(view.laboratory);
+    view.view = mock(Column.class);
+    when(view.users.addComponentColumn(any(ValueProvider.class))).thenReturn(view.view);
+    when(view.view.setKey(any())).thenReturn(view.view);
+    when(view.view.setHeader(any(String.class))).thenReturn(view.view);
   }
 
   @Test
@@ -107,6 +119,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
     assertTrue(view.header.getClassNames().contains(HEADER));
     assertTrue(view.users.getClassNames().contains(USERS));
+    assertTrue(view.add.getClassNames().contains(ADD));
   }
 
   @Test
@@ -119,6 +132,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
+    verify(view.view).setHeader(resources.message(VIEW));
+    verify(view.view).setFooter(resources.message(VIEW));
+    assertEquals(resources.message(ADD), view.add.getText());
+    validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
 
   @Test
@@ -136,6 +153,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
+    verify(view.view).setHeader(resources.message(VIEW));
+    verify(view.view).setFooter(resources.message(VIEW));
   }
 
   @Test
@@ -154,13 +173,14 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Test
   public void users_Columns() {
     view.initUsers();
-    assertEquals(2, view.users.getColumns().size());
+    assertEquals(3, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertNotNull(view.users.getColumnByKey(LABORATORY));
+    assertNotNull(view.users.getColumnByKey(VIEW));
   }
 
   @Test
-  public void users_ColumnsValueProvider() {
+  public void users_ColumnsValueProvider() throws Throwable {
     mockColumns();
     view.initUsers();
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));
@@ -173,6 +193,15 @@ public class UsersViewTest extends AbstractViewTestCase {
     for (User user : users) {
       assertEquals(user.getLaboratory() != null ? user.getLaboratory().getName() : "",
           valueProvider.apply(user));
+    }
+    verify(view.users).addComponentColumn(buttonProviderCaptor.capture());
+    ValueProvider<User, Button> buttonProvider = buttonProviderCaptor.getValue();
+    for (User user : users) {
+      Button button = buttonProvider.apply(user);
+      assertTrue(button.getClassNames().contains(VIEW));
+      validateIcon(VaadinIcon.EYE.create(), button);
+      clickButton(button);
+      verify(presenter).view(user);
     }
   }
 

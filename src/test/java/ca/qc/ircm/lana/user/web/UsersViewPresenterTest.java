@@ -19,14 +19,22 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
+import ca.qc.ircm.lana.web.SaveEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import java.util.List;
@@ -35,6 +43,8 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -46,6 +56,10 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private UsersView view;
   @Mock
   private UserService userService;
+  @Captor
+  private ArgumentCaptor<User> userCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<SaveEvent<UserWithPassword>>> saveListenerCaptor;
   @Inject
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
@@ -59,6 +73,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     presenter = new UsersViewPresenter(userService);
     view.header = new H2();
     view.users = new Grid<>();
+    view.userDialog = mock(UserDialog.class);
     users = userRepository.findAll();
     when(view.getLocale()).thenReturn(locale);
   }
@@ -74,5 +89,58 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.users.getSelectedItems().size());
     users.forEach(user -> view.users.select(user));
     assertEquals(users.size(), view.users.getSelectedItems().size());
+  }
+
+  @Test
+  public void view() {
+    presenter.init(view);
+    User user = new User();
+    user.setId(2L);
+    User databaseUser = new User();
+    when(userService.get(any())).thenReturn(databaseUser);
+    presenter.view(user);
+    verify(userService).get(2L);
+    verify(view.userDialog).setUser(databaseUser);
+    verify(view.userDialog).open();
+  }
+
+  @Test
+  public void add() {
+    presenter.init(view);
+    presenter.add();
+    verify(view.userDialog).setUser(userCaptor.capture());
+    User user = userCaptor.getValue();
+    assertNull(user.getId());
+    assertNull(user.getEmail());
+    assertNull(user.getName());
+    assertNotNull(user.getLaboratory());
+    Laboratory laboratory = user.getLaboratory();
+    assertNull(laboratory.getName());
+    verify(view.userDialog).open();
+  }
+
+  @Test
+  public void save() {
+    User user = new User();
+    String password = "test_password";
+    presenter.init(view);
+    verify(view.userDialog).addSaveListener(saveListenerCaptor.capture());
+    ComponentEventListener<SaveEvent<UserWithPassword>> listener = saveListenerCaptor.getValue();
+    SaveEvent<UserWithPassword> saveEvent =
+        new SaveEvent<>(view.userDialog, false, new UserWithPassword(user, password));
+    listener.onComponentEvent(saveEvent);
+    verify(userService).save(user, password);
+  }
+
+  @Test
+  public void save_NullPassword() {
+    User user = new User();
+    presenter.init(view);
+    verify(view.userDialog).addSaveListener(saveListenerCaptor.capture());
+    ComponentEventListener<SaveEvent<UserWithPassword>> listener = saveListenerCaptor.getValue();
+    SaveEvent<UserWithPassword> saveEvent =
+        new SaveEvent<>(view.userDialog, false, new UserWithPassword(user, null));
+    listener.onComponentEvent(saveEvent);
+    verify(userService).save(user, null);
   }
 }

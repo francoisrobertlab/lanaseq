@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.inject.Inject;
@@ -43,5 +45,22 @@ public class UsersViewPresenter {
   void init(UsersView view) {
     this.view = view;
     view.users.setItems(userService.all());
+    view.userDialog.addSaveListener(e -> save(e.getSavedObject()));
+  }
+
+  void view(User user) {
+    view.userDialog.setUser(userService.get(user.getId()));
+    view.userDialog.open();
+  }
+
+  void add() {
+    User user = new User();
+    user.setLaboratory(new Laboratory());
+    view.userDialog.setUser(user);
+    view.userDialog.open();
+  }
+
+  private void save(UserWithPassword userWithPassword) {
+    userService.save(userWithPassword.user, userWithPassword.password);
   }
 }
