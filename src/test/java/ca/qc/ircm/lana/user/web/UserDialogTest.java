@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
@@ -26,6 +27,7 @@ import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.HEADER;
+import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
@@ -93,6 +95,7 @@ public class UserDialogTest extends AbstractViewTestCase {
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);
   private String email = "test@ircm.qc.ca";
   private String name = "Test User";
+  private String laboratoryName = "Test Laboratory";
 
   /**
    * Before test.
@@ -102,12 +105,12 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new UserDialog(authorizationService);
     dialog.passwordForm = mock(PasswordForm.class);
-    dialog.laboratoryForm = mock(LaboratoryForm.class);
   }
 
   private void fillForm() {
     dialog.email.setValue(email);
     dialog.name.setValue(name);
+    dialog.laboratoryName.setValue(laboratoryName);
   }
 
   @Test
@@ -119,6 +122,8 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.admin.getClassNames().contains(ADMIN));
     assertTrue(dialog.manager.getClassNames().contains(MANAGER));
     assertTrue(dialog.laboratoryHeader.getClassNames().contains(LABORATORY));
+    assertTrue(
+        dialog.laboratoryName.getClassNames().contains(styleName(LABORATORY, LABORATORY_NAME)));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
     assertEquals(PRIMARY, dialog.save.getElement().getAttribute(THEME));
     assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
@@ -186,8 +191,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertFalse(dialog.name.isReadOnly());
     assertFalse(dialog.admin.isReadOnly());
     assertFalse(dialog.manager.isReadOnly());
-    verify(dialog.laboratoryForm, atLeastOnce()).setReadOnly(booleanCaptor.capture());
-    assertFalse(booleanCaptor.getValue());
+    assertFalse(dialog.laboratoryName.isReadOnly());
     verify(dialog.passwordForm, atLeastOnce()).setVisible(booleanCaptor.capture());
     assertTrue(booleanCaptor.getValue());
     assertTrue(dialog.buttonsLayout.isVisible());
@@ -201,8 +205,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.name.isReadOnly());
     assertTrue(dialog.admin.isReadOnly());
     assertTrue(dialog.manager.isReadOnly());
-    verify(dialog.laboratoryForm, atLeastOnce()).setReadOnly(booleanCaptor.capture());
-    assertTrue(booleanCaptor.getValue());
+    assertTrue(dialog.laboratoryName.isReadOnly());
     verify(dialog.passwordForm, atLeastOnce()).setVisible(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
     assertFalse(dialog.buttonsLayout.isVisible());
@@ -238,7 +241,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertFalse(dialog.admin.getValue());
     assertFalse(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(true);
-    verify(dialog.laboratoryForm).setLaboratory(laboratory);
+    assertEquals("", dialog.laboratoryName.getValue());
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
@@ -254,7 +257,23 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertFalse(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(false);
-    verify(dialog.laboratoryForm).setLaboratory(user.getLaboratory());
+    assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
+    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
+  }
+
+  @Test
+  public void setUser_UserNoLaboratory() {
+    User user = userRepository.findById(1L).get();
+
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+    dialog.setUser(user);
+
+    assertEquals(user.getEmail(), dialog.email.getValue());
+    assertEquals(user.getName(), dialog.name.getValue());
+    assertTrue(dialog.admin.getValue());
+    assertFalse(dialog.manager.getValue());
+    verify(dialog.passwordForm).setRequired(false);
+    assertEquals("", dialog.laboratoryName.getValue());
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
   }
 
@@ -271,7 +290,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(false);
-    verify(dialog.laboratoryForm).setLaboratory(user.getLaboratory());
+    assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
   }
 
@@ -287,7 +306,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertFalse(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(false);
-    verify(dialog.laboratoryForm).setLaboratory(user.getLaboratory());
+    assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
   }
 
@@ -304,7 +323,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(false);
-    verify(dialog.laboratoryForm).setLaboratory(user.getLaboratory());
+    assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
   }
 
@@ -318,7 +337,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertFalse(dialog.admin.getValue());
     assertFalse(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(true);
-    verify(dialog.laboratoryForm).setLaboratory(null);
+    assertEquals("", dialog.laboratoryName.getValue());
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
@@ -326,8 +345,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void save_EmailEmpty() {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.email.setValue("");
@@ -349,8 +366,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void save_EmailInvalid() {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.email.setValue("test");
@@ -372,8 +387,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void save_NameEmpty() {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.name.setValue("");
@@ -395,8 +408,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void save_PasswordValidationFails() {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(passwordValidationStatus.isOk()).thenReturn(false);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.addSaveListener(saveListener);
@@ -407,29 +418,34 @@ public class UserDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void save_LaboratoryValidationFails() {
+  public void save_LaboratoryNameEmpty() {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(false);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
+    dialog.laboratoryName.setValue("");
     dialog.addSaveListener(saveListener);
 
     dialog.fireClickSave();
-
     verify(saveListener, never()).onComponentEvent(any());
+
+    BinderValidationStatus<Laboratory> status = dialog.validateLaboratory();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.laboratoryName);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
   }
 
   @Test
-  public void save_AdminLaboratoryValidationFails() {
+  public void save_AdminLaboratoryNameEmpty() {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(false);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.admin.setValue(true);
+    dialog.laboratoryName.setValue("");
     dialog.addSaveListener(saveListener);
 
     dialog.fireClickSave();
@@ -447,8 +463,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.addSaveListener(saveListener);
@@ -474,8 +488,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.admin.setValue(true);
@@ -501,8 +513,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.admin.setValue(true);
     dialog.manager.setValue(false);
@@ -526,8 +536,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(null);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.addSaveListener(saveListener);
 
@@ -552,8 +560,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
     dialog.admin.setValue(true);
@@ -579,8 +585,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.addSaveListener(saveListener);
 
@@ -602,8 +606,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(null);
     when(passwordValidationStatus.isOk()).thenReturn(true);
-    when(dialog.laboratoryForm.validate()).thenReturn(laboratoryValidationStatus);
-    when(laboratoryValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.addSaveListener(saveListener);
 
