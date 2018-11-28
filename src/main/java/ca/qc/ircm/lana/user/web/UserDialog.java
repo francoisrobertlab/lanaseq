@@ -18,11 +18,15 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
+import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
+import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.web.WebConstants.BORDER;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
+import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
+import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
@@ -42,8 +46,11 @@ import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
@@ -59,7 +66,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";
   protected H2 header = new H2();
-  protected UserForm userForm = new UserForm();
+  protected TextField email = new TextField();
+  protected TextField name = new TextField();
   protected Checkbox admin = new Checkbox();
   protected Checkbox manager = new Checkbox();
   protected PasswordForm passwordForm = new PasswordForm();
@@ -82,7 +90,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     add(layout);
     layout.add(header);
     header.addClassName(HEADER);
-    layout.add(userForm);
+    layout.add(email);
+    email.addClassName(EMAIL);
+    layout.add(name);
+    name.addClassName(NAME);
     layout.add(admin);
     admin.addClassName(ADMIN);
     admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
@@ -114,6 +125,12 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
     updateHeader();
     laboratoryHeader.setText(userResources.message(LABORATORY));
+    email.setLabel(userResources.message(EMAIL));
+    binder.forField(email).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL))).bind(EMAIL);
+    name.setLabel(userResources.message(NAME));
+    binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .bind(NAME);
     admin.setLabel(userResources.message(ADMIN));
     binder.forField(admin).bind(ADMIN);
     manager.setLabel(userResources.message(MANAGER));
@@ -132,9 +149,13 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     }
   }
 
+  BinderValidationStatus<User> validateUser() {
+    return binder.validate();
+  }
+
   private boolean validate() {
     boolean valid = true;
-    valid = userForm.validate().isOk() && valid;
+    valid = validateUser().isOk() && valid;
     valid = passwordForm.validate().isOk() && valid;
     if (!admin.getValue()) {
       valid = laboratoryForm.validate().isOk() && valid;
@@ -173,7 +194,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     binder.setReadOnly(readOnly);
-    userForm.setReadOnly(readOnly);
     passwordForm.setVisible(!readOnly);
     laboratoryForm.setReadOnly(readOnly);
     buttonsLayout.setVisible(!readOnly);
@@ -192,7 +212,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   public void setUser(User user) {
     this.user = user;
     binder.setBean(user);
-    userForm.setUser(user);
     if (user != null && user.getId() != null) {
       passwordForm.setRequired(false);
     } else {
