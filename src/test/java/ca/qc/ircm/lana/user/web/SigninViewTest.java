@@ -56,10 +56,14 @@ public class SigninViewTest extends AbstractViewTestCase {
   private MessageResource userResources = new MessageResource(User.class, locale);
   private MessageResource generalResources = new MessageResource(WebConstants.class, locale);
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     view = new SigninView(presenter);
+    view.init();
   }
 
   @Test

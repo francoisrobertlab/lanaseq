@@ -40,6 +40,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import java.util.Locale;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 /**
@@ -64,10 +65,15 @@ public class SigninView extends Composite<VerticalLayout>
   @Inject
   private transient SigninViewPresenter presenter;
 
-  /**
-   * Creates {@link SigninView}.
-   */
   public SigninView() {
+  }
+
+  protected SigninView(SigninViewPresenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @PostConstruct
+  void init() {
     VerticalLayout root = getContent();
     root.setId(VIEW_NAME);
     root.add(header);
@@ -80,11 +86,6 @@ public class SigninView extends Composite<VerticalLayout>
     signin.addClassName(SIGNIN);
     root.add(error);
     error.addClassName(FAIL);
-  }
-
-  protected SigninView(SigninViewPresenter presenter) {
-    this();
-    this.presenter = presenter;
   }
 
   @Override

@@ -49,6 +49,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
@@ -87,12 +88,15 @@ public class UsersViewTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     view = new UsersView(presenter);
+    view.init();
     users = userRepository.findAll();
   }
 
   @SuppressWarnings("unchecked")
   private void mockColumns() {
+    Element usersElement = view.users.getElement();
     view.users = mock(Grid.class);
+    when(view.users.getElement()).thenReturn(usersElement);
     view.email = mock(Column.class);
     when(view.users.addColumn(any(ValueProvider.class), eq(EMAIL))).thenReturn(view.email);
     when(view.email.setKey(any())).thenReturn(view.email);
@@ -125,7 +129,6 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Test
   public void labels() {
     mockColumns();
-    view.initUsers();
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.email).setHeader(userResources.message(EMAIL));
@@ -140,8 +143,9 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
+    view = new UsersView(presenter);
     mockColumns();
-    view.initUsers();
+    view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final MessageResource resources = new MessageResource(UsersView.class, locale);
@@ -165,14 +169,14 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_SelectionMode() {
+    view = new UsersView(presenter);
     mockColumns();
-    view.initUsers();
+    view.init();
     verify(view.users).setSelectionMode(SelectionMode.MULTI);
   }
 
   @Test
   public void users_Columns() {
-    view.initUsers();
     assertEquals(3, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertNotNull(view.users.getColumnByKey(LABORATORY));
@@ -181,8 +185,9 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_ColumnsValueProvider() {
+    view = new UsersView(presenter);
     mockColumns();
-    view.initUsers();
+    view.init();
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));
     ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
     for (User user : users) {

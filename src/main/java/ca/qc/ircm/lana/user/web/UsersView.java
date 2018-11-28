@@ -73,35 +73,31 @@ public class UsersView extends Composite<VerticalLayout>
   @Inject
   private transient UsersViewPresenter presenter;
 
-  /**
-   * Creates a new UsersView.
-   */
   public UsersView() {
+  }
+
+  protected UsersView(UsersViewPresenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @PostConstruct
+  void init() {
     VerticalLayout root = getContent();
     root.setId(VIEW_NAME);
     root.add(header);
     header.addClassName(HEADER);
     root.add(users);
     users.addClassName(USERS);
-    HorizontalLayout buttonsLayout = new HorizontalLayout();
-    root.add(buttonsLayout);
-    buttonsLayout.add(add);
-    add.addClassName(ADD);
-  }
-
-  protected UsersView(UsersViewPresenter presenter) {
-    this();
-    this.presenter = presenter;
-  }
-
-  @PostConstruct
-  void initUsers() {
     users.setSelectionMode(SelectionMode.MULTI);
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL);
     laboratory =
         users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
             LABORATORY).setKey(LABORATORY);
     view = users.addComponentColumn(user -> viewButton(user)).setKey(VIEW);
+    HorizontalLayout buttonsLayout = new HorizontalLayout();
+    root.add(buttonsLayout);
+    buttonsLayout.add(add);
+    add.addClassName(ADD);
     add.addClickListener(e -> presenter.add());
   }
 
