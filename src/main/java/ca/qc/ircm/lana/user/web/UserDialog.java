@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
@@ -49,10 +50,13 @@ import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -68,13 +72,17 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";
+  public static final String PASSWORD = "password";
+  public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
+  public static final String PASSWORDS_NOT_MATCH = property(PASSWORD, "notMatch");
   public static final String LABORATORY_NAME = LaboratoryProperties.NAME;
   protected H2 header = new H2();
   protected TextField email = new TextField();
   protected TextField name = new TextField();
   protected Checkbox admin = new Checkbox();
   protected Checkbox manager = new Checkbox();
-  protected PasswordForm passwordForm = new PasswordForm();
+  protected PasswordField password = new PasswordField();
+  protected PasswordField passwordConfirm = new PasswordField();
   protected VerticalLayout laboratoryLayout = new VerticalLayout();
   protected H6 laboratoryHeader = new H6();
   protected TextField laboratoryName = new TextField();
@@ -82,6 +90,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   protected Button save = new Button();
   protected Button cancel = new Button();
   private Binder<User> binder = new BeanValidationBinder<>(User.class);
+  private Binder<Passwords> passwordBinder = new BeanValidationBinder<>(Passwords.class);
   private Binder<Laboratory> laboratoryBinder = new BeanValidationBinder<>(Laboratory.class);
   private User user;
   private boolean readOnly;
@@ -106,8 +115,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     manager.addClassName(MANAGER);
     admin.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     admin.addValueChangeListener(e -> updateAdmin());
-    layout.add(passwordForm);
-    passwordForm.setRequired(true);
+    layout.add(password);
+    password.addClassName(PASSWORD);
+    layout.add(passwordConfirm);
+    passwordConfirm.addClassName(PASSWORD_CONFIRM);
     layout.add(laboratoryLayout);
     laboratoryLayout.addClassName(BORDER);
     laboratoryLayout.add(laboratoryHeader);
@@ -125,10 +136,12 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> close());
     setUser(null);
+    passwordBinder.setBean(new Passwords());
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    final MessageResource resources = new MessageResource(UserDialog.class, getLocale());
     final MessageResource userResources = new MessageResource(User.class, getLocale());
     final MessageResource laboratoryResources = new MessageResource(Laboratory.class, getLocale());
     final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
@@ -144,12 +157,34 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     binder.forField(admin).bind(ADMIN);
     manager.setLabel(userResources.message(MANAGER));
     binder.forField(manager).bind(MANAGER);
+    password.setLabel(resources.message(PASSWORD));
+    passwordBinder.forField(password)
+        .withValidator(requiredValidator(webResources.message(REQUIRED))).withNullRepresentation("")
+        .withValidator(password -> {
+          String confirmPassword = passwordConfirm.getValue();
+          return password == null || password.isEmpty() || confirmPassword == null
+              || confirmPassword.isEmpty() || password.equals(confirmPassword);
+        }, resources.message(PASSWORDS_NOT_MATCH))
+        .bind(Passwords::getPassword, Passwords::setPassword);
+    passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
+    passwordBinder.forField(passwordConfirm)
+        .withValidator(requiredValidator(webResources.message(REQUIRED))).withNullRepresentation("")
+        .bind(Passwords::getConfirmPassword, Passwords::setConfirmPassword);
     laboratoryName.setLabel(laboratoryResources.message(LABORATORY_NAME));
     laboratoryBinder.forField(laboratoryName).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(LABORATORY_NAME);
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     setReadOnly(readOnly);
+  }
+
+  private Validator<String> requiredValidator(String errorMessage) {
+    return (value, context) -> !isNewUser() || !value.isEmpty() ? ValidationResult.ok()
+        : ValidationResult.error(errorMessage);
+  }
+
+  private boolean isNewUser() {
+    return user.getId() == null;
   }
 
   private void updateAdmin() {
@@ -170,6 +205,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     return binder.validate();
   }
 
+  BinderValidationStatus<Passwords> validatePassword() {
+    return passwordBinder.validate();
+  }
+
   BinderValidationStatus<Laboratory> validateLaboratory() {
     return laboratoryBinder.validate();
   }
@@ -177,7 +216,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   private boolean validate() {
     boolean valid = true;
     valid = validateUser().isOk() && valid;
-    valid = passwordForm.validate().isOk() && valid;
+    valid = validatePassword().isOk() && valid;
     if (!admin.getValue()) {
       valid = validateLaboratory().isOk() && valid;
     }
@@ -191,8 +230,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
         user.setManager(false);
         user.setLaboratory(null);
       }
-      fireEvent(
-          new SaveEvent<>(this, false, new UserWithPassword(user, passwordForm.getPassword())));
+      String password = passwordBinder.getBean().getPassword();
+      fireEvent(new SaveEvent<>(this, false, new UserWithPassword(user, password)));
     }
   }
 
@@ -219,7 +258,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     binder.setReadOnly(readOnly);
-    passwordForm.setVisible(!readOnly);
+    password.setVisible(!readOnly);
+    passwordConfirm.setVisible(!readOnly);
     laboratoryBinder.setReadOnly(readOnly);
     buttonsLayout.setVisible(!readOnly);
   }
@@ -244,11 +284,34 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     this.user = user;
     binder.setBean(user);
     if (user != null && user.getId() != null) {
-      passwordForm.setRequired(false);
+      password.setRequiredIndicatorVisible(false);
+      passwordConfirm.setRequiredIndicatorVisible(false);
     } else {
-      passwordForm.setRequired(true);
+      password.setRequiredIndicatorVisible(true);
+      passwordConfirm.setRequiredIndicatorVisible(true);
     }
     laboratoryBinder.setBean(user.getLaboratory());
     updateHeader();
+  }
+
+  static class Passwords {
+    private String password;
+    private String confirmPassword;
+
+    public String getPassword() {
+      return password;
+    }
+
+    public void setPassword(String password) {
+      this.password = password;
+    }
+
+    public String getConfirmPassword() {
+      return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+      this.confirmPassword = confirmPassword;
+    }
   }
 }
