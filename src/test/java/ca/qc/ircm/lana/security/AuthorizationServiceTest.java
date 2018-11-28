@@ -103,6 +103,45 @@ public class AuthorizationServiceTest {
   }
 
   @Test
+  @WithSubject
+  public void hasRole_False() throws Throwable {
+    assertFalse(authorizationService.hasRole(ADMIN));
+    verify(subject).hasRole(ADMIN);
+  }
+
+  @Test
+  @WithSubject
+  public void hasRole_True() throws Throwable {
+    when(subject.hasRole(ADMIN)).thenReturn(true);
+    assertTrue(authorizationService.hasRole(ADMIN));
+    verify(subject).hasRole(ADMIN);
+  }
+
+  @Test
+  @WithSubject
+  public void hasAnyRole_False() throws Throwable {
+    assertFalse(authorizationService.hasAnyRole(ADMIN, MANAGER));
+    verify(subject).hasRole(ADMIN);
+    verify(subject).hasRole(MANAGER);
+  }
+
+  @Test
+  @WithSubject
+  public void hasAnyRole_TrueFirst() throws Throwable {
+    when(subject.hasRole(ADMIN)).thenReturn(true);
+    assertTrue(authorizationService.hasAnyRole(ADMIN, MANAGER));
+    verify(subject).hasRole(ADMIN);
+  }
+
+  @Test
+  @WithSubject
+  public void hasAnyRole_TrueLast() throws Throwable {
+    when(subject.hasRole(MANAGER)).thenReturn(true);
+    assertTrue(authorizationService.hasAnyRole(ADMIN, MANAGER));
+    verify(subject).hasRole(MANAGER);
+  }
+
+  @Test
   public void isAuthorized_NoRole() throws Throwable {
     assertTrue(authorizationService.isAuthorized(NoRoleTest.class));
     verifyZeroInteractions(subject);

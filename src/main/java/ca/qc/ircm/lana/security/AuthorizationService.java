@@ -71,6 +71,33 @@ public class AuthorizationService {
   }
 
   /**
+   * Returns true if current user has specified role, false otherwise.
+   *
+   * @param role
+   *          role
+   * @return true if current user has specified role, false otherwise
+   */
+  public boolean hasRole(String role) {
+    return getSubject().hasRole(role);
+  }
+
+  /**
+   * Returns true if current user has any of the specified roles, false otherwise.
+   *
+   * @param roles
+   *          roles
+   * @return true if current user has any of the specified roles, false otherwise
+   */
+  public boolean hasAnyRole(String... roles) {
+    Subject subject = getSubject();
+    boolean hasAnyRole = false;
+    for (String role : roles) {
+      hasAnyRole |= subject.hasRole(role);
+    }
+    return hasAnyRole;
+  }
+
+  /**
    * Returns true if current user is authorized to access class, false otherwise.
    *
    * @param type
