@@ -24,6 +24,7 @@ import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.MainView;
 import ca.qc.ircm.lana.web.WebConstants;
@@ -69,15 +70,18 @@ public class UsersView extends Composite<VerticalLayout>
   protected Column<User> laboratory;
   protected Column<User> view;
   protected Button add = new Button();
-  protected UserDialog userDialog = new UserDialog();
+  protected UserDialog userDialog;
   @Inject
   private transient UsersViewPresenter presenter;
+  @Inject
+  private transient AuthorizationService authorizationService;
 
   public UsersView() {
   }
 
-  protected UsersView(UsersViewPresenter presenter) {
+  protected UsersView(UsersViewPresenter presenter, AuthorizationService authorizationService) {
     this.presenter = presenter;
+    this.authorizationService = authorizationService;
   }
 
   @PostConstruct
@@ -99,6 +103,7 @@ public class UsersView extends Composite<VerticalLayout>
     buttonsLayout.add(add);
     add.addClassName(ADD);
     add.addClickListener(e -> presenter.add());
+    userDialog = new UserDialog(authorizationService);
   }
 
   private Button viewButton(User user) {
