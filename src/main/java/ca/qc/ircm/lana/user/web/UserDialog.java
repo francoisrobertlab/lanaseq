@@ -105,6 +105,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     layout.add(manager);
     manager.addClassName(MANAGER);
     admin.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
+    admin.addValueChangeListener(e -> updateAdmin());
     layout.add(passwordForm);
     passwordForm.setRequired(true);
     layout.add(laboratoryLayout);
@@ -123,6 +124,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     cancel.addClassName(CANCEL);
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> close());
+    setUser(null);
   }
 
   @Override
@@ -148,6 +150,11 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     setReadOnly(readOnly);
+  }
+
+  private void updateAdmin() {
+    manager.setVisible(!admin.getValue());
+    laboratoryLayout.setVisible(!admin.getValue());
   }
 
   private void updateHeader() {
@@ -180,6 +187,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   private void save() {
     if (validate()) {
       logger.debug("Fire save event for user {}", user);
+      if (user.isAdmin()) {
+        user.setManager(false);
+        user.setLaboratory(null);
+      }
       fireEvent(
           new SaveEvent<>(this, false, new UserWithPassword(user, passwordForm.getPassword())));
     }
@@ -224,6 +235,12 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
    *          user
    */
   public void setUser(User user) {
+    if (user == null) {
+      user = new User();
+    }
+    if (user.getLaboratory() == null) {
+      user.setLaboratory(new Laboratory());
+    }
     this.user = user;
     binder.setBean(user);
     if (user != null && user.getId() != null) {
@@ -231,7 +248,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     } else {
       passwordForm.setRequired(true);
     }
-    laboratoryBinder.setBean(user != null ? user.getLaboratory() : null);
+    laboratoryBinder.setBean(user.getLaboratory());
     updateHeader();
   }
 }

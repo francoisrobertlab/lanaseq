@@ -36,6 +36,7 @@ import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -212,6 +213,23 @@ public class UserDialogTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void checkAdmin() {
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+    dialog.admin.setValue(true);
+    assertFalse(dialog.manager.isVisible());
+    assertFalse(dialog.laboratoryLayout.isVisible());
+  }
+
+  @Test
+  public void uncheckAdmin() {
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+    dialog.admin.setValue(true);
+    dialog.admin.setValue(false);
+    assertTrue(dialog.manager.isVisible());
+    assertTrue(dialog.laboratoryLayout.isVisible());
+  }
+
+  @Test
   public void getUser() {
     User user = new User();
     dialog.setUser(user);
@@ -278,23 +296,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void setUser_UserAdminManager() {
-    User user = userRepository.findById(2L).get();
-    user.setAdmin(true);
-
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setUser(user);
-
-    assertEquals(user.getEmail(), dialog.email.getValue());
-    assertEquals(user.getName(), dialog.name.getValue());
-    assertTrue(dialog.admin.getValue());
-    assertTrue(dialog.manager.getValue());
-    verify(dialog.passwordForm).setRequired(false);
-    assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
-    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
-  }
-
-  @Test
   public void setUser_UserBeforeLocaleChange() {
     User user = userRepository.findById(2L).get();
 
@@ -304,23 +305,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(user.getEmail(), dialog.email.getValue());
     assertEquals(user.getName(), dialog.name.getValue());
     assertFalse(dialog.admin.getValue());
-    assertTrue(dialog.manager.getValue());
-    verify(dialog.passwordForm).setRequired(false);
-    assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
-    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
-  }
-
-  @Test
-  public void setUser_UserAdminManagerBeforeLocaleChange() {
-    User user = userRepository.findById(2L).get();
-    user.setAdmin(true);
-
-    dialog.setUser(user);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-
-    assertEquals(user.getEmail(), dialog.email.getValue());
-    assertEquals(user.getName(), dialog.name.getValue());
-    assertTrue(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
     verify(dialog.passwordForm).setRequired(false);
     assertEquals(user.getLaboratory().getName(), dialog.laboratoryName.getValue());
@@ -455,10 +439,6 @@ public class UserDialogTest extends AbstractViewTestCase {
 
   @Test
   public void save_NewUser() {
-    User user = new User();
-    Laboratory laboratory = new Laboratory();
-    user.setLaboratory(laboratory);
-    dialog.setUser(user);
     String password = "test_password";
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
@@ -471,37 +451,12 @@ public class UserDialogTest extends AbstractViewTestCase {
 
     verify(saveListener).onComponentEvent(saveEventCaptor.capture());
     UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
     assertFalse(userWithPassword.user.isAdmin());
     assertFalse(userWithPassword.user.isManager());
-    assertEquals(laboratory, userWithPassword.user.getLaboratory());
-    assertEquals(password, userWithPassword.password);
-  }
-
-  @Test
-  public void save_NewUserAdminManager() {
-    User user = new User();
-    Laboratory laboratory = new Laboratory();
-    user.setLaboratory(laboratory);
-    dialog.setUser(user);
-    String password = "test_password";
-    when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
-    when(dialog.passwordForm.getPassword()).thenReturn(password);
-    when(passwordValidationStatus.isOk()).thenReturn(true);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    fillForm();
-    dialog.admin.setValue(true);
-    dialog.manager.setValue(true);
-    dialog.addSaveListener(saveListener);
-
-    dialog.fireClickSave();
-
-    verify(saveListener).onComponentEvent(saveEventCaptor.capture());
-    UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
-    assertTrue(userWithPassword.user.isAdmin());
-    assertTrue(userWithPassword.user.isManager());
-    assertEquals(laboratory, userWithPassword.user.getLaboratory());
+    assertNotNull(userWithPassword.user.getLaboratory());
+    assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertEquals(password, userWithPassword.password);
   }
 
@@ -514,18 +469,19 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.admin.setValue(true);
-    dialog.manager.setValue(false);
+    fillForm();
     dialog.addSaveListener(saveListener);
 
     dialog.fireClickSave();
 
     verify(saveListener).onComponentEvent(saveEventCaptor.capture());
     UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
-    assertTrue(userWithPassword.user.isAdmin());
-    assertFalse(userWithPassword.user.isManager());
-    assertEquals(user.getLaboratory(), userWithPassword.user.getLaboratory());
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
+    assertFalse(userWithPassword.user.isAdmin());
+    assertTrue(userWithPassword.user.isManager());
+    assertNotNull(userWithPassword.user.getLaboratory());
+    assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertEquals(password, userWithPassword.password);
   }
 
@@ -537,25 +493,24 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.getPassword()).thenReturn(null);
     when(passwordValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
     dialog.addSaveListener(saveListener);
 
     dialog.fireClickSave();
 
     verify(saveListener).onComponentEvent(saveEventCaptor.capture());
     UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
     assertFalse(userWithPassword.user.isAdmin());
     assertTrue(userWithPassword.user.isManager());
-    assertEquals(user.getLaboratory(), userWithPassword.user.getLaboratory());
+    assertNotNull(userWithPassword.user.getLaboratory());
+    assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertNull(userWithPassword.password);
   }
 
   @Test
   public void save_NewAdmin() {
-    User user = new User();
-    Laboratory laboratory = new Laboratory();
-    user.setLaboratory(laboratory);
-    dialog.setUser(user);
     String password = "test_password";
     when(dialog.passwordForm.validate()).thenReturn(passwordValidationStatus);
     when(dialog.passwordForm.getPassword()).thenReturn(password);
@@ -569,11 +524,11 @@ public class UserDialogTest extends AbstractViewTestCase {
 
     verify(saveListener).onComponentEvent(saveEventCaptor.capture());
     UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
     assertTrue(userWithPassword.user.isAdmin());
     assertFalse(userWithPassword.user.isManager());
-    assertTrue(userWithPassword.user.getLaboratory() == null
-        || userWithPassword.user.getLaboratory().getName() == null);
+    assertNull(userWithPassword.user.getLaboratory());
     assertEquals(password, userWithPassword.password);
   }
 
@@ -586,16 +541,18 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.getPassword()).thenReturn(password);
     when(passwordValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
     dialog.addSaveListener(saveListener);
 
     dialog.fireClickSave();
 
     verify(saveListener).onComponentEvent(saveEventCaptor.capture());
     UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
     assertTrue(userWithPassword.user.isAdmin());
     assertFalse(userWithPassword.user.isManager());
-    assertEquals(null, userWithPassword.user.getLaboratory());
+    assertNull(userWithPassword.user.getLaboratory());
     assertEquals(password, userWithPassword.password);
   }
 
@@ -607,16 +564,18 @@ public class UserDialogTest extends AbstractViewTestCase {
     when(dialog.passwordForm.getPassword()).thenReturn(null);
     when(passwordValidationStatus.isOk()).thenReturn(true);
     dialog.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
     dialog.addSaveListener(saveListener);
 
     dialog.fireClickSave();
 
     verify(saveListener).onComponentEvent(saveEventCaptor.capture());
     UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(user, userWithPassword.user);
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
     assertTrue(userWithPassword.user.isAdmin());
     assertFalse(userWithPassword.user.isManager());
-    assertEquals(null, userWithPassword.user.getLaboratory());
-    assertEquals(null, userWithPassword.password);
+    assertNull(userWithPassword.user.getLaboratory());
+    assertNull(userWithPassword.password);
   }
 }
