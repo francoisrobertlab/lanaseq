@@ -28,4 +28,13 @@ public interface UserRole {
    * Forces user to change his password.
    */
   public static final String CHANGE_PASSWORD = "CHANGE_PASSWORD";
+
+  /**
+   * Returns all user roles.
+   * 
+   * @return all user roles
+   */
+  public static String[] roles() {
+    return new String[] { USER, MANAGER, ADMIN };
+  }
 }

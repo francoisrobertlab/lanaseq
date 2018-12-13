@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lana.security;
 
+import java.time.Duration;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.Hex;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,13 +32,32 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 public class SecurityConfiguration {
   public static final String PREFIX = "security";
+  public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
   private static final String HEX_BEGIN_TOKEN = "0x";
+  private int lockAttemps;
+  private Duration lockDuration;
   private String cipherKey;
   private int passwordStrength;
   private int maximumSignAttemps;
   private long maximumSignAttempsDelay;
   private int disableSignAttemps;
   private String realmName;
+
+  public int getLockAttemps() {
+    return lockAttemps;
+  }
+
+  public void setLockAttemps(int lockAttemps) {
+    this.lockAttemps = lockAttemps;
+  }
+
+  public Duration getLockDuration() {
+    return lockDuration;
+  }
+
+  public void setLockDuration(Duration lockDuration) {
+    this.lockDuration = lockDuration;
+  }
 
   public String getRealmName() {
     return realmName;
