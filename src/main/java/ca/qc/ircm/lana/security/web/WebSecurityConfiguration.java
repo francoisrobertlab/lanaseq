@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lana.security.web;
 
+import ca.qc.ircm.lana.security.SecurityConfiguration;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.SigninView;
 import com.vaadin.flow.server.ServletHelper.RequestType;
@@ -27,7 +28,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 import org.apache.shiro.web.servlet.ShiroFilter;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -45,8 +45,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 /**
  * Security configuration.
@@ -64,7 +62,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Inject
   private UserDetailsService userDetailsService;
   @Inject
-  private DataSource dataSource;
+  private SecurityConfiguration configuration;
 
   /**
    * Returns password encoder that supports password upgrades.
@@ -82,18 +80,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     passworEncoder.setDefaultPasswordEncoderForMatches(defaultPasswordEncoder);
 
     return passworEncoder;
-  }
-
-  /**
-   * Returns {@link PersistentTokenRepository}.
-   *
-   * @return {@link PersistentTokenRepository}
-   */
-  @Bean
-  public PersistentTokenRepository persistentTokenRepository() {
-    JdbcTokenRepositoryImpl persistentTokenRepository = new JdbcTokenRepositoryImpl();
-    persistentTokenRepository.setDataSource(dataSource);
-    return persistentTokenRepository;
   }
 
   /**
@@ -158,7 +144,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and().logout().logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
 
         // Remember me
-        .and().rememberMe().alwaysRemember(true).tokenRepository(persistentTokenRepository());
+        .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());
   }
 
   /**

@@ -36,6 +36,7 @@ public class SecurityConfiguration {
   private static final String HEX_BEGIN_TOKEN = "0x";
   private int lockAttemps;
   private Duration lockDuration;
+  private String rememberMeKey;
   private String cipherKey;
   private int passwordStrength;
   private int maximumSignAttemps;
@@ -118,5 +119,13 @@ public class SecurityConfiguration {
 
   public void setRealmName(String realmName) {
     this.realmName = realmName;
+  }
+
+  public String getRememberMeKey() {
+    return rememberMeKey;
+  }
+
+  public void setRememberMeKey(String rememberMeKey) {
+    this.rememberMeKey = rememberMeKey;
   }
 }
