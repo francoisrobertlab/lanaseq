@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Services for LDAP (active directory).
+ * Services for LDAP (active directory) based on Shiro.
  */
 @Component
 public class ShiroLdapService {

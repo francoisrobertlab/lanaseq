@@ -30,7 +30,7 @@ import org.springframework.ldap.query.LdapQuery;
 import org.springframework.stereotype.Component;
 
 /**
- * Services for LDAP (active directory).
+ * Services for LDAP (active directory) based on Spring.
  */
 @Component
 public class SpringLdapService implements LdapService {
