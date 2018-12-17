@@ -27,14 +27,11 @@ import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lana.security.AuthenticationService;
 import ca.qc.ircm.lana.security.LdapConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
@@ -48,11 +45,12 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.DisabledAccountException;
-import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,8 +64,6 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   @Mock
   private SigninView view;
   @Mock
-  private AuthenticationService authenticationService;
-  @Mock
   private LdapConfiguration ldapConfiguration;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(SigninView.class, locale);
@@ -78,11 +74,12 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new SigninViewPresenter(authenticationService, ldapConfiguration);
+    presenter = new SigninViewPresenter(ldapConfiguration);
     view.header = new H2();
     view.email = new TextField();
     view.password = new PasswordField();
     view.signin = new Button();
+    view.doSignin = mock(Button.class);
     view.error = new Div();
     when(view.getLocale()).thenReturn(locale);
   }
@@ -99,7 +96,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     view.password.setValue("test");
     clickButton(view.signin);
 
-    verifyZeroInteractions(authenticationService);
+    verifyZeroInteractions(view.doSignin);
     // Necessary because required status is not updated immediately.
     BinderValidationStatus<User> statuses = presenter.validate();
     Optional<BindingValidationStatus<?>> optionalError =
@@ -116,7 +113,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     view.password.setValue("test");
     clickButton(view.signin);
 
-    verifyZeroInteractions(authenticationService);
+    verifyZeroInteractions(view.doSignin);
     assertEquals(generalResources.message(INVALID_EMAIL), view.email.getErrorMessage());
   }
 
@@ -128,7 +125,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     view.password.setValue("test_password");
     clickButton(view.signin);
 
-    verify(authenticationService).sign("test", "test_password", true);
+    verify(view.doSignin).click();
   }
 
   @Test
@@ -137,7 +134,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     view.email.setValue("test");
     clickButton(view.signin);
 
-    verifyZeroInteractions(authenticationService);
+    verifyZeroInteractions(view.doSignin);
     // Necessary because required status is not updated immediately.
     BinderValidationStatus<User> statuses = presenter.validate();
     Optional<BindingValidationStatus<?>> optionalError =
@@ -154,48 +151,41 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     view.password.setValue("test_password");
     clickButton(view.signin);
 
-    verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
-    verify(view).navigate("");
+    verify(view.doSignin).click();
   }
 
   @Test
-  public void sign_DisabledAccountException() {
+  public void showError_Disabled() {
     presenter.init(view);
-    view.email.setValue("test@ircm.qc.ca");
-    view.password.setValue("test_password");
-    doThrow(new DisabledAccountException("test")).when(authenticationService).sign(any(), any(),
-        anyBoolean());
-    clickButton(view.signin);
+    Map<String, List<String>> parameters = new HashMap<>();
+    parameters.put(DISABLED, Collections.emptyList());
 
-    verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
+    presenter.showError(parameters);
+
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DISABLED), view.error.getText());
   }
 
   @Test
-  public void sign_ExcessiveAttemptsException() {
+  public void sign_ExcessiveAttempts() {
     presenter.init(view);
-    view.email.setValue("test@ircm.qc.ca");
-    view.password.setValue("test_password");
-    doThrow(new ExcessiveAttemptsException("test")).when(authenticationService).sign(any(), any(),
-        anyBoolean());
-    clickButton(view.signin);
+    Map<String, List<String>> parameters = new HashMap<>();
+    parameters.put(EXCESSIVE_ATTEMPTS, Collections.emptyList());
 
-    verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
+    presenter.showError(parameters);
+
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(EXCESSIVE_ATTEMPTS), view.error.getText());
   }
 
   @Test
-  public void sign_AuthenticationException() {
+  public void sign_Fail() {
     presenter.init(view);
-    view.email.setValue("test@ircm.qc.ca");
-    view.password.setValue("test_password");
-    doThrow(new AuthenticationException("test")).when(authenticationService).sign(any(), any(),
-        anyBoolean());
-    clickButton(view.signin);
+    Map<String, List<String>> parameters = new HashMap<>();
+    parameters.put(FAIL, Collections.emptyList());
 
-    verify(authenticationService).sign("test@ircm.qc.ca", "test_password", true);
+    presenter.showError(parameters);
+
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(FAIL), view.error.getText());
   }

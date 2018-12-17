@@ -32,6 +32,7 @@ import org.apache.shiro.web.servlet.ShiroFilter;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -54,8 +55,14 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   public static final String SHIRO_FILTER_NAME = "ShiroFilter";
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
-  private static final String SIGNIN_DEFAULT_FAILURE_URL = SIGNIN_PROCESSING_URL + "?error";
-  private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?locked";
+  private static final String SIGNIN_FAILURE_URL_PATTERN =
+      Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
+  private static final String SIGNIN_DEFAULT_FAILURE_URL =
+      SIGNIN_PROCESSING_URL + "?" + SigninView.FAIL;
+  private static final String SIGNIN_EXCESSIVE_ATTEMPTS_URL =
+      SIGNIN_PROCESSING_URL + "?" + SigninView.EXCESSIVE_ATTEMPTS;
+  private static final String SIGNIN_DISABLED_URL =
+      SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
   private static final String SIGNOUT_SUCCESS_URL = "/";
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
@@ -90,7 +97,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   public AuthenticationFailureHandler authenticationFailureHandler() {
     final Map<String, String> failureUrlMap = new HashMap<>();
-    failureUrlMap.put(LockedException.class.getName(), SIGNIN_LOCKED_URL);
+    failureUrlMap.put(LockedException.class.getName(), SIGNIN_EXCESSIVE_ATTEMPTS_URL);
+    failureUrlMap.put(DisabledException.class.getName(), SIGNIN_DISABLED_URL);
     ExceptionMappingAuthenticationFailureHandler authenticationFailureHandler =
         new ExceptionMappingAuthenticationFailureHandler();
     authenticationFailureHandler.setDefaultFailureUrl(SIGNIN_DEFAULT_FAILURE_URL);
@@ -126,8 +134,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .requestMatchers(WebSecurityConfiguration::isVaadinInternalRequest).permitAll()
 
         // Allow all login failure URLs.
-        .regexMatchers(Pattern.quote(SIGNIN_DEFAULT_FAILURE_URL)).permitAll()
-        .regexMatchers(Pattern.quote(SIGNIN_LOCKED_URL)).permitAll()
+        .regexMatchers(SIGNIN_FAILURE_URL_PATTERN).permitAll()
 
         // Allow all requests by logged in users.
         .anyRequest().hasAnyAuthority(UserRole.roles())

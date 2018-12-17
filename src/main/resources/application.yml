@@ -35,6 +35,8 @@ security:
   maximumSignAttemps: 5
   maximumSignAttempsDelay: 300000  # 5 minutes.
   disableSignAttemps: 15
+  lockAttemps: 5
+  lock-duration: PT3M
 
 ldap:
   base: dc=mycompany,dc=com

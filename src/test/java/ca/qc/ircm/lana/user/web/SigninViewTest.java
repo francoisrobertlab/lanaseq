@@ -19,9 +19,12 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
+import static ca.qc.ircm.lana.user.web.SigninView.DO_SIGNIN;
 import static ca.qc.ircm.lana.user.web.SigninView.FAIL;
 import static ca.qc.ircm.lana.user.web.SigninView.HEADER;
+import static ca.qc.ircm.lana.user.web.SigninView.PASSWORD;
 import static ca.qc.ircm.lana.user.web.SigninView.SIGNIN;
+import static ca.qc.ircm.lana.user.web.SigninView.USERNAME;
 import static ca.qc.ircm.lana.user.web.SigninView.VIEW_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
@@ -31,14 +34,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.server.InitialPageSettings;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,9 +83,19 @@ public class SigninViewTest extends AbstractViewTestCase {
   public void styles() {
     assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
     assertTrue(view.header.getClassNames().contains(HEADER));
+    assertEquals("iron-form", view.ironForm.getTag());
+    assertEquals("ironform", view.ironForm.getAttribute("id"));
+    assertEquals("", view.ironForm.getAttribute("allow-redirect"));
+    assertEquals("form", view.form.getTag());
+    assertEquals("post", view.form.getAttribute("method"));
+    assertEquals(WebSecurityConfiguration.SIGNIN_PROCESSING_URL, view.form.getAttribute("action"));
     assertTrue(view.email.getClassNames().contains(EMAIL));
+    assertEquals(USERNAME, view.email.getElement().getAttribute("name"));
     assertTrue(view.password.getClassNames().contains(HASHED_PASSWORD));
+    assertEquals(PASSWORD, view.password.getElement().getAttribute("name"));
     assertTrue(view.signin.getClassNames().contains(SIGNIN));
+    assertEquals(DO_SIGNIN, view.doSignin.getId().orElse(""));
+    assertEquals("none", view.doSignin.getStyle().get("display"));
     assertTrue(view.error.getClassNames().contains(FAIL));
   }
 
@@ -90,6 +107,16 @@ public class SigninViewTest extends AbstractViewTestCase {
     assertEquals(userResources.message(HASHED_PASSWORD), view.password.getLabel());
     assertEquals(resources.message(SIGNIN), view.signin.getText());
     assertEquals("", view.error.getText());
+  }
+
+  @Test
+  public void configurePage() {
+    InitialPageSettings settings = mock(InitialPageSettings.class);
+    view.configurePage(settings);
+    verify(settings).addInlineWithContents(InitialPageSettings.Position.PREPEND,
+        "window.customElements=window.customElements||{};"
+            + "window.customElements.forcePolyfill=true;" + "window.ShadyDOM={force:true};",
+        InitialPageSettings.WrapMode.JAVASCRIPT);
   }
 
   @Test
@@ -114,6 +141,14 @@ public class SigninViewTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void attach() {
+    view = new SigninViewForTest(presenter);
+    view.onAttach(mock(AttachEvent.class));
+    verify(page).executeJavaScript("document.getElementById('" + DO_SIGNIN
+        + "').addEventListener('click', () => document.getElementById('ironform').submit());");
+  }
+
+  @Test
   public void getLocale() {
     assertEquals(locale, view.getLocale());
   }
@@ -123,5 +158,17 @@ public class SigninViewTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     when(ui.getLocale()).thenReturn(locale);
     assertEquals(locale, view.getLocale());
+  }
+
+  @SuppressWarnings("serial")
+  private class SigninViewForTest extends SigninView {
+    public SigninViewForTest(SigninViewPresenter presenter) {
+      super(presenter);
+    }
+
+    @Override
+    public Optional<UI> getUI() {
+      return Optional.of(ui);
+    }
   }
 }
