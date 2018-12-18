@@ -28,8 +28,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.shiro.web.servlet.ShiroFilter;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DisabledException;
@@ -53,7 +51,6 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-  public static final String SHIRO_FILTER_NAME = "ShiroFilter";
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   private static final String SIGNIN_FAILURE_URL_PATTERN =
       Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
@@ -189,16 +186,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
     return parameterValue != null
         && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
-  }
-
-  @Bean(name = SHIRO_FILTER_NAME)
-  public ShiroFilter shiroFilter() {
-    return new ShiroFilter();
-  }
-
-  @Bean
-  public ServletListenerRegistrationBean<ShiroWebEnvironmentListener>
-      shiroWebEnvironmentListener() {
-    return new ServletListenerRegistrationBean<>(new ShiroWebEnvironmentListener());
   }
 }

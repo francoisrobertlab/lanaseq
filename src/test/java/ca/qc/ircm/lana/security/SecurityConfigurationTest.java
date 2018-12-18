@@ -17,13 +17,11 @@
 
 package ca.qc.ircm.lana.security;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import java.time.Duration;
 import javax.inject.Inject;
-import org.apache.shiro.codec.Base64;
-import org.apache.shiro.codec.Hex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -36,19 +34,8 @@ public class SecurityConfigurationTest {
 
   @Test
   public void defaultProperties() throws Throwable {
-    assertArrayEquals(Hex.decode("2c9bff536d5bb8ae5550c93cdadace1b"),
-        securityConfiguration.getCipherKeyBytes());
-    assertEquals("lana", securityConfiguration.getRealmName());
-    assertEquals(10, securityConfiguration.getPasswordStrength());
-    assertEquals(5, securityConfiguration.getMaximumSignAttemps());
-    assertEquals(300000, securityConfiguration.getMaximumSignAttempsDelay());
-    assertEquals(15, securityConfiguration.getDisableSignAttemps());
-  }
-
-  @Test
-  public void base64CipherKey() throws Throwable {
-    securityConfiguration.setCipherKey("AcEG7RqLxcP6enoSBJKNjA==");
-    assertArrayEquals(Base64.decode("AcEG7RqLxcP6enoSBJKNjA=="),
-        securityConfiguration.getCipherKeyBytes());
+    assertEquals(5, securityConfiguration.getLockAttemps());
+    assertEquals(Duration.ofMinutes(3), securityConfiguration.getLockDuration());
+    assertEquals("JfYMi0qUQVt8FObsZHW7", securityConfiguration.getRememberMeKey());
   }
 }

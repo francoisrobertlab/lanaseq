@@ -29,12 +29,6 @@ spring:
       validationQuery: SELECT 1
 
 security:
-  realmName: ${spring.application.name}
-  cipherKey: '0x2c9bff536d5bb8ae5550c93cdadace1b'
-  passwordStrength: 10
-  maximumSignAttemps: 5
-  maximumSignAttempsDelay: 300000  # 5 minutes.
-  disableSignAttemps: 15
   lockAttemps: 5
   lock-duration: PT3M
 
@@ -44,9 +38,6 @@ ldap:
   user-filter: uid={0}
   id-attribute: uid
   mail-attribute: mail
-
-shiro:
-  loginUrl: /signin
 
 # Web server.
 server:
@@ -74,6 +65,9 @@ spring:
       credential:
         username: uid=poitrasc
         password: secret
+
+security:
+  rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
 
 vaadin:
   productionMode: false
