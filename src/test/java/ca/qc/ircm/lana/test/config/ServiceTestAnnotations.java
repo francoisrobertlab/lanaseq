@@ -36,7 +36,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @TestExecutionListeners(
     value = { InitializeDatabaseExecutionListener.class, ShiroTestExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
-@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql" })
+@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql" })
 public @interface ServiceTestAnnotations {
 
 }

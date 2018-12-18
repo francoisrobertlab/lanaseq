@@ -76,8 +76,7 @@ public class SpringDataUserDetailsService implements UserDetailsService {
         authorities
             .add(new SimpleGrantedAuthority(SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE));
       }
-      return new org.springframework.security.core.userdetails.User(user.getEmail(),
-          user.getHashedPassword(), user.isActive(), true, true, !accountLocked(user), authorities);
+      return new AuthenticatedUser(user, true, true, !accountLocked(user), authorities);
     }
   }
 

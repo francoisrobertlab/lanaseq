@@ -17,21 +17,21 @@
 
 package ca.qc.ircm.lana.test.config;
 
-import ca.qc.ircm.lana.user.Laboratory;
-import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.test.context.TestContext;
 
 /**
  * Initialized test database.
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class InitializeDatabaseExecutionListener extends InjectIntoTestExecutionListener {
   private static final Logger logger =
       LoggerFactory.getLogger(InitializeDatabaseExecutionListener.class);
@@ -49,91 +49,29 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
       "$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu";
   @Inject
   private UserRepository userRepository;
-  @Inject
-  private LaboratoryRepository laboratoryRepository;
 
   @Override
   @SuppressWarnings("checkstyle:linelength")
   public void beforeTestMethod(TestContext testContext) throws Exception {
     logger.debug("Initializes database");
 
-    User user = new User();
-    user.setId(1L);
-    user.setName("Lana Administrator");
-    user.setEmail("lana@ircm.qc.ca");
-    user.setHashedPassword(PASSWORD_PASS2);
-    user.setSignAttempts(1);
+    User user = userRepository.findById(1L).orElse(null);
     user.setLastSignAttempt(Instant.now().minus(4, ChronoUnit.DAYS));
-    user.setActive(true);
-    user.setAdmin(true);
     userRepository.save(user);
-    Laboratory lab = new Laboratory();
-    lab.setId(1L);
-    lab.setName("Chromatin and Genomic Expression");
-    laboratoryRepository.save(lab);
-    user = new User();
-    user.setId(2L);
-    user.setName("Francois Robert");
-    user.setEmail("francois.robert@ircm.qc.ca");
-    user.setHashedPassword(PASSWORD_PASS1);
-    user.setSignAttempts(0);
+    user = userRepository.findById(2L).orElse(null);
     user.setLastSignAttempt(Instant.now().minus(2, ChronoUnit.HOURS));
-    user.setActive(true);
-    user.setManager(true);
-    user.setLaboratory(lab);
-    user.setLocale(Locale.ENGLISH);
     userRepository.save(user);
-    user = new User();
-    user.setId(3L);
-    user.setName("Jonh Smith");
-    user.setEmail("jonh.smith@ircm.qc.ca");
-    user.setHashedPassword(PASSWORD_PASS1);
-    user.setSignAttempts(2);
+    user = userRepository.findById(3L).orElse(null);
     user.setLastSignAttempt(Instant.now().minus(10, ChronoUnit.DAYS));
-    user.setActive(true);
-    user.setLaboratory(lab);
     userRepository.save(user);
-    lab = new Laboratory();
-    lab.setId(2L);
-    lab.setName("Translational Proteomics Research Unit");
-    laboratoryRepository.save(lab);
-    user = new User();
-    user.setId(4L);
-    user.setName("Benoit Coulombe");
-    user.setEmail("benoit.coulombe@ircm.qc.ca");
-    user.setHashedPassword(PASSWORD_PASS1);
-    user.setActive(true);
-    user.setManager(true);
-    user.setSignAttempts(0);
+    user = userRepository.findById(4L).orElse(null);
     user.setLastSignAttempt(Instant.now().minus(21, ChronoUnit.DAYS));
-    user.setLaboratory(lab);
     userRepository.save(user);
-    user = new User();
-    user.setId(5L);
-    user.setName("Christian Poitras");
-    user.setEmail("christian.poitras@ircm.qc.ca");
-    user.setHashedPassword(PASSWORD_PASS1);
-    user.setSignAttempts(3);
+    user = userRepository.findById(5L).orElse(null);
     user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.MINUTES));
-    user.setExpiredPassword(true);
-    user.setActive(true);
-    user.setLaboratory(lab);
     userRepository.save(user);
-    user = new User();
-    user.setId(6L);
-    user.setName("Inactive User");
-    user.setEmail("inactive.user@ircm.qc.ca");
-    user.setHashedPassword(PASSWORD_PASS1);
-    user.setSignAttempts(3);
+    user = userRepository.findById(6L).orElse(null);
     user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.MINUTES));
-    user.setActive(false);
-    user.setLaboratory(lab);
     userRepository.save(user);
-  }
-
-  @Override
-  public void afterTestMethod(TestContext testContext) throws Exception {
-    userRepository.deleteAll();
-    laboratoryRepository.deleteAll();
   }
 }
