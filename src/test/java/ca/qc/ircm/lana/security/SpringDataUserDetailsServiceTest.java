@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
@@ -66,6 +67,7 @@ public class SpringDataUserDetailsServiceTest {
   public void loadUserByUsername() {
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
 
+    verify(userRepository).findByEmail("lana@ircm.qc.ca");
     assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
@@ -77,6 +79,9 @@ public class SpringDataUserDetailsServiceTest {
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
     assertTrue(userDetails.isAccountNonLocked());
+    assertTrue(userDetails instanceof AuthenticatedUser);
+    AuthenticatedUser authenticatedUser = (AuthenticatedUser) userDetails;
+    assertEquals((Long) 2L, authenticatedUser.getId());
   }
 
   @Test
