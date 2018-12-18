@@ -168,6 +168,23 @@ public class LdapDaoAuthenticationProviderTest {
   }
 
   @Test
+  public void loadUserByUsername_NotLockedSignAttemp() {
+    User user = userRepository.findById(3L).get();
+    user.setSignAttempts(0);
+    user.setLastSignAttempt(Instant.now());
+    userRepository.save(user);
+
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass1");
+    ldapDaoAuthenticationProvider.authenticate(authentication);
+
+    user = userRepository.findById(3L).get();
+    assertEquals(0, user.getSignAttempts());
+    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+  }
+
+  @Test
   public void loadUserByUsername_NotLockedLastSignAttemp() {
     User user = userRepository.findById(3L).get();
     user.setSignAttempts(5);

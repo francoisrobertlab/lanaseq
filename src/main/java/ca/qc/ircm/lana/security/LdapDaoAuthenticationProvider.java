@@ -70,7 +70,8 @@ public class LdapDaoAuthenticationProvider extends DaoAuthenticationProvider {
   }
 
   private boolean accountLocked(User user) {
-    return user.getSignAttempts() % securityConfiguration.getLockAttemps() == 0
+    return user.getSignAttempts() > 0
+        && user.getSignAttempts() % securityConfiguration.getLockAttemps() == 0
         && user.getLastSignAttempt() != null && user.getLastSignAttempt()
             .plusMillis(securityConfiguration.getLockDuration().toMillis()).isAfter(Instant.now());
   }
