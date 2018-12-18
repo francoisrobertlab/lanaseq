@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lana.security;
 
+import static ca.qc.ircm.lana.security.SecurityConfiguration.ROLE_PREFIX;
+
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Collection;
@@ -36,7 +38,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class SpringAuthorizationService implements AuthorizationService {
-  private static final String ROLE_PREFIX = "ROLE_";
   @Inject
   private UserRepository userRepository;
 

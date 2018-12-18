@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 public class SecurityConfiguration {
   public static final String PREFIX = "security";
+  public static final String ROLE_PREFIX = "ROLE_";
   public static final String FORCE_CHANGE_PASSWORD_ROLE = "CHANGE_PASSWORD";
   private int lockAttemps;
   private Duration lockDuration;

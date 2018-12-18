@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lana.security;
 
+import static ca.qc.ircm.lana.security.SecurityConfiguration.ROLE_PREFIX;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
@@ -65,12 +66,12 @@ public class SpringDataUserDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException("No user with email: " + email);
     } else {
       Collection<GrantedAuthority> authorities = new ArrayList<>();
-      authorities.add(new SimpleGrantedAuthority(USER));
+      authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + USER));
       if (user.isAdmin()) {
-        authorities.add(new SimpleGrantedAuthority(ADMIN));
+        authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + ADMIN));
       }
       if (user.isManager()) {
-        authorities.add(new SimpleGrantedAuthority(MANAGER));
+        authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + MANAGER));
       }
       if (user.isExpiredPassword()) {
         authorities
