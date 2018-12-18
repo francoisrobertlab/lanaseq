@@ -24,12 +24,9 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,28 +39,21 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SpringDataUserDetailsService implements UserDetailsService {
-  private static final Logger logger = LoggerFactory.getLogger(SpringDataUserDetailsService.class);
   @Inject
   private UserRepository userRepository;
-  @Inject
-  private SecurityConfiguration securityConfiguration;
 
   protected SpringDataUserDetailsService() {
   }
 
-  protected SpringDataUserDetailsService(UserRepository userRepository,
-      SecurityConfiguration securityConfiguration) {
+  protected SpringDataUserDetailsService(UserRepository userRepository) {
     this.userRepository = userRepository;
-    this.securityConfiguration = securityConfiguration;
   }
 
   @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    User user = userRepository.findByEmail(email).orElse(null);
-    logger.debug("user {} signin-in, locked: {}, database user: {}", email,
-        user != null ? accountLocked(user) : "false", user);
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    User user = userRepository.findByEmail(username).orElse(null);
     if (null == user) {
-      throw new UsernameNotFoundException("No user with email: " + email);
+      throw new UsernameNotFoundException("No user with username: " + username);
     } else {
       Collection<GrantedAuthority> authorities = new ArrayList<>();
       authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + USER));
@@ -77,13 +67,7 @@ public class SpringDataUserDetailsService implements UserDetailsService {
         authorities
             .add(new SimpleGrantedAuthority(SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE));
       }
-      return new AuthenticatedUser(user, true, true, !accountLocked(user), authorities);
+      return new AuthenticatedUser(user, authorities);
     }
-  }
-
-  private boolean accountLocked(User user) {
-    return user.getSignAttempts() % securityConfiguration.getLockAttemps() == 0
-        && user.getLastSignAttempt() != null && user.getLastSignAttempt()
-            .plusMillis(securityConfiguration.getLockDuration().toMillis()).isAfter(Instant.now());
   }
 }

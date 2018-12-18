@@ -17,7 +17,11 @@
 
 package ca.qc.ircm.lana.security.web;
 
+import ca.qc.ircm.lana.security.LdapConfiguration;
+import ca.qc.ircm.lana.security.LdapDaoAuthenticationProvider;
+import ca.qc.ircm.lana.security.LdapService;
 import ca.qc.ircm.lana.security.SecurityConfiguration;
+import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.SigninView;
 import com.vaadin.flow.server.ServletHelper.RequestType;
@@ -66,7 +70,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Inject
   private UserDetailsService userDetailsService;
   @Inject
+  private UserRepository userRepository;
+  @Inject
+  private LdapService ldapService;
+  @Inject
   private SecurityConfiguration configuration;
+  @Inject
+  private LdapConfiguration ldapConfiguration;
 
   /**
    * Returns password encoder that supports password upgrades.
@@ -84,6 +94,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     passworEncoder.setDefaultPasswordEncoderForMatches(defaultPasswordEncoder);
 
     return passworEncoder;
+  }
+
+  /**
+   * Returns {@link LdapDaoAuthenticationProvider}.
+   *
+   * @return {@link LdapDaoAuthenticationProvider}
+   */
+  @Bean
+  public LdapDaoAuthenticationProvider authenticationProvider() {
+    LdapDaoAuthenticationProvider authenticationProvider = new LdapDaoAuthenticationProvider();
+    authenticationProvider.setUserDetailsService(userDetailsService);
+    authenticationProvider.setPasswordEncoder(passwordEncoder());
+    authenticationProvider.setUserRepository(userRepository);
+    authenticationProvider.setLdapService(ldapService);
+    authenticationProvider.setLdapConfiguration(ldapConfiguration);
+    authenticationProvider.setSecurityConfiguration(configuration);
+    return authenticationProvider;
   }
 
   /**
@@ -109,7 +136,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     super.configure(auth);
-    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    auth.authenticationProvider(authenticationProvider());
   }
 
   /**

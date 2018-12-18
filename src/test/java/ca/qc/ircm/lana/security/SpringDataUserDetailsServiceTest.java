@@ -3,7 +3,6 @@ package ca.qc.ircm.lana.security;
 import static ca.qc.ircm.lana.security.SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE;
 import static ca.qc.ircm.lana.security.SecurityConfiguration.ROLE_PREFIX;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -14,9 +13,6 @@ import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,8 +33,6 @@ public class SpringDataUserDetailsServiceTest {
   private SpringDataUserDetailsService userDetailsService;
   @Mock
   private UserRepository userRepository;
-  @Mock
-  private SecurityConfiguration securityConfiguration;
   private User user;
 
   /**
@@ -46,7 +40,7 @@ public class SpringDataUserDetailsServiceTest {
    */
   @Before
   public void beforeTest() {
-    userDetailsService = new SpringDataUserDetailsService(userRepository, securityConfiguration);
+    userDetailsService = new SpringDataUserDetailsService(userRepository);
     user = new User();
     user.setId(2L);
     user.setEmail("lana@ircm.qc.ca");
@@ -54,8 +48,6 @@ public class SpringDataUserDetailsServiceTest {
     user.setHashedPassword(InitializeDatabaseExecutionListener.PASSWORD_PASS1);
     user.setActive(true);
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
-    when(securityConfiguration.getLockAttemps()).thenReturn(5);
-    when(securityConfiguration.getLockDuration()).thenReturn(Duration.ofMinutes(3));
   }
 
   private Optional<? extends GrantedAuthority>
@@ -139,25 +131,6 @@ public class SpringDataUserDetailsServiceTest {
   }
 
   @Test
-  public void loadUserByUsername_Inactive() {
-    user.setActive(false);
-
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
-
-    assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
-    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
-    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(1, authorities.size());
-    GrantedAuthority authority = authorities.iterator().next();
-    assertTrue(authority instanceof SimpleGrantedAuthority);
-    assertEquals(ROLE_PREFIX + UserRole.USER, authority.getAuthority());
-    assertFalse(userDetails.isEnabled());
-    assertTrue(userDetails.isAccountNonExpired());
-    assertTrue(userDetails.isCredentialsNonExpired());
-    assertTrue(userDetails.isAccountNonLocked());
-  }
-
-  @Test
   public void loadUserByUsername_ExpiredPassword() {
     user.setExpiredPassword(true);
 
@@ -176,65 +149,5 @@ public class SpringDataUserDetailsServiceTest {
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
     assertTrue(userDetails.isAccountNonLocked());
-  }
-
-  @Test
-  public void loadUserByUsername_NotLockedAttemps() {
-    user.setSignAttempts(1);
-    user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.SECONDS));
-
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
-
-    assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
-    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
-    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(1, authorities.size());
-    GrantedAuthority authority = authorities.iterator().next();
-    assertTrue(authority instanceof SimpleGrantedAuthority);
-    assertEquals(ROLE_PREFIX + UserRole.USER, authority.getAuthority());
-    assertTrue(userDetails.isEnabled());
-    assertTrue(userDetails.isAccountNonExpired());
-    assertTrue(userDetails.isCredentialsNonExpired());
-    assertTrue(userDetails.isAccountNonLocked());
-  }
-
-  @Test
-  public void loadUserByUsername_NotLockedLastSignAttemp() {
-    user.setSignAttempts(5);
-    user.setLastSignAttempt(Instant.now().minus(6, ChronoUnit.MINUTES));
-
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
-
-    assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
-    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
-    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(1, authorities.size());
-    GrantedAuthority authority = authorities.iterator().next();
-    assertTrue(authority instanceof SimpleGrantedAuthority);
-    assertEquals(ROLE_PREFIX + UserRole.USER, authority.getAuthority());
-    assertTrue(userDetails.isEnabled());
-    assertTrue(userDetails.isAccountNonExpired());
-    assertTrue(userDetails.isCredentialsNonExpired());
-    assertTrue(userDetails.isAccountNonLocked());
-  }
-
-  @Test
-  public void loadUserByUsername_Locked() {
-    user.setSignAttempts(5);
-    user.setLastSignAttempt(Instant.now().minus(20, ChronoUnit.SECONDS));
-
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
-
-    assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
-    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
-    Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(1, authorities.size());
-    GrantedAuthority authority = authorities.iterator().next();
-    assertTrue(authority instanceof SimpleGrantedAuthority);
-    assertEquals(ROLE_PREFIX + UserRole.USER, authority.getAuthority());
-    assertTrue(userDetails.isEnabled());
-    assertTrue(userDetails.isAccountNonExpired());
-    assertTrue(userDetails.isCredentialsNonExpired());
-    assertFalse(userDetails.isAccountNonLocked());
   }
 }
