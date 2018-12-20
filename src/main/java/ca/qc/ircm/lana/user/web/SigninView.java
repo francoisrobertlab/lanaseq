@@ -22,6 +22,7 @@ import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
+import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
@@ -35,10 +36,15 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.InitialPageSettings;
+import com.vaadin.flow.server.PageConfigurator;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -48,19 +54,26 @@ import javax.inject.Inject;
  */
 @Route(value = SigninView.VIEW_NAME)
 @HtmlImport("styles/shared-styles.html")
-public class SigninView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
+@HtmlImport("frontend://bower_components/iron-form/iron-form.html")
+public class SigninView extends Composite<VerticalLayout> implements LocaleChangeObserver,
+    HasDynamicTitle, PageConfigurator, AfterNavigationObserver, BaseComponent {
   public static final String VIEW_NAME = "signin";
   public static final String HEADER = "header";
+  public static final String USERNAME = "username";
+  public static final String PASSWORD = "password";
   public static final String SIGNIN = "signin";
+  public static final String DO_SIGNIN = "dosignin";
   public static final String FAIL = "fail";
   public static final String DISABLED = "disabled";
   public static final String EXCESSIVE_ATTEMPTS = "excessiveAttempts";
   private static final long serialVersionUID = 638443368018456019L;
   protected H2 header = new H2();
+  protected Element ironForm = new Element("iron-form");
+  protected Element form = new Element("form");
   protected TextField email = new TextField();
   protected PasswordField password = new PasswordField();
   protected Button signin = new Button();
+  protected Button doSignin = new Button();
   protected Div error = new Div();
   @Inject
   private transient SigninViewPresenter presenter;
@@ -78,14 +91,37 @@ public class SigninView extends Composite<VerticalLayout>
     root.setId(VIEW_NAME);
     root.add(header);
     header.addClassName(HEADER);
-    root.add(email);
+    root.getElement().appendChild(ironForm);
+    ironForm.setAttribute("id", "ironform");
+    ironForm.setAttribute("allow-redirect", "");
+    ironForm.appendChild(form);
+    form.setAttribute("method", "post");
+    form.setAttribute("action", WebSecurityConfiguration.SIGNIN_PROCESSING_URL);
+    VerticalLayout formLayout = new VerticalLayout();
+    form.appendChild(formLayout.getElement());
+    formLayout.add(email);
     email.addClassName(EMAIL);
-    root.add(password);
+    email.getElement().setAttribute("name", USERNAME);
+    formLayout.add(password);
     password.addClassName(HASHED_PASSWORD);
-    root.add(signin);
+    password.getElement().setAttribute("name", PASSWORD);
+    formLayout.add(signin);
     signin.addClassName(SIGNIN);
+    formLayout.add(doSignin);
+    doSignin.setId(DO_SIGNIN);
+    doSignin.getStyle().set("display", "none");
     root.add(error);
     error.addClassName(FAIL);
+  }
+
+  @Override
+  public void configurePage(InitialPageSettings settings) {
+    // Force login page to use Shady DOM to avoid problems with browsers and
+    // password managers not supporting shadow DOM
+    settings.addInlineWithContents(InitialPageSettings.Position.PREPEND,
+        "window.customElements=window.customElements||{};"
+            + "window.customElements.forcePolyfill=true;" + "window.ShadyDOM={force:true};",
+        InitialPageSettings.WrapMode.JAVASCRIPT);
   }
 
   @Override
@@ -108,7 +144,16 @@ public class SigninView extends Composite<VerticalLayout>
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
+    getUI().ifPresent(ui -> {
+      ui.getPage().executeJavaScript("document.getElementById('" + DO_SIGNIN
+          + "').addEventListener('click', () => document.getElementById('ironform').submit());");
+    });
     presenter.init(this);
+  }
+
+  @Override
+  public void afterNavigation(AfterNavigationEvent event) {
+    presenter.showError(event.getLocation().getQueryParameters().getParameters());
   }
 
   @Override

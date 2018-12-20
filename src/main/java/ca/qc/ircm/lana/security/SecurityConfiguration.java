@@ -17,8 +17,7 @@
 
 package ca.qc.ircm.lana.security;
 
-import org.apache.shiro.codec.Base64;
-import org.apache.shiro.codec.Hex;
+import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -31,72 +30,31 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 public class SecurityConfiguration {
   public static final String PREFIX = "security";
-  private static final String HEX_BEGIN_TOKEN = "0x";
-  private String cipherKey;
-  private int passwordStrength;
-  private int maximumSignAttemps;
-  private long maximumSignAttempsDelay;
-  private int disableSignAttemps;
-  private String realmName;
+  private int lockAttemps;
+  private Duration lockDuration;
+  private String rememberMeKey;
 
-  public String getRealmName() {
-    return realmName;
+  public int getLockAttemps() {
+    return lockAttemps;
   }
 
-  public String getCipherKey() {
-    return cipherKey;
+  public void setLockAttemps(int lockAttemps) {
+    this.lockAttemps = lockAttemps;
   }
 
-  public void setCipherKey(String cipherKey) {
-    this.cipherKey = cipherKey;
+  public Duration getLockDuration() {
+    return lockDuration;
   }
 
-  /**
-   * Returns cipher key as a byte array.
-   *
-   * @return cipher key as a byte array
-   */
-  public byte[] getCipherKeyBytes() {
-    if (cipherKey.startsWith(HEX_BEGIN_TOKEN)) {
-      return Hex.decode(cipherKey.substring(HEX_BEGIN_TOKEN.length()));
-    } else {
-      return Base64.decode(cipherKey);
-    }
+  public void setLockDuration(Duration lockDuration) {
+    this.lockDuration = lockDuration;
   }
 
-  public int getPasswordStrength() {
-    return passwordStrength;
+  public String getRememberMeKey() {
+    return rememberMeKey;
   }
 
-  public void setPasswordStrength(int passwordStrength) {
-    this.passwordStrength = passwordStrength;
-  }
-
-  public int getMaximumSignAttemps() {
-    return maximumSignAttemps;
-  }
-
-  public void setMaximumSignAttemps(int maximumSignAttemps) {
-    this.maximumSignAttemps = maximumSignAttemps;
-  }
-
-  public long getMaximumSignAttempsDelay() {
-    return maximumSignAttempsDelay;
-  }
-
-  public void setMaximumSignAttempsDelay(long maximumSignAttempsDelay) {
-    this.maximumSignAttempsDelay = maximumSignAttempsDelay;
-  }
-
-  public int getDisableSignAttemps() {
-    return disableSignAttemps;
-  }
-
-  public void setDisableSignAttemps(int disableSignAttemps) {
-    this.disableSignAttemps = disableSignAttemps;
-  }
-
-  public void setRealmName(String realmName) {
-    this.realmName = realmName;
+  public void setRememberMeKey(String rememberMeKey) {
+    this.rememberMeKey = rememberMeKey;
   }
 }

@@ -15,26 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.user;
+package ca.qc.ircm.lana.security.web;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 /**
- * User roles.
+ * HttpSessionRequestCache that avoids saving internal framework requests.
  */
-public interface UserRole {
-  public static final String USER = "ROLE_USER";
-  public static final String MANAGER = "ROLE_MANAGER";
-  public static final String ADMIN = "ROLE_ADMIN";
+class SkipVaadinRequestCache extends HttpSessionRequestCache {
   /**
-   * Forces user to change his password.
-   */
-  public static final String FORCE_CHANGE_PASSWORD = "CHANGE_PASSWORD";
-
-  /**
-   * Returns all user roles.
+   * {@inheritDoc}
+   * <p>
+   * If the method is considered an internal request from the framework, we skip saving it.
+   * </p>
    *
-   * @return all user roles
+   * @see WebSecurityConfiguration#isVaadinInternalRequest(HttpServletRequest)
    */
-  public static String[] roles() {
-    return new String[] { USER, MANAGER, ADMIN };
+  @Override
+  public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
+    if (!WebSecurityConfiguration.isVaadinInternalRequest(request)) {
+      super.saveRequest(request, response);
+    }
   }
 }

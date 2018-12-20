@@ -42,48 +42,44 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lana.test.config.WithSubject;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class AuthorizationServiceTest {
+public class SpringAuthorizationServiceTest {
+  private static final String DEFAULT_ROLE = "USER";
   @Inject
   private UserRepository userRepository;
-  private AuthorizationService authorizationService;
-  private Subject subject;
+  private SpringAuthorizationService authorizationService;
 
   /**
    * Before test.
    */
   @Before
   public void beforeTest() {
-    authorizationService = new AuthorizationService(userRepository);
-    subject = SecurityUtils.getSubject();
+    authorizationService = new SpringAuthorizationService(userRepository);
   }
 
   @Test
-  @WithSubject(anonymous = true)
+  @WithAnonymousUser
   public void currentUser_Anonymous() throws Throwable {
     assertNull(authorizationService.currentUser());
   }
 
   @Test
-  @WithSubject(userId = 1)
+  @WithUserDetails("lana@ircm.qc.ca")
   public void currentUser() throws Throwable {
     User user = authorizationService.currentUser();
     assertNotNull(authorizationService.currentUser());
@@ -91,120 +87,105 @@ public class AuthorizationServiceTest {
   }
 
   @Test
-  @WithSubject(anonymous = true)
+  @WithAnonymousUser
   public void isAnonymous_True() throws Throwable {
     assertTrue(authorizationService.isAnonymous());
   }
 
   @Test
-  @WithSubject(anonymous = false)
+  @WithMockUser
   public void isAnonymous_False() throws Throwable {
     assertFalse(authorizationService.isAnonymous());
   }
 
   @Test
-  @WithSubject
+  @WithMockUser
   public void hasRole_False() throws Throwable {
     assertFalse(authorizationService.hasRole(ADMIN));
-    verify(subject).hasRole(ADMIN);
   }
 
   @Test
-  @WithSubject
+  @WithMockUser
   public void hasRole_True() throws Throwable {
-    when(subject.hasRole(ADMIN)).thenReturn(true);
-    assertTrue(authorizationService.hasRole(ADMIN));
-    verify(subject).hasRole(ADMIN);
+    assertTrue(authorizationService.hasRole(DEFAULT_ROLE));
   }
 
   @Test
-  @WithSubject
+  @WithMockUser
   public void hasAnyRole_False() throws Throwable {
     assertFalse(authorizationService.hasAnyRole(ADMIN, MANAGER));
-    verify(subject).hasRole(ADMIN);
-    verify(subject).hasRole(MANAGER);
   }
 
   @Test
-  @WithSubject
+  @WithMockUser
   public void hasAnyRole_TrueFirst() throws Throwable {
-    when(subject.hasRole(ADMIN)).thenReturn(true);
-    assertTrue(authorizationService.hasAnyRole(ADMIN, MANAGER));
-    verify(subject).hasRole(ADMIN);
+    assertTrue(authorizationService.hasAnyRole(DEFAULT_ROLE, MANAGER));
   }
 
   @Test
-  @WithSubject
+  @WithMockUser
   public void hasAnyRole_TrueLast() throws Throwable {
-    when(subject.hasRole(MANAGER)).thenReturn(true);
-    assertTrue(authorizationService.hasAnyRole(ADMIN, MANAGER));
-    verify(subject).hasRole(MANAGER);
+    assertTrue(authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE));
   }
 
   @Test
+  @WithMockUser
   public void isAuthorized_NoRole() throws Throwable {
     assertTrue(authorizationService.isAuthorized(NoRoleTest.class));
-    verifyZeroInteractions(subject);
   }
 
   @Test
+  @WithMockUser(roles = { USER })
   public void isAuthorized_UserRole_True() throws Throwable {
-    when(subject.hasRole(USER)).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(UserRoleTest.class));
-    verify(subject).hasRole(USER);
   }
 
   @Test
+  @WithMockUser(roles = {})
   public void isAuthorized_UserRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(UserRoleTest.class));
-    verify(subject).hasRole(USER);
   }
 
   @Test
+  @WithMockUser(roles = { MANAGER })
   public void isAuthorized_ManagerRole_True() throws Throwable {
-    when(subject.hasRole(MANAGER)).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(ManagerRoleTest.class));
-    verify(subject).hasRole(MANAGER);
   }
 
   @Test
+  @WithMockUser
   public void isAuthorized_ManagerRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(ManagerRoleTest.class));
-    verify(subject).hasRole(MANAGER);
   }
 
   @Test
+  @WithMockUser(roles = { ADMIN })
   public void isAuthorized_AdminRole_True() throws Throwable {
-    when(subject.hasRole(ADMIN)).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(AdminRoleTest.class));
-    verify(subject).hasRole(ADMIN);
   }
 
   @Test
+  @WithMockUser
   public void isAuthorized_AdminRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(AdminRoleTest.class));
-    verify(subject).hasRole(ADMIN);
   }
 
   @Test
+  @WithMockUser(roles = { MANAGER })
   public void isAuthorized_ManagerOrAdminRole_Manager() throws Throwable {
-    when(subject.hasRole(MANAGER)).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
-    verify(subject).hasRole(MANAGER);
   }
 
   @Test
+  @WithMockUser(roles = { ADMIN })
   public void isAuthorized_ManagerOrAdminRole_Admin() throws Throwable {
-    when(subject.hasRole(ADMIN)).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
-    verify(subject).hasRole(ADMIN);
   }
 
   @Test
+  @WithMockUser
   public void isAuthorized_ManagerOrAdminRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
-    verify(subject).hasRole(MANAGER);
-    verify(subject).hasRole(ADMIN);
   }
 
   public static final class NoRoleTest {

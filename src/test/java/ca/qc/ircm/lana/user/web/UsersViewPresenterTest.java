@@ -36,6 +36,7 @@ import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.SaveEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
 import java.util.List;
 import java.util.Locale;
@@ -73,9 +74,11 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     presenter = new UsersViewPresenter(userService);
     view.header = new H2();
     view.users = new Grid<>();
+    view.users.setSelectionMode(SelectionMode.MULTI);
     view.userDialog = mock(UserDialog.class);
     users = userRepository.findAll();
     when(view.getLocale()).thenReturn(locale);
+    when(userService.all()).thenReturn(users);
   }
 
   @Test

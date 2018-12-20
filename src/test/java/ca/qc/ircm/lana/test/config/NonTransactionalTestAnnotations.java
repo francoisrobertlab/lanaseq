@@ -32,9 +32,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @ActiveProfiles("test")
 @WebAppConfiguration
-@TestExecutionListeners(
-    value = { ShiroTestExecutionListener.class },
-    mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+@TestExecutionListeners(value = {}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 public @interface NonTransactionalTestAnnotations {
 
 }

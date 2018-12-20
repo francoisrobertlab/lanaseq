@@ -20,68 +20,61 @@ package ca.qc.ircm.lana.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@NonTransactionalTestAnnotations
-public class ShiroLdapServiceTest {
-  private ShiroLdapService ldapService;
-  @Mock
-  private LdapConfiguration ldapConfiguration;
+@ServiceTestAnnotations
+public class SpringLdapServiceTest {
+  private SpringLdapService ldapService;
   @Inject
   private LdapTemplate ldapTemplate;
+  @Inject
+  private LdapConfiguration ldapConfiguration;
 
-  /**
-   * Before test.
-   */
   @Before
   public void beforeTest() {
-    LdapContextSource contextSource = (LdapContextSource) ldapTemplate.getContextSource();
-    ldapService = new ShiroLdapService(ldapConfiguration);
-    when(ldapConfiguration.getUrl()).thenReturn(contextSource.getUrls()[0]);
-    when(ldapConfiguration.getBase()).thenReturn("dc=mycompany,dc=com");
-    when(ldapConfiguration.getUserDnTemplate()).thenReturn("uid={0},ou=people,dc=mycompany,dc=com");
-    when(ldapConfiguration.getUserFilter()).thenReturn("uid={0}");
-    when(ldapConfiguration.getMailAttribute()).thenReturn("mail");
+    ldapService = new SpringLdapService(ldapTemplate, ldapConfiguration);
   }
 
   @Test
-  public void isPasswordValid_Username_True() {
+  public void isPasswordValid_True() {
     assertTrue(ldapService.isPasswordValid("robertf", "secret"));
   }
 
   @Test
-  public void isPasswordValid_Username_InvalidUser() {
+  public void isPasswordValid_InvalidUser() {
     assertFalse(ldapService.isPasswordValid("invalid", "secret"));
   }
 
   @Test
-  public void isPasswordValid_Username_InvalidPassword() {
+  public void isPasswordValid_InvalidPassword() {
     assertFalse(ldapService.isPasswordValid("robertf", "secret2"));
   }
 
   @Test
   public void getEmail() {
-    assertEquals("francois.robert@ircm.qc.ca", ldapService.getEmail("robertf", "secret"));
+    assertEquals("francois.robert@ircm.qc.ca", ldapService.getEmail("robertf"));
   }
 
   @Test
-  public void getEmail_InvalidUser() {
-    assertEquals(null, ldapService.getEmail("invalid", "secret"));
+  public void getEmail_Invalid() {
+    assertEquals(null, ldapService.getEmail("invalid"));
   }
 
   @Test
-  public void getEmail_InvalidPassword() {
-    assertEquals(null, ldapService.getEmail("robertf", "secret2"));
+  public void getUsername() {
+    assertEquals("robertf", ldapService.getUsername("francois.robert@ircm.qc.ca"));
+  }
+
+  @Test
+  public void getUsername_Invalid() {
+    assertEquals(null, ldapService.getUsername("not.a.user@ircm.qc.ca"));
   }
 }

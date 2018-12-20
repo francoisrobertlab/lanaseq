@@ -58,7 +58,6 @@
     <!-- Dependencies -->
     <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
     <vaadin.version>10.0.6</vaadin.version>
-    <shiro.version>1.4.0</shiro.version>
     <jbcrypt.version>0.4</jbcrypt.version>
     <javax.inject.version>1</javax.inject.version>
     <property-names-annotation-processor.version>0.4</property-names-annotation-processor.version>
@@ -100,8 +99,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-ldap</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -127,19 +126,16 @@
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-      <version>${shiro.version}</version>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-web</artifactId>
-      <version>${shiro.version}</version>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mindrot</groupId>
-      <artifactId>jbcrypt</artifactId>
-      <version>${jbcrypt.version}</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-ldap</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

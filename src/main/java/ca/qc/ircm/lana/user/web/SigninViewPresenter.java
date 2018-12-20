@@ -25,7 +25,6 @@ import static ca.qc.ircm.lana.user.web.SigninView.FAIL;
 import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 
-import ca.qc.ircm.lana.security.AuthenticationService;
 import ca.qc.ircm.lana.security.LdapConfiguration;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.WebConstants;
@@ -37,10 +36,9 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.DisabledAccountException;
-import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -56,16 +54,12 @@ public class SigninViewPresenter {
   private SigninView view;
   private Binder<User> binder = new BeanValidationBinder<>(User.class);
   @Inject
-  private AuthenticationService authenticationService;
-  @Inject
   private LdapConfiguration ldapConfiguration;
 
   protected SigninViewPresenter() {
   }
 
-  protected SigninViewPresenter(AuthenticationService authenticationService,
-      LdapConfiguration ldapConfiguration) {
-    this.authenticationService = authenticationService;
+  protected SigninViewPresenter(LdapConfiguration ldapConfiguration) {
     this.ldapConfiguration = ldapConfiguration;
   }
 
@@ -94,24 +88,24 @@ public class SigninViewPresenter {
 
   private void sign() {
     view.error.setVisible(false);
-    MessageResource resources = new MessageResource(SigninView.class, view.getLocale());
     if (binder.isValid()) {
-      try {
-        authenticationService.sign(view.email.getValue(), view.password.getValue(), true);
-        logger.debug("User {} signed successfully", view.email.getValue());
-        view.navigate("");
-      } catch (DisabledAccountException e) {
-        logger.debug("Account disabled for user {}", view.email.getValue());
-        view.error.setText(resources.message(DISABLED));
-        view.error.setVisible(true);
-      } catch (ExcessiveAttemptsException e) {
-        logger.debug("Excessive attempts for user {}", view.email.getValue());
-        view.error.setText(resources.message(EXCESSIVE_ATTEMPTS));
-        view.error.setVisible(true);
-      } catch (AuthenticationException e) {
-        view.error.setText(resources.message(FAIL));
-        view.error.setVisible(true);
-      }
+      view.doSignin.click();
+    }
+  }
+
+  void showError(Map<String, List<String>> parameters) {
+    MessageResource resources = new MessageResource(SigninView.class, view.getLocale());
+    if (parameters.containsKey(DISABLED)) {
+      logger.debug("Account disabled for user {}", view.email.getValue());
+      view.error.setText(resources.message(DISABLED));
+      view.error.setVisible(true);
+    } else if (parameters.containsKey(EXCESSIVE_ATTEMPTS)) {
+      logger.debug("Excessive attempts for user {}", view.email.getValue());
+      view.error.setText(resources.message(EXCESSIVE_ATTEMPTS));
+      view.error.setVisible(true);
+    } else if (parameters.containsKey(FAIL)) {
+      view.error.setText(resources.message(FAIL));
+      view.error.setVisible(true);
     }
   }
 
