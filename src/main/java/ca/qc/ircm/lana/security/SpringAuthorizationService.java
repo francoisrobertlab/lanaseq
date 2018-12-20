@@ -22,7 +22,6 @@ import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Collection;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -31,6 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Authorization service.
