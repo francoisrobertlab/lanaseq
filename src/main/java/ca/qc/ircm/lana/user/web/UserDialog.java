@@ -97,6 +97,9 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
 
   /**
    * Creates a new UserDialog.
+   *
+   * @param authorizationService
+   *          authorization service
    */
   public UserDialog(AuthorizationService authorizationService) {
     setId(CLASS_NAME);
