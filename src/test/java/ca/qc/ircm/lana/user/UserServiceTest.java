@@ -231,6 +231,18 @@ public class UserServiceTest {
     userService.save(user, "password");
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void save_AddBiologistLabIdNotExists() {
+    User user = new User();
+    user.setName("Test User");
+    user.setEmail("test.user@ircm.qc.ca");
+    user.setLocale(Locale.ENGLISH);
+    user.setLaboratory(new Laboratory());
+    user.getLaboratory().setId(3L);
+
+    userService.save(user, "password");
+  }
+
   @Test
   public void save_AddBiologistManager() {
     User user = new User();

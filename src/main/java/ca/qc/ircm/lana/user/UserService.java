@@ -115,7 +115,7 @@ public class UserService {
         throw new IllegalArgumentException("biologists must be in a laboratory");
       }
       if (!user.isManager()
-          && laboratoryRepository.findById(user.getLaboratory().getId()) == null) {
+          && !laboratoryRepository.findById(user.getLaboratory().getId()).isPresent()) {
         throw new IllegalArgumentException(
             "laboratory " + user.getLaboratory().getId() + " does not exists");
       }
