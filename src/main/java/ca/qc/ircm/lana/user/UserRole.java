@@ -21,17 +21,17 @@ package ca.qc.ircm.lana.user;
  * User roles.
  */
 public interface UserRole {
-  public static final String USER = "USER";
-  public static final String MANAGER = "MANAGER";
-  public static final String ADMIN = "ADMIN";
+  public static final String USER = "ROLE_USER";
+  public static final String MANAGER = "ROLE_MANAGER";
+  public static final String ADMIN = "ROLE_ADMIN";
   /**
    * Forces user to change his password.
    */
-  public static final String CHANGE_PASSWORD = "CHANGE_PASSWORD";
+  public static final String FORCE_CHANGE_PASSWORD = "CHANGE_PASSWORD";
 
   /**
    * Returns all user roles.
-   * 
+   *
    * @return all user roles
    */
   public static String[] roles() {

@@ -17,8 +17,10 @@
 
 package ca.qc.ircm.lana.security;
 
-import static ca.qc.ircm.lana.security.SecurityConfiguration.FORCE_CHANGE_PASSWORD_ROLE;
-import static ca.qc.ircm.lana.security.SecurityConfiguration.ROLE_PREFIX;
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.FORCE_CHANGE_PASSWORD;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,7 +31,6 @@ import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import ca.qc.ircm.lana.user.UserRole;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,7 +84,7 @@ public class SpringDataUserDetailsServiceTest {
     assertEquals(1, authorities.size());
     GrantedAuthority authority = authorities.iterator().next();
     assertTrue(authority instanceof SimpleGrantedAuthority);
-    assertEquals(ROLE_PREFIX + UserRole.USER, authority.getAuthority());
+    assertEquals(USER, authority.getAuthority());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
@@ -104,8 +105,8 @@ public class SpringDataUserDetailsServiceTest {
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.USER).isPresent());
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.ADMIN).isPresent());
+    assertTrue(findAuthority(authorities, USER).isPresent());
+    assertTrue(findAuthority(authorities, ADMIN).isPresent());
   }
 
   @Test
@@ -119,8 +120,8 @@ public class SpringDataUserDetailsServiceTest {
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.USER).isPresent());
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.MANAGER).isPresent());
+    assertTrue(findAuthority(authorities, USER).isPresent());
+    assertTrue(findAuthority(authorities, MANAGER).isPresent());
   }
 
   @Test
@@ -135,9 +136,9 @@ public class SpringDataUserDetailsServiceTest {
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.USER).isPresent());
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.ADMIN).isPresent());
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.MANAGER).isPresent());
+    assertTrue(findAuthority(authorities, USER).isPresent());
+    assertTrue(findAuthority(authorities, ADMIN).isPresent());
+    assertTrue(findAuthority(authorities, MANAGER).isPresent());
   }
 
   @Test(expected = UsernameNotFoundException.class)
@@ -160,8 +161,8 @@ public class SpringDataUserDetailsServiceTest {
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
-    assertTrue(findAuthority(authorities, ROLE_PREFIX + UserRole.USER).isPresent());
-    assertTrue(findAuthority(authorities, FORCE_CHANGE_PASSWORD_ROLE).isPresent());
+    assertTrue(findAuthority(authorities, USER).isPresent());
+    assertTrue(findAuthority(authorities, FORCE_CHANGE_PASSWORD).isPresent());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());

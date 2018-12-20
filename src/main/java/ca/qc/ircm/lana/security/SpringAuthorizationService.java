@@ -17,14 +17,14 @@
 
 package ca.qc.ircm.lana.security;
 
-import static ca.qc.ircm.lana.security.SecurityConfiguration.ROLE_PREFIX;
-
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Collection;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class SpringAuthorizationService implements AuthorizationService {
+  private static final Logger logger = LoggerFactory.getLogger(SpringAuthorizationService.class);
   @Inject
   private UserRepository userRepository;
 
@@ -96,11 +97,13 @@ public class SpringAuthorizationService implements AuthorizationService {
    */
   @Override
   public boolean hasRole(String role) {
-    Collection<? extends GrantedAuthority> authorities = getUser().getAuthorities();
+    UserDetails user = getUser();
+    Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
     boolean hasRole = false;
     for (GrantedAuthority authority : authorities) {
-      hasRole |= authority.getAuthority().equals(ROLE_PREFIX + role);
+      hasRole |= authority.getAuthority().equals(role);
     }
+    logger.trace("user {} hasRole {}? {}", user.getUsername(), role, hasRole);
     return hasRole;
   }
 
