@@ -36,7 +36,7 @@ public class MainView extends VerticalLayout implements RouterLayout, BeforeEnte
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
   @Inject
-  private AuthorizationService authorizationService;
+  private transient AuthorizationService authorizationService;
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {

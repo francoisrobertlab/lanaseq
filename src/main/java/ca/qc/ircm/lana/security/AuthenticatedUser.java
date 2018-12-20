@@ -76,6 +76,16 @@ public class AuthenticatedUser extends User implements Data {
   }
 
   @Override
+  public boolean equals(Object rhs) {
+    return super.equals(rhs);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
   public Long getId() {
     return id;
   }
