@@ -59,7 +59,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class SpringAuthorizationServiceTest {
-  private static final String DEFAULT_ROLE = "USER";
+  private static final String DEFAULT_ROLE = USER;
   @Inject
   private UserRepository userRepository;
   private SpringAuthorizationService authorizationService;
@@ -135,7 +135,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithMockUser(roles = { USER })
+  @WithMockUser
   public void isAuthorized_UserRole_True() throws Throwable {
     assertTrue(authorizationService.isAuthorized(UserRoleTest.class));
   }
@@ -147,7 +147,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithMockUser(roles = { MANAGER })
+  @WithMockUser(authorities = { MANAGER })
   public void isAuthorized_ManagerRole_True() throws Throwable {
     assertTrue(authorizationService.isAuthorized(ManagerRoleTest.class));
   }
@@ -159,7 +159,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithMockUser(roles = { ADMIN })
+  @WithMockUser(authorities = { ADMIN })
   public void isAuthorized_AdminRole_True() throws Throwable {
     assertTrue(authorizationService.isAuthorized(AdminRoleTest.class));
   }
@@ -171,13 +171,13 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithMockUser(roles = { MANAGER })
+  @WithMockUser(authorities = { MANAGER })
   public void isAuthorized_ManagerOrAdminRole_Manager() throws Throwable {
     assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
   }
 
   @Test
-  @WithMockUser(roles = { ADMIN })
+  @WithMockUser(authorities = { ADMIN })
   public void isAuthorized_ManagerOrAdminRole_Admin() throws Throwable {
     assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
   }
