@@ -24,6 +24,7 @@ import ca.qc.ircm.lana.security.SecurityConfiguration;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.SigninView;
+import ca.qc.ircm.lana.web.MainView;
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   private static final String SIGNIN_DISABLED_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
-  private static final String SIGNOUT_SUCCESS_URL = "/";
+  private static final String SIGNOUT_SUCCESS_URL = "/" + MainView.VIEW_NAME;
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
   @Inject
   private UserDetailsService userDetailsService;

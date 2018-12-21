@@ -53,7 +53,6 @@ import javax.inject.Inject;
  * Users view.
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
-@RouteAlias(value = "", layout = ViewLayout.class)
 @RolesAllowed({ ADMIN, MANAGER })
 public class UsersView extends Composite<VerticalLayout>
     implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
