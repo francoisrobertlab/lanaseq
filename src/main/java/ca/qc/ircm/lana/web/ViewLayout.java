@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.web;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.web.SigninView;
+import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -52,9 +53,12 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, BeforeEn
       if (authorizationService.isAnonymous()) {
         event.rerouteTo(SigninView.class);
       } else {
-        logger.info("User {} does not have access to {}", authorizationService.currentUser(),
-            event.getNavigationTarget());
-        event.rerouteToError(AccessDeniedException.class);
+        MessageResource resources = new MessageResource(ViewLayout.class, getLocale());
+        String message = resources.message(AccessDeniedException.class.getSimpleName(),
+            authorizationService.currentUser().getEmail(),
+            event.getNavigationTarget().getSimpleName());
+        logger.info(message);
+        event.rerouteToError(new AccessDeniedException(message), message);
       }
     }
   }

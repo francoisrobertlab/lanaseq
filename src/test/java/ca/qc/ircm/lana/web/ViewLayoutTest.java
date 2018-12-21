@@ -1,13 +1,18 @@
 package ca.qc.ircm.lana.web;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.web.SigninView;
+import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.router.BeforeEnterEvent;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,17 +22,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
-public class ViewLayoutTest {
+public class ViewLayoutTest extends AbstractViewTestCase {
   private ViewLayout view;
   @Mock
   private AuthorizationService authorizationService;
   @Mock
   private BeforeEnterEvent event;
+  private Locale locale = Locale.ENGLISH;
+  private MessageResource resources = new MessageResource(ViewLayout.class, locale);
+  private User user = new User(1L, "myuser");
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
+    when(ui.getLocale()).thenReturn(locale);
     view = new ViewLayout(authorizationService);
     when(event.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
+    when(authorizationService.currentUser()).thenReturn(user);
   }
 
   @Test
@@ -45,7 +58,9 @@ public class ViewLayoutTest {
 
     verify(authorizationService).isAuthorized(ViewTest.class);
     verify(authorizationService).isAnonymous();
-    verify(event).rerouteToError(AccessDeniedException.class);
+    String message = resources.message(AccessDeniedException.class.getSimpleName(), user.getEmail(),
+        ViewTest.class.getSimpleName());
+    verify(event).rerouteToError(any(AccessDeniedException.class), eq(message));
   }
 
   @Test

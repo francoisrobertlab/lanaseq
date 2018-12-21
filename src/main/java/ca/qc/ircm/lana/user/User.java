@@ -116,6 +116,11 @@ public class User implements Data, Serializable {
     this.id = id;
   }
 
+  public User(Long id, String email) {
+    this.id = id;
+    this.email = email;
+  }
+
   @Override
   public String toString() {
     return "User [id=" + id + ", email=" + email + "]";
