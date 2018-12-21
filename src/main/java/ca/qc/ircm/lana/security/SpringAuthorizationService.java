@@ -17,6 +17,11 @@
 
 package ca.qc.ircm.lana.security;
 
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Collection;
@@ -25,6 +30,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,11 +64,6 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  /**
-   * Returns current user or null for anonymous.
-   *
-   * @return current user or null for anonymous
-   */
   @Override
   public User currentUser() {
     UserDetails user = getUser();
@@ -78,23 +79,11 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  /**
-   * Returns true if current user is anonymous, false otherwise.
-   *
-   * @return true if current user is anonymous, false otherwise
-   */
   @Override
   public boolean isAnonymous() {
     return getUser() == null;
   }
 
-  /**
-   * Returns true if current user has specified role, false otherwise.
-   *
-   * @param role
-   *          role
-   * @return true if current user has specified role, false otherwise
-   */
   @Override
   public boolean hasRole(String role) {
     UserDetails user = getUser();
@@ -107,13 +96,14 @@ public class SpringAuthorizationService implements AuthorizationService {
     return hasRole;
   }
 
-  /**
-   * Returns true if current user has any of the specified roles, false otherwise.
-   *
-   * @param roles
-   *          roles
-   * @return true if current user has any of the specified roles, false otherwise
-   */
+  @Override
+  public void checkRole(String role) throws AccessDeniedException {
+    if (!hasRole(role)) {
+      User user = currentUser();
+      throw new AccessDeniedException("User " + user + " does not have role " + role);
+    }
+  }
+
   @Override
   public boolean hasAnyRole(String... roles) {
     boolean hasAnyRole = false;
@@ -123,13 +113,6 @@ public class SpringAuthorizationService implements AuthorizationService {
     return hasAnyRole;
   }
 
-  /**
-   * Returns true if current user is authorized to access class, false otherwise.
-   *
-   * @param type
-   *          class
-   * @return true if current user is authorized to access class, false otherwise
-   */
   @Override
   public boolean isAuthorized(Class<?> type) {
     RolesAllowed rolesAllowed = AnnotationUtils.findAnnotation(type, RolesAllowed.class);
@@ -138,6 +121,40 @@ public class SpringAuthorizationService implements AuthorizationService {
       return hasAnyRole(roles);
     } else {
       return true;
+    }
+  }
+
+  private boolean isAuthorized(Owned owned) {
+    if (owned == null || owned.getOwner() == null || owned.getOwner().getId() == null) {
+      return true;
+    }
+    User owner = owned.getOwner();
+    User user = currentUser();
+    if (user == null || user.getId() == null) {
+      return false;
+    }
+    if (hasRole(ADMIN)) {
+      return true;
+    }
+    if (hasRole(MANAGER)) {
+      boolean authorized = false;
+      authorized |= owner.getId().equals(user.getId());
+      Laboratory ownedLaboratory = owner.getLaboratory();
+      Laboratory userLaboratory = user.getLaboratory();
+      if (ownedLaboratory != null && ownedLaboratory.getId() != null && userLaboratory != null
+          && userLaboratory.getId() != null) {
+        authorized |= ownedLaboratory.getId().equals(userLaboratory.getId());
+      }
+      return authorized;
+    }
+    return owner.getId().equals(user.getId());
+  }
+
+  @Override
+  public void checkRead(Owned owned) {
+    if (!isAuthorized(owned)) {
+      User user = currentUser();
+      throw new AccessDeniedException("User " + user + " does not have access to " + owned);
     }
   }
 }

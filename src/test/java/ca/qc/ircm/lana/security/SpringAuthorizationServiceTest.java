@@ -43,7 +43,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lana.experiment.Experiment;
+import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import javax.annotation.security.RolesAllowed;
@@ -51,6 +54,7 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -60,9 +64,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ServiceTestAnnotations
 public class SpringAuthorizationServiceTest {
   private static final String DEFAULT_ROLE = USER;
+  private SpringAuthorizationService authorizationService;
   @Inject
   private UserRepository userRepository;
-  private SpringAuthorizationService authorizationService;
+  @Inject
+  private ExperimentRepository experimentRepository;
 
   /**
    * Before test.
@@ -108,6 +114,18 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void hasRole_True() throws Throwable {
     assertTrue(authorizationService.hasRole(DEFAULT_ROLE));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithMockUser
+  public void checkRole_Fail() throws Throwable {
+    authorizationService.checkRole(ADMIN);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkRole_Ok() throws Throwable {
+    authorizationService.checkRole(DEFAULT_ROLE);
   }
 
   @Test
@@ -186,6 +204,67 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void isAuthorized_ManagerOrAdminRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void checkAuthorization_Experiment_Anonymous() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void checkAuthorization_Experiment_Owner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkAuthorization_Experiment_NotOwner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void checkAuthorization_Experiment_Manager() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void checkAuthorization_Experiment_ManagerOtherLab() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkAuthorization_Experiment_Admin() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void checkAuthorization_Null_Anonymous() throws Throwable {
+    authorizationService.checkRead((Owned) null);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkAuthorization_Null() throws Throwable {
+    authorizationService.checkRead((Owned) null);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkAuthorization_NullOwner() throws Throwable {
+    Experiment experiment = new Experiment();
+    authorizationService.checkRead(experiment);
   }
 
   public static final class NoRoleTest {
