@@ -26,7 +26,7 @@ import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.web.MainView;
+import ca.qc.ircm.lana.web.ViewLayout;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
@@ -44,7 +44,6 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
@@ -53,8 +52,8 @@ import javax.inject.Inject;
 /**
  * Users view.
  */
-@Route(value = UsersView.VIEW_NAME, layout = MainView.class)
-@RouteAlias(value = "", layout = MainView.class)
+@Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
+@RouteAlias(value = "", layout = ViewLayout.class)
 @RolesAllowed({ ADMIN, MANAGER })
 public class UsersView extends Composite<VerticalLayout>
     implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {

@@ -27,16 +27,24 @@ import com.vaadin.flow.router.RouterLayout;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Main layout.
  */
 @HtmlImport("styles/shared-styles.html")
-public class MainView extends VerticalLayout implements RouterLayout, BeforeEnterObserver {
+public class ViewLayout extends VerticalLayout implements RouterLayout, BeforeEnterObserver {
   private static final long serialVersionUID = 710800815636494374L;
-  private static final Logger logger = LoggerFactory.getLogger(MainView.class);
+  private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   @Inject
   private transient AuthorizationService authorizationService;
+
+  protected ViewLayout() {
+  }
+
+  protected ViewLayout(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
@@ -46,9 +54,7 @@ public class MainView extends VerticalLayout implements RouterLayout, BeforeEnte
       } else {
         logger.info("User {} does not have access to {}", authorizationService.currentUser(),
             event.getNavigationTarget());
-        // Reroute to error.
-        logger.warn("Access denied, but no access denied view");
-        //event.rerouteToError(AccessDeniedView.class);
+        event.rerouteToError(AccessDeniedException.class);
       }
     }
   }
