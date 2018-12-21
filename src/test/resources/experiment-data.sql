@@ -15,6 +15,13 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-DROP TABLE experiment IF EXISTS;
-DROP TABLE user IF EXISTS;
-DROP TABLE laboratory IF EXISTS;
+INSERT INTO experiment (id,name,owner_id,date)
+VALUES ('1', 'POLR2A DNA location', '2', '2018-10-20 13:28:12');
+INSERT INTO experiment (id,name,owner_id,date)
+VALUES ('2', 'Histone location', '3', '2018-10-22 9:48:20');
+INSERT INTO experiment (id,name,owner_id,date)
+VALUES ('3', 'POLR1A location', '3', '2018-11-12 11:53:09');
+INSERT INTO experiment (id,name,owner_id,date)
+VALUES ('4', 'POLR2A', '5', '2018-11-18 9:31:14');
+INSERT INTO experiment (id,name,owner_id,date)
+VALUES ('5', 'POLR2B', '5', '2018-12-05 9:28:23');
