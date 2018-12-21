@@ -37,16 +37,16 @@ public class Experiment implements Data, Owned, Serializable {
   @Size(max = 255)
   private String name;
   /**
+   * Insertion date.
+   */
+  @Column(name = "date")
+  private Instant date;
+  /**
    * Owner.
    */
   @ManyToOne
   @JoinColumn
   private User owner;
-  /**
-   * Insertion date.
-   */
-  @Column(name = "date")
-  private Instant date;
 
   @Override
   public Long getId() {

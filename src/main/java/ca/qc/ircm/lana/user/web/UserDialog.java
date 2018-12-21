@@ -65,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Users form.
+ * Users dialog.
  */
 public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComponent {
   private static final Logger logger = LoggerFactory.getLogger(UserDialog.class);
