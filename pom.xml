@@ -293,7 +293,7 @@
           <artifactId>migrations-maven-plugin</artifactId>
           <version>${migrations-maven-plugin.version}</version>
           <configuration>
-              <repository>src/migration</repository>
+              <repository>src/main/migration</repository>
           </configuration>
           <dependencies>
             <dependency>
