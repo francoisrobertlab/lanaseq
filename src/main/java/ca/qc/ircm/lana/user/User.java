@@ -101,7 +101,7 @@ public class User implements Data, Serializable {
    * User's lab.
    */
   @ManyToOne
-  @JoinColumn(name = "laboratoryId")
+  @JoinColumn
   private Laboratory laboratory;
   /**
    * User's prefered locale.
