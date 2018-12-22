@@ -23,7 +23,7 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.User;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
@@ -103,7 +103,7 @@ public class ExperimentService {
 
     User user = authorizationService.currentUser();
     experiment.setOwner(user);
-    experiment.setDate(Instant.now());
+    experiment.setDate(LocalDateTime.now());
     repository.save(experiment);
   }
 }

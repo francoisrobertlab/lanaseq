@@ -1,7 +1,6 @@
 package ca.qc.ircm.lana.experiment;
 
 import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
-import static ca.qc.ircm.lana.time.TimeConverter.toInstant;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
@@ -16,7 +15,6 @@ import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.inject.Inject;
@@ -49,7 +47,7 @@ public class ExperimentServiceTest {
     assertEquals((Long) 1L, experiment.getId());
     assertEquals("POLR2A DNA location", experiment.getName());
     assertEquals((Long) 2L, experiment.getOwner().getId());
-    assertEquals(toInstant(LocalDateTime.of(2018, 10, 20, 13, 28, 12)), experiment.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
     verify(authorizationService).checkRead(experiment);
   }
 
@@ -117,8 +115,8 @@ public class ExperimentServiceTest {
     Experiment database = repository.findById(experiment.getId()).orElse(null);
     assertEquals(experiment.getName(), database.getName());
     assertEquals(user.getId(), database.getOwner().getId());
-    assertTrue(Instant.now().minusSeconds(10).isBefore(experiment.getDate()));
-    assertTrue(Instant.now().plusSeconds(10).isAfter(experiment.getDate()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(experiment.getDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(experiment.getDate()));
     verify(authorizationService).checkRole(USER);
   }
 }

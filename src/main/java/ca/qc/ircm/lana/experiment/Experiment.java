@@ -7,7 +7,7 @@ import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +40,7 @@ public class Experiment implements Data, Owned, Serializable {
    * Insertion date.
    */
   @Column(name = "date")
-  private Instant date;
+  private LocalDateTime date;
   /**
    * Owner.
    */
@@ -74,11 +74,11 @@ public class Experiment implements Data, Owned, Serializable {
     this.owner = owner;
   }
 
-  public Instant getDate() {
+  public LocalDateTime getDate() {
     return date;
   }
 
-  public void setDate(Instant date) {
+  public void setDate(LocalDateTime date) {
     this.date = date;
   }
 }
