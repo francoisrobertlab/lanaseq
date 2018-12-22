@@ -23,6 +23,7 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.web.UsersView;
@@ -53,7 +54,7 @@ public class MainViewTest {
 
     view.beforeEnter(event);
 
-    //verify(event).rerouteTo(ExperimentsView.class);
+    verify(event).rerouteTo(ExperimentsView.class);
   }
 
   @Test
@@ -73,7 +74,7 @@ public class MainViewTest {
 
     view.beforeEnter(event);
 
-    verify(event).rerouteTo(UsersView.class);
+    verify(event).rerouteTo(ExperimentsView.class);
   }
 
   @Test

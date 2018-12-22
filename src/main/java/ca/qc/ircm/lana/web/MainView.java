@@ -21,6 +21,7 @@ import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
+import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.lana.web.component.BaseComponent;
@@ -61,10 +62,9 @@ public class MainView extends Composite<VerticalLayout>
     if (authorizationService.hasRole(ADMIN)) {
       event.rerouteTo(UsersView.class);
     } else if (authorizationService.hasRole(MANAGER)) {
-      // TODO Redirect to experiment page.
-      event.rerouteTo(UsersView.class);
+      event.rerouteTo(ExperimentsView.class);
     } else {
-      // TODO Create an experiment page.
+      event.rerouteTo(ExperimentsView.class);
     }
   }
 }
