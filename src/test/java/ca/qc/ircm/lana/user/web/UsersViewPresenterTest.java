@@ -133,6 +133,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
         new SaveEvent<>(view.userDialog, false, new UserWithPassword(user, password));
     listener.onComponentEvent(saveEvent);
     verify(userService).save(user, password);
+    verify(view.userDialog).close();
   }
 
   @Test
@@ -145,5 +146,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
         new SaveEvent<>(view.userDialog, false, new UserWithPassword(user, null));
     listener.onComponentEvent(saveEvent);
     verify(userService).save(user, null);
+    verify(view.userDialog).close();
   }
 }

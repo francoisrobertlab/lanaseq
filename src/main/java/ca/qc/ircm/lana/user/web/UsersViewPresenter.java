@@ -62,5 +62,6 @@ public class UsersViewPresenter {
 
   private void save(UserWithPassword userWithPassword) {
     userService.save(userWithPassword.user, userWithPassword.password);
+    view.userDialog.close();
   }
 }
