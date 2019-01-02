@@ -29,10 +29,12 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -51,7 +53,8 @@ public class SpringDataUserDetailsServiceTest {
   private SpringDataUserDetailsService userDetailsService;
   @Mock
   private UserRepository userRepository;
-  private User user;
+  private User user = new User();
+  private Laboratory laboratory = new Laboratory();
 
   /**
    * Before test.
@@ -65,6 +68,10 @@ public class SpringDataUserDetailsServiceTest {
     user.setName("A User");
     user.setHashedPassword(InitializeDatabaseExecutionListener.PASSWORD_PASS1);
     user.setActive(true);
+    user.setLaboratory(laboratory);
+    laboratory.setId(1L);
+    laboratory.setName("A Laboratory");
+    laboratory.setManagers(new HashSet<>());
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
   }
 
@@ -96,6 +103,7 @@ public class SpringDataUserDetailsServiceTest {
 
   @Test
   public void loadUserByUsername_Admin() {
+    user.setLaboratory(null);
     user.setAdmin(true);
 
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
@@ -111,7 +119,7 @@ public class SpringDataUserDetailsServiceTest {
 
   @Test
   public void loadUserByUsername_Manager() {
-    user.setManager(true);
+    laboratory.getManagers().add(user);
 
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
 
@@ -127,7 +135,7 @@ public class SpringDataUserDetailsServiceTest {
   @Test
   public void loadUserByUsername_AdminManager() {
     user.setAdmin(true);
-    user.setManager(true);
+    laboratory.getManagers().add(user);
 
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
 

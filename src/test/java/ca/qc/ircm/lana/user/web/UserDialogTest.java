@@ -23,11 +23,11 @@ import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
-import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.HEADER;
 import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
+import static ca.qc.ircm.lana.user.web.UserDialog.MANAGER;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORDS_NOT_MATCH;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD_CONFIRM;
@@ -67,6 +67,7 @@ import java.util.Locale;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -141,7 +142,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(EMAIL), dialog.email.getLabel());
     assertEquals(userResources.message(NAME), dialog.name.getLabel());
     assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
-    assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
+    assertEquals(resources.message(MANAGER), dialog.manager.getLabel());
     assertEquals(resources.message(PASSWORD), dialog.password.getLabel());
     assertEquals(resources.message(PASSWORD_CONFIRM), dialog.passwordConfirm.getLabel());
     assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.laboratoryName.getLabel());
@@ -166,7 +167,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(EMAIL), dialog.email.getLabel());
     assertEquals(userResources.message(NAME), dialog.name.getLabel());
     assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
-    assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
+    assertEquals(resources.message(MANAGER), dialog.manager.getLabel());
     assertEquals(resources.message(PASSWORD), dialog.password.getLabel());
     assertEquals(resources.message(PASSWORD_CONFIRM), dialog.passwordConfirm.getLabel());
     assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.laboratoryName.getLabel());
@@ -479,6 +480,7 @@ public class UserDialogTest extends AbstractViewTestCase {
   }
 
   @Test
+  @Ignore("cannot create regular users yet")
   public void save_NewUser() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     fillForm();
@@ -491,8 +493,28 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(email, userWithPassword.user.getEmail());
     assertEquals(name, userWithPassword.user.getName());
     assertFalse(userWithPassword.user.isAdmin());
-    assertFalse(userWithPassword.user.isManager());
     assertNotNull(userWithPassword.user.getLaboratory());
+    assertEquals((Long) 1L, userWithPassword.user.getLaboratory().getId());
+    assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
+    assertEquals(password, userWithPassword.password);
+  }
+
+  @Test
+  public void save_NewManager() {
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
+    dialog.manager.setValue(true);
+    dialog.addSaveListener(saveListener);
+
+    dialog.fireClickSave();
+
+    verify(saveListener).onComponentEvent(saveEventCaptor.capture());
+    UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
+    assertFalse(userWithPassword.user.isAdmin());
+    assertNotNull(userWithPassword.user.getLaboratory());
+    assertNull(userWithPassword.user.getLaboratory().getId());
     assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertEquals(password, userWithPassword.password);
   }
@@ -512,7 +534,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(email, userWithPassword.user.getEmail());
     assertEquals(name, userWithPassword.user.getName());
     assertFalse(userWithPassword.user.isAdmin());
-    assertTrue(userWithPassword.user.isManager());
     assertNotNull(userWithPassword.user.getLaboratory());
     assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertEquals(password, userWithPassword.password);
@@ -535,7 +556,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(email, userWithPassword.user.getEmail());
     assertEquals(name, userWithPassword.user.getName());
     assertFalse(userWithPassword.user.isAdmin());
-    assertTrue(userWithPassword.user.isManager());
     assertNotNull(userWithPassword.user.getLaboratory());
     assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertNull(userWithPassword.password);
@@ -555,7 +575,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(email, userWithPassword.user.getEmail());
     assertEquals(name, userWithPassword.user.getName());
     assertTrue(userWithPassword.user.isAdmin());
-    assertFalse(userWithPassword.user.isManager());
     assertNull(userWithPassword.user.getLaboratory());
     assertEquals(password, userWithPassword.password);
   }
@@ -575,7 +594,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(email, userWithPassword.user.getEmail());
     assertEquals(name, userWithPassword.user.getName());
     assertTrue(userWithPassword.user.isAdmin());
-    assertFalse(userWithPassword.user.isManager());
     assertNull(userWithPassword.user.getLaboratory());
     assertEquals(password, userWithPassword.password);
   }
@@ -597,8 +615,32 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(email, userWithPassword.user.getEmail());
     assertEquals(name, userWithPassword.user.getName());
     assertTrue(userWithPassword.user.isAdmin());
-    assertFalse(userWithPassword.user.isManager());
     assertNull(userWithPassword.user.getLaboratory());
+    assertNull(userWithPassword.password);
+  }
+
+  @Test
+  @Ignore("cannot create regular users yet")
+  public void save_UpdateAdmin_RemoveAdminAddManager() {
+    User user = userRepository.findById(1L).get();
+    dialog.setUser(user);
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
+    dialog.password.setValue("");
+    dialog.passwordConfirm.setValue("");
+    dialog.admin.setValue(false);
+    dialog.manager.setValue(true);
+    dialog.addSaveListener(saveListener);
+
+    dialog.fireClickSave();
+
+    verify(saveListener).onComponentEvent(saveEventCaptor.capture());
+    UserWithPassword userWithPassword = saveEventCaptor.getValue().getSavedObject();
+    assertEquals(email, userWithPassword.user.getEmail());
+    assertEquals(name, userWithPassword.user.getName());
+    assertFalse(userWithPassword.user.isAdmin());
+    assertNull(userWithPassword.user.getLaboratory().getId());
+    assertEquals(laboratoryName, userWithPassword.user.getLaboratory().getName());
     assertNull(userWithPassword.password);
   }
 }

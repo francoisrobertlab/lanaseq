@@ -22,7 +22,6 @@ import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
-import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.web.WebConstants.BORDER;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
@@ -72,6 +71,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";
+  public static final String MANAGER = "manager";
   public static final String PASSWORD = "password";
   public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
   public static final String PASSWORDS_NOT_MATCH = property(PASSWORD, "notMatch");
@@ -114,10 +114,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     layout.add(admin);
     admin.addClassName(ADMIN);
     admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
+    admin.addValueChangeListener(e -> updateAdmin());
     layout.add(manager);
     manager.addClassName(MANAGER);
-    admin.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
-    admin.addValueChangeListener(e -> updateAdmin());
+    manager.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     layout.add(password);
     password.addClassName(PASSWORD);
     layout.add(passwordConfirm);
@@ -158,8 +158,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
         .bind(NAME);
     admin.setLabel(userResources.message(ADMIN));
     binder.forField(admin).bind(ADMIN);
-    manager.setLabel(userResources.message(MANAGER));
-    binder.forField(manager).bind(MANAGER);
+    manager.setLabel(resources.message(MANAGER));
     password.setLabel(resources.message(PASSWORD));
     passwordBinder.forField(password)
         .withValidator(requiredValidator(webResources.message(REQUIRED))).withNullRepresentation("")
@@ -230,7 +229,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     if (validate()) {
       logger.debug("Fire save event for user {}", user);
       if (user.isAdmin()) {
-        user.setManager(false);
         user.setLaboratory(null);
       }
       String password = passwordBinder.getBean().getPassword();
@@ -261,6 +259,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     binder.setReadOnly(readOnly);
+    manager.setReadOnly(readOnly);
     password.setVisible(!readOnly);
     passwordConfirm.setVisible(!readOnly);
     laboratoryBinder.setReadOnly(readOnly);
@@ -286,6 +285,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     }
     this.user = user;
     binder.setBean(user);
+    manager.setValue(isManager(user));
     if (user != null && user.getId() != null) {
       password.setRequiredIndicatorVisible(false);
       passwordConfirm.setRequiredIndicatorVisible(false);
@@ -295,6 +295,12 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     }
     laboratoryBinder.setBean(user.getLaboratory());
     updateHeader();
+  }
+
+  private boolean isManager(User user) {
+    return user.getLaboratory() != null && user.getLaboratory().getManagers() != null
+        && user.getLaboratory().getManagers().stream().filter(us -> us.getId().equals(user.getId()))
+            .findAny().isPresent();
   }
 
   static class Passwords {

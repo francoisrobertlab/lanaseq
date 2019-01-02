@@ -17,7 +17,10 @@
 
 package ca.qc.ircm.lana.user;
 
+import ca.qc.ircm.lana.Data;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -86,6 +89,17 @@ public class UserService {
   }
 
   /**
+   * Returns true if user is a manager of his laboratory, false otherwise.
+   *
+   * @param user
+   *          user
+   * @return true if user is a manager of his laboratory, false otherwise
+   */
+  public boolean isManager(User user) {
+    return false;
+  }
+
+  /**
    * Saves user into database.
    * <p>
    * If user is a biologist, his laboratory must be defined.
@@ -107,17 +121,9 @@ public class UserService {
       if (user.getLaboratory() != null) {
         throw new IllegalArgumentException("administrators cannot be in a laboratory");
       }
-      if (user.isManager()) {
-        throw new IllegalArgumentException("administrators cannot be managers");
-      }
     } else {
       if (user.getLaboratory() == null) {
-        throw new IllegalArgumentException("biologists must be in a laboratory");
-      }
-      if (!user.isManager()
-          && !laboratoryRepository.findById(user.getLaboratory().getId()).isPresent()) {
-        throw new IllegalArgumentException(
-            "laboratory " + user.getLaboratory().getId() + " does not exists");
+        throw new IllegalArgumentException("users must be in a laboratory");
       }
     }
 
@@ -128,9 +134,20 @@ public class UserService {
       String hashedPassword = passwordEncoder.encode(password);
       user.setHashedPassword(hashedPassword);
     }
-    if (user.isManager()) {
+    if (user.getLaboratory() != null && user.getLaboratory().getId() == null) {
+      user.getLaboratory().setManagers(Stream.of(user).collect(Collectors.toSet()));
       laboratoryRepository.save(user.getLaboratory());
     }
-    repository.save(user);
+    User potentialManager = repository.save(user);
+    if (potentialManager.isAdmin()) {
+      // Remove user from managers, if applicable.
+      List<Laboratory> laboratories =
+          laboratoryRepository.findByManagersId(potentialManager.getId());
+      laboratories.forEach(lab -> {
+        User manager = Data.find(lab.getManagers(), potentialManager.getId()).orElse(null);
+        lab.getManagers().remove(manager);
+        laboratoryRepository.save(lab);
+      });
+    }
   }
 }

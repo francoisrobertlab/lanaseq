@@ -17,16 +17,20 @@
 
 package ca.qc.ircm.lana.user;
 
+import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import javax.inject.Inject;
+import org.hibernate.Hibernate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
@@ -41,12 +45,16 @@ public class LaboratoryServiceTest {
   }
 
   @Test
+  @Transactional
   public void get() {
     Laboratory laboratory = laboratoryService.get(1L);
 
     assertNotNull(laboratory);
     assertEquals((Long) 1L, laboratory.getId());
     assertEquals("Chromatin and Genomic Expression", laboratory.getName());
+    Hibernate.initialize(laboratory.getManagers());
+    assertEquals(1, laboratory.getManagers().size());
+    assertTrue(find(laboratory.getManagers(), 2L).isPresent());
   }
 
   @Test

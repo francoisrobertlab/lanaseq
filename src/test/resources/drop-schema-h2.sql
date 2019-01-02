@@ -16,5 +16,6 @@
 --
 
 DROP TABLE experiment IF EXISTS;
+DROP TABLE manager IF EXISTS;
 DROP TABLE user IF EXISTS;
 DROP TABLE laboratory IF EXISTS;

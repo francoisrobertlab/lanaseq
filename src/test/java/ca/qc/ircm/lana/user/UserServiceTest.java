@@ -73,7 +73,6 @@ public class UserServiceTest {
     assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
     assertEquals(true, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNull(user.getLaboratory());
@@ -109,7 +108,6 @@ public class UserServiceTest {
     assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
-    assertEquals(true, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
@@ -163,7 +161,6 @@ public class UserServiceTest {
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
     assertEquals(true, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNull(user.getLaboratory());
@@ -181,19 +178,8 @@ public class UserServiceTest {
     userService.save(user, "password");
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void save_AddAdminManager() {
-    User user = new User();
-    user.setName("Test User");
-    user.setEmail("test.user@ircm.qc.ca");
-    user.setAdmin(true);
-    user.setManager(true);
-
-    userService.save(user, "password");
-  }
-
   @Test
-  public void save_AddBiologist() {
+  public void save_AddUser() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
@@ -213,7 +199,6 @@ public class UserServiceTest {
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
@@ -222,33 +207,20 @@ public class UserServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void save_AddBiologistNoLab() {
+  public void save_AddUserNoLab() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.ENGLISH);
-
-    userService.save(user, "password");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void save_AddBiologistLabIdNotExists() {
-    User user = new User();
-    user.setName("Test User");
-    user.setEmail("test.user@ircm.qc.ca");
-    user.setLocale(Locale.ENGLISH);
-    user.setLaboratory(new Laboratory());
-    user.getLaboratory().setId(3L);
 
     userService.save(user, "password");
   }
 
   @Test
-  public void save_AddBiologistManager() {
+  public void save_AddManager() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setManager(true);
     Laboratory laboratory = new Laboratory();
     laboratory.setName("Test Lab");
     user.setLaboratory(laboratory);
@@ -267,7 +239,6 @@ public class UserServiceTest {
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
-    assertEquals(true, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
@@ -296,7 +267,6 @@ public class UserServiceTest {
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
@@ -325,7 +295,6 @@ public class UserServiceTest {
     assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
@@ -352,12 +321,91 @@ public class UserServiceTest {
     assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
+  }
+
+  @Test
+  public void save_UpdateUserToAdmin() {
+    User user = userRepository.findById(3L).get();
+    user.setAdmin(true);
+    user.setLaboratory(null);
+
+    userService.save(user, null);
+
+    user = userRepository.findById(3L).get();
+    assertEquals((Long) 3L, user.getId());
+    assertEquals("Jonh Smith", user.getName());
+    assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
+    assertEquals(2, user.getSignAttempts());
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(true, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertNull(user.getLaboratory());
+    assertNull(user.getLocale());
+  }
+
+  @Test
+  public void save_UpdateManagerToAdmin() {
+    User user = userRepository.findById(2L).get();
+    user.setAdmin(true);
+    user.setLaboratory(null);
+
+    userService.save(user, null);
+
+    user = userRepository.findById(2L).get();
+    assertEquals((Long) 2L, user.getId());
+    assertEquals("Francois Robert", user.getName());
+    assertEquals("francois.robert@ircm.qc.ca", user.getEmail());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
+    assertEquals(0, user.getSignAttempts());
+    assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(true, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertNull(user.getLaboratory());
+    assertEquals(Locale.ENGLISH, user.getLocale());
+    Laboratory laboratory = laboratoryRepository.findById(1L).get();
+    assertEquals(0, laboratory.getManagers().size());
+  }
+
+  @Test
+  public void save_UpdateAdminToUser() {
+    User user = userRepository.findById(1L).get();
+    user.setAdmin(false);
+    user.setLaboratory(laboratoryRepository.findById(1L).get());
+
+    userService.save(user, null);
+
+    user = userRepository.findById(1L).get();
+    assertEquals((Long) 1L, user.getId());
+    assertEquals("Lana Administrator", user.getName());
+    assertEquals("lana@ircm.qc.ca", user.getEmail());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
+    assertEquals(1, user.getSignAttempts());
+    assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertNotNull(user.getLaboratory());
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals(1, user.getLaboratory().getManagers().size());
+    assertTrue(find(user.getLaboratory().getManagers(), 2).isPresent());
+    assertNull(user.getLocale());
   }
 
   @Test(expected = NullPointerException.class)

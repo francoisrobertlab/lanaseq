@@ -83,11 +83,6 @@ public class User implements Data, Serializable {
   @Column
   private boolean active;
   /**
-   * True if user is a manager of his lab.
-   */
-  @Column
-  private boolean manager;
-  /**
    * True if user is an administrator.
    */
   @Column
@@ -181,14 +176,6 @@ public class User implements Data, Serializable {
 
   public void setActive(boolean active) {
     this.active = active;
-  }
-
-  public boolean isManager() {
-    return manager;
-  }
-
-  public void setManager(boolean manager) {
-    this.manager = manager;
   }
 
   public Laboratory getLaboratory() {
