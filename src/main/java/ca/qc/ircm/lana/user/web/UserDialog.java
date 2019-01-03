@@ -21,6 +21,7 @@ import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
+import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
@@ -59,8 +60,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";
-  public static final String MANAGER = "manager";
-  public static final String NEW_LABORATORY_NOT_MANAGER = property(LABORATORY, "notManager");
+  public static final String NOT_MANAGER_NEW_LABORATORY = property(MANAGER, "newLaboratory");
   public static final String PASSWORD = "password";
   public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
   public static final String PASSWORDS_NOT_MATCH = property(PASSWORD, "notMatch");
@@ -124,7 +124,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     email.setLabel(userResources.message(EMAIL));
     name.setLabel(userResources.message(NAME));
     admin.setLabel(userResources.message(ADMIN));
-    manager.setLabel(resources.message(MANAGER));
+    manager.setLabel(userResources.message(MANAGER));
     password.setLabel(resources.message(PASSWORD));
     passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
     laboratory.setLabel(userResources.message(LABORATORY));

@@ -19,7 +19,7 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
-import static ca.qc.ircm.lana.user.web.UserDialog.NEW_LABORATORY_NOT_MANAGER;
+import static ca.qc.ircm.lana.user.web.UserDialog.NOT_MANAGER_NEW_LABORATORY;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORDS_NOT_MATCH;
 import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
@@ -620,10 +620,10 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     BinderValidationStatus<User> status = presenter.validateUser();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.laboratory);
+        findValidationStatusByField(status, dialog.manager);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(resources.message(NEW_LABORATORY_NOT_MANAGER)), error.getMessage());
+    assertEquals(Optional.of(resources.message(NOT_MANAGER_NEW_LABORATORY)), error.getMessage());
   }
 
   @Test
@@ -639,6 +639,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertFalse(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
@@ -657,6 +658,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
@@ -679,6 +681,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertNull(user.getLaboratory().getId());
     assertEquals(laboratoryName, user.getLaboratory().getName());
@@ -698,6 +701,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
@@ -718,6 +722,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertFalse(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
@@ -739,6 +744,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
@@ -759,6 +765,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
+    assertFalse(user.isManager());
     assertNull(user.getLaboratory());
   }
 
@@ -779,6 +786,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
+    assertFalse(user.isManager());
     assertNull(user.getLaboratory());
   }
 
@@ -801,6 +809,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
+    assertFalse(user.isManager());
     assertNull(user.getLaboratory());
   }
 
@@ -825,6 +834,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
+    assertTrue(user.isManager());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
 }

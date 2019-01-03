@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS user (
   sign_attempts int NOT NULL DEFAULT 0,
   last_sign_attempt DATETIME,
   active tinyint NOT NULL DEFAULT 0,
+  manager tinyint NOT NULL DEFAULT 0,
   admin tinyint NOT NULL DEFAULT 0,
   expired_password tinyint NOT NULL DEFAULT 0,
   laboratory_id bigint(20),
@@ -36,17 +37,8 @@ CREATE TABLE IF NOT EXISTS user (
   UNIQUE KEY email (email),
   CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS manager (
-  id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
-  user_id bigint(20) NOT NULL,
-  laboratory_id bigint(20) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE (user_id,laboratory_id),
-  CONSTRAINT manager_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT manager_ibfk_2 FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-CREATE TABLE IF NOT EXISTS experiment (
-  id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+CREATE TABLE experiment (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   owner_id bigint(20),
   date DATETIME NOT NULL,

@@ -22,8 +22,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class SearchUtils {
-  public static <D extends Data> Optional<D> find(Collection<D> datas, long id) {
-    return datas.stream().filter(data -> data != null && id == data.getId()).findFirst();
+  public static <D extends Data> Optional<D> find(Collection<D> datas, Long id) {
+    return datas.stream().filter(data -> id.equals(data.getId())).findFirst();
   }
 
   public static <V> boolean containsInstanceOf(Collection<V> values, Class<? extends V> clazz) {

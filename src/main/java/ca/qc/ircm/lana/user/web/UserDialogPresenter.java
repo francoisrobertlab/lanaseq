@@ -20,8 +20,9 @@ package ca.qc.ircm.lana.user.web;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
+import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.user.web.UserDialog.NEW_LABORATORY_NOT_MANAGER;
+import static ca.qc.ircm.lana.user.web.UserDialog.NOT_MANAGER_NEW_LABORATORY;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORDS_NOT_MATCH;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD_CONFIRM;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
@@ -117,6 +118,9 @@ public class UserDialogPresenter {
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.admin).bind(ADMIN);
+    binder.forField(dialog.manager)
+        .withValidator(managerNewLaboratoryValidator(resources.message(NOT_MANAGER_NEW_LABORATORY)))
+        .bind(MANAGER);
     passwordBinder.forField(dialog.password)
         .withValidator(passwordRequiredValidator(webResources.message(REQUIRED)))
         .withNullRepresentation("").withValidator(password -> {
@@ -133,9 +137,7 @@ public class UserDialogPresenter {
     dialog.laboratory.setLabel(userResources.message(LABORATORY));
     binder.forField(dialog.laboratory)
         .withValidator(laboratoryRequiredValidator(webResources.message(REQUIRED)))
-        .withNullRepresentation(null)
-        .withValidator(newLaboratoryManagerValidator(resources.message(NEW_LABORATORY_NOT_MANAGER)))
-        .bind(LABORATORY);
+        .withNullRepresentation(null).bind(LABORATORY);
     dialog.save.setText(webResources.message(SAVE));
     dialog.cancel.setText(webResources.message(CANCEL));
     setReadOnly(readOnly);
@@ -154,9 +156,9 @@ public class UserDialogPresenter {
                 : ValidationResult.ok();
   }
 
-  private Validator<Laboratory> newLaboratoryManagerValidator(String errorMessage) {
-    return (value,
-        context) -> !dialog.manager.getValue() && (value != null && value.getId() == null)
+  private Validator<Boolean> managerNewLaboratoryValidator(String errorMessage) {
+    return (value, context) -> !value
+        && (dialog.laboratory.getValue() != null && dialog.laboratory.getValue().getId() == null)
             ? ValidationResult.error(errorMessage)
             : ValidationResult.ok();
   }
@@ -251,7 +253,6 @@ public class UserDialogPresenter {
     }
     this.user = user;
     binder.setBean(user);
-    dialog.manager.setValue(isManager(user));
     if (user != null && user.getId() != null) {
       dialog.password.setRequiredIndicatorVisible(false);
       dialog.passwordConfirm.setRequiredIndicatorVisible(false);
@@ -259,12 +260,6 @@ public class UserDialogPresenter {
       dialog.password.setRequiredIndicatorVisible(true);
       dialog.passwordConfirm.setRequiredIndicatorVisible(true);
     }
-  }
-
-  private boolean isManager(User user) {
-    return user.getLaboratory() != null && user.getLaboratory().getManagers() != null
-        && user.getLaboratory().getManagers().stream().filter(us -> us.getId().equals(user.getId()))
-            .findAny().isPresent();
   }
 
   ListDataProvider<Laboratory> laboratoryDataProvider() {

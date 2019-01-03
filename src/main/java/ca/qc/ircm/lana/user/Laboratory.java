@@ -22,16 +22,10 @@ import static javax.persistence.GenerationType.IDENTITY;
 import ca.qc.ircm.lana.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.validation.constraints.Size;
 
 /**
@@ -48,18 +42,9 @@ public class Laboratory implements Data, Serializable {
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
   private Long id;
-  /**
-   * Laboratory's name.
-   */
   @Column(nullable = false)
   @Size(max = 255)
   private String name;
-  /**
-   * Managers of this laboratory.
-   */
-  @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-  @JoinTable(name = "manager", inverseJoinColumns = @JoinColumn(name = "user_id"))
-  private Set<User> managers;
 
   @Override
   public String toString() {
@@ -81,13 +66,5 @@ public class Laboratory implements Data, Serializable {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Set<User> getManagers() {
-    return managers;
-  }
-
-  public void setManagers(Set<User> managers) {
-    this.managers = managers;
   }
 }

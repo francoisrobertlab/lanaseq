@@ -17,12 +17,10 @@
 
 package ca.qc.ircm.lana.user;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Repository for {@link Laboratory}.
  */
 public interface LaboratoryRepository extends JpaRepository<Laboratory, Long> {
-  List<Laboratory> findByManagersId(Long userId);
 }

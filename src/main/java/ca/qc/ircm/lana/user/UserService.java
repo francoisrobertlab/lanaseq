@@ -17,10 +17,7 @@
 
 package ca.qc.ircm.lana.user;
 
-import ca.qc.ircm.lana.Data;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -110,9 +107,17 @@ public class UserService {
       if (user.getLaboratory() != null) {
         throw new IllegalArgumentException("administrators cannot be in a laboratory");
       }
+      if (user.isManager()) {
+        throw new IllegalArgumentException("administrators cannot be managers");
+      }
     } else {
       if (user.getLaboratory() == null) {
-        throw new IllegalArgumentException("users must be in a laboratory");
+        throw new IllegalArgumentException("biologists must be in a laboratory");
+      }
+      if (!user.isManager()
+          && !laboratoryRepository.findById(user.getLaboratory().getId()).isPresent()) {
+        throw new IllegalArgumentException(
+            "laboratory " + user.getLaboratory().getId() + " does not exists");
       }
     }
 
@@ -123,20 +128,9 @@ public class UserService {
       String hashedPassword = passwordEncoder.encode(password);
       user.setHashedPassword(hashedPassword);
     }
-    if (user.getLaboratory() != null && user.getLaboratory().getId() == null) {
-      user.getLaboratory().setManagers(Stream.of(user).collect(Collectors.toSet()));
+    if (user.isManager()) {
       laboratoryRepository.save(user.getLaboratory());
     }
-    User potentialManager = repository.save(user);
-    if (potentialManager.isAdmin()) {
-      // Remove user from managers, if applicable.
-      List<Laboratory> laboratories =
-          laboratoryRepository.findByManagersId(potentialManager.getId());
-      laboratories.forEach(lab -> {
-        User manager = Data.find(lab.getManagers(), potentialManager.getId()).orElse(null);
-        lab.getManagers().remove(manager);
-        laboratoryRepository.save(lab);
-      });
-    }
+    repository.save(user);
   }
 }

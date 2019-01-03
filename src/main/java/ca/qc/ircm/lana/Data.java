@@ -17,9 +17,6 @@
 
 package ca.qc.ircm.lana;
 
-import java.util.Collection;
-import java.util.Optional;
-
 /**
  * Data in the database.
  */
@@ -30,17 +27,4 @@ public interface Data {
    * @return database identifier
    */
   public Long getId();
-
-  /**
-   * Returns data having specified id.
-   * 
-   * @param datas
-   *          data
-   * @param id
-   *          id
-   * @return data having specified id
-   */
-  public static <D extends Data> Optional<D> find(Collection<D> datas, long id) {
-    return datas.stream().filter(data -> data != null && id == data.getId()).findFirst();
-  }
 }

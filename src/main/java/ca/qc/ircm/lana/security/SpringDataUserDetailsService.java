@@ -60,7 +60,7 @@ public class SpringDataUserDetailsService implements UserDetailsService {
       if (user.isAdmin()) {
         authorities.add(new SimpleGrantedAuthority(ADMIN));
       }
-      if (user.getLaboratory() != null && user.getLaboratory().getManagers().contains(user)) {
+      if (user.isManager()) {
         authorities.add(new SimpleGrantedAuthority(MANAGER));
       }
       if (user.isExpiredPassword()) {
