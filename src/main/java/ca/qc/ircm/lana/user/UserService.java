@@ -89,17 +89,6 @@ public class UserService {
   }
 
   /**
-   * Returns true if user is a manager of his laboratory, false otherwise.
-   *
-   * @param user
-   *          user
-   * @return true if user is a manager of his laboratory, false otherwise
-   */
-  public boolean isManager(User user) {
-    return false;
-  }
-
-  /**
    * Saves user into database.
    * <p>
    * If user is a biologist, his laboratory must be defined.
