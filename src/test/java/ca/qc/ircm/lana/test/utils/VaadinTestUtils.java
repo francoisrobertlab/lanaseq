@@ -24,6 +24,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventBus;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -76,6 +77,23 @@ public class VaadinTestUtils {
       return new ArrayList<>(((ListDataProvider<V>) grid.getDataProvider()).getItems());
     } else {
       return grid.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
+          .collect(Collectors.toList());
+    }
+  }
+
+  /**
+   * Returns items in combo box, unsorted and non-filtered.
+   *
+   * @param comboBox
+   *          combo box
+   * @return items in combo box, unsorted and non-filtered
+   */
+  @SuppressWarnings("unchecked")
+  public static <V> List<V> items(ComboBox<V> comboBox) {
+    if (comboBox.getDataProvider() instanceof ListDataProvider) {
+      return new ArrayList<>(((ListDataProvider<V>) comboBox.getDataProvider()).getItems());
+    } else {
+      return comboBox.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
           .collect(Collectors.toList());
     }
   }

@@ -37,7 +37,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.User;
@@ -71,7 +70,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Mock
   private UsersViewPresenter presenter;
   @Mock
-  private AuthorizationService authorizationService;
+  private UserDialog userDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
   @Captor
@@ -90,7 +89,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new UsersView(presenter, authorizationService);
+    view = new UsersView(presenter, userDialog);
     view.init();
     users = userRepository.findAll();
   }
@@ -146,7 +145,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new UsersView(presenter, authorizationService);
+    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -172,7 +171,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_SelectionMode() {
-    view = new UsersView(presenter, authorizationService);
+    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     verify(view.users).setSelectionMode(SelectionMode.MULTI);
@@ -188,7 +187,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_ColumnsValueProvider() {
-    view = new UsersView(presenter, authorizationService);
+    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));

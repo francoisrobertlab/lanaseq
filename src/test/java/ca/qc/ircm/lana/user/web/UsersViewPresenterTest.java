@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,8 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
-import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
@@ -50,7 +48,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
 public class UsersViewPresenterTest extends AbstractViewTestCase {
   private UsersViewPresenter presenter;
   @Mock
@@ -76,8 +74,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
     view.userDialog = mock(UserDialog.class);
-    users = userRepository.findAll();
     when(view.getLocale()).thenReturn(locale);
+    users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
   }
 
@@ -116,36 +114,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertNull(user.getId());
     assertNull(user.getEmail());
     assertNull(user.getName());
-    assertNotNull(user.getLaboratory());
-    Laboratory laboratory = user.getLaboratory();
-    assertNull(laboratory.getName());
+    assertNull(user.getLaboratory());
     verify(view.userDialog).open();
-  }
-
-  @Test
-  public void save() {
-    User user = new User();
-    String password = "test_password";
-    presenter.init(view);
-    verify(view.userDialog).addSaveListener(saveListenerCaptor.capture());
-    ComponentEventListener<SaveEvent<UserWithPassword>> listener = saveListenerCaptor.getValue();
-    SaveEvent<UserWithPassword> saveEvent =
-        new SaveEvent<>(view.userDialog, false, new UserWithPassword(user, password));
-    listener.onComponentEvent(saveEvent);
-    verify(userService).save(user, password);
-    verify(view.userDialog).close();
-  }
-
-  @Test
-  public void save_NullPassword() {
-    User user = new User();
-    presenter.init(view);
-    verify(view.userDialog).addSaveListener(saveListenerCaptor.capture());
-    ComponentEventListener<SaveEvent<UserWithPassword>> listener = saveListenerCaptor.getValue();
-    SaveEvent<UserWithPassword> saveEvent =
-        new SaveEvent<>(view.userDialog, false, new UserWithPassword(user, null));
-    listener.onComponentEvent(saveEvent);
-    verify(userService).save(user, null);
-    verify(view.userDialog).close();
   }
 }
