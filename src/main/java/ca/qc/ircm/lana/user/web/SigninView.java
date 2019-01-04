@@ -144,10 +144,8 @@ public class SigninView extends Composite<VerticalLayout> implements LocaleChang
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    getUI().ifPresent(ui -> {
-      ui.getPage().executeJavaScript("document.getElementById('" + DO_SIGNIN
-          + "').addEventListener('click', () => document.getElementById('ironform').submit());");
-    });
+    getCurrentUi().getPage().executeJavaScript("document.getElementById('" + DO_SIGNIN
+        + "').addEventListener('click', () => document.getElementById('ironform').submit());");
     presenter.init(this);
   }
 
