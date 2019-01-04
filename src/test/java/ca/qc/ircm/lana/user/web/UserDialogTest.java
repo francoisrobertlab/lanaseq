@@ -37,7 +37,6 @@ import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
 import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -156,32 +155,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     presenter.localeChange(locale);
-  }
-
-  @Test
-  public void isReadOnly_False() {
-    when(presenter.isReadOnly()).thenReturn(false);
-    assertFalse(dialog.isReadOnly());
-    verify(presenter).isReadOnly();
-  }
-
-  @Test
-  public void isReadOnly_True() {
-    when(presenter.isReadOnly()).thenReturn(true);
-    assertTrue(dialog.isReadOnly());
-    verify(presenter).isReadOnly();
-  }
-
-  @Test
-  public void setReadOnly_False() {
-    dialog.setReadOnly(false);
-    verify(presenter).setReadOnly(false);
-  }
-
-  @Test
-  public void setReadOnly_True() {
-    dialog.setReadOnly(true);
-    verify(presenter).setReadOnly(true);
   }
 
   @Test

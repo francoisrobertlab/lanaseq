@@ -70,7 +70,6 @@ public class UserDialogPresenter {
   private Binder<Laboratory> laboratoryBinder = new BeanValidationBinder<>(Laboratory.class);
   private ListDataProvider<Laboratory> laboratoriesDataProvider;
   private User user;
-  private boolean readOnly;
   @Inject
   private UserService userService;
   @Inject
@@ -142,7 +141,6 @@ public class UserDialogPresenter {
         .withNullRepresentation("").bind(LABORATORY_NAME);
     dialog.save.setText(webResources.message(SAVE));
     dialog.cancel.setText(webResources.message(CANCEL));
-    setReadOnly(readOnly);
   }
 
   private Validator<String> passwordRequiredValidator(String errorMessage) {
@@ -212,28 +210,6 @@ public class UserDialogPresenter {
 
   void cancel() {
     dialog.close();
-  }
-
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  /**
-   * Sets if dialog should be read only.
-   *
-   * @param readOnly
-   *          read only
-   */
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-    binder.setReadOnly(readOnly);
-    dialog.laboratory.setReadOnly(readOnly || !authorizationService.hasRole(UserRole.ADMIN));
-    dialog.manager.setReadOnly(readOnly);
-    dialog.createNewLaboratory
-        .setVisible(!readOnly && authorizationService.hasRole(UserRole.ADMIN));
-    dialog.password.setVisible(!readOnly);
-    dialog.passwordConfirm.setVisible(!readOnly);
-    dialog.buttonsLayout.setVisible(!readOnly);
   }
 
   public User getUser() {

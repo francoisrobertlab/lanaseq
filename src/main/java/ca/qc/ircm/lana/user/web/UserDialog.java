@@ -158,20 +158,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     }
   }
 
-  public boolean isReadOnly() {
-    return presenter.isReadOnly();
-  }
-
-  /**
-   * Sets if dialog should be read only.
-   *
-   * @param readOnly
-   *          read only
-   */
-  public void setReadOnly(boolean readOnly) {
-    presenter.setReadOnly(readOnly);
-  }
-
   public User getUser() {
     return presenter.getUser();
   }
