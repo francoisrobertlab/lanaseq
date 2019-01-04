@@ -714,6 +714,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -733,6 +734,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -756,6 +758,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertNull(user.getLaboratory().getId());
     assertEquals(newLaboratoryName, user.getLaboratory().getName());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -775,6 +778,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -796,6 +800,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -818,6 +823,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -839,6 +845,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(user.isManager());
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -860,6 +867,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isAdmin());
     assertTrue(user.isManager());
     assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -883,6 +891,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isAdmin());
     assertTrue(user.isManager());
     assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
@@ -908,5 +917,16 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(user.isAdmin());
     assertTrue(user.isManager());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
+    assertFalse(dialog.isOpened());
+  }
+
+  @Test
+  public void cancel_Close() {
+    presenter.init(dialog);
+    presenter.localeChange(locale);
+
+    presenter.cancel();
+
+    assertFalse(dialog.isOpened());
   }
 }

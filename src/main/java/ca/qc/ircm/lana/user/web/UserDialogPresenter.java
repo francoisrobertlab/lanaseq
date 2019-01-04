@@ -206,6 +206,7 @@ public class UserDialogPresenter {
       String password = passwordBinder.getBean().getPassword();
       logger.debug("save user {} in laboratory {}", user, user.getLaboratory());
       userService.save(user, password);
+      dialog.close();
     }
   }
 
