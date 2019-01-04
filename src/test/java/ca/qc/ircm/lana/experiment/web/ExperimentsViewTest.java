@@ -22,7 +22,6 @@ import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.ADD;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.EXPERIMENTS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.HEADER;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsView.VIEW;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
@@ -49,9 +48,9 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -72,11 +71,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Mock
   private ExperimentsViewPresenter presenter;
   @Captor
-  private ArgumentCaptor<ValueProvider<Experiment, String>> valueProviderCaptor;
+  private ArgumentCaptor<ComponentRenderer<Button, Experiment>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<LocalDateTimeRenderer<Experiment>> localDateTimeRendererCaptor;
-  @Captor
-  private ArgumentCaptor<ValueProvider<Experiment, Button>> buttonProviderCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
   private Locale locale = Locale.ENGLISH;
@@ -102,7 +99,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.experiments = mock(Grid.class);
     when(view.experiments.getElement()).thenReturn(experimentsElement);
     view.name = mock(Column.class);
-    when(view.experiments.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
+    when(view.experiments.addColumn(any(ComponentRenderer.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     view.date = mock(Column.class);
@@ -110,10 +107,6 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
         .thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
-    view.view = mock(Column.class);
-    when(view.experiments.addComponentColumn(any(ValueProvider.class))).thenReturn(view.view);
-    when(view.view.setKey(any())).thenReturn(view.view);
-    when(view.view.setHeader(any(String.class))).thenReturn(view.view);
   }
 
   @Test
@@ -138,8 +131,6 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(experimentResources.message(NAME));
     verify(view.date).setHeader(experimentResources.message(DATE));
     verify(view.date).setFooter(experimentResources.message(DATE));
-    verify(view.view).setHeader(resources.message(VIEW));
-    verify(view.view).setFooter(resources.message(VIEW));
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -160,8 +151,6 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.name, atLeastOnce()).setFooter(experimentResources.message(NAME));
     verify(view.date, atLeastOnce()).setHeader(experimentResources.message(DATE));
     verify(view.date, atLeastOnce()).setFooter(experimentResources.message(DATE));
-    verify(view.view, atLeastOnce()).setHeader(resources.message(VIEW));
-    verify(view.view, atLeastOnce()).setFooter(resources.message(VIEW));
   }
 
   @Test
@@ -172,10 +161,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void experiments_Columns() {
-    assertEquals(3, view.experiments.getColumns().size());
+    assertEquals(2, view.experiments.getColumns().size());
     assertNotNull(view.experiments.getColumnByKey(NAME));
     assertNotNull(view.experiments.getColumnByKey(DATE));
-    assertNotNull(view.experiments.getColumnByKey(VIEW));
   }
 
   @Test
@@ -183,10 +171,14 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view = new ExperimentsView(presenter);
     mockColumns();
     view.init();
-    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<Experiment, String> valueProvider = valueProviderCaptor.getValue();
+    verify(view.experiments).addColumn(buttonRendererCaptor.capture(), eq(NAME));
+    ComponentRenderer<Button, Experiment> buttonRenderer = buttonRendererCaptor.getValue();
     for (Experiment experiment : experiments) {
-      assertEquals(experiment.getName(), valueProvider.apply(experiment));
+      Button button = buttonRenderer.createComponent(experiment);
+      assertTrue(button.getClassNames().contains(NAME));
+      assertEquals(experiment.getName(), button.getText());
+      clickButton(button);
+      verify(presenter).view(experiment);
     }
     verify(view.experiments).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
@@ -195,15 +187,6 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
       Component component = localDateTimeRenderer.createComponent(experiment);
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(experiment.getDate()),
           component.getElement().getText());
-    }
-    verify(view.experiments).addComponentColumn(buttonProviderCaptor.capture());
-    ValueProvider<Experiment, Button> buttonProvider = buttonProviderCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      Button button = buttonProvider.apply(experiment);
-      assertTrue(button.getClassNames().contains(VIEW));
-      validateIcon(VaadinIcon.EYE.create(), button);
-      clickButton(button);
-      verify(presenter).view(experiment);
     }
   }
 }

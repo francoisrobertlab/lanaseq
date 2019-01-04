@@ -36,6 +36,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -56,7 +57,6 @@ public class ExperimentsView extends Composite<VerticalLayout>
   public static final String VIEW_NAME = "experiments";
   public static final String HEADER = "header";
   public static final String EXPERIMENTS = "experiments";
-  public static final String VIEW = "view";
   public static final String ADD = "add";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
@@ -84,11 +84,12 @@ public class ExperimentsView extends Composite<VerticalLayout>
     header.addClassName(HEADER);
     root.add(experiments);
     experiments.addClassName(EXPERIMENTS);
-    name = experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME);
+    name =
+        experiments.addColumn(new ComponentRenderer<>(experiment -> viewButton(experiment)), NAME)
+            .setKey(NAME);
     date = experiments.addColumn(
         new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
-    view = experiments.addComponentColumn(experiment -> viewButton(experiment)).setKey(VIEW);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -99,8 +100,8 @@ public class ExperimentsView extends Composite<VerticalLayout>
 
   private Button viewButton(Experiment experiment) {
     Button button = new Button();
-    button.addClassName(VIEW);
-    button.setIcon(VaadinIcon.EYE.create());
+    button.addClassName(NAME);
+    button.setText(experiment.getName());
     button.addClickListener(e -> presenter.view(experiment));
     return button;
   }
@@ -114,8 +115,6 @@ public class ExperimentsView extends Composite<VerticalLayout>
     name.setHeader(nameHeader).setFooter(nameHeader);
     String dateHeader = userResources.message(DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
-    String viewHeader = resources.message(VIEW);
-    view.setHeader(viewHeader).setFooter(viewHeader);
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
   }
