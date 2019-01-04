@@ -44,7 +44,6 @@ import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -119,7 +118,6 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void presenter_Init() {
-    view.onAttach(mock(AttachEvent.class));
     verify(presenter).init(view);
   }
 
@@ -207,17 +205,5 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
       clickButton(button);
       verify(presenter).view(experiment);
     }
-  }
-
-  @Test
-  public void getLocale() {
-    assertEquals(locale, view.getLocale());
-  }
-
-  @Test
-  public void getLocale_French() {
-    Locale locale = Locale.FRENCH;
-    when(ui.getLocale()).thenReturn(locale);
-    assertEquals(locale, view.getLocale());
   }
 }

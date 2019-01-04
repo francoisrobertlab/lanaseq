@@ -37,7 +37,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
 import java.util.List;
-import java.util.Locale;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +60,6 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentEventListener<SaveEvent<Experiment>>> saveListenerCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
-  private Locale locale = Locale.ENGLISH;
   private List<Experiment> experiments;
 
   /**
@@ -75,7 +73,6 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     view.experiments.setSelectionMode(SelectionMode.MULTI);
     view.experimentDialog = mock(ExperimentDialog.class);
     experiments = experimentRepository.findAll();
-    when(view.getLocale()).thenReturn(locale);
     when(experimentService.all()).thenReturn(experiments);
   }
 

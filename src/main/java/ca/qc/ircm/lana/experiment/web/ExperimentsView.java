@@ -28,7 +28,6 @@ import ca.qc.ircm.lana.web.ViewLayout;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -43,7 +42,6 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -96,6 +94,7 @@ public class ExperimentsView extends Composite<VerticalLayout>
     buttonsLayout.add(add);
     add.addClassName(ADD);
     add.addClickListener(e -> presenter.add());
+    presenter.init(this);
   }
 
   private Button viewButton(Experiment experiment) {
@@ -126,16 +125,5 @@ public class ExperimentsView extends Composite<VerticalLayout>
     MessageResource resources = new MessageResource(ExperimentsView.class, getLocale());
     MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
-  }
-
-  @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
-    presenter.init(this);
-  }
-
-  @Override
-  protected Locale getLocale() {
-    return super.getLocale();
   }
 }
