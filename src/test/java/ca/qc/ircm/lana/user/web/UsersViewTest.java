@@ -51,6 +51,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -74,6 +75,8 @@ public class UsersViewTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, User>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<User>> comparatorCaptor;
   @Inject
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
@@ -101,6 +104,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.email = mock(Column.class);
     when(view.users.addColumn(any(ComponentRenderer.class), eq(EMAIL))).thenReturn(view.email);
     when(view.email.setKey(any())).thenReturn(view.email);
+    when(view.email.setComparator(any(Comparator.class))).thenReturn(view.email);
     when(view.email.setHeader(any(String.class))).thenReturn(view.email);
     view.laboratory = mock(Column.class);
     when(view.users.addColumn(any(ValueProvider.class), eq(LABORATORY)))
@@ -188,11 +192,27 @@ public class UsersViewTest extends AbstractViewTestCase {
       clickButton(button);
       verify(presenter).view(user);
     }
+    verify(view.email).setComparator(comparatorCaptor.capture());
+    Comparator<User> comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(email("abc@site.com"), email("test@site.com")) < 0);
+    assertTrue(comparator.compare(email("Abc@site.com"), email("test@site.com")) < 0);
+    assertTrue(comparator.compare(email("test@abc.com"), email("test@site.com")) < 0);
+    assertTrue(comparator.compare(email("test@site.com"), email("test@site.com")) == 0);
+    assertTrue(comparator.compare(email("Test@site.com"), email("test@site.com")) == 0);
+    assertTrue(comparator.compare(email("test@site.com"), email("abc@site.com")) > 0);
+    assertTrue(comparator.compare(email("Test@site.com"), email("abc@site.com")) > 0);
+    assertTrue(comparator.compare(email("test@site.com"), email("test@abc.com")) > 0);
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
     ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
     for (User user : users) {
       assertEquals(user.getLaboratory() != null ? user.getLaboratory().getName() : "",
           valueProvider.apply(user));
     }
+  }
+
+  private User email(String email) {
+    User user = new User();
+    user.setEmail(email);
+    return user;
   }
 }

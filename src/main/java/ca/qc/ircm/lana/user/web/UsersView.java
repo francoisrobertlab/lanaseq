@@ -86,7 +86,8 @@ public class UsersView extends Composite<VerticalLayout>
     root.add(users);
     users.addClassName(USERS);
     users.setSelectionMode(SelectionMode.MULTI);
-    email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL);
+    email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL)
+        .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
     laboratory =
         users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
             LABORATORY).setKey(LABORATORY);
