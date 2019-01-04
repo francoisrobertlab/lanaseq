@@ -37,7 +37,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @GeneratePropertyNames
-public class User implements Data, Serializable {
+public class User implements Data, Owned, Serializable {
   private static final long serialVersionUID = -3200958473089020837L;
   /**
    * Database identifier.
@@ -124,6 +124,11 @@ public class User implements Data, Serializable {
   @Override
   public String toString() {
     return "User [id=" + id + ", email=" + email + "]";
+  }
+
+  @Override
+  public User getOwner() {
+    return this;
   }
 
   @Override

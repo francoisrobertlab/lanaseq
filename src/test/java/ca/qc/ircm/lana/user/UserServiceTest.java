@@ -18,15 +18,20 @@
 package ca.qc.ircm.lana.user;
 
 import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import java.time.Instant;
@@ -52,11 +57,17 @@ public class UserServiceTest {
   private LaboratoryRepository laboratoryRepository;
   @Mock
   private PasswordEncoder passwordEncoder;
+  @Mock
+  private AuthorizationService authorizationService;
   private String hashedPassword = "4k7GCUVUzV5zL74V867q";
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
-    userService = new UserService(userRepository, laboratoryRepository, passwordEncoder);
+    userService = new UserService(userRepository, laboratoryRepository, passwordEncoder,
+        authorizationService);
     when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
   }
 
@@ -80,6 +91,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
+    verify(authorizationService).checkRead(user);
   }
 
   @Test
@@ -116,6 +128,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
+    verify(authorizationService).checkRead(user);
   }
 
   @Test
@@ -133,7 +146,33 @@ public class UserServiceTest {
   }
 
   @Test
-  public void all() {
+  public void all_User() {
+    when(authorizationService.currentUser()).thenReturn(userRepository.findById(3L).get());
+
+    List<User> users = userService.all();
+
+    assertEquals(1, users.size());
+    assertTrue(find(users, 3L).isPresent());
+    verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
+  public void all_Manager() {
+    when(authorizationService.currentUser()).thenReturn(userRepository.findById(2L).get());
+    when(authorizationService.hasRole(MANAGER)).thenReturn(true);
+
+    List<User> users = userService.all();
+
+    assertEquals(2, users.size());
+    assertTrue(find(users, 2L).isPresent());
+    assertTrue(find(users, 3L).isPresent());
+    verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
+  public void all_Admin() {
+    when(authorizationService.currentUser()).thenReturn(userRepository.findById(1L).get());
+    when(authorizationService.hasRole(ADMIN)).thenReturn(true);
     List<User> users = userService.all();
 
     assertEquals(7, users.size());
@@ -143,6 +182,7 @@ public class UserServiceTest {
     assertTrue(find(users, 4L).isPresent());
     assertTrue(find(users, 5L).isPresent());
     assertTrue(find(users, 6L).isPresent());
+    verify(authorizationService).checkRole(USER);
   }
 
   @Test
@@ -171,6 +211,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
+    verify(authorizationService).checkRole(ADMIN);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -210,6 +251,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
+    verify(authorizationService).checkRole(ADMIN);
   }
 
   @Test
@@ -239,6 +281,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
+    verify(authorizationService).checkAnyRole(ADMIN, MANAGER);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -290,6 +333,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertNull(user.getLocale());
+    verify(authorizationService).checkAnyRole(ADMIN, MANAGER);
   }
 
   @Test
@@ -323,6 +367,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory().getId());
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertNull(user.getLocale());
+    verify(authorizationService).checkRole(ADMIN);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -372,6 +417,7 @@ public class UserServiceTest {
 
     userService.save(user, "newpassword");
 
+    verify(authorizationService).checkWrite(user);
     user = userRepository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
@@ -402,6 +448,7 @@ public class UserServiceTest {
 
     userService.save(user, "newpassword");
 
+    verify(authorizationService).checkWrite(user);
     user = userRepository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
@@ -420,6 +467,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
+    verify(authorizationService).checkRole(ADMIN);
   }
 
   @Test
@@ -432,6 +480,8 @@ public class UserServiceTest {
     userService.save(user, null);
 
     assertFalse(laboratoryRepository.findById(2L).isPresent());
+    verify(authorizationService, atLeastOnce()).checkRole(ADMIN);
+    verify(authorizationService).checkWrite(user);
   }
 
   @Test
@@ -447,6 +497,7 @@ public class UserServiceTest {
 
     userService.save(user, "newpassword");
 
+    verify(authorizationService).checkWrite(user);
     assertNotNull(laboratory.getId());
     user = userRepository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
@@ -466,6 +517,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertEquals(Locale.CHINESE, user.getLocale());
+    verify(authorizationService, atLeastOnce()).checkRole(ADMIN);
   }
 
   @Test
@@ -477,6 +529,7 @@ public class UserServiceTest {
 
     userService.save(user, null);
 
+    verify(authorizationService).checkWrite(user);
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());

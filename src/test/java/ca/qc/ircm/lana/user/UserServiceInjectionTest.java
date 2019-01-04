@@ -29,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,6 +39,7 @@ public class UserServiceInjectionTest {
   private UserService userService;
 
   @Test
+  @WithUserDetails("lana@ircm.qc.ca")
   public void get() {
     User user = userService.get(1L);
 

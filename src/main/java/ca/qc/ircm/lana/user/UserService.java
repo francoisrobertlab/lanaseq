@@ -17,7 +17,15 @@
 
 package ca.qc.ircm.lana.user;
 
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.user.UserRole.USER;
+
+import ca.qc.ircm.lana.security.AuthorizationService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,15 +44,18 @@ public class UserService {
   private LaboratoryRepository laboratoryRepository;
   @Inject
   private PasswordEncoder passwordEncoder;
+  @Inject
+  private AuthorizationService authorizationService;
 
   protected UserService() {
   }
 
   protected UserService(UserRepository repository, LaboratoryRepository laboratoryRepository,
-      PasswordEncoder passwordEncoder) {
+      PasswordEncoder passwordEncoder, AuthorizationService authorizationService) {
     this.repository = repository;
     this.laboratoryRepository = laboratoryRepository;
     this.passwordEncoder = passwordEncoder;
+    this.authorizationService = authorizationService;
   }
 
   /**
@@ -59,7 +70,9 @@ public class UserService {
       return null;
     }
 
-    return repository.findById(id).orElse(null);
+    User user = repository.findById(id).orElse(null);
+    authorizationService.checkRead(user);
+    return user;
   }
 
   /**
@@ -74,16 +87,27 @@ public class UserService {
       return null;
     }
 
-    return repository.findByEmail(email).orElse(null);
+    User user = repository.findByEmail(email).orElse(null);
+    authorizationService.checkRead(user);
+    return user;
   }
 
   /**
-   * Returns all users.
+   * Returns all users the user can access.
    *
-   * @return all users
+   * @return all users the user can access
    */
   public List<User> all() {
-    return repository.findAll();
+    authorizationService.checkRole(USER);
+    if (authorizationService.hasRole(ADMIN)) {
+      return repository.findAll();
+    } else if (authorizationService.hasRole(MANAGER)) {
+      Laboratory laboratory = authorizationService.currentUser().getLaboratory();
+      return repository.findByLaboratory(laboratory);
+    } else {
+      User user = authorizationService.currentUser();
+      return Stream.of(user).collect(Collectors.toCollection(ArrayList::new));
+    }
   }
 
   /**
@@ -116,19 +140,28 @@ public class UserService {
           "laboratory " + user.getLaboratory().getId() + " does not exists");
     }
 
+    authorizationService.checkWrite(user);
     if (user.getId() == null) {
+      authorizationService.checkAnyRole(ADMIN, MANAGER);
       user.setActive(true);
+    }
+    if (user.isAdmin()) {
+      authorizationService.checkRole(ADMIN);
     }
     if (password != null) {
       String hashedPassword = passwordEncoder.encode(password);
       user.setHashedPassword(hashedPassword);
     }
-    if (user.isManager()) {
+    if (user.getLaboratory().getId() == null) {
+      authorizationService.checkRole(ADMIN);
       laboratoryRepository.save(user.getLaboratory());
     }
     final Laboratory oldLaboratory = user.getId() != null
         ? repository.findById(user.getId()).map(old -> old.getLaboratory()).orElse(null)
         : null;
+    if (oldLaboratory != null && !oldLaboratory.getId().equals(user.getLaboratory().getId())) {
+      authorizationService.checkRole(ADMIN);
+    }
     repository.save(user);
     deleteLaboratoryIfEmpty(oldLaboratory);
   }
