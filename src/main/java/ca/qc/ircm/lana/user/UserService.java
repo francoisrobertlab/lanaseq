@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.user;
 
 import java.util.List;
 import javax.inject.Inject;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,6 +104,9 @@ public class UserService {
    *          user's unhashed password, can be null to keep previous password
    */
   public void save(User user, String password) {
+    if (user.getId() != null && user.getId() == 1L && !user.isAdmin()) {
+      throw new AccessDeniedException("user 1 must be an admin");
+    }
     if (user.getLaboratory() == null) {
       throw new IllegalArgumentException("users must be in a laboratory");
     }

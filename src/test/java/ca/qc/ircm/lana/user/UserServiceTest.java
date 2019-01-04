@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -492,6 +493,14 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void save_UpdateFirstUserRemoveAdmin() {
+    User user = userRepository.findById(1L).get();
+    user.setAdmin(false);
+
+    userService.save(user, "newpassword");
   }
 
   @Test(expected = NullPointerException.class)
