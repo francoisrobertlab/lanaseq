@@ -53,6 +53,7 @@ import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -74,6 +75,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, Experiment>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<LocalDateTimeRenderer<Experiment>> localDateTimeRendererCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<Experiment>> comparatorCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
   private Locale locale = Locale.ENGLISH;
@@ -101,6 +104,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.name = mock(Column.class);
     when(view.experiments.addColumn(any(ComponentRenderer.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
+    when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     view.date = mock(Column.class);
     when(view.experiments.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
@@ -180,6 +184,15 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
       clickButton(button);
       verify(presenter).view(experiment);
     }
+    verify(view.name).setComparator(comparatorCaptor.capture());
+    Comparator<Experiment> comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(name("abc"), name("test")) < 0);
+    assertTrue(comparator.compare(name("Abc"), name("test")) < 0);
+    assertTrue(comparator.compare(name("test"), name("test")) == 0);
+    assertTrue(comparator.compare(name("Test"), name("test")) == 0);
+    assertTrue(comparator.compare(name("Expérienceà"), name("experiencea")) == 0);
+    assertTrue(comparator.compare(name("test"), name("abc")) > 0);
+    assertTrue(comparator.compare(name("Test"), name("abc")) > 0);
     verify(view.experiments).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
         localDateTimeRendererCaptor.getValue();
@@ -188,5 +201,11 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(experiment.getDate()),
           component.getElement().getText());
     }
+  }
+
+  private Experiment name(String name) {
+    Experiment experiment = new Experiment();
+    experiment.setName(name);
+    return experiment;
   }
 }

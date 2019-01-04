@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.experiment.web;
 
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
@@ -86,7 +87,8 @@ public class ExperimentsView extends Composite<VerticalLayout>
     experiments.addClassName(EXPERIMENTS);
     name =
         experiments.addColumn(new ComponentRenderer<>(experiment -> viewButton(experiment)), NAME)
-            .setKey(NAME);
+            .setKey(NAME).setComparator(
+                (e1, e2) -> normalize(e1.getName()).compareToIgnoreCase(normalize(e2.getName())));
     date = experiments.addColumn(
         new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
