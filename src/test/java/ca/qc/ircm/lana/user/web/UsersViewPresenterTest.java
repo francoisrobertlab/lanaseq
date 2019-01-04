@@ -37,7 +37,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
 import java.util.List;
-import java.util.Locale;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +60,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentEventListener<SaveEvent<UserWithPassword>>> saveListenerCaptor;
   @Inject
   private UserRepository userRepository;
-  private Locale locale = Locale.ENGLISH;
   private List<User> users;
 
   /**
@@ -74,7 +72,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
     view.userDialog = mock(UserDialog.class);
-    when(view.getLocale()).thenReturn(locale);
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
   }

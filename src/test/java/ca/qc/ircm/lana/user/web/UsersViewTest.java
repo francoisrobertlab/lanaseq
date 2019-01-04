@@ -42,7 +42,6 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -111,7 +110,6 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void presenter_Init() {
-    view.onAttach(mock(AttachEvent.class));
     verify(presenter).init(view);
   }
 
@@ -195,17 +193,5 @@ public class UsersViewTest extends AbstractViewTestCase {
       assertEquals(user.getLaboratory() != null ? user.getLaboratory().getName() : "",
           valueProvider.apply(user));
     }
-  }
-
-  @Test
-  public void getLocale() {
-    assertEquals(locale, view.getLocale());
-  }
-
-  @Test
-  public void getLocale_French() {
-    Locale locale = Locale.FRENCH;
-    when(ui.getLocale()).thenReturn(locale);
-    assertEquals(locale, view.getLocale());
   }
 }
