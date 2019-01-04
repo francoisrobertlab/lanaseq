@@ -45,7 +45,6 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
-import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -112,6 +111,7 @@ public class SigninView extends Composite<VerticalLayout> implements LocaleChang
     doSignin.getStyle().set("display", "none");
     root.add(error);
     error.addClassName(FAIL);
+    presenter.init(this);
   }
 
   @Override
@@ -132,6 +132,7 @@ public class SigninView extends Composite<VerticalLayout> implements LocaleChang
     email.setLabel(userResources.message(EMAIL));
     password.setLabel(userResources.message(HASHED_PASSWORD));
     signin.setText(resources.message(SIGNIN));
+    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -146,16 +147,10 @@ public class SigninView extends Composite<VerticalLayout> implements LocaleChang
     super.onAttach(attachEvent);
     getCurrentUi().getPage().executeJavaScript("document.getElementById('" + DO_SIGNIN
         + "').addEventListener('click', () => document.getElementById('ironform').submit());");
-    presenter.init(this);
   }
 
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
-    presenter.showError(event.getLocation().getQueryParameters().getParameters());
-  }
-
-  @Override
-  protected Locale getLocale() {
-    return super.getLocale();
+    presenter.showError(event.getLocation().getQueryParameters().getParameters(), getLocale());
   }
 }

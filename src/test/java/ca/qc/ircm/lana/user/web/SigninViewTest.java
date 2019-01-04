@@ -43,6 +43,8 @@ import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.Location;
 import com.vaadin.flow.server.InitialPageSettings;
 import java.util.Locale;
 import java.util.Optional;
@@ -75,7 +77,6 @@ public class SigninViewTest extends AbstractViewTestCase {
 
   @Test
   public void presenter_Init() {
-    view.onAttach(mock(AttachEvent.class));
     verify(presenter).init(view);
   }
 
@@ -107,6 +108,7 @@ public class SigninViewTest extends AbstractViewTestCase {
     assertEquals(userResources.message(HASHED_PASSWORD), view.password.getLabel());
     assertEquals(resources.message(SIGNIN), view.signin.getText());
     assertEquals("", view.error.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -132,6 +134,7 @@ public class SigninViewTest extends AbstractViewTestCase {
     assertEquals(userResources.message(HASHED_PASSWORD), view.password.getLabel());
     assertEquals(resources.message(SIGNIN), view.signin.getText());
     assertEquals("", view.error.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -149,15 +152,14 @@ public class SigninViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void getLocale() {
-    assertEquals(locale, view.getLocale());
-  }
+  public void afterNavigation() {
+    AfterNavigationEvent event = mock(AfterNavigationEvent.class);
+    Location location = new Location("signin?error");
+    when(event.getLocation()).thenReturn(location);
 
-  @Test
-  public void getLocale_French() {
-    Locale locale = Locale.FRENCH;
-    when(ui.getLocale()).thenReturn(locale);
-    assertEquals(locale, view.getLocale());
+    view.afterNavigation(event);
+
+    verify(presenter).showError(location.getQueryParameters().getParameters(), locale);
   }
 
   @SuppressWarnings("serial")

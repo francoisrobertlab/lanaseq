@@ -81,7 +81,6 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     view.signin = new Button();
     view.doSignin = mock(Button.class);
     view.error = new Div();
-    when(view.getLocale()).thenReturn(locale);
   }
 
   @Test
@@ -93,6 +92,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void sign_EmptyEmail() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.password.setValue("test");
     clickButton(view.signin);
 
@@ -109,6 +109,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void sign_InvalidEmail() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.email.setValue("test");
     view.password.setValue("test");
     clickButton(view.signin);
@@ -121,6 +122,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   public void sign_InvalidEmailWithLdap() {
     when(ldapConfiguration.isEnabled()).thenReturn(true);
     presenter.init(view);
+    presenter.localeChange(locale);
     view.email.setValue("test");
     view.password.setValue("test_password");
     clickButton(view.signin);
@@ -131,6 +133,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void sign_EmptyPassword() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.email.setValue("test");
     clickButton(view.signin);
 
@@ -147,6 +150,7 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void sign() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.email.setValue("test@ircm.qc.ca");
     view.password.setValue("test_password");
     clickButton(view.signin);
@@ -160,31 +164,31 @@ public class SigninViewPresenterTest extends AbstractViewTestCase {
     Map<String, List<String>> parameters = new HashMap<>();
     parameters.put(DISABLED, Collections.emptyList());
 
-    presenter.showError(parameters);
+    presenter.showError(parameters, locale);
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DISABLED), view.error.getText());
   }
 
   @Test
-  public void sign_ExcessiveAttempts() {
+  public void showError_ExcessiveAttempts() {
     presenter.init(view);
     Map<String, List<String>> parameters = new HashMap<>();
     parameters.put(EXCESSIVE_ATTEMPTS, Collections.emptyList());
 
-    presenter.showError(parameters);
+    presenter.showError(parameters, locale);
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(EXCESSIVE_ATTEMPTS), view.error.getText());
   }
 
   @Test
-  public void sign_Fail() {
+  public void showError_Fail() {
     presenter.init(view);
     Map<String, List<String>> parameters = new HashMap<>();
     parameters.put(FAIL, Collections.emptyList());
 
-    presenter.showError(parameters);
+    presenter.showError(parameters, locale);
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(FAIL), view.error.getText());

@@ -37,6 +37,7 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -66,12 +67,14 @@ public class SigninViewPresenter {
   void init(SigninView view) {
     logger.debug("signin view");
     this.view = view;
-    final MessageResource generalResources =
-        new MessageResource(WebConstants.class, view.getLocale());
     view.error.setVisible(false);
     view.email.addKeyDownListener(Key.ENTER, e -> sign());
     view.password.addKeyDownListener(Key.ENTER, e -> sign());
     view.signin.addClickListener(e -> sign());
+  }
+
+  void localeChange(Locale locale) {
+    final MessageResource generalResources = new MessageResource(WebConstants.class, locale);
     binder.forField(view.email).asRequired(generalResources.message(REQUIRED))
         .withValidator(emailValidator(generalResources.message(INVALID_EMAIL))).bind(EMAIL);
     binder.forField(view.password).asRequired(generalResources.message(REQUIRED))
@@ -93,8 +96,8 @@ public class SigninViewPresenter {
     }
   }
 
-  void showError(Map<String, List<String>> parameters) {
-    MessageResource resources = new MessageResource(SigninView.class, view.getLocale());
+  void showError(Map<String, List<String>> parameters, Locale locale) {
+    MessageResource resources = new MessageResource(SigninView.class, locale);
     if (parameters.containsKey(DISABLED)) {
       logger.debug("Account disabled for user {}", view.email.getValue());
       view.error.setText(resources.message(DISABLED));
