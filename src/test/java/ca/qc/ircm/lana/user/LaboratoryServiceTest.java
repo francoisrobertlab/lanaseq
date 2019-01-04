@@ -114,4 +114,24 @@ public class LaboratoryServiceTest {
     assertTrue(Data.find(laboratories, 3).isPresent());
     verify(authorizationService).checkRole(USER);
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void save_New() {
+    Laboratory laboratory = new Laboratory();
+    laboratory.setName("New name");
+
+    laboratoryService.save(laboratory);
+  }
+
+  @Test
+  public void save_Update() {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    laboratory.setName("New name");
+
+    laboratoryService.save(laboratory);
+
+    verify(authorizationService).checkWrite(laboratory);
+    laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertEquals("New name", laboratory.getName());
+  }
 }

@@ -28,6 +28,8 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
@@ -54,6 +56,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private UsersView view;
   @Mock
   private UserService userService;
+  @Mock
+  private LaboratoryService laboratoryService;
   @Captor
   private ArgumentCaptor<User> userCaptor;
   @Captor
@@ -67,11 +71,12 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new UsersViewPresenter(userService);
+    presenter = new UsersViewPresenter(userService, laboratoryService);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
     view.userDialog = mock(UserDialog.class);
+    view.laboratoryDialog = mock(LaboratoryDialog.class);
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
   }
@@ -94,12 +99,25 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     presenter.init(view);
     User user = new User();
     user.setId(2L);
-    User databaseUser = new User();
+    User databaseUser = userRepository.findById(2L).orElse(null);
     when(userService.get(any())).thenReturn(databaseUser);
     presenter.view(user);
     verify(userService).get(2L);
     verify(view.userDialog).setUser(databaseUser);
     verify(view.userDialog).open();
+  }
+
+  @Test
+  public void viewLaboratory() {
+    presenter.init(view);
+    Laboratory laboratory = new Laboratory();
+    laboratory.setId(2L);
+    User databaseUser = userRepository.findById(2L).orElse(null);
+    when(laboratoryService.get(any())).thenReturn(databaseUser.getLaboratory());
+    presenter.viewLaboratory(laboratory);
+    verify(laboratoryService).get(2L);
+    verify(view.laboratoryDialog).setLaboratory(databaseUser.getLaboratory());
+    verify(view.laboratoryDialog).open();
   }
 
   @Test

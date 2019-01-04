@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
@@ -67,14 +68,18 @@ public class UsersView extends Composite<VerticalLayout>
   @Inject
   protected UserDialog userDialog;
   @Inject
+  protected LaboratoryDialog laboratoryDialog;
+  @Inject
   private transient UsersViewPresenter presenter;
 
   public UsersView() {
   }
 
-  protected UsersView(UsersViewPresenter presenter, UserDialog userDialog) {
+  protected UsersView(UsersViewPresenter presenter, UserDialog userDialog,
+      LaboratoryDialog laboratoryDialog) {
     this.presenter = presenter;
     this.userDialog = userDialog;
+    this.laboratoryDialog = laboratoryDialog;
   }
 
   @PostConstruct
@@ -89,8 +94,9 @@ public class UsersView extends Composite<VerticalLayout>
     email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
     laboratory =
-        users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
-            LABORATORY).setKey(LABORATORY);
+        users.addColumn(new ComponentRenderer<>(user -> viewLaboratoryButton(user)), LABORATORY)
+            .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
+                .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -104,6 +110,14 @@ public class UsersView extends Composite<VerticalLayout>
     button.addClassName(EMAIL);
     button.setText(user.getEmail());
     button.addClickListener(e -> presenter.view(user));
+    return button;
+  }
+
+  private Button viewLaboratoryButton(User user) {
+    Button button = new Button();
+    button.addClassName(LABORATORY);
+    button.setText(user.getLaboratory().getName());
+    button.addClickListener(e -> presenter.viewLaboratory(user.getLaboratory()));
     return button;
   }
 

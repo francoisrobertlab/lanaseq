@@ -81,4 +81,19 @@ public class LaboratoryService {
           .collect(Collectors.toCollection(ArrayList::new));
     }
   }
+
+  /**
+   * Saves laboratory into database.
+   *
+   * @param laboratory
+   *          laboratory
+   */
+  public void save(Laboratory laboratory) {
+    if (laboratory.getId() == null) {
+      throw new IllegalArgumentException("cannot create a new laboratory without a user");
+    }
+    authorizationService.checkWrite(laboratory);
+
+    repository.save(laboratory);
+  }
 }

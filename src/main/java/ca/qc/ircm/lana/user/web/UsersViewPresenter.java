@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -33,12 +35,15 @@ public class UsersViewPresenter {
   private UsersView view;
   @Inject
   private UserService userService;
+  @Inject
+  private LaboratoryService laboratoryService;
 
   protected UsersViewPresenter() {
   }
 
-  protected UsersViewPresenter(UserService userService) {
+  protected UsersViewPresenter(UserService userService, LaboratoryService laboratoryService) {
     this.userService = userService;
+    this.laboratoryService = laboratoryService;
   }
 
   void init(UsersView view) {
@@ -49,6 +54,11 @@ public class UsersViewPresenter {
   void view(User user) {
     view.userDialog.setUser(userService.get(user.getId()));
     view.userDialog.open();
+  }
+
+  void viewLaboratory(Laboratory laboratory) {
+    view.laboratoryDialog.setLaboratory(laboratoryService.get(laboratory.getId()));
+    view.laboratoryDialog.open();
   }
 
   void add() {

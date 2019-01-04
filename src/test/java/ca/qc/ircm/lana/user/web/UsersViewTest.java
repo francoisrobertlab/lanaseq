@@ -32,12 +32,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.WebConstants;
@@ -49,7 +51,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Comparator;
 import java.util.List;
@@ -71,10 +72,10 @@ public class UsersViewTest extends AbstractViewTestCase {
   private UsersViewPresenter presenter;
   @Mock
   private UserDialog userDialog;
+  @Mock
+  private LaboratoryDialog laboratoryDialog;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, User>> buttonRendererCaptor;
-  @Captor
-  private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<Comparator<User>> comparatorCaptor;
   @Inject
@@ -91,7 +92,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new UsersView(presenter, userDialog);
+    view = new UsersView(presenter, userDialog, laboratoryDialog);
     view.init();
     users = userRepository.findAll();
   }
@@ -107,9 +108,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.email.setComparator(any(Comparator.class))).thenReturn(view.email);
     when(view.email.setHeader(any(String.class))).thenReturn(view.email);
     view.laboratory = mock(Column.class);
-    when(view.users.addColumn(any(ValueProvider.class), eq(LABORATORY)))
+    when(view.users.addColumn(any(ComponentRenderer.class), eq(LABORATORY)))
         .thenReturn(view.laboratory);
     when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
+    when(view.laboratory.setComparator(any(Comparator.class))).thenReturn(view.laboratory);
     when(view.laboratory.setHeader(any(String.class))).thenReturn(view.laboratory);
   }
 
@@ -141,7 +143,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new UsersView(presenter, userDialog);
+    view = new UsersView(presenter, userDialog, laboratoryDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -165,7 +167,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_SelectionMode() {
-    view = new UsersView(presenter, userDialog);
+    view = new UsersView(presenter, userDialog, laboratoryDialog);
     mockColumns();
     view.init();
     verify(view.users).setSelectionMode(SelectionMode.MULTI);
@@ -180,7 +182,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_ColumnsValueProvider() {
-    view = new UsersView(presenter, userDialog);
+    view = new UsersView(presenter, userDialog, laboratoryDialog);
     mockColumns();
     view.init();
     verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(EMAIL));
@@ -202,17 +204,40 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(email("test@site.com"), email("abc@site.com")) > 0);
     assertTrue(comparator.compare(email("Test@site.com"), email("abc@site.com")) > 0);
     assertTrue(comparator.compare(email("test@site.com"), email("test@abc.com")) > 0);
-    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
-    ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
+    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(LABORATORY));
+    buttonRenderer = buttonRendererCaptor.getValue();
     for (User user : users) {
-      assertEquals(user.getLaboratory() != null ? user.getLaboratory().getName() : "",
-          valueProvider.apply(user));
+      Button button = buttonRenderer.createComponent(user);
+      assertTrue(button.getClassNames().contains(LABORATORY));
+      assertEquals(user.getLaboratory().getName(), button.getText());
+      clickButton(button);
+      verify(presenter, atLeastOnce()).viewLaboratory(user.getLaboratory());
     }
+    verify(view.laboratory).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(lab("abc"), lab("test")) < 0);
+    assertTrue(comparator.compare(lab("Abc"), lab("test")) < 0);
+    assertTrue(comparator.compare(lab("élement"), lab("facteur")) < 0);
+    assertTrue(comparator.compare(lab("test"), lab("test")) == 0);
+    assertTrue(comparator.compare(lab("Test"), lab("test")) == 0);
+    assertTrue(comparator.compare(lab("Expérienceà"), lab("experiencea")) == 0);
+    assertTrue(comparator.compare(lab("experiencea"), lab("Expérienceà")) == 0);
+    assertTrue(comparator.compare(lab("test"), lab("abc")) > 0);
+    assertTrue(comparator.compare(lab("Test"), lab("abc")) > 0);
+    assertTrue(comparator.compare(lab("facteur"), lab("élement")) > 0);
   }
 
   private User email(String email) {
     User user = new User();
     user.setEmail(email);
+    return user;
+  }
+
+  private User lab(String name) {
+    User user = new User();
+    Laboratory laboratory = new Laboratory();
+    laboratory.setName(name);
+    user.setLaboratory(laboratory);
     return user;
   }
 }
