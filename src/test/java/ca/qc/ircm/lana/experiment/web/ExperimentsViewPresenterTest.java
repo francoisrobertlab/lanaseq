@@ -31,8 +31,6 @@ import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.experiment.ExperimentService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lana.web.SaveEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
@@ -56,8 +54,6 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ExperimentService experimentService;
   @Captor
   private ArgumentCaptor<Experiment> experimentCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentEventListener<SaveEvent<Experiment>>> saveListenerCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
   private List<Experiment> experiments;
@@ -111,27 +107,5 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     assertNull(experiment.getId());
     assertNull(experiment.getName());
     verify(view.experimentDialog).open();
-  }
-
-  @Test
-  public void save() {
-    Experiment experiment = new Experiment();
-    presenter.init(view);
-    verify(view.experimentDialog).addSaveListener(saveListenerCaptor.capture());
-    ComponentEventListener<SaveEvent<Experiment>> listener = saveListenerCaptor.getValue();
-    SaveEvent<Experiment> saveEvent = new SaveEvent<>(view.experimentDialog, false, experiment);
-    listener.onComponentEvent(saveEvent);
-    verify(experimentService).save(experiment);
-  }
-
-  @Test
-  public void save_NullPassword() {
-    Experiment experiment = new Experiment();
-    presenter.init(view);
-    verify(view.experimentDialog).addSaveListener(saveListenerCaptor.capture());
-    ComponentEventListener<SaveEvent<Experiment>> listener = saveListenerCaptor.getValue();
-    SaveEvent<Experiment> saveEvent = new SaveEvent<>(view.experimentDialog, false, experiment);
-    listener.onComponentEvent(saveEvent);
-    verify(experimentService).save(experiment);
   }
 }

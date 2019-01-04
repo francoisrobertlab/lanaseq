@@ -44,7 +44,6 @@ public class ExperimentsViewPresenter {
   void init(ExperimentsView view) {
     this.view = view;
     view.experiments.setItems(experimentService.all());
-    view.experimentDialog.addSaveListener(e -> save(e.getSavedObject()));
   }
 
   void view(Experiment experiment) {
@@ -53,12 +52,7 @@ public class ExperimentsViewPresenter {
   }
 
   void add() {
-    Experiment experiment = new Experiment();
-    view.experimentDialog.setExperiment(experiment);
+    view.experimentDialog.setExperiment(new Experiment());
     view.experimentDialog.open();
-  }
-
-  private void save(Experiment experiment) {
-    experimentService.save(experiment);
   }
 }

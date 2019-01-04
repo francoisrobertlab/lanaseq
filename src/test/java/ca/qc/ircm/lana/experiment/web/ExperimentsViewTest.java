@@ -71,6 +71,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   private ExperimentsView view;
   @Mock
   private ExperimentsViewPresenter presenter;
+  @Mock
+  private ExperimentDialog experimentDialog;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, Experiment>> buttonRendererCaptor;
   @Captor
@@ -91,7 +93,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new ExperimentsView(presenter);
+    view = new ExperimentsView(presenter, experimentDialog);
     view.init();
     experiments = experimentRepository.findAll();
   }
@@ -141,7 +143,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new ExperimentsView(presenter);
+    view = new ExperimentsView(presenter, experimentDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -172,7 +174,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void experiments_ColumnsValueProvider() {
-    view = new ExperimentsView(presenter);
+    view = new ExperimentsView(presenter, experimentDialog);
     mockColumns();
     view.init();
     verify(view.experiments).addColumn(buttonRendererCaptor.capture(), eq(NAME));

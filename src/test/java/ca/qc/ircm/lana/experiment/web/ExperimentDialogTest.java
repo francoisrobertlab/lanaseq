@@ -20,43 +20,32 @@ package ca.qc.ircm.lana.experiment.web;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentDialog.HEADER;
-import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
-import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lana.web.SaveEvent;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
-import java.util.Optional;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -65,20 +54,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ExperimentDialogTest extends AbstractViewTestCase {
   private ExperimentDialog dialog;
   @Mock
-  private AuthorizationService authorizationService;
+  private ExperimentDialogPresenter presenter;
   @Mock
-  private ComponentEventListener<SaveEvent<Experiment>> saveListener;
-  @Captor
-  private ArgumentCaptor<SaveEvent<Experiment>> saveEventCaptor;
-  @Captor
-  private ArgumentCaptor<Boolean> booleanCaptor;
+  private Experiment experiment;
   @Inject
   private ExperimentRepository experimentRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(ExperimentDialog.class, locale);
   private MessageResource experimentResources = new MessageResource(Experiment.class, locale);
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);
-  private String name = "Test Experiment";
 
   /**
    * Before test.
@@ -86,11 +70,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    dialog = new ExperimentDialog();
-  }
-
-  private void fillForm() {
-    dialog.name.setValue(name);
+    dialog = new ExperimentDialog(presenter);
   }
 
   @Test
@@ -130,46 +110,35 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void isReadOnly_Default() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertFalse(dialog.isReadOnly());
-  }
-
-  @Test
   public void isReadOnly_False() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setReadOnly(false);
     assertFalse(dialog.isReadOnly());
+    verify(presenter).isReadOnly();
   }
 
   @Test
   public void isReadOnly_True() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setReadOnly(true);
+    when(presenter.isReadOnly()).thenReturn(true);
     assertTrue(dialog.isReadOnly());
+    verify(presenter).isReadOnly();
   }
 
   @Test
   public void setReadOnly_False() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setReadOnly(false);
-    assertFalse(dialog.name.isReadOnly());
-    assertTrue(dialog.buttonsLayout.isVisible());
+    verify(presenter).setReadOnly(false);
   }
 
   @Test
   public void setReadOnly_True() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setReadOnly(true);
-    assertTrue(dialog.name.isReadOnly());
-    assertFalse(dialog.buttonsLayout.isVisible());
+    verify(presenter).setReadOnly(true);
   }
 
   @Test
   public void getExperiment() {
-    Experiment experiment = new Experiment();
-    dialog.setExperiment(experiment);
+    when(presenter.getExperiment()).thenReturn(experiment);
     assertEquals(experiment, dialog.getExperiment());
+    verify(presenter).getExperiment();
   }
 
   @Test
@@ -179,7 +148,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setExperiment(experiment);
 
-    assertEquals("", dialog.name.getValue());
+    verify(presenter).setExperiment(experiment);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
@@ -190,18 +159,18 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setExperiment(experiment);
 
-    assertEquals(experiment.getName(), dialog.name.getValue());
+    verify(presenter).setExperiment(experiment);
     assertEquals(resources.message(HEADER, 1, experiment.getName()), dialog.header.getText());
   }
 
   @Test
-  public void setExperiment_UserBeforeLocaleChange() {
+  public void setExperiment_BeforeLocaleChange() {
     Experiment experiment = experimentRepository.findById(2L).get();
 
     dialog.setExperiment(experiment);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    assertEquals(experiment.getName(), dialog.name.getValue());
+    verify(presenter).setExperiment(experiment);
     assertEquals(resources.message(HEADER, 1, experiment.getName()), dialog.header.getText());
   }
 
@@ -210,54 +179,21 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setExperiment(null);
 
-    assertEquals("", dialog.name.getValue());
+    verify(presenter).setExperiment(experiment);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
   @Test
-  public void save_NameEmpty() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    fillForm();
-    dialog.name.setValue("");
-    dialog.addSaveListener(saveListener);
+  public void save() {
+    clickButton(dialog.save);
 
-    dialog.fireClickSave();
-    verify(saveListener, never()).onComponentEvent(any());
-
-    BinderValidationStatus<Experiment> status = dialog.validateExperiment();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.name);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(presenter).save();
   }
 
   @Test
-  public void save_NewExperiment() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    fillForm();
-    dialog.addSaveListener(saveListener);
+  public void cancel() {
+    clickButton(dialog.cancel);
 
-    dialog.fireClickSave();
-
-    verify(saveListener).onComponentEvent(saveEventCaptor.capture());
-    Experiment experiment = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(name, experiment.getName());
-  }
-
-  @Test
-  public void save_UpdateExperiment() {
-    Experiment experiment = experimentRepository.findById(2L).get();
-    dialog.setExperiment(experiment);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    fillForm();
-    dialog.addSaveListener(saveListener);
-
-    dialog.fireClickSave();
-
-    verify(saveListener).onComponentEvent(saveEventCaptor.capture());
-    experiment = saveEventCaptor.getValue().getSavedObject();
-    assertEquals(name, experiment.getName());
+    verify(presenter).cancel();
   }
 }

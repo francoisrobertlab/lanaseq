@@ -66,15 +66,17 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected Column<Experiment> date;
   protected Column<Experiment> view;
   protected Button add = new Button();
-  protected ExperimentDialog experimentDialog = new ExperimentDialog();
+  @Inject
+  protected ExperimentDialog experimentDialog;
   @Inject
   private transient ExperimentsViewPresenter presenter;
 
   public ExperimentsView() {
   }
 
-  protected ExperimentsView(ExperimentsViewPresenter presenter) {
+  protected ExperimentsView(ExperimentsViewPresenter presenter, ExperimentDialog experimentDialog) {
     this.presenter = presenter;
+    this.experimentDialog = experimentDialog;
   }
 
   @PostConstruct

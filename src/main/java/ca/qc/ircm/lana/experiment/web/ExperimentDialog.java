@@ -20,16 +20,13 @@ package ca.qc.ircm.lana.experiment.web;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
 import ca.qc.ircm.lana.experiment.Experiment;
-import ca.qc.ircm.lana.web.SaveEvent;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
@@ -37,20 +34,20 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.shared.Registration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 
 /**
  * Experiment dialog.
  */
+@SpringComponent
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ExperimentDialog extends Dialog implements LocaleChangeObserver, BaseComponent {
-  private static final Logger logger = LoggerFactory.getLogger(ExperimentDialog.class);
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "experiment-dialog";
   public static final String HEADER = "header";
@@ -59,14 +56,18 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
-  private Binder<Experiment> binder = new BeanValidationBinder<>(Experiment.class);
-  private Experiment experiment;
-  private boolean readOnly;
+  @Inject
+  private ExperimentDialogPresenter presenter;
 
-  /**
-   * Creates a new ExperimentDialog.
-   */
-  public ExperimentDialog() {
+  protected ExperimentDialog() {
+  }
+
+  protected ExperimentDialog(ExperimentDialogPresenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @PostConstruct
+  void init() {
     setId(CLASS_NAME);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
@@ -78,12 +79,12 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
     save.addClassName(SAVE);
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> save());
+    save.addClickListener(e -> presenter.save());
     buttonsLayout.add(cancel);
     cancel.addClassName(CANCEL);
     cancel.setIcon(VaadinIcon.CLOSE.create());
-    cancel.addClickListener(e -> close());
-    setExperiment(null);
+    cancel.addClickListener(e -> presenter.cancel());
+    presenter.init(this);
   }
 
   @Override
@@ -92,15 +93,13 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
     final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
     updateHeader();
     name.setLabel(experimentResources.message(NAME));
-    binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .bind(NAME);
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
-    setReadOnly(readOnly);
   }
 
   private void updateHeader() {
     final MessageResource resources = new MessageResource(ExperimentDialog.class, getLocale());
+    Experiment experiment = presenter.getExperiment();
     if (experiment != null && experiment.getId() != null) {
       header.setText(resources.message(HEADER, 1, experiment.getName()));
     } else {
@@ -108,32 +107,8 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
     }
   }
 
-  BinderValidationStatus<Experiment> validateExperiment() {
-    return binder.validate();
-  }
-
-  private boolean validate() {
-    return validateExperiment().isOk();
-  }
-
-  private void save() {
-    if (validate()) {
-      logger.debug("Fire save event for experiment {}", experiment);
-      fireEvent(new SaveEvent<>(this, false, experiment));
-    }
-  }
-
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Registration addSaveListener(ComponentEventListener<SaveEvent<Experiment>> listener) {
-    return addListener((Class) SaveEvent.class, listener);
-  }
-
-  void fireClickSave() {
-    save();
-  }
-
   public boolean isReadOnly() {
-    return readOnly;
+    return presenter.isReadOnly();
   }
 
   /**
@@ -143,13 +118,11 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
    *          read only
    */
   public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-    binder.setReadOnly(readOnly);
-    buttonsLayout.setVisible(!readOnly);
+    presenter.setReadOnly(readOnly);
   }
 
   public Experiment getExperiment() {
-    return experiment;
+    return presenter.getExperiment();
   }
 
   /**
@@ -159,11 +132,7 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
    *          experiment
    */
   public void setExperiment(Experiment experiment) {
-    if (experiment == null) {
-      experiment = new Experiment();
-    }
-    this.experiment = experiment;
-    binder.setBean(experiment);
+    presenter.setExperiment(experiment);
     updateHeader();
   }
 }
