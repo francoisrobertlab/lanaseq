@@ -58,14 +58,12 @@ public class UsersView extends Composite<VerticalLayout>
   public static final String VIEW_NAME = "users";
   public static final String HEADER = "header";
   public static final String USERS = "users";
-  public static final String VIEW = "view";
   public static final String ADD = "add";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
   protected Column<User> laboratory;
-  protected Column<User> view;
   protected Button add = new Button();
   @Inject
   protected UserDialog userDialog;
@@ -89,11 +87,10 @@ public class UsersView extends Composite<VerticalLayout>
     root.add(users);
     users.addClassName(USERS);
     users.setSelectionMode(SelectionMode.MULTI);
-    email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL);
+    email = users.addComponentColumn(user -> viewButton(user)).setKey(EMAIL);
     laboratory =
         users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
             LABORATORY).setKey(LABORATORY);
-    view = users.addComponentColumn(user -> viewButton(user)).setKey(VIEW);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -103,8 +100,8 @@ public class UsersView extends Composite<VerticalLayout>
 
   private Button viewButton(User user) {
     Button button = new Button();
-    button.addClassName(VIEW);
-    button.setIcon(VaadinIcon.EYE.create());
+    button.addClassName(EMAIL);
+    button.setText(user.getEmail());
     button.addClickListener(e -> presenter.view(user));
     return button;
   }
@@ -118,8 +115,6 @@ public class UsersView extends Composite<VerticalLayout>
     email.setHeader(emailHeader).setFooter(emailHeader);
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
-    String viewHeader = resources.message(VIEW);
-    view.setHeader(viewHeader).setFooter(viewHeader);
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
   }

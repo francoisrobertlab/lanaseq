@@ -24,7 +24,6 @@ import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.web.UsersView.ADD;
 import static ca.qc.ircm.lana.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS;
-import static ca.qc.ircm.lana.user.web.UsersView.VIEW;
 import static ca.qc.ircm.lana.user.web.UsersView.VIEW_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
@@ -100,7 +99,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.users = mock(Grid.class);
     when(view.users.getElement()).thenReturn(usersElement);
     view.email = mock(Column.class);
-    when(view.users.addColumn(any(ValueProvider.class), eq(EMAIL))).thenReturn(view.email);
+    when(view.users.addComponentColumn(any(ValueProvider.class))).thenReturn(view.email);
     when(view.email.setKey(any())).thenReturn(view.email);
     when(view.email.setHeader(any(String.class))).thenReturn(view.email);
     view.laboratory = mock(Column.class);
@@ -108,10 +107,6 @@ public class UsersViewTest extends AbstractViewTestCase {
         .thenReturn(view.laboratory);
     when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
     when(view.laboratory.setHeader(any(String.class))).thenReturn(view.laboratory);
-    view.view = mock(Column.class);
-    when(view.users.addComponentColumn(any(ValueProvider.class))).thenReturn(view.view);
-    when(view.view.setKey(any())).thenReturn(view.view);
-    when(view.view.setHeader(any(String.class))).thenReturn(view.view);
   }
 
   @Test
@@ -137,8 +132,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
-    verify(view.view).setHeader(resources.message(VIEW));
-    verify(view.view).setFooter(resources.message(VIEW));
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -159,8 +152,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
-    verify(view.view).setHeader(resources.message(VIEW));
-    verify(view.view).setFooter(resources.message(VIEW));
   }
 
   @Test
@@ -179,10 +170,9 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_Columns() {
-    assertEquals(3, view.users.getColumns().size());
+    assertEquals(2, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertNotNull(view.users.getColumnByKey(LABORATORY));
-    assertNotNull(view.users.getColumnByKey(VIEW));
   }
 
   @Test
@@ -190,25 +180,20 @@ public class UsersViewTest extends AbstractViewTestCase {
     view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
-    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));
-    ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
-    for (User user : users) {
-      assertEquals(user.getEmail(), valueProvider.apply(user));
-    }
-    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
-    valueProvider = valueProviderCaptor.getValue();
-    for (User user : users) {
-      assertEquals(user.getLaboratory() != null ? user.getLaboratory().getName() : "",
-          valueProvider.apply(user));
-    }
     verify(view.users).addComponentColumn(buttonProviderCaptor.capture());
     ValueProvider<User, Button> buttonProvider = buttonProviderCaptor.getValue();
     for (User user : users) {
       Button button = buttonProvider.apply(user);
-      assertTrue(button.getClassNames().contains(VIEW));
-      validateIcon(VaadinIcon.EYE.create(), button);
+      assertTrue(button.getClassNames().contains(EMAIL));
+      assertEquals(user.getEmail(), button.getText());
       clickButton(button);
       verify(presenter).view(user);
+    }
+    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
+    ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
+    for (User user : users) {
+      assertEquals(user.getLaboratory() != null ? user.getLaboratory().getName() : "",
+          valueProvider.apply(user));
     }
   }
 
