@@ -33,3 +33,5 @@ INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,
 VALUES ('5', 'christian.poitras@ircm.qc.ca', 'Christian Poitras', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 3, '2018-12-17 15:20:12', 1, 0, 0, 1, 3, null);
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale)
 VALUES ('6', 'inactive.user@ircm.qc.ca', 'Inactive User', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 3, '2018-12-17 15:20:12', 0, 0, 0, 0, 3, null);
+INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale)
+VALUES ('7', 'virginie.calderon@ircm.qc.ca', 'Virginie Calderon', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-04 13:31:24', 1, 0, 1, 0, 1, null);

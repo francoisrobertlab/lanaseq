@@ -122,6 +122,16 @@ public class UserService {
     if (user.isManager()) {
       laboratoryRepository.save(user.getLaboratory());
     }
+    final Laboratory oldLaboratory = user.getId() != null
+        ? repository.findById(user.getId()).map(old -> old.getLaboratory()).orElse(null)
+        : null;
     repository.save(user);
+    deleteLaboratoryIfEmpty(oldLaboratory);
+  }
+
+  private void deleteLaboratoryIfEmpty(Laboratory laboratory) {
+    if (laboratory != null && repository.countByLaboratory(laboratory) == 0) {
+      laboratoryRepository.delete(laboratory);
+    }
   }
 }

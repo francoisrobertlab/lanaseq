@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.user;
 
 import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -134,7 +135,7 @@ public class UserServiceTest {
   public void all() {
     List<User> users = userService.all();
 
-    assertEquals(6, users.size());
+    assertEquals(7, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
@@ -338,7 +339,7 @@ public class UserServiceTest {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setLaboratory(laboratoryRepository.findById(1L).get());
+    user.setLaboratory(laboratoryRepository.findById(2L).get());
     user.setLocale(Locale.ENGLISH);
 
     userService.save(user, null);
@@ -357,7 +358,7 @@ public class UserServiceTest {
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
@@ -418,6 +419,18 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
+  }
+
+  @Test
+  public void save_UpdateDeleteEmptyLaboratory() {
+    User user = userRepository.findById(2L).get();
+    user.setLaboratory(laboratoryRepository.findById(3L).get());
+    userService.save(user, null);
+    user = userRepository.findById(3L).get();
+    user.setLaboratory(laboratoryRepository.findById(3L).get());
+    userService.save(user, null);
+
+    assertFalse(laboratoryRepository.findById(2L).isPresent());
   }
 
   @Test
