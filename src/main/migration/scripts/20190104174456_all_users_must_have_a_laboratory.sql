@@ -26,11 +26,15 @@ VALUES ('1', 'Informatics');
 UPDATE user
 SET laboratory_id = 1
 WHERE laboratory_id IS NULL;
+ALTER TABLE user
+CHANGE laboratory_id laboratory_id bigint(20) NOT NULL; 
 
 
 -- //@UNDO
 -- SQL to undo the change goes here.
 
+ALTER TABLE user
+CHANGE laboratory_id laboratory_id bigint(20); 
 UPDATE user
 SET laboratory_id = NULL
 WHERE laboratory_id = 1;
