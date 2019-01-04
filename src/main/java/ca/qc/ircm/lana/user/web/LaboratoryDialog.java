@@ -107,20 +107,6 @@ public class LaboratoryDialog extends Dialog implements LocaleChangeObserver, Ba
     }
   }
 
-  public boolean isReadOnly() {
-    return presenter.isReadOnly();
-  }
-
-  /**
-   * Sets if dialog should be read only.
-   *
-   * @param readOnly
-   *          read only
-   */
-  public void setReadOnly(boolean readOnly) {
-    presenter.setReadOnly(readOnly);
-  }
-
   public Laboratory getLaboratory() {
     return presenter.getLaboratory();
   }
