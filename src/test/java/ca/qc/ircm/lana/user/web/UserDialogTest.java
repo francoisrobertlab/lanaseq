@@ -19,15 +19,19 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.CLASS_NAME;
+import static ca.qc.ircm.lana.user.web.UserDialog.CREATE_NEW_LABORATORY;
 import static ca.qc.ircm.lana.user.web.UserDialog.HEADER;
+import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD_CONFIRM;
+import static ca.qc.ircm.lana.web.WebConstants.BORDER;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
 import static ca.qc.ircm.lana.web.WebConstants.SAVE;
@@ -41,6 +45,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.WebConstants;
@@ -68,6 +73,7 @@ public class UserDialogTest extends AbstractViewTestCase {
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(UserDialog.class, locale);
   private MessageResource userResources = new MessageResource(User.class, locale);
+  private MessageResource laboratoryResources = new MessageResource(Laboratory.class, locale);
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);
 
   /**
@@ -95,7 +101,11 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.manager.getClassNames().contains(MANAGER));
     assertTrue(dialog.password.getClassNames().contains(PASSWORD));
     assertTrue(dialog.passwordConfirm.getClassNames().contains(PASSWORD_CONFIRM));
+    assertTrue(dialog.createNewLaboratory.getClassNames().contains(CREATE_NEW_LABORATORY));
     assertTrue(dialog.laboratory.getClassNames().contains(LABORATORY));
+    assertTrue(dialog.newLaboratoryLayout.getClassNames().contains(BORDER));
+    assertTrue(
+        dialog.newLaboratoryName.getClassNames().contains(styleName(LABORATORY, LABORATORY_NAME)));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
     assertEquals(PRIMARY, dialog.save.getElement().getAttribute(THEME));
     assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
@@ -111,7 +121,10 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
     assertEquals(resources.message(PASSWORD), dialog.password.getLabel());
     assertEquals(resources.message(PASSWORD_CONFIRM), dialog.passwordConfirm.getLabel());
+    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
+    assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());
+    assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), dialog.save);
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -125,6 +138,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final MessageResource resources = new MessageResource(UserDialog.class, locale);
     final MessageResource userResources = new MessageResource(User.class, locale);
+    final MessageResource laboratoryResources = new MessageResource(Laboratory.class, locale);
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -135,7 +149,10 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
     assertEquals(resources.message(PASSWORD), dialog.password.getLabel());
     assertEquals(resources.message(PASSWORD_CONFIRM), dialog.passwordConfirm.getLabel());
+    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
+    assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());
+    assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     presenter.localeChange(locale);

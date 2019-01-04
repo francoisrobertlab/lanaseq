@@ -22,7 +22,7 @@ import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.user.web.UserDialog.NOT_MANAGER_NEW_LABORATORY;
+import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORDS_NOT_MATCH;
 import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD_CONFIRM;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
@@ -67,9 +67,9 @@ public class UserDialogPresenter {
   private UserDialog dialog;
   private Binder<User> binder = new BeanValidationBinder<>(User.class);
   private Binder<Passwords> passwordBinder = new BeanValidationBinder<>(Passwords.class);
+  private Binder<Laboratory> laboratoryBinder = new BeanValidationBinder<>(Laboratory.class);
   private ListDataProvider<Laboratory> laboratoriesDataProvider;
   private User user;
-  private Laboratory newLaboratory = new Laboratory();
   private boolean readOnly;
   @Inject
   private UserService userService;
@@ -93,6 +93,9 @@ public class UserDialogPresenter {
     dialog.admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
     dialog.admin.addValueChangeListener(e -> updateAdmin());
     dialog.manager.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
+    dialog.manager.addValueChangeListener(e -> updateManager());
+    dialog.createNewLaboratory.setReadOnly(true);
+    dialog.createNewLaboratory.addValueChangeListener(e -> updateCreateNewLaboratory());
     if (authorizationService.hasRole(UserRole.ADMIN)) {
       laboratoriesDataProvider = new LaboratoryDataProvider(laboratoryService.all());
     } else {
@@ -102,10 +105,10 @@ public class UserDialogPresenter {
     }
     dialog.laboratory.setDataProvider(laboratoriesDataProvider);
     dialog.laboratory.setItemLabelGenerator(lab -> lab.getName());
-    dialog.laboratory.addCustomValueSetListener(e -> addNewLaboratory(e.getDetail()));
-    dialog.laboratory.setAllowCustomValue(authorizationService.hasRole(UserRole.ADMIN));
+    dialog.newLaboratoryLayout.setVisible(false);
     setUser(null);
     passwordBinder.setBean(new Passwords());
+    laboratoryBinder.setBean(new Laboratory());
   }
 
   void localeChange(Locale locale) {
@@ -118,9 +121,7 @@ public class UserDialogPresenter {
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.admin).bind(ADMIN);
-    binder.forField(dialog.manager)
-        .withValidator(managerNewLaboratoryValidator(resources.message(NOT_MANAGER_NEW_LABORATORY)))
-        .bind(MANAGER);
+    binder.forField(dialog.manager).bind(MANAGER);
     passwordBinder.forField(dialog.password)
         .withValidator(passwordRequiredValidator(webResources.message(REQUIRED)))
         .withNullRepresentation("").withValidator(password -> {
@@ -138,6 +139,8 @@ public class UserDialogPresenter {
     binder.forField(dialog.laboratory)
         .withValidator(laboratoryRequiredValidator(webResources.message(REQUIRED)))
         .withNullRepresentation(null).bind(LABORATORY);
+    laboratoryBinder.forField(dialog.newLaboratoryName).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("").bind(LABORATORY_NAME);
     dialog.save.setText(webResources.message(SAVE));
     dialog.cancel.setText(webResources.message(CANCEL));
     setReadOnly(readOnly);
@@ -149,18 +152,8 @@ public class UserDialogPresenter {
   }
 
   private Validator<Laboratory> laboratoryRequiredValidator(String errorMessage) {
-    return (value,
-        context) -> !dialog.admin.getValue()
-            && (value == null || value.getName() == null || value.getName().trim().isEmpty())
-                ? ValidationResult.error(errorMessage)
-                : ValidationResult.ok();
-  }
-
-  private Validator<Boolean> managerNewLaboratoryValidator(String errorMessage) {
-    return (value, context) -> !value
-        && (dialog.laboratory.getValue() != null && dialog.laboratory.getValue().getId() == null)
-            ? ValidationResult.error(errorMessage)
-            : ValidationResult.ok();
+    return (value, context) -> !dialog.admin.getValue() && !dialog.createNewLaboratory.getValue()
+        && value == null ? ValidationResult.error(errorMessage) : ValidationResult.ok();
   }
 
   private boolean isNewUser() {
@@ -169,16 +162,24 @@ public class UserDialogPresenter {
 
   private void updateAdmin() {
     dialog.manager.setVisible(!dialog.admin.getValue());
+    dialog.createNewLaboratory.setVisible(!dialog.admin.getValue());
     dialog.laboratory.setVisible(!dialog.admin.getValue());
   }
 
-  void addNewLaboratory(String name) {
-    if (!laboratoriesDataProvider.getItems().contains(newLaboratory)) {
-      laboratoriesDataProvider.getItems().add(newLaboratory);
+  private void updateManager() {
+    if (authorizationService.hasRole(UserRole.ADMIN)) {
+      dialog.createNewLaboratory.setReadOnly(!dialog.manager.getValue());
+      if (!dialog.manager.getValue()) {
+        dialog.createNewLaboratory.setValue(false);
+        dialog.laboratory.setVisible(true);
+        dialog.newLaboratoryLayout.setVisible(false);
+      }
     }
-    newLaboratory.setName(name);
-    laboratoriesDataProvider.refreshItem(newLaboratory);
-    dialog.laboratory.setValue(newLaboratory);
+  }
+
+  private void updateCreateNewLaboratory() {
+    dialog.laboratory.setVisible(!dialog.createNewLaboratory.getValue());
+    dialog.newLaboratoryLayout.setVisible(dialog.createNewLaboratory.getValue());
   }
 
   BinderValidationStatus<User> validateUser() {
@@ -189,29 +190,37 @@ public class UserDialogPresenter {
     return passwordBinder.validate();
   }
 
+  BinderValidationStatus<Laboratory> validateLaboratory() {
+    return laboratoryBinder.validate();
+  }
+
   private boolean validate() {
     boolean valid = true;
     valid = validateUser().isOk() && valid;
     valid = validatePassword().isOk() && valid;
+    if (dialog.createNewLaboratory.getValue()) {
+      valid = validateLaboratory().isOk() && valid;
+    }
     return valid;
   }
 
   void save() {
     if (validate()) {
-      user.setLaboratory(dialog.laboratory.getValue());
       if (user.isAdmin()) {
+        user.setManager(false);
         user.setLaboratory(null);
+      }
+      if (dialog.createNewLaboratory.getValue()) {
+        user.setLaboratory(laboratoryBinder.getBean());
       }
       String password = passwordBinder.getBean().getPassword();
       logger.debug("save user {} in laboratory {}", user, user.getLaboratory());
       userService.save(user, password);
-      laboratoriesDataProvider.getItems().remove(newLaboratory);
     }
   }
 
   void cancel() {
     dialog.close();
-    laboratoriesDataProvider.getItems().remove(newLaboratory);
   }
 
   public boolean isReadOnly() {
@@ -229,6 +238,8 @@ public class UserDialogPresenter {
     binder.setReadOnly(readOnly);
     dialog.laboratory.setReadOnly(readOnly || !authorizationService.hasRole(UserRole.ADMIN));
     dialog.manager.setReadOnly(readOnly);
+    dialog.createNewLaboratory
+        .setVisible(!readOnly && authorizationService.hasRole(UserRole.ADMIN));
     dialog.password.setVisible(!readOnly);
     dialog.passwordConfirm.setVisible(!readOnly);
     dialog.buttonsLayout.setVisible(!readOnly);
