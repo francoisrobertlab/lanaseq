@@ -113,19 +113,17 @@ public class UserService {
   /**
    * Saves user into database.
    * <p>
-   * If user is a biologist, his laboratory must be defined.
+   * If user is a normal user, his laboratory must exists.
    * </p>
    * <p>
-   * If user is a manager, his laboratory will be saved as well.
-   * </p>
-   * <p>
-   * If user is a not a manager, his laboratory must exists.
+   * If user is a manager, his laboratory will be created.
    * </p>
    *
    * @param user
    *          user
    * @param password
-   *          user's unhashed password, can be null to keep previous password
+   *          user's unhashed password; required for new users; can be null to keep previous
+   *          password
    */
   public void save(User user, String password) {
     if (user.getId() != null && user.getId() == 1L && !user.isAdmin()) {
