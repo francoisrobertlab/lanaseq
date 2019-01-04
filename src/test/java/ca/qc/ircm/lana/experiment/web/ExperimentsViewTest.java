@@ -190,11 +190,14 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     Comparator<Experiment> comparator = comparatorCaptor.getValue();
     assertTrue(comparator.compare(name("abc"), name("test")) < 0);
     assertTrue(comparator.compare(name("Abc"), name("test")) < 0);
+    assertTrue(comparator.compare(name("élement"), name("facteur")) < 0);
     assertTrue(comparator.compare(name("test"), name("test")) == 0);
     assertTrue(comparator.compare(name("Test"), name("test")) == 0);
     assertTrue(comparator.compare(name("Expérienceà"), name("experiencea")) == 0);
+    assertTrue(comparator.compare(name("experiencea"), name("Expérienceà")) == 0);
     assertTrue(comparator.compare(name("test"), name("abc")) > 0);
     assertTrue(comparator.compare(name("Test"), name("abc")) > 0);
+    assertTrue(comparator.compare(name("facteur"), name("élement")) > 0);
     verify(view.experiments).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
         localDateTimeRendererCaptor.getValue();
