@@ -46,6 +46,8 @@ import static org.junit.Assert.assertTrue;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
@@ -69,6 +71,8 @@ public class SpringAuthorizationServiceTest {
   private UserRepository userRepository;
   @Inject
   private ExperimentRepository experimentRepository;
+  @Inject
+  private LaboratoryRepository laboratoryRepository;
 
   /**
    * Before test.
@@ -146,6 +150,24 @@ public class SpringAuthorizationServiceTest {
     assertTrue(authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE));
   }
 
+  @Test(expected = AccessDeniedException.class)
+  @WithMockUser
+  public void checkAnyRole_False() throws Throwable {
+    authorizationService.checkAnyRole(ADMIN, MANAGER);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkAnyRole_TrueFirst() throws Throwable {
+    authorizationService.hasAnyRole(DEFAULT_ROLE, MANAGER);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkAnyRole_TrueLast() throws Throwable {
+    authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE);
+  }
+
   @Test
   @WithMockUser
   public void isAuthorized_NoRole() throws Throwable {
@@ -208,63 +230,187 @@ public class SpringAuthorizationServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkAuthorization_Experiment_Anonymous() throws Throwable {
+  public void checkRead_Experiment_Anonymous() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkRead(experiment);
   }
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkAuthorization_Experiment_Owner() throws Throwable {
+  public void checkRead_Experiment_Owner() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkRead(experiment);
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkAuthorization_Experiment_NotOwner() throws Throwable {
+  public void checkRead_Experiment_NotOwner() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkRead(experiment);
   }
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void checkAuthorization_Experiment_Manager() throws Throwable {
+  public void checkRead_Experiment_Manager() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkRead(experiment);
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void checkAuthorization_Experiment_ManagerOtherLab() throws Throwable {
+  public void checkRead_Experiment_ManagerOtherLab() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkRead(experiment);
   }
 
   @Test
   @WithUserDetails("lana@ircm.qc.ca")
-  public void checkAuthorization_Experiment_Admin() throws Throwable {
+  public void checkRead_Experiment_Admin() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkRead(experiment);
   }
 
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void checkRead_Laboratory_Anonymous() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(laboratory);
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void checkRead_Laboratory_Member() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(laboratory);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkRead_Laboratory_NotMember() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(laboratory);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkRead_Laboratory_Admin() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(laboratory);
+  }
+
   @Test
   @WithAnonymousUser
-  public void checkAuthorization_Null_Anonymous() throws Throwable {
+  public void checkRead_Null_Anonymous() throws Throwable {
     authorizationService.checkRead((Owned) null);
   }
 
   @Test
   @WithMockUser
-  public void checkAuthorization_Null() throws Throwable {
+  public void checkRead_Null() throws Throwable {
     authorizationService.checkRead((Owned) null);
   }
 
   @Test
   @WithMockUser
-  public void checkAuthorization_NullOwner() throws Throwable {
+  public void checkRead_NullOwner() throws Throwable {
     Experiment experiment = new Experiment();
     authorizationService.checkRead(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void checkWrite_Experiment_Anonymous() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void checkWrite_Experiment_Owner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_Experiment_NotOwner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void checkWrite_Experiment_Manager() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void checkWrite_Experiment_ManagerOtherLab() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkWrite_Experiment_Admin() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void checkWrite_Laboratory_Anonymous() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(laboratory);
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void checkWrite_Laboratory_MemberManager() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(laboratory);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void checkWrite_Laboratory_MemberNotManager() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(laboratory);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_Laboratory_NotMember() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(laboratory);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkWrite_Laboratory_Admin() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(laboratory);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void checkWrite_Null_Anonymous() throws Throwable {
+    authorizationService.checkWrite((Owned) null);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkWrite_Null() throws Throwable {
+    authorizationService.checkWrite((Owned) null);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkWrite_NullOwner() throws Throwable {
+    Experiment experiment = new Experiment();
+    authorizationService.checkWrite(experiment);
   }
 
   public static final class NoRoleTest {

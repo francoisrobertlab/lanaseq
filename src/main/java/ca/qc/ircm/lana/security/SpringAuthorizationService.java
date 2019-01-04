@@ -24,6 +24,7 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
+import java.util.Arrays;
 import java.util.Collection;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -105,6 +106,15 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
+  public void checkAnyRole(String... roles) throws AccessDeniedException {
+    if (!hasAnyRole(roles)) {
+      User user = currentUser();
+      throw new AccessDeniedException(
+          "User " + user + " does not have any of roles " + Arrays.toString(roles));
+    }
+  }
+
+  @Override
   public boolean hasAnyRole(String... roles) {
     boolean hasAnyRole = false;
     for (String role : roles) {
@@ -150,11 +160,52 @@ public class SpringAuthorizationService implements AuthorizationService {
     return owner.getId().equals(user.getId());
   }
 
+  private boolean isAuthorized(Laboratory laboratory, boolean write) {
+    if (laboratory == null || laboratory.getId() == null) {
+      return true;
+    }
+    User user = currentUser();
+    if (user == null || user.getId() == null) {
+      return false;
+    }
+    if (hasRole(ADMIN)) {
+      return true;
+    }
+    boolean authorized = true;
+    if (write) {
+      authorized &= hasRole(MANAGER);
+    }
+    authorized &= laboratory.getId().equals(user.getLaboratory().getId());
+    return authorized;
+  }
+
   @Override
-  public void checkRead(Owned owned) {
-    if (!isAuthorized(owned)) {
-      User user = currentUser();
-      throw new AccessDeniedException("User " + user + " does not have access to " + owned);
+  public void checkRead(Object object) {
+    if (object instanceof Owned) {
+      if (!isAuthorized((Owned) object)) {
+        User user = currentUser();
+        throw new AccessDeniedException("User " + user + " does not have access to " + object);
+      }
+    } else if (object instanceof Laboratory) {
+      if (!isAuthorized((Laboratory) object, false)) {
+        User user = currentUser();
+        throw new AccessDeniedException("User " + user + " does not have access to " + object);
+      }
+    }
+  }
+
+  @Override
+  public void checkWrite(Object object) throws AccessDeniedException {
+    if (object instanceof Owned) {
+      if (!isAuthorized((Owned) object)) {
+        User user = currentUser();
+        throw new AccessDeniedException("User " + user + " does not have access to " + object);
+      }
+    } else if (object instanceof Laboratory) {
+      if (!isAuthorized((Laboratory) object, true)) {
+        User user = currentUser();
+        throw new AccessDeniedException("User " + user + " does not have access to " + object);
+      }
     }
   }
 }

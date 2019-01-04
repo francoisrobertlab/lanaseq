@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lana.security;
 
-import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -59,6 +58,16 @@ public interface AuthorizationService {
   public void checkRole(String role) throws AccessDeniedException;
 
   /**
+   * Checks if user has any of the specified roles.
+   *
+   * @param roles
+   *          roles
+   * @throws AccessDeniedException
+   *           user does not have any of the specified roles
+   */
+  public void checkAnyRole(String... roles) throws AccessDeniedException;
+
+  /**
    * Returns true if current user has any of the specified roles, false otherwise.
    *
    * @param roles
@@ -77,12 +86,22 @@ public interface AuthorizationService {
   public boolean isAuthorized(Class<?> type);
 
   /**
-   * Checks if user can read owned object.
+   * Checks if user can read object.
    *
-   * @param owned
-   *          object owned by a user
+   * @param object
+   *          object
    * @throws AccessDeniedException
-   *           user does not have specified role
+   *           user cannot read object
    */
-  public void checkRead(Owned owned) throws AccessDeniedException;
+  public void checkRead(Object object) throws AccessDeniedException;
+
+  /**
+   * Checks if user can write object.
+   *
+   * @param object
+   *          object
+   * @throws AccessDeniedException
+   *           user cannot write object
+   */
+  public void checkWrite(Object object) throws AccessDeniedException;
 }
