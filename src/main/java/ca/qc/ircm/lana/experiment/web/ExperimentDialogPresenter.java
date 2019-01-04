@@ -45,7 +45,6 @@ public class ExperimentDialogPresenter {
   private ExperimentDialog dialog;
   private Binder<Experiment> binder = new BeanValidationBinder<>(Experiment.class);
   private Experiment experiment;
-  private boolean readOnly;
   @Inject
   private ExperimentService experimentService;
 
@@ -65,7 +64,6 @@ public class ExperimentDialogPresenter {
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
-    setReadOnly(readOnly);
   }
 
   BinderValidationStatus<Experiment> validateExperiment() {
@@ -86,22 +84,6 @@ public class ExperimentDialogPresenter {
 
   void cancel() {
     dialog.close();
-  }
-
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  /**
-   * Sets if dialog should be read only.
-   *
-   * @param readOnly
-   *          read only
-   */
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-    binder.setReadOnly(readOnly);
-    dialog.buttonsLayout.setVisible(!readOnly);
   }
 
   public Experiment getExperiment() {

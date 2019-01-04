@@ -85,42 +85,6 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void isReadOnly_Default() {
-    presenter.localeChange(locale);
-    assertFalse(presenter.isReadOnly());
-  }
-
-  @Test
-  public void isReadOnly_False() {
-    presenter.localeChange(locale);
-    presenter.setReadOnly(false);
-    assertFalse(presenter.isReadOnly());
-  }
-
-  @Test
-  public void isReadOnly_True() {
-    presenter.localeChange(locale);
-    presenter.setReadOnly(true);
-    assertTrue(presenter.isReadOnly());
-  }
-
-  @Test
-  public void setReadOnly_False() {
-    presenter.localeChange(locale);
-    presenter.setReadOnly(false);
-    assertFalse(dialog.name.isReadOnly());
-    assertTrue(dialog.buttonsLayout.isVisible());
-  }
-
-  @Test
-  public void setReadOnly_True() {
-    presenter.localeChange(locale);
-    presenter.setReadOnly(true);
-    assertTrue(dialog.name.isReadOnly());
-    assertFalse(dialog.buttonsLayout.isVisible());
-  }
-
-  @Test
   public void getExperiment() {
     Experiment experiment = new Experiment();
     presenter.setExperiment(experiment);
