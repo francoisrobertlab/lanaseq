@@ -17,18 +17,30 @@
 
 package ca.qc.ircm.lana.web;
 
+import static ca.qc.ircm.lana.web.ViewLayout.HOME;
+import static ca.qc.ircm.lana.web.ViewLayout.SIGNOUT;
+import static ca.qc.ircm.lana.web.ViewLayout.USERS;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.web.SigninView;
+import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.text.MessageResource;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.Location;
 import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +56,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   @Mock
   private AuthorizationService authorizationService;
   @Mock
-  private BeforeEnterEvent event;
+  private BeforeEnterEvent beforeEnterEvent;
+  @Mock
+  private AfterNavigationEvent afterNavigationEvent;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(ViewLayout.class, locale);
   private User user = new User(1L, "myuser");
@@ -56,39 +70,141 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     view = new ViewLayout(authorizationService);
-    when(event.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
+    when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
     when(authorizationService.currentUser()).thenReturn(user);
+    view.init();
+  }
+
+  @Test
+  public void labels() {
+    view.localeChange(mock(LocaleChangeEvent.class));
+    assertEquals(resources.message(HOME), view.home.getLabel());
+    assertEquals(resources.message(USERS), view.users.getLabel());
+    assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
+  }
+
+  @Test
+  public void localeChange() {
+    view.localeChange(mock(LocaleChangeEvent.class));
+    Locale locale = Locale.FRENCH;
+    final MessageResource resources = new MessageResource(ViewLayout.class, locale);
+    when(ui.getLocale()).thenReturn(locale);
+    view.localeChange(mock(LocaleChangeEvent.class));
+    assertEquals(resources.message(HOME), view.home.getLabel());
+    assertEquals(resources.message(USERS), view.users.getLabel());
+    assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
+  }
+
+  @Test
+  public void tabs_SelectHome() {
+    Location location = new Location(UsersView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.home);
+
+    verify(ui).navigate(ExperimentsView.VIEW_NAME);
+    verify(page, never()).executeJavaScript(any());
+  }
+
+  @Test
+  public void tabs_SelectHomeNoChange() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.home);
+
+    verify(ui, never()).navigate(any(String.class));
+    verify(page, never()).executeJavaScript(any());
+  }
+
+  @Test
+  public void tabs_SelectUsers() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.users);
+
+    verify(ui).navigate(UsersView.VIEW_NAME);
+    verify(page, never()).executeJavaScript(any());
+  }
+
+  @Test
+  public void tabs_SelectUsersNoChange() {
+    Location location = new Location(UsersView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.users);
+
+    verify(ui, never()).navigate(any(String.class));
+    verify(page, never()).executeJavaScript(any());
+  }
+
+  @Test
+  public void tabs_SelectSignout() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.signout);
+
+    verify(ui, never()).navigate(any(String.class));
+    verify(page)
+        .executeJavaScript("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
   }
 
   @Test
   public void beforeEnter_Authorized() {
     when(authorizationService.isAuthorized(any())).thenReturn(true);
 
-    view.beforeEnter(event);
+    view.beforeEnter(beforeEnterEvent);
 
     verify(authorizationService).isAuthorized(ViewTest.class);
   }
 
   @Test
   public void beforeEnter_NotAuthorized() {
-    view.beforeEnter(event);
+    view.beforeEnter(beforeEnterEvent);
 
     verify(authorizationService).isAuthorized(ViewTest.class);
     verify(authorizationService).isAnonymous();
     String message = resources.message(AccessDeniedException.class.getSimpleName(), user.getEmail(),
         ViewTest.class.getSimpleName());
-    verify(event).rerouteToError(any(AccessDeniedException.class), eq(message));
+    verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
   }
 
   @Test
   public void beforeEnter_NotAuthorizedAnonymous() {
     when(authorizationService.isAnonymous()).thenReturn(true);
 
-    view.beforeEnter(event);
+    view.beforeEnter(beforeEnterEvent);
 
-    verify(event).rerouteTo(SigninView.class);
+    verify(beforeEnterEvent).rerouteTo(SigninView.class);
     verify(authorizationService).isAuthorized(ViewTest.class);
     verify(authorizationService).isAnonymous();
+  }
+
+  @Test
+  public void afterNavigation_Home() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertEquals(view.home, view.tabs.getSelectedTab());
+  }
+
+  @Test
+  public void afterNavigation_Users() {
+    Location location = new Location(UsersView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertEquals(view.users, view.tabs.getSelectedTab());
   }
 
   public static class ViewTest {

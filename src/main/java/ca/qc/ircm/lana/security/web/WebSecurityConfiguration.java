@@ -57,6 +57,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 @Configuration
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
+  public static final String SIGNOUT_URL = "/signout";
   private static final String SIGNIN_FAILURE_URL_PATTERN =
       Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
@@ -173,7 +174,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
 
         // Configure logout
-        .and().logout().logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
+        .and().logout().logoutUrl(SIGNOUT_URL).logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
 
         // Remember me
         .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());

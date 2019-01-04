@@ -35,4 +35,13 @@ public interface UiComponent {
    */
   @SuppressWarnings("checkstyle:all")
   public Optional<UI> getUI();
+
+  /**
+   * Returns current UI.
+   * 
+   * @return current UI
+   */
+  public default UI getCurrentUi() {
+    return UI.getCurrent();
+  }
 }

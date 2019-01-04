@@ -25,15 +25,15 @@ import com.vaadin.flow.router.HasUrlParameter;
  */
 public interface NavigationComponent extends UiComponent {
   public default void navigate(String navigationTarget) {
-    getUI().get().navigate(navigationTarget);
+    getCurrentUi().navigate(navigationTarget);
   }
 
   public default void navigate(Class<? extends Component> navigationTarget) {
-    getUI().get().navigate(navigationTarget);
+    getCurrentUi().navigate(navigationTarget);
   }
 
   public default <T, C extends Component & HasUrlParameter<T>> void
       navigate(Class<? extends C> navigationTarget, T parameter) {
-    getUI().get().navigate(navigationTarget, parameter);
+    getCurrentUi().navigate(navigationTarget, parameter);
   }
 }

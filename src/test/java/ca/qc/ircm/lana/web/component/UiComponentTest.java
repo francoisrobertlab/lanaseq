@@ -17,15 +17,12 @@
 
 package ca.qc.ircm.lana.web.component;
 
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.Route;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,42 +30,28 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
-public class NavigationComponentTest extends AbstractViewTestCase {
-  private NavigationComponentForTest navigationComponent = new NavigationComponentForTest();
+public class UiComponentTest extends AbstractViewTestCase {
+  private UiComponentForTest uiComponent = new UiComponentForTest();
 
   @Test
-  public void navigate_String() {
-    navigationComponent.navigate("abc");
+  public void getUi() {
+    Optional<UI> optionalUi = uiComponent.getUI();
 
-    verify(ui).navigate("abc");
+    assertTrue(optionalUi.isPresent());
+    assertEquals(this.ui, optionalUi.get());
   }
 
   @Test
-  public void navigate() {
-    navigationComponent.navigate(TestView.class);
+  public void getCurrentUi() {
+    UI ui = uiComponent.getCurrentUi();
 
-    verify(ui).navigate(TestView.class);
+    assertEquals(this.ui, ui);
   }
 
-  @Test
-  public void navigate_Parameter() {
-    navigationComponent.navigate(TestView.class, "someParameters");
-
-    verify(ui).navigate(TestView.class, "someParameters");
-  }
-
-  private class NavigationComponentForTest implements NavigationComponent {
+  private class UiComponentForTest implements UiComponent {
     @Override
     public Optional<UI> getUI() {
       return Optional.of(ui);
-    }
-  }
-
-  @Route("test-view")
-  @SuppressWarnings("serial")
-  private static class TestView extends VerticalLayout implements HasUrlParameter<String> {
-    @Override
-    public void setParameter(BeforeEvent event, String parameter) {
     }
   }
 }
