@@ -17,7 +17,14 @@
 
 package ca.qc.ircm.lana.user;
 
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.USER;
+
+import ca.qc.ircm.lana.security.AuthorizationService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +37,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class LaboratoryService {
   @Inject
   private LaboratoryRepository repository;
+  @Inject
+  private AuthorizationService authorizationService;
 
   protected LaboratoryService() {
   }
 
-  protected LaboratoryService(LaboratoryRepository repository) {
+  protected LaboratoryService(LaboratoryRepository repository,
+      AuthorizationService authorizationService) {
     this.repository = repository;
+    this.authorizationService = authorizationService;
   }
 
   /**
@@ -50,15 +61,24 @@ public class LaboratoryService {
       return null;
     }
 
-    return repository.findById(id).orElse(null);
+    Laboratory laboratory = repository.findById(id).orElse(null);
+    authorizationService.checkRead(laboratory);
+    return laboratory;
   }
 
   /**
-   * Returns all laboratories.
+   * Returns all laboratories the user can access.
    *
-   * @return all laboratories
+   * @return all laboratories the user can access
    */
   public List<Laboratory> all() {
-    return repository.findAll();
+    authorizationService.checkRole(USER);
+
+    if (authorizationService.hasRole(ADMIN)) {
+      return repository.findAll();
+    } else {
+      return Stream.of(authorizationService.currentUser().getLaboratory())
+          .collect(Collectors.toCollection(ArrayList::new));
+    }
   }
 }
