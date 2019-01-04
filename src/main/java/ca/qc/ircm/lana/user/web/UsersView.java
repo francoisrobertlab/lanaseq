@@ -38,6 +38,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -85,7 +86,7 @@ public class UsersView extends Composite<VerticalLayout>
     root.add(users);
     users.addClassName(USERS);
     users.setSelectionMode(SelectionMode.MULTI);
-    email = users.addComponentColumn(user -> viewButton(user)).setKey(EMAIL);
+    email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL);
     laboratory =
         users.addColumn(user -> user.getLaboratory() != null ? user.getLaboratory().getName() : "",
             LABORATORY).setKey(LABORATORY);

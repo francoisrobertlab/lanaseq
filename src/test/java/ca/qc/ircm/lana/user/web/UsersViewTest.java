@@ -47,6 +47,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -70,9 +71,9 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Mock
   private UserDialog userDialog;
   @Captor
-  private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
+  private ArgumentCaptor<ComponentRenderer<Button, User>> buttonRendererCaptor;
   @Captor
-  private ArgumentCaptor<ValueProvider<User, Button>> buttonProviderCaptor;
+  private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
   @Inject
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
@@ -98,7 +99,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.users = mock(Grid.class);
     when(view.users.getElement()).thenReturn(usersElement);
     view.email = mock(Column.class);
-    when(view.users.addComponentColumn(any(ValueProvider.class))).thenReturn(view.email);
+    when(view.users.addColumn(any(ComponentRenderer.class), eq(EMAIL))).thenReturn(view.email);
     when(view.email.setKey(any())).thenReturn(view.email);
     when(view.email.setHeader(any(String.class))).thenReturn(view.email);
     view.laboratory = mock(Column.class);
@@ -178,10 +179,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
-    verify(view.users).addComponentColumn(buttonProviderCaptor.capture());
-    ValueProvider<User, Button> buttonProvider = buttonProviderCaptor.getValue();
+    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(EMAIL));
+    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
     for (User user : users) {
-      Button button = buttonProvider.apply(user);
+      Button button = buttonRenderer.createComponent(user);
       assertTrue(button.getClassNames().contains(EMAIL));
       assertEquals(user.getEmail(), button.getText());
       clickButton(button);
