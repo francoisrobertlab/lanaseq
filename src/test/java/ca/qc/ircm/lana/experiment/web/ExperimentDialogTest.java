@@ -71,6 +71,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new ExperimentDialog(presenter);
+    dialog.init();
   }
 
   @Test
@@ -144,6 +145,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   @Test
   public void setExperiment_NewExperiment() {
     Experiment experiment = new Experiment();
+    when(presenter.getExperiment()).thenReturn(experiment);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setExperiment(experiment);
@@ -155,6 +157,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   @Test
   public void setExperiment_Experiment() {
     Experiment experiment = experimentRepository.findById(2L).get();
+    when(presenter.getExperiment()).thenReturn(experiment);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setExperiment(experiment);
@@ -166,6 +169,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   @Test
   public void setExperiment_BeforeLocaleChange() {
     Experiment experiment = experimentRepository.findById(2L).get();
+    when(presenter.getExperiment()).thenReturn(experiment);
 
     dialog.setExperiment(experiment);
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -179,7 +183,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setExperiment(null);
 
-    verify(presenter).setExperiment(experiment);
+    verify(presenter).setExperiment(null);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
