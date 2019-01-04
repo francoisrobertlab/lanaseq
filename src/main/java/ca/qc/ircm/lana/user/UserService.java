@@ -103,22 +103,13 @@ public class UserService {
    *          user's unhashed password, can be null to keep previous password
    */
   public void save(User user, String password) {
-    if (user.isAdmin()) {
-      if (user.getLaboratory() != null) {
-        throw new IllegalArgumentException("administrators cannot be in a laboratory");
-      }
-      if (user.isManager()) {
-        throw new IllegalArgumentException("administrators cannot be managers");
-      }
-    } else {
-      if (user.getLaboratory() == null) {
-        throw new IllegalArgumentException("biologists must be in a laboratory");
-      }
-      if (!user.isManager()
-          && !laboratoryRepository.findById(user.getLaboratory().getId()).isPresent()) {
-        throw new IllegalArgumentException(
-            "laboratory " + user.getLaboratory().getId() + " does not exists");
-      }
+    if (user.getLaboratory() == null) {
+      throw new IllegalArgumentException("users must be in a laboratory");
+    }
+    if (!user.isManager()
+        && !laboratoryRepository.findById(user.getLaboratory().getId()).isPresent()) {
+      throw new IllegalArgumentException(
+          "laboratory " + user.getLaboratory().getId() + " does not exists");
     }
 
     if (user.getId() == null) {

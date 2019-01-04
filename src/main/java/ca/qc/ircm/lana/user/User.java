@@ -100,7 +100,7 @@ public class User implements Data, Serializable {
   /**
    * User's lab.
    */
-  @ManyToOne
+  @ManyToOne(optional = false)
   @JoinColumn
   private Laboratory laboratory;
   /**

@@ -91,7 +91,6 @@ public class UserDialogPresenter {
   void init(UserDialog dialog) {
     this.dialog = dialog;
     dialog.admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
-    dialog.admin.addValueChangeListener(e -> updateAdmin());
     dialog.manager.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     dialog.manager.addValueChangeListener(e -> updateManager());
     dialog.createNewLaboratory.setReadOnly(true);
@@ -152,18 +151,13 @@ public class UserDialogPresenter {
   }
 
   private Validator<Laboratory> laboratoryRequiredValidator(String errorMessage) {
-    return (value, context) -> !dialog.admin.getValue() && !dialog.createNewLaboratory.getValue()
-        && value == null ? ValidationResult.error(errorMessage) : ValidationResult.ok();
+    return (value, context) -> !dialog.createNewLaboratory.getValue() && value == null
+        ? ValidationResult.error(errorMessage)
+        : ValidationResult.ok();
   }
 
   private boolean isNewUser() {
     return user.getId() == null;
-  }
-
-  private void updateAdmin() {
-    dialog.manager.setVisible(!dialog.admin.getValue());
-    dialog.createNewLaboratory.setVisible(!dialog.admin.getValue());
-    dialog.laboratory.setVisible(!dialog.admin.getValue());
   }
 
   private void updateManager() {
@@ -206,10 +200,6 @@ public class UserDialogPresenter {
 
   void save() {
     if (validate()) {
-      if (user.isAdmin()) {
-        user.setManager(false);
-        user.setLaboratory(null);
-      }
       if (dialog.createNewLaboratory.getValue()) {
         user.setLaboratory(laboratoryBinder.getBean());
       }

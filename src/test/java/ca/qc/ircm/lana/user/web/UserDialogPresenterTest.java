@@ -127,7 +127,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.currentUser()).thenReturn(currentUser);
     laboratories = laboratoryRepository.findAll();
     when(laboratoryService.all()).thenReturn(laboratories);
-    laboratory = laboratories.get(0);
+    laboratory = laboratoryRepository.findById(2L).orElse(null);
   }
 
   private void fillForm() {
@@ -360,9 +360,9 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.init(dialog);
     presenter.localeChange(locale);
     dialog.admin.setValue(true);
-    assertFalse(dialog.manager.isVisible());
-    assertFalse(dialog.createNewLaboratory.isVisible());
-    assertFalse(dialog.laboratory.isVisible());
+    assertTrue(dialog.manager.isVisible());
+    assertTrue(dialog.createNewLaboratory.isVisible());
+    assertTrue(dialog.laboratory.isVisible());
     assertFalse(dialog.newLaboratoryLayout.isVisible());
   }
 
@@ -492,23 +492,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.password.isRequiredIndicatorVisible());
     assertFalse(dialog.passwordConfirm.isRequiredIndicatorVisible());
     assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
-  }
-
-  @Test
-  public void setUser_UserNoLaboratory() {
-    presenter.init(dialog);
-    User user = userRepository.findById(1L).get();
-
-    presenter.localeChange(locale);
-    presenter.setUser(user);
-
-    assertEquals(user.getEmail(), dialog.email.getValue());
-    assertEquals(user.getName(), dialog.name.getValue());
-    assertTrue(dialog.admin.getValue());
-    assertFalse(dialog.manager.getValue());
-    assertFalse(dialog.password.isRequiredIndicatorVisible());
-    assertFalse(dialog.passwordConfirm.isRequiredIndicatorVisible());
-    assertEquals(laboratory.getId(), dialog.laboratory.getValue().getId());
   }
 
   @Test
@@ -685,7 +668,12 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     BinderValidationStatus<User> status = presenter.validateUser();
-    assertTrue(status.isOk());
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.laboratory);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
   }
 
   @Test
@@ -849,7 +837,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
     assertFalse(user.isManager());
-    assertNull(user.getLaboratory());
+    assertNotNull(user.getLaboratory());
+    assertEquals(laboratory.getId(), user.getLaboratory().getId());
   }
 
   @Test
@@ -869,8 +858,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
-    assertFalse(user.isManager());
-    assertNull(user.getLaboratory());
+    assertTrue(user.isManager());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
   }
 
   @Test
@@ -892,8 +881,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
-    assertFalse(user.isManager());
-    assertNull(user.getLaboratory());
+    assertTrue(user.isManager());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
   }
 
   @Test

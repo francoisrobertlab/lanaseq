@@ -52,9 +52,9 @@ public class UserServiceInjectionTest {
     assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    //assertEquals(true, user.isAdmin());
-    assertNull(user.getLaboratory());
+    assertEquals(true, user.isManager());
+    assertEquals(true, user.isAdmin());
+    assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
   }
 }

@@ -73,10 +73,10 @@ public class UserServiceTest {
     assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
+    assertEquals(true, user.isManager());
     assertEquals(true, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertNull(user.getLaboratory());
+    assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
   }
 
@@ -112,7 +112,7 @@ public class UserServiceTest {
     assertEquals(true, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
@@ -149,6 +149,7 @@ public class UserServiceTest {
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setAdmin(true);
+    user.setLaboratory(laboratoryRepository.findById(1L).get());
 
     userService.save(user, "password");
 
@@ -166,38 +167,55 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(true, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertNull(user.getLaboratory());
+    assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void save_AddAdminWithLab() {
+  public void save_AddAdminNoLab() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setAdmin(true);
-    user.setLaboratory(laboratoryRepository.findById(1L).get());
 
     userService.save(user, "password");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void save_AddAdminManager() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setAdmin(true);
     user.setManager(true);
+    user.setLaboratory(laboratoryRepository.findById(1L).get());
 
     userService.save(user, "password");
+
+    assertNotNull(user.getId());
+    user = userRepository.findById(user.getId()).get();
+    assertNotNull(user);
+    assertNotNull(user.getId());
+    assertEquals("Test User", user.getName());
+    assertEquals("test.user@ircm.qc.ca", user.getEmail());
+    verify(passwordEncoder).encode("password");
+    assertEquals(hashedPassword, user.getHashedPassword());
+    assertEquals(0, user.getSignAttempts());
+    assertNull(user.getLastSignAttempt());
+    assertEquals(true, user.isActive());
+    assertEquals(true, user.isManager());
+    assertEquals(true, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertNull(user.getLocale());
   }
 
   @Test
-  public void save_AddBiologist() {
+  public void save_AddUser() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
-    user.setLaboratory(laboratoryRepository.findById(1L).get());
+    user.setLaboratory(laboratoryRepository.findById(2L).get());
     user.setLocale(Locale.ENGLISH);
 
     userService.save(user, "password");
@@ -217,12 +235,12 @@ public class UserServiceTest {
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void save_AddBiologistNoLab() {
+  public void save_AddUserNoLab() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
@@ -232,19 +250,48 @@ public class UserServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void save_AddBiologistLabIdNotExists() {
+  public void save_AddUserLabIdNotExists() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.ENGLISH);
     user.setLaboratory(new Laboratory());
-    user.getLaboratory().setId(3L);
+    user.getLaboratory().setId(0L);
 
     userService.save(user, "password");
   }
 
   @Test
-  public void save_AddBiologistManager() {
+  public void save_AddManager() {
+    User user = new User();
+    user.setName("Test User");
+    user.setEmail("test.user@ircm.qc.ca");
+    user.setManager(true);
+    user.setLaboratory(laboratoryRepository.findById(2L).get());
+
+    userService.save(user, "password");
+
+    assertNotNull(user.getId());
+    user = userRepository.findById(user.getId()).get();
+    assertNotNull(user);
+    assertNotNull(user.getId());
+    assertEquals("Test User", user.getName());
+    assertEquals("test.user@ircm.qc.ca", user.getEmail());
+    verify(passwordEncoder).encode("password");
+    assertEquals(hashedPassword, user.getHashedPassword());
+    assertEquals(0, user.getSignAttempts());
+    assertNull(user.getLastSignAttempt());
+    assertEquals(true, user.isActive());
+    assertEquals(true, user.isManager());
+    assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertNotNull(user.getLaboratory());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertNull(user.getLocale());
+  }
+
+  @Test
+  public void save_AddManagerNewLab() {
     User user = new User();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
@@ -274,6 +321,16 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory().getId());
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertNull(user.getLocale());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void save_AddManagerNoLab() {
+    User user = new User();
+    user.setName("Test User");
+    user.setEmail("test.user@ircm.qc.ca");
+    user.setManager(true);
+
+    userService.save(user, "password");
   }
 
   @Test
@@ -329,7 +386,71 @@ public class UserServiceTest {
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertEquals(Locale.CHINESE, user.getLocale());
+  }
+
+  @Test
+  public void save_UpdateChangeLaboratory() {
+    User user = userRepository.findById(3L).get();
+    user.setName("Test User");
+    user.setEmail("test.user@ircm.qc.ca");
+    user.setLocale(Locale.CHINESE);
+    user.setLaboratory(laboratoryRepository.findById(3L).get());
+
+    userService.save(user, "newpassword");
+
+    user = userRepository.findById(3L).get();
+    assertEquals((Long) 3L, user.getId());
+    assertEquals("Test User", user.getName());
+    assertEquals("test.user@ircm.qc.ca", user.getEmail());
+    verify(passwordEncoder).encode("newpassword");
+    assertEquals(hashedPassword, user.getHashedPassword());
+    assertEquals(2, user.getSignAttempts());
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertNotNull(user.getLaboratory());
+    assertEquals((Long) 3L, user.getLaboratory().getId());
+    assertEquals(Locale.CHINESE, user.getLocale());
+  }
+
+  @Test
+  public void save_UpdateNewLaboratory() {
+    User user = userRepository.findById(3L).get();
+    user.setName("Test User");
+    user.setEmail("test.user@ircm.qc.ca");
+    user.setManager(true);
+    user.setLocale(Locale.CHINESE);
+    Laboratory laboratory = new Laboratory();
+    laboratory.setName("Test Lab");
+    user.setLaboratory(laboratory);
+
+    userService.save(user, "newpassword");
+
+    assertNotNull(laboratory.getId());
+    user = userRepository.findById(3L).get();
+    assertEquals((Long) 3L, user.getId());
+    assertEquals("Test User", user.getName());
+    assertEquals("test.user@ircm.qc.ca", user.getEmail());
+    verify(passwordEncoder).encode("newpassword");
+    assertEquals(hashedPassword, user.getHashedPassword());
+    assertEquals(2, user.getSignAttempts());
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(true, user.isManager());
+    assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertNotNull(user.getLaboratory());
+    assertEquals("Test Lab", user.getLaboratory().getName());
     assertEquals(Locale.CHINESE, user.getLocale());
   }
 
@@ -356,7 +477,7 @@ public class UserServiceTest {
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
   }
 

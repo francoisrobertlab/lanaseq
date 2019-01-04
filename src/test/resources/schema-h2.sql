@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS user (
   manager tinyint NOT NULL DEFAULT 0,
   admin tinyint NOT NULL DEFAULT 0,
   expired_password tinyint NOT NULL DEFAULT 0,
-  laboratory_id bigint(20),
+  laboratory_id bigint(20) NOT NULL,
   locale varchar(255),
   PRIMARY KEY (id),
   UNIQUE KEY email (email),
