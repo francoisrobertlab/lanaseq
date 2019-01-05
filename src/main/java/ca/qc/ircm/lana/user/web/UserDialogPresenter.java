@@ -104,6 +104,8 @@ public class UserDialogPresenter {
     dialog.laboratory.setDataProvider(laboratoriesDataProvider);
     dialog.laboratory.setItemLabelGenerator(lab -> lab.getName());
     dialog.newLaboratoryLayout.setVisible(false);
+    dialog.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
+    dialog.createNewLaboratory.setVisible(authorizationService.hasRole(UserRole.ADMIN));
     setUser(null);
     passwordBinder.setBean(new Passwords());
     laboratoryBinder.setBean(new Laboratory());
