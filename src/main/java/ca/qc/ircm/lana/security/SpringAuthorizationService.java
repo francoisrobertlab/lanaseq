@@ -134,9 +134,9 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  private boolean isAuthorized(Owned owned) {
+  private boolean isAuthorized(Owned owned, boolean check) {
     if (owned == null || owned.getOwner() == null || owned.getOwner().getId() == null) {
-      return true;
+      return check;
     }
     User owner = owned.getOwner();
     User user = currentUser();
@@ -160,9 +160,9 @@ public class SpringAuthorizationService implements AuthorizationService {
     return owner.getId().equals(user.getId());
   }
 
-  private boolean isAuthorized(Laboratory laboratory, boolean write) {
+  private boolean isAuthorized(Laboratory laboratory, boolean check, boolean write) {
     if (laboratory == null || laboratory.getId() == null) {
-      return true;
+      return check;
     }
     User user = currentUser();
     if (user == null || user.getId() == null) {
@@ -182,12 +182,12 @@ public class SpringAuthorizationService implements AuthorizationService {
   @Override
   public void checkRead(Object object) {
     if (object instanceof Owned) {
-      if (!isAuthorized((Owned) object)) {
+      if (!isAuthorized((Owned) object, true)) {
         User user = currentUser();
         throw new AccessDeniedException("User " + user + " does not have access to " + object);
       }
     } else if (object instanceof Laboratory) {
-      if (!isAuthorized((Laboratory) object, false)) {
+      if (!isAuthorized((Laboratory) object, true, false)) {
         User user = currentUser();
         throw new AccessDeniedException("User " + user + " does not have access to " + object);
       }
@@ -195,17 +195,27 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
-  public void checkWrite(Object object) throws AccessDeniedException {
+  public boolean hasWrite(Object object) {
     if (object instanceof Owned) {
-      if (!isAuthorized((Owned) object)) {
-        User user = currentUser();
-        throw new AccessDeniedException("User " + user + " does not have access to " + object);
-      }
+      return isAuthorized((Owned) object, false);
     } else if (object instanceof Laboratory) {
-      if (!isAuthorized((Laboratory) object, true)) {
-        User user = currentUser();
-        throw new AccessDeniedException("User " + user + " does not have access to " + object);
-      }
+      return isAuthorized((Laboratory) object, false, true);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public void checkWrite(Object object) throws AccessDeniedException {
+    boolean canWrite = true;
+    if (object instanceof Owned) {
+      canWrite &= isAuthorized((Owned) object, true);
+    } else if (object instanceof Laboratory) {
+      canWrite &= isAuthorized((Laboratory) object, true, true);
+    }
+    if (!canWrite) {
+      User user = currentUser();
+      throw new AccessDeniedException("User " + user + " does not have access to " + object);
     }
   }
 }

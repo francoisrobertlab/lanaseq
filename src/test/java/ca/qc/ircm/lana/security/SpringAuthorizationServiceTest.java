@@ -300,21 +300,141 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void checkRead_Null_Anonymous() throws Throwable {
+  public void checkRead_NullOwned_Anonymous() throws Throwable {
     authorizationService.checkRead((Owned) null);
   }
 
   @Test
   @WithMockUser
-  public void checkRead_Null() throws Throwable {
+  public void checkRead_NullOwned() throws Throwable {
     authorizationService.checkRead((Owned) null);
   }
 
   @Test
-  @WithMockUser
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void checkRead_NullOwner() throws Throwable {
     Experiment experiment = new Experiment();
     authorizationService.checkRead(experiment);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void checkRead_NullLaboratory_Anonymous() throws Throwable {
+    authorizationService.checkRead((Laboratory) null);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkRead_NullLaboratory() throws Throwable {
+    authorizationService.checkRead((Laboratory) null);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasWrite_Experiment_Anonymous() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_Experiment_Owner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_Experiment_NotOwner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_Experiment_Manager() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void hasWrite_Experiment_ManagerOtherLab() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_Experiment_Admin() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasWrite_Laboratory_Anonymous() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_Laboratory_MemberManager() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_Laboratory_MemberNotManager() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_Laboratory_NotMember() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_Laboratory_Admin() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasWrite_NullOwned_Anonymous() throws Throwable {
+    assertFalse(authorizationService.hasWrite((Owned) null));
+  }
+
+  @Test
+  @WithMockUser
+  public void hasWrite_NullOwned() throws Throwable {
+    assertFalse(authorizationService.hasWrite((Owned) null));
+  }
+
+  @Test
+  @WithMockUser
+  public void hasWrite_NullOwner() throws Throwable {
+    Experiment experiment = new Experiment();
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasWrite_NullLaboratory_Anonymous() throws Throwable {
+    assertFalse(authorizationService.hasWrite((Laboratory) null));
+  }
+
+  @Test
+  @WithMockUser
+  public void hasWrite_NullLaboratory() throws Throwable {
+    assertFalse(authorizationService.hasWrite((Laboratory) null));
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -396,21 +516,33 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void checkWrite_Null_Anonymous() throws Throwable {
+  public void checkWrite_NullOwned_Anonymous() throws Throwable {
     authorizationService.checkWrite((Owned) null);
   }
 
   @Test
   @WithMockUser
-  public void checkWrite_Null() throws Throwable {
+  public void checkWrite_NullOwned() throws Throwable {
     authorizationService.checkWrite((Owned) null);
   }
 
   @Test
-  @WithMockUser
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void checkWrite_NullOwner() throws Throwable {
     Experiment experiment = new Experiment();
     authorizationService.checkWrite(experiment);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void checkWrite_NullLaboratory_Anonymous() throws Throwable {
+    authorizationService.checkWrite((Laboratory) null);
+  }
+
+  @Test
+  @WithMockUser
+  public void checkWrite_NullLaboratory() throws Throwable {
+    authorizationService.checkWrite((Laboratory) null);
   }
 
   public static final class NoRoleTest {

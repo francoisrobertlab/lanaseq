@@ -86,7 +86,7 @@ public interface AuthorizationService {
   public boolean isAuthorized(Class<?> type);
 
   /**
-   * Checks if user can read object.
+   * Checks if current user can read object.
    *
    * @param object
    *          object
@@ -96,7 +96,16 @@ public interface AuthorizationService {
   public void checkRead(Object object) throws AccessDeniedException;
 
   /**
-   * Checks if user can write object.
+   * Returns true if current user can write object, false otherwise.
+   *
+   * @param object
+   *          object
+   * @return true if current user can write object, false otherwise
+   */
+  public boolean hasWrite(Object object);
+
+  /**
+   * Checks if current user can write object.
    *
    * @param object
    *          object
