@@ -212,7 +212,7 @@ public class UserDialogPresenter {
     dialog.close();
   }
 
-  public User getUser() {
+  User getUser() {
     return user;
   }
 
@@ -222,7 +222,7 @@ public class UserDialogPresenter {
    * @param user
    *          user
    */
-  public void setUser(User user) {
+  void setUser(User user) {
     if (user == null) {
       user = new User();
     }

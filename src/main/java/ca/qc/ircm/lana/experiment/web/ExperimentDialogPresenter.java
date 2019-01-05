@@ -86,7 +86,7 @@ public class ExperimentDialogPresenter {
     dialog.close();
   }
 
-  public Experiment getExperiment() {
+  Experiment getExperiment() {
     return experiment;
   }
 
@@ -96,7 +96,7 @@ public class ExperimentDialogPresenter {
    * @param experiment
    *          experiment
    */
-  public void setExperiment(Experiment experiment) {
+  void setExperiment(Experiment experiment) {
     if (experiment == null) {
       experiment = new Experiment();
     }
