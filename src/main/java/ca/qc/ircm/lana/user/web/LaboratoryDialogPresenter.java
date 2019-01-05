@@ -20,6 +20,7 @@ package ca.qc.ircm.lana.user.web;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.web.WebConstants;
@@ -47,12 +48,16 @@ public class LaboratoryDialogPresenter {
   private Laboratory laboratory;
   @Inject
   private LaboratoryService laboratoryService;
+  @Inject
+  private AuthorizationService authorizationService;
 
   protected LaboratoryDialogPresenter() {
   }
 
-  protected LaboratoryDialogPresenter(LaboratoryService laboratoryService) {
+  protected LaboratoryDialogPresenter(LaboratoryService laboratoryService,
+      AuthorizationService authorizationService) {
     this.laboratoryService = laboratoryService;
+    this.authorizationService = authorizationService;
   }
 
   void init(LaboratoryDialog dialog) {
@@ -64,6 +69,13 @@ public class LaboratoryDialogPresenter {
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
+    updateReadOnly();
+  }
+
+  private void updateReadOnly() {
+    boolean readOnly = !authorizationService.hasWrite(laboratory);
+    binder.setReadOnly(readOnly);
+    dialog.buttonsLayout.setVisible(!readOnly);
   }
 
   BinderValidationStatus<Laboratory> validateLaboratory() {
@@ -86,21 +98,16 @@ public class LaboratoryDialogPresenter {
     dialog.close();
   }
 
-  public Laboratory getLaboratory() {
+  Laboratory getLaboratory() {
     return laboratory;
   }
 
-  /**
-   * Sets laboratory.
-   *
-   * @param laboratory
-   *          laboratory
-   */
-  public void setLaboratory(Laboratory laboratory) {
+  void setLaboratory(Laboratory laboratory) {
     if (laboratory == null) {
       laboratory = new Laboratory();
     }
     this.laboratory = laboratory;
     binder.setBean(laboratory);
+    updateReadOnly();
   }
 }

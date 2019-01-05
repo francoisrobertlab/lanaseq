@@ -22,9 +22,11 @@ import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
@@ -57,6 +59,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
   private LaboratoryDialog dialog;
   @Mock
   private LaboratoryService laboratoryService;
+  @Mock
+  private AuthorizationService authorizationService;
   @Captor
   private ArgumentCaptor<Laboratory> laboratoryCaptor;
   @Inject
@@ -71,13 +75,14 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new LaboratoryDialogPresenter(laboratoryService);
+    presenter = new LaboratoryDialogPresenter(laboratoryService, authorizationService);
     dialog.header = new H2();
     dialog.name = new TextField();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
     presenter.init(dialog);
+    when(authorizationService.hasWrite(any())).thenReturn(true);
   }
 
   private void fillForm() {
@@ -99,6 +104,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.setLaboratory(laboratory);
 
     assertEquals("", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertTrue(dialog.buttonsLayout.isVisible());
   }
 
   @Test
@@ -109,6 +116,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.setLaboratory(laboratory);
 
     assertEquals(laboratory.getName(), dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertTrue(dialog.buttonsLayout.isVisible());
   }
 
   @Test
@@ -119,6 +128,32 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
 
     assertEquals(laboratory.getName(), dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertTrue(dialog.buttonsLayout.isVisible());
+  }
+
+  @Test
+  public void setLaboratory_CannotWrite() {
+    Laboratory laboratory = new Laboratory();
+    when(authorizationService.hasWrite(laboratory)).thenReturn(false);
+
+    presenter.localeChange(locale);
+    presenter.setLaboratory(laboratory);
+
+    assertTrue(dialog.name.isReadOnly());
+    assertFalse(dialog.buttonsLayout.isVisible());
+  }
+
+  @Test
+  public void setLaboratory_CannotWriteBeforeLocaleChange() {
+    Laboratory laboratory = new Laboratory();
+    when(authorizationService.hasWrite(laboratory)).thenReturn(false);
+
+    presenter.setLaboratory(laboratory);
+    presenter.localeChange(locale);
+
+    assertTrue(dialog.name.isReadOnly());
+    assertFalse(dialog.buttonsLayout.isVisible());
   }
 
   @Test
@@ -127,6 +162,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.setLaboratory(null);
 
     assertEquals("", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertTrue(dialog.buttonsLayout.isVisible());
   }
 
   @Test
