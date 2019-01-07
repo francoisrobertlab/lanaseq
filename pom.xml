@@ -58,7 +58,6 @@
     <!-- Dependencies -->
     <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
     <vaadin.version>10.0.6</vaadin.version>
-    <jbcrypt.version>0.4</jbcrypt.version>
     <javax.inject.version>1</javax.inject.version>
     <property-names-annotation-processor.version>0.4</property-names-annotation-processor.version>
     <iron-form.version>2.1.3</iron-form.version>
