@@ -18,6 +18,7 @@
 CREATE TABLE IF NOT EXISTS laboratory (
   id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
   name varchar(255) NOT NULL,
+  date DATETIME NOT NULL,
   PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS user (
@@ -33,6 +34,7 @@ CREATE TABLE IF NOT EXISTS user (
   expired_password tinyint NOT NULL DEFAULT 0,
   laboratory_id bigint(20) NOT NULL,
   locale varchar(255),
+  date DATETIME NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY email (email),
   CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE

@@ -23,6 +23,7 @@ import ca.qc.ircm.lana.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -108,6 +109,11 @@ public class User implements Data, Owned, Serializable {
    */
   @Column
   private Locale locale;
+  /**
+   * Creation date.
+   */
+  @Column
+  private LocalDateTime date;
 
   public User() {
   }
@@ -124,6 +130,36 @@ public class User implements Data, Owned, Serializable {
   @Override
   public String toString() {
     return "User [id=" + id + ", email=" + email + "]";
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((email == null) ? 0 : email.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof User)) {
+      return false;
+    }
+    User other = (User) obj;
+    if (email == null) {
+      if (other.email != null) {
+        return false;
+      }
+    } else if (!email.equals(other.email)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -226,5 +262,13 @@ public class User implements Data, Owned, Serializable {
 
   public void setAdmin(boolean admin) {
     this.admin = admin;
+  }
+
+  public LocalDateTime getDate() {
+    return date;
+  }
+
+  public void setDate(LocalDateTime date) {
+    this.date = date;
   }
 }

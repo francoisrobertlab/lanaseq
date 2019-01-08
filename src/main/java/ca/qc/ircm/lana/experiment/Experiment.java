@@ -54,9 +54,9 @@ public class Experiment implements Data, Owned, Serializable {
   @Size(max = 255)
   private String name;
   /**
-   * Insertion date.
+   * Creation date.
    */
-  @Column(name = "date")
+  @Column
   private LocalDateTime date;
   /**
    * Owner.
@@ -64,6 +64,49 @@ public class Experiment implements Data, Owned, Serializable {
   @ManyToOne
   @JoinColumn
   private User owner;
+
+  @Override
+  public String toString() {
+    return "Experiment [id=" + id + ", name=" + name + "]";
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((date == null) ? 0 : date.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof Experiment)) {
+      return false;
+    }
+    Experiment other = (Experiment) obj;
+    if (date == null) {
+      if (other.date != null) {
+        return false;
+      }
+    } else if (!date.equals(other.date)) {
+      return false;
+    }
+    if (name == null) {
+      if (other.name != null) {
+        return false;
+      }
+    } else if (!name.equals(other.name)) {
+      return false;
+    }
+    return true;
+  }
 
   @Override
   public Long getId() {

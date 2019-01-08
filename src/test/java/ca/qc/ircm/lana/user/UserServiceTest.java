@@ -35,6 +35,7 @@ import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
@@ -91,6 +92,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getDate());
     verify(authorizationService).checkRead(user);
   }
 

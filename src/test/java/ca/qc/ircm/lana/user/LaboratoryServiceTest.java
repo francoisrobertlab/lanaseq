@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lana.Data;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -61,6 +62,7 @@ public class LaboratoryServiceTest {
     assertNotNull(laboratory);
     assertEquals((Long) 2L, laboratory.getId());
     assertEquals("Chromatin and Genomic Expression", laboratory.getName());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 45, 21), laboratory.getDate());
     verify(authorizationService).checkRead(laboratory);
   }
 

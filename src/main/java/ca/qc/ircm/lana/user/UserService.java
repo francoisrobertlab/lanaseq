@@ -22,6 +22,7 @@ import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -139,6 +140,7 @@ public class UserService {
     }
 
     authorizationService.checkWrite(user);
+    user.setDate(LocalDateTime.now());
     if (user.getId() == null) {
       authorizationService.checkAnyRole(ADMIN, MANAGER);
       user.setActive(true);
@@ -152,6 +154,7 @@ public class UserService {
     }
     if (user.getLaboratory().getId() == null) {
       authorizationService.checkRole(ADMIN);
+      user.getLaboratory().setDate(LocalDateTime.now());
       laboratoryRepository.save(user.getLaboratory());
     }
     final Laboratory oldLaboratory = user.getId() != null
