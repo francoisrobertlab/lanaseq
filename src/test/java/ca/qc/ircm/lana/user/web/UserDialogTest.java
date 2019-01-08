@@ -128,7 +128,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.CHECK.create(), dialog.save);
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel);
-    presenter.localeChange(locale);
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -154,7 +154,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    presenter.localeChange(locale);
+    verify(presenter).localeChange(locale);
   }
 
   @Test
