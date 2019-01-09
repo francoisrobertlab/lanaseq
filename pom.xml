@@ -56,7 +56,7 @@
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <webapp.directory>src/main/webapp</webapp.directory>
     <!-- Dependencies -->
-    <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
+    <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
     <vaadin.version>10.0.9</vaadin.version>
     <javax.inject.version>1</javax.inject.version>
     <generate-property-names.version>0.5</generate-property-names.version>
