@@ -33,8 +33,6 @@ import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
-import ca.qc.ircm.lana.web.SaveEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
@@ -60,8 +58,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private LaboratoryService laboratoryService;
   @Captor
   private ArgumentCaptor<User> userCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentEventListener<SaveEvent<UserWithPassword>>> saveListenerCaptor;
   @Inject
   private UserRepository userRepository;
   private List<User> users;
