@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.text;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lana.text.Strings;
 import org.junit.Test;
 
 public class StringsTest {
@@ -83,14 +82,63 @@ public class StringsTest {
     assertEquals("pepin", Strings.normalize("pépîn"));
     // Test Polish, out of curiosity.
     assertEquals("a", Strings.normalize("ą"));
+    assertEquals("A", Strings.normalize("Ą"));
     assertEquals("c", Strings.normalize("ć"));
+    assertEquals("C", Strings.normalize("Ć"));
     assertEquals("e", Strings.normalize("ę"));
+    assertEquals("E", Strings.normalize("Ę"));
     // Doesn't work because ł in Unicode is not l with a slash, but its own character.
     //assertEquals("l", Strings.normalize("ł"));
     assertEquals("n", Strings.normalize("ń"));
+    assertEquals("N", Strings.normalize("Ń"));
     assertEquals("o", Strings.normalize("ó"));
+    assertEquals("O", Strings.normalize("Ó"));
     assertEquals("s", Strings.normalize("ś"));
+    assertEquals("S", Strings.normalize("Ś"));
     assertEquals("z", Strings.normalize("ź"));
+    assertEquals("Z", Strings.normalize("Ź"));
     assertEquals("z", Strings.normalize("ż"));
+    assertEquals("Z", Strings.normalize("Ż"));
+  }
+
+  @Test
+  public void comparable() {
+    assertEquals("bateau", Strings.comparable("bàteau"));
+    assertEquals("bateau", Strings.comparable("BÀTEAU"));
+    assertEquals("bateau", Strings.comparable("bâteau"));
+    assertEquals("bateau", Strings.comparable("BÂTEAU"));
+    assertEquals("bateau", Strings.comparable("bäteau"));
+    assertEquals("bateau", Strings.comparable("BÄTEAU"));
+    assertEquals("pepin", Strings.comparable("pépin"));
+    assertEquals("pepin", Strings.comparable("pèpin"));
+    assertEquals("pepin", Strings.comparable("pêpin"));
+    assertEquals("pepin", Strings.comparable("pëpin"));
+    assertEquals("pepin", Strings.comparable("pepîn"));
+    assertEquals("pepin", Strings.comparable("pepïn"));
+    assertEquals("pepon", Strings.comparable("pepôn"));
+    assertEquals("pepon", Strings.comparable("pepön"));
+    assertEquals("pepun", Strings.comparable("pepùn"));
+    assertEquals("pepun", Strings.comparable("pepûn"));
+    assertEquals("pepun", Strings.comparable("pepün"));
+    assertEquals("pepin", Strings.comparable("pépîn"));
+    // Test Polish, out of curiosity.
+    assertEquals("a", Strings.comparable("ą"));
+    assertEquals("a", Strings.comparable("Ą"));
+    assertEquals("c", Strings.comparable("ć"));
+    assertEquals("c", Strings.comparable("Ć"));
+    assertEquals("e", Strings.comparable("ę"));
+    assertEquals("e", Strings.comparable("Ę"));
+    // Doesn't work because ł in Unicode is not l with a slash, but its own character.
+    //assertEquals("l", Strings.comparable("ł"));
+    assertEquals("n", Strings.comparable("ń"));
+    assertEquals("n", Strings.comparable("Ń"));
+    assertEquals("o", Strings.comparable("ó"));
+    assertEquals("o", Strings.comparable("Ó"));
+    assertEquals("s", Strings.comparable("ś"));
+    assertEquals("s", Strings.comparable("Ś"));
+    assertEquals("z", Strings.comparable("ź"));
+    assertEquals("z", Strings.comparable("Ź"));
+    assertEquals("z", Strings.comparable("ż"));
+    assertEquals("z", Strings.comparable("Ż"));
   }
 }

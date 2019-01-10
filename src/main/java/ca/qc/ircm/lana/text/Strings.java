@@ -58,4 +58,15 @@ public class Strings {
     return Normalizer.normalize(value, Normalizer.Form.NFD)
         .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
   }
+
+  /**
+   * Removes accents from characters and change string to lower case.
+   *
+   * @param value
+   *          value
+   * @return value without accents and lower case
+   */
+  public static String comparable(String value) {
+    return normalize(value).toLowerCase();
+  }
 }

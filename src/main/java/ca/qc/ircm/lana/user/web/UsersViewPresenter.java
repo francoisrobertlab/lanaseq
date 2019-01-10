@@ -21,6 +21,9 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.inject.Inject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -37,6 +40,8 @@ public class UsersViewPresenter {
   private UserService userService;
   @Inject
   private LaboratoryService laboratoryService;
+  private ListDataProvider<User> usersDataProvider;
+  private WebUserFilter filter = new WebUserFilter();
 
   protected UsersViewPresenter() {
   }
@@ -48,7 +53,26 @@ public class UsersViewPresenter {
 
   void init(UsersView view) {
     this.view = view;
-    view.users.setItems(userService.all());
+    usersDataProvider = new ListDataProvider<>(userService.all());
+    ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
+        usersDataProvider.withConfigurableFilter();
+    dataProvider.setFilter(filter);
+    view.users.setDataProvider(dataProvider);
+  }
+
+  void filterEmail(String value) {
+    filter.emailContains = value.isEmpty() ? null : value;
+    view.users.getDataProvider().refreshAll();
+  }
+
+  void filterName(String value) {
+    filter.nameContains = value.isEmpty() ? null : value;
+    view.users.getDataProvider().refreshAll();
+  }
+
+  void filterLaboratory(String value) {
+    filter.laboratoryNameContains = value.isEmpty() ? null : value;
+    view.users.getDataProvider().refreshAll();
   }
 
   void view(User user) {
@@ -64,5 +88,9 @@ public class UsersViewPresenter {
   void add() {
     view.userDialog.setUser(new User());
     view.userDialog.open();
+  }
+
+  WebUserFilter filter() {
+    return filter;
   }
 }

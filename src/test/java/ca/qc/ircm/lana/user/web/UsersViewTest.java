@@ -25,6 +25,7 @@ import static ca.qc.ircm.lana.user.web.UsersView.ADD;
 import static ca.qc.ircm.lana.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS;
 import static ca.qc.ircm.lana.user.web.UsersView.VIEW_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
@@ -48,6 +49,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
@@ -83,7 +86,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(UsersView.class, locale);
   private MessageResource userResources = new MessageResource(User.class, locale);
-  private MessageResource generalResources = new MessageResource(WebConstants.class, locale);
+  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
   private List<User> users;
 
   /**
@@ -113,6 +116,12 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
     when(view.laboratory.setComparator(any(Comparator.class))).thenReturn(view.laboratory);
     when(view.laboratory.setHeader(any(String.class))).thenReturn(view.laboratory);
+    HeaderRow filtersRow = mock(HeaderRow.class);
+    when(view.users.appendHeaderRow()).thenReturn(filtersRow);
+    HeaderCell emailFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.email)).thenReturn(emailFilterCell);
+    HeaderCell laboratoryFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.laboratory)).thenReturn(laboratoryFilterCell);
   }
 
   @Test
@@ -137,6 +146,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
+    assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -161,7 +172,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, generalResources.message(APPLICATION_NAME)),
+    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
         view.getPageTitle());
   }
 
@@ -239,5 +250,19 @@ public class UsersViewTest extends AbstractViewTestCase {
     laboratory.setName(name);
     user.setLaboratory(laboratory);
     return user;
+  }
+
+  @Test
+  public void filterEmail() {
+    view.emailFilter.setValue("test");
+
+    verify(presenter).filterEmail("test");
+  }
+
+  @Test
+  public void filterLaboratory() {
+    view.laboratoryFilter.setValue("test");
+
+    verify(presenter).filterLaboratory("test");
   }
 }

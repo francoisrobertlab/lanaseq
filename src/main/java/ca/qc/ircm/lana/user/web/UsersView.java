@@ -22,6 +22,7 @@ import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
@@ -35,11 +36,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -64,6 +68,8 @@ public class UsersView extends Composite<VerticalLayout>
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
   protected Column<User> laboratory;
+  protected TextField emailFilter = new TextField();
+  protected TextField laboratoryFilter = new TextField();
   protected Button add = new Button();
   @Inject
   protected UserDialog userDialog;
@@ -97,6 +103,16 @@ public class UsersView extends Composite<VerticalLayout>
         users.addColumn(new ComponentRenderer<>(user -> viewLaboratoryButton(user)), LABORATORY)
             .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
                 .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
+    users.appendHeaderRow(); // Headers.
+    HeaderRow filtersRow = users.appendHeaderRow();
+    filtersRow.getCell(email).setComponent(emailFilter);
+    emailFilter.addValueChangeListener(e -> presenter.filterEmail(e.getValue()));
+    emailFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    emailFilter.setSizeFull();
+    filtersRow.getCell(laboratory).setComponent(laboratoryFilter);
+    laboratoryFilter.addValueChangeListener(e -> presenter.filterLaboratory(e.getValue()));
+    laboratoryFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    laboratoryFilter.setSizeFull();
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -123,13 +139,16 @@ public class UsersView extends Composite<VerticalLayout>
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    MessageResource resources = new MessageResource(UsersView.class, getLocale());
-    MessageResource userResources = new MessageResource(User.class, getLocale());
+    final MessageResource resources = new MessageResource(UsersView.class, getLocale());
+    final MessageResource userResources = new MessageResource(User.class, getLocale());
+    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
     header.setText(resources.message(HEADER));
     String emailHeader = userResources.message(EMAIL);
     email.setHeader(emailHeader).setFooter(emailHeader);
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
+    emailFilter.setPlaceholder(webResources.message(ALL));
+    laboratoryFilter.setPlaceholder(webResources.message(ALL));
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
   }
@@ -137,7 +156,7 @@ public class UsersView extends Composite<VerticalLayout>
   @Override
   public String getPageTitle() {
     MessageResource resources = new MessageResource(UsersView.class, getLocale());
-    MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    return resources.message(TITLE, webResources.message(APPLICATION_NAME));
   }
 }

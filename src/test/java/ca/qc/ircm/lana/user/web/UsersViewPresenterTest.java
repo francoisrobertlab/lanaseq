@@ -36,6 +36,7 @@ import ca.qc.ircm.lana.user.UserService;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -56,6 +57,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private UserService userService;
   @Mock
   private LaboratoryService laboratoryService;
+  @Mock
+  private DataProvider<User, ?> dataProvider;
   @Captor
   private ArgumentCaptor<User> userCaptor;
   @Inject
@@ -88,6 +91,72 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.users.getSelectedItems().size());
     users.forEach(user -> view.users.select(user));
     assertEquals(users.size(), view.users.getSelectedItems().size());
+  }
+
+  @Test
+  public void filterEmail() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterEmail("test");
+
+    assertEquals("test", presenter.filter().emailContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterEmail_Empty() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterEmail("");
+
+    assertEquals(null, presenter.filter().emailContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterName() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterName("test");
+
+    assertEquals("test", presenter.filter().nameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterName_Empty() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterName("");
+
+    assertEquals(null, presenter.filter().nameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterLaboratory() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterLaboratory("test");
+
+    assertEquals("test", presenter.filter().laboratoryNameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterLaboratory_Empty() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterLaboratory("");
+
+    assertEquals(null, presenter.filter().laboratoryNameContains);
+    verify(dataProvider).refreshAll();
   }
 
   @Test
