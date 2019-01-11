@@ -192,7 +192,8 @@ public class SpringAuthorizationService implements AuthorizationService {
   private boolean isAclAuthorized(Owned owned, Permission permission, User user) {
     try {
       Acl acl = aclService.readAclById(new ObjectIdentityImpl(owned.getClass(), owned.getId()));
-      return acl.isGranted(list(permission), list(new PrincipalSid(user.getEmail())), false);
+      return acl.isGranted(list(permission), list(new PrincipalSid(String.valueOf(user.getId()))),
+          false);
     } catch (NotFoundException e) {
       return false;
     }

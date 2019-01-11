@@ -317,7 +317,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(BasePermission.READ, permissions.get(0));
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("christian.poitras@ircm.qc.ca"), sids.get(0));
+    assertEquals(new PrincipalSid("5"), sids.get(0));
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -447,7 +447,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(BasePermission.WRITE, permissions.get(0));
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("christian.poitras@ircm.qc.ca"), sids.get(0));
+    assertEquals(new PrincipalSid("5"), sids.get(0));
   }
 
   @Test
@@ -584,7 +584,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(BasePermission.WRITE, permissions.get(0));
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("christian.poitras@ircm.qc.ca"), sids.get(0));
+    assertEquals(new PrincipalSid("5"), sids.get(0));
   }
 
   @Test(expected = AccessDeniedException.class)
