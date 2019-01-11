@@ -147,67 +147,71 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  private boolean isAuthorized(Owned owned, boolean check, Permission permission) {
+  private boolean isAuthorized(Owned owned, User currentUser, boolean check,
+      Permission permission) {
     if (owned == null || owned.getOwner() == null || owned.getOwner().getId() == null) {
       return check;
     }
     User owner = owned.getOwner();
-    User user = currentUser();
-    if (user == null || user.getId() == null) {
+    if (currentUser == null || currentUser.getId() == null) {
       return false;
     }
     if (hasRole(ADMIN)) {
       return true;
     }
-    boolean authorized = owner.getId().equals(user.getId());
+    boolean authorized = owner.getId().equals(currentUser.getId());
     if (!authorized && hasRole(MANAGER)) {
-      Laboratory ownedLaboratory = owner.getLaboratory();
-      Laboratory userLaboratory = user.getLaboratory();
-      if (ownedLaboratory != null && ownedLaboratory.getId() != null && userLaboratory != null
-          && userLaboratory.getId() != null) {
-        authorized |= ownedLaboratory.getId().equals(userLaboratory.getId());
-      }
+      authorized |= isAuthorized(owner.getLaboratory(), currentUser, check, BasePermission.READ);
     }
     if (!authorized) {
-      try {
-        Acl acl = aclService.readAclById(new ObjectIdentityImpl(owned.getClass(), owned.getId()));
-        authorized |=
-            acl.isGranted(list(permission), list(new PrincipalSid(user.getEmail())), false);
-      } catch (NotFoundException e) {
-        // Assume not authorized.
-      }
+      authorized |= isAclAuthorized(owned, permission, currentUser);
     }
     return authorized;
   }
 
-  private boolean isAuthorized(Laboratory laboratory, boolean check, boolean write) {
+  private boolean isAuthorized(Laboratory laboratory, User currentUser, boolean check,
+      Permission permission) {
     if (laboratory == null || laboratory.getId() == null) {
       return check;
     }
-    User user = currentUser();
-    if (user == null || user.getId() == null) {
+    if (currentUser == null || currentUser.getId() == null) {
       return false;
     }
     if (hasRole(ADMIN)) {
       return true;
     }
     boolean authorized = true;
-    if (write) {
+    if (permission != BasePermission.READ) {
       authorized &= hasRole(MANAGER);
     }
-    authorized &= laboratory.getId().equals(user.getLaboratory().getId());
+    authorized &= laboratory.getId().equals(currentUser.getLaboratory().getId());
     return authorized;
+  }
+
+  private boolean isAclAuthorized(Owned owned, Permission permission, User user) {
+    try {
+      Acl acl = aclService.readAclById(new ObjectIdentityImpl(owned.getClass(), owned.getId()));
+      return acl.isGranted(list(permission), list(new PrincipalSid(user.getEmail())), false);
+    } catch (NotFoundException e) {
+      return false;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> List<T> list(T... values) {
+    return Stream.of(values).collect(Collectors.toList());
   }
 
   @Override
   public void checkRead(Object object) {
+    User currentUser = currentUser();
     if (object instanceof Owned) {
-      if (!isAuthorized((Owned) object, true, BasePermission.READ)) {
+      if (!isAuthorized((Owned) object, currentUser, true, BasePermission.READ)) {
         User user = currentUser();
         throw new AccessDeniedException("User " + user + " does not have access to " + object);
       }
     } else if (object instanceof Laboratory) {
-      if (!isAuthorized((Laboratory) object, true, false)) {
+      if (!isAuthorized((Laboratory) object, currentUser, true, BasePermission.READ)) {
         User user = currentUser();
         throw new AccessDeniedException("User " + user + " does not have access to " + object);
       }
@@ -216,10 +220,11 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasWrite(Object object) {
+    User currentUser = currentUser();
     if (object instanceof Owned) {
-      return isAuthorized((Owned) object, false, BasePermission.WRITE);
+      return isAuthorized((Owned) object, currentUser, false, BasePermission.WRITE);
     } else if (object instanceof Laboratory) {
-      return isAuthorized((Laboratory) object, false, true);
+      return isAuthorized((Laboratory) object, currentUser, false, BasePermission.WRITE);
     } else {
       return false;
     }
@@ -227,20 +232,16 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public void checkWrite(Object object) throws AccessDeniedException {
+    User currentUser = currentUser();
     boolean canWrite = true;
     if (object instanceof Owned) {
-      canWrite &= isAuthorized((Owned) object, true, BasePermission.WRITE);
+      canWrite &= isAuthorized((Owned) object, currentUser, true, BasePermission.WRITE);
     } else if (object instanceof Laboratory) {
-      canWrite &= isAuthorized((Laboratory) object, true, true);
+      canWrite &= isAuthorized((Laboratory) object, currentUser, true, BasePermission.WRITE);
     }
     if (!canWrite) {
       User user = currentUser();
       throw new AccessDeniedException("User " + user + " does not have access to " + object);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> List<T> list(T... values) {
-    return Stream.of(values).collect(Collectors.toList());
   }
 }
