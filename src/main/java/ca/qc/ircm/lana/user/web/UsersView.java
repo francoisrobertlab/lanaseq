@@ -20,6 +20,7 @@ package ca.qc.ircm.lana.user.web;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
+import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
@@ -67,8 +68,10 @@ public class UsersView extends Composite<VerticalLayout>
   protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
+  protected Column<User> name;
   protected Column<User> laboratory;
   protected TextField emailFilter = new TextField();
+  protected TextField nameFilter = new TextField();
   protected TextField laboratoryFilter = new TextField();
   protected Button add = new Button();
   @Inject
@@ -99,6 +102,7 @@ public class UsersView extends Composite<VerticalLayout>
     users.setSelectionMode(SelectionMode.MULTI);
     email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
+    name = users.addColumn(user -> user.getName(), NAME).setKey(NAME);
     laboratory =
         users.addColumn(new ComponentRenderer<>(user -> viewLaboratoryButton(user)), LABORATORY)
             .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
@@ -109,6 +113,10 @@ public class UsersView extends Composite<VerticalLayout>
     emailFilter.addValueChangeListener(e -> presenter.filterEmail(e.getValue()));
     emailFilter.setValueChangeMode(ValueChangeMode.EAGER);
     emailFilter.setSizeFull();
+    filtersRow.getCell(name).setComponent(nameFilter);
+    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
+    nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    nameFilter.setSizeFull();
     filtersRow.getCell(laboratory).setComponent(laboratoryFilter);
     laboratoryFilter.addValueChangeListener(e -> presenter.filterLaboratory(e.getValue()));
     laboratoryFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -145,9 +153,12 @@ public class UsersView extends Composite<VerticalLayout>
     header.setText(resources.message(HEADER));
     String emailHeader = userResources.message(EMAIL);
     email.setHeader(emailHeader).setFooter(emailHeader);
+    String nameHeader = userResources.message(NAME);
+    name.setHeader(nameHeader).setFooter(nameHeader);
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
     emailFilter.setPlaceholder(webResources.message(ALL));
+    nameFilter.setPlaceholder(webResources.message(ALL));
     laboratoryFilter.setPlaceholder(webResources.message(ALL));
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
