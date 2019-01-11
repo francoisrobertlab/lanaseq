@@ -15,40 +15,9 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-CREATE TABLE IF NOT EXISTS laboratory (
-  id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
-  name varchar(255) NOT NULL,
-  date DATETIME NOT NULL,
-  PRIMARY KEY (id)
-);
-CREATE TABLE IF NOT EXISTS user (
-  id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
-  email varchar(255) NOT NULL,
-  name varchar(255),
-  hashed_password varchar(255),
-  sign_attempts int NOT NULL DEFAULT 0,
-  last_sign_attempt DATETIME,
-  active tinyint NOT NULL DEFAULT 0,
-  manager tinyint NOT NULL DEFAULT 0,
-  admin tinyint NOT NULL DEFAULT 0,
-  expired_password tinyint NOT NULL DEFAULT 0,
-  laboratory_id bigint(20) NOT NULL,
-  locale varchar(255),
-  date DATETIME NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY email (email),
-  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
-);
-CREATE TABLE experiment (
-  id bigint(20) NOT NULL AUTO_INCREMENT,
-  name varchar(255) NOT NULL,
-  owner_id bigint(20),
-  date DATETIME NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT experimentOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
-);
+-- // add access control list tables
+-- Migration SQL that makes the change goes here.
 
--- Spring Security ACL.
 CREATE TABLE acl_sid (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   principal BOOLEAN NOT NULL,
@@ -85,3 +54,12 @@ CREATE TABLE acl_entry (
   CONSTRAINT acl_entry_object FOREIGN KEY (acl_object_identity) REFERENCES acl_object_identity (id),
   CONSTRAINT acl_entry_acl FOREIGN KEY (sid) REFERENCES acl_sid (id)
 );
+
+
+-- //@UNDO
+-- SQL to undo the change goes here.
+
+DROP TABLE acl_entry;
+DROP TABLE acl_object_identity;
+DROP TABLE acl_class;
+DROP TABLE acl_sid;

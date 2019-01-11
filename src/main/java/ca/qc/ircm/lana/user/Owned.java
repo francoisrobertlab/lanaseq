@@ -17,13 +17,15 @@
 
 package ca.qc.ircm.lana.user;
 
+import ca.qc.ircm.lana.Data;
+
 /**
  * Object owned by a {@link User}.
  */
-public interface Owned {
+public interface Owned extends Data {
   /**
    * Returns owner.
-   * 
+   *
    * @return owner
    */
   public User getOwner();

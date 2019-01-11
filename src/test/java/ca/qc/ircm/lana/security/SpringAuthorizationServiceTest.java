@@ -42,6 +42,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
@@ -51,12 +56,24 @@ import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
+import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.AclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -69,6 +86,14 @@ public class SpringAuthorizationServiceTest {
   private SpringAuthorizationService authorizationService;
   @Inject
   private UserRepository userRepository;
+  @Mock
+  private AclService aclService;
+  @Mock
+  private Acl acl;
+  @Captor
+  private ArgumentCaptor<List<Permission>> permissionsCaptor;
+  @Captor
+  private ArgumentCaptor<List<Sid>> sidsCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
   @Inject
@@ -79,7 +104,13 @@ public class SpringAuthorizationServiceTest {
    */
   @Before
   public void beforeTest() {
-    authorizationService = new SpringAuthorizationService(userRepository);
+    authorizationService = new SpringAuthorizationService(userRepository, aclService);
+    when(aclService.readAclById(any())).thenAnswer(i -> {
+      if (i.getArgument(0) != null) {
+        throw new NotFoundException("Cannot find ACL");
+      }
+      return null;
+    });
   }
 
   @Test
@@ -270,6 +301,35 @@ public class SpringAuthorizationServiceTest {
     authorizationService.checkRead(experiment);
   }
 
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkRead_Experiment_AclAllowed() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkRead(experiment);
+
+    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
+    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
+    List<Permission> permissions = permissionsCaptor.getValue();
+    assertEquals(1, permissions.size());
+    assertEquals(BasePermission.READ, permissions.get(0));
+    List<Sid> sids = sidsCaptor.getValue();
+    assertEquals(1, sids.size());
+    assertEquals(new PrincipalSid("christian.poitras@ircm.qc.ca"), sids.get(0));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkRead_Experiment_AclDenied() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkRead(experiment);
+  }
+
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
   public void checkRead_Laboratory_Anonymous() throws Throwable {
@@ -369,6 +429,35 @@ public class SpringAuthorizationServiceTest {
   public void hasWrite_Experiment_Admin() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     assertTrue(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_Experiment_AclAllowed() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertTrue(authorizationService.hasWrite(experiment));
+
+    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
+    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
+    List<Permission> permissions = permissionsCaptor.getValue();
+    assertEquals(1, permissions.size());
+    assertEquals(BasePermission.WRITE, permissions.get(0));
+    List<Sid> sids = sidsCaptor.getValue();
+    assertEquals(1, sids.size());
+    assertEquals(new PrincipalSid("christian.poitras@ircm.qc.ca"), sids.get(0));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_Experiment_AclDenied() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertFalse(authorizationService.hasWrite(experiment));
   }
 
   @Test
@@ -476,6 +565,35 @@ public class SpringAuthorizationServiceTest {
   @WithUserDetails("lana@ircm.qc.ca")
   public void checkWrite_Experiment_Admin() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_Experiment_AclAllowed() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkWrite(experiment);
+
+    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
+    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
+    List<Permission> permissions = permissionsCaptor.getValue();
+    assertEquals(1, permissions.size());
+    assertEquals(BasePermission.WRITE, permissions.get(0));
+    List<Sid> sids = sidsCaptor.getValue();
+    assertEquals(1, sids.size());
+    assertEquals(new PrincipalSid("christian.poitras@ircm.qc.ca"), sids.get(0));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_Experiment_AclDenied() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
     authorizationService.checkWrite(experiment);
   }
 

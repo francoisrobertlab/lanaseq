@@ -15,6 +15,10 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
+DROP TABLE acl_entry IF EXISTS;
+DROP TABLE acl_object_identity IF EXISTS;
+DROP TABLE acl_class IF EXISTS;
+DROP TABLE acl_sid IF EXISTS;
 DROP TABLE experiment IF EXISTS;
 DROP TABLE user IF EXISTS;
 DROP TABLE laboratory IF EXISTS;
