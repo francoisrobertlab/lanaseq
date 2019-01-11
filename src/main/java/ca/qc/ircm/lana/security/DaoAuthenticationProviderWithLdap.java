@@ -31,7 +31,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * {@link DaoAuthenticationProvider} that also validates password using {@link LdapService}.
  */
-public class LdapDaoAuthenticationProvider extends DaoAuthenticationProvider {
+public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider {
   private UserRepository userRepository;
   private LdapService ldapService;
   private SecurityConfiguration securityConfiguration;

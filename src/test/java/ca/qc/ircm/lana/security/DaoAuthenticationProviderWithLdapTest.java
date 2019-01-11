@@ -45,9 +45,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class LdapDaoAuthenticationProviderTest {
+public class DaoAuthenticationProviderWithLdapTest {
   @Inject
-  private LdapDaoAuthenticationProvider ldapDaoAuthenticationProvider;
+  private DaoAuthenticationProviderWithLdap ldapDaoAuthenticationProvider;
   @Mock
   private LdapService ldapService;
   @Mock

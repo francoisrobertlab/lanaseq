@@ -18,7 +18,7 @@
 package ca.qc.ircm.lana.security.web;
 
 import ca.qc.ircm.lana.security.LdapConfiguration;
-import ca.qc.ircm.lana.security.LdapDaoAuthenticationProvider;
+import ca.qc.ircm.lana.security.DaoAuthenticationProviderWithLdap;
 import ca.qc.ircm.lana.security.LdapService;
 import ca.qc.ircm.lana.security.SecurityConfiguration;
 import ca.qc.ircm.lana.user.UserRepository;
@@ -99,13 +99,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   /**
-   * Returns {@link LdapDaoAuthenticationProvider}.
+   * Returns {@link DaoAuthenticationProviderWithLdap}.
    *
-   * @return {@link LdapDaoAuthenticationProvider}
+   * @return {@link DaoAuthenticationProviderWithLdap}
    */
   @Bean
-  public LdapDaoAuthenticationProvider authenticationProvider() {
-    LdapDaoAuthenticationProvider authenticationProvider = new LdapDaoAuthenticationProvider();
+  public DaoAuthenticationProviderWithLdap authenticationProvider() {
+    DaoAuthenticationProviderWithLdap authenticationProvider = new DaoAuthenticationProviderWithLdap();
     authenticationProvider.setUserDetailsService(userDetailsService);
     authenticationProvider.setPasswordEncoder(passwordEncoder());
     authenticationProvider.setUserRepository(userRepository);
