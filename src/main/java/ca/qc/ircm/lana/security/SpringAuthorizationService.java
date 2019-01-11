@@ -147,10 +147,10 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  private boolean isAuthorized(Owned owned, User currentUser, boolean check,
+  private boolean isAuthorized(Owned owned, User currentUser, boolean allowNull,
       Permission permission) {
     if (owned == null || owned.getOwner() == null || owned.getOwner().getId() == null) {
-      return check;
+      return allowNull;
     }
     User owner = owned.getOwner();
     if (currentUser == null || currentUser.getId() == null) {
@@ -161,7 +161,8 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
     boolean authorized = owner.getId().equals(currentUser.getId());
     if (!authorized && hasRole(MANAGER)) {
-      authorized |= isAuthorized(owner.getLaboratory(), currentUser, check, BasePermission.READ);
+      authorized |=
+          isAuthorized(owner.getLaboratory(), currentUser, allowNull, BasePermission.READ);
     }
     if (!authorized) {
       authorized |= isAclAuthorized(owned, permission, currentUser);
@@ -169,10 +170,10 @@ public class SpringAuthorizationService implements AuthorizationService {
     return authorized;
   }
 
-  private boolean isAuthorized(Laboratory laboratory, User currentUser, boolean check,
+  private boolean isAuthorized(Laboratory laboratory, User currentUser, boolean allowNull,
       Permission permission) {
     if (laboratory == null || laboratory.getId() == null) {
-      return check;
+      return allowNull;
     }
     if (currentUser == null || currentUser.getId() == null) {
       return false;
