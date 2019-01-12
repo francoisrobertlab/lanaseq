@@ -148,14 +148,9 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  private boolean isAuthorized(Experiment experiment, User currentUser, boolean allowNull,
-      Permission permission) {
-    if (experiment == null || experiment.getOwner() == null
-        || experiment.getOwner().getId() == null) {
-      return allowNull;
-    }
+  private boolean isAuthorized(Experiment experiment, User currentUser, Permission permission) {
     User owner = experiment.getOwner();
-    if (currentUser == null || currentUser.getId() == null) {
+    if (currentUser == null) {
       return false;
     }
     if (hasRole(ADMIN)) {
@@ -163,8 +158,7 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
     boolean authorized = owner.getId().equals(currentUser.getId());
     if (!authorized && hasRole(MANAGER)) {
-      authorized |=
-          isAuthorized(owner.getLaboratory(), currentUser, allowNull, BasePermission.READ);
+      authorized |= isAuthorized(owner.getLaboratory(), currentUser, BasePermission.READ);
     }
     if (!authorized) {
       authorized |= isAclAuthorized(experiment, permission, currentUser);
@@ -172,12 +166,8 @@ public class SpringAuthorizationService implements AuthorizationService {
     return authorized;
   }
 
-  private boolean isAuthorized(User user, User currentUser, boolean allowNull,
-      Permission permission) {
-    if (user == null || user.getId() == null) {
-      return allowNull;
-    }
-    if (currentUser == null || currentUser.getId() == null) {
+  private boolean isAuthorized(User user, User currentUser, Permission permission) {
+    if (currentUser == null) {
       return false;
     }
     if (hasRole(ADMIN)) {
@@ -185,17 +175,13 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
     boolean authorized = user.getId().equals(currentUser.getId());
     if (!authorized && hasRole(MANAGER)) {
-      authorized |= isAuthorized(user.getLaboratory(), currentUser, allowNull, BasePermission.READ);
+      authorized |= isAuthorized(user.getLaboratory(), currentUser, BasePermission.READ);
     }
     return authorized;
   }
 
-  private boolean isAuthorized(Laboratory laboratory, User currentUser, boolean allowNull,
-      Permission permission) {
-    if (laboratory == null || laboratory.getId() == null) {
-      return allowNull;
-    }
-    if (currentUser == null || currentUser.getId() == null) {
+  private boolean isAuthorized(Laboratory laboratory, User currentUser, Permission permission) {
+    if (currentUser == null) {
       return false;
     }
     if (hasRole(ADMIN)) {
@@ -226,14 +212,17 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public void checkRead(Object object) {
+    if (object == null) {
+      return;
+    }
     User currentUser = currentUser();
     boolean canRead = true;
     if (object instanceof Experiment) {
-      canRead &= isAuthorized((Experiment) object, currentUser, true, BasePermission.READ);
+      canRead &= isAuthorized((Experiment) object, currentUser, BasePermission.READ);
     } else if (object instanceof User) {
-      canRead &= isAuthorized((User) object, currentUser, true, BasePermission.READ);
+      canRead &= isAuthorized((User) object, currentUser, BasePermission.READ);
     } else if (object instanceof Laboratory) {
-      canRead &= isAuthorized((Laboratory) object, currentUser, true, BasePermission.READ);
+      canRead &= isAuthorized((Laboratory) object, currentUser, BasePermission.READ);
     }
     if (!canRead) {
       User user = currentUser();
@@ -243,13 +232,16 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasWrite(Object object) {
+    if (object == null) {
+      return false;
+    }
     User currentUser = currentUser();
     if (object instanceof Experiment) {
-      return isAuthorized((Experiment) object, currentUser, false, BasePermission.WRITE);
+      return isAuthorized((Experiment) object, currentUser, BasePermission.WRITE);
     } else if (object instanceof User) {
-      return isAuthorized((User) object, currentUser, false, BasePermission.WRITE);
+      return isAuthorized((User) object, currentUser, BasePermission.WRITE);
     } else if (object instanceof Laboratory) {
-      return isAuthorized((Laboratory) object, currentUser, false, BasePermission.WRITE);
+      return isAuthorized((Laboratory) object, currentUser, BasePermission.WRITE);
     } else {
       return false;
     }
@@ -257,14 +249,17 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public void checkWrite(Object object) throws AccessDeniedException {
+    if (object == null) {
+      return;
+    }
     User currentUser = currentUser();
     boolean canWrite = true;
     if (object instanceof Experiment) {
-      canWrite &= isAuthorized((Experiment) object, currentUser, true, BasePermission.WRITE);
+      canWrite &= isAuthorized((Experiment) object, currentUser, BasePermission.WRITE);
     } else if (object instanceof User) {
-      canWrite &= isAuthorized((User) object, currentUser, true, BasePermission.WRITE);
+      canWrite &= isAuthorized((User) object, currentUser, BasePermission.WRITE);
     } else if (object instanceof Laboratory) {
-      canWrite &= isAuthorized((Laboratory) object, currentUser, true, BasePermission.WRITE);
+      canWrite &= isAuthorized((Laboratory) object, currentUser, BasePermission.WRITE);
     }
     if (!canWrite) {
       User user = currentUser();

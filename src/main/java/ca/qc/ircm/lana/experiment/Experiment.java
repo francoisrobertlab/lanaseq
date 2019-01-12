@@ -61,7 +61,7 @@ public class Experiment implements Data, Owned, Serializable {
   /**
    * Owner.
    */
-  @ManyToOne
+  @ManyToOne(optional = false)
   @JoinColumn
   private User owner;
 

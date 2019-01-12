@@ -53,7 +53,6 @@ import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
-import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.List;
@@ -402,33 +401,14 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void checkRead_NullOwned_Anonymous() throws Throwable {
-    authorizationService.checkRead((Owned) null);
+  public void checkRead_Null_Anonymous() throws Throwable {
+    authorizationService.checkRead(null);
   }
 
   @Test
   @WithMockUser
-  public void checkRead_NullOwned() throws Throwable {
-    authorizationService.checkRead((Owned) null);
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkRead_NullOwner() throws Throwable {
-    Experiment experiment = new Experiment();
-    authorizationService.checkRead(experiment);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkRead_NullLaboratory_Anonymous() throws Throwable {
-    authorizationService.checkRead((Laboratory) null);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkRead_NullLaboratory() throws Throwable {
-    authorizationService.checkRead((Laboratory) null);
+  public void checkRead_Null() throws Throwable {
+    authorizationService.checkRead(null);
   }
 
   @Test
@@ -581,33 +561,14 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void hasWrite_NullOwned_Anonymous() throws Throwable {
-    assertFalse(authorizationService.hasWrite((Owned) null));
+  public void hasWrite_Null_Anonymous() throws Throwable {
+    assertFalse(authorizationService.hasWrite(null));
   }
 
   @Test
   @WithMockUser
-  public void hasWrite_NullOwned() throws Throwable {
-    assertFalse(authorizationService.hasWrite((Owned) null));
-  }
-
-  @Test
-  @WithMockUser
-  public void hasWrite_NullOwner() throws Throwable {
-    Experiment experiment = new Experiment();
-    assertFalse(authorizationService.hasWrite(experiment));
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasWrite_NullLaboratory_Anonymous() throws Throwable {
-    assertFalse(authorizationService.hasWrite((Laboratory) null));
-  }
-
-  @Test
-  @WithMockUser
-  public void hasWrite_NullLaboratory() throws Throwable {
-    assertFalse(authorizationService.hasWrite((Laboratory) null));
+  public void hasWrite_Null() throws Throwable {
+    assertFalse(authorizationService.hasWrite(null));
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -761,32 +722,13 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithAnonymousUser
   public void checkWrite_NullOwned_Anonymous() throws Throwable {
-    authorizationService.checkWrite((Owned) null);
+    authorizationService.checkWrite(null);
   }
 
   @Test
   @WithMockUser
   public void checkWrite_NullOwned() throws Throwable {
-    authorizationService.checkWrite((Owned) null);
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkWrite_NullOwner() throws Throwable {
-    Experiment experiment = new Experiment();
-    authorizationService.checkWrite(experiment);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkWrite_NullLaboratory_Anonymous() throws Throwable {
-    authorizationService.checkWrite((Laboratory) null);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkWrite_NullLaboratory() throws Throwable {
-    authorizationService.checkWrite((Laboratory) null);
+    authorizationService.checkWrite(null);
   }
 
   public static final class NoRoleTest {
