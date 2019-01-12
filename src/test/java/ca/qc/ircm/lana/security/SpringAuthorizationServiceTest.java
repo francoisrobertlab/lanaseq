@@ -332,6 +332,48 @@ public class SpringAuthorizationServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
+  public void checkRead_User_Anonymous() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkRead(user);
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void checkRead_User_Self() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkRead(user);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkRead_User_NotSelf() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkRead(user);
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void checkRead_User_Manager() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkRead(user);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void checkRead_User_ManagerOtherLab() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkRead(user);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkRead_User_Admin() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkRead(user);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
   public void checkRead_Laboratory_Anonymous() throws Throwable {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
     authorizationService.checkRead(laboratory);
@@ -458,6 +500,48 @@ public class SpringAuthorizationServiceTest {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
 
     assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasWrite_User_Anonymous() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_User_Self() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_User_NotSelf() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_User_Manager() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void hasWrite_User_ManagerOtherLab() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_User_Admin() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasWrite(user));
   }
 
   @Test
@@ -595,6 +679,48 @@ public class SpringAuthorizationServiceTest {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
 
     authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void checkWrite_User_Anonymous() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkWrite(user);
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void checkWrite_User_Self() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkWrite(user);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_User_NotSelf() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkWrite(user);
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void checkWrite_User_Manager() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkWrite(user);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void checkWrite_User_ManagerOtherLab() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkWrite(user);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkWrite_User_Admin() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    authorizationService.checkWrite(user);
   }
 
   @Test(expected = AccessDeniedException.class)
