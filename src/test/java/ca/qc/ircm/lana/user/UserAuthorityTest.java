@@ -17,20 +17,21 @@
 
 package ca.qc.ircm.lana.user;
 
-/**
- * User roles.
- */
-public interface UserRole {
-  public static final String USER = "ROLE_USER";
-  public static final String MANAGER = "ROLE_MANAGER";
-  public static final String ADMIN = "ROLE_ADMIN";
+import static org.junit.Assert.assertEquals;
 
-  /**
-   * Returns all user roles.
-   *
-   * @return all user roles
-   */
-  public static String[] roles() {
-    return new String[] { USER, MANAGER, ADMIN };
+import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@NonTransactionalTestAnnotations
+public class UserAuthorityTest {
+  @Test
+  public void laboratoryMember() {
+    assertEquals(Laboratory.class.getSimpleName() + "_" + 1L,
+        UserAuthority.laboratoryMember(new Laboratory(1L)));
+    assertEquals(Laboratory.class.getSimpleName() + "_" + 3L,
+        UserAuthority.laboratoryMember(new Laboratory(3L)));
   }
 }

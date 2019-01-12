@@ -52,6 +52,18 @@ public class Laboratory implements Data, Serializable {
   @Column
   private LocalDateTime date;
 
+  public Laboratory() {
+  }
+
+  public Laboratory(Long id) {
+    this.id = id;
+  }
+
+  public Laboratory(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
   @Override
   public String toString() {
     return "Laboratory [id=" + id + ", name=" + name + "]";

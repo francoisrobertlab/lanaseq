@@ -18,19 +18,15 @@
 package ca.qc.ircm.lana.user;
 
 /**
- * User roles.
+ * User authorities.
  */
-public interface UserRole {
-  public static final String USER = "ROLE_USER";
-  public static final String MANAGER = "ROLE_MANAGER";
-  public static final String ADMIN = "ROLE_ADMIN";
-
+public interface UserAuthority {
   /**
-   * Returns all user roles.
-   *
-   * @return all user roles
+   * Forces user to change his password.
    */
-  public static String[] roles() {
-    return new String[] { USER, MANAGER, ADMIN };
+  public static final String FORCE_CHANGE_PASSWORD = "CHANGE_PASSWORD";
+
+  public static String laboratoryMember(Laboratory laboratory) {
+    return Laboratory.class.getSimpleName() + "_" + laboratory.getId();
   }
 }

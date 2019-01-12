@@ -17,12 +17,13 @@
 
 package ca.qc.ircm.lana.security;
 
+import static ca.qc.ircm.lana.user.UserAuthority.FORCE_CHANGE_PASSWORD;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.FORCE_CHANGE_PASSWORD;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +58,8 @@ public class SpringDataUserDetailsService implements UserDetailsService {
     } else {
       Collection<GrantedAuthority> authorities = new ArrayList<>();
       authorities.add(new SimpleGrantedAuthority(USER));
+      authorities
+          .add(new SimpleGrantedAuthority(UserAuthority.laboratoryMember(user.getLaboratory())));
       if (user.isAdmin()) {
         authorities.add(new SimpleGrantedAuthority(ADMIN));
       }
