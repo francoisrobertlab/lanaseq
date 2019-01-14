@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
-import static ca.qc.ircm.lana.user.UserProperties.NAME;
+import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
 import static ca.qc.ircm.lana.web.WebConstants.SAVE;
