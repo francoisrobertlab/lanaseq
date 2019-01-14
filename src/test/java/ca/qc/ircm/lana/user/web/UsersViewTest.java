@@ -183,6 +183,11 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(userResources.message(NAME));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
+    assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
+    assertEquals(resources.message(ADD), view.add.getText());
+    validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
 
   @Test
