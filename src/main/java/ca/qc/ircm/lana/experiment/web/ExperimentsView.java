@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.experiment.web;
 
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
@@ -64,6 +65,7 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected Grid<Experiment> experiments = new Grid<>();
   protected Column<Experiment> name;
   protected Column<Experiment> date;
+  protected Column<Experiment> owner;
   protected Button add = new Button();
   @Inject
   protected ExperimentDialog experimentDialog;
@@ -93,6 +95,8 @@ public class ExperimentsView extends Composite<VerticalLayout>
     date = experiments.addColumn(
         new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
+    owner =
+        experiments.addColumn(experiment -> experiment.getOwner().getEmail(), OWNER).setKey(OWNER);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -112,12 +116,14 @@ public class ExperimentsView extends Composite<VerticalLayout>
   @Override
   public void localeChange(LocaleChangeEvent event) {
     MessageResource resources = new MessageResource(ExperimentsView.class, getLocale());
-    MessageResource userResources = new MessageResource(Experiment.class, getLocale());
+    MessageResource experimentResources = new MessageResource(Experiment.class, getLocale());
     header.setText(resources.message(HEADER));
-    String nameHeader = userResources.message(NAME);
+    String nameHeader = experimentResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String dateHeader = userResources.message(DATE);
+    String dateHeader = experimentResources.message(DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
+    String ownerHeader = experimentResources.message(OWNER);
+    owner.setHeader(ownerHeader).setFooter(ownerHeader);
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
   }

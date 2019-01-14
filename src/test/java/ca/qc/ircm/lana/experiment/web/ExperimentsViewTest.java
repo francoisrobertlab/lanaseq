@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.experiment.web;
 
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.ADD;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.EXPERIMENTS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.HEADER;
@@ -51,6 +52,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -77,6 +79,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, Experiment>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<LocalDateTimeRenderer<Experiment>> localDateTimeRendererCaptor;
+  @Captor
+  private ArgumentCaptor<ValueProvider<Experiment, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Experiment>> comparatorCaptor;
   @Inject
@@ -113,6 +117,10 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
         .thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
+    view.owner = mock(Column.class);
+    when(view.experiments.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
+    when(view.owner.setKey(any())).thenReturn(view.owner);
+    when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
   }
 
   @Test
@@ -137,6 +145,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(experimentResources.message(NAME));
     verify(view.date).setHeader(experimentResources.message(DATE));
     verify(view.date).setFooter(experimentResources.message(DATE));
+    verify(view.owner).setHeader(experimentResources.message(OWNER));
+    verify(view.owner).setFooter(experimentResources.message(OWNER));
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -157,6 +167,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.name, atLeastOnce()).setFooter(experimentResources.message(NAME));
     verify(view.date, atLeastOnce()).setHeader(experimentResources.message(DATE));
     verify(view.date, atLeastOnce()).setFooter(experimentResources.message(DATE));
+    verify(view.owner, atLeastOnce()).setHeader(experimentResources.message(OWNER));
+    verify(view.owner, atLeastOnce()).setFooter(experimentResources.message(OWNER));
   }
 
   @Test
@@ -167,9 +179,10 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void experiments_Columns() {
-    assertEquals(2, view.experiments.getColumns().size());
+    assertEquals(3, view.experiments.getColumns().size());
     assertNotNull(view.experiments.getColumnByKey(NAME));
     assertNotNull(view.experiments.getColumnByKey(DATE));
+    assertNotNull(view.experiments.getColumnByKey(OWNER));
   }
 
   @Test
@@ -205,6 +218,11 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
       Component component = localDateTimeRenderer.createComponent(experiment);
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(experiment.getDate()),
           component.getElement().getText());
+    }
+    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(OWNER));
+    ValueProvider<Experiment, String> valueProvider = valueProviderCaptor.getValue();
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getOwner().getEmail(), valueProvider.apply(experiment));
     }
   }
 
