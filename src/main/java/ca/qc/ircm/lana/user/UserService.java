@@ -91,9 +91,9 @@ public class UserService {
   }
 
   /**
-   * Returns all users the user can access.
+   * Returns all users.
    *
-   * @return all users the user can access
+   * @return all users
    */
   public List<User> all() {
     authorizationService.checkRole(USER);
