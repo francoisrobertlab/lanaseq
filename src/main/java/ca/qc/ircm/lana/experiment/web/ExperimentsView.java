@@ -64,7 +64,6 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected Grid<Experiment> experiments = new Grid<>();
   protected Column<Experiment> name;
   protected Column<Experiment> date;
-  protected Column<Experiment> view;
   protected Button add = new Button();
   @Inject
   protected ExperimentDialog experimentDialog;
