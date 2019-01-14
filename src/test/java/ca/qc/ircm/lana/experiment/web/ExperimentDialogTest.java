@@ -74,6 +74,11 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void presenter_Init() {
+    verify(presenter).init(dialog);
+  }
+
+  @Test
   public void styles() {
     assertEquals(CLASS_NAME, dialog.getId().orElse(""));
     assertTrue(dialog.header.getClassNames().contains(HEADER));
