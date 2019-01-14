@@ -99,12 +99,12 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final MessageResource resources = new MessageResource(ExperimentDialog.class, locale);
-    final MessageResource userResources = new MessageResource(Experiment.class, locale);
+    final MessageResource experimentResources = new MessageResource(Experiment.class, locale);
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(userResources.message(NAME), dialog.name.getLabel());
+    assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
   }
