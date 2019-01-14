@@ -1,4 +1,4 @@
-package ca.qc.ircm.lana.user.web;
+package ca.qc.ircm.lana.user;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
