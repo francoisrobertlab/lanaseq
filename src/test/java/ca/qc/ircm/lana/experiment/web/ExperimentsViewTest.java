@@ -26,6 +26,7 @@ import static ca.qc.ircm.lana.experiment.web.ExperimentsView.HEADER;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
@@ -48,6 +49,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
@@ -88,7 +91,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(ExperimentsView.class, locale);
   private MessageResource experimentResources = new MessageResource(Experiment.class, locale);
-  private MessageResource generalResources = new MessageResource(WebConstants.class, locale);
+  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
   private List<Experiment> experiments;
 
   /**
@@ -121,6 +124,12 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     when(view.experiments.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
+    HeaderRow filtersRow = mock(HeaderRow.class);
+    when(view.experiments.appendHeaderRow()).thenReturn(filtersRow);
+    HeaderCell nameFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
+    HeaderCell ownerFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.owner)).thenReturn(ownerFilterCell);
   }
 
   @Test
@@ -147,6 +156,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.date).setFooter(experimentResources.message(DATE));
     verify(view.owner).setHeader(experimentResources.message(OWNER));
     verify(view.owner).setFooter(experimentResources.message(OWNER));
+    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -169,11 +180,15 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.date, atLeastOnce()).setFooter(experimentResources.message(DATE));
     verify(view.owner, atLeastOnce()).setHeader(experimentResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(experimentResources.message(OWNER));
+    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
+    assertEquals(resources.message(ADD), view.add.getText());
+    validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, generalResources.message(APPLICATION_NAME)),
+    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
         view.getPageTitle());
   }
 
@@ -230,5 +245,19 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     Experiment experiment = new Experiment();
     experiment.setName(name);
     return experiment;
+  }
+
+  @Test
+  public void filterName() {
+    view.nameFilter.setValue("test");
+
+    verify(presenter).filterName("test");
+  }
+
+  @Test
+  public void filterOwner() {
+    view.ownerFilter.setValue("test");
+
+    verify(presenter).filterOwner("test");
   }
 }

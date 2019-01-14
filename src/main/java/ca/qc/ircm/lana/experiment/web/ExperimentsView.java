@@ -22,6 +22,7 @@ import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.user.UserRole.USER;
+import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
@@ -34,12 +35,15 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -66,6 +70,8 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected Column<Experiment> name;
   protected Column<Experiment> date;
   protected Column<Experiment> owner;
+  protected TextField nameFilter = new TextField();
+  protected TextField ownerFilter = new TextField();
   protected Button add = new Button();
   @Inject
   protected ExperimentDialog experimentDialog;
@@ -97,6 +103,16 @@ public class ExperimentsView extends Composite<VerticalLayout>
         .setKey(DATE);
     owner =
         experiments.addColumn(experiment -> experiment.getOwner().getEmail(), OWNER).setKey(OWNER);
+    experiments.appendHeaderRow(); // Headers.
+    HeaderRow filtersRow = experiments.appendHeaderRow();
+    filtersRow.getCell(name).setComponent(nameFilter);
+    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
+    nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    nameFilter.setSizeFull();
+    filtersRow.getCell(owner).setComponent(ownerFilter);
+    ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
+    ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    ownerFilter.setSizeFull();
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -115,8 +131,9 @@ public class ExperimentsView extends Composite<VerticalLayout>
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    MessageResource resources = new MessageResource(ExperimentsView.class, getLocale());
-    MessageResource experimentResources = new MessageResource(Experiment.class, getLocale());
+    final MessageResource resources = new MessageResource(ExperimentsView.class, getLocale());
+    final MessageResource experimentResources = new MessageResource(Experiment.class, getLocale());
+    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
     header.setText(resources.message(HEADER));
     String nameHeader = experimentResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
@@ -124,6 +141,8 @@ public class ExperimentsView extends Composite<VerticalLayout>
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = experimentResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
+    nameFilter.setPlaceholder(webResources.message(ALL));
+    ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
   }

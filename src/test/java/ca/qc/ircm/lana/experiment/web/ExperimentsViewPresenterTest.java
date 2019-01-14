@@ -34,6 +34,7 @@ import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -52,6 +53,8 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ExperimentsView view;
   @Mock
   private ExperimentService experimentService;
+  @Mock
+  private DataProvider<Experiment, ?> dataProvider;
   @Captor
   private ArgumentCaptor<Experiment> experimentCaptor;
   @Inject
@@ -83,6 +86,50 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.experiments.getSelectedItems().size());
     experiments.forEach(experiment -> view.experiments.select(experiment));
     assertEquals(experiments.size(), view.experiments.getSelectedItems().size());
+  }
+
+  @Test
+  public void filterName() {
+    presenter.init(view);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterName("test");
+
+    assertEquals("test", presenter.filter().nameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterName_Empty() {
+    presenter.init(view);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterName("");
+
+    assertEquals(null, presenter.filter().nameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterLaboratory() {
+    presenter.init(view);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterOwner("test");
+
+    assertEquals("test", presenter.filter().ownerContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterLaboratory_Empty() {
+    presenter.init(view);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterOwner("");
+
+    assertEquals(null, presenter.filter().ownerContains);
+    verify(dataProvider).refreshAll();
   }
 
   @Test
