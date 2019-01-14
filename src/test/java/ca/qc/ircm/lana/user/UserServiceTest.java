@@ -153,7 +153,9 @@ public class UserServiceTest {
 
     List<User> users = userService.all();
 
-    assertEquals(1, users.size());
+    assertEquals(8, users.size());
+    assertTrue(find(users, 1L).isPresent());
+    assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
     verify(authorizationService).checkRole(USER);
   }
@@ -165,10 +167,10 @@ public class UserServiceTest {
 
     List<User> users = userService.all();
 
-    assertEquals(3, users.size());
+    assertEquals(8, users.size());
+    assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
-    assertTrue(find(users, 8L).isPresent());
     verify(authorizationService).checkRole(USER);
   }
 
@@ -182,9 +184,6 @@ public class UserServiceTest {
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
-    assertTrue(find(users, 4L).isPresent());
-    assertTrue(find(users, 5L).isPresent());
-    assertTrue(find(users, 6L).isPresent());
     verify(authorizationService).checkRole(USER);
   }
 

@@ -23,10 +23,7 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -100,15 +97,7 @@ public class UserService {
    */
   public List<User> all() {
     authorizationService.checkRole(USER);
-    if (authorizationService.hasRole(ADMIN)) {
-      return repository.findAll();
-    } else if (authorizationService.hasRole(MANAGER)) {
-      Laboratory laboratory = authorizationService.currentUser().getLaboratory();
-      return repository.findByLaboratory(laboratory);
-    } else {
-      User user = authorizationService.currentUser();
-      return Stream.of(user).collect(Collectors.toCollection(ArrayList::new));
-    }
+    return repository.findAll();
   }
 
   /**

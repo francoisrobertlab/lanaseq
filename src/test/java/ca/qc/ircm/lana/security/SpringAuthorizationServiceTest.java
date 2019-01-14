@@ -350,7 +350,7 @@ public class SpringAuthorizationServiceTest {
     authorizationService.checkRead(user);
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void checkRead_User_NotSelf() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
@@ -364,7 +364,7 @@ public class SpringAuthorizationServiceTest {
     authorizationService.checkRead(user);
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void checkRead_User_ManagerOtherLab() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
@@ -392,7 +392,7 @@ public class SpringAuthorizationServiceTest {
     authorizationService.checkRead(laboratory);
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void checkRead_Laboratory_NotMember() throws Throwable {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);

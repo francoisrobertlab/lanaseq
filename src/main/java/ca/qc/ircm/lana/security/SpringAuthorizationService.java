@@ -184,8 +184,7 @@ public class SpringAuthorizationService implements AuthorizationService {
       return true;
     }
     boolean authorized = user.getId().equals(currentUser.getId());
-    authorized |= permission.equals(BasePermission.READ)
-        && hasRole(UserAuthority.laboratoryMember(user.getLaboratory()));
+    authorized |= permission.equals(BasePermission.READ);
     authorized |= permission.equals(BasePermission.WRITE)
         && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(user.getLaboratory()));
     return authorized;
@@ -199,8 +198,7 @@ public class SpringAuthorizationService implements AuthorizationService {
       return true;
     }
     boolean authorized = false;
-    authorized |= permission.equals(BasePermission.READ)
-        && hasRole(UserAuthority.laboratoryMember(laboratory));
+    authorized |= permission.equals(BasePermission.READ);
     authorized |= permission.equals(BasePermission.WRITE)
         && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(laboratory));
     return authorized;
