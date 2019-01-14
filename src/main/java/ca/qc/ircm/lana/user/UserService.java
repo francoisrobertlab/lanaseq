@@ -101,6 +101,16 @@ public class UserService {
   }
 
   /**
+   * Returns all managers.
+   *
+   * @return all managers
+   */
+  public List<User> managers() {
+    authorizationService.checkRole(USER);
+    return repository.findByManagerTrue();
+  }
+
+  /**
    * Saves user into database.
    * <p>
    * If user is a normal user, his laboratory must exists.
