@@ -18,7 +18,6 @@
 package ca.qc.ircm.lana.experiment;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
@@ -85,10 +84,8 @@ public class ExperimentService {
 
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
-    } else if (authorizationService.hasRole(MANAGER)) {
-      return repository.findByOwnerLaboratory(authorizationService.currentUser().getLaboratory());
     } else {
-      return repository.findByOwner(authorizationService.currentUser());
+      return repository.findByOwnerLaboratory(authorizationService.currentUser().getLaboratory());
     }
   }
 

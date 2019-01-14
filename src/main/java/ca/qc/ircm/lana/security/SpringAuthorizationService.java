@@ -24,6 +24,7 @@ import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Arrays;
 import java.util.Collection;
@@ -137,6 +138,14 @@ public class SpringAuthorizationService implements AuthorizationService {
     return hasAnyRole;
   }
 
+  private boolean hasAllRoles(String... roles) {
+    boolean hasAllRole = true;
+    for (String role : roles) {
+      hasAllRole &= hasRole(role);
+    }
+    return hasAllRole;
+  }
+
   @Override
   public boolean isAuthorized(Class<?> type) {
     RolesAllowed rolesAllowed = AnnotationUtils.findAnnotation(type, RolesAllowed.class);
@@ -157,9 +166,10 @@ public class SpringAuthorizationService implements AuthorizationService {
       return true;
     }
     boolean authorized = owner.getId().equals(currentUser.getId());
-    if (!authorized && hasRole(MANAGER)) {
-      authorized |= isAuthorized(owner.getLaboratory(), currentUser, BasePermission.READ);
-    }
+    authorized |= permission.equals(BasePermission.READ)
+        && hasRole(UserAuthority.laboratoryMember(owner.getLaboratory()));
+    authorized |= permission.equals(BasePermission.WRITE)
+        && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(owner.getLaboratory()));
     if (!authorized) {
       authorized |= isAclAuthorized(experiment, permission, currentUser);
     }
@@ -174,9 +184,10 @@ public class SpringAuthorizationService implements AuthorizationService {
       return true;
     }
     boolean authorized = user.getId().equals(currentUser.getId());
-    if (!authorized && hasRole(MANAGER)) {
-      authorized |= isAuthorized(user.getLaboratory(), currentUser, BasePermission.READ);
-    }
+    authorized |= permission.equals(BasePermission.READ)
+        && hasRole(UserAuthority.laboratoryMember(user.getLaboratory()));
+    authorized |= permission.equals(BasePermission.WRITE)
+        && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(user.getLaboratory()));
     return authorized;
   }
 
@@ -187,11 +198,11 @@ public class SpringAuthorizationService implements AuthorizationService {
     if (hasRole(ADMIN)) {
       return true;
     }
-    boolean authorized = true;
-    if (permission != BasePermission.READ) {
-      authorized &= hasRole(MANAGER);
-    }
-    authorized &= laboratory.getId().equals(currentUser.getLaboratory().getId());
+    boolean authorized = false;
+    authorized |= permission.equals(BasePermission.READ)
+        && hasRole(UserAuthority.laboratoryMember(laboratory));
+    authorized |= permission.equals(BasePermission.WRITE)
+        && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(laboratory));
     return authorized;
   }
 

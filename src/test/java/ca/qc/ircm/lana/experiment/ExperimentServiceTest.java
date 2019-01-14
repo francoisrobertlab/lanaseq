@@ -81,7 +81,8 @@ public class ExperimentServiceTest {
 
     List<Experiment> experiments = service.all();
 
-    assertEquals(2, experiments.size());
+    assertEquals(3, experiments.size());
+    assertTrue(find(experiments, 1L).isPresent());
     assertTrue(find(experiments, 2L).isPresent());
     assertTrue(find(experiments, 3L).isPresent());
     verify(authorizationService).checkRole(USER);

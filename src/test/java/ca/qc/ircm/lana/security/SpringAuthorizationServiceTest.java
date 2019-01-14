@@ -272,6 +272,13 @@ public class SpringAuthorizationServiceTest {
     authorizationService.checkRead(experiment);
   }
 
+  @Test
+  @WithUserDetails("olivia.brown@ircm.qc.ca")
+  public void checkRead_Experiment_OtherLabMember() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkRead(experiment);
+  }
+
   @Test(expected = AccessDeniedException.class)
   @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void checkRead_Experiment_NotOwner() throws Throwable {
@@ -423,6 +430,13 @@ public class SpringAuthorizationServiceTest {
   public void hasWrite_Experiment_Owner() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     assertTrue(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("olivia.brown@ircm.qc.ca")
+  public void hasWrite_Experiment_OtherLabMember() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasWrite(experiment));
   }
 
   @Test
@@ -581,6 +595,13 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void checkWrite_Experiment_Owner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("olivia.brown@ircm.qc.ca")
+  public void checkWrite_Experiment_OtherLabMember() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     authorizationService.checkWrite(experiment);
   }
