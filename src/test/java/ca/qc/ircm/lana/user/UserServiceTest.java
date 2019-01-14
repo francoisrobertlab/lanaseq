@@ -165,9 +165,10 @@ public class UserServiceTest {
 
     List<User> users = userService.all();
 
-    assertEquals(2, users.size());
+    assertEquals(3, users.size());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
+    assertTrue(find(users, 8L).isPresent());
     verify(authorizationService).checkRole(USER);
   }
 
@@ -177,7 +178,7 @@ public class UserServiceTest {
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
     List<User> users = userService.all();
 
-    assertEquals(7, users.size());
+    assertEquals(8, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
@@ -478,6 +479,9 @@ public class UserServiceTest {
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     userService.save(user, null);
     user = userRepository.findById(3L).get();
+    user.setLaboratory(laboratoryRepository.findById(3L).get());
+    userService.save(user, null);
+    user = userRepository.findById(8L).get();
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     userService.save(user, null);
 
