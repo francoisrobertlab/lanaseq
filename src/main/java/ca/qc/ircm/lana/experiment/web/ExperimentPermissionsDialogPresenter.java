@@ -23,6 +23,7 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.user.web.WebUserFilter;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
@@ -75,6 +76,32 @@ public class ExperimentPermissionsDialogPresenter {
         managersDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     dialog.managers.setDataProvider(dataProvider);
+    initReads();
+  }
+
+  private void initReads() {
+    if (dialog == null) {
+      return;
+    }
+    if (experiment != null) {
+      Set<Long> laboratoriesId = experimentService.permissions(experiment).stream()
+          .map(lab -> lab.getId()).collect(Collectors.toSet());
+      dialog.reads.entrySet().stream().forEach(entry -> {
+        User user = entry.getKey();
+        Checkbox read = entry.getValue();
+        read.setValue(laboratoriesId.contains(user.getLaboratory().getId()));
+        read.setReadOnly(false);
+        if (user.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+          read.setValue(true);
+          read.setReadOnly(true);
+        }
+      });
+    } else {
+      dialog.reads.values().forEach(read -> {
+        read.setReadOnly(false);
+        read.setValue(false);
+      });
+    }
   }
 
   void filterLaboratory(String value) {
@@ -88,8 +115,11 @@ public class ExperimentPermissionsDialogPresenter {
   }
 
   void save() {
-    // TODO Auto-generated method stub
-    //experimentService.savePermissions(experiments, permissions);
+    List<Laboratory> laboratories = dialog.reads.entrySet().stream()
+        .filter(entry -> entry.getValue().getValue()).map(entry -> entry.getKey().getLaboratory())
+        .filter(lab -> !lab.getId().equals(experiment.getOwner().getLaboratory().getId()))
+        .collect(Collectors.toList());
+    experimentService.savePermissions(experiment, laboratories);
   }
 
   void cancel() {
@@ -102,6 +132,7 @@ public class ExperimentPermissionsDialogPresenter {
 
   void setExperiment(Experiment experiment) {
     this.experiment = experiment;
+    initReads();
   }
 
   WebUserFilter userFilter() {

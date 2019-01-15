@@ -17,10 +17,16 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,25 +35,38 @@ import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.experiment.ExperimentService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCase {
+  @SuppressWarnings("unused")
+  private static final Logger logger =
+      LoggerFactory.getLogger(ExperimentPermissionsDialogPresenterTest.class);
   private ExperimentPermissionsDialogPresenter presenter;
   @Mock
   private ExperimentPermissionsDialog dialog;
@@ -57,10 +76,14 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   private UserService userService;
   @Mock
   private DataProvider<User, ?> managersDataProvider;
+  @Captor
+  private ArgumentCaptor<Collection<Laboratory>> laboratoriesCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
   @Inject
   private UserRepository userRepository;
+  @Inject
+  private LaboratoryRepository laboratoryRepository;
   private Experiment experiment;
   private List<User> managers;
   private User secondManager = new User(800L, "second.manager@ircm.qc.ca");
@@ -77,6 +100,8 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     dialog.cancel = new Button();
     experiment = experimentRepository.findById(2L).orElse(null);
     managers = userRepository.findByManagerTrue();
+    dialog.reads =
+        managers.stream().collect(Collectors.toMap(user -> user, user -> new Checkbox()));
     User manager = userRepository.findById(2L).orElse(null);
     secondManager.setLaboratory(manager.getLaboratory());
     when(userService.managers()).thenReturn(managers);
@@ -93,6 +118,70 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     for (User user : managers) {
       if (user != secondManager) {
         assertTrue(users.contains(user));
+      }
+    }
+  }
+
+  @Test
+  public void init_Reads() {
+    Set<Laboratory> permissions = new HashSet<>();
+    permissions.add(laboratoryRepository.findById(3L).orElse(null));
+    when(experimentService.permissions(any())).thenReturn(permissions);
+
+    presenter.init(dialog);
+    presenter.setExperiment(experiment);
+
+    for (User manager : managers) {
+      if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+        assertTrue(dialog.reads.get(manager).getValue());
+        assertTrue(dialog.reads.get(manager).isReadOnly());
+      } else if (manager.getLaboratory().getId().equals(3L)) {
+        assertTrue(dialog.reads.get(manager).getValue());
+        assertFalse(dialog.reads.get(manager).isReadOnly());
+      } else {
+        assertFalse(dialog.reads.get(manager).getValue());
+        assertFalse(dialog.reads.get(manager).isReadOnly());
+      }
+    }
+  }
+
+  @Test
+  public void init_ReadsSetExperimentBeforeInit() {
+    Set<Laboratory> permissions = new HashSet<>();
+    permissions.add(laboratoryRepository.findById(3L).orElse(null));
+    when(experimentService.permissions(any())).thenReturn(permissions);
+
+    presenter.setExperiment(experiment);
+    presenter.init(dialog);
+
+    for (User manager : managers) {
+      if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+        assertTrue(dialog.reads.get(manager).getValue());
+        assertTrue(dialog.reads.get(manager).isReadOnly());
+      } else if (manager.getLaboratory().getId().equals(3L)) {
+        assertTrue(dialog.reads.get(manager).getValue());
+        assertFalse(dialog.reads.get(manager).isReadOnly());
+      } else {
+        assertFalse(dialog.reads.get(manager).getValue());
+        assertFalse(dialog.reads.get(manager).isReadOnly());
+      }
+    }
+  }
+
+  @Test
+  public void init_ReadsNoAclPermissions() {
+    when(experimentService.permissions(any())).thenReturn(new HashSet<>());
+
+    presenter.init(dialog);
+    presenter.setExperiment(experiment);
+
+    for (User manager : managers) {
+      if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+        assertTrue(dialog.reads.get(manager).getValue());
+        assertTrue(dialog.reads.get(manager).isReadOnly());
+      } else {
+        assertFalse(dialog.reads.get(manager).getValue());
+        assertFalse(dialog.reads.get(manager).isReadOnly());
       }
     }
   }
@@ -142,8 +231,48 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   }
 
   @Test
-  @Ignore("program test")
+  public void save_NullExperiment() {
+    presenter.init(dialog);
+    dialog.reads.get(managers.get(2)).setValue(true);
+
+    try {
+      presenter.save();
+      fail("Expected an exception");
+    } catch (Exception e) {
+      // Success.
+    }
+
+    verify(experimentService, never()).savePermissions(any(), any());
+  }
+
+  @Test
   public void save() {
+    presenter.init(dialog);
+    presenter.setExperiment(experiment);
+    dialog.reads.get(managers.get(2)).setValue(true);
+
+    presenter.save();
+
+    verify(experimentService).savePermissions(eq(experiment), laboratoriesCaptor.capture());
+    Collection<Laboratory> laboratories = laboratoriesCaptor.getValue();
+    assertEquals(1, laboratories.size());
+    assertTrue(find(laboratories, 3L).isPresent());
+  }
+
+  @Test
+  public void save_Many() {
+    presenter.init(dialog);
+    presenter.setExperiment(experiment);
+    dialog.reads.get(managers.get(0)).setValue(true);
+    dialog.reads.get(managers.get(2)).setValue(true);
+
+    presenter.save();
+
+    verify(experimentService).savePermissions(eq(experiment), laboratoriesCaptor.capture());
+    Collection<Laboratory> laboratories = laboratoriesCaptor.getValue();
+    assertEquals(2, laboratories.size());
+    assertTrue(find(laboratories, 1L).isPresent());
+    assertTrue(find(laboratories, 3L).isPresent());
   }
 
   @Test
