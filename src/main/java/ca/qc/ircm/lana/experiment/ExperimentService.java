@@ -21,10 +21,27 @@ import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserAuthority;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +54,21 @@ public class ExperimentService {
   @Inject
   private ExperimentRepository repository;
   @Inject
+  private LaboratoryRepository laboratoryRepository;
+  @Inject
+  private MutableAclService aclService;
+  @Inject
   private AuthorizationService authorizationService;
 
   protected ExperimentService() {
   }
 
   protected ExperimentService(ExperimentRepository repository,
+      LaboratoryRepository laboratoryRepository, MutableAclService aclService,
       AuthorizationService authorizationService) {
     this.repository = repository;
+    this.laboratoryRepository = laboratoryRepository;
+    this.aclService = aclService;
     this.authorizationService = authorizationService;
   }
 
@@ -90,6 +114,44 @@ public class ExperimentService {
   }
 
   /**
+   * Returns laboratories that can read experiment.
+   *
+   * @param experiment
+   *          experiment
+   * @return laboratories that can read experiment
+   */
+  public Set<Laboratory> permissions(Experiment experiment) {
+    authorizationService.checkWrite(experiment);
+
+    Laboratory ownerLaboratory = experiment.getOwner().getLaboratory();
+    ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
+    try {
+      Acl acl = aclService.readAclById(oi);
+      List<Laboratory> allLaboratories = laboratoryRepository.findAll();
+      HashSet<Laboratory> laboratories = new HashSet<>();
+      for (Laboratory laboratory : allLaboratories) {
+        Sid sid = new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory));
+        try {
+          if (acl.isGranted(list(BasePermission.READ), list(sid), false)) {
+            laboratories.add(laboratory);
+          }
+        } catch (NotFoundException e) {
+          // Cannot read.
+        }
+      }
+      laboratories.add(ownerLaboratory);
+      return laboratories;
+    } catch (NotFoundException e) {
+      return Stream.of(ownerLaboratory).collect(Collectors.toCollection(HashSet::new));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> List<T> list(T... values) {
+    return Stream.of(values).collect(Collectors.toList());
+  }
+
+  /**
    * Saves experiment into database.
    *
    * @param experiment
@@ -102,5 +164,24 @@ public class ExperimentService {
     experiment.setOwner(user);
     experiment.setDate(LocalDateTime.now());
     repository.save(experiment);
+  }
+
+  /**
+   * Saves experiment's permissions into database.
+   *
+   * @param experiment
+   *          experiment
+   * @param laboratories
+   *          laboratories that can read experiment
+   */
+  public void savePermissions(Experiment experiment, Collection<Laboratory> laboratories) {
+    authorizationService.checkWrite(experiment);
+    ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
+    aclService.deleteAcl(oi, false);
+    MutableAcl acl = aclService.createAcl(oi);
+    for (Laboratory laboratory : laboratories) {
+      acl.insertAce(acl.getEntries().size(), BasePermission.READ,
+          new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), true);
+    }
   }
 }

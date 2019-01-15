@@ -22,6 +22,7 @@ import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -30,16 +31,33 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
@@ -48,13 +66,18 @@ public class ExperimentServiceTest {
   @Inject
   private ExperimentRepository repository;
   @Inject
+  private LaboratoryRepository laboratoryRepository;
+  @Inject
+  private MutableAclService aclService;
+  @Inject
   private UserRepository userRepository;
   @Mock
   private AuthorizationService authorizationService;
 
   @Before
   public void beforeTest() {
-    service = new ExperimentService(repository, authorizationService);
+    service =
+        new ExperimentService(repository, laboratoryRepository, aclService, authorizationService);
   }
 
   @Test
@@ -121,6 +144,18 @@ public class ExperimentServiceTest {
   }
 
   @Test
+  public void permissions() {
+    Experiment experiment = repository.findById(2L).orElse(null);
+
+    Set<Laboratory> laboratories = service.permissions(experiment);
+
+    assertEquals(2, laboratories.size());
+    assertTrue(find(laboratories, 2L).isPresent());
+    assertTrue(find(laboratories, 3L).isPresent());
+    verify(authorizationService).checkWrite(experiment);
+  }
+
+  @Test
   public void save() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.currentUser()).thenReturn(user);
@@ -136,5 +171,37 @@ public class ExperimentServiceTest {
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(experiment.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(experiment.getDate()));
     verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  @Transactional
+  public void savePermissions() {
+    Experiment experiment = repository.findById(5L).orElse(null);
+    List<Laboratory> laboratories = new ArrayList<>();
+    laboratories.add(laboratoryRepository.findById(2L).orElse(null));
+
+    service.savePermissions(experiment, laboratories);
+
+    ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
+    Acl acl = aclService.readAclById(oi);
+    assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(1L).orElse(null)));
+    assertTrue(granted(acl, BasePermission.READ, laboratoryRepository.findById(2L).orElse(null)));
+    assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(3L).orElse(null)));
+    verify(authorizationService).checkWrite(experiment);
+  }
+
+  private boolean granted(Acl acl, Permission permission, Laboratory laboratory) {
+    try {
+      return acl.isGranted(list(permission),
+          list(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory))), false);
+    } catch (NotFoundException e) {
+      return false;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> List<T> list(T... values) {
+    return Stream.of(values).collect(Collectors.toList());
   }
 }
