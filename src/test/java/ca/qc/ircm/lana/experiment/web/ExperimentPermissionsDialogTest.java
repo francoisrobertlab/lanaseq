@@ -17,15 +17,12 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
-import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsPermissionsDialog.CLASS_NAME;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsPermissionsDialog.EXPERIMENTS;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsPermissionsDialog.HEADER;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsPermissionsDialog.MANAGERS;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsPermissionsDialog.READ;
+import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.CLASS_NAME;
+import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.HEADER;
+import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.MANAGERS;
+import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.READ;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
@@ -60,7 +57,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -74,10 +70,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
-  private ExperimentsPermissionsDialog dialog;
+public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
+  private ExperimentPermissionsDialog dialog;
   @Mock
-  private ExperimentsPermissionsDialogPresenter presenter;
+  private ExperimentPermissionsDialogPresenter presenter;
   @Captor
   private ArgumentCaptor<ValueProvider<Experiment, String>> experimentValueProviderCaptor;
   @Captor
@@ -90,10 +86,10 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources =
-      new MessageResource(ExperimentsPermissionsDialog.class, locale);
+      new MessageResource(ExperimentPermissionsDialog.class, locale);
   private MessageResource userResources = new MessageResource(User.class, locale);
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);
-  private List<Experiment> experiments;
+  private Experiment experiment;
   private List<User> users;
 
   /**
@@ -102,22 +98,10 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    dialog = new ExperimentsPermissionsDialog(presenter);
+    dialog = new ExperimentPermissionsDialog(presenter);
     dialog.init();
-    experiments = experimentRepository.findAll();
+    experiment = experimentRepository.findById(2L).orElse(null);
     users = userRepository.findAll();
-  }
-
-  @SuppressWarnings("unchecked")
-  private void mockExperimentColumns() {
-    Element experimentsElement = dialog.experiments.getElement();
-    dialog.experiments = mock(Grid.class);
-    when(dialog.experiments.getElement()).thenReturn(experimentsElement);
-    dialog.name = mock(Column.class);
-    when(dialog.experiments.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(dialog.name);
-    when(dialog.name.setKey(any())).thenReturn(dialog.name);
-    when(dialog.name.setComparator(any(Comparator.class))).thenReturn(dialog.name);
-    when(dialog.name.setHeader(any(String.class))).thenReturn(dialog.name);
   }
 
   @SuppressWarnings("unchecked")
@@ -155,7 +139,6 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(CLASS_NAME, dialog.getId().orElse(""));
     assertTrue(dialog.header.getClassNames().contains(HEADER));
-    assertTrue(dialog.experiments.getClassNames().contains(EXPERIMENTS));
     assertTrue(dialog.managers.getClassNames().contains(MANAGERS));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
     assertEquals(PRIMARY, dialog.save.getElement().getAttribute(THEME));
@@ -164,12 +147,9 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
 
   @Test
   public void labels() {
-    mockExperimentColumns();
     mockManagersColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    verify(dialog.name).setHeader(resources.message(property(EXPERIMENTS, NAME)));
-    verify(dialog.name).setFooter(resources.message(property(EXPERIMENTS, NAME)));
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
     verify(dialog.laboratory).setHeader(userResources.message(LABORATORY));
     verify(dialog.laboratory).setFooter(userResources.message(LABORATORY));
     verify(dialog.email).setHeader(userResources.message(MANAGER));
@@ -186,19 +166,16 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    mockExperimentColumns();
     mockManagersColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final MessageResource resources =
-        new MessageResource(ExperimentsPermissionsDialog.class, locale);
+        new MessageResource(ExperimentPermissionsDialog.class, locale);
     final MessageResource userResources = new MessageResource(User.class, locale);
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    verify(dialog.name).setHeader(resources.message(property(EXPERIMENTS, NAME)));
-    verify(dialog.name).setFooter(resources.message(property(EXPERIMENTS, NAME)));
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
     verify(dialog.laboratory).setHeader(userResources.message(LABORATORY));
     verify(dialog.laboratory).setFooter(userResources.message(LABORATORY));
     verify(dialog.email).setHeader(userResources.message(MANAGER));
@@ -214,24 +191,6 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void experiments_Columns() {
-    assertEquals(1, dialog.experiments.getColumns().size());
-    assertNotNull(dialog.experiments.getColumnByKey(NAME));
-  }
-
-  @Test
-  public void experiments_ColumnsValueProvider() {
-    dialog = new ExperimentsPermissionsDialog(presenter);
-    mockExperimentColumns();
-    dialog.init();
-    verify(dialog.experiments).addColumn(experimentValueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<Experiment, String> valueProvider = experimentValueProviderCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getName(), valueProvider.apply(experiment));
-    }
-  }
-
-  @Test
   public void managers_Columns() {
     assertEquals(3, dialog.managers.getColumns().size());
     assertNotNull(dialog.managers.getColumnByKey(LABORATORY));
@@ -241,7 +200,7 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
 
   @Test
   public void managers_ColumnsValueProvider() {
-    dialog = new ExperimentsPermissionsDialog(presenter);
+    dialog = new ExperimentPermissionsDialog(presenter);
     mockManagersColumns();
     dialog.init();
     verify(dialog.managers).addColumn(userValueProviderCaptor.capture(), eq(LABORATORY));
@@ -263,20 +222,48 @@ public class ExperimentsPermissionsDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void getExperiments() {
-    experiments = mock(List.class);
-    when(presenter.getExperiments()).thenReturn(experiments);
-    assertEquals(experiments, dialog.getExperiments());
-    verify(presenter).getExperiments();
+  public void getExperiment() {
+    experiment = mock(Experiment.class);
+    when(presenter.getExperiment()).thenReturn(experiment);
+    assertEquals(experiment, dialog.getExperiment());
+    verify(presenter).getExperiment();
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void setExperiments() {
-    experiments = mock(List.class);
-    dialog.setExperiments(experiments);
-    verify(presenter).setExperiments(experiments);
+    when(presenter.getExperiment()).thenReturn(experiment);
+    dialog.setExperiment(experiment);
+    verify(presenter).setExperiment(experiment);
+    assertEquals(resources.message(HEADER, experiment.getName()), dialog.header.getText());
+  }
+
+  @Test
+  public void setExperiments_NullExperiment() {
+    when(presenter.getExperiment()).thenReturn(null);
+    dialog.setExperiment(null);
+    verify(presenter).setExperiment(null);
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+  }
+
+  @Test
+  public void setExperiments_NullName() {
+    experiment = new Experiment();
+    when(presenter.getExperiment()).thenReturn(experiment);
+    dialog.setExperiment(experiment);
+    verify(presenter).setExperiment(experiment);
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+  }
+
+  @Test
+  public void setExperiment_BeforeLocaleChange() {
+    Experiment experiment = experimentRepository.findById(2L).get();
+    when(presenter.getExperiment()).thenReturn(experiment);
+
+    dialog.setExperiment(experiment);
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+
+    verify(presenter).setExperiment(experiment);
+    assertEquals(resources.message(HEADER, experiment.getName()), dialog.header.getText());
   }
 
   @Test

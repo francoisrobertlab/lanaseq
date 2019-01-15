@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.experiment.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,10 +47,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentsPermissionsDialogPresenterTest extends AbstractViewTestCase {
-  private ExperimentsPermissionsDialogPresenter presenter;
+public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCase {
+  private ExperimentPermissionsDialogPresenter presenter;
   @Mock
-  private ExperimentsPermissionsDialog dialog;
+  private ExperimentPermissionsDialog dialog;
   @Mock
   private ExperimentService experimentService;
   @Mock
@@ -60,7 +61,7 @@ public class ExperimentsPermissionsDialogPresenterTest extends AbstractViewTestC
   private ExperimentRepository experimentRepository;
   @Inject
   private UserRepository userRepository;
-  private List<Experiment> experiments;
+  private Experiment experiment;
   private List<User> managers;
   private User secondManager = new User(800L, "second.manager@ircm.qc.ca");
 
@@ -69,13 +70,12 @@ public class ExperimentsPermissionsDialogPresenterTest extends AbstractViewTestC
    */
   @Before
   public void beforeTest() {
-    presenter = new ExperimentsPermissionsDialogPresenter(experimentService, userService);
+    presenter = new ExperimentPermissionsDialogPresenter(experimentService, userService);
     dialog.header = new H2();
-    dialog.experiments = new Grid<>();
     dialog.managers = new Grid<>();
     dialog.save = new Button();
     dialog.cancel = new Button();
-    experiments = experimentRepository.findAll();
+    experiment = experimentRepository.findById(2L).orElse(null);
     managers = userRepository.findByManagerTrue();
     User manager = userRepository.findById(2L).orElse(null);
     secondManager.setLaboratory(manager.getLaboratory());
@@ -156,17 +156,17 @@ public class ExperimentsPermissionsDialogPresenterTest extends AbstractViewTestC
   }
 
   @Test
-  public void getExperiments() {
+  public void getExperiment() {
     presenter.init(dialog);
-    assertTrue(presenter.getExperiments() == null || presenter.getExperiments().isEmpty());
-    presenter.setExperiments(experiments);
-    assertEquals(experiments, presenter.getExperiments());
+    assertNull(presenter.getExperiment());
+    presenter.setExperiment(experiment);
+    assertEquals(experiment, presenter.getExperiment());
   }
 
   @Test
-  public void setExperiments() {
+  public void setExperiment() {
     presenter.init(dialog);
-    presenter.setExperiments(experiments);
-    assertEquals(experiments, items(dialog.experiments));
+    presenter.setExperiment(experiment);
+    assertEquals(experiment, presenter.getExperiment());
   }
 }

@@ -27,7 +27,6 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,29 +42,29 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentsPermissionsDialogPresenter {
+public class ExperimentPermissionsDialogPresenter {
   private static final Logger logger =
-      LoggerFactory.getLogger(ExperimentsPermissionsDialogPresenter.class);
-  private ExperimentsPermissionsDialog dialog;
+      LoggerFactory.getLogger(ExperimentPermissionsDialogPresenter.class);
+  private ExperimentPermissionsDialog dialog;
   @Inject
   private ExperimentService experimentService;
   @Inject
   private UserService userService;
-  private Collection<Experiment> experiments;
+  private Experiment experiment;
   private ListDataProvider<User> managersDataProvider;
   private WebUserFilter filter = new WebUserFilter();
 
-  protected ExperimentsPermissionsDialogPresenter() {
+  protected ExperimentPermissionsDialogPresenter() {
   }
 
-  protected ExperimentsPermissionsDialogPresenter(ExperimentService experimentService,
+  protected ExperimentPermissionsDialogPresenter(ExperimentService experimentService,
       UserService userService) {
     this.experimentService = experimentService;
     this.userService = userService;
   }
 
-  void init(ExperimentsPermissionsDialog dialog) {
-    logger.debug("open experiments permissions dialog for experiments {}", experiments);
+  void init(ExperimentPermissionsDialog dialog) {
+    logger.debug("open experiments permissions dialog for experiment {}", experiment);
     this.dialog = dialog;
     List<User> managers = userService.managers();
     Set<Laboratory> laboratories = new HashSet<>();
@@ -97,13 +96,12 @@ public class ExperimentsPermissionsDialogPresenter {
     dialog.close();
   }
 
-  Collection<Experiment> getExperiments() {
-    return experiments;
+  Experiment getExperiment() {
+    return experiment;
   }
 
-  void setExperiments(Collection<Experiment> experiments) {
-    this.experiments = experiments;
-    dialog.experiments.setItems(experiments);
+  void setExperiment(Experiment experiment) {
+    this.experiment = experiment;
   }
 
   WebUserFilter userFilter() {

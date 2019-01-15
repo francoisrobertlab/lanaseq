@@ -17,8 +17,6 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
-import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
@@ -48,7 +46,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -61,17 +58,14 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentsPermissionsDialog extends Dialog
+public class ExperimentPermissionsDialog extends Dialog
     implements LocaleChangeObserver, BaseComponent {
   private static final long serialVersionUID = 3285639770914046262L;
-  public static final String CLASS_NAME = "experiments-permissions-dialog";
+  public static final String CLASS_NAME = "experiment-permissions-dialog";
   public static final String HEADER = "header";
-  public static final String EXPERIMENTS = "experiments";
   public static final String MANAGERS = "managers";
   public static final String READ = "read";
   protected H2 header = new H2();
-  protected Grid<Experiment> experiments = new Grid<>();
-  protected Column<Experiment> name;
   protected Grid<User> managers = new Grid<>();
   protected Column<User> laboratory;
   protected Column<User> email;
@@ -82,12 +76,12 @@ public class ExperimentsPermissionsDialog extends Dialog
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Inject
-  private ExperimentsPermissionsDialogPresenter presenter;
+  private ExperimentPermissionsDialogPresenter presenter;
 
-  protected ExperimentsPermissionsDialog() {
+  protected ExperimentPermissionsDialog() {
   }
 
-  protected ExperimentsPermissionsDialog(ExperimentsPermissionsDialogPresenter presenter) {
+  protected ExperimentPermissionsDialog(ExperimentPermissionsDialogPresenter presenter) {
     this.presenter = presenter;
   }
 
@@ -97,11 +91,9 @@ public class ExperimentsPermissionsDialog extends Dialog
     VerticalLayout layout = new VerticalLayout();
     add(layout);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
-    layout.add(header, experiments, managers, buttonsLayout);
+    layout.add(header, managers, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.addClassName(HEADER);
-    experiments.addClassName(EXPERIMENTS);
-    name = experiments.addColumn(Experiment::getName, NAME).setKey(NAME);
     managers.addClassName(MANAGERS);
     laboratory =
         managers.addColumn(user -> user.getLaboratory().getName(), LABORATORY).setKey(LABORATORY);
@@ -140,12 +132,10 @@ public class ExperimentsPermissionsDialog extends Dialog
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final MessageResource resources =
-        new MessageResource(ExperimentsPermissionsDialog.class, getLocale());
+        new MessageResource(ExperimentPermissionsDialog.class, getLocale());
     final MessageResource userResources = new MessageResource(User.class, getLocale());
     final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    String experimentNameHeader = resources.message(property(EXPERIMENTS, NAME));
-    name.setHeader(experimentNameHeader).setFooter(experimentNameHeader);
+    updateHeader();
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
     String emailHeader = userResources.message(MANAGER);
@@ -158,11 +148,23 @@ public class ExperimentsPermissionsDialog extends Dialog
     cancel.setText(webResources.message(CANCEL));
   }
 
-  public Collection<Experiment> getExperiments() {
-    return presenter.getExperiments();
+  private void updateHeader() {
+    final MessageResource resources =
+        new MessageResource(ExperimentPermissionsDialog.class, getLocale());
+    Experiment experiment = presenter.getExperiment();
+    if (experiment != null && experiment.getId() != null) {
+      header.setText(resources.message(HEADER, experiment.getName()));
+    } else {
+      header.setText(resources.message(HEADER, ""));
+    }
   }
 
-  public void setExperiments(Collection<Experiment> experiments) {
-    presenter.setExperiments(experiments);
+  public Experiment getExperiment() {
+    return presenter.getExperiment();
+  }
+
+  public void setExperiment(Experiment experiment) {
+    presenter.setExperiment(experiment);
+    updateHeader();
   }
 }
