@@ -86,6 +86,15 @@ public interface AuthorizationService {
   public boolean isAuthorized(Class<?> type);
 
   /**
+   * Returns true if current user can read object, false otherwise.
+   *
+   * @param object
+   *          object
+   * @return true if current user can read object, false otherwise
+   */
+  public boolean hasRead(Object object);
+
+  /**
    * Checks if current user can read object.
    *
    * @param object

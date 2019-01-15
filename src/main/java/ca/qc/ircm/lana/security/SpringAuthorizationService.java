@@ -220,6 +220,23 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
+  public boolean hasRead(Object object) {
+    if (object == null) {
+      return false;
+    }
+    User currentUser = currentUser();
+    if (object instanceof Experiment) {
+      return isAuthorized((Experiment) object, currentUser, BasePermission.READ);
+    } else if (object instanceof User) {
+      return isAuthorized((User) object, currentUser, BasePermission.READ);
+    } else if (object instanceof Laboratory) {
+      return isAuthorized((Laboratory) object, currentUser, BasePermission.READ);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public void checkRead(Object object) {
     if (object == null) {
       return;

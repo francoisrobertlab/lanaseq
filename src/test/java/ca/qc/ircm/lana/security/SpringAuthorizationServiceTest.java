@@ -258,6 +258,166 @@ public class SpringAuthorizationServiceTest {
     assertFalse(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
   }
 
+  @Test
+  @WithAnonymousUser
+  public void hasRead_Experiment_Anonymous() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasRead_Experiment_Owner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("olivia.brown@ircm.qc.ca")
+  public void hasRead_Experiment_OtherLabMember() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_Experiment_NotOwner() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasRead_Experiment_Manager() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void hasRead_Experiment_ManagerOtherLab() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasRead_Experiment_Admin() throws Throwable {
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_Experiment_AclAllowed() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertTrue(authorizationService.hasRead(experiment));
+
+    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
+    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
+    List<Permission> permissions = permissionsCaptor.getValue();
+    assertEquals(1, permissions.size());
+    assertEquals(BasePermission.READ, permissions.get(0));
+    List<Sid> sids = sidsCaptor.getValue();
+    assertEquals(1, sids.size());
+    assertEquals(new PrincipalSid("5"), sids.get(0));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_Experiment_AclDenied() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertFalse(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasRead_User_Anonymous() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertFalse(authorizationService.hasRead(user));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasRead_User_Self() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasRead(user));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_User_NotSelf() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasRead(user));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasRead_User_Manager() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasRead(user));
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void hasRead_User_ManagerOtherLab() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasRead(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasRead_User_Admin() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    assertTrue(authorizationService.hasRead(user));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasRead_Laboratory_Anonymous() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertFalse(authorizationService.hasRead(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasRead_Laboratory_Member() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_Laboratory_NotMember() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasRead_Laboratory_Admin() throws Throwable {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    assertTrue(authorizationService.hasRead(laboratory));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasRead_Null_Anonymous() throws Throwable {
+    assertFalse(authorizationService.hasRead(null));
+  }
+
+  @Test
+  @WithMockUser
+  public void hasRead_Null() throws Throwable {
+    assertFalse(authorizationService.hasRead(null));
+  }
+
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
   public void checkRead_Experiment_Anonymous() throws Throwable {
