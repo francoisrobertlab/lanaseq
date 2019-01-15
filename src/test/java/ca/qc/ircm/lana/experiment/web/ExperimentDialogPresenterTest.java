@@ -22,6 +22,7 @@ import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -144,6 +145,8 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -157,6 +160,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     Experiment experiment = experimentCaptor.getValue();
     assertEquals(name, experiment.getName());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -172,6 +176,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     experiment = experimentCaptor.getValue();
     assertEquals(name, experiment.getName());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -182,5 +187,6 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     presenter.cancel();
 
     verify(dialog).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 }

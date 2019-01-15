@@ -21,26 +21,12 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 
 /**
- * Save event.
+ * Saved event.
  */
-public class SaveEvent<V> extends ComponentEvent<Component> {
-  private static final long serialVersionUID = -6955805231803503018L;
-  private V savedObject;
+public class SavedEvent<V extends Component> extends ComponentEvent<V> {
+  private static final long serialVersionUID = 1558070508317511253L;
 
-  public SaveEvent(Component source, boolean fromClient) {
+  public SavedEvent(V source, boolean fromClient) {
     super(source, fromClient);
-  }
-
-  public SaveEvent(Component source, boolean fromClient, V savedObject) {
-    super(source, fromClient);
-    this.savedObject = savedObject;
-  }
-
-  public V getSavedObject() {
-    return savedObject;
-  }
-
-  public void setSavedObject(V savedObject) {
-    this.savedObject = savedObject;
   }
 }

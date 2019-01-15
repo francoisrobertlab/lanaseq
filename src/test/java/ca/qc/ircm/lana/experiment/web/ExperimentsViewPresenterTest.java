@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +36,8 @@ import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
+import ca.qc.ircm.lana.web.SavedEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
@@ -64,6 +67,8 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private DataProvider<Experiment, ?> dataProvider;
   @Captor
   private ArgumentCaptor<Experiment> experimentCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<ExperimentDialog>>> savedListenerCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
   @Inject
@@ -186,5 +191,16 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     assertNull(experiment.getId());
     assertNull(experiment.getName());
     verify(view.experimentDialog).open();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshExperimentsOnSaved() {
+    presenter.init(view);
+    verify(view.experimentDialog).addSavedListener(savedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<ExperimentDialog>> savedListener =
+        savedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(experimentService, times(2)).all();
   }
 }

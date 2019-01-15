@@ -79,6 +79,7 @@ public class ExperimentDialogPresenter {
       logger.debug("Save experiment {}", experiment);
       experimentService.save(experiment);
       dialog.close();
+      dialog.fireSavedEvent();
     }
   }
 

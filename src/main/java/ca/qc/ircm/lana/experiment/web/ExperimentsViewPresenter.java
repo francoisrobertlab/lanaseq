@@ -52,17 +52,22 @@ public class ExperimentsViewPresenter {
     this.authorizationService = authorizationService;
   }
 
-  @SuppressWarnings("checkstyle:linelength")
   void init(ExperimentsView view) {
     this.view = view;
+    loadExperiments();
+    view.experimentDialog.addSavedListener(e -> loadExperiments());
+    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      view.ownerFilter.setValue(authorizationService.currentUser().getEmail());
+    }
+  }
+
+  @SuppressWarnings("checkstyle:linelength")
+  private void loadExperiments() {
     experimentsDataProvider = new ListDataProvider<>(experimentService.all());
     ConfigurableFilterDataProvider<Experiment, Void, SerializablePredicate<Experiment>> dataProvider =
         experimentsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     view.experiments.setDataProvider(dataProvider);
-    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      view.ownerFilter.setValue(authorizationService.currentUser().getEmail());
-    }
   }
 
   void view(Experiment experiment) {
