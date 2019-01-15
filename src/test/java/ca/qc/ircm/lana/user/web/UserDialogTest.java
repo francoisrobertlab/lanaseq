@@ -38,7 +38,9 @@ import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +49,10 @@ import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
+import ca.qc.ircm.lana.web.SavedEvent;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
@@ -67,6 +71,8 @@ public class UserDialogTest extends AbstractViewTestCase {
   private UserDialogPresenter presenter;
   @Mock
   private User user;
+  @Mock
+  private ComponentEventListener<SavedEvent<UserDialog>> savedListener;
   @Inject
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
@@ -155,6 +161,20 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
+  }
+
+  @Test
+  public void savedListener() {
+    dialog.addSavedListener(savedListener);
+    dialog.fireSavedEvent();
+    verify(savedListener).onComponentEvent(any());
+  }
+
+  @Test
+  public void savedListener_Remove() {
+    dialog.addSavedListener(savedListener).remove();
+    dialog.fireSavedEvent();
+    verify(savedListener, never()).onComponentEvent(any());
   }
 
   @Test

@@ -53,6 +53,12 @@ public class UsersViewPresenter {
 
   void init(UsersView view) {
     this.view = view;
+    loadUsers();
+    view.userDialog.addSavedListener(e -> loadUsers());
+    view.laboratoryDialog.addSavedListener(e -> loadUsers());
+  }
+
+  private void loadUsers() {
     usersDataProvider = new ListDataProvider<>(userService.all());
     ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
         usersDataProvider.withConfigurableFilter();

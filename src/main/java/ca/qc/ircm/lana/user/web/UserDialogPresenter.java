@@ -207,6 +207,7 @@ public class UserDialogPresenter {
       logger.debug("save user {} in laboratory {}", user, user.getLaboratory());
       userService.save(user, password);
       dialog.close();
+      dialog.fireSavedEvent();
     }
   }
 

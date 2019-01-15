@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -397,6 +398,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -415,6 +418,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(INVALID_EMAIL)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -433,6 +438,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -451,6 +458,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -470,6 +479,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(resources.message(PASSWORDS_NOT_MATCH)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -488,6 +499,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -508,6 +521,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -529,6 +544,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -551,6 +568,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -570,6 +589,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -590,6 +610,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -614,6 +635,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNull(user.getLaboratory().getId());
     assertEquals(newLaboratoryName, user.getLaboratory().getName());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -634,6 +656,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -656,6 +679,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -679,6 +703,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -701,6 +726,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertNotNull(user.getLaboratory());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -723,6 +749,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isManager());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -747,6 +774,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isManager());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -773,6 +801,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(user.isManager());
     assertEquals(laboratory.getId(), user.getLaboratory().getId());
     verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -783,5 +812,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.cancel();
 
     verify(dialog).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 }

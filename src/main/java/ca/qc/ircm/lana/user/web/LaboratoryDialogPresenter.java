@@ -91,6 +91,7 @@ public class LaboratoryDialogPresenter {
       logger.debug("Save laboratory {}", laboratory);
       laboratoryService.save(laboratory);
       dialog.close();
+      dialog.fireSavedEvent();
     }
   }
 

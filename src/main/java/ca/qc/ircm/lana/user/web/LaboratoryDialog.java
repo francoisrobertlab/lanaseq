@@ -24,9 +24,11 @@ import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
 import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.web.SavedEvent;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
@@ -36,6 +38,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -106,6 +109,23 @@ public class LaboratoryDialog extends Dialog implements LocaleChangeObserver, Ba
     } else {
       header.setText(resources.message(HEADER, 0));
     }
+  }
+
+  /**
+   * Adds listener to be informed when a laboratory was saved.
+   *
+   * @param listener
+   *          listener
+   * @return listener registration
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Registration
+      addSavedListener(ComponentEventListener<SavedEvent<LaboratoryDialog>> listener) {
+    return addListener((Class) SavedEvent.class, listener);
+  }
+
+  void fireSavedEvent() {
+    fireEvent(new SavedEvent<>(this, true));
   }
 
   public Laboratory getLaboratory() {

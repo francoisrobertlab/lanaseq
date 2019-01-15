@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -181,6 +182,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -194,6 +197,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     Laboratory laboratory = laboratoryCaptor.getValue();
     assertEquals(name, laboratory.getName());
     verify(dialog).close();
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -209,6 +214,8 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     laboratory = laboratoryCaptor.getValue();
     assertEquals(name, laboratory.getName());
     verify(dialog).close();
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -219,5 +226,6 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.cancel();
 
     verify(dialog).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 }

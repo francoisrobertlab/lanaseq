@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +34,8 @@ import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
+import ca.qc.ircm.lana.web.SavedEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
@@ -61,6 +64,11 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private DataProvider<User, ?> dataProvider;
   @Captor
   private ArgumentCaptor<User> userCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<UserDialog>>> userSavedListenerCaptor;
+  @Captor
+  @SuppressWarnings("checkstyle:linelength")
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<LaboratoryDialog>>> laboratorySavedListenerCaptor;
   @Inject
   private UserRepository userRepository;
   private List<User> users;
@@ -196,5 +204,27 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertNull(user.getName());
     assertNull(user.getLaboratory());
     verify(view.userDialog).open();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshExperimentsOnUserSaved() {
+    presenter.init(view);
+    verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<UserDialog>> savedListener =
+        userSavedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(userService, times(2)).all();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshExperimentsOnLaboratorySaved() {
+    presenter.init(view);
+    verify(view.laboratoryDialog).addSavedListener(laboratorySavedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener =
+        laboratorySavedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(userService, times(2)).all();
   }
 }
