@@ -29,11 +29,16 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.experiment.ExperimentService;
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
-import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserRepository;
+import ca.qc.ircm.lana.user.UserRole;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
 import javax.inject.Inject;
@@ -46,7 +51,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
 public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ExperimentsViewPresenter presenter;
   @Mock
@@ -54,25 +59,34 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Mock
   private ExperimentService experimentService;
   @Mock
+  private AuthorizationService authorizationService;
+  @Mock
   private DataProvider<Experiment, ?> dataProvider;
   @Captor
   private ArgumentCaptor<Experiment> experimentCaptor;
   @Inject
   private ExperimentRepository experimentRepository;
+  @Inject
+  private UserRepository userRepository;
   private List<Experiment> experiments;
+  private User currentUser;
 
   /**
    * Before test.
    */
   @Before
   public void beforeTest() {
-    presenter = new ExperimentsViewPresenter(experimentService);
+    presenter = new ExperimentsViewPresenter(experimentService, authorizationService);
     view.header = new H2();
     view.experiments = new Grid<>();
     view.experiments.setSelectionMode(SelectionMode.MULTI);
+    view.nameFilter = new TextField();
+    view.ownerFilter = new TextField();
     view.experimentDialog = mock(ExperimentDialog.class);
     experiments = experimentRepository.findAll();
     when(experimentService.all()).thenReturn(experiments);
+    currentUser = userRepository.findById(3L).orElse(null);
+    when(authorizationService.currentUser()).thenReturn(currentUser);
   }
 
   @Test
@@ -86,6 +100,24 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.experiments.getSelectedItems().size());
     experiments.forEach(experiment -> view.experiments.select(experiment));
     assertEquals(experiments.size(), view.experiments.getSelectedItems().size());
+  }
+
+  @Test
+  public void ownerFilter_User() {
+    presenter.init(view);
+
+    assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
+    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+  }
+
+  @Test
+  public void ownerFilter_ManagerOrAdmin() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+
+    presenter.init(view);
+
+    assertEquals("", view.ownerFilter.getValue());
+    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test

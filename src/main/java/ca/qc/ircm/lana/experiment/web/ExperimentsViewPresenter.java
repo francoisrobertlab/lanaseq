@@ -19,6 +19,8 @@ package ca.qc.ircm.lana.experiment.web;
 
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentService;
+import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.user.UserRole;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
@@ -36,14 +38,18 @@ public class ExperimentsViewPresenter {
   private ExperimentsView view;
   @Inject
   private ExperimentService experimentService;
+  @Inject
+  private AuthorizationService authorizationService;
   private ListDataProvider<Experiment> experimentsDataProvider;
   private WebExperimentFilter filter = new WebExperimentFilter();
 
   protected ExperimentsViewPresenter() {
   }
 
-  protected ExperimentsViewPresenter(ExperimentService experimentService) {
+  protected ExperimentsViewPresenter(ExperimentService experimentService,
+      AuthorizationService authorizationService) {
     this.experimentService = experimentService;
+    this.authorizationService = authorizationService;
   }
 
   @SuppressWarnings("checkstyle:linelength")
@@ -55,6 +61,9 @@ public class ExperimentsViewPresenter {
     dataProvider.setFilter(filter);
     view.experiments.setDataProvider(dataProvider);
     view.experiments.setItems(experimentService.all());
+    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      view.ownerFilter.setValue(authorizationService.currentUser().getEmail());
+    }
   }
 
   void view(Experiment experiment) {
