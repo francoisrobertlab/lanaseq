@@ -60,7 +60,6 @@ public class ExperimentsViewPresenter {
         experimentsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     view.experiments.setDataProvider(dataProvider);
-    view.experiments.setItems(experimentService.all());
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       view.ownerFilter.setValue(authorizationService.currentUser().getEmail());
     }
