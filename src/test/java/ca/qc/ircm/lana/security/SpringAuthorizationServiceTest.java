@@ -54,6 +54,7 @@ import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
@@ -66,8 +67,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
@@ -321,9 +322,10 @@ public class SpringAuthorizationServiceTest {
     List<Permission> permissions = permissionsCaptor.getValue();
     assertEquals(1, permissions.size());
     assertEquals(BasePermission.READ, permissions.get(0));
+    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("5"), sids.get(0));
+    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
   }
 
   @Test
@@ -331,6 +333,26 @@ public class SpringAuthorizationServiceTest {
   public void hasRead_Experiment_AclDenied() throws Throwable {
     when(aclService.readAclById(any())).thenReturn(acl);
     when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertFalse(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_Experiment_AclNotFoundExceptionOnRead() throws Throwable {
+    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertFalse(authorizationService.hasRead(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasRead_Experiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
 
     assertFalse(authorizationService.hasRead(experiment));
@@ -481,9 +503,10 @@ public class SpringAuthorizationServiceTest {
     List<Permission> permissions = permissionsCaptor.getValue();
     assertEquals(1, permissions.size());
     assertEquals(BasePermission.READ, permissions.get(0));
+    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("5"), sids.get(0));
+    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -491,6 +514,26 @@ public class SpringAuthorizationServiceTest {
   public void checkRead_Experiment_AclDenied() throws Throwable {
     when(aclService.readAclById(any())).thenReturn(acl);
     when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkRead_Experiment_AclNotFoundExceptionOnRead() throws Throwable {
+    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkRead(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkRead_Experiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
 
     authorizationService.checkRead(experiment);
@@ -641,9 +684,10 @@ public class SpringAuthorizationServiceTest {
     List<Permission> permissions = permissionsCaptor.getValue();
     assertEquals(1, permissions.size());
     assertEquals(BasePermission.WRITE, permissions.get(0));
+    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("5"), sids.get(0));
+    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
   }
 
   @Test
@@ -651,6 +695,26 @@ public class SpringAuthorizationServiceTest {
   public void hasWrite_Experiment_AclDenied() throws Throwable {
     when(aclService.readAclById(any())).thenReturn(acl);
     when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_Experiment_AclNotFoundExceptionOnRead() throws Throwable {
+    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void hasWrite_Experiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
 
     assertFalse(authorizationService.hasWrite(experiment));
@@ -808,9 +872,10 @@ public class SpringAuthorizationServiceTest {
     List<Permission> permissions = permissionsCaptor.getValue();
     assertEquals(1, permissions.size());
     assertEquals(BasePermission.WRITE, permissions.get(0));
+    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
     List<Sid> sids = sidsCaptor.getValue();
     assertEquals(1, sids.size());
-    assertEquals(new PrincipalSid("5"), sids.get(0));
+    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -818,6 +883,26 @@ public class SpringAuthorizationServiceTest {
   public void checkWrite_Experiment_AclDenied() throws Throwable {
     when(aclService.readAclById(any())).thenReturn(acl);
     when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_Experiment_AclNotFoundExceptionOnRead() throws Throwable {
+    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
+    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
+    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+
+    authorizationService.checkWrite(experiment);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void checkWrite_Experiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
+    when(aclService.readAclById(any())).thenReturn(acl);
+    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
 
     authorizationService.checkWrite(experiment);

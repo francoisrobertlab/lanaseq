@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
@@ -207,7 +207,8 @@ public class SpringAuthorizationService implements AuthorizationService {
   private boolean isAclAuthorized(Owned owned, Permission permission, User user) {
     try {
       Acl acl = aclService.readAclById(new ObjectIdentityImpl(owned.getClass(), owned.getId()));
-      return acl.isGranted(list(permission), list(new PrincipalSid(String.valueOf(user.getId()))),
+      return acl.isGranted(list(permission),
+          list(new GrantedAuthoritySid(UserAuthority.laboratoryMember(user.getLaboratory()))),
           false);
     } catch (NotFoundException e) {
       return false;
