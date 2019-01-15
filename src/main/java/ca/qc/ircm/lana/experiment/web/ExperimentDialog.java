@@ -95,6 +95,7 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
     name.setLabel(experimentResources.message(NAME));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
+    presenter.localeChange(getLocale());
   }
 
   private void updateHeader() {

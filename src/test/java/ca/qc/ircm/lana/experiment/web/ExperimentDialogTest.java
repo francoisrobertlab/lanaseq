@@ -97,6 +97,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.CHECK.create(), dialog.save);
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel);
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -112,6 +113,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
