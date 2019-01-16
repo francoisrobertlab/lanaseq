@@ -298,4 +298,10 @@ public class UsersViewTest extends AbstractViewTestCase {
 
     verify(presenter).filterLaboratory("test");
   }
+
+  @Test
+  public void add() {
+    clickButton(view.add);
+    verify(presenter).add();
+  }
 }
