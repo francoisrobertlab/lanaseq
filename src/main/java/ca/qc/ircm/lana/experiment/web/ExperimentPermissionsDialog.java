@@ -50,6 +50,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -60,11 +62,13 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ExperimentPermissionsDialog extends Dialog
     implements LocaleChangeObserver, BaseComponent {
-  private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "experiment-permissions-dialog";
   public static final String HEADER = "header";
   public static final String MANAGERS = "managers";
   public static final String READ = "read";
+  private static final long serialVersionUID = 3285639770914046262L;
+  @SuppressWarnings("unused")
+  private static final Logger logger = LoggerFactory.getLogger(ExperimentPermissionsDialog.class);
   protected H2 header = new H2();
   protected Grid<User> managers = new Grid<>();
   protected Column<User> laboratory;
@@ -119,7 +123,7 @@ public class ExperimentPermissionsDialog extends Dialog
     presenter.init(this);
   }
 
-  private Checkbox read(User user) {
+  Checkbox read(User user) {
     if (reads.containsKey(user)) {
       return reads.get(user);
     }

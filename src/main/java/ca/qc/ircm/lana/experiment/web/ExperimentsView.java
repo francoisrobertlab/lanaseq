@@ -21,9 +21,12 @@ import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lana.text.Strings.normalize;
+import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
+import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
 import ca.qc.ircm.lana.experiment.Experiment;
@@ -36,6 +39,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -63,7 +67,10 @@ public class ExperimentsView extends Composite<VerticalLayout>
   public static final String VIEW_NAME = "experiments";
   public static final String HEADER = "header";
   public static final String EXPERIMENTS = "experiments";
+  public static final String EXPERIMENTS_REQUIRED = property(EXPERIMENTS, REQUIRED);
   public static final String ADD = "add";
+  public static final String PERMISSIONS = "permissions";
+  public static final String PERMISSIONS_DENIED = property(PERMISSIONS, "denied");
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<Experiment> experiments = new Grid<>();
@@ -72,27 +79,34 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected Column<Experiment> owner;
   protected TextField nameFilter = new TextField();
   protected TextField ownerFilter = new TextField();
+  protected Div error = new Div();
   protected Button add = new Button();
+  protected Button permissions = new Button();
   @Inject
   protected ExperimentDialog experimentDialog;
+  @Inject
+  protected ExperimentPermissionsDialog experimentPermissionsDialog;
   @Inject
   private transient ExperimentsViewPresenter presenter;
 
   public ExperimentsView() {
   }
 
-  protected ExperimentsView(ExperimentsViewPresenter presenter, ExperimentDialog experimentDialog) {
+  protected ExperimentsView(ExperimentsViewPresenter presenter, ExperimentDialog experimentDialog,
+      ExperimentPermissionsDialog experimentPermissionsDialog) {
     this.presenter = presenter;
     this.experimentDialog = experimentDialog;
+    this.experimentPermissionsDialog = experimentPermissionsDialog;
   }
 
   @PostConstruct
   void init() {
     VerticalLayout root = getContent();
     root.setId(VIEW_NAME);
-    root.add(header);
+    HorizontalLayout buttonsLayout = new HorizontalLayout();
+    root.add(header, experiments, error, buttonsLayout);
+    buttonsLayout.add(add, permissions);
     header.addClassName(HEADER);
-    root.add(experiments);
     experiments.addClassName(EXPERIMENTS);
     name =
         experiments.addColumn(new ComponentRenderer<>(experiment -> viewButton(experiment)), NAME)
@@ -113,11 +127,11 @@ public class ExperimentsView extends Composite<VerticalLayout>
     ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
-    HorizontalLayout buttonsLayout = new HorizontalLayout();
-    root.add(buttonsLayout);
-    buttonsLayout.add(add);
+    error.addClassName(ERROR_TEXT);
     add.addClassName(ADD);
     add.addClickListener(e -> presenter.add());
+    permissions.addClassName(PERMISSIONS);
+    permissions.addClickListener(e -> presenter.permissions());
     presenter.init(this);
   }
 
@@ -145,6 +159,9 @@ public class ExperimentsView extends Composite<VerticalLayout>
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
+    permissions.setText(resources.message(PERMISSIONS));
+    permissions.setIcon(VaadinIcon.LOCK.create());
+    presenter.localeChange(getLocale());
   }
 
   @Override

@@ -65,7 +65,11 @@ public class ExperimentPermissionsDialogPresenter {
   }
 
   void init(ExperimentPermissionsDialog dialog) {
-    logger.debug("open experiments permissions dialog for experiment {}", experiment);
+    dialog.addOpenedChangeListener(e -> {
+      if (e.isOpened()) {
+        logger.debug("open experiments permissions dialog for experiment {}", experiment);
+      }
+    });
     this.dialog = dialog;
     List<User> managers = userService.managers();
     Set<Laboratory> laboratories = new HashSet<>();
@@ -76,6 +80,7 @@ public class ExperimentPermissionsDialogPresenter {
         managersDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     dialog.managers.setDataProvider(dataProvider);
+    managers.forEach(user -> dialog.read(user));
     initReads();
   }
 
@@ -83,6 +88,8 @@ public class ExperimentPermissionsDialogPresenter {
     if (dialog == null) {
       return;
     }
+    dialog.reads.clear();
+    managersDataProvider.getItems().forEach(user -> dialog.read(user));
     if (experiment != null) {
       Set<Long> laboratoriesId = experimentService.permissions(experiment).stream()
           .map(lab -> lab.getId()).collect(Collectors.toSet());
@@ -115,11 +122,16 @@ public class ExperimentPermissionsDialogPresenter {
   }
 
   void save() {
+    if (experiment == null) {
+      throw new IllegalStateException("Cannot update permissions without an experiment");
+    }
     List<Laboratory> laboratories = dialog.reads.entrySet().stream()
         .filter(entry -> entry.getValue().getValue()).map(entry -> entry.getKey().getLaboratory())
         .filter(lab -> !lab.getId().equals(experiment.getOwner().getLaboratory().getId()))
         .collect(Collectors.toList());
+    logger.info("save read for laboratories {} for experiment {}", laboratories, experiment);
     experimentService.savePermissions(experiment, laboratories);
+    dialog.close();
   }
 
   void cancel() {

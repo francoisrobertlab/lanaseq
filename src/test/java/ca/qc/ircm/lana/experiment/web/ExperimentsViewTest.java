@@ -23,11 +23,13 @@ import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.ADD;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.EXPERIMENTS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.HEADER;
+import static ca.qc.ircm.lana.experiment.web.ExperimentsView.PERMISSIONS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -54,6 +56,7 @@ import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -78,6 +81,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   private ExperimentsViewPresenter presenter;
   @Mock
   private ExperimentDialog experimentDialog;
+  @Mock
+  private ExperimentPermissionsDialog experimentPermissionsDialog;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, Experiment>> buttonRendererCaptor;
   @Captor
@@ -100,7 +105,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new ExperimentsView(presenter, experimentDialog);
+    view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
     view.init();
     experiments = experimentRepository.findAll();
   }
@@ -142,7 +147,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
     assertTrue(view.header.getClassNames().contains(HEADER));
     assertTrue(view.experiments.getClassNames().contains(EXPERIMENTS));
+    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertTrue(view.add.getClassNames().contains(ADD));
+    assertTrue(view.permissions.getClassNames().contains(PERMISSIONS));
   }
 
   @Test
@@ -160,11 +167,14 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
+    assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
+    validateIcon(VaadinIcon.LOCK.create(), view.permissions);
+    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void localeChange() {
-    view = new ExperimentsView(presenter, experimentDialog);
+    view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -184,6 +194,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
+    assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
+    validateIcon(VaadinIcon.LOCK.create(), view.permissions);
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -193,16 +206,17 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void experiments_Columns() {
+  public void experiments() {
     assertEquals(3, view.experiments.getColumns().size());
     assertNotNull(view.experiments.getColumnByKey(NAME));
     assertNotNull(view.experiments.getColumnByKey(DATE));
     assertNotNull(view.experiments.getColumnByKey(OWNER));
+    assertTrue(view.experiments.getSelectionModel() instanceof SelectionModel.Single);
   }
 
   @Test
   public void experiments_ColumnsValueProvider() {
-    view = new ExperimentsView(presenter, experimentDialog);
+    view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
     mockColumns();
     view.init();
     verify(view.experiments).addColumn(buttonRendererCaptor.capture(), eq(NAME));
@@ -259,5 +273,17 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.ownerFilter.setValue("test");
 
     verify(presenter).filterOwner("test");
+  }
+
+  @Test
+  public void add() {
+    clickButton(view.add);
+    verify(presenter).add();
+  }
+
+  @Test
+  public void permissions() {
+    clickButton(view.permissions);
+    verify(presenter).permissions();
   }
 }

@@ -17,12 +17,16 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.experiment.web.ExperimentsView.EXPERIMENTS_REQUIRED;
+import static ca.qc.ircm.lana.experiment.web.ExperimentsView.PERMISSIONS_DENIED;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,13 +41,17 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.web.SavedEvent;
+import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
+import java.util.Locale;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,6 +81,8 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ExperimentRepository experimentRepository;
   @Inject
   private UserRepository userRepository;
+  private Locale locale = Locale.ENGLISH;
+  private MessageResource resources = new MessageResource(ExperimentsView.class, locale);
   private List<Experiment> experiments;
   private User currentUser;
 
@@ -87,7 +97,11 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     view.experiments.setSelectionMode(SelectionMode.MULTI);
     view.nameFilter = new TextField();
     view.ownerFilter = new TextField();
+    view.error = new Div();
+    view.add = new Button();
+    view.permissions = new Button();
     view.experimentDialog = mock(ExperimentDialog.class);
+    view.experimentPermissionsDialog = mock(ExperimentPermissionsDialog.class);
     experiments = experimentRepository.findAll();
     when(experimentService.all()).thenReturn(experiments);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -97,6 +111,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void experiments() {
     presenter.init(view);
+    presenter.localeChange(locale);
     List<Experiment> experiments = items(view.experiments);
     assertEquals(this.experiments.size(), experiments.size());
     for (Experiment experiment : this.experiments) {
@@ -110,6 +125,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void ownerFilter_User() {
     presenter.init(view);
+    presenter.localeChange(locale);
 
     assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
@@ -120,6 +136,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
 
     presenter.init(view);
+    presenter.localeChange(locale);
 
     assertEquals("", view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
@@ -128,6 +145,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterName() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.experiments.setDataProvider(dataProvider);
 
     presenter.filterName("test");
@@ -139,6 +157,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterName_Empty() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.experiments.setDataProvider(dataProvider);
 
     presenter.filterName("");
@@ -148,8 +167,9 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void filterLaboratory() {
+  public void filterOwner() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.experiments.setDataProvider(dataProvider);
 
     presenter.filterOwner("test");
@@ -159,8 +179,9 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void filterLaboratory_Empty() {
+  public void filterOwner_Empty() {
     presenter.init(view);
+    presenter.localeChange(locale);
     view.experiments.setDataProvider(dataProvider);
 
     presenter.filterOwner("");
@@ -170,8 +191,16 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void error() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    assertFalse(view.error.isVisible());
+  }
+
+  @Test
   public void view() {
     presenter.init(view);
+    presenter.localeChange(locale);
     Experiment experiment = new Experiment();
     experiment.setId(2L);
     Experiment databaseExperiment = new Experiment();
@@ -185,6 +214,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void add() {
     presenter.init(view);
+    presenter.localeChange(locale);
     presenter.add();
     verify(view.experimentDialog).setExperiment(experimentCaptor.capture());
     Experiment experiment = experimentCaptor.getValue();
@@ -194,9 +224,83 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void permissions() {
+    Experiment experiment = experiments.get(2);
+    when(authorizationService.hasWrite(experiment)).thenReturn(true);
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.experiments.select(experiment);
+    presenter.permissions();
+    assertFalse(view.error.isVisible());
+    verify(view.experimentPermissionsDialog).setExperiment(experiment);
+    verify(view.experimentPermissionsDialog).open();
+  }
+
+  @Test
+  public void permissions_NoExperiment() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.permissions();
+    assertEquals(resources.message(EXPERIMENTS_REQUIRED), view.error.getText());
+    assertTrue(view.error.isVisible());
+    verify(view.experimentPermissionsDialog, never()).setExperiment(any());
+    verify(view.experimentPermissionsDialog, never()).open();
+  }
+
+  @Test
+  public void permissions_Denied() {
+    Experiment experiment = experiments.get(2);
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.experiments.select(experiment);
+    presenter.permissions();
+    assertEquals(resources.message(PERMISSIONS_DENIED), view.error.getText());
+    assertTrue(view.error.isVisible());
+    verify(view.experimentPermissionsDialog, never()).setExperiment(any());
+    verify(view.experimentPermissionsDialog, never()).open();
+  }
+
+  @Test
+  public void permissions_ErrorThenView() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.permissions();
+    presenter.view(experiments.get(1));
+    assertFalse(view.error.isVisible());
+  }
+
+  @Test
+  public void permissions_ErrorThenAdd() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.permissions();
+    presenter.add();
+    assertFalse(view.error.isVisible());
+  }
+
+  @Test
+  public void permissions_ErrorThenFilterName() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.permissions();
+    presenter.filterName("");
+    assertFalse(view.error.isVisible());
+  }
+
+  @Test
+  public void permissions_ErrorThenFilterOwner() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.permissions();
+    presenter.filterOwner("");
+    assertFalse(view.error.isVisible());
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void refreshExperimentsOnSaved() {
     presenter.init(view);
+    presenter.localeChange(locale);
     verify(view.experimentDialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ExperimentDialog>> savedListener =
         savedListenerCaptor.getValue();

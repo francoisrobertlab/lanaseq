@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,10 +47,10 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,8 +101,16 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     dialog.cancel = new Button();
     experiment = experimentRepository.findById(2L).orElse(null);
     managers = userRepository.findByManagerTrue();
-    dialog.reads =
-        managers.stream().collect(Collectors.toMap(user -> user, user -> new Checkbox()));
+    dialog.reads = new HashMap<>();
+    when(dialog.read(any())).thenAnswer(i -> {
+      User user = (User) i.getArgument(0);
+      if (dialog.reads.containsKey(user)) {
+        return dialog.reads.get(user);
+      }
+      Checkbox checkbox = new Checkbox();
+      dialog.reads.put(user, checkbox);
+      return checkbox;
+    });
     User manager = userRepository.findById(2L).orElse(null);
     secondManager.setLaboratory(manager.getLaboratory());
     when(userService.managers()).thenReturn(managers);
@@ -132,6 +141,7 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     presenter.setExperiment(experiment);
 
     for (User manager : managers) {
+      verify(dialog, atLeastOnce()).read(manager);
       if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
         assertTrue(dialog.reads.get(manager).getValue());
         assertTrue(dialog.reads.get(manager).isReadOnly());
@@ -257,6 +267,7 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     Collection<Laboratory> laboratories = laboratoriesCaptor.getValue();
     assertEquals(1, laboratories.size());
     assertTrue(find(laboratories, 3L).isPresent());
+    verify(dialog).close();
   }
 
   @Test
@@ -273,6 +284,7 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     assertEquals(2, laboratories.size());
     assertTrue(find(laboratories, 1L).isPresent());
     assertTrue(find(laboratories, 3L).isPresent());
+    verify(dialog).close();
   }
 
   @Test
