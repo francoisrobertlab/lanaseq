@@ -31,6 +31,7 @@ import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
+import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -44,9 +45,18 @@ public class AclConfiguration {
   @Inject
   private CacheManager cacheManager;
 
+  /**
+   * Returns {@link AclService} instance.
+   *
+   * @return {@link AclService} instance
+   */
   @Bean
   public JdbcMutableAclService aclService() {
-    return new JdbcMutableAclService(dataSource, lookupStrategy(), aclCache());
+    JdbcMutableAclService aclService =
+        new JdbcMutableAclService(dataSource, lookupStrategy(), aclCache());
+    aclService.setClassIdentityQuery("SELECT LAST_INSERT_ID()");
+    aclService.setSidIdentityQuery("SELECT LAST_INSERT_ID()");
+    return aclService;
   }
 
   @Bean
