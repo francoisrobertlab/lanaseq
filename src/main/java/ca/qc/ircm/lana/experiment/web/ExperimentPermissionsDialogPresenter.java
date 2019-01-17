@@ -20,6 +20,7 @@ package ca.qc.ircm.lana.experiment.web;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentService;
 import ca.qc.ircm.lana.user.Laboratory;
+import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.user.web.WebUserFilter;
@@ -28,8 +29,8 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -50,6 +51,8 @@ public class ExperimentPermissionsDialogPresenter {
   @Inject
   private ExperimentService experimentService;
   @Inject
+  private LaboratoryService laboratoryService;
+  @Inject
   private UserService userService;
   private Experiment experiment;
   private ListDataProvider<User> managersDataProvider;
@@ -59,8 +62,9 @@ public class ExperimentPermissionsDialogPresenter {
   }
 
   protected ExperimentPermissionsDialogPresenter(ExperimentService experimentService,
-      UserService userService) {
+      LaboratoryService laboratoryService, UserService userService) {
     this.experimentService = experimentService;
+    this.laboratoryService = laboratoryService;
     this.userService = userService;
   }
 
@@ -71,9 +75,9 @@ public class ExperimentPermissionsDialogPresenter {
       }
     });
     this.dialog = dialog;
-    List<User> managers = userService.managers();
-    Set<Laboratory> laboratories = new HashSet<>();
-    managers = managers.stream().filter(user -> laboratories.add(user.getLaboratory()))
+    List<Laboratory> laboratories = laboratoryService.all();
+    List<User> managers = laboratories.stream()
+        .map(lab -> Optional.ofNullable(userService.manager(lab)).orElse(fakeManager(lab)))
         .collect(Collectors.toList());
     managersDataProvider = new ListDataProvider<>(managers);
     ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
@@ -82,6 +86,12 @@ public class ExperimentPermissionsDialogPresenter {
     dialog.managers.setDataProvider(dataProvider);
     managers.forEach(user -> dialog.read(user));
     initReads();
+  }
+
+  private User fakeManager(Laboratory laboratory) {
+    User user = new User();
+    user.setLaboratory(laboratory);
+    return user;
   }
 
   private void initReads() {

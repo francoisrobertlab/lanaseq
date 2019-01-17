@@ -204,17 +204,6 @@ public class UserServiceTest {
   }
 
   @Test
-  public void managers() {
-    List<User> users = userService.managers();
-
-    assertEquals(3, users.size());
-    assertTrue(find(users, 1L).isPresent());
-    assertTrue(find(users, 2L).isPresent());
-    assertTrue(find(users, 5L).isPresent());
-    verify(authorizationService).checkRole(USER);
-  }
-
-  @Test
   public void save_AddAdmin() {
     User user = new User();
     user.setName("Test User");

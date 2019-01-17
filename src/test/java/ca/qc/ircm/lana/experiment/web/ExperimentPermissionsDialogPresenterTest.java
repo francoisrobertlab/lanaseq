@@ -38,6 +38,7 @@ import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
+import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
@@ -50,7 +51,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +77,8 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   @Mock
   private ExperimentService experimentService;
   @Mock
+  private LaboratoryService laboratoryService;
+  @Mock
   private UserService userService;
   @Mock
   private DataProvider<User, ?> managersDataProvider;
@@ -82,11 +87,13 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   @Inject
   private ExperimentRepository experimentRepository;
   @Inject
-  private UserRepository userRepository;
-  @Inject
   private LaboratoryRepository laboratoryRepository;
+  @Inject
+  private UserRepository userRepository;
   private Experiment experiment;
+  private List<Laboratory> laboratories;
   private List<User> managers;
+  private Map<Laboratory, User> managersByLaboratory;
   private User secondManager = new User(800L, "second.manager@ircm.qc.ca");
 
   /**
@@ -94,13 +101,19 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
    */
   @Before
   public void beforeTest() {
-    presenter = new ExperimentPermissionsDialogPresenter(experimentService, userService);
+    presenter =
+        new ExperimentPermissionsDialogPresenter(experimentService, laboratoryService, userService);
     dialog.header = new H2();
     dialog.managers = new Grid<>();
     dialog.save = new Button();
     dialog.cancel = new Button();
     experiment = experimentRepository.findById(2L).orElse(null);
+    laboratories = laboratoryRepository.findAll();
+    when(laboratoryService.all()).thenReturn(laboratories);
     managers = userRepository.findByManagerTrueAndActiveTrue();
+    managersByLaboratory =
+        managers.stream().collect(Collectors.toMap(user -> user.getLaboratory(), user -> user));
+    when(userService.manager(any())).thenAnswer(i -> managersByLaboratory.get(i.getArgument(0)));
     dialog.reads = new HashMap<>();
     when(dialog.read(any())).thenAnswer(i -> {
       User user = (User) i.getArgument(0);
@@ -111,9 +124,6 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
       dialog.reads.put(user, checkbox);
       return checkbox;
     });
-    User manager = userRepository.findById(2L).orElse(null);
-    secondManager.setLaboratory(manager.getLaboratory());
-    when(userService.managers()).thenReturn(managers);
   }
 
   @Test
