@@ -664,7 +664,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
-    User user = userRepository.findById(5L).get();
+    User user = userRepository.findById(6L).get();
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();

@@ -100,7 +100,7 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     dialog.save = new Button();
     dialog.cancel = new Button();
     experiment = experimentRepository.findById(2L).orElse(null);
-    managers = userRepository.findByManagerTrue();
+    managers = userRepository.findByManagerTrueAndActiveTrue();
     dialog.reads = new HashMap<>();
     when(dialog.read(any())).thenAnswer(i -> {
       User user = (User) i.getArgument(0);

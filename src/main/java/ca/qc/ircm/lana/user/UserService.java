@@ -101,13 +101,26 @@ public class UserService {
   }
 
   /**
+   * Returns laboratory's manager. <br>
+   * If laboratory has many managers, returns anyone of them.
+   *
+   * @return laboratory's manager
+   */
+  public User manager(Laboratory laboratory) {
+    authorizationService.checkRole(USER);
+    List<User> users = repository.findByLaboratoryAndManagerTrueAndActiveTrue(laboratory);
+    return !users.isEmpty() ? users.get(0) : null;
+  }
+
+  /**
    * Returns all managers.
    *
    * @return all managers
    */
+  @Deprecated
   public List<User> managers() {
     authorizationService.checkRole(USER);
-    return repository.findByManagerTrue();
+    return repository.findByManagerTrueAndActiveTrue();
   }
 
   /**

@@ -28,12 +28,14 @@ VALUES ('2', 'francois.robert@ircm.qc.ca', 'Francois Robert', '$2a$10$nGJQSCEj1x
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
 VALUES ('3', 'jonh.smith@ircm.qc.ca', 'Jonh Smith', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 2, '2018-12-07 15:40:12', 1, 0, 0, 0, 2, null, '2018-11-20 09:48:47');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
-VALUES ('4', 'benoit.coulombe@ircm.qc.ca', 'Benoit Coulombe', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2018-11-26 15:40:12', 1, 1, 0, 0, 3, null, '2018-11-21 09:36:43');
+VALUES ('4', 'ava.martin@ircm.qc.ca', 'Ava Martin', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2018-11-26 15:35:12', 0, 1, 0, 0, 3, null, '2018-11-21 09:31:43');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
-VALUES ('5', 'christian.poitras@ircm.qc.ca', 'Christian Poitras', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 3, '2018-12-17 15:20:12', 1, 0, 0, 1, 3, null, '2018-11-21 10:14:53');
+VALUES ('5', 'benoit.coulombe@ircm.qc.ca', 'Benoit Coulombe', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2018-11-26 15:40:12', 1, 1, 0, 0, 3, null, '2018-11-21 09:36:43');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
-VALUES ('6', 'inactive.user@ircm.qc.ca', 'Inactive User', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 3, '2018-12-17 15:20:12', 0, 0, 0, 0, 3, null, '2018-11-21 10:15:47');
+VALUES ('6', 'christian.poitras@ircm.qc.ca', 'Christian Poitras', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 3, '2018-12-17 15:20:12', 1, 0, 0, 1, 3, null, '2018-11-21 10:14:53');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
-VALUES ('7', 'virginie.calderon@ircm.qc.ca', 'Virginie Calderon', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-04 13:31:24', 1, 0, 1, 0, 1, null, '2018-11-24 10:08:03');
+VALUES ('7', 'inactive.user@ircm.qc.ca', 'Inactive User', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 3, '2018-12-17 15:20:12', 0, 0, 0, 0, 3, null, '2018-11-21 10:15:47');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
-VALUES ('8', 'olivia.brown@ircm.qc.ca', 'Olivia Brown', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-14 15:18:24', 1, 0, 0, 0, 2, null, '2019-01-14 15:10:24');
+VALUES ('8', 'virginie.calderon@ircm.qc.ca', 'Virginie Calderon', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-04 13:31:24', 1, 0, 1, 0, 1, null, '2018-11-24 10:08:03');
+INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
+VALUES ('9', 'olivia.brown@ircm.qc.ca', 'Olivia Brown', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-14 15:18:24', 1, 0, 0, 0, 2, null, '2019-01-14 15:10:24');

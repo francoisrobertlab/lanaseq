@@ -153,7 +153,7 @@ public class UserServiceTest {
 
     List<User> users = userService.all();
 
-    assertEquals(8, users.size());
+    assertEquals(9, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
@@ -167,7 +167,7 @@ public class UserServiceTest {
 
     List<User> users = userService.all();
 
-    assertEquals(8, users.size());
+    assertEquals(9, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
@@ -180,10 +180,26 @@ public class UserServiceTest {
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
     List<User> users = userService.all();
 
-    assertEquals(8, users.size());
+    assertEquals(9, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
+    verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
+  public void manager() {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+    User user = userService.manager(laboratory);
+    assertEquals((Long) 2L, user.getId());
+    verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
+  public void manager_OnlyActive() {
+    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
+    User user = userService.manager(laboratory);
+    assertEquals((Long) 5L, user.getId());
     verify(authorizationService).checkRole(USER);
   }
 
@@ -194,7 +210,7 @@ public class UserServiceTest {
     assertEquals(3, users.size());
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
-    assertTrue(find(users, 4L).isPresent());
+    assertTrue(find(users, 5L).isPresent());
     verify(authorizationService).checkRole(USER);
   }
 
@@ -491,7 +507,7 @@ public class UserServiceTest {
     user = userRepository.findById(3L).get();
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     userService.save(user, null);
-    user = userRepository.findById(8L).get();
+    user = userRepository.findById(9L).get();
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     userService.save(user, null);
 
