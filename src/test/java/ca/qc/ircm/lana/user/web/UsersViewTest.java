@@ -49,11 +49,11 @@ import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -198,10 +198,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_SelectionMode() {
-    view = new UsersView(presenter, userDialog, laboratoryDialog);
-    mockColumns();
-    view.init();
-    verify(view.users).setSelectionMode(SelectionMode.MULTI);
+    assertTrue(view.users.getSelectionModel() instanceof SelectionModel.Single);
   }
 
   @Test

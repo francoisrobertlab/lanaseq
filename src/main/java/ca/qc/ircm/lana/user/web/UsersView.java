@@ -36,7 +36,6 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -99,7 +98,6 @@ public class UsersView extends Composite<VerticalLayout>
     header.addClassName(HEADER);
     root.add(users);
     users.addClassName(USERS);
-    users.setSelectionMode(SelectionMode.MULTI);
     email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME);
