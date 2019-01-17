@@ -29,7 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   List<User> findByManagerTrue();
 
-  List<User> findByLaboratory(Laboratory laboratory);
-
   long countByLaboratory(Laboratory laboratory);
 }
