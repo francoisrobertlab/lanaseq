@@ -18,7 +18,10 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lana.text.Strings.property;
+import static ca.qc.ircm.lana.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
@@ -28,6 +31,9 @@ import static ca.qc.ircm.lana.user.web.UsersView.USERS;
 import static ca.qc.ircm.lana.user.web.UsersView.VIEW_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.ERROR;
+import static ca.qc.ircm.lana.web.WebConstants.SUCCESS;
+import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,6 +41,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,6 +53,7 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -54,12 +62,14 @@ import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,6 +134,11 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
     when(view.laboratory.setComparator(any(Comparator.class))).thenReturn(view.laboratory);
     when(view.laboratory.setHeader(any(String.class))).thenReturn(view.laboratory);
+    view.active = mock(Column.class);
+    when(view.users.addColumn(any(ComponentRenderer.class), eq(ACTIVE))).thenReturn(view.active);
+    when(view.active.setKey(any())).thenReturn(view.active);
+    when(view.active.setComparator(any(Comparator.class))).thenReturn(view.active);
+    when(view.active.setHeader(any(String.class))).thenReturn(view.active);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.users.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell emailFilterCell = mock(HeaderCell.class);
@@ -132,6 +147,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
     HeaderCell laboratoryFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.laboratory)).thenReturn(laboratoryFilterCell);
+    HeaderCell activeFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.active)).thenReturn(activeFilterCell);
   }
 
   @Test
@@ -158,9 +175,17 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(userResources.message(NAME));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
+    verify(view.active).setHeader(userResources.message(ACTIVE));
+    verify(view.active).setFooter(userResources.message(ACTIVE));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL),
+        view.activeFilter.getItemLabelGenerator().apply(Optional.empty()));
+    assertEquals(userResources.message(property(ACTIVE, false)),
+        view.activeFilter.getItemLabelGenerator().apply(Optional.of(false)));
+    assertEquals(userResources.message(property(ACTIVE, true)),
+        view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -183,9 +208,17 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(userResources.message(NAME));
     verify(view.laboratory).setHeader(userResources.message(LABORATORY));
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
+    verify(view.active).setHeader(userResources.message(ACTIVE));
+    verify(view.active).setFooter(userResources.message(ACTIVE));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL),
+        view.activeFilter.getItemLabelGenerator().apply(Optional.empty()));
+    assertEquals(userResources.message(property(ACTIVE, false)),
+        view.activeFilter.getItemLabelGenerator().apply(Optional.of(false)));
+    assertEquals(userResources.message(property(ACTIVE, true)),
+        view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(resources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add);
   }
@@ -203,14 +236,20 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_Columns() {
-    assertEquals(3, view.users.getColumns().size());
+    assertEquals(4, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertNotNull(view.users.getColumnByKey(NAME));
     assertNotNull(view.users.getColumnByKey(LABORATORY));
+    assertNotNull(view.users.getColumnByKey(ACTIVE));
   }
 
   @Test
   public void users_ColumnsValueProvider() {
+    doAnswer(i -> {
+      User user = i.getArgument(0);
+      user.setActive(!user.isActive());
+      return null;
+    }).when(presenter).toggleActive(any());
     view = new UsersView(presenter, userDialog, laboratoryDialog);
     mockColumns();
     view.init();
@@ -259,6 +298,30 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(lab("test"), lab("abc")) > 0);
     assertTrue(comparator.compare(lab("Test"), lab("abc")) > 0);
     assertTrue(comparator.compare(lab("facteur"), lab("élement")) > 0);
+    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(ACTIVE));
+    buttonRenderer = buttonRendererCaptor.getValue();
+    for (User user : users) {
+      Button button = buttonRenderer.createComponent(user);
+      assertTrue(button.getClassNames().contains(ACTIVE));
+      assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
+      assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
+      validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
+          button);
+      boolean previousActive = user.isActive();
+      clickButton(button);
+      verify(presenter, atLeastOnce()).toggleActive(user);
+      assertEquals(!previousActive, user.isActive());
+      assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
+      assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
+      validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
+          button);
+    }
+    verify(view.active).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(active(false), active(true)) < 0);
+    assertTrue(comparator.compare(active(false), active(false)) == 0);
+    assertTrue(comparator.compare(active(true), active(true)) == 0);
+    assertTrue(comparator.compare(active(true), active(false)) > 0);
   }
 
   private User email(String email) {
@@ -275,11 +338,29 @@ public class UsersViewTest extends AbstractViewTestCase {
     return user;
   }
 
+  private User active(boolean active) {
+    User user = new User();
+    user.setActive(active);
+    return user;
+  }
+
+  @Test
+  public void emailFilter() {
+    assertEquals("", view.emailFilter.getValue());
+    assertEquals(ValueChangeMode.EAGER, view.emailFilter.getValueChangeMode());
+  }
+
   @Test
   public void filterEmail() {
     view.emailFilter.setValue("test");
 
     verify(presenter).filterEmail("test");
+  }
+
+  @Test
+  public void nameFilter() {
+    assertEquals("", view.nameFilter.getValue());
+    assertEquals(ValueChangeMode.EAGER, view.nameFilter.getValueChangeMode());
   }
 
   @Test
@@ -290,10 +371,41 @@ public class UsersViewTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void laboratoryFilter() {
+    assertEquals("", view.laboratoryFilter.getValue());
+    assertEquals(ValueChangeMode.EAGER, view.laboratoryFilter.getValueChangeMode());
+  }
+
+  @Test
   public void filterLaboratory() {
     view.laboratoryFilter.setValue("test");
 
     verify(presenter).filterLaboratory("test");
+  }
+
+  @Test
+  public void activeFilter() {
+    view.onAttach(mock(AttachEvent.class));
+    assertEquals(Optional.empty(), view.activeFilter.getValue());
+    List<Optional<Boolean>> values = items(view.activeFilter);
+    assertEquals(3, values.size());
+    assertTrue(values.contains(Optional.empty()));
+    assertTrue(values.contains(Optional.of(false)));
+    assertTrue(values.contains(Optional.of(true)));
+  }
+
+  @Test
+  public void filterActive_False() {
+    view.activeFilter.setValue(Optional.of(false));
+
+    verify(presenter).filterActive(false);
+  }
+
+  @Test
+  public void filterActive_True() {
+    view.activeFilter.setValue(Optional.of(true));
+
+    verify(presenter).filterActive(true);
   }
 
   @Test

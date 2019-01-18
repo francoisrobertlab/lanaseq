@@ -18,6 +18,8 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.text.Strings.normalize;
+import static ca.qc.ircm.lana.text.Strings.property;
+import static ca.qc.ircm.lana.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
@@ -25,6 +27,9 @@ import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.web.WebConstants.ERROR;
+import static ca.qc.ircm.lana.web.WebConstants.SUCCESS;
+import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
 import ca.qc.ircm.lana.user.User;
@@ -32,8 +37,10 @@ import ca.qc.ircm.lana.web.ViewLayout;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -48,6 +55,9 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -69,10 +79,13 @@ public class UsersView extends Composite<VerticalLayout>
   protected Column<User> email;
   protected Column<User> name;
   protected Column<User> laboratory;
+  protected Column<User> active;
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected TextField laboratoryFilter = new TextField();
+  protected ComboBox<Optional<Boolean>> activeFilter = new ComboBox<>();
   protected Button add = new Button();
+  private Map<User, Button> actives = new HashMap<>();
   @Inject
   protected UserDialog userDialog;
   @Inject
@@ -90,6 +103,7 @@ public class UsersView extends Composite<VerticalLayout>
     this.laboratoryDialog = laboratoryDialog;
   }
 
+  @SuppressWarnings("unchecked")
   @PostConstruct
   void init() {
     VerticalLayout root = getContent();
@@ -105,6 +119,8 @@ public class UsersView extends Composite<VerticalLayout>
         users.addColumn(new ComponentRenderer<>(user -> viewLaboratoryButton(user)), LABORATORY)
             .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
                 .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
+    active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
+        .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();
     filtersRow.getCell(email).setComponent(emailFilter);
@@ -119,6 +135,10 @@ public class UsersView extends Composite<VerticalLayout>
     laboratoryFilter.addValueChangeListener(e -> presenter.filterLaboratory(e.getValue()));
     laboratoryFilter.setValueChangeMode(ValueChangeMode.EAGER);
     laboratoryFilter.setSizeFull();
+    filtersRow.getCell(active).setComponent(activeFilter);
+    activeFilter.setItems(Optional.empty(), Optional.of(false), Optional.of(true));
+    activeFilter.addValueChangeListener(e -> presenter.filterActive(e.getValue().orElse(null)));
+    activeFilter.setSizeFull();
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(buttonsLayout);
     buttonsLayout.add(add);
@@ -143,6 +163,25 @@ public class UsersView extends Composite<VerticalLayout>
     return button;
   }
 
+  private Button activeButton(User user) {
+    Button button = new Button();
+    button.addClassName(ACTIVE);
+    actives.put(user, button);
+    updateActiveButton(button, user);
+    button.addClickListener(e -> {
+      presenter.toggleActive(user);
+      updateActiveButton(button, user);
+    });
+    return button;
+  }
+
+  private void updateActiveButton(Button button, User user) {
+    final MessageResource userResources = new MessageResource(User.class, getLocale());
+    button.setIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create());
+    button.setText(userResources.message(property(ACTIVE, user.isActive())));
+    button.getElement().setAttribute(THEME, user.isActive() ? SUCCESS : ERROR);
+  }
+
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final MessageResource resources = new MessageResource(UsersView.class, getLocale());
@@ -155,11 +194,23 @@ public class UsersView extends Composite<VerticalLayout>
     name.setHeader(nameHeader).setFooter(nameHeader);
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
+    String activeHeader = userResources.message(ACTIVE);
+    active.setHeader(activeHeader).setFooter(activeHeader);
     emailFilter.setPlaceholder(webResources.message(ALL));
     nameFilter.setPlaceholder(webResources.message(ALL));
     laboratoryFilter.setPlaceholder(webResources.message(ALL));
+    activeFilter.setItemLabelGenerator(value -> value
+        .map(bv -> userResources.message(property(ACTIVE, bv))).orElse(webResources.message(ALL)));
+    actives.entrySet().stream().forEach(entry -> entry.getValue()
+        .setText(userResources.message(property(ACTIVE, entry.getKey().isActive()))));
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+    activeFilter.setValue(Optional.empty());
   }
 
   @Override

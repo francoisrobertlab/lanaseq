@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,12 +28,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
+import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -61,6 +64,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   @Mock
   private LaboratoryService laboratoryService;
   @Mock
+  private AuthorizationService authorizationService;
+  @Mock
   private DataProvider<User, ?> dataProvider;
   @Captor
   private ArgumentCaptor<User> userCaptor;
@@ -72,25 +77,46 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   @Inject
   private UserRepository userRepository;
   private List<User> users;
+  private User currentUser;
 
   /**
    * Before test.
    */
   @Before
   public void beforeTest() {
-    presenter = new UsersViewPresenter(userService, laboratoryService);
+    presenter = new UsersViewPresenter(userService, laboratoryService, authorizationService);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
     view.userDialog = mock(UserDialog.class);
     view.laboratoryDialog = mock(LaboratoryDialog.class);
     users = userRepository.findAll();
+    when(userService.all(any(Laboratory.class))).thenReturn(users);
     when(userService.all()).thenReturn(users);
+    currentUser = userRepository.findById(2L).orElse(null);
+    when(authorizationService.currentUser()).thenReturn(currentUser);
   }
 
   @Test
-  public void users() {
+  public void users_Manager() {
+    when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(false);
     presenter.init(view);
+    verify(userService).all(currentUser.getLaboratory());
+    List<User> users = items(view.users);
+    assertEquals(this.users.size(), users.size());
+    for (User user : this.users) {
+      assertTrue(user.toString(), users.contains(user));
+    }
+    assertEquals(0, view.users.getSelectedItems().size());
+    users.forEach(user -> view.users.select(user));
+    assertEquals(users.size(), view.users.getSelectedItems().size());
+  }
+
+  @Test
+  public void users_Admin() {
+    when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(true);
+    presenter.init(view);
+    verify(userService).all();
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -168,6 +194,39 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void filterActive_False() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterActive(false);
+
+    assertEquals(false, presenter.filter().active);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterActive_True() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterActive(true);
+
+    assertEquals(true, presenter.filter().active);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterActive_Null() {
+    presenter.init(view);
+    view.users.setDataProvider(dataProvider);
+
+    presenter.filterActive(null);
+
+    assertEquals(null, presenter.filter().active);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
   public void view() {
     presenter.init(view);
     User user = new User();
@@ -194,6 +253,24 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void toggleActive_Active() {
+    presenter.init(view);
+    User user = userRepository.findById(3L).orElse(null);
+    presenter.toggleActive(user);
+    verify(userService).save(user, null);
+    assertFalse(user.isActive());
+  }
+
+  @Test
+  public void toggleActive_Inactive() {
+    presenter.init(view);
+    User user = userRepository.findById(7L).orElse(null);
+    presenter.toggleActive(user);
+    verify(userService).save(user, null);
+    assertTrue(user.isActive());
+  }
+
+  @Test
   public void add() {
     presenter.init(view);
     presenter.add();
@@ -214,7 +291,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     ComponentEventListener<SavedEvent<UserDialog>> savedListener =
         userSavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(userService, times(2)).all();
+    verify(userService, times(2)).all(currentUser.getLaboratory());
   }
 
   @Test
@@ -225,6 +302,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener =
         laboratorySavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(userService, times(2)).all();
+    verify(userService, times(2)).all(currentUser.getLaboratory());
   }
 }

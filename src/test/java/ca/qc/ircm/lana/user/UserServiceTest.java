@@ -188,6 +188,19 @@ public class UserServiceTest {
   }
 
   @Test
+  public void all_Laboratory() {
+    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+
+    List<User> users = userService.all(laboratory);
+
+    assertEquals(3, users.size());
+    assertTrue(find(users, 2L).isPresent());
+    assertTrue(find(users, 3L).isPresent());
+    assertTrue(find(users, 9L).isPresent());
+    verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
   public void manager() {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
     User user = userService.manager(laboratory);

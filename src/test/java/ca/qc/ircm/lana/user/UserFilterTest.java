@@ -4,9 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lana.user.Laboratory;
-import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -101,6 +98,30 @@ public class UserFilterTest {
   }
 
   @Test
+  public void test_ActiveFalse() {
+    filter.active = false;
+
+    assertTrue(filter.test(active(false)));
+    assertFalse(filter.test(active(true)));
+  }
+
+  @Test
+  public void test_ActiveTrue() {
+    filter.active = true;
+
+    assertFalse(filter.test(active(false)));
+    assertTrue(filter.test(active(true)));
+  }
+
+  @Test
+  public void test_ActiveNull() {
+    filter.active = null;
+
+    assertTrue(filter.test(active(false)));
+    assertTrue(filter.test(active(true)));
+  }
+
+  @Test
   public void test_EmailAndNameContains() {
     filter.emailContains = "test";
     filter.nameContains = "test";
@@ -148,6 +169,12 @@ public class UserFilterTest {
     laboratory.setName(name);
     User user = new User();
     user.setLaboratory(laboratory);
+    return user;
+  }
+
+  private User active(boolean active) {
+    User user = new User();
+    user.setActive(active);
     return user;
   }
 

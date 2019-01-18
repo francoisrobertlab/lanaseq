@@ -101,6 +101,18 @@ public class UserService {
   }
 
   /**
+   * Returns all users in laboratory.
+   *
+   * @param laboratory
+   *          laboratory
+   * @return all users in laboratory
+   */
+  public List<User> all(Laboratory laboratory) {
+    authorizationService.checkRole(USER);
+    return repository.findByLaboratory(laboratory);
+  }
+
+  /**
    * Returns laboratory's manager. <br>
    * If laboratory has many managers, returns anyone of them.
    *

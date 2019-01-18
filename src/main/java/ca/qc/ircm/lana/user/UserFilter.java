@@ -12,6 +12,7 @@ public class UserFilter implements Predicate<User> {
   public String emailContains;
   public String nameContains;
   public String laboratoryNameContains;
+  public Boolean active;
 
   @Override
   public boolean test(User user) {
@@ -25,6 +26,9 @@ public class UserFilter implements Predicate<User> {
     if (laboratoryNameContains != null) {
       test &= comparable(replaceNull(user.getLaboratory().getName()))
           .contains(comparable(laboratoryNameContains));
+    }
+    if (active != null) {
+      test &= active == user.isActive();
     }
     return test;
   }

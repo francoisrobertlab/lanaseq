@@ -17,6 +17,9 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
@@ -25,6 +28,7 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.List;
 import javax.inject.Inject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -40,15 +44,19 @@ public class UsersViewPresenter {
   private UserService userService;
   @Inject
   private LaboratoryService laboratoryService;
+  @Inject
+  private AuthorizationService authorizationService;
   private ListDataProvider<User> usersDataProvider;
   private WebUserFilter filter = new WebUserFilter();
 
   protected UsersViewPresenter() {
   }
 
-  protected UsersViewPresenter(UserService userService, LaboratoryService laboratoryService) {
+  protected UsersViewPresenter(UserService userService, LaboratoryService laboratoryService,
+      AuthorizationService authorizationService) {
     this.userService = userService;
     this.laboratoryService = laboratoryService;
+    this.authorizationService = authorizationService;
   }
 
   void init(UsersView view) {
@@ -59,7 +67,9 @@ public class UsersViewPresenter {
   }
 
   private void loadUsers() {
-    usersDataProvider = new ListDataProvider<>(userService.all());
+    List<User> users = authorizationService.hasRole(ADMIN) ? userService.all()
+        : userService.all(authorizationService.currentUser().getLaboratory());
+    usersDataProvider = new ListDataProvider<>(users);
     ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
         usersDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
@@ -81,6 +91,11 @@ public class UsersViewPresenter {
     view.users.getDataProvider().refreshAll();
   }
 
+  void filterActive(Boolean value) {
+    filter.active = value;
+    view.users.getDataProvider().refreshAll();
+  }
+
   void view(User user) {
     view.userDialog.setUser(userService.get(user.getId()));
     view.userDialog.open();
@@ -89,6 +104,11 @@ public class UsersViewPresenter {
   void viewLaboratory(Laboratory laboratory) {
     view.laboratoryDialog.setLaboratory(laboratoryService.get(laboratory.getId()));
     view.laboratoryDialog.open();
+  }
+
+  void toggleActive(User user) {
+    user.setActive(!user.isActive());
+    userService.save(user, null);
   }
 
   void add() {
