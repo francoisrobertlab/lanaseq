@@ -140,8 +140,8 @@ public class UserService {
    *          password
    */
   public void save(User user, String password) {
-    if (user.getId() != null && user.getId() == 1L && !user.isAdmin()) {
-      throw new AccessDeniedException("user 1 must be an admin");
+    if (user.getId() != null && user.getId() == 1L && (!user.isAdmin() || !user.isActive())) {
+      throw new AccessDeniedException("user 1 must be an admin and active");
     }
     if (user.getLaboratory() == null) {
       throw new IllegalArgumentException("users must be in a laboratory");

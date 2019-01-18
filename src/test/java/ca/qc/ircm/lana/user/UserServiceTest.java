@@ -590,6 +590,14 @@ public class UserServiceTest {
     userService.save(user, "newpassword");
   }
 
+  @Test(expected = AccessDeniedException.class)
+  public void save_UpdateFirstUserRemoveActive() {
+    User user = userRepository.findById(1L).get();
+    user.setActive(false);
+
+    userService.save(user, "newpassword");
+  }
+
   @Test(expected = NullPointerException.class)
   public void save_Null() {
     userService.save(null, null);
