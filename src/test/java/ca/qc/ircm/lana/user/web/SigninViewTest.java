@@ -154,7 +154,7 @@ public class SigninViewTest extends AbstractViewTestCase {
   @Test
   public void afterNavigation() {
     AfterNavigationEvent event = mock(AfterNavigationEvent.class);
-    Location location = new Location("signin?error");
+    Location location = new Location(VIEW_NAME + "?" + FAIL);
     when(event.getLocation()).thenReturn(location);
 
     view.afterNavigation(event);
