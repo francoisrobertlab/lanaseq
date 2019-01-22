@@ -71,8 +71,12 @@ public class SpringAuthorizationService implements AuthorizationService {
     this.aclService = aclService;
   }
 
+  private Authentication getAuthentication() {
+    return SecurityContextHolder.getContext().getAuthentication();
+  }
+
   private UserDetails getUser() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Authentication authentication = getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
       return (UserDetails) authentication.getPrincipal();
     } else {
@@ -102,13 +106,13 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasRole(String role) {
-    UserDetails user = getUser();
-    Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+    Authentication authentication = getAuthentication();
+    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
     boolean hasRole = false;
     for (GrantedAuthority authority : authorities) {
       hasRole |= authority.getAuthority().equals(role);
     }
-    logger.trace("user {} hasRole {}? {}", user.getUsername(), role, hasRole);
+    logger.trace("user {} hasRole {}? {}", authentication.getName(), role, hasRole);
     return hasRole;
   }
 

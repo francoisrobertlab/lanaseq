@@ -56,6 +56,7 @@ import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -74,9 +75,17 @@ import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
+import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -98,6 +107,8 @@ public class SpringAuthorizationServiceTest {
   private ExperimentRepository experimentRepository;
   @Inject
   private LaboratoryRepository laboratoryRepository;
+  @Inject
+  private UserDetailsService userDetailsService;
 
   /**
    * Before test.
@@ -111,6 +122,17 @@ public class SpringAuthorizationServiceTest {
       }
       return null;
     });
+  }
+
+  private void switchToUser(String username) {
+    Authentication previousAuthentication = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
+    authorities.add(new SwitchUserGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR,
+        previousAuthentication));
+    TestingAuthenticationToken authentication =
+        new TestingAuthenticationToken(userDetails, null, authorities);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
   @Test
@@ -151,6 +173,13 @@ public class SpringAuthorizationServiceTest {
     assertTrue(authorizationService.hasRole(DEFAULT_ROLE));
   }
 
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasRole_SwitchedUser() throws Throwable {
+    switchToUser("francois.robert@ircm.qc.ca");
+    assertTrue(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+  }
+
   @Test(expected = AccessDeniedException.class)
   @WithMockUser
   public void checkRole_Fail() throws Throwable {
@@ -161,6 +190,13 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void checkRole_Ok() throws Throwable {
     authorizationService.checkRole(DEFAULT_ROLE);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkRole_SwitchedUser() throws Throwable {
+    switchToUser("francois.robert@ircm.qc.ca");
+    authorizationService.checkRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR);
   }
 
   @Test
@@ -181,6 +217,13 @@ public class SpringAuthorizationServiceTest {
     assertTrue(authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE));
   }
 
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasAnyRole_SwitchedUser() throws Throwable {
+    switchToUser("francois.robert@ircm.qc.ca");
+    assertTrue(authorizationService.hasAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+  }
+
   @Test(expected = AccessDeniedException.class)
   @WithMockUser
   public void checkAnyRole_False() throws Throwable {
@@ -197,6 +240,13 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void checkAnyRole_TrueLast() throws Throwable {
     authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE);
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void checkAnyRole_SwitchedUser() throws Throwable {
+    switchToUser("francois.robert@ircm.qc.ca");
+    authorizationService.checkAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR);
   }
 
   @Test
@@ -257,6 +307,16 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void isAuthorized_ManagerOrAdminRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void isAuthorized_SwitchedUser() throws Throwable {
+    switchToUser("francois.robert@ircm.qc.ca");
+    assertTrue(authorizationService.isAuthorized(UserRoleTest.class));
+    assertTrue(authorizationService.isAuthorized(ManagerRoleTest.class));
+    assertFalse(authorizationService.isAuthorized(AdminRoleTest.class));
+    assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
   }
 
   @Test
