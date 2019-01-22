@@ -29,8 +29,6 @@ import static ca.qc.ircm.lana.user.web.UserDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.CREATE_NEW_LABORATORY;
 import static ca.qc.ircm.lana.user.web.UserDialog.HEADER;
 import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
-import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD;
-import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD_CONFIRM;
 import static ca.qc.ircm.lana.web.WebConstants.BORDER;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
@@ -104,8 +102,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.name.getClassNames().contains(NAME));
     assertTrue(dialog.admin.getClassNames().contains(ADMIN));
     assertTrue(dialog.manager.getClassNames().contains(MANAGER));
-    assertTrue(dialog.password.getClassNames().contains(PASSWORD));
-    assertTrue(dialog.passwordConfirm.getClassNames().contains(PASSWORD_CONFIRM));
     assertTrue(dialog.createNewLaboratory.getClassNames().contains(CREATE_NEW_LABORATORY));
     assertTrue(dialog.laboratory.getClassNames().contains(LABORATORY));
     assertTrue(dialog.newLaboratoryLayout.getClassNames().contains(BORDER));
@@ -124,8 +120,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(NAME), dialog.name.getLabel());
     assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
     assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
-    assertEquals(resources.message(PASSWORD), dialog.password.getLabel());
-    assertEquals(resources.message(PASSWORD_CONFIRM), dialog.passwordConfirm.getLabel());
     assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());
@@ -152,8 +146,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(NAME), dialog.name.getLabel());
     assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
     assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
-    assertEquals(resources.message(PASSWORD), dialog.password.getLabel());
-    assertEquals(resources.message(PASSWORD_CONFIRM), dialog.passwordConfirm.getLabel());
     assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());

@@ -23,8 +23,6 @@ import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
-import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORDS_NOT_MATCH;
-import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORD_CONFIRM;
 import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
 import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
@@ -66,7 +64,6 @@ public class UserDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(UserDialogPresenter.class);
   private UserDialog dialog;
   private Binder<User> binder = new BeanValidationBinder<>(User.class);
-  private Binder<Passwords> passwordBinder = new BeanValidationBinder<>(Passwords.class);
   private Binder<Laboratory> laboratoryBinder = new BeanValidationBinder<>(Laboratory.class);
   private ListDataProvider<Laboratory> laboratoriesDataProvider;
   private User user;
@@ -107,12 +104,10 @@ public class UserDialogPresenter {
     dialog.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
     dialog.createNewLaboratory.setVisible(authorizationService.hasRole(UserRole.ADMIN));
     setUser(null);
-    passwordBinder.setBean(new Passwords());
     laboratoryBinder.setBean(new Laboratory());
   }
 
   void localeChange(Locale locale) {
-    final MessageResource resources = new MessageResource(UserDialog.class, locale);
     final MessageResource userResources = new MessageResource(User.class, locale);
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     binder.forField(dialog.email).asRequired(webResources.message(REQUIRED))
@@ -122,19 +117,6 @@ public class UserDialogPresenter {
         .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.admin).bind(ADMIN);
     binder.forField(dialog.manager).bind(MANAGER);
-    passwordBinder.forField(dialog.password)
-        .withValidator(passwordRequiredValidator(webResources.message(REQUIRED)))
-        .withNullRepresentation("").withValidator(password -> {
-          String confirmPassword = dialog.passwordConfirm.getValue();
-          return password == null || password.isEmpty() || confirmPassword == null
-              || confirmPassword.isEmpty() || password.equals(confirmPassword);
-        }, resources.message(PASSWORDS_NOT_MATCH))
-        .bind(Passwords::getPassword, Passwords::setPassword);
-    dialog.passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
-    passwordBinder.forField(dialog.passwordConfirm)
-        .withValidator(passwordRequiredValidator(webResources.message(REQUIRED)))
-        .withNullRepresentation("")
-        .bind(Passwords::getConfirmPassword, Passwords::setConfirmPassword);
     dialog.laboratory.setLabel(userResources.message(LABORATORY));
     binder.forField(dialog.laboratory)
         .withValidator(laboratoryRequiredValidator(webResources.message(REQUIRED)))
@@ -145,19 +127,10 @@ public class UserDialogPresenter {
     dialog.cancel.setText(webResources.message(CANCEL));
   }
 
-  private Validator<String> passwordRequiredValidator(String errorMessage) {
-    return (value, context) -> isNewUser() && value.isEmpty() ? ValidationResult.error(errorMessage)
-        : ValidationResult.ok();
-  }
-
   private Validator<Laboratory> laboratoryRequiredValidator(String errorMessage) {
     return (value, context) -> !dialog.createNewLaboratory.getValue() && value == null
         ? ValidationResult.error(errorMessage)
         : ValidationResult.ok();
-  }
-
-  private boolean isNewUser() {
-    return user.getId() == null;
   }
 
   private void updateManager() {
@@ -180,10 +153,6 @@ public class UserDialogPresenter {
     return binder.validate();
   }
 
-  BinderValidationStatus<Passwords> validatePassword() {
-    return passwordBinder.validate();
-  }
-
   BinderValidationStatus<Laboratory> validateLaboratory() {
     return laboratoryBinder.validate();
   }
@@ -191,7 +160,7 @@ public class UserDialogPresenter {
   private boolean validate() {
     boolean valid = true;
     valid = validateUser().isOk() && valid;
-    valid = validatePassword().isOk() && valid;
+    valid = dialog.passwords.validate().isOk() && valid;
     if (dialog.createNewLaboratory.getValue()) {
       valid = validateLaboratory().isOk() && valid;
     }
@@ -203,7 +172,7 @@ public class UserDialogPresenter {
       if (dialog.createNewLaboratory.getValue()) {
         user.setLaboratory(laboratoryBinder.getBean());
       }
-      String password = passwordBinder.getBean().getPassword();
+      String password = dialog.passwords.getPassword();
       logger.debug("save user {} in laboratory {}", user, user.getLaboratory());
       userService.save(user, password);
       dialog.close();
@@ -234,13 +203,7 @@ public class UserDialogPresenter {
     }
     this.user = user;
     binder.setBean(user);
-    if (user != null && user.getId() != null) {
-      dialog.password.setRequiredIndicatorVisible(false);
-      dialog.passwordConfirm.setRequiredIndicatorVisible(false);
-    } else {
-      dialog.password.setRequiredIndicatorVisible(true);
-      dialog.passwordConfirm.setRequiredIndicatorVisible(true);
-    }
+    dialog.passwords.setRequired(user.getId() == null);
   }
 
   ListDataProvider<Laboratory> laboratoryDataProvider() {

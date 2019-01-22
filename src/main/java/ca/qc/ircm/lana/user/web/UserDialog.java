@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lana.user.web;
 
-import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
@@ -47,7 +46,6 @@ import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -67,9 +65,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";
-  public static final String PASSWORD = "password";
-  public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
-  public static final String PASSWORDS_NOT_MATCH = property(PASSWORD, "notMatch");
   public static final String CREATE_NEW_LABORATORY = "createNewLaboratory";
   public static final String LABORATORY_NAME = LaboratoryProperties.NAME;
   protected H2 header = new H2();
@@ -78,8 +73,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   protected Checkbox admin = new Checkbox();
   protected Checkbox manager = new Checkbox();
   protected Checkbox createNewLaboratory = new Checkbox();
-  protected PasswordField password = new PasswordField();
-  protected PasswordField passwordConfirm = new PasswordField();
+  protected PasswordsForm passwords = new PasswordsForm();
   protected ComboBox<Laboratory> laboratory = new ComboBox<>();
   protected VerticalLayout newLaboratoryLayout = new VerticalLayout();
   protected H6 newLaboratoryHeader = new H6();
@@ -105,8 +99,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     setId(CLASS_NAME);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, email, name, admin, manager, password, passwordConfirm, createNewLaboratory,
-        laboratory, newLaboratoryLayout, buttonsLayout);
+    layout.add(header, email, name, admin, manager, passwords, createNewLaboratory, laboratory,
+        newLaboratoryLayout, buttonsLayout);
     newLaboratoryLayout.add(newLaboratoryHeader, newLaboratoryName);
     buttonsLayout.add(save, cancel);
     header.addClassName(HEADER);
@@ -114,8 +108,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     name.addClassName(NAME);
     admin.addClassName(ADMIN);
     manager.addClassName(MANAGER);
-    password.addClassName(PASSWORD);
-    passwordConfirm.addClassName(PASSWORD_CONFIRM);
     createNewLaboratory.addClassName(CREATE_NEW_LABORATORY);
     laboratory.addClassName(LABORATORY);
     newLaboratoryLayout.addClassName(BORDER);
@@ -141,8 +133,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
     name.setLabel(userResources.message(NAME));
     admin.setLabel(userResources.message(ADMIN));
     manager.setLabel(userResources.message(MANAGER));
-    password.setLabel(resources.message(PASSWORD));
-    passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
     createNewLaboratory.setLabel(resources.message(CREATE_NEW_LABORATORY));
     laboratory.setLabel(userResources.message(LABORATORY));
     newLaboratoryHeader.setText(userResources.message(LABORATORY));

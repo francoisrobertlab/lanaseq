@@ -19,7 +19,6 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
-import static ca.qc.ircm.lana.user.web.UserDialog.PASSWORDS_NOT_MATCH;
 import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
 import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +28,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,7 +54,6 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
@@ -82,8 +82,12 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   private LaboratoryService laboratoryService;
   @Mock
   private AuthorizationService authorizationService;
+  @Mock
+  private BinderValidationStatus<Passwords> passwordsValidationStatus;
   @Captor
   private ArgumentCaptor<User> userCaptor;
+  @Captor
+  private ArgumentCaptor<Boolean> booleanCaptor;
   @Captor
   @SuppressWarnings("checkstyle:linelength")
   private ArgumentCaptor<ComponentEventListener<CustomValueSetEvent<ComboBox<Laboratory>>>> laboratoryComponentEventListenerCaptor;
@@ -92,7 +96,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   @Inject
   private LaboratoryRepository laboratoryRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(UserDialog.class, locale);
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);
   private String email = "test@ircm.qc.ca";
   private String name = "Test User";
@@ -114,8 +117,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     dialog.admin = new Checkbox();
     dialog.manager = new Checkbox();
     dialog.createNewLaboratory = new Checkbox();
-    dialog.password = new PasswordField();
-    dialog.passwordConfirm = new PasswordField();
+    dialog.passwords = mock(PasswordsForm.class);
     dialog.laboratory = new ComboBox<>();
     dialog.newLaboratoryLayout = new VerticalLayout();
     dialog.newLaboratoryHeader = new H6();
@@ -128,13 +130,13 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     laboratories = laboratoryRepository.findAll();
     when(laboratoryService.all()).thenReturn(laboratories);
     laboratory = laboratoryRepository.findById(2L).orElse(null);
+    when(dialog.passwords.validate()).thenReturn(passwordsValidationStatus);
+    when(passwordsValidationStatus.isOk()).thenReturn(true);
   }
 
   private void fillForm() {
     dialog.email.setValue(email);
     dialog.name.setValue(name);
-    dialog.password.setValue(password);
-    dialog.passwordConfirm.setValue(password);
     if (!items(dialog.laboratory).isEmpty()) {
       dialog.laboratory.setValue(laboratory);
     }
@@ -327,8 +329,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.name.getValue());
     assertFalse(dialog.admin.getValue());
     assertFalse(dialog.manager.getValue());
-    assertTrue(dialog.password.isRequiredIndicatorVisible());
-    assertTrue(dialog.passwordConfirm.isRequiredIndicatorVisible());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
     assertEquals(laboratory.getId(), dialog.laboratory.getValue().getId());
   }
 
@@ -344,8 +346,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(user.getName(), dialog.name.getValue());
     assertFalse(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
-    assertFalse(dialog.password.isRequiredIndicatorVisible());
-    assertFalse(dialog.passwordConfirm.isRequiredIndicatorVisible());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertFalse(booleanCaptor.getValue());
     assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
   }
 
@@ -361,8 +363,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(user.getName(), dialog.name.getValue());
     assertFalse(dialog.admin.getValue());
     assertTrue(dialog.manager.getValue());
-    assertFalse(dialog.password.isRequiredIndicatorVisible());
-    assertFalse(dialog.passwordConfirm.isRequiredIndicatorVisible());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertFalse(booleanCaptor.getValue());
     assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
   }
 
@@ -376,8 +378,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.name.getValue());
     assertFalse(dialog.admin.getValue());
     assertFalse(dialog.manager.getValue());
-    assertTrue(dialog.password.isRequiredIndicatorVisible());
-    assertTrue(dialog.passwordConfirm.isRequiredIndicatorVisible());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
     assertEquals(laboratory.getId(), dialog.laboratory.getValue().getId());
   }
 
@@ -397,6 +399,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
@@ -417,6 +420,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(INVALID_EMAIL)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
@@ -437,67 +441,21 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
-  public void save_PasswordEmpty() {
+  public void save_PasswordValidationFailed() {
+    when(passwordsValidationStatus.isOk()).thenReturn(false);
     presenter.init(dialog);
     presenter.localeChange(locale);
     fillForm();
-    dialog.password.setValue("");
 
     presenter.save();
 
-    BinderValidationStatus<Passwords> status = presenter.validatePassword();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.password);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_PasswordsNotMatch() {
-    presenter.init(dialog);
-    presenter.localeChange(locale);
-    fillForm();
-    dialog.password.setValue("test");
-    dialog.passwordConfirm.setValue("test2");
-
-    presenter.save();
-
-    BinderValidationStatus<Passwords> status = presenter.validatePassword();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.password);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(resources.message(PASSWORDS_NOT_MATCH)), error.getMessage());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_PasswordConfirmEmpty() {
-    presenter.init(dialog);
-    presenter.localeChange(locale);
-    fillForm();
-    dialog.passwordConfirm.setValue("");
-
-    presenter.save();
-
-    BinderValidationStatus<Passwords> status = presenter.validatePassword();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.passwordConfirm);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
@@ -520,6 +478,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
@@ -543,6 +502,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
@@ -567,12 +527,14 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
   public void save_NewUser() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     presenter.init(dialog);
     presenter.localeChange(locale);
     fillForm();
@@ -593,6 +555,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_NewManager() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     presenter.init(dialog);
     presenter.localeChange(locale);
     fillForm();
@@ -614,6 +577,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_NewManagerNewLaboratory() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
@@ -639,6 +603,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_UpdateUser() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
     presenter.setUser(user);
@@ -660,6 +625,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_UpdateUserLaboratory() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
@@ -688,8 +654,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
-    dialog.password.setValue("");
-    dialog.passwordConfirm.setValue("");
 
     presenter.save();
 
@@ -707,6 +671,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_NewAdmin() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
@@ -730,6 +695,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_UpdateAdmin() {
+    when(dialog.passwords.getPassword()).thenReturn(password);
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
@@ -760,8 +726,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
-    dialog.password.setValue("");
-    dialog.passwordConfirm.setValue("");
 
     presenter.save();
 
@@ -785,8 +749,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
-    dialog.password.setValue("");
-    dialog.passwordConfirm.setValue("");
     dialog.admin.setValue(false);
     dialog.manager.setValue(true);
 
