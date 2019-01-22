@@ -51,6 +51,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -105,6 +106,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.init();
     assertTrue(view.home.isVisible());
     assertFalse(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
     verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
@@ -115,6 +117,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.init();
     assertTrue(view.home.isVisible());
     assertTrue(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
     verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
@@ -125,6 +128,19 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.init();
     assertTrue(view.home.isVisible());
     assertTrue(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
+    assertTrue(view.signout.isVisible());
+    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+  }
+
+  @Test
+  public void tabs_SwitchedUser() {
+    when(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
+        .thenReturn(true);
+    view.init();
+    assertTrue(view.home.isVisible());
+    assertFalse(view.users.isVisible());
+    assertTrue(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
     verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
@@ -175,6 +191,19 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     verify(ui, never()).navigate(any(String.class));
     verify(page, never()).executeJavaScript(any());
+  }
+
+  @Test
+  public void tabs_SelectExitSwitchUser() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.exitSwitchUser);
+
+    verify(ui, never()).navigate(any(String.class));
+    verify(page).executeJavaScript(
+        "location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
   }
 
   @Test

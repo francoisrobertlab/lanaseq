@@ -44,6 +44,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
  * Main layout.
@@ -53,12 +54,14 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
     BeforeEnterObserver, AfterNavigationObserver, BaseComponent {
   public static final String HOME = "home";
   public static final String USERS = "users";
+  public static final String EXIT_SWITCH_USER = "exitSwitchUser";
   public static final String SIGNOUT = "signout";
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected Tabs tabs = new Tabs();
   protected Tab home = new Tab();
   protected Tab users = new Tab();
+  protected Tab exitSwitchUser = new Tab();
   protected Tab signout = new Tab();
   private Map<Tab, String> tabsHref = new HashMap<>();
   private String currentHref;
@@ -75,8 +78,10 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
   @PostConstruct
   void init() {
     add(tabs);
-    tabs.add(home, users, signout);
+    tabs.add(home, users, exitSwitchUser, signout);
     users.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
+    exitSwitchUser
+        .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     tabsHref.put(home, ExperimentsView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
     tabs.addSelectedChangeListener(e -> selectTab());
@@ -87,6 +92,7 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
     MessageResource resources = new MessageResource(ViewLayout.class, getLocale());
     home.setLabel(resources.message(HOME));
     users.setLabel(resources.message(USERS));
+    exitSwitchUser.setLabel(resources.message(EXIT_SWITCH_USER));
     signout.setLabel(resources.message(SIGNOUT));
   }
 
@@ -96,6 +102,11 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
       logger.debug("Redirect to sign out");
       getCurrentUi().getPage()
           .executeJavaScript("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
+    } else if (tabs.getSelectedTab() == exitSwitchUser) {
+      // Exit switch user requires a request to be made outside of Vaadin.
+      logger.debug("Redirect to exit switch user");
+      getCurrentUi().getPage().executeJavaScript(
+          "location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
     } else {
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("Navigate to {}", tabsHref.get(tabs.getSelectedTab()));

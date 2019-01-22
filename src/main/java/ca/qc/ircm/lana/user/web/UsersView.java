@@ -53,6 +53,8 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import java.util.HashMap;
@@ -68,10 +70,12 @@ import javax.inject.Inject;
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ ADMIN, MANAGER })
 public class UsersView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
+    implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BaseComponent {
   public static final String VIEW_NAME = "users";
   public static final String HEADER = "header";
   public static final String USERS = "users";
+  public static final String SWITCH_USER = "switchUser";
+  public static final String SWITCH_FAILED = "switchFailed";
   public static final String ADD = "add";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
@@ -80,6 +84,7 @@ public class UsersView extends Composite<VerticalLayout>
   protected Column<User> name;
   protected Column<User> laboratory;
   protected Column<User> active;
+  protected Column<User> switchUser;
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected TextField laboratoryFilter = new TextField();
@@ -121,6 +126,7 @@ public class UsersView extends Composite<VerticalLayout>
                 .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
         .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
+    switchUser = users.addComponentColumn(user -> switchButton(user)).setKey(SWITCH_USER);
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();
     filtersRow.getCell(email).setComponent(emailFilter);
@@ -182,6 +188,14 @@ public class UsersView extends Composite<VerticalLayout>
     button.getElement().setAttribute(THEME, user.isActive() ? SUCCESS : ERROR);
   }
 
+  private Button switchButton(User user) {
+    Button button = new Button();
+    button.addClassName(SWITCH_USER);
+    button.setIcon(VaadinIcon.BUG.create());
+    button.addClickListener(e -> presenter.switchUser(user));
+    return button;
+  }
+
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final MessageResource resources = new MessageResource(UsersView.class, getLocale());
@@ -196,6 +210,8 @@ public class UsersView extends Composite<VerticalLayout>
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
     String activeHeader = userResources.message(ACTIVE);
     active.setHeader(activeHeader).setFooter(activeHeader);
+    String runasHeader = resources.message(SWITCH_USER);
+    switchUser.setHeader(runasHeader).setFooter(runasHeader);
     emailFilter.setPlaceholder(webResources.message(ALL));
     nameFilter.setPlaceholder(webResources.message(ALL));
     laboratoryFilter.setPlaceholder(webResources.message(ALL));
@@ -218,5 +234,10 @@ public class UsersView extends Composite<VerticalLayout>
     MessageResource resources = new MessageResource(UsersView.class, getLocale());
     MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
     return resources.message(TITLE, webResources.message(APPLICATION_NAME));
+  }
+
+  @Override
+  public void afterNavigation(AfterNavigationEvent event) {
+    presenter.showError(event.getLocation().getQueryParameters().getParameters(), getLocale());
   }
 }

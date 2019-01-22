@@ -18,17 +18,20 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
+import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
@@ -38,12 +41,20 @@ import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.SavedEvent;
+import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,18 +89,23 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private UserRepository userRepository;
   private List<User> users;
   private User currentUser;
+  private Locale locale = Locale.ENGLISH;
+  private MessageResource resources = new MessageResource(UsersView.class, locale);
 
   /**
    * Before test.
    */
   @Before
+  @SuppressWarnings("unchecked")
   public void beforeTest() {
     presenter = new UsersViewPresenter(userService, laboratoryService, authorizationService);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
+    view.switchUser = mock(Column.class);
     view.userDialog = mock(UserDialog.class);
     view.laboratoryDialog = mock(LaboratoryDialog.class);
+    when(view.getCurrentUi()).thenReturn(ui);
     users = userRepository.findAll();
     when(userService.all(any(Laboratory.class))).thenReturn(users);
     when(userService.all()).thenReturn(users);
@@ -102,6 +118,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(false);
     presenter.init(view);
     verify(userService).all(currentUser.getLaboratory());
+    verify(view.switchUser).setVisible(false);
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -117,6 +134,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(true);
     presenter.init(view);
     verify(userService).all();
+    verify(view.switchUser).setVisible(true);
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -240,6 +258,17 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
+  public void refreshExperimentsOnUserSaved() {
+    presenter.init(view);
+    verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<UserDialog>> savedListener =
+        userSavedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(userService, times(2)).all(currentUser.getLaboratory());
+  }
+
+  @Test
   public void viewLaboratory() {
     presenter.init(view);
     Laboratory laboratory = new Laboratory();
@@ -250,6 +279,17 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     verify(laboratoryService).get(2L);
     verify(view.laboratoryDialog).setLaboratory(databaseUser.getLaboratory());
     verify(view.laboratoryDialog).open();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshExperimentsOnLaboratorySaved() {
+    presenter.init(view);
+    verify(view.laboratoryDialog).addSavedListener(laboratorySavedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener =
+        laboratorySavedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(userService, times(2)).all(currentUser.getLaboratory());
   }
 
   @Test
@@ -271,6 +311,16 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void switchUser() throws Throwable {
+    presenter.init(view);
+    User user = userRepository.findById(3L).orElse(null);
+    presenter.switchUser(user);
+    verify(page).executeJavaScript("location.assign('" + WebSecurityConfiguration.SWITCH_USER_URL
+        + "?" + WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER + "="
+        + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8.name()) + "')");
+  }
+
+  @Test
   public void add() {
     presenter.init(view);
     presenter.add();
@@ -284,24 +334,19 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void refreshExperimentsOnUserSaved() {
+  public void showError_NoError() {
     presenter.init(view);
-    verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
-    ComponentEventListener<SavedEvent<UserDialog>> savedListener =
-        userSavedListenerCaptor.getValue();
-    savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(userService, times(2)).all(currentUser.getLaboratory());
+    Map<String, List<String>> parameters = new HashMap<>();
+    presenter.showError(parameters, locale);
+    verify(view, never()).showNotification(any());
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void refreshExperimentsOnLaboratorySaved() {
+  public void showError_SwitchFailed() {
     presenter.init(view);
-    verify(view.laboratoryDialog).addSavedListener(laboratorySavedListenerCaptor.capture());
-    ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener =
-        laboratorySavedListenerCaptor.getValue();
-    savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(userService, times(2)).all(currentUser.getLaboratory());
+    Map<String, List<String>> parameters = new HashMap<>();
+    parameters.put(SWITCH_FAILED, Collections.emptyList());
+    presenter.showError(parameters, locale);
+    verify(view).showNotification(resources.message(SWITCH_FAILED));
   }
 }

@@ -17,19 +17,30 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER;
+import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USER_URL;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
+import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -39,6 +50,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UsersViewPresenter {
+  private static final Logger logger = LoggerFactory.getLogger(UsersViewPresenter.class);
   private UsersView view;
   @Inject
   private UserService userService;
@@ -62,6 +74,7 @@ public class UsersViewPresenter {
   void init(UsersView view) {
     this.view = view;
     loadUsers();
+    view.switchUser.setVisible(authorizationService.hasRole(ADMIN));
     view.userDialog.addSavedListener(e -> loadUsers());
     view.laboratoryDialog.addSavedListener(e -> loadUsers());
   }
@@ -111,9 +124,32 @@ public class UsersViewPresenter {
     userService.save(user, null);
   }
 
+  void switchUser(User user) {
+    // Switch user requires a request to be made outside of Vaadin.
+    view.getCurrentUi().getPage()
+        .executeJavaScript("location.assign('" + switchUserUrl(user) + "')");
+  }
+
+  private String switchUserUrl(User user) {
+    try {
+      return SWITCH_USER_URL + "?" + SWITCH_USERNAME_PARAMETER + "="
+          + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      logger.warn("UTF_8 not supported ???");
+      return SWITCH_USER_URL;
+    }
+  }
+
   void add() {
     view.userDialog.setUser(new User());
     view.userDialog.open();
+  }
+
+  void showError(Map<String, List<String>> parameters, Locale locale) {
+    MessageResource resources = new MessageResource(UsersView.class, locale);
+    if (parameters.containsKey(SWITCH_FAILED)) {
+      view.showNotification(resources.message(SWITCH_FAILED));
+    }
   }
 
   WebUserFilter filter() {

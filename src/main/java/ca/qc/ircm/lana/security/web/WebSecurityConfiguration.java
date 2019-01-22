@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lana.security.web;
 
+import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+
 import ca.qc.ircm.lana.security.DaoAuthenticationProviderWithLdap;
 import ca.qc.ircm.lana.security.LdapConfiguration;
 import ca.qc.ircm.lana.security.LdapService;
@@ -24,6 +26,7 @@ import ca.qc.ircm.lana.security.SecurityConfiguration;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.SigninView;
+import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.lana.web.MainView;
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
@@ -46,9 +49,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
  * Security configuration.
@@ -58,6 +63,9 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   public static final String SIGNOUT_URL = "/signout";
+  public static final String SWITCH_USER_URL = "/switchUser";
+  public static final String SWITCH_USERNAME_PARAMETER = "username";
+  public static final String SWITCH_USER_EXIT_URL = "/switchUser/exit";
   private static final String SIGNIN_FAILURE_URL_PATTERN =
       Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
@@ -68,6 +76,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
   private static final String SIGNOUT_SUCCESS_URL = "/" + MainView.VIEW_NAME;
+  private static final String SWITCH_USER_FAILURE_URL =
+      "/" + UsersView.VIEW_NAME + "?" + UsersView.SWITCH_FAILED;
+  private static final String SWITCH_USER_TRAGET_URL = "/" + MainView.VIEW_NAME;
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
   @Inject
   private UserDetailsService userDetailsService;
@@ -134,6 +145,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   /**
+   * Returns {@link SwitchUserFilter}.
+   *
+   * @return {@link SwitchUserFilter}
+   */
+  @Bean
+  public SwitchUserFilter switchUserFilter() {
+    SwitchUserFilter filter = new SwitchUserFilter();
+    filter.setUserDetailsService(userDetailsService());
+    filter.setSwitchUserUrl(SWITCH_USER_URL);
+    filter.setSwitchFailureUrl(SWITCH_USER_FAILURE_URL);
+    filter.setTargetUrl(SWITCH_USER_TRAGET_URL);
+    filter.setExitUserUrl(SWITCH_USER_EXIT_URL);
+    filter.setUsernameParameter(SWITCH_USERNAME_PARAMETER);
+    return filter;
+  }
+
+  /**
    * Registers our UserDetailsService and the password encoder to be used on login attempts.
    */
   @Override
@@ -163,6 +191,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Allow all login failure URLs.
         .regexMatchers(SIGNIN_FAILURE_URL_PATTERN).permitAll()
 
+        // Only admins can switch users.
+        .antMatchers(SWITCH_USER_URL).hasAuthority(ADMIN).antMatchers(SWITCH_USER_EXIT_URL)
+        .authenticated()
+
         // Allow all requests by logged in users.
         .anyRequest().hasAnyAuthority(UserRole.roles())
 
@@ -178,7 +210,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and().logout().logoutUrl(SIGNOUT_URL).logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
 
         // Remember me
-        .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());
+        .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey())
+
+        // Switch user.
+        .and().addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
   }
 
   /**

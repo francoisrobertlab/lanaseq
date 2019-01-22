@@ -27,6 +27,8 @@ import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.web.UsersView.ADD;
 import static ca.qc.ircm.lana.user.web.UsersView.HEADER;
+import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
+import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_USER;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS;
 import static ca.qc.ircm.lana.user.web.UsersView.VIEW_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
@@ -36,6 +38,7 @@ import static ca.qc.ircm.lana.web.WebConstants.SUCCESS;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,6 +57,7 @@ import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -66,6 +70,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.Location;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -93,6 +99,8 @@ public class UsersViewTest extends AbstractViewTestCase {
   private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, User>> buttonRendererCaptor;
+  @Captor
+  private ArgumentCaptor<ValueProvider<User, Component>> componentValueProviderCaptor;
   @Captor
   private ArgumentCaptor<Comparator<User>> comparatorCaptor;
   @Inject
@@ -139,6 +147,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.active.setKey(any())).thenReturn(view.active);
     when(view.active.setComparator(any(Comparator.class))).thenReturn(view.active);
     when(view.active.setHeader(any(String.class))).thenReturn(view.active);
+    view.switchUser = mock(Column.class);
+    when(view.users.addComponentColumn(any())).thenReturn(view.switchUser);
+    when(view.switchUser.setKey(any())).thenReturn(view.switchUser);
+    when(view.switchUser.setHeader(any(String.class))).thenReturn(view.switchUser);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.users.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell emailFilterCell = mock(HeaderCell.class);
@@ -177,6 +189,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
     verify(view.active).setHeader(userResources.message(ACTIVE));
     verify(view.active).setFooter(userResources.message(ACTIVE));
+    verify(view.switchUser).setHeader(resources.message(SWITCH_USER));
+    verify(view.switchUser).setFooter(resources.message(SWITCH_USER));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
@@ -210,6 +224,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.laboratory).setFooter(userResources.message(LABORATORY));
     verify(view.active).setHeader(userResources.message(ACTIVE));
     verify(view.active).setFooter(userResources.message(ACTIVE));
+    verify(view.switchUser).setHeader(resources.message(SWITCH_USER));
+    verify(view.switchUser).setFooter(resources.message(SWITCH_USER));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
@@ -236,11 +252,17 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_Columns() {
-    assertEquals(4, view.users.getColumns().size());
+    assertEquals(5, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
+    assertTrue(view.users.getColumnByKey(EMAIL).isSortable());
     assertNotNull(view.users.getColumnByKey(NAME));
+    assertTrue(view.users.getColumnByKey(NAME).isSortable());
     assertNotNull(view.users.getColumnByKey(LABORATORY));
+    assertTrue(view.users.getColumnByKey(LABORATORY).isSortable());
     assertNotNull(view.users.getColumnByKey(ACTIVE));
+    assertTrue(view.users.getColumnByKey(ACTIVE).isSortable());
+    assertNotNull(view.users.getColumnByKey(SWITCH_USER));
+    assertFalse(view.users.getColumnByKey(SWITCH_USER).isSortable());
   }
 
   @Test
@@ -322,6 +344,16 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(active(false), active(false)) == 0);
     assertTrue(comparator.compare(active(true), active(true)) == 0);
     assertTrue(comparator.compare(active(true), active(false)) > 0);
+    verify(view.users).addComponentColumn(componentValueProviderCaptor.capture());
+    ValueProvider<User, Component> componentValueProvider = componentValueProviderCaptor.getValue();
+    for (User user : users) {
+      Button button = (Button) componentValueProvider.apply(user);
+      assertTrue(button.getClassNames().contains(SWITCH_USER));
+      assertEquals("", button.getText());
+      validateIcon(VaadinIcon.BUG.create(), button);
+      clickButton(button);
+      verify(presenter, atLeastOnce()).switchUser(user);
+    }
   }
 
   private User email(String email) {
@@ -412,5 +444,16 @@ public class UsersViewTest extends AbstractViewTestCase {
   public void add() {
     clickButton(view.add);
     verify(presenter).add();
+  }
+
+  @Test
+  public void afterNavigation() {
+    AfterNavigationEvent event = mock(AfterNavigationEvent.class);
+    Location location = new Location(VIEW_NAME + "?" + SWITCH_FAILED);
+    when(event.getLocation()).thenReturn(location);
+
+    view.afterNavigation(event);
+
+    verify(presenter).showError(location.getQueryParameters().getParameters(), locale);
   }
 }
