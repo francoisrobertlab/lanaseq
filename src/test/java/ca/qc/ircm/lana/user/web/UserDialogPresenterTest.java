@@ -42,7 +42,6 @@ import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserService;
-import ca.qc.ircm.lana.user.web.UserDialogPresenter.Passwords;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
