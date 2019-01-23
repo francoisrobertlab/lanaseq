@@ -156,7 +156,7 @@ public class ExperimentServiceTest {
   }
 
   @Test
-  public void save() {
+  public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.currentUser()).thenReturn(user);
     Experiment experiment = new Experiment();
@@ -171,6 +171,20 @@ public class ExperimentServiceTest {
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(experiment.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(experiment.getDate()));
     verify(authorizationService).checkRole(USER);
+  }
+
+  @Test
+  public void save_Update() {
+    Experiment experiment = repository.findById(1L).orElse(null);
+    experiment.setName("New name");
+
+    service.save(experiment);
+
+    experiment = repository.findById(1L).orElse(null);
+    assertEquals("New name", experiment.getName());
+    assertEquals((Long) 2L, experiment.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
+    verify(authorizationService).checkWrite(experiment);
   }
 
   @Test

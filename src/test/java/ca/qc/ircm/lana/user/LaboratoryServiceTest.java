@@ -135,5 +135,6 @@ public class LaboratoryServiceTest {
     verify(authorizationService).checkWrite(laboratory);
     laboratory = laboratoryRepository.findById(2L).orElse(null);
     assertEquals("New name", laboratory.getName());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 45, 21), laboratory.getDate());
   }
 }

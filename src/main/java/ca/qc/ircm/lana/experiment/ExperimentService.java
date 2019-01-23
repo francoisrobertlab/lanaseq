@@ -158,11 +158,17 @@ public class ExperimentService {
    *          experiment
    */
   public void save(Experiment experiment) {
-    authorizationService.checkRole(USER);
+    if (experiment.getId() == null) {
+      authorizationService.checkRole(USER);
+    } else {
+      authorizationService.checkWrite(experiment);
+    }
 
-    User user = authorizationService.currentUser();
-    experiment.setOwner(user);
-    experiment.setDate(LocalDateTime.now());
+    if (experiment.getId() == null) {
+      User user = authorizationService.currentUser();
+      experiment.setOwner(user);
+      experiment.setDate(LocalDateTime.now());
+    }
     repository.save(experiment);
   }
 

@@ -154,11 +154,10 @@ public class UserService {
 
     authorizationService.checkWrite(user);
     final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
-    // TODO Creation date should never change.
-    user.setDate(LocalDateTime.now());
     if (user.getId() == null) {
       authorizationService.checkAnyRole(ADMIN, MANAGER);
       user.setActive(true);
+      user.setDate(LocalDateTime.now());
     }
     if (user.isAdmin()) {
       authorizationService.checkRole(ADMIN);

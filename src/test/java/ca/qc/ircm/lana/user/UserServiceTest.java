@@ -465,6 +465,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
+    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
@@ -497,6 +498,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getDate());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
@@ -551,6 +553,7 @@ public class UserServiceTest {
     assertEquals(true, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getDate());
     assertNotNull(user.getLaboratory());
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertEquals(Locale.CHINESE, user.getLocale());
@@ -568,6 +571,7 @@ public class UserServiceTest {
     userService.save(user, null);
 
     verify(authorizationService).checkWrite(user);
+    user = userRepository.findById(6L).orElse(null);
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -581,6 +585,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(true, user.isExpiredPassword());
+    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
@@ -631,6 +636,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
+    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertNull(user.getLocale());
     verify(authorizationService).reloadAuthorities();
@@ -659,6 +665,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getDate());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertNull(user.getLocale());
     verify(authorizationService, never()).reloadAuthorities();
