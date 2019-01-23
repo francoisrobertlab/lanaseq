@@ -37,7 +37,9 @@ import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRole;
+import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.user.web.SigninView;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.text.MessageResource;
@@ -248,6 +250,27 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     verify(beforeEnterEvent).rerouteTo(SigninView.class);
     verify(authorizationService).isAuthorized(ViewTest.class);
     verify(authorizationService).isAnonymous();
+  }
+
+  @Test
+  public void beforeEnter_AuthorizedForceChangePassword() {
+    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
+    when(authorizationService.isAuthorized(any())).thenReturn(true);
+
+    view.beforeEnter(beforeEnterEvent);
+
+    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(beforeEnterEvent).rerouteTo(PasswordView.class);
+  }
+
+  @Test
+  public void beforeEnter_NotAuthorizedForceChangePassword() {
+    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
+
+    view.beforeEnter(beforeEnterEvent);
+
+    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(beforeEnterEvent).rerouteTo(PasswordView.class);
   }
 
   @Test

@@ -20,7 +20,9 @@ package ca.qc.ircm.lana.web;
 import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
+import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRole;
+import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.user.web.SigninView;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.lana.web.component.BaseComponent;
@@ -117,6 +119,9 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
+    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)) {
+      event.rerouteTo(PasswordView.class);
+    }
     if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
       if (authorizationService.isAnonymous()) {
         event.rerouteTo(SigninView.class);
