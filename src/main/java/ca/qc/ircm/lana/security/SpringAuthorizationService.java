@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lana.security;
 
+import static ca.qc.ircm.lana.user.UserAuthority.FORCE_CHANGE_PASSWORD;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 
@@ -44,10 +45,12 @@ import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,13 +64,17 @@ public class SpringAuthorizationService implements AuthorizationService {
   @Inject
   private UserRepository userRepository;
   @Inject
+  private UserDetailsService userDetailsService;
+  @Inject
   private AclService aclService;
 
   protected SpringAuthorizationService() {
   }
 
-  protected SpringAuthorizationService(UserRepository userRepository, AclService aclService) {
+  protected SpringAuthorizationService(UserRepository userRepository,
+      UserDetailsService userDetailsService, AclService aclService) {
     this.userRepository = userRepository;
+    this.userDetailsService = userDetailsService;
     this.aclService = aclService;
   }
 
@@ -148,6 +155,18 @@ public class SpringAuthorizationService implements AuthorizationService {
       hasAllRole &= hasRole(role);
     }
     return hasAllRole;
+  }
+
+  @Override
+  public void reloadAuthorities() {
+    if (hasRole(FORCE_CHANGE_PASSWORD)) {
+      Authentication oldAuthentication = getAuthentication();
+      logger.debug("reload authorities from user {}", oldAuthentication.getName());
+      UserDetails userDetails = userDetailsService.loadUserByUsername(oldAuthentication.getName());
+      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+          userDetails, oldAuthentication.getCredentials(), userDetails.getAuthorities());
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
   }
 
   @Override

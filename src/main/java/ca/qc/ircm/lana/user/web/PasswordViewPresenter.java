@@ -47,7 +47,7 @@ public class PasswordViewPresenter {
       User user = authorizationService.currentUser();
       String password = view.passwords.getPassword();
       logger.debug("save new password for user {}", user);
-      service.save(user, password);
+      service.save(password);
       view.navigate(MainView.class);
     }
   }

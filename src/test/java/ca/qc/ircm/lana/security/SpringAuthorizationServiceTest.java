@@ -40,7 +40,9 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -50,14 +52,18 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
+import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
+import ca.qc.ircm.lana.user.UserRole;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -95,6 +101,8 @@ public class SpringAuthorizationServiceTest {
   private SpringAuthorizationService authorizationService;
   @Inject
   private UserRepository userRepository;
+  @Inject
+  private UserDetailsService userDetailsService;
   @Mock
   private AclService aclService;
   @Mock
@@ -107,15 +115,14 @@ public class SpringAuthorizationServiceTest {
   private ExperimentRepository experimentRepository;
   @Inject
   private LaboratoryRepository laboratoryRepository;
-  @Inject
-  private UserDetailsService userDetailsService;
 
   /**
    * Before test.
    */
   @Before
   public void beforeTest() {
-    authorizationService = new SpringAuthorizationService(userRepository, aclService);
+    authorizationService =
+        new SpringAuthorizationService(userRepository, userDetailsService, aclService);
     when(aclService.readAclById(any())).thenAnswer(i -> {
       if (i.getArgument(0) != null) {
         throw new NotFoundException("Cannot find ACL");
@@ -133,6 +140,11 @@ public class SpringAuthorizationServiceTest {
     TestingAuthenticationToken authentication =
         new TestingAuthenticationToken(userDetails, null, authorities);
     SecurityContextHolder.getContext().setAuthentication(authentication);
+  }
+
+  private Optional<? extends GrantedAuthority>
+      findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
+    return authorities.stream().filter(autho -> autho.getAuthority().equals(authority)).findFirst();
   }
 
   @Test
@@ -247,6 +259,116 @@ public class SpringAuthorizationServiceTest {
   public void checkAnyRole_SwitchedUser() throws Throwable {
     switchToUser("francois.robert@ircm.qc.ca");
     authorizationService.checkAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR);
+  }
+
+  @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
+  public void removeForceChangePasswordRole() throws Throwable {
+    userRepository.findById(6L).ifPresent(user -> {
+      user.setExpiredPassword(false);
+      userRepository.save(user);
+    });
+    Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
+    assertEquals("christian.poitras@ircm.qc.ca", oldAuthentication.getName());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1,
+        oldAuthentication.getCredentials());
+    assertTrue(oldAuthentication.isAuthenticated());
+    assertEquals(3, oldAuthentication.getAuthorities().size());
+    assertTrue(findAuthority(oldAuthentication.getAuthorities(), UserRole.USER).isPresent());
+    assertTrue(findAuthority(oldAuthentication.getAuthorities(),
+        UserAuthority.laboratoryMember(new Laboratory(3L))).isPresent());
+    assertTrue(
+        findAuthority(oldAuthentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
+            .isPresent());
+    assertTrue(oldAuthentication.getPrincipal() instanceof AuthenticatedUser);
+    AuthenticatedUser user = (AuthenticatedUser) oldAuthentication.getPrincipal();
+    assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getPassword());
+    assertEquals((Long) 6L, user.getId());
+    assertEquals(3, user.getAuthorities().size());
+    assertTrue(findAuthority(user.getAuthorities(), UserRole.USER).isPresent());
+    assertTrue(
+        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(3L)))
+            .isPresent());
+    assertTrue(
+        findAuthority(user.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
+    assertTrue(user.isAccountNonExpired());
+    assertTrue(user.isAccountNonLocked());
+    assertTrue(user.isCredentialsNonExpired());
+    assertTrue(user.isEnabled());
+
+    authorizationService.reloadAuthorities();
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    assertNotSame(oldAuthentication, authentication);
+    assertEquals("christian.poitras@ircm.qc.ca", authentication.getName());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1,
+        authentication.getCredentials());
+    assertTrue(authentication.isAuthenticated());
+    assertEquals(2, authentication.getAuthorities().size());
+    assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
+    assertTrue(findAuthority(authentication.getAuthorities(),
+        UserAuthority.laboratoryMember(new Laboratory(3L))).isPresent());
+    assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
+        .isPresent());
+    assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
+    user = (AuthenticatedUser) authentication.getPrincipal();
+    assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getPassword());
+    assertEquals((Long) 6L, user.getId());
+    assertEquals(2, user.getAuthorities().size());
+    assertTrue(findAuthority(user.getAuthorities(), UserRole.USER).isPresent());
+    assertTrue(
+        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(3L)))
+            .isPresent());
+    assertFalse(
+        findAuthority(user.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
+    assertTrue(user.isAccountNonExpired());
+    assertTrue(user.isAccountNonLocked());
+    assertTrue(user.isCredentialsNonExpired());
+    assertTrue(user.isEnabled());
+    assertEquals(oldAuthentication.getDetails(), authentication.getDetails());
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void removeForceChangePasswordRole_NoForceChangePasswordRole() throws Throwable {
+    Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
+
+    authorizationService.reloadAuthorities();
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    assertSame(oldAuthentication, authentication);
+    assertEquals("lana@ircm.qc.ca", authentication.getName());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2,
+        authentication.getCredentials());
+    assertTrue(authentication.isAuthenticated());
+    assertEquals(4, authentication.getAuthorities().size());
+    assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
+    assertTrue(findAuthority(authentication.getAuthorities(), UserRole.MANAGER).isPresent());
+    assertTrue(findAuthority(authentication.getAuthorities(), UserRole.ADMIN).isPresent());
+    assertTrue(findAuthority(authentication.getAuthorities(),
+        UserAuthority.laboratoryMember(new Laboratory(1L))).isPresent());
+    assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
+        .isPresent());
+    assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
+    AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
+    assertEquals("lana@ircm.qc.ca", user.getUsername());
+    assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getPassword());
+    assertEquals((Long) 1L, user.getId());
+    assertEquals(4, user.getAuthorities().size());
+    assertTrue(findAuthority(user.getAuthorities(), UserRole.USER).isPresent());
+    assertTrue(findAuthority(user.getAuthorities(), UserRole.MANAGER).isPresent());
+    assertTrue(findAuthority(user.getAuthorities(), UserRole.ADMIN).isPresent());
+    assertTrue(
+        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(1L)))
+            .isPresent());
+    assertFalse(
+        findAuthority(user.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
+    assertTrue(user.isAccountNonExpired());
+    assertTrue(user.isAccountNonLocked());
+    assertTrue(user.isCredentialsNonExpired());
+    assertTrue(user.isEnabled());
   }
 
   @Test

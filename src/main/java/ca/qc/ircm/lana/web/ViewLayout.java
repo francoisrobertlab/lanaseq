@@ -120,10 +120,13 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
     if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)) {
+      logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
+          PasswordView.class.getSimpleName());
       event.rerouteTo(PasswordView.class);
     }
     if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
       if (authorizationService.isAnonymous()) {
+        logger.debug("user is anonymous, redirect to {}", SigninView.class.getSimpleName());
         event.rerouteTo(SigninView.class);
       } else {
         MessageResource resources = new MessageResource(ViewLayout.class, getLocale());

@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -441,7 +442,7 @@ public class UserServiceTest {
 
   @Test
   public void save_Update() {
-    User user = userRepository.findById(3L).get();
+    User user = userRepository.findById(6L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
@@ -449,24 +450,25 @@ public class UserServiceTest {
     userService.save(user, "newpassword");
 
     verify(authorizationService).checkWrite(user);
-    user = userRepository.findById(3L).get();
-    assertEquals((Long) 3L, user.getId());
+    user = userRepository.findById(6L).get();
+    assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
-    assertEquals(2, user.getSignAttempts());
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+    assertEquals(3, user.getSignAttempts());
+    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
+    verify(authorizationService).reloadAuthorities();
   }
 
   @Test
@@ -499,6 +501,7 @@ public class UserServiceTest {
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(authorizationService).checkRole(ADMIN);
+    verify(authorizationService, never()).reloadAuthorities();
   }
 
   @Test
@@ -552,11 +555,12 @@ public class UserServiceTest {
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(authorizationService, atLeastOnce()).checkRole(ADMIN);
+    verify(authorizationService, never()).reloadAuthorities();
   }
 
   @Test
   public void save_UpdateKeepPassword() {
-    User user = userRepository.findById(3L).get();
+    User user = userRepository.findById(6L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
@@ -564,22 +568,23 @@ public class UserServiceTest {
     userService.save(user, null);
 
     verify(authorizationService).checkWrite(user);
-    assertEquals((Long) 3L, user.getId());
+    assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
-    assertEquals(2, user.getSignAttempts());
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+    assertEquals(3, user.getSignAttempts());
+    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertEquals(true, user.isExpiredPassword());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
+    verify(authorizationService, never()).reloadAuthorities();
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -601,5 +606,69 @@ public class UserServiceTest {
   @Test(expected = NullPointerException.class)
   public void save_Null() {
     userService.save(null, null);
+  }
+
+  @Test
+  public void save_Password() {
+    User user = userRepository.findById(6L).get();
+    when(authorizationService.currentUser()).thenReturn(user);
+
+    userService.save("newpassword");
+
+    verify(authorizationService).currentUser();
+    verify(authorizationService).checkWrite(user);
+    user = userRepository.findById(6L).get();
+    assertEquals("Christian Poitras", user.getName());
+    assertEquals("christian.poitras@ircm.qc.ca", user.getEmail());
+    verify(passwordEncoder).encode("newpassword");
+    assertEquals(hashedPassword, user.getHashedPassword());
+    assertEquals(3, user.getSignAttempts());
+    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertEquals((Long) 3L, user.getLaboratory().getId());
+    assertNull(user.getLocale());
+    verify(authorizationService).reloadAuthorities();
+  }
+
+  @Test
+  public void save_PasswordNoAuthorityChange() {
+    User user = userRepository.findById(3L).get();
+    when(authorizationService.currentUser()).thenReturn(user);
+
+    userService.save("newpassword");
+
+    verify(authorizationService).currentUser();
+    verify(authorizationService).checkWrite(user);
+    user = userRepository.findById(3L).get();
+    assertEquals("Jonh Smith", user.getName());
+    assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
+    verify(passwordEncoder).encode("newpassword");
+    assertEquals(hashedPassword, user.getHashedPassword());
+    assertEquals(2, user.getSignAttempts());
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+        .isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+        .isBefore(user.getLastSignAttempt()));
+    assertEquals(true, user.isActive());
+    assertEquals(false, user.isManager());
+    assertEquals(false, user.isAdmin());
+    assertEquals(false, user.isExpiredPassword());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
+    assertNull(user.getLocale());
+    verify(authorizationService, never()).reloadAuthorities();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void save_PasswordNull() {
+    User user = userRepository.findById(3L).get();
+    when(authorizationService.currentUser()).thenReturn(user);
+
+    userService.save(null);
   }
 }

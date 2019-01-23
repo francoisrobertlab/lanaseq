@@ -77,6 +77,11 @@ public interface AuthorizationService {
   public boolean hasAnyRole(String... roles);
 
   /**
+   * Reload current user's authorities.
+   */
+  public void reloadAuthorities();
+
+  /**
    * Returns true if current user is authorized to access class, false otherwise.
    *
    * @param type

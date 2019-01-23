@@ -153,6 +153,8 @@ public class UserService {
     }
 
     authorizationService.checkWrite(user);
+    final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
+    // TODO Creation date should never change.
     user.setDate(LocalDateTime.now());
     if (user.getId() == null) {
       authorizationService.checkAnyRole(ADMIN, MANAGER);
@@ -164,6 +166,7 @@ public class UserService {
     if (password != null) {
       String hashedPassword = passwordEncoder.encode(password);
       user.setHashedPassword(hashedPassword);
+      user.setExpiredPassword(false);
     }
     if (user.getLaboratory().getId() == null) {
       authorizationService.checkRole(ADMIN);
@@ -178,6 +181,32 @@ public class UserService {
     }
     repository.save(user);
     deleteLaboratoryIfEmpty(oldLaboratory);
+    if (reloadAuthorities) {
+      authorizationService.reloadAuthorities();
+    }
+  }
+
+  /**
+   * Saves new password for current user.
+   *
+   * @param password
+   *          user's unhashed password
+   */
+  public void save(String password) {
+    if (password == null) {
+      throw new NullPointerException("password parameter cannot be null");
+    }
+    User user = authorizationService.currentUser();
+    authorizationService.checkWrite(user);
+
+    final boolean reloadAuthorities = user.isExpiredPassword();
+    String hashedPassword = passwordEncoder.encode(password);
+    user.setHashedPassword(hashedPassword);
+    user.setExpiredPassword(false);
+    repository.save(user);
+    if (reloadAuthorities) {
+      authorizationService.reloadAuthorities();
+    }
   }
 
   private void deleteLaboratoryIfEmpty(Laboratory laboratory) {
