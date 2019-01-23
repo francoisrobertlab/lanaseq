@@ -213,6 +213,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final MessageResource resources = new MessageResource(UsersView.class, locale);
     final MessageResource userResources = new MessageResource(User.class, locale);
+    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
