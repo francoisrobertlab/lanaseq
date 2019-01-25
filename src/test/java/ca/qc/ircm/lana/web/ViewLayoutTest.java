@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -38,7 +37,6 @@ import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
-import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.user.web.SigninView;
 import ca.qc.ircm.lana.user.web.UsersView;
@@ -103,36 +101,12 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void tabs_User() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(false);
-    view.init();
-    assertTrue(view.home.isVisible());
-    assertFalse(view.users.isVisible());
-    assertFalse(view.exitSwitchUser.isVisible());
-    assertTrue(view.signout.isVisible());
-    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
-  }
-
-  @Test
-  public void tabs_Manager() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+  public void tabs() {
     view.init();
     assertTrue(view.home.isVisible());
     assertTrue(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
-    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
-  }
-
-  @Test
-  public void tabs_Admin() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
-    view.init();
-    assertTrue(view.home.isVisible());
-    assertTrue(view.users.isVisible());
-    assertFalse(view.exitSwitchUser.isVisible());
-    assertTrue(view.signout.isVisible());
-    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
@@ -141,10 +115,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
         .thenReturn(true);
     view.init();
     assertTrue(view.home.isVisible());
-    assertFalse(view.users.isVisible());
+    assertTrue(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
-    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test

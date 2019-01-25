@@ -20,6 +20,7 @@ package ca.qc.ircm.lana.user.web;
 import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER;
 import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USER_URL;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS_REQUIRED;
 
@@ -76,7 +77,9 @@ public class UsersViewPresenter {
   void init(UsersView view) {
     this.view = view;
     loadUsers();
+    view.active.setVisible(authorizationService.hasAnyRole(ADMIN, MANAGER));
     view.error.setVisible(false);
+    view.add.setVisible(authorizationService.hasAnyRole(ADMIN, MANAGER));
     view.switchUser.setVisible(authorizationService.hasRole(ADMIN));
     view.userDialog.addSavedListener(e -> loadUsers());
     view.laboratoryDialog.addSavedListener(e -> loadUsers());

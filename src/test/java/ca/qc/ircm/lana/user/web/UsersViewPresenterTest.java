@@ -46,6 +46,7 @@ import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -98,11 +99,13 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
    * Before test.
    */
   @Before
+  @SuppressWarnings("unchecked")
   public void beforeTest() {
     presenter = new UsersViewPresenter(userService, laboratoryService, authorizationService);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
+    view.active = mock(Column.class);
     view.error = new Div();
     view.add = new Button();
     view.switchUser = new Button();
@@ -117,8 +120,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void users_Manager() {
-    when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(false);
+  public void users_User() {
     presenter.init(view);
     verify(userService).all(currentUser.getLaboratory());
     List<User> users = items(view.users);
@@ -129,11 +131,32 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.users.getSelectedItems().size());
     users.forEach(user -> view.users.select(user));
     assertEquals(users.size(), view.users.getSelectedItems().size());
+    verify(view.active).setVisible(false);
+    assertFalse(view.add.isVisible());
+    assertFalse(view.switchUser.isVisible());
+  }
+
+  @Test
+  public void users_Manager() {
+    when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
+    presenter.init(view);
+    verify(userService).all(currentUser.getLaboratory());
+    List<User> users = items(view.users);
+    assertEquals(this.users.size(), users.size());
+    for (User user : this.users) {
+      assertTrue(user.toString(), users.contains(user));
+    }
+    assertEquals(0, view.users.getSelectedItems().size());
+    users.forEach(user -> view.users.select(user));
+    assertEquals(users.size(), view.users.getSelectedItems().size());
+    verify(view.active).setVisible(true);
+    assertTrue(view.add.isVisible());
     assertFalse(view.switchUser.isVisible());
   }
 
   @Test
   public void users_Admin() {
+    when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
     when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(true);
     presenter.init(view);
     verify(userService).all();
@@ -145,6 +168,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.users.getSelectedItems().size());
     users.forEach(user -> view.users.select(user));
     assertEquals(users.size(), view.users.getSelectedItems().size());
+    verify(view.active).setVisible(true);
+    assertTrue(view.add.isVisible());
     assertTrue(view.switchUser.isVisible());
   }
 

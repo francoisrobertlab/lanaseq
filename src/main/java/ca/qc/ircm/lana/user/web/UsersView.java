@@ -23,8 +23,7 @@ import static ca.qc.ircm.lana.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.user.UserRole.USER;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.ERROR;
@@ -71,7 +70,7 @@ import javax.inject.Inject;
  * Users view.
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ ADMIN, MANAGER })
+@RolesAllowed({ USER })
 public class UsersView extends Composite<VerticalLayout>
     implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BaseComponent {
   public static final String VIEW_NAME = "users";

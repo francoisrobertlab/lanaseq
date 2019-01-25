@@ -21,7 +21,6 @@ import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.user.UserAuthority;
-import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.user.web.SigninView;
 import ca.qc.ircm.lana.user.web.UsersView;
@@ -81,7 +80,6 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
   void init() {
     add(tabs);
     tabs.add(home, users, exitSwitchUser, signout);
-    users.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     exitSwitchUser
         .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     tabsHref.put(home, ExperimentsView.VIEW_NAME);
