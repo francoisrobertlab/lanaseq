@@ -101,7 +101,6 @@ public class UserDialogPresenter {
     dialog.laboratory.setDataProvider(laboratoriesDataProvider);
     dialog.laboratory.setItemLabelGenerator(lab -> lab.getName());
     dialog.newLaboratoryLayout.setVisible(false);
-    dialog.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
     dialog.createNewLaboratory.setVisible(authorizationService.hasRole(UserRole.ADMIN));
     setUser(null);
     laboratoryBinder.setBean(new Laboratory());
@@ -125,12 +124,20 @@ public class UserDialogPresenter {
         .withNullRepresentation("").bind(LABORATORY_NAME);
     dialog.save.setText(webResources.message(SAVE));
     dialog.cancel.setText(webResources.message(CANCEL));
+    updateReadOnly();
   }
 
   private Validator<Laboratory> laboratoryRequiredValidator(String errorMessage) {
     return (value, context) -> !dialog.createNewLaboratory.getValue() && value == null
         ? ValidationResult.error(errorMessage)
         : ValidationResult.ok();
+  }
+
+  private void updateReadOnly() {
+    boolean readOnly = user.getId() != null && !authorizationService.hasWrite(user);
+    binder.setReadOnly(readOnly);
+    dialog.laboratory.setReadOnly(readOnly || !authorizationService.hasRole(UserRole.ADMIN));
+    dialog.passwords.setVisible(!readOnly);
   }
 
   private void updateManager() {
@@ -204,6 +211,7 @@ public class UserDialogPresenter {
     this.user = user;
     binder.setBean(user);
     dialog.passwords.setRequired(user.getId() == null);
+    updateReadOnly();
   }
 
   ListDataProvider<Laboratory> laboratoryDataProvider() {

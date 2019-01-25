@@ -172,6 +172,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void currentUser_Admin() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
     assertTrue(dialog.admin.isVisible());
@@ -297,6 +298,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void uncheckManagerAndCheckCreateNewLaboratory_Admin() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
     dialog.manager.setValue(true);
@@ -319,6 +321,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setUser_NewUser() {
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.init(dialog);
     User user = new User();
 
@@ -326,12 +329,46 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.setUser(user);
 
     assertEquals("", dialog.email.getValue());
+    assertFalse(dialog.email.isReadOnly());
     assertEquals("", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
     assertFalse(dialog.admin.getValue());
+    assertFalse(dialog.admin.isReadOnly());
     assertFalse(dialog.manager.getValue());
+    assertFalse(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
     verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertTrue(booleanCaptor.getValue());
     assertEquals(laboratory.getId(), dialog.laboratory.getValue().getId());
+    assertTrue(dialog.laboratory.isReadOnly());
+  }
+
+  @Test
+  public void setUser_NewUserAdmin() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authorizationService.hasRole(any())).thenReturn(true);
+    when(authorizationService.hasWrite(any())).thenReturn(true);
+    presenter.init(dialog);
+    User user = new User();
+
+    presenter.localeChange(locale);
+    presenter.setUser(user);
+
+    assertEquals("", dialog.email.getValue());
+    assertFalse(dialog.email.isReadOnly());
+    assertEquals("", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertFalse(dialog.admin.getValue());
+    assertFalse(dialog.admin.isReadOnly());
+    assertFalse(dialog.manager.getValue());
+    assertFalse(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
+    assertEquals((Long) 1L, dialog.laboratory.getValue().getId());
+    assertFalse(dialog.laboratory.isReadOnly());
   }
 
   @Test
@@ -343,12 +380,69 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.setUser(user);
 
     assertEquals(user.getEmail(), dialog.email.getValue());
+    assertTrue(dialog.email.isReadOnly());
     assertEquals(user.getName(), dialog.name.getValue());
+    assertTrue(dialog.name.isReadOnly());
     assertFalse(dialog.admin.getValue());
+    assertTrue(dialog.admin.isReadOnly());
     assertTrue(dialog.manager.getValue());
+    assertTrue(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertFalse(booleanCaptor.getValue());
+    assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
+    assertTrue(dialog.laboratory.isReadOnly());
+  }
+
+  @Test
+  public void setUser_UserCanWrite() {
+    presenter.init(dialog);
+    User user = userRepository.findById(2L).get();
+    when(authorizationService.hasWrite(user)).thenReturn(true);
+
+    presenter.localeChange(locale);
+    presenter.setUser(user);
+
+    assertEquals(user.getEmail(), dialog.email.getValue());
+    assertFalse(dialog.email.isReadOnly());
+    assertEquals(user.getName(), dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertFalse(dialog.admin.getValue());
+    assertFalse(dialog.admin.isReadOnly());
+    assertTrue(dialog.manager.getValue());
+    assertFalse(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
     verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
     assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
+    assertTrue(dialog.laboratory.isReadOnly());
+  }
+
+  @Test
+  public void setUser_UserAdmin() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authorizationService.hasRole(any())).thenReturn(true);
+    when(authorizationService.hasWrite(any())).thenReturn(true);
+    presenter.init(dialog);
+    User user = userRepository.findById(2L).get();
+
+    presenter.localeChange(locale);
+    presenter.setUser(user);
+
+    assertEquals(user.getEmail(), dialog.email.getValue());
+    assertFalse(dialog.email.isReadOnly());
+    assertEquals(user.getName(), dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertFalse(dialog.admin.getValue());
+    assertFalse(dialog.admin.isReadOnly());
+    assertTrue(dialog.manager.getValue());
+    assertFalse(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertFalse(booleanCaptor.getValue());
+    assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
+    assertFalse(dialog.laboratory.isReadOnly());
   }
 
   @Test
@@ -360,12 +454,69 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
 
     assertEquals(user.getEmail(), dialog.email.getValue());
+    assertTrue(dialog.email.isReadOnly());
     assertEquals(user.getName(), dialog.name.getValue());
+    assertTrue(dialog.name.isReadOnly());
     assertFalse(dialog.admin.getValue());
+    assertTrue(dialog.admin.isReadOnly());
     assertTrue(dialog.manager.getValue());
+    assertTrue(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertFalse(booleanCaptor.getValue());
+    assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
+    assertTrue(dialog.laboratory.isReadOnly());
+  }
+
+  @Test
+  public void setUser_UserCanWriteBeforeLocaleChange() {
+    presenter.init(dialog);
+    User user = userRepository.findById(2L).get();
+    when(authorizationService.hasWrite(user)).thenReturn(true);
+
+    presenter.setUser(user);
+    presenter.localeChange(locale);
+
+    assertEquals(user.getEmail(), dialog.email.getValue());
+    assertFalse(dialog.email.isReadOnly());
+    assertEquals(user.getName(), dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertFalse(dialog.admin.getValue());
+    assertFalse(dialog.admin.isReadOnly());
+    assertTrue(dialog.manager.getValue());
+    assertFalse(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
     verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
     assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
+    assertTrue(dialog.laboratory.isReadOnly());
+  }
+
+  @Test
+  public void setUser_UserAdminBeforeLocaleChange() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authorizationService.hasRole(any())).thenReturn(true);
+    when(authorizationService.hasWrite(any())).thenReturn(true);
+    presenter.init(dialog);
+    User user = userRepository.findById(2L).get();
+
+    presenter.setUser(user);
+    presenter.localeChange(locale);
+
+    assertEquals(user.getEmail(), dialog.email.getValue());
+    assertFalse(dialog.email.isReadOnly());
+    assertEquals(user.getName(), dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
+    assertFalse(dialog.admin.getValue());
+    assertFalse(dialog.admin.isReadOnly());
+    assertTrue(dialog.manager.getValue());
+    assertFalse(dialog.manager.isReadOnly());
+    verify(dialog.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
+    assertTrue(booleanCaptor.getValue());
+    verify(dialog.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
+    assertFalse(booleanCaptor.getValue());
+    assertEquals(user.getLaboratory(), dialog.laboratory.getValue());
+    assertFalse(dialog.laboratory.isReadOnly());
   }
 
   @Test
@@ -606,6 +757,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(dialog.passwords.getPassword()).thenReturn(password);
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -630,6 +782,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(6L).get();
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -651,6 +804,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void save_UpdateUserNoPassword() {
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -700,6 +854,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(1L).get();
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -723,6 +878,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(1L).get();
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -746,6 +902,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(1L).get();
+    when(authorizationService.hasWrite(any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
