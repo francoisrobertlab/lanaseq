@@ -28,6 +28,8 @@ import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.ERROR;
+import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
+import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static ca.qc.ircm.lana.web.WebConstants.SUCCESS;
 import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
@@ -44,6 +46,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -74,6 +77,7 @@ public class UsersView extends Composite<VerticalLayout>
   public static final String VIEW_NAME = "users";
   public static final String HEADER = "header";
   public static final String USERS = "users";
+  public static final String USERS_REQUIRED = property(USERS, REQUIRED);
   public static final String SWITCH_USER = "switchUser";
   public static final String SWITCH_FAILED = "switchFailed";
   public static final String ADD = "add";
@@ -84,12 +88,13 @@ public class UsersView extends Composite<VerticalLayout>
   protected Column<User> name;
   protected Column<User> laboratory;
   protected Column<User> active;
-  protected Column<User> switchUser;
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected TextField laboratoryFilter = new TextField();
   protected ComboBox<Optional<Boolean>> activeFilter = new ComboBox<>();
+  protected Div error = new Div();
   protected Button add = new Button();
+  protected Button switchUser = new Button();
   private Map<User, Button> actives = new HashMap<>();
   @Inject
   protected UserDialog userDialog;
@@ -113,9 +118,10 @@ public class UsersView extends Composite<VerticalLayout>
   void init() {
     VerticalLayout root = getContent();
     root.setId(VIEW_NAME);
-    root.add(header);
+    HorizontalLayout buttonsLayout = new HorizontalLayout();
+    root.add(header, users, error, buttonsLayout);
+    buttonsLayout.add(add, switchUser);
     header.addClassName(HEADER);
-    root.add(users);
     users.addClassName(USERS);
     email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
@@ -126,7 +132,6 @@ public class UsersView extends Composite<VerticalLayout>
                 .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
         .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
-    switchUser = users.addComponentColumn(user -> switchButton(user)).setKey(SWITCH_USER);
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();
     filtersRow.getCell(email).setComponent(emailFilter);
@@ -145,11 +150,11 @@ public class UsersView extends Composite<VerticalLayout>
     activeFilter.setItems(Optional.empty(), Optional.of(false), Optional.of(true));
     activeFilter.addValueChangeListener(e -> presenter.filterActive(e.getValue().orElse(null)));
     activeFilter.setSizeFull();
-    HorizontalLayout buttonsLayout = new HorizontalLayout();
-    root.add(buttonsLayout);
-    buttonsLayout.add(add);
+    error.addClassName(ERROR_TEXT);
     add.addClassName(ADD);
     add.addClickListener(e -> presenter.add());
+    switchUser.addClassName(SWITCH_USER);
+    switchUser.addClickListener(e -> presenter.switchUser());
     presenter.init(this);
   }
 
@@ -188,14 +193,6 @@ public class UsersView extends Composite<VerticalLayout>
     button.getElement().setAttribute(THEME, user.isActive() ? SUCCESS : ERROR);
   }
 
-  private Button switchButton(User user) {
-    Button button = new Button();
-    button.addClassName(SWITCH_USER);
-    button.setIcon(VaadinIcon.BUG.create());
-    button.addClickListener(e -> presenter.switchUser(user));
-    return button;
-  }
-
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final MessageResource resources = new MessageResource(UsersView.class, getLocale());
@@ -210,8 +207,6 @@ public class UsersView extends Composite<VerticalLayout>
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
     String activeHeader = userResources.message(ACTIVE);
     active.setHeader(activeHeader).setFooter(activeHeader);
-    String runasHeader = resources.message(SWITCH_USER);
-    switchUser.setHeader(runasHeader).setFooter(runasHeader);
     emailFilter.setPlaceholder(webResources.message(ALL));
     nameFilter.setPlaceholder(webResources.message(ALL));
     laboratoryFilter.setPlaceholder(webResources.message(ALL));
@@ -221,6 +216,9 @@ public class UsersView extends Composite<VerticalLayout>
         .setText(userResources.message(property(ACTIVE, entry.getKey().isActive()))));
     add.setText(resources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
+    switchUser.setText(resources.message(SWITCH_USER));
+    switchUser.setIcon(VaadinIcon.BUG.create());
+    presenter.localeChange(getLocale());
   }
 
   @Override

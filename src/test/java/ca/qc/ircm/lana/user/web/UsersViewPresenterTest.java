@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
+import static ca.qc.ircm.lana.user.web.UsersView.USERS_REQUIRED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -43,9 +44,10 @@ import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.SavedEvent;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.net.URLEncoder;
@@ -96,13 +98,14 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
    * Before test.
    */
   @Before
-  @SuppressWarnings("unchecked")
   public void beforeTest() {
     presenter = new UsersViewPresenter(userService, laboratoryService, authorizationService);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
-    view.switchUser = mock(Column.class);
+    view.error = new Div();
+    view.add = new Button();
+    view.switchUser = new Button();
     view.userDialog = mock(UserDialog.class);
     view.laboratoryDialog = mock(LaboratoryDialog.class);
     when(view.getCurrentUi()).thenReturn(ui);
@@ -118,7 +121,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(false);
     presenter.init(view);
     verify(userService).all(currentUser.getLaboratory());
-    verify(view.switchUser).setVisible(false);
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -127,6 +129,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.users.getSelectedItems().size());
     users.forEach(user -> view.users.select(user));
     assertEquals(users.size(), view.users.getSelectedItems().size());
+    assertFalse(view.switchUser.isVisible());
   }
 
   @Test
@@ -134,7 +137,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(true);
     presenter.init(view);
     verify(userService).all();
-    verify(view.switchUser).setVisible(true);
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -143,6 +145,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertEquals(0, view.users.getSelectedItems().size());
     users.forEach(user -> view.users.select(user));
     assertEquals(users.size(), view.users.getSelectedItems().size());
+    assertTrue(view.switchUser.isVisible());
   }
 
   @Test
@@ -245,6 +248,13 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void error() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    assertFalse(view.error.isVisible());
+  }
+
+  @Test
   public void view() {
     presenter.init(view);
     User user = new User();
@@ -314,10 +324,31 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   public void switchUser() throws Throwable {
     presenter.init(view);
     User user = userRepository.findById(3L).orElse(null);
-    presenter.switchUser(user);
+    view.users.select(user);
+    presenter.switchUser();
+    assertFalse(view.error.isVisible());
     verify(page).executeJavaScript("location.assign('" + WebSecurityConfiguration.SWITCH_USER_URL
         + "?" + WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER + "="
         + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8.name()) + "')");
+  }
+
+  @Test
+  public void switchUser_EmptySelection() throws Throwable {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.switchUser();
+    assertEquals(resources.message(USERS_REQUIRED), view.error.getText());
+    assertTrue(view.error.isVisible());
+    verify(page, never()).executeJavaScript(any());
+  }
+
+  @Test
+  public void permissions_ErrorThenView() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    presenter.switchUser();
+    presenter.view(users.get(1));
+    assertFalse(view.error.isVisible());
   }
 
   @Test

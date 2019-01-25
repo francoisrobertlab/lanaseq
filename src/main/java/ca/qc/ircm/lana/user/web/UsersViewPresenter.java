@@ -21,6 +21,7 @@ import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USERN
 import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USER_URL;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
+import static ca.qc.ircm.lana.user.web.UsersView.USERS_REQUIRED;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
@@ -58,6 +59,7 @@ public class UsersViewPresenter {
   private LaboratoryService laboratoryService;
   @Inject
   private AuthorizationService authorizationService;
+  private Locale locale;
   private ListDataProvider<User> usersDataProvider;
   private WebUserFilter filter = new WebUserFilter();
 
@@ -74,6 +76,7 @@ public class UsersViewPresenter {
   void init(UsersView view) {
     this.view = view;
     loadUsers();
+    view.error.setVisible(false);
     view.switchUser.setVisible(authorizationService.hasRole(ADMIN));
     view.userDialog.addSavedListener(e -> loadUsers());
     view.laboratoryDialog.addSavedListener(e -> loadUsers());
@@ -87,6 +90,10 @@ public class UsersViewPresenter {
         usersDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     view.users.setDataProvider(dataProvider);
+  }
+
+  void localeChange(Locale locale) {
+    this.locale = locale;
   }
 
   void filterEmail(String value) {
@@ -109,25 +116,40 @@ public class UsersViewPresenter {
     view.users.getDataProvider().refreshAll();
   }
 
+  private void clearError() {
+    view.error.setVisible(false);
+  }
+
   void view(User user) {
+    clearError();
     view.userDialog.setUser(userService.get(user.getId()));
     view.userDialog.open();
   }
 
   void viewLaboratory(Laboratory laboratory) {
+    clearError();
     view.laboratoryDialog.setLaboratory(laboratoryService.get(laboratory.getId()));
     view.laboratoryDialog.open();
   }
 
   void toggleActive(User user) {
+    clearError();
     user.setActive(!user.isActive());
     userService.save(user, null);
   }
 
-  void switchUser(User user) {
-    // Switch user requires a request to be made outside of Vaadin.
-    view.getCurrentUi().getPage()
-        .executeJavaScript("location.assign('" + switchUserUrl(user) + "')");
+  void switchUser() {
+    clearError();
+    User user = view.users.getSelectedItems().stream().findFirst().orElse(null);
+    if (user == null) {
+      MessageResource resources = new MessageResource(UsersView.class, locale);
+      view.error.setText(resources.message(USERS_REQUIRED));
+      view.error.setVisible(true);
+    } else {
+      // Switch user requires a request to be made outside of Vaadin.
+      view.getCurrentUi().getPage()
+          .executeJavaScript("location.assign('" + switchUserUrl(user) + "')");
+    }
   }
 
   private String switchUserUrl(User user) {
