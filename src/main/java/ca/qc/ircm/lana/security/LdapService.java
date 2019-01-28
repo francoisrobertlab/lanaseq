@@ -70,29 +70,6 @@ public class LdapService {
   }
 
   /**
-   * Returns user's email from LDAP.
-   *
-   * @param username
-   *          username
-   * @return user's email from LDAP or null if user does not exists
-   */
-  public String getEmail(String username) {
-    LdapQuery query = query().attributes(ldapConfiguration.getMailAttribute())
-        .where(ldapConfiguration.getIdAttribute()).is(username);
-    AttributesMapper<String> mapper =
-        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getMailAttribute())).map(attr -> {
-          try {
-            return attr.get();
-          } catch (NamingException e) {
-            return null;
-          }
-        }).map(value -> value.toString()).orElse(null);
-    String email = ldapTemplate.search(query, mapper).stream().findFirst().orElse(null);
-    logger.debug("Found LDAP email {} for user [{}]", username, email);
-    return email;
-  }
-
-  /**
    * Returns user's username on LDAP.
    *
    * @param email
