@@ -74,6 +74,26 @@ public class DaoAuthenticationProviderWithLdapTest {
     assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
+  @Test()
+  public void authenticate_NoLdapFail() throws Throwable {
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass");
+
+    try {
+      ldapDaoAuthenticationProvider.authenticate(authentication);
+      fail(BadCredentialsException.class.getSimpleName() + " expected");
+    } catch (BadCredentialsException e) {
+      // Success.
+    }
+
+    verify(ldapService, never()).getUsername(any());
+    verify(ldapService, never()).isPasswordValid(any(), any());
+    User user = userRepository.findById(3L).get();
+    assertEquals(3, user.getSignAttempts());
+    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+  }
+
   @Test
   public void authenticate_LdapSuccess() throws Throwable {
     when(ldapConfiguration.isEnabled()).thenReturn(true);
@@ -101,7 +121,7 @@ public class DaoAuthenticationProviderWithLdapTest {
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "test");
     try {
       ldapDaoAuthenticationProvider.authenticate(authentication);
-      fail(BadCredentialsException.class.getName() + " expected");
+      fail(BadCredentialsException.class.getSimpleName() + " expected");
     } catch (BadCredentialsException e) {
       // Success.
     }
@@ -137,7 +157,7 @@ public class DaoAuthenticationProviderWithLdapTest {
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "test");
     try {
       ldapDaoAuthenticationProvider.authenticate(authentication);
-      fail(BadCredentialsException.class.getName() + " expected");
+      fail(BadCredentialsException.class.getSimpleName() + " expected");
     } catch (BadCredentialsException e) {
       // Success.
     }
@@ -156,7 +176,7 @@ public class DaoAuthenticationProviderWithLdapTest {
         new UsernamePasswordAuthenticationToken("inactive.user@ircm.qc.ca", "pass1");
     try {
       ldapDaoAuthenticationProvider.authenticate(authentication);
-      fail(DisabledException.class.getName() + " expected");
+      fail(DisabledException.class.getSimpleName() + " expected");
     } catch (DisabledException e) {
       // Success.
     }
@@ -212,7 +232,7 @@ public class DaoAuthenticationProviderWithLdapTest {
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass1");
     try {
       ldapDaoAuthenticationProvider.authenticate(authentication);
-      fail(LockedException.class.getName() + " expected");
+      fail(LockedException.class.getSimpleName() + " expected");
     } catch (LockedException e) {
       // Success.
     }
