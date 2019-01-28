@@ -29,48 +29,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = LdapConfiguration.PREFIX)
 public class LdapConfiguration {
   public static final String PREFIX = "ldap";
-  private String url;
-  private String base;
-  private String userDnTemplate;
-  private String userFilter;
+  private boolean enabled;
   private String idAttribute;
   private String mailAttribute;
-
-  public boolean isEnabled() {
-    return url != null && url.length() > 0;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public String getBase() {
-    return base;
-  }
-
-  public void setBase(String base) {
-    this.base = base;
-  }
-
-  public String getUserDnTemplate() {
-    return userDnTemplate;
-  }
-
-  public void setUserDnTemplate(String userDnTemplate) {
-    this.userDnTemplate = userDnTemplate;
-  }
-
-  public String getUserFilter() {
-    return userFilter;
-  }
-
-  public void setUserFilter(String userFilter) {
-    this.userFilter = userFilter;
-  }
 
   public String getIdAttribute() {
     return idAttribute;
@@ -86,5 +47,13 @@ public class LdapConfiguration {
 
   public void setMailAttribute(String mailAttribute) {
     this.mailAttribute = mailAttribute;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }

@@ -33,9 +33,7 @@ security:
   lock-duration: PT3M
 
 ldap:
-  base: dc=mycompany,dc=com
-  user-dn-template: uid={0},ou=people,dc=mycompany,dc=com
-  user-filter: uid={0}
+  enabled: false
   id-attribute: uid
   mail-attribute: mail
 
@@ -68,6 +66,9 @@ spring:
 
 security:
   rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
+
+ldap:
+  enabled: true
 
 vaadin:
   productionMode: false
