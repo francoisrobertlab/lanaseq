@@ -32,6 +32,7 @@ public class SecurityConfiguration {
   public static final String PREFIX = "security";
   private int lockAttemps;
   private Duration lockDuration;
+  private int disableSignAttemps;
   private String rememberMeKey;
 
   public int getLockAttemps() {
@@ -48,6 +49,14 @@ public class SecurityConfiguration {
 
   public void setLockDuration(Duration lockDuration) {
     this.lockDuration = lockDuration;
+  }
+
+  public int getDisableSignAttemps() {
+    return disableSignAttemps;
+  }
+
+  public void setDisableSignAttemps(int disableSignAttemps) {
+    this.disableSignAttemps = disableSignAttemps;
   }
 
   public String getRememberMeKey() {

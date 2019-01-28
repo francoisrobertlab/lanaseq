@@ -36,6 +36,7 @@ public class SecurityConfigurationTest {
   public void defaultProperties() throws Throwable {
     assertEquals(5, securityConfiguration.getLockAttemps());
     assertEquals(Duration.ofMinutes(3), securityConfiguration.getLockDuration());
+    assertEquals(20, securityConfiguration.getDisableSignAttemps());
     assertEquals("JfYMi0qUQVt8FObsZHW7", securityConfiguration.getRememberMeKey());
   }
 }

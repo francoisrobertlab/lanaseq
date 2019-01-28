@@ -18,6 +18,7 @@
 package ca.qc.ircm.lana.security;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -185,6 +186,28 @@ public class DaoAuthenticationProviderWithLdapTest {
     assertEquals(3, user.getSignAttempts());
     assertTrue(Instant.now().minus(19, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
     assertTrue(Instant.now().minus(30, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
+  }
+
+  @Test
+  public void authenticate_Disable() throws Throwable {
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass");
+    User user = userRepository.findById(3L).get();
+    user.setSignAttempts(19);
+    userRepository.save(user);
+
+    try {
+      ldapDaoAuthenticationProvider.authenticate(authentication);
+      fail(BadCredentialsException.class.getSimpleName() + " expected");
+    } catch (BadCredentialsException e) {
+      // Success.
+    }
+
+    user = userRepository.findById(3L).get();
+    assertEquals(20, user.getSignAttempts());
+    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertFalse(user.isActive());
   }
 
   @Test

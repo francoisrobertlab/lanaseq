@@ -91,6 +91,9 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
   private void incrementSignAttemps(User user) {
     user.setSignAttempts(user.getSignAttempts() + 1);
     user.setLastSignAttempt(Instant.now());
+    if (user.getSignAttempts() >= securityConfiguration.getDisableSignAttemps()) {
+      user.setActive(false);
+    }
     userRepository.save(user);
   }
 
