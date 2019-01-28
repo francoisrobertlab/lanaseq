@@ -116,6 +116,8 @@ public class UserService {
    * Returns laboratory's manager. <br>
    * If laboratory has many managers, returns anyone of them.
    *
+   * @param laboratory
+   *          laboratory
    * @return laboratory's manager
    */
   public User manager(Laboratory laboratory) {

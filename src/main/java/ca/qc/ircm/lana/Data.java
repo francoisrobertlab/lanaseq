@@ -38,6 +38,8 @@ public interface Data {
    *          all data
    * @param id
    *          id
+   * @param <D>
+   *          instances of {@link Data}
    * @return data having this id within all data
    */
   public static <D extends Data> Optional<D> find(Collection<D> datas, long id) {
