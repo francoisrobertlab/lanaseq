@@ -31,8 +31,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class SpringLdapServiceTest {
-  private SpringLdapService ldapService;
+public class LdapServiceTest {
+  private LdapService ldapService;
   @Inject
   private LdapTemplate ldapTemplate;
   @Inject
@@ -40,7 +40,7 @@ public class SpringLdapServiceTest {
 
   @Before
   public void beforeTest() {
-    ldapService = new SpringLdapService(ldapTemplate, ldapConfiguration);
+    ldapService = new LdapService(ldapTemplate, ldapConfiguration);
   }
 
   @Test

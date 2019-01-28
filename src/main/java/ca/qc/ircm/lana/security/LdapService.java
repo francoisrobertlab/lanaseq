@@ -17,10 +17,36 @@
 
 package ca.qc.ircm.lana.security;
 
+import static org.springframework.ldap.query.LdapQueryBuilder.query;
+
+import java.util.Optional;
+import javax.inject.Inject;
+import javax.naming.NamingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.query.LdapQuery;
+import org.springframework.stereotype.Component;
+
 /**
  * Services for LDAP (active directory).
  */
-public interface LdapService {
+@Component
+public class LdapService {
+  private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
+  @Inject
+  private LdapTemplate ldapTemplate;
+  @Inject
+  private LdapConfiguration ldapConfiguration;
+
+  protected LdapService() {
+  }
+
+  public LdapService(LdapTemplate ldapTemplate, LdapConfiguration ldapConfiguration) {
+    this.ldapTemplate = ldapTemplate;
+    this.ldapConfiguration = ldapConfiguration;
+  }
 
   /**
    * Returns true if user exists in LDAP and password is valid, false otherwise.
@@ -31,7 +57,17 @@ public interface LdapService {
    *          password
    * @return true if user exists in LDAP and password is valid, false otherwise
    */
-  public boolean isPasswordValid(String username, String password);
+  public boolean isPasswordValid(String username, String password) {
+    try {
+      LdapQuery query = query().where(ldapConfiguration.getIdAttribute()).is(username);
+      ldapTemplate.authenticate(query, password);
+      logger.debug("Valid LDAP password for user [{}]", username);
+      return true;
+    } catch (Exception e) {
+      logger.debug("Invalid LDAP password for user [{}]", username, e);
+      return false;
+    }
+  }
 
   /**
    * Returns user's email from LDAP.
@@ -40,7 +76,21 @@ public interface LdapService {
    *          username
    * @return user's email from LDAP or null if user does not exists
    */
-  public String getEmail(String username);
+  public String getEmail(String username) {
+    LdapQuery query = query().attributes(ldapConfiguration.getMailAttribute())
+        .where(ldapConfiguration.getIdAttribute()).is(username);
+    AttributesMapper<String> mapper =
+        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getMailAttribute())).map(attr -> {
+          try {
+            return attr.get();
+          } catch (NamingException e) {
+            return null;
+          }
+        }).map(value -> value.toString()).orElse(null);
+    String email = ldapTemplate.search(query, mapper).stream().findFirst().orElse(null);
+    logger.debug("Found LDAP email {} for user [{}]", username, email);
+    return email;
+  }
 
   /**
    * Returns user's username on LDAP.
@@ -49,5 +99,19 @@ public interface LdapService {
    *          user's email
    * @return user's username on LDAP or null if user does not exists
    */
-  public String getUsername(String email);
+  public String getUsername(String email) {
+    LdapQuery query = query().attributes(ldapConfiguration.getIdAttribute())
+        .where(ldapConfiguration.getMailAttribute()).is(email);
+    AttributesMapper<String> mapper =
+        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getIdAttribute())).map(attr -> {
+          try {
+            return attr.get();
+          } catch (NamingException e) {
+            return null;
+          }
+        }).map(value -> value.toString()).orElse(null);
+    String username = ldapTemplate.search(query, mapper).stream().findFirst().orElse(null);
+    logger.debug("Found LDAP username {} for user [{}]", username, email);
+    return username;
+  }
 }
