@@ -17,8 +17,6 @@
 
 package ca.qc.ircm.lana.user;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
@@ -26,7 +24,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import javax.inject.Inject;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,14 +63,13 @@ public class UserService {
    *          user's id
    * @return user having specified id
    */
+  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
   public User get(Long id) {
     if (id == null) {
       return null;
     }
 
-    User user = repository.findById(id).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.READ);
-    return user;
+    return repository.findById(id).orElse(null);
   }
 
   /**
@@ -81,14 +79,13 @@ public class UserService {
    *          user's email
    * @return user having specified email
    */
+  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
   public User getByEmail(String email) {
     if (email == null) {
       return null;
     }
 
-    User user = repository.findByEmail(email).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.READ);
-    return user;
+    return repository.findByEmail(email).orElse(null);
   }
 
   /**
@@ -96,8 +93,8 @@ public class UserService {
    *
    * @return all users
    */
+  @PreAuthorize("hasAuthority('" + USER + "')")
   public List<User> all() {
-    authorizationService.checkRole(USER);
     return repository.findAll();
   }
 
@@ -108,8 +105,8 @@ public class UserService {
    *          laboratory
    * @return all users in laboratory
    */
+  @PreAuthorize("hasAuthority('" + USER + "')")
   public List<User> all(Laboratory laboratory) {
-    authorizationService.checkRole(USER);
     return repository.findByLaboratory(laboratory);
   }
 
@@ -121,8 +118,8 @@ public class UserService {
    *          laboratory
    * @return laboratory's manager
    */
+  @PreAuthorize("hasAuthority('" + USER + "')")
   public User manager(Laboratory laboratory) {
-    authorizationService.checkRole(USER);
     List<User> users = repository.findByLaboratoryAndManagerTrueAndActiveTrue(laboratory);
     return !users.isEmpty() ? users.get(0) : null;
   }
@@ -142,6 +139,7 @@ public class UserService {
    *          user's unhashed password; required for new users; can be null to keep previous
    *          password
    */
+  @PostAuthorize("hasPermission(#user, 'write')")
   public void save(User user, String password) {
     if (user.getId() != null && user.getId() == 1L && (!user.isAdmin() || !user.isActive())) {
       throw new AccessDeniedException("user 1 must be an admin and active");
@@ -155,15 +153,10 @@ public class UserService {
           "laboratory " + user.getLaboratory().getId() + " does not exists");
     }
 
-    authorizationService.checkPermission(user, BasePermission.WRITE);
     final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
     if (user.getId() == null) {
-      authorizationService.checkAnyRole(ADMIN, MANAGER);
       user.setActive(true);
       user.setDate(LocalDateTime.now());
-    }
-    if (user.isAdmin()) {
-      authorizationService.checkRole(ADMIN);
     }
     if (password != null) {
       String hashedPassword = passwordEncoder.encode(password);
@@ -171,16 +164,12 @@ public class UserService {
       user.setExpiredPassword(false);
     }
     if (user.getLaboratory().getId() == null) {
-      authorizationService.checkRole(ADMIN);
       user.getLaboratory().setDate(LocalDateTime.now());
       laboratoryRepository.save(user.getLaboratory());
     }
     final Laboratory oldLaboratory = user.getId() != null
         ? repository.findById(user.getId()).map(old -> old.getLaboratory()).orElse(null)
         : null;
-    if (oldLaboratory != null && !oldLaboratory.getId().equals(user.getLaboratory().getId())) {
-      authorizationService.checkRole(ADMIN);
-    }
     repository.save(user);
     deleteLaboratoryIfEmpty(oldLaboratory);
     if (reloadAuthorities) {
@@ -194,12 +183,12 @@ public class UserService {
    * @param password
    *          user's unhashed password
    */
+  @PreAuthorize("hasAuthority('" + USER + "')")
   public void save(String password) {
     if (password == null) {
       throw new NullPointerException("password parameter cannot be null");
     }
     User user = authorizationService.currentUser();
-    authorizationService.checkPermission(user, BasePermission.WRITE);
 
     final boolean reloadAuthorities = user.isExpiredPassword();
     String hashedPassword = passwordEncoder.encode(password);
