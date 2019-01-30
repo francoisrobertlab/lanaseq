@@ -805,6 +805,20 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
+  public void hasWrite_NewExperiment_Anonymous() throws Throwable {
+    Experiment experiment = new Experiment("new experiment");
+    assertFalse(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_NewExperiment() throws Throwable {
+    Experiment experiment = new Experiment("new experiment");
+    assertTrue(authorizationService.hasWrite(experiment));
+  }
+
+  @Test
+  @WithAnonymousUser
   public void hasWrite_Experiment_Anonymous() throws Throwable {
     Experiment experiment = experimentRepository.findById(2L).orElse(null);
     assertFalse(authorizationService.hasWrite(experiment));
@@ -904,6 +918,95 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
+  public void hasWrite_NewUser_Anonymous() throws Throwable {
+    Laboratory laboratory = new Laboratory("new lab");
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_NewUserNewLab_User() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(new Laboratory("new lab"));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_NewUserExistingLab_User() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_NewAdmin_User() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    user.setAdmin(true);
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_NewUserNewLab_Manager() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(new Laboratory("new lab"));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_NewUserExistingLab_Manager() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_NewAdmin_Manager() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    user.setAdmin(true);
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void hasWrite_NewUserExistingLab_ManagerOtherLab() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_NewUserNewLab_Admin() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(new Laboratory("new lab"));
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_NewUserExistingLab_Admin() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_NewAdmin_Admin() throws Throwable {
+    User user = new User("new lab");
+    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithAnonymousUser
   public void hasWrite_User_Anonymous() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
     assertFalse(authorizationService.hasWrite(user));
@@ -914,6 +1017,22 @@ public class SpringAuthorizationServiceTest {
   public void hasWrite_User_Self() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
     assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_UserWithOtherLaboratory_Self() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_UserWithNewLaboratory_Self() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(new Laboratory("new lab"));
+    assertFalse(authorizationService.hasWrite(user));
   }
 
   @Test
@@ -931,9 +1050,33 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_UserWithOtherLaboratory_Manager() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_UserWithNewLaboratory_Manager() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(new Laboratory("new lab"));
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void hasWrite_User_ManagerOtherLab() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
+    assertFalse(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void hasWrite_UserWithOtherLaboratory_ManagerOtherLab() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
     assertFalse(authorizationService.hasWrite(user));
   }
 
@@ -942,6 +1085,50 @@ public class SpringAuthorizationServiceTest {
   public void hasWrite_User_Admin() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
     assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_UserWithOtherLaboratory_Admin() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_UserWithNewLaboratory_Admin() throws Throwable {
+    User user = userRepository.findById(3L).orElse(null);
+    user.setLaboratory(new Laboratory("new lab"));
+    assertTrue(authorizationService.hasWrite(user));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasWrite_NewLaboratory_Anonymous() throws Throwable {
+    Laboratory laboratory = new Laboratory("new lab");
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void hasWrite_NewLaboratory_User() throws Throwable {
+    Laboratory laboratory = new Laboratory("new lab");
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void hasWrite_NewLaboratory_Manager() throws Throwable {
+    Laboratory laboratory = new Laboratory("new lab");
+    assertFalse(authorizationService.hasWrite(laboratory));
+  }
+
+  @Test
+  @WithUserDetails("lana@ircm.qc.ca")
+  public void hasWrite_NewLaboratory_Admin() throws Throwable {
+    Laboratory laboratory = new Laboratory("new lab");
+    assertTrue(authorizationService.hasWrite(laboratory));
   }
 
   @Test

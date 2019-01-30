@@ -122,6 +122,10 @@ public class User implements Data, Owned, Serializable {
     this.id = id;
   }
 
+  public User(String email) {
+    this.email = email;
+  }
+
   public User(Long id, String email) {
     this.id = id;
     this.email = email;

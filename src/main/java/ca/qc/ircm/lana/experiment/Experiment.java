@@ -65,6 +65,22 @@ public class Experiment implements Data, Owned, Serializable {
   @JoinColumn
   private User owner;
 
+  public Experiment() {
+  }
+
+  public Experiment(Long id) {
+    this.id = id;
+  }
+
+  public Experiment(String name) {
+    this.name = name;
+  }
+
+  public Experiment(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
   @Override
   public String toString() {
     return "Experiment [id=" + id + ", name=" + name + "]";

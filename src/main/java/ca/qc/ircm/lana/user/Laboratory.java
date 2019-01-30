@@ -59,6 +59,10 @@ public class Laboratory implements Data, Serializable {
     this.id = id;
   }
 
+  public Laboratory(String name) {
+    this.name = name;
+  }
+
   public Laboratory(Long id, String name) {
     this.id = id;
     this.name = name;

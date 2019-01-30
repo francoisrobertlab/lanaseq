@@ -55,9 +55,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Authorization service.
+ * Authorization service using Spring.
  */
-@Service
+@Service("authorizationService")
 @Transactional
 public class SpringAuthorizationService implements AuthorizationService {
   private static final Logger logger = LoggerFactory.getLogger(SpringAuthorizationService.class);
@@ -181,13 +181,16 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   private boolean isAuthorized(Experiment experiment, User currentUser, Permission permission) {
-    User owner = experiment.getOwner();
     if (currentUser == null) {
       return false;
     }
     if (hasRole(ADMIN)) {
       return true;
     }
+    if (experiment.getId() == null) {
+      return true;
+    }
+    User owner = experiment.getOwner();
     boolean authorized = owner.getId().equals(currentUser.getId());
     authorized |= permission.equals(BasePermission.READ)
         && hasRole(UserAuthority.laboratoryMember(owner.getLaboratory()));
@@ -206,7 +209,16 @@ public class SpringAuthorizationService implements AuthorizationService {
     if (hasRole(ADMIN)) {
       return true;
     }
-    boolean authorized = user.getId().equals(currentUser.getId());
+    if (user.getLaboratory() == null || user.getLaboratory().getId() == null || user.isAdmin()) {
+      return false;
+    }
+    if (user.getId() != null) {
+      User unmodified = userRepository.findById(user.getId()).orElse(null);
+      if (!unmodified.getLaboratory().getId().equals(user.getLaboratory().getId())) {
+        return false;
+      }
+    }
+    boolean authorized = currentUser.getId().equals(user.getId());
     authorized |= permission.equals(BasePermission.READ);
     authorized |= permission.equals(BasePermission.WRITE)
         && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(user.getLaboratory()));
@@ -219,6 +231,9 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
     if (hasRole(ADMIN)) {
       return true;
+    }
+    if (laboratory.getId() == null) {
+      return false;
     }
     boolean authorized = false;
     authorized |= permission.equals(BasePermission.READ);
