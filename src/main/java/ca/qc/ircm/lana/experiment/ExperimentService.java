@@ -85,7 +85,7 @@ public class ExperimentService {
     }
 
     Experiment experiment = repository.findById(id).orElse(null);
-    authorizationService.checkRead(experiment);
+    authorizationService.checkPermission(experiment, BasePermission.READ);
     return experiment;
   }
 
@@ -121,7 +121,7 @@ public class ExperimentService {
    * @return laboratories that can read experiment
    */
   public Set<Laboratory> permissions(Experiment experiment) {
-    authorizationService.checkWrite(experiment);
+    authorizationService.checkPermission(experiment, BasePermission.WRITE);
 
     Laboratory ownerLaboratory = experiment.getOwner().getLaboratory();
     ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
@@ -161,7 +161,7 @@ public class ExperimentService {
     if (experiment.getId() == null) {
       authorizationService.checkRole(USER);
     } else {
-      authorizationService.checkWrite(experiment);
+      authorizationService.checkPermission(experiment, BasePermission.WRITE);
     }
 
     if (experiment.getId() == null) {
@@ -181,7 +181,7 @@ public class ExperimentService {
    *          laboratories that can read experiment
    */
   public void savePermissions(Experiment experiment, Collection<Laboratory> laboratories) {
-    authorizationService.checkWrite(experiment);
+    authorizationService.checkPermission(experiment, BasePermission.WRITE);
     ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
     aclService.deleteAcl(oi, false);
     MutableAcl acl = aclService.createAcl(oi);

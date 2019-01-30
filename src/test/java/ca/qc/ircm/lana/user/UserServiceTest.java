@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -94,7 +95,7 @@ public class UserServiceTest {
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getDate());
-    verify(authorizationService).checkRead(user);
+    verify(authorizationService).checkPermission(user, BasePermission.READ);
   }
 
   @Test
@@ -131,7 +132,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
-    verify(authorizationService).checkRead(user);
+    verify(authorizationService).checkPermission(user, BasePermission.READ);
   }
 
   @Test
@@ -449,7 +450,7 @@ public class UserServiceTest {
 
     userService.save(user, "newpassword");
 
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
     user = userRepository.findById(6L).get();
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
@@ -482,7 +483,7 @@ public class UserServiceTest {
 
     userService.save(user, "newpassword");
 
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
     user = userRepository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
@@ -520,7 +521,7 @@ public class UserServiceTest {
 
     assertFalse(laboratoryRepository.findById(2L).isPresent());
     verify(authorizationService, atLeastOnce()).checkRole(ADMIN);
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
   }
 
   @Test
@@ -536,7 +537,7 @@ public class UserServiceTest {
 
     userService.save(user, "newpassword");
 
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
     assertNotNull(laboratory.getId());
     user = userRepository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
@@ -570,7 +571,7 @@ public class UserServiceTest {
 
     userService.save(user, null);
 
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
     user = userRepository.findById(6L).orElse(null);
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
@@ -621,7 +622,7 @@ public class UserServiceTest {
     userService.save("newpassword");
 
     verify(authorizationService).currentUser();
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
     user = userRepository.findById(6L).get();
     assertEquals("Christian Poitras", user.getName());
     assertEquals("christian.poitras@ircm.qc.ca", user.getEmail());
@@ -650,7 +651,7 @@ public class UserServiceTest {
     userService.save("newpassword");
 
     verify(authorizationService).currentUser();
-    verify(authorizationService).checkWrite(user);
+    verify(authorizationService).checkPermission(user, BasePermission.WRITE);
     user = userRepository.findById(3L).get();
     assertEquals("Jonh Smith", user.getName());
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());

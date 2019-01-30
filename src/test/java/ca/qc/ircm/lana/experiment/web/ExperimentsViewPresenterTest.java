@@ -225,8 +225,8 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void permissions() {
-    Experiment experiment = experiments.get(2);
-    when(authorizationService.hasWrite(experiment)).thenReturn(true);
+    final Experiment experiment = experiments.get(2);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);
     view.experiments.select(experiment);

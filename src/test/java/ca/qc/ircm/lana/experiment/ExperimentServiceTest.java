@@ -88,7 +88,7 @@ public class ExperimentServiceTest {
     assertEquals("POLR2A DNA location", experiment.getName());
     assertEquals((Long) 2L, experiment.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
-    verify(authorizationService).checkRead(experiment);
+    verify(authorizationService).checkPermission(experiment, BasePermission.READ);
   }
 
   @Test
@@ -152,7 +152,7 @@ public class ExperimentServiceTest {
     assertEquals(2, laboratories.size());
     assertTrue(find(laboratories, 2L).isPresent());
     assertTrue(find(laboratories, 3L).isPresent());
-    verify(authorizationService).checkWrite(experiment);
+    verify(authorizationService).checkPermission(experiment, BasePermission.WRITE);
   }
 
   @Test
@@ -184,7 +184,7 @@ public class ExperimentServiceTest {
     assertEquals("New name", experiment.getName());
     assertEquals((Long) 2L, experiment.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
-    verify(authorizationService).checkWrite(experiment);
+    verify(authorizationService).checkPermission(experiment, BasePermission.WRITE);
   }
 
   @Test
@@ -202,7 +202,7 @@ public class ExperimentServiceTest {
     assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(1L).orElse(null)));
     assertTrue(granted(acl, BasePermission.READ, laboratoryRepository.findById(2L).orElse(null)));
     assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(3L).orElse(null)));
-    verify(authorizationService).checkWrite(experiment);
+    verify(authorizationService).checkPermission(experiment, BasePermission.WRITE);
   }
 
   private boolean granted(Acl acl, Permission permission, Laboratory laboratory) {

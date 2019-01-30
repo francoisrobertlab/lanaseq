@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.security;
 
 import ca.qc.ircm.lana.user.User;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.acls.model.Permission;
 
 /**
  * Authorization service.
@@ -91,40 +92,25 @@ public interface AuthorizationService {
   public boolean isAuthorized(Class<?> type);
 
   /**
-   * Returns true if current user can read object, false otherwise.
+   * Returns true if current user has permission on object, false otherwise.
    *
    * @param object
    *          object
-   * @return true if current user can read object, false otherwise
+   * @param permission
+   *          permission
+   * @return true if current user has permission on object, false otherwise
    */
-  public boolean hasRead(Object object);
+  public boolean hasPermission(Object object, Permission permission);
 
   /**
-   * Checks if current user can read object.
+   * Checks if current user has permission on object.
    *
    * @param object
    *          object
+   * @param permission
+   *          permission
    * @throws AccessDeniedException
    *           user cannot read object
    */
-  public void checkRead(Object object) throws AccessDeniedException;
-
-  /**
-   * Returns true if current user can write object, false otherwise.
-   *
-   * @param object
-   *          object
-   * @return true if current user can write object, false otherwise
-   */
-  public boolean hasWrite(Object object);
-
-  /**
-   * Checks if current user can write object.
-   *
-   * @param object
-   *          object
-   * @throws AccessDeniedException
-   *           user cannot write object
-   */
-  public void checkWrite(Object object) throws AccessDeniedException;
+  public void checkPermission(Object object, Permission permission) throws AccessDeniedException;
 }

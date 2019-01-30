@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.acls.domain.BasePermission;
 
 /**
  * Users dialog presenter.
@@ -134,7 +135,8 @@ public class UserDialogPresenter {
   }
 
   private void updateReadOnly() {
-    boolean readOnly = user.getId() != null && !authorizationService.hasWrite(user);
+    boolean readOnly =
+        user.getId() != null && !authorizationService.hasPermission(user, BasePermission.WRITE);
     binder.setReadOnly(readOnly);
     dialog.laboratory.setReadOnly(readOnly || !authorizationService.hasRole(UserRole.ADMIN));
     dialog.passwords.setVisible(!readOnly);

@@ -37,6 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -63,7 +64,7 @@ public class LaboratoryServiceTest {
     assertEquals((Long) 2L, laboratory.getId());
     assertEquals("Chromatin and Genomic Expression", laboratory.getName());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 45, 21), laboratory.getDate());
-    verify(authorizationService).checkRead(laboratory);
+    verify(authorizationService).checkPermission(laboratory, BasePermission.READ);
   }
 
   @Test
@@ -132,7 +133,7 @@ public class LaboratoryServiceTest {
 
     laboratoryService.save(laboratory);
 
-    verify(authorizationService).checkWrite(laboratory);
+    verify(authorizationService).checkPermission(laboratory, BasePermission.WRITE);
     laboratory = laboratoryRepository.findById(2L).orElse(null);
     assertEquals("New name", laboratory.getName());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 45, 21), laboratory.getDate());

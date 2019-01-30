@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.acls.domain.BasePermission;
 
 /**
  * Laboratory dialog.
@@ -73,7 +74,7 @@ public class LaboratoryDialogPresenter {
   }
 
   private void updateReadOnly() {
-    boolean readOnly = !authorizationService.hasWrite(laboratory);
+    boolean readOnly = !authorizationService.hasPermission(laboratory, BasePermission.WRITE);
     binder.setReadOnly(readOnly);
     dialog.buttonsLayout.setVisible(!readOnly);
   }

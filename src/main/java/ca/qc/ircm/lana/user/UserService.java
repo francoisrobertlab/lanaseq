@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import javax.inject.Inject;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +70,7 @@ public class UserService {
     }
 
     User user = repository.findById(id).orElse(null);
-    authorizationService.checkRead(user);
+    authorizationService.checkPermission(user, BasePermission.READ);
     return user;
   }
 
@@ -86,7 +87,7 @@ public class UserService {
     }
 
     User user = repository.findByEmail(email).orElse(null);
-    authorizationService.checkRead(user);
+    authorizationService.checkPermission(user, BasePermission.READ);
     return user;
   }
 
@@ -154,7 +155,7 @@ public class UserService {
           "laboratory " + user.getLaboratory().getId() + " does not exists");
     }
 
-    authorizationService.checkWrite(user);
+    authorizationService.checkPermission(user, BasePermission.WRITE);
     final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
     if (user.getId() == null) {
       authorizationService.checkAnyRole(ADMIN, MANAGER);
@@ -198,7 +199,7 @@ public class UserService {
       throw new NullPointerException("password parameter cannot be null");
     }
     User user = authorizationService.currentUser();
-    authorizationService.checkWrite(user);
+    authorizationService.checkPermission(user, BasePermission.WRITE);
 
     final boolean reloadAuthorities = user.isExpiredPassword();
     String hashedPassword = passwordEncoder.encode(password);

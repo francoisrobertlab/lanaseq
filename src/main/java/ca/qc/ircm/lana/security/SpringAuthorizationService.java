@@ -180,7 +180,8 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  private boolean isAuthorized(Experiment experiment, User currentUser, Permission permission) {
+  private boolean hasExperimentPermission(Experiment experiment, User currentUser,
+      Permission permission) {
     if (currentUser == null) {
       return false;
     }
@@ -197,12 +198,12 @@ public class SpringAuthorizationService implements AuthorizationService {
     authorized |= permission.equals(BasePermission.WRITE)
         && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(owner.getLaboratory()));
     if (!authorized) {
-      authorized |= isAclAuthorized(experiment, permission, currentUser);
+      authorized |= hasAclPermission(experiment, permission, currentUser);
     }
     return authorized;
   }
 
-  private boolean isAuthorized(User user, User currentUser, Permission permission) {
+  private boolean hasUserPermission(User user, User currentUser, Permission permission) {
     if (currentUser == null) {
       return false;
     }
@@ -225,7 +226,8 @@ public class SpringAuthorizationService implements AuthorizationService {
     return authorized;
   }
 
-  private boolean isAuthorized(Laboratory laboratory, User currentUser, Permission permission) {
+  private boolean hasLaboratoryPermission(Laboratory laboratory, User currentUser,
+      Permission permission) {
     if (currentUser == null) {
       return false;
     }
@@ -242,7 +244,7 @@ public class SpringAuthorizationService implements AuthorizationService {
     return authorized;
   }
 
-  private boolean isAclAuthorized(Owned owned, Permission permission, User user) {
+  private boolean hasAclPermission(Owned owned, Permission permission, User user) {
     try {
       Acl acl = aclService.readAclById(new ObjectIdentityImpl(owned.getClass(), owned.getId()));
       return acl.isGranted(list(permission),
@@ -259,74 +261,37 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
-  public boolean hasRead(Object object) {
+  public boolean hasPermission(Object object, Permission permission) {
     if (object == null) {
       return false;
     }
     User currentUser = currentUser();
     if (object instanceof Experiment) {
-      return isAuthorized((Experiment) object, currentUser, BasePermission.READ);
+      return hasExperimentPermission((Experiment) object, currentUser, permission);
     } else if (object instanceof User) {
-      return isAuthorized((User) object, currentUser, BasePermission.READ);
+      return hasUserPermission((User) object, currentUser, permission);
     } else if (object instanceof Laboratory) {
-      return isAuthorized((Laboratory) object, currentUser, BasePermission.READ);
+      return hasLaboratoryPermission((Laboratory) object, currentUser, permission);
     } else {
       return false;
     }
   }
 
   @Override
-  public void checkRead(Object object) {
+  public void checkPermission(Object object, Permission permission) {
     if (object == null) {
       return;
     }
     User currentUser = currentUser();
     boolean canRead = true;
     if (object instanceof Experiment) {
-      canRead &= isAuthorized((Experiment) object, currentUser, BasePermission.READ);
+      canRead &= hasExperimentPermission((Experiment) object, currentUser, permission);
     } else if (object instanceof User) {
-      canRead &= isAuthorized((User) object, currentUser, BasePermission.READ);
+      canRead &= hasUserPermission((User) object, currentUser, permission);
     } else if (object instanceof Laboratory) {
-      canRead &= isAuthorized((Laboratory) object, currentUser, BasePermission.READ);
+      canRead &= hasLaboratoryPermission((Laboratory) object, currentUser, permission);
     }
     if (!canRead) {
-      User user = currentUser();
-      throw new AccessDeniedException("User " + user + " does not have access to " + object);
-    }
-  }
-
-  @Override
-  public boolean hasWrite(Object object) {
-    if (object == null) {
-      return false;
-    }
-    User currentUser = currentUser();
-    if (object instanceof Experiment) {
-      return isAuthorized((Experiment) object, currentUser, BasePermission.WRITE);
-    } else if (object instanceof User) {
-      return isAuthorized((User) object, currentUser, BasePermission.WRITE);
-    } else if (object instanceof Laboratory) {
-      return isAuthorized((Laboratory) object, currentUser, BasePermission.WRITE);
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public void checkWrite(Object object) throws AccessDeniedException {
-    if (object == null) {
-      return;
-    }
-    User currentUser = currentUser();
-    boolean canWrite = true;
-    if (object instanceof Experiment) {
-      canWrite &= isAuthorized((Experiment) object, currentUser, BasePermission.WRITE);
-    } else if (object instanceof User) {
-      canWrite &= isAuthorized((User) object, currentUser, BasePermission.WRITE);
-    } else if (object instanceof Laboratory) {
-      canWrite &= isAuthorized((Laboratory) object, currentUser, BasePermission.WRITE);
-    }
-    if (!canWrite) {
       User user = currentUser();
       throw new AccessDeniedException("User " + user + " does not have access to " + object);
     }

@@ -83,7 +83,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     dialog.save = new Button();
     dialog.cancel = new Button();
     presenter.init(dialog);
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
   }
 
   private void fillForm() {
@@ -136,7 +136,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void setLaboratory_CannotWrite() {
     Laboratory laboratory = new Laboratory();
-    when(authorizationService.hasWrite(laboratory)).thenReturn(false);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
 
     presenter.localeChange(locale);
     presenter.setLaboratory(laboratory);
@@ -148,7 +148,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void setLaboratory_CannotWriteBeforeLocaleChange() {
     Laboratory laboratory = new Laboratory();
-    when(authorizationService.hasWrite(laboratory)).thenReturn(false);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
 
     presenter.setLaboratory(laboratory);
     presenter.localeChange(locale);

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +63,7 @@ public class LaboratoryService {
     }
 
     Laboratory laboratory = repository.findById(id).orElse(null);
-    authorizationService.checkRead(laboratory);
+    authorizationService.checkPermission(laboratory, BasePermission.READ);
     return laboratory;
   }
 
@@ -92,7 +93,7 @@ public class LaboratoryService {
     if (laboratory.getId() == null) {
       throw new IllegalArgumentException("cannot create a new laboratory without a user");
     }
-    authorizationService.checkWrite(laboratory);
+    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
 
     repository.save(laboratory);
   }

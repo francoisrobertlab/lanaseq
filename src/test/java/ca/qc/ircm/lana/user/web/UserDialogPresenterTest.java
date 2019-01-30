@@ -172,7 +172,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void currentUser_Admin() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
     assertTrue(dialog.admin.isVisible());
@@ -298,7 +298,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void uncheckManagerAndCheckCreateNewLaboratory_Admin() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
     dialog.manager.setValue(true);
@@ -321,7 +321,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setUser_NewUser() {
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     User user = new User();
 
@@ -348,7 +348,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void setUser_NewUserAdmin() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     User user = new User();
 
@@ -397,7 +397,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void setUser_UserCanWrite() {
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
-    when(authorizationService.hasWrite(user)).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
 
     presenter.localeChange(locale);
     presenter.setUser(user);
@@ -422,7 +422,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void setUser_UserAdmin() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
 
@@ -471,7 +471,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void setUser_UserCanWriteBeforeLocaleChange() {
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
-    when(authorizationService.hasWrite(user)).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
 
     presenter.setUser(user);
     presenter.localeChange(locale);
@@ -496,7 +496,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void setUser_UserAdminBeforeLocaleChange() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
     when(authorizationService.hasRole(any())).thenReturn(true);
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
 
@@ -757,7 +757,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(dialog.passwords.getPassword()).thenReturn(password);
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -782,7 +782,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(6L).get();
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -804,7 +804,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void save_UpdateUserNoPassword() {
     presenter.init(dialog);
     User user = userRepository.findById(2L).get();
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -854,7 +854,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(1L).get();
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -878,7 +878,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(1L).get();
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();
@@ -902,7 +902,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(any())).thenReturn(true);
     presenter.init(dialog);
     User user = userRepository.findById(1L).get();
-    when(authorizationService.hasWrite(any())).thenReturn(true);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.setUser(user);
     presenter.localeChange(locale);
     fillForm();

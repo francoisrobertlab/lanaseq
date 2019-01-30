@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.acls.domain.BasePermission;
 
 /**
  * Experiments view presenter.
@@ -108,7 +109,7 @@ public class ExperimentsViewPresenter {
       MessageResource resources = new MessageResource(ExperimentsView.class, locale);
       view.error.setText(resources.message(EXPERIMENTS_REQUIRED));
       view.error.setVisible(true);
-    } else if (!authorizationService.hasWrite(experiment)) {
+    } else if (!authorizationService.hasPermission(experiment, BasePermission.WRITE)) {
       MessageResource resources = new MessageResource(ExperimentsView.class, locale);
       view.error.setText(resources.message(PERMISSIONS_DENIED));
       view.error.setVisible(true);
