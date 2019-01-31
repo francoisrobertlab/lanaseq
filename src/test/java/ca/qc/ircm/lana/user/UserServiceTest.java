@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -51,6 +52,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class UserServiceTest {
+  private static final String READ = "read";
+  private static final String WRITE = "write";
   @Inject
   private UserService userService;
   @Inject
@@ -61,6 +64,8 @@ public class UserServiceTest {
   private PasswordEncoder passwordEncoder;
   @MockBean
   private AuthorizationService authorizationService;
+  @MockBean
+  private PermissionEvaluator permissionEvaluator;
   private String hashedPassword = "4k7GCUVUzV5zL74V867q";
 
   /**
@@ -69,8 +74,7 @@ public class UserServiceTest {
   @Before
   public void beforeTest() {
     when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
-    when(authorizationService.hasRole(any())).thenReturn(true);
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
   }
 
   @Test
@@ -95,7 +99,7 @@ public class UserServiceTest {
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getDate());
-    verify(authorizationService).hasPermission(user, BasePermission.READ);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
 
   @Test
@@ -135,7 +139,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.READ);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
 
   @Test
@@ -243,7 +247,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -285,7 +289,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals((Long) 1L, user.getLaboratory().getId());
     assertNull(user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test
@@ -316,7 +320,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.ENGLISH, user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -371,7 +375,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertNull(user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test
@@ -406,7 +410,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory().getId());
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertNull(user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -478,7 +482,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService).reloadAuthorities();
   }
 
@@ -512,7 +516,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService, never()).reloadAuthorities();
   }
 
@@ -530,7 +534,7 @@ public class UserServiceTest {
     userService.save(user, null);
 
     assertFalse(laboratoryRepository.findById(2L).isPresent());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test
@@ -567,7 +571,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals("Test Lab", user.getLaboratory().getName());
     assertEquals(Locale.CHINESE, user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService, never()).reloadAuthorities();
   }
 
@@ -599,7 +603,7 @@ public class UserServiceTest {
     assertNotNull(user.getLaboratory());
     assertEquals((Long) 3L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
-    verify(authorizationService).hasPermission(user, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService, never()).reloadAuthorities();
   }
 

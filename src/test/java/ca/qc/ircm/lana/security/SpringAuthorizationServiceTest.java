@@ -15,23 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-; * Copyright (c) 2016 Institut de recherches cliniques de Montreal (IRCM)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
@@ -45,17 +28,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.experiment.Experiment;
-import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
-import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
@@ -73,12 +52,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclService;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -104,17 +79,17 @@ public class SpringAuthorizationServiceTest {
   @Inject
   private UserDetailsService userDetailsService;
   @Mock
-  private AclService aclService;
+  private PermissionEvaluator permissionEvaluator;
   @Mock
-  private Acl acl;
+  private Laboratory laboratory;
+  @Mock
+  private User user;
+  @Mock
+  private Experiment experiment;
   @Captor
   private ArgumentCaptor<List<Permission>> permissionsCaptor;
   @Captor
   private ArgumentCaptor<List<Sid>> sidsCaptor;
-  @Inject
-  private ExperimentRepository experimentRepository;
-  @Inject
-  private LaboratoryRepository laboratoryRepository;
 
   /**
    * Before test.
@@ -122,13 +97,7 @@ public class SpringAuthorizationServiceTest {
   @Before
   public void beforeTest() {
     authorizationService =
-        new SpringAuthorizationService(userRepository, userDetailsService, aclService);
-    when(aclService.readAclById(any())).thenAnswer(i -> {
-      if (i.getArgument(0) != null) {
-        throw new NotFoundException("Cannot find ACL");
-      }
-      return null;
-    });
+        new SpringAuthorizationService(userRepository, userDetailsService, permissionEvaluator);
   }
 
   private void switchToUser(String username) {
@@ -443,171 +412,53 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_ReadExperiment_Anonymous() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+  public void hasPermission_ReadExperiment_False() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_Owner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_OtherLabMember() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_NotOwner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_Manager() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_ManagerOtherLab() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_Admin() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_AclAllowed() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
-
-    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
-    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
-    List<Permission> permissions = permissionsCaptor.getValue();
-    assertEquals(1, permissions.size());
-    assertEquals(BasePermission.READ, permissions.get(0));
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    List<Sid> sids = sidsCaptor.getValue();
-    assertEquals(1, sids.size());
-    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_AclDenied() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_AclNotFoundExceptionOnRead() throws Throwable {
-    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadExperiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
+    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.READ);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_ReadUser_Anonymous() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+  public void hasPermission_ReadExperiment_True() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
+    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.READ);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasPermission_ReadUser_False() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(user, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_ReadUser_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadUser_NotSelf() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_ReadUser_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_ReadUser_ManagerOtherLab() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_ReadUser_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
+    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.READ);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_ReadLaboratory_Anonymous() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+  public void hasPermission_ReadUser_True() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
+    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.READ);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasPermission_ReadLaboratory_False() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(laboratory, BasePermission.READ));
+    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.READ);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_ReadLaboratory_Member() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+  @WithAnonymousUser
+  public void hasPermission_ReadLaboratory_True() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     assertTrue(authorizationService.hasPermission(laboratory, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadLaboratory_NotMember() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(laboratory, BasePermission.READ));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_ReadLaboratory_Admin() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(laboratory, BasePermission.READ));
+    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.READ);
   }
 
   @Test
@@ -624,365 +475,53 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteNewExperiment_Anonymous() throws Throwable {
-    Experiment experiment = new Experiment("new experiment");
+  public void hasPermission_WriteExperiment_False() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteNewExperiment() throws Throwable {
-    Experiment experiment = new Experiment("new experiment");
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.WRITE));
+    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.WRITE);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteExperiment_Anonymous() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_Owner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+  public void hasPermission_WriteExperiment_True() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     assertTrue(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_OtherLabMember() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_NotOwner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_Manager() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_ManagerOtherLab() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_Admin() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_AclAllowed() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-
-    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
-    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
-    List<Permission> permissions = permissionsCaptor.getValue();
-    assertEquals(1, permissions.size());
-    assertEquals(BasePermission.WRITE, permissions.get(0));
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    List<Sid> sids = sidsCaptor.getValue();
-    assertEquals(1, sids.size());
-    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_AclDenied() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_AclNotFoundExceptionOnRead() throws Throwable {
-    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteExperiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
+    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.WRITE);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteNewUser_Anonymous() throws Throwable {
-    Laboratory laboratory = new Laboratory("new lab");
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteNewUserNewLab_User() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(new Laboratory("new lab"));
+  public void hasPermission_WriteUser_False() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteNewUserExistingLab_User() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteNewAdmin_User() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    user.setAdmin(true);
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteNewUserNewLab_Manager() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(new Laboratory("new lab"));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteNewUserExistingLab_Manager() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteNewAdmin_Manager() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    user.setAdmin(true);
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_WriteNewUserExistingLab_ManagerOtherLab() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteNewUserNewLab_Admin() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(new Laboratory("new lab"));
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteNewUserExistingLab_Admin() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteNewAdmin_Admin() throws Throwable {
-    User user = new User("new lab");
-    user.setLaboratory(laboratoryRepository.findById(2L).orElse(null));
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
+    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.WRITE);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteUser_Anonymous() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteUser_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+  public void hasPermission_WriteUser_True() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteUserWithOtherLaboratory_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteUserWithNewLaboratory_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(new Laboratory("new lab"));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteUser_NotSelf() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteUser_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteUserWithOtherLaboratory_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteUserWithNewLaboratory_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(new Laboratory("new lab"));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_WriteUser_ManagerOtherLab() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_WriteUserWithOtherLaboratory_ManagerOtherLab() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteUser_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteUserWithOtherLaboratory_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteUserWithNewLaboratory_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    user.setLaboratory(new Laboratory("new lab"));
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
+    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.WRITE);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteNewLaboratory_Anonymous() throws Throwable {
-    Laboratory laboratory = new Laboratory("new lab");
+  public void hasPermission_WriteLaboratory_False() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
+    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.WRITE);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteNewLaboratory_User() throws Throwable {
-    Laboratory laboratory = new Laboratory("new lab");
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteNewLaboratory_Manager() throws Throwable {
-    Laboratory laboratory = new Laboratory("new lab");
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteNewLaboratory_Admin() throws Throwable {
-    Laboratory laboratory = new Laboratory("new lab");
+  @WithAnonymousUser
+  public void hasPermission_WriteLaboratory_True() throws Throwable {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     assertTrue(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteLaboratory_Anonymous() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteLaboratory_MemberManager() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteLaboratory_MemberNotManager() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteLaboratory_NotMember() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void hasPermission_WriteLaboratory_Admin() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    assertTrue(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
+    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.WRITE);
   }
 
   @Test
@@ -999,170 +538,40 @@ public class SpringAuthorizationServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkPermission_ReadExperiment_Anonymous() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+  public void checkPermission_ReadExperiment_Denied() throws Throwable {
     authorizationService.checkPermission(experiment, BasePermission.READ);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_Owner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_OtherLabMember() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_NotOwner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_Manager() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_ManagerOtherLab() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_Admin() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_AclAllowed() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-
-    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
-    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
-    List<Permission> permissions = permissionsCaptor.getValue();
-    assertEquals(1, permissions.size());
-    assertEquals(BasePermission.READ, permissions.get(0));
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    List<Sid> sids = sidsCaptor.getValue();
-    assertEquals(1, sids.size());
-    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_AclDenied() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_AclNotFoundExceptionOnRead() throws Throwable {
-    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadExperiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
+  @WithAnonymousUser
+  public void checkPermission_ReadExperiment_Granted() throws Throwable {
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     authorizationService.checkPermission(experiment, BasePermission.READ);
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkPermission_ReadUser_Anonymous() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+  public void checkPermission_ReadUser_Denied() throws Throwable {
     authorizationService.checkPermission(user, BasePermission.READ);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkPermission_ReadUser_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadUser_NotSelf() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void checkPermission_ReadUser_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void checkPermission_ReadUser_ManagerOtherLab() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkPermission_ReadUser_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+  @WithAnonymousUser
+  public void checkPermission_ReadUser_Granted() throws Throwable {
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     authorizationService.checkPermission(user, BasePermission.READ);
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkPermission_ReadLaboratory_Anonymous() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+  public void checkPermission_ReadLaboratory_Denied() throws Throwable {
     authorizationService.checkPermission(laboratory, BasePermission.READ);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkPermission_ReadLaboratory_Member() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(laboratory, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPermission_ReadLaboratory_NotMember() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(laboratory, BasePermission.READ);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkPermission_ReadLaboratory_Admin() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+  @WithAnonymousUser
+  public void checkPermission_ReadLaboratory_Granted() throws Throwable {
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     authorizationService.checkPermission(laboratory, BasePermission.READ);
   }
 
@@ -1180,177 +589,40 @@ public class SpringAuthorizationServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkPemission_WriteExperiment_Anonymous() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
+  public void checkPermission_WriteExperiment_Denied() throws Throwable {
     authorizationService.checkPermission(experiment, BasePermission.WRITE);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_Owner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_OtherLabMember() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_NotOwner() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_Manager() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_ManagerOtherLab() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_Admin() throws Throwable {
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_AclAllowed() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-
-    verify(aclService).readAclById(new ObjectIdentityImpl(Experiment.class, 2L));
-    verify(acl).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
-    List<Permission> permissions = permissionsCaptor.getValue();
-    assertEquals(1, permissions.size());
-    assertEquals(BasePermission.WRITE, permissions.get(0));
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    List<Sid> sids = sidsCaptor.getValue();
-    assertEquals(1, sids.size());
-    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_AclDenied() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_AclNotFoundExceptionOnRead() throws Throwable {
-    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteExperiment_AclNotFoundExceptionOnIsGrandted() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
-    Experiment experiment = experimentRepository.findById(2L).orElse(null);
-
+  @WithAnonymousUser
+  public void checkPermission_WriteExperiment_Granted() throws Throwable {
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     authorizationService.checkPermission(experiment, BasePermission.WRITE);
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkPemission_WriteUser_Anonymous() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+  public void checkPermission_WriteUser_Denied() throws Throwable {
     authorizationService.checkPermission(user, BasePermission.WRITE);
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkPemission_WriteUser_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteUser_NotSelf() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void checkPemission_WriteUser_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void checkPemission_WriteUser_ManagerOtherLab() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    authorizationService.checkPermission(user, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkPemission_WriteUser_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+  @WithAnonymousUser
+  public void checkPermission_WriteUser_Granted() throws Throwable {
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     authorizationService.checkPermission(user, BasePermission.WRITE);
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
-  public void checkPemission_WriteLaboratory_Anonymous() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+  public void checkPermission_WriteLaboratory_Denied() throws Throwable {
     authorizationService.checkPermission(laboratory, BasePermission.WRITE);
   }
 
   @Test
-  @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void checkPemission_WriteLaboratory_MemberManager() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void checkPemission_WriteLaboratory_MemberNotManager() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void checkPemission_WriteLaboratory_NotMember() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkPemission_WriteLaboratory_Admin() throws Throwable {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
+  @WithAnonymousUser
+  public void checkPermission_WriteLaboratory_Granted() throws Throwable {
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     authorizationService.checkPermission(laboratory, BasePermission.WRITE);
   }
 

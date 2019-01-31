@@ -49,6 +49,24 @@ public interface AuthorizationService {
   public boolean hasRole(String role);
 
   /**
+   * Returns true if current user has any of the specified roles, false otherwise.
+   *
+   * @param roles
+   *          roles
+   * @return true if current user has any of the specified roles, false otherwise
+   */
+  public boolean hasAnyRole(String... roles);
+
+  /**
+   * Returns true if current user has all of the specified roles, false otherwise.
+   *
+   * @param roles
+   *          roles
+   * @return true if current user has all of the specified roles, false otherwise
+   */
+  public boolean hasAllRoles(String... roles);
+
+  /**
    * Checks if user has specified role.
    *
    * @param role
@@ -67,15 +85,6 @@ public interface AuthorizationService {
    *           user does not have any of the specified roles
    */
   public void checkAnyRole(String... roles) throws AccessDeniedException;
-
-  /**
-   * Returns true if current user has any of the specified roles, false otherwise.
-   *
-   * @param roles
-   *          roles
-   * @return true if current user has any of the specified roles, false otherwise
-   */
-  public boolean hasAnyRole(String... roles);
 
   /**
    * Reload current user's authorities.

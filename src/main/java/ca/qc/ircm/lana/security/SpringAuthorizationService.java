@@ -18,32 +18,18 @@
 package ca.qc.ircm.lana.security;
 
 import static ca.qc.ircm.lana.user.UserAuthority.FORCE_CHANGE_PASSWORD;
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 
-import ca.qc.ircm.lana.experiment.Experiment;
-import ca.qc.ircm.lana.user.Laboratory;
-import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclService;
-import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -66,16 +52,16 @@ public class SpringAuthorizationService implements AuthorizationService {
   @Inject
   private UserDetailsService userDetailsService;
   @Inject
-  private AclService aclService;
+  private PermissionEvaluator permissionEvaluator;
 
   protected SpringAuthorizationService() {
   }
 
   protected SpringAuthorizationService(UserRepository userRepository,
-      UserDetailsService userDetailsService, AclService aclService) {
+      UserDetailsService userDetailsService, PermissionEvaluator permissionEvaluator) {
     this.userRepository = userRepository;
     this.userDetailsService = userDetailsService;
-    this.aclService = aclService;
+    this.permissionEvaluator = permissionEvaluator;
   }
 
   private Authentication getAuthentication() {
@@ -124,6 +110,24 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
+  public boolean hasAnyRole(String... roles) {
+    boolean hasAnyRole = false;
+    for (String role : roles) {
+      hasAnyRole |= hasRole(role);
+    }
+    return hasAnyRole;
+  }
+
+  @Override
+  public boolean hasAllRoles(String... roles) {
+    boolean hasAllRole = true;
+    for (String role : roles) {
+      hasAllRole &= hasRole(role);
+    }
+    return hasAllRole;
+  }
+
+  @Override
   public void checkRole(String role) throws AccessDeniedException {
     if (!hasRole(role)) {
       User user = currentUser();
@@ -138,23 +142,6 @@ public class SpringAuthorizationService implements AuthorizationService {
       throw new AccessDeniedException(
           "User " + user + " does not have any of roles " + Arrays.toString(roles));
     }
-  }
-
-  @Override
-  public boolean hasAnyRole(String... roles) {
-    boolean hasAnyRole = false;
-    for (String role : roles) {
-      hasAnyRole |= hasRole(role);
-    }
-    return hasAnyRole;
-  }
-
-  private boolean hasAllRoles(String... roles) {
-    boolean hasAllRole = true;
-    for (String role : roles) {
-      hasAllRole &= hasRole(role);
-    }
-    return hasAllRole;
   }
 
   @Override
@@ -180,101 +167,12 @@ public class SpringAuthorizationService implements AuthorizationService {
     }
   }
 
-  private boolean hasExperimentPermission(Experiment experiment, User currentUser,
-      Permission permission) {
-    if (currentUser == null) {
-      return false;
-    }
-    if (hasRole(ADMIN)) {
-      return true;
-    }
-    if (experiment.getId() == null) {
-      return true;
-    }
-    User owner = experiment.getOwner();
-    boolean authorized = owner.getId().equals(currentUser.getId());
-    authorized |= permission.equals(BasePermission.READ)
-        && hasRole(UserAuthority.laboratoryMember(owner.getLaboratory()));
-    authorized |= permission.equals(BasePermission.WRITE)
-        && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(owner.getLaboratory()));
-    if (!authorized) {
-      authorized |= hasAclPermission(experiment, permission, currentUser);
-    }
-    return authorized;
-  }
-
-  private boolean hasUserPermission(User user, User currentUser, Permission permission) {
-    if (currentUser == null) {
-      return false;
-    }
-    if (hasRole(ADMIN)) {
-      return true;
-    }
-    if (user.getLaboratory() == null || user.getLaboratory().getId() == null || user.isAdmin()) {
-      return false;
-    }
-    if (user.getId() != null) {
-      User unmodified = userRepository.findById(user.getId()).orElse(null);
-      if (!unmodified.getLaboratory().getId().equals(user.getLaboratory().getId())) {
-        return false;
-      }
-    }
-    boolean authorized = currentUser.getId().equals(user.getId());
-    authorized |= permission.equals(BasePermission.READ);
-    authorized |= permission.equals(BasePermission.WRITE)
-        && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(user.getLaboratory()));
-    return authorized;
-  }
-
-  private boolean hasLaboratoryPermission(Laboratory laboratory, User currentUser,
-      Permission permission) {
-    if (currentUser == null) {
-      return false;
-    }
-    if (hasRole(ADMIN)) {
-      return true;
-    }
-    if (laboratory.getId() == null) {
-      return false;
-    }
-    boolean authorized = false;
-    authorized |= permission.equals(BasePermission.READ);
-    authorized |= permission.equals(BasePermission.WRITE)
-        && hasAllRoles(MANAGER, UserAuthority.laboratoryMember(laboratory));
-    return authorized;
-  }
-
-  private boolean hasAclPermission(Owned owned, Permission permission, User user) {
-    try {
-      Acl acl = aclService.readAclById(new ObjectIdentityImpl(owned.getClass(), owned.getId()));
-      return acl.isGranted(list(permission),
-          list(new GrantedAuthoritySid(UserAuthority.laboratoryMember(user.getLaboratory()))),
-          false);
-    } catch (NotFoundException e) {
-      return false;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> List<T> list(T... values) {
-    return Stream.of(values).collect(Collectors.toList());
-  }
-
   @Override
   public boolean hasPermission(Object object, Permission permission) {
     if (object == null) {
       return false;
     }
-    User currentUser = currentUser();
-    if (object instanceof Experiment) {
-      return hasExperimentPermission((Experiment) object, currentUser, permission);
-    } else if (object instanceof User) {
-      return hasUserPermission((User) object, currentUser, permission);
-    } else if (object instanceof Laboratory) {
-      return hasLaboratoryPermission((Laboratory) object, currentUser, permission);
-    } else {
-      return false;
-    }
+    return permissionEvaluator.hasPermission(getAuthentication(), object, permission);
   }
 
   @Override
@@ -282,15 +180,7 @@ public class SpringAuthorizationService implements AuthorizationService {
     if (object == null) {
       return;
     }
-    User currentUser = currentUser();
-    boolean canRead = true;
-    if (object instanceof Experiment) {
-      canRead &= hasExperimentPermission((Experiment) object, currentUser, permission);
-    } else if (object instanceof User) {
-      canRead &= hasUserPermission((User) object, currentUser, permission);
-    } else if (object instanceof Laboratory) {
-      canRead &= hasLaboratoryPermission((Laboratory) object, currentUser, permission);
-    }
+    boolean canRead = permissionEvaluator.hasPermission(getAuthentication(), object, permission);
     if (!canRead) {
       User user = currentUser();
       throw new AccessDeniedException("User " + user + " does not have access to " + object);
