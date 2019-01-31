@@ -19,11 +19,12 @@ package ca.qc.ircm.lana.user;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
-import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,27 +37,37 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class LaboratoryServiceTest {
+  private static final String READ = "read";
+  private static final String WRITE = "write";
+  @Inject
   private LaboratoryService laboratoryService;
   @Inject
   private LaboratoryRepository laboratoryRepository;
   @Inject
   private UserRepository userRepository;
-  @Mock
+  @MockBean
   private AuthorizationService authorizationService;
+  @MockBean
+  private PermissionEvaluator permissionEvaluator;
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
-    laboratoryService = new LaboratoryService(laboratoryRepository, authorizationService);
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
   }
 
   @Test
+  @WithMockUser
   public void get() {
     Laboratory laboratory = laboratoryService.get(2L);
 
@@ -64,10 +75,11 @@ public class LaboratoryServiceTest {
     assertEquals((Long) 2L, laboratory.getId());
     assertEquals("Chromatin and Genomic Expression", laboratory.getName());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 45, 21), laboratory.getDate());
-    verify(authorizationService).checkPermission(laboratory, BasePermission.READ);
+    verify(permissionEvaluator).hasPermission(any(), eq(laboratory), eq(READ));
   }
 
   @Test
+  @WithMockUser
   public void get_Invalid() {
     Laboratory laboratory = laboratoryService.get(0L);
 
@@ -75,6 +87,7 @@ public class LaboratoryServiceTest {
   }
 
   @Test
+  @WithMockUser
   public void get_Null() {
     Laboratory laboratory = laboratoryService.get(null);
 
@@ -82,6 +95,7 @@ public class LaboratoryServiceTest {
   }
 
   @Test
+  @WithMockUser
   public void all() {
     when(authorizationService.currentUser()).thenReturn(userRepository.findById(3L).get());
 
@@ -89,10 +103,13 @@ public class LaboratoryServiceTest {
 
     assertEquals(1, laboratories.size());
     assertTrue(Data.find(laboratories, 2).isPresent());
-    verify(authorizationService).checkRole(USER);
+    for (Laboratory laboratory : laboratories) {
+      verify(permissionEvaluator).hasPermission(any(), eq(laboratory), eq(READ));
+    }
   }
 
   @Test
+  @WithMockUser
   public void all_Manager() {
     when(authorizationService.currentUser()).thenReturn(userRepository.findById(2L).get());
     when(authorizationService.hasRole(MANAGER)).thenReturn(true);
@@ -101,10 +118,13 @@ public class LaboratoryServiceTest {
 
     assertEquals(1, laboratories.size());
     assertTrue(Data.find(laboratories, 2).isPresent());
-    verify(authorizationService).checkRole(USER);
+    for (Laboratory laboratory : laboratories) {
+      verify(permissionEvaluator).hasPermission(any(), eq(laboratory), eq(READ));
+    }
   }
 
   @Test
+  @WithMockUser
   public void all_Admin() {
     when(authorizationService.currentUser()).thenReturn(userRepository.findById(1L).get());
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
@@ -115,10 +135,13 @@ public class LaboratoryServiceTest {
     assertTrue(Data.find(laboratories, 1).isPresent());
     assertTrue(Data.find(laboratories, 2).isPresent());
     assertTrue(Data.find(laboratories, 3).isPresent());
-    verify(authorizationService).checkRole(USER);
+    for (Laboratory laboratory : laboratories) {
+      verify(permissionEvaluator).hasPermission(any(), eq(laboratory), eq(READ));
+    }
   }
 
   @Test(expected = IllegalArgumentException.class)
+  @WithMockUser
   public void save_New() {
     Laboratory laboratory = new Laboratory();
     laboratory.setName("New name");
@@ -127,15 +150,16 @@ public class LaboratoryServiceTest {
   }
 
   @Test
+  @WithMockUser
   public void save_Update() {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
     laboratory.setName("New name");
 
     laboratoryService.save(laboratory);
 
-    verify(authorizationService).checkPermission(laboratory, BasePermission.WRITE);
     laboratory = laboratoryRepository.findById(2L).orElse(null);
     assertEquals("New name", laboratory.getName());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 45, 21), laboratory.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(laboratory), eq(WRITE));
   }
 }

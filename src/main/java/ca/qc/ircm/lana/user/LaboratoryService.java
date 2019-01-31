@@ -18,7 +18,6 @@
 package ca.qc.ircm.lana.user;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import java.util.ArrayList;
@@ -26,7 +25,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
-import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,14 +58,13 @@ public class LaboratoryService {
    *          laboratory's id
    * @return laboratory having specified id
    */
+  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
   public Laboratory get(Long id) {
     if (id == null) {
       return null;
     }
 
-    Laboratory laboratory = repository.findById(id).orElse(null);
-    authorizationService.checkPermission(laboratory, BasePermission.READ);
-    return laboratory;
+    return repository.findById(id).orElse(null);
   }
 
   /**
@@ -72,9 +72,8 @@ public class LaboratoryService {
    *
    * @return all laboratories the user can access
    */
+  @PostFilter("hasPermission(filterObject, 'read')")
   public List<Laboratory> all() {
-    authorizationService.checkRole(USER);
-
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
     } else {
@@ -89,11 +88,11 @@ public class LaboratoryService {
    * @param laboratory
    *          laboratory
    */
+  @PreAuthorize("hasPermission(#laboratory, 'write')")
   public void save(Laboratory laboratory) {
     if (laboratory.getId() == null) {
       throw new IllegalArgumentException("cannot create a new laboratory without a user");
     }
-    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
 
     repository.save(laboratory);
   }
