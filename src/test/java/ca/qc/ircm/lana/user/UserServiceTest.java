@@ -169,12 +169,9 @@ public class UserServiceTest {
     assertTrue(find(users, 1L).isPresent());
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void all_AnonymousDenied() {
-    userService.all();
+    for (User user : users) {
+      verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
+    }
   }
 
   @Test
@@ -188,13 +185,9 @@ public class UserServiceTest {
     assertTrue(find(users, 2L).isPresent());
     assertTrue(find(users, 3L).isPresent());
     assertTrue(find(users, 9L).isPresent());
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void all_LaboratoryAnonymousDenied() {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    userService.all(laboratory);
+    for (User user : users) {
+      verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
+    }
   }
 
   @Test
@@ -203,6 +196,7 @@ public class UserServiceTest {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
     User user = userService.manager(laboratory);
     assertEquals((Long) 2L, user.getId());
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
 
   @Test
@@ -211,13 +205,7 @@ public class UserServiceTest {
     Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
     User user = userService.manager(laboratory);
     assertEquals((Long) 5L, user.getId());
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void manager_AnonymousDenied() {
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    userService.manager(laboratory);
+    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
 
   @Test

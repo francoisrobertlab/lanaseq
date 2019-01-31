@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -93,7 +94,7 @@ public class UserService {
    *
    * @return all users
    */
-  @PreAuthorize("hasAuthority('" + USER + "')")
+  @PostFilter("hasPermission(filterObject, 'read')")
   public List<User> all() {
     return repository.findAll();
   }
@@ -105,7 +106,7 @@ public class UserService {
    *          laboratory
    * @return all users in laboratory
    */
-  @PreAuthorize("hasAuthority('" + USER + "')")
+  @PostFilter("hasPermission(filterObject, 'read')")
   public List<User> all(Laboratory laboratory) {
     return repository.findByLaboratory(laboratory);
   }
@@ -118,7 +119,7 @@ public class UserService {
    *          laboratory
    * @return laboratory's manager
    */
-  @PreAuthorize("hasAuthority('" + USER + "')")
+  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
   public User manager(Laboratory laboratory) {
     List<User> users = repository.findByLaboratoryAndManagerTrueAndActiveTrue(laboratory);
     return !users.isEmpty() ? users.get(0) : null;
