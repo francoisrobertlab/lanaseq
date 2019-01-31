@@ -52,7 +52,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -85,6 +84,10 @@ public class SpringAuthorizationServiceTest {
   private User user;
   @Mock
   private Experiment experiment;
+  @Mock
+  private Object object;
+  @Mock
+  private Permission permission;
   @Captor
   private ArgumentCaptor<List<Permission>> permissionsCaptor;
   @Captor
@@ -367,128 +370,19 @@ public class SpringAuthorizationServiceTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_ReadExperiment_False() throws Throwable {
+  public void hasPermission_False() throws Throwable {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.READ));
-    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.READ);
+    assertFalse(authorizationService.hasPermission(object, permission));
+    verify(permissionEvaluator).hasPermission(authentication, object, permission);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_ReadExperiment_True() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.READ));
-    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_ReadUser_False() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertFalse(authorizationService.hasPermission(user, BasePermission.READ));
-    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_ReadUser_True() throws Throwable {
+  public void hasPermission_True() throws Throwable {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.READ));
-    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_ReadLaboratory_False() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.READ));
-    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_ReadLaboratory_True() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    assertTrue(authorizationService.hasPermission(laboratory, BasePermission.READ));
-    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_ReadNull_Anonymous() throws Throwable {
-    assertFalse(authorizationService.hasPermission(null, BasePermission.READ));
-  }
-
-  @Test
-  @WithMockUser
-  public void hasPermission_ReadNull() throws Throwable {
-    assertFalse(authorizationService.hasPermission(null, BasePermission.READ));
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteExperiment_False() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertFalse(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteExperiment_True() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    assertTrue(authorizationService.hasPermission(experiment, BasePermission.WRITE));
-    verify(permissionEvaluator).hasPermission(authentication, experiment, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteUser_False() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertFalse(authorizationService.hasPermission(user, BasePermission.WRITE));
-    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteUser_True() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    assertTrue(authorizationService.hasPermission(user, BasePermission.WRITE));
-    verify(permissionEvaluator).hasPermission(authentication, user, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteLaboratory_False() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertFalse(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteLaboratory_True() throws Throwable {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    assertTrue(authorizationService.hasPermission(laboratory, BasePermission.WRITE));
-    verify(permissionEvaluator).hasPermission(authentication, laboratory, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_WriteNull_Anonymous() throws Throwable {
-    assertFalse(authorizationService.hasPermission(null, BasePermission.WRITE));
-  }
-
-  @Test
-  @WithMockUser
-  public void hasPermission_WriteNull() throws Throwable {
-    assertFalse(authorizationService.hasPermission(null, BasePermission.WRITE));
+    assertTrue(authorizationService.hasPermission(object, permission));
+    verify(permissionEvaluator).hasPermission(authentication, object, permission);
   }
 
   public static final class NoRoleTest {

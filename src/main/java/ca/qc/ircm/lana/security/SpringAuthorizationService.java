@@ -150,9 +150,6 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasPermission(Object object, Permission permission) {
-    if (object == null) {
-      return false;
-    }
     return permissionEvaluator.hasPermission(getAuthentication(), object, permission);
   }
 }
