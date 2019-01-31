@@ -21,14 +21,12 @@ import static ca.qc.ircm.lana.user.UserAuthority.FORCE_CHANGE_PASSWORD;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import java.util.Arrays;
 import java.util.Collection;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -128,23 +126,6 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
-  public void checkRole(String role) throws AccessDeniedException {
-    if (!hasRole(role)) {
-      User user = currentUser();
-      throw new AccessDeniedException("User " + user + " does not have role " + role);
-    }
-  }
-
-  @Override
-  public void checkAnyRole(String... roles) throws AccessDeniedException {
-    if (!hasAnyRole(roles)) {
-      User user = currentUser();
-      throw new AccessDeniedException(
-          "User " + user + " does not have any of roles " + Arrays.toString(roles));
-    }
-  }
-
-  @Override
   public void reloadAuthorities() {
     if (hasRole(FORCE_CHANGE_PASSWORD)) {
       Authentication oldAuthentication = getAuthentication();
@@ -173,17 +154,5 @@ public class SpringAuthorizationService implements AuthorizationService {
       return false;
     }
     return permissionEvaluator.hasPermission(getAuthentication(), object, permission);
-  }
-
-  @Override
-  public void checkPermission(Object object, Permission permission) {
-    if (object == null) {
-      return;
-    }
-    boolean canRead = permissionEvaluator.hasPermission(getAuthentication(), object, permission);
-    if (!canRead) {
-      User user = currentUser();
-      throw new AccessDeniedException("User " + user + " does not have access to " + object);
-    }
   }
 }

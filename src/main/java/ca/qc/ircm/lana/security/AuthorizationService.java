@@ -18,7 +18,6 @@
 package ca.qc.ircm.lana.security;
 
 import ca.qc.ircm.lana.user.User;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.acls.model.Permission;
 
 /**
@@ -67,26 +66,6 @@ public interface AuthorizationService {
   public boolean hasAllRoles(String... roles);
 
   /**
-   * Checks if user has specified role.
-   *
-   * @param role
-   *          role
-   * @throws AccessDeniedException
-   *           user does not have specified role
-   */
-  public void checkRole(String role) throws AccessDeniedException;
-
-  /**
-   * Checks if user has any of the specified roles.
-   *
-   * @param roles
-   *          roles
-   * @throws AccessDeniedException
-   *           user does not have any of the specified roles
-   */
-  public void checkAnyRole(String... roles) throws AccessDeniedException;
-
-  /**
    * Reload current user's authorities.
    */
   public void reloadAuthorities();
@@ -110,16 +89,4 @@ public interface AuthorizationService {
    * @return true if current user has permission on object, false otherwise
    */
   public boolean hasPermission(Object object, Permission permission);
-
-  /**
-   * Checks if current user has permission on object.
-   *
-   * @param object
-   *          object
-   * @param permission
-   *          permission
-   * @throws AccessDeniedException
-   *           user cannot read object
-   */
-  public void checkPermission(Object object, Permission permission) throws AccessDeniedException;
 }

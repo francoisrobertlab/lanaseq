@@ -51,7 +51,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -161,25 +160,6 @@ public class SpringAuthorizationServiceTest {
     assertTrue(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
   }
 
-  @Test(expected = AccessDeniedException.class)
-  @WithMockUser
-  public void checkRole_Fail() throws Throwable {
-    authorizationService.checkRole(ADMIN);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkRole_Ok() throws Throwable {
-    authorizationService.checkRole(DEFAULT_ROLE);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkRole_SwitchedUser() throws Throwable {
-    switchToUser("francois.robert@ircm.qc.ca");
-    authorizationService.checkRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR);
-  }
-
   @Test
   @WithMockUser
   public void hasAnyRole_False() throws Throwable {
@@ -203,31 +183,6 @@ public class SpringAuthorizationServiceTest {
   public void hasAnyRole_SwitchedUser() throws Throwable {
     switchToUser("francois.robert@ircm.qc.ca");
     assertTrue(authorizationService.hasAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithMockUser
-  public void checkAnyRole_False() throws Throwable {
-    authorizationService.checkAnyRole(ADMIN, MANAGER);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkAnyRole_TrueFirst() throws Throwable {
-    authorizationService.hasAnyRole(DEFAULT_ROLE, MANAGER);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkAnyRole_TrueLast() throws Throwable {
-    authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE);
-  }
-
-  @Test
-  @WithUserDetails("lana@ircm.qc.ca")
-  public void checkAnyRole_SwitchedUser() throws Throwable {
-    switchToUser("francois.robert@ircm.qc.ca");
-    authorizationService.checkAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR);
   }
 
   @Test
@@ -534,108 +489,6 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void hasPermission_WriteNull() throws Throwable {
     assertFalse(authorizationService.hasPermission(null, BasePermission.WRITE));
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void checkPermission_ReadExperiment_Denied() throws Throwable {
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_ReadExperiment_Granted() throws Throwable {
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void checkPermission_ReadUser_Denied() throws Throwable {
-    authorizationService.checkPermission(user, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_ReadUser_Granted() throws Throwable {
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    authorizationService.checkPermission(user, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void checkPermission_ReadLaboratory_Denied() throws Throwable {
-    authorizationService.checkPermission(laboratory, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_ReadLaboratory_Granted() throws Throwable {
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    authorizationService.checkPermission(laboratory, BasePermission.READ);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_ReadNull_Anonymous() throws Throwable {
-    authorizationService.checkPermission(null, BasePermission.READ);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkPermission_ReadNull() throws Throwable {
-    authorizationService.checkPermission(null, BasePermission.READ);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void checkPermission_WriteExperiment_Denied() throws Throwable {
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_WriteExperiment_Granted() throws Throwable {
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void checkPermission_WriteUser_Denied() throws Throwable {
-    authorizationService.checkPermission(user, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_WriteUser_Granted() throws Throwable {
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    authorizationService.checkPermission(user, BasePermission.WRITE);
-  }
-
-  @Test(expected = AccessDeniedException.class)
-  @WithAnonymousUser
-  public void checkPermission_WriteLaboratory_Denied() throws Throwable {
-    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPermission_WriteLaboratory_Granted() throws Throwable {
-    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    authorizationService.checkPermission(laboratory, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void checkPemission_WriteNullOwned_Anonymous() throws Throwable {
-    authorizationService.checkPermission(null, BasePermission.WRITE);
-  }
-
-  @Test
-  @WithMockUser
-  public void checkPemission_WriteNullOwned() throws Throwable {
-    authorizationService.checkPermission(null, BasePermission.WRITE);
   }
 
   public static final class NoRoleTest {
