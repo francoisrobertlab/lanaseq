@@ -140,7 +140,7 @@ public class UserService {
    *          user's unhashed password; required for new users; can be null to keep previous
    *          password
    */
-  @PostAuthorize("hasPermission(#user, 'write')")
+  @PreAuthorize("hasPermission(#user, 'write')")
   public void save(User user, String password) {
     if (user.getId() != null && user.getId() == 1L && (!user.isAdmin() || !user.isActive())) {
       throw new AccessDeniedException("user 1 must be an admin and active");
