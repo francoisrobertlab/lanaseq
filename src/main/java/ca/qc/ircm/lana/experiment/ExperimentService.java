@@ -18,7 +18,6 @@
 package ca.qc.ircm.lana.experiment;
 
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
@@ -33,6 +32,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -79,14 +81,13 @@ public class ExperimentService {
    *          experiment's id
    * @return experiment having specified id
    */
+  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
   public Experiment get(Long id) {
     if (id == null) {
       return null;
     }
 
-    Experiment experiment = repository.findById(id).orElse(null);
-    authorizationService.checkPermission(experiment, BasePermission.READ);
-    return experiment;
+    return repository.findById(id).orElse(null);
   }
 
   /**
@@ -103,9 +104,8 @@ public class ExperimentService {
    *
    * @return all experiments for current user
    */
+  @PostFilter("hasPermission(filterObject, 'read')")
   public List<Experiment> all() {
-    authorizationService.checkRole(USER);
-
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
     } else {
@@ -120,9 +120,8 @@ public class ExperimentService {
    *          experiment
    * @return laboratories that can read experiment
    */
+  @PreAuthorize("hasPermission(#experiment, 'write')")
   public Set<Laboratory> permissions(Experiment experiment) {
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
-
     Laboratory ownerLaboratory = experiment.getOwner().getLaboratory();
     ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
     try {
@@ -157,13 +156,8 @@ public class ExperimentService {
    * @param experiment
    *          experiment
    */
+  @PreAuthorize("hasPermission(#experiment, 'write')")
   public void save(Experiment experiment) {
-    if (experiment.getId() == null) {
-      authorizationService.checkRole(USER);
-    } else {
-      authorizationService.checkPermission(experiment, BasePermission.WRITE);
-    }
-
     if (experiment.getId() == null) {
       User user = authorizationService.currentUser();
       experiment.setOwner(user);
@@ -180,8 +174,8 @@ public class ExperimentService {
    * @param laboratories
    *          laboratories that can read experiment
    */
+  @PreAuthorize("hasPermission(#experiment, 'write')")
   public void savePermissions(Experiment experiment, Collection<Laboratory> laboratories) {
-    authorizationService.checkPermission(experiment, BasePermission.WRITE);
     ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
     aclService.deleteAcl(oi, false);
     MutableAcl acl = aclService.createAcl(oi);

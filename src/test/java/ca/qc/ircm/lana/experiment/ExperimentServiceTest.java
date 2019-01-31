@@ -20,12 +20,13 @@ package ca.qc.ircm.lana.experiment;
 import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lana.user.UserRole.ADMIN;
 import static ca.qc.ircm.lana.user.UserRole.MANAGER;
-import static ca.qc.ircm.lana.user.UserRole.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +47,8 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -55,6 +57,7 @@ import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +65,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class ExperimentServiceTest {
+  private static final String READ = "read";
+  private static final String WRITE = "write";
+  @Inject
   private ExperimentService service;
   @Inject
   private ExperimentRepository repository;
@@ -71,16 +77,18 @@ public class ExperimentServiceTest {
   private MutableAclService aclService;
   @Inject
   private UserRepository userRepository;
-  @Mock
+  @MockBean
   private AuthorizationService authorizationService;
+  @MockBean
+  private PermissionEvaluator permissionEvaluator;
 
   @Before
   public void beforeTest() {
-    service =
-        new ExperimentService(repository, laboratoryRepository, aclService, authorizationService);
+    when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
   }
 
   @Test
+  @WithMockUser
   public void get() {
     Experiment experiment = service.get(1L);
 
@@ -88,16 +96,18 @@ public class ExperimentServiceTest {
     assertEquals("POLR2A DNA location", experiment.getName());
     assertEquals((Long) 2L, experiment.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
-    verify(authorizationService).checkPermission(experiment, BasePermission.READ);
+    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
   }
 
   @Test
+  @WithMockUser
   public void get_Null() {
     Experiment experiment = service.get(null);
     assertNull(experiment);
   }
 
   @Test
+  @WithMockUser
   public void all() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.currentUser()).thenReturn(user);
@@ -108,10 +118,13 @@ public class ExperimentServiceTest {
     assertTrue(find(experiments, 1L).isPresent());
     assertTrue(find(experiments, 2L).isPresent());
     assertTrue(find(experiments, 3L).isPresent());
-    verify(authorizationService).checkRole(USER);
+    for (Experiment experiment : experiments) {
+      verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    }
   }
 
   @Test
+  @WithMockUser
   public void all_Manager() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.currentUser()).thenReturn(user);
@@ -123,10 +136,13 @@ public class ExperimentServiceTest {
     assertTrue(find(experiments, 1L).isPresent());
     assertTrue(find(experiments, 2L).isPresent());
     assertTrue(find(experiments, 3L).isPresent());
-    verify(authorizationService).checkRole(USER);
+    for (Experiment experiment : experiments) {
+      verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    }
   }
 
   @Test
+  @WithMockUser
   public void all_Admin() {
     User user = userRepository.findById(1L).orElse(null);
     when(authorizationService.currentUser()).thenReturn(user);
@@ -140,10 +156,13 @@ public class ExperimentServiceTest {
     assertTrue(find(experiments, 3L).isPresent());
     assertTrue(find(experiments, 4L).isPresent());
     assertTrue(find(experiments, 5L).isPresent());
-    verify(authorizationService).checkRole(USER);
+    for (Experiment experiment : experiments) {
+      verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    }
   }
 
   @Test
+  @WithMockUser
   public void permissions() {
     Experiment experiment = repository.findById(2L).orElse(null);
 
@@ -152,10 +171,11 @@ public class ExperimentServiceTest {
     assertEquals(2, laboratories.size());
     assertTrue(find(laboratories, 2L).isPresent());
     assertTrue(find(laboratories, 3L).isPresent());
-    verify(authorizationService).checkPermission(experiment, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
   }
 
   @Test
+  @WithMockUser
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.currentUser()).thenReturn(user);
@@ -170,10 +190,11 @@ public class ExperimentServiceTest {
     assertEquals(user.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(experiment.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(experiment.getDate()));
-    verify(authorizationService).checkRole(USER);
+    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
   }
 
   @Test
+  @WithMockUser
   public void save_Update() {
     Experiment experiment = repository.findById(1L).orElse(null);
     experiment.setName("New name");
@@ -184,7 +205,7 @@ public class ExperimentServiceTest {
     assertEquals("New name", experiment.getName());
     assertEquals((Long) 2L, experiment.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
-    verify(authorizationService).checkPermission(experiment, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
   }
 
   @Test
@@ -202,7 +223,7 @@ public class ExperimentServiceTest {
     assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(1L).orElse(null)));
     assertTrue(granted(acl, BasePermission.READ, laboratoryRepository.findById(2L).orElse(null)));
     assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(3L).orElse(null)));
-    verify(authorizationService).checkPermission(experiment, BasePermission.WRITE);
+    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
   }
 
   private boolean granted(Acl acl, Permission permission, Laboratory laboratory) {
