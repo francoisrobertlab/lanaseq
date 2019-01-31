@@ -64,7 +64,7 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     if (user.getLaboratory() == null || user.getLaboratory().getId() == null || user.isAdmin()) {
       return false;
     }
-    if (user.getId() != null) {
+    if (permission.equals(BasePermission.WRITE) && user.getId() != null) {
       User unmodified = repository.findById(user.getId()).orElse(null);
       if (!unmodified.getLaboratory().getId().equals(user.getLaboratory().getId())) {
         return false;
