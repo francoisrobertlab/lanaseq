@@ -116,7 +116,7 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
     when(userService.manager(any())).thenAnswer(i -> managersByLaboratory.get(i.getArgument(0)));
     dialog.reads = new HashMap<>();
     when(dialog.read(any())).thenAnswer(i -> {
-      User user = (User) i.getArgument(0);
+      User user = i.getArgument(0);
       if (dialog.reads.containsKey(user)) {
         return dialog.reads.get(user);
       }
