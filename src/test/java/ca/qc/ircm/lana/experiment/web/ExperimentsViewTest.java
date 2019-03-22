@@ -26,6 +26,7 @@ import static ca.qc.ircm.lana.experiment.web.ExperimentsView.HEADER;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.PERMISSIONS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
@@ -48,13 +49,11 @@ import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
@@ -84,11 +83,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Mock
   private ExperimentPermissionsDialog experimentPermissionsDialog;
   @Captor
-  private ArgumentCaptor<ComponentRenderer<Button, Experiment>> buttonRendererCaptor;
+  private ArgumentCaptor<ValueProvider<Experiment, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<LocalDateTimeRenderer<Experiment>> localDateTimeRendererCaptor;
-  @Captor
-  private ArgumentCaptor<ValueProvider<Experiment, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Experiment>> comparatorCaptor;
   @Inject
@@ -116,7 +113,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.experiments = mock(Grid.class);
     when(view.experiments.getElement()).thenReturn(experimentsElement);
     view.name = mock(Column.class);
-    when(view.experiments.addColumn(any(ComponentRenderer.class), eq(NAME))).thenReturn(view.name);
+    when(view.experiments.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
@@ -220,14 +217,10 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
     mockColumns();
     view.init();
-    verify(view.experiments).addColumn(buttonRendererCaptor.capture(), eq(NAME));
-    ComponentRenderer<Button, Experiment> buttonRenderer = buttonRendererCaptor.getValue();
+    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(NAME));
+    ValueProvider<Experiment, String> valueProvider = valueProviderCaptor.getValue();
     for (Experiment experiment : experiments) {
-      Button button = buttonRenderer.createComponent(experiment);
-      assertTrue(button.getClassNames().contains(NAME));
-      assertEquals(experiment.getName(), button.getText());
-      clickButton(button);
-      verify(presenter).view(experiment);
+      assertEquals(experiment.getName(), valueProvider.apply(experiment));
     }
     verify(view.name).setComparator(comparatorCaptor.capture());
     Comparator<Experiment> comparator = comparatorCaptor.getValue();
@@ -250,10 +243,18 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
           component.getElement().getText());
     }
     verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(OWNER));
-    ValueProvider<Experiment, String> valueProvider = valueProviderCaptor.getValue();
+    valueProvider = valueProviderCaptor.getValue();
     for (Experiment experiment : experiments) {
       assertEquals(experiment.getOwner().getEmail(), valueProvider.apply(experiment));
     }
+  }
+
+  @Test
+  public void view() {
+    Experiment experiment = experiments.get(0);
+    doubleClickItem(view.experiments, experiment);
+
+    verify(presenter).view(experiment);
   }
 
   private Experiment name(String name) {

@@ -45,7 +45,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -108,10 +107,10 @@ public class ExperimentsView extends Composite<VerticalLayout>
     buttonsLayout.add(add, permissions);
     header.addClassName(HEADER);
     experiments.addClassName(EXPERIMENTS);
+    experiments.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     name =
-        experiments.addColumn(new ComponentRenderer<>(experiment -> viewButton(experiment)), NAME)
-            .setKey(NAME).setComparator(
-                (e1, e2) -> normalize(e1.getName()).compareToIgnoreCase(normalize(e2.getName())));
+        experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME).setComparator(
+            (e1, e2) -> normalize(e1.getName()).compareToIgnoreCase(normalize(e2.getName())));
     date = experiments.addColumn(
         new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
@@ -133,14 +132,6 @@ public class ExperimentsView extends Composite<VerticalLayout>
     permissions.addClassName(PERMISSIONS);
     permissions.addClickListener(e -> presenter.permissions());
     presenter.init(this);
-  }
-
-  private Button viewButton(Experiment experiment) {
-    Button button = new Button();
-    button.addClassName(NAME);
-    button.setText(experiment.getName());
-    button.addClickListener(e -> presenter.view(experiment));
-    return button;
   }
 
   @Override
