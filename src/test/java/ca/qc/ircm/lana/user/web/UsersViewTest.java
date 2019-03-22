@@ -18,6 +18,7 @@
 package ca.qc.ircm.lana.user.web;
 
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.text.Strings.property;
@@ -125,7 +126,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.users = mock(Grid.class);
     when(view.users.getElement()).thenReturn(usersElement);
     view.email = mock(Column.class);
-    when(view.users.addColumn(any(ComponentRenderer.class), eq(EMAIL))).thenReturn(view.email);
+    when(view.users.addColumn(any(ValueProvider.class), eq(EMAIL))).thenReturn(view.email);
     when(view.email.setKey(any())).thenReturn(view.email);
     when(view.email.setComparator(any(Comparator.class))).thenReturn(view.email);
     when(view.email.setHeader(any(String.class))).thenReturn(view.email);
@@ -271,14 +272,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     view = new UsersView(presenter, userDialog, laboratoryDialog);
     mockColumns();
     view.init();
-    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(EMAIL));
-    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
+    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));
+    ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
     for (User user : users) {
-      Button button = buttonRenderer.createComponent(user);
-      assertTrue(button.getClassNames().contains(EMAIL));
-      assertEquals(user.getEmail(), button.getText());
-      clickButton(button);
-      verify(presenter).view(user);
+      assertEquals(user.getEmail() != null ? user.getEmail() : "", valueProvider.apply(user));
     }
     verify(view.email).setComparator(comparatorCaptor.capture());
     Comparator<User> comparator = comparatorCaptor.getValue();
@@ -291,12 +288,12 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(email("Test@site.com"), email("abc@site.com")) > 0);
     assertTrue(comparator.compare(email("test@site.com"), email("test@abc.com")) > 0);
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<User, String> valueProvider = valueProviderCaptor.getValue();
+    valueProvider = valueProviderCaptor.getValue();
     for (User user : users) {
       assertEquals(user.getName() != null ? user.getName() : "", valueProvider.apply(user));
     }
     verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(LABORATORY));
-    buttonRenderer = buttonRendererCaptor.getValue();
+    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
     for (User user : users) {
       Button button = buttonRenderer.createComponent(user);
       assertTrue(button.getClassNames().contains(LABORATORY));
@@ -340,6 +337,14 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(active(false), active(false)) == 0);
     assertTrue(comparator.compare(active(true), active(true)) == 0);
     assertTrue(comparator.compare(active(true), active(false)) > 0);
+  }
+
+  @Test
+  public void view() {
+    User user = users.get(0);
+    doubleClickItem(view.users, user);
+
+    verify(presenter).view(user);
   }
 
   private User email(String email) {

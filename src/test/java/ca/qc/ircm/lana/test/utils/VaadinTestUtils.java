@@ -26,6 +26,7 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
@@ -58,6 +59,28 @@ public class VaadinTestUtils {
       method.setAccessible(true);
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
       eventBus.fireEvent(new ClickEvent<>(button));
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Simulates an item click on grid.
+   *
+   * @param grid
+   *          grid
+   * @param item
+   *          item
+   */
+  public static <E> void doubleClickItem(Grid<E> grid, E item) {
+    try {
+      String key = grid.getDataCommunicator().getKeyMapper().key(item);
+      Method method = Component.class.getDeclaredMethod("getEventBus");
+      method.setAccessible(true);
+      ComponentEventBus eventBus = (ComponentEventBus) method.invoke(grid);
+      eventBus.fireEvent(new ItemDoubleClickEvent<>(grid, false, key, -1, -1, -1, -1, 2, 0, false,
+          false, false, false));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);

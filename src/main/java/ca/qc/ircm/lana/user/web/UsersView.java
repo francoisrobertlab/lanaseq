@@ -122,7 +122,8 @@ public class UsersView extends Composite<VerticalLayout>
     buttonsLayout.add(add, switchUser);
     header.addClassName(HEADER);
     users.addClassName(USERS);
-    email = users.addColumn(new ComponentRenderer<>(user -> viewButton(user)), EMAIL).setKey(EMAIL)
+    users.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME);
     laboratory =
@@ -155,14 +156,6 @@ public class UsersView extends Composite<VerticalLayout>
     switchUser.addClassName(SWITCH_USER);
     switchUser.addClickListener(e -> presenter.switchUser());
     presenter.init(this);
-  }
-
-  private Button viewButton(User user) {
-    Button button = new Button();
-    button.addClassName(EMAIL);
-    button.setText(user.getEmail());
-    button.addClickListener(e -> presenter.view(user));
-    return button;
   }
 
   private Button viewLaboratoryButton(User user) {
