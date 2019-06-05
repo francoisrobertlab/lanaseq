@@ -21,9 +21,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>ca.qc.ircm</groupId>
-    <artifactId>ircm-parent</artifactId>
-    <version>4</version>
-    <relativePath>../ircm-parent/pom.xml</relativePath>
+    <artifactId>parent</artifactId>
+    <version>7</version>
+    <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>lana</artifactId>
