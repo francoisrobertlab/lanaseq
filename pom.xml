@@ -338,24 +338,6 @@
             </executions>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>${mojolicense-maven-plugin.version}</version>
-          <configuration>
-            <useMissingFile>true</useMissingFile>
-          </configuration>
-          <executions>
-            <execution>
-              <id>license-add-third-party</id>
-              <goals><goal>add-third-party</goal></goals>
-            </execution>
-            <execution>
-              <id>license-download-licenses</id>
-              <goals><goal>download-licenses</goal></goals>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -376,10 +358,6 @@
       </plugin>
       <plugin>
         <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
