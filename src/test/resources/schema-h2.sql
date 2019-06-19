@@ -16,13 +16,13 @@
 --
 
 CREATE TABLE IF NOT EXISTS laboratory (
-  id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+  id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS user (
-  id bigint(20) NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+  id bigint(20) NOT NULL AUTO_INCREMENT,
   email varchar(255) NOT NULL,
   name varchar(255),
   hashed_password varchar(255),
