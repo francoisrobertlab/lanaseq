@@ -90,7 +90,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.header.getClassNames().contains(HEADER));
     assertTrue(dialog.name.getClassNames().contains(NAME));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
-    assertEquals(PRIMARY, dialog.save.getElement().getAttribute(THEME));
+    assertTrue(dialog.save.getElement().getAttribute(THEME).contains(PRIMARY));
     assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
   }
 

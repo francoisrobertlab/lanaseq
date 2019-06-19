@@ -85,8 +85,8 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
   @Inject
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources =
-      new MessageResource(ExperimentPermissionsDialog.class, locale);
+  private MessageResource resources = new MessageResource(ExperimentPermissionsDialog.class,
+      locale);
   private MessageResource userResources = new MessageResource(User.class, locale);
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);
   private Experiment experiment;
@@ -141,7 +141,7 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.header.getClassNames().contains(HEADER));
     assertTrue(dialog.managers.getClassNames().contains(MANAGERS));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
-    assertEquals(PRIMARY, dialog.save.getElement().getAttribute(THEME));
+    assertTrue(dialog.save.getElement().getAttribute(THEME).contains(PRIMARY));
     assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
   }
 
@@ -169,8 +169,8 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
     mockManagersColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources =
-        new MessageResource(ExperimentPermissionsDialog.class, locale);
+    final MessageResource resources = new MessageResource(ExperimentPermissionsDialog.class,
+        locale);
     final MessageResource userResources = new MessageResource(User.class, locale);
     final MessageResource webResources = new MessageResource(WebConstants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
