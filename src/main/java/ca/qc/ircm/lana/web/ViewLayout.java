@@ -20,9 +20,6 @@ package ca.qc.ircm.lana.web;
 import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
-import ca.qc.ircm.lana.user.UserAuthority;
-import ca.qc.ircm.lana.user.web.PasswordView;
-import ca.qc.ircm.lana.user.web.SigninView;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
@@ -34,8 +31,6 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.RouterLayout;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,15 +39,14 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
  * Main layout.
  */
 @HtmlImport("styles/shared-styles.html")
-public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleChangeObserver,
-    BeforeEnterObserver, AfterNavigationObserver, BaseComponent {
+public class ViewLayout extends VerticalLayout
+    implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver, BaseComponent {
   public static final String HOME = "home";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
@@ -111,28 +105,6 @@ public class ViewLayout extends VerticalLayout implements RouterLayout, LocaleCh
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("Navigate to {}", tabsHref.get(tabs.getSelectedTab()));
         navigate(tabsHref.get(tabs.getSelectedTab()));
-      }
-    }
-  }
-
-  @Override
-  public void beforeEnter(BeforeEnterEvent event) {
-    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)) {
-      logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
-          PasswordView.class.getSimpleName());
-      event.rerouteTo(PasswordView.class);
-    }
-    if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
-      if (authorizationService.isAnonymous()) {
-        logger.debug("user is anonymous, redirect to {}", SigninView.class.getSimpleName());
-        event.rerouteTo(SigninView.class);
-      } else {
-        MessageResource resources = new MessageResource(ViewLayout.class, getLocale());
-        String message = resources.message(AccessDeniedException.class.getSimpleName(),
-            authorizationService.currentUser().getEmail(),
-            event.getNavigationTarget().getSimpleName());
-        logger.info(message);
-        event.rerouteToError(new AccessDeniedException(message), message);
       }
     }
   }

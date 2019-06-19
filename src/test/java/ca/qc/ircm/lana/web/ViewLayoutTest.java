@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -36,21 +35,16 @@ import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
-import ca.qc.ircm.lana.user.web.PasswordView;
-import ca.qc.ircm.lana.user.web.SigninView;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Location;
 import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -60,8 +54,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   private ViewLayout view;
   @Mock
   private AuthorizationService authorizationService;
-  @Mock
-  private BeforeEnterEvent beforeEnterEvent;
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
   private Locale locale = Locale.ENGLISH;
@@ -75,7 +67,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     view = new ViewLayout(authorizationService);
-    when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
     when(authorizationService.currentUser()).thenReturn(user);
     view.init();
   }
@@ -192,58 +183,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     verify(ui, never()).navigate(any(String.class));
     verify(page)
         .executeJavaScript("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
-  }
-
-  @Test
-  public void beforeEnter_Authorized() {
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
-
-    view.beforeEnter(beforeEnterEvent);
-
-    verify(authorizationService).isAuthorized(ViewTest.class);
-  }
-
-  @Test
-  public void beforeEnter_NotAuthorized() {
-    view.beforeEnter(beforeEnterEvent);
-
-    verify(authorizationService).isAuthorized(ViewTest.class);
-    verify(authorizationService).isAnonymous();
-    String message = resources.message(AccessDeniedException.class.getSimpleName(), user.getEmail(),
-        ViewTest.class.getSimpleName());
-    verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
-  }
-
-  @Test
-  public void beforeEnter_NotAuthorizedAnonymous() {
-    when(authorizationService.isAnonymous()).thenReturn(true);
-
-    view.beforeEnter(beforeEnterEvent);
-
-    verify(beforeEnterEvent).rerouteTo(SigninView.class);
-    verify(authorizationService).isAuthorized(ViewTest.class);
-    verify(authorizationService).isAnonymous();
-  }
-
-  @Test
-  public void beforeEnter_AuthorizedForceChangePassword() {
-    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
-
-    view.beforeEnter(beforeEnterEvent);
-
-    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(beforeEnterEvent).rerouteTo(PasswordView.class);
-  }
-
-  @Test
-  public void beforeEnter_NotAuthorizedForceChangePassword() {
-    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
-
-    view.beforeEnter(beforeEnterEvent);
-
-    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(beforeEnterEvent).rerouteTo(PasswordView.class);
   }
 
   @Test
