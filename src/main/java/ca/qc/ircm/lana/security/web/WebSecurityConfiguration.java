@@ -70,8 +70,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
       Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.FAIL;
-  private static final String SIGNIN_LOCKED_URL =
-      SIGNIN_PROCESSING_URL + "?" + SigninView.LOCKED;
+  private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?" + SigninView.LOCKED;
   private static final String SIGNIN_DISABLED_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
@@ -190,6 +189,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Allow all login failure URLs.
         .regexMatchers(SIGNIN_FAILURE_URL_PATTERN).permitAll()
+
+        // Allow test URLs.
+        .regexMatchers("/testvaadinservice").permitAll()
 
         // Only admins can switch users.
         .antMatchers(SWITCH_USER_URL).hasAuthority(ADMIN).antMatchers(SWITCH_USER_EXIT_URL)
