@@ -20,6 +20,8 @@ package ca.qc.ircm.lana.security;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -32,6 +34,8 @@ import org.springframework.security.core.userdetails.UserDetails;
  * {@link DaoAuthenticationProvider} that also validates password using {@link LdapService}.
  */
 public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider {
+  private static final Logger logger =
+      LoggerFactory.getLogger(DaoAuthenticationProviderWithLdap.class);
   private UserRepository userRepository;
   private LdapService ldapService;
   private SecurityConfiguration securityConfiguration;
@@ -40,25 +44,32 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
   @Override
   protected void additionalAuthenticationChecks(UserDetails userDetails,
       UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+    String username = authentication.getName();
+    logger.trace("user {} tries to authenticate", username);
     User user = getUser(userDetails);
     if (!user.isActive()) {
-      throw new DisabledException("User " + userDetails.getUsername() + " is inactive");
+      logger.debug("user {} account is disabled", username);
+      throw new DisabledException("User " + username + " is inactive");
     }
     if (accountLocked(user)) {
-      throw new LockedException("User " + userDetails.getUsername() + " account is locked");
+      logger.debug("user {} account is locked", username);
+      throw new LockedException("User " + username + " account is locked");
     }
 
     try {
       super.additionalAuthenticationChecks(userDetails, authentication);
       resetSignAttemps(user);
+      logger.debug("user {} authenticated successfully", username);
     } catch (BadCredentialsException e) {
       // Try LDAP, if available.
       if (authentication.getCredentials() != null && ldapConfiguration.isEnabled()
           && isLdapPasswordValid(userDetails, authentication.getCredentials().toString())) {
         // User is valid.
         resetSignAttemps(user);
+        logger.debug("user {} authenticated successfully through JDAP", username);
       } else {
         incrementSignAttemps(user);
+        logger.debug("user {} supplied wrong password for authentication", username);
         throw e;
       }
     }

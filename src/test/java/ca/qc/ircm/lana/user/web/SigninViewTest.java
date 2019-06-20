@@ -17,37 +17,38 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
-import static ca.qc.ircm.lana.user.web.SigninView.DO_SIGNIN;
+import static ca.qc.ircm.lana.user.web.SigninView.DESCRIPTION;
+import static ca.qc.ircm.lana.user.web.SigninView.DISABLED;
 import static ca.qc.ircm.lana.user.web.SigninView.FAIL;
+import static ca.qc.ircm.lana.user.web.SigninView.FORM_TITLE;
 import static ca.qc.ircm.lana.user.web.SigninView.HEADER;
-import static ca.qc.ircm.lana.user.web.SigninView.PASSWORD;
+import static ca.qc.ircm.lana.user.web.SigninView.LOCKED;
 import static ca.qc.ircm.lana.user.web.SigninView.SIGNIN;
-import static ca.qc.ircm.lana.user.web.SigninView.USERNAME;
 import static ca.qc.ircm.lana.user.web.SigninView.VIEW_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Location;
-import com.vaadin.flow.server.InitialPageSettings;
+import com.vaadin.flow.router.QueryParameters;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,11 +60,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SigninViewTest extends AbstractViewTestCase {
   private SigninView view;
   @Mock
-  private SigninViewPresenter presenter;
+  private AfterNavigationEvent afterNavigationEvent;
+  @Mock
+  private Location location;
+  @Mock
+  private QueryParameters queryParameters;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(SigninView.class, locale);
   private MessageResource userResources = new MessageResource(User.class, locale);
   private MessageResource generalResources = new MessageResource(WebConstants.class, locale);
+  private Map<String, List<String>> parameters = new HashMap<>();
 
   /**
    * Before test.
@@ -71,54 +77,77 @@ public class SigninViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new SigninView(presenter);
+    view = new SigninView();
     view.init();
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(view);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    when(location.getQueryParameters()).thenReturn(queryParameters);
+    when(queryParameters.getParameters()).thenReturn(parameters);
   }
 
   @Test
   public void styles() {
-    assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
-    assertTrue(view.header.getClassNames().contains(HEADER));
-    assertEquals("iron-form", view.ironForm.getTag());
-    assertEquals("ironform", view.ironForm.getAttribute("id"));
-    assertEquals("", view.ironForm.getAttribute("allow-redirect"));
-    assertEquals("form", view.form.getTag());
-    assertEquals("post", view.form.getAttribute("method"));
-    assertEquals(WebSecurityConfiguration.SIGNIN_PROCESSING_URL, view.form.getAttribute("action"));
-    assertTrue(view.email.getClassNames().contains(EMAIL));
-    assertEquals(USERNAME, view.email.getElement().getAttribute("name"));
-    assertTrue(view.password.getClassNames().contains(HASHED_PASSWORD));
-    assertEquals(PASSWORD, view.password.getElement().getAttribute("name"));
-    assertTrue(view.signin.getClassNames().contains(SIGNIN));
-    assertEquals(DO_SIGNIN, view.doSignin.getId().orElse(""));
-    assertEquals("none", view.doSignin.getStyle().get("display"));
-    assertTrue(view.error.getClassNames().contains(FAIL));
+    assertTrue(view.getId().orElse("").equals(VIEW_NAME));
+    assertFalse(view.isForgotPasswordButtonVisible());
   }
 
   @Test
   public void labels() {
     view.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(userResources.message(EMAIL), view.email.getLabel());
-    assertEquals(userResources.message(HASHED_PASSWORD), view.password.getLabel());
-    assertEquals(resources.message(SIGNIN), view.signin.getText());
-    assertEquals("", view.error.getText());
-    verify(presenter).localeChange(locale);
+    assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
+    assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
+    assertEquals(resources.message(FORM_TITLE), view.i18n.getForm().getTitle());
+    assertEquals(userResources.message(EMAIL), view.i18n.getForm().getUsername());
+    assertEquals(userResources.message(HASHED_PASSWORD), view.i18n.getForm().getPassword());
+    assertEquals(resources.message(SIGNIN), view.i18n.getForm().getSubmit());
+    assertEquals(resources.message(property(FAIL, TITLE)), view.i18n.getErrorMessage().getTitle());
+    assertEquals(resources.message(FAIL), view.i18n.getErrorMessage().getMessage());
   }
 
   @Test
-  public void configurePage() {
-    InitialPageSettings settings = mock(InitialPageSettings.class);
-    view.configurePage(settings);
-    verify(settings).addInlineWithContents(InitialPageSettings.Position.PREPEND,
-        "window.customElements=window.customElements||{};"
-            + "window.customElements.forcePolyfill=true;" + "window.ShadyDOM={force:true};",
-        InitialPageSettings.WrapMode.JAVASCRIPT);
+  public void labels_Fail() {
+    parameters.put(FAIL, null);
+    view.afterNavigation(afterNavigationEvent);
+    view.localeChange(mock(LocaleChangeEvent.class));
+    assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
+    assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
+    assertEquals(resources.message(FORM_TITLE), view.i18n.getForm().getTitle());
+    assertEquals(userResources.message(EMAIL), view.i18n.getForm().getUsername());
+    assertEquals(userResources.message(HASHED_PASSWORD), view.i18n.getForm().getPassword());
+    assertEquals(resources.message(SIGNIN), view.i18n.getForm().getSubmit());
+    assertEquals(resources.message(property(FAIL, TITLE)), view.i18n.getErrorMessage().getTitle());
+    assertEquals(resources.message(FAIL), view.i18n.getErrorMessage().getMessage());
+  }
+
+  @Test
+  public void labels_Disabled() {
+    parameters.put(DISABLED, null);
+    view.afterNavigation(afterNavigationEvent);
+    view.localeChange(mock(LocaleChangeEvent.class));
+    assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
+    assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
+    assertEquals(resources.message(FORM_TITLE), view.i18n.getForm().getTitle());
+    assertEquals(userResources.message(EMAIL), view.i18n.getForm().getUsername());
+    assertEquals(userResources.message(HASHED_PASSWORD), view.i18n.getForm().getPassword());
+    assertEquals(resources.message(SIGNIN), view.i18n.getForm().getSubmit());
+    assertEquals(resources.message(property(DISABLED, TITLE)),
+        view.i18n.getErrorMessage().getTitle());
+    assertEquals(resources.message(DISABLED), view.i18n.getErrorMessage().getMessage());
+  }
+
+  @Test
+  public void labels_Locked() {
+    parameters.put(LOCKED, null);
+    view.afterNavigation(afterNavigationEvent);
+    view.localeChange(mock(LocaleChangeEvent.class));
+    assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
+    assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
+    assertEquals(resources.message(FORM_TITLE), view.i18n.getForm().getTitle());
+    assertEquals(userResources.message(EMAIL), view.i18n.getForm().getUsername());
+    assertEquals(userResources.message(HASHED_PASSWORD), view.i18n.getForm().getPassword());
+    assertEquals(resources.message(SIGNIN), view.i18n.getForm().getSubmit());
+    assertEquals(resources.message(property(LOCKED, TITLE)),
+        view.i18n.getErrorMessage().getTitle());
+    assertEquals(resources.message(LOCKED), view.i18n.getErrorMessage().getMessage());
   }
 
   @Test
@@ -129,12 +158,14 @@ public class SigninViewTest extends AbstractViewTestCase {
     final MessageResource userResources = new MessageResource(User.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(userResources.message(EMAIL), view.email.getLabel());
-    assertEquals(userResources.message(HASHED_PASSWORD), view.password.getLabel());
-    assertEquals(resources.message(SIGNIN), view.signin.getText());
-    assertEquals("", view.error.getText());
-    verify(presenter).localeChange(locale);
+    assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
+    assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
+    assertEquals(resources.message(FORM_TITLE), view.i18n.getForm().getTitle());
+    assertEquals(userResources.message(EMAIL), view.i18n.getForm().getUsername());
+    assertEquals(userResources.message(HASHED_PASSWORD), view.i18n.getForm().getPassword());
+    assertEquals(resources.message(SIGNIN), view.i18n.getForm().getSubmit());
+    assertEquals(resources.message(property(FAIL, TITLE)), view.i18n.getErrorMessage().getTitle());
+    assertEquals(resources.message(FAIL), view.i18n.getErrorMessage().getMessage());
   }
 
   @Test
@@ -144,33 +175,38 @@ public class SigninViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void attach() {
-    view = new SigninViewForTest(presenter);
-    view.onAttach(mock(AttachEvent.class));
-    verify(page).executeJavaScript("document.getElementById('" + DO_SIGNIN
-        + "').addEventListener('click', () => document.getElementById('ironform').submit());");
+  public void afterNavigationEvent_NoError() {
+    parameters.put(FAIL, null);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertTrue(view.isError());
   }
 
   @Test
-  public void afterNavigation() {
-    AfterNavigationEvent event = mock(AfterNavigationEvent.class);
-    Location location = new Location(VIEW_NAME + "?" + FAIL);
-    when(event.getLocation()).thenReturn(location);
+  public void afterNavigationEvent_Fail() {
+    parameters.put(FAIL, null);
 
-    view.afterNavigation(event);
+    view.afterNavigation(afterNavigationEvent);
 
-    verify(presenter).showError(location.getQueryParameters().getParameters(), locale);
+    assertTrue(view.isError());
   }
 
-  @SuppressWarnings("serial")
-  private class SigninViewForTest extends SigninView {
-    public SigninViewForTest(SigninViewPresenter presenter) {
-      super(presenter);
-    }
+  @Test
+  public void afterNavigationEvent_Disabled() {
+    parameters.put(DISABLED, null);
 
-    @Override
-    public Optional<UI> getUI() {
-      return Optional.of(ui);
-    }
+    view.afterNavigation(afterNavigationEvent);
+
+    assertTrue(view.isError());
+  }
+
+  @Test
+  public void afterNavigationEvent_ExcessiveAttempts() {
+    parameters.put(LOCKED, null);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertTrue(view.isError());
   }
 }

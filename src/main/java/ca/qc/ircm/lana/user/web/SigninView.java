@@ -17,36 +17,33 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
-import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.login.LoginI18n.ErrorMessage;
+import com.vaadin.flow.component.login.LoginOverlay;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.InitialPageSettings;
-import com.vaadin.flow.server.PageConfigurator;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sign in view.
@@ -54,85 +51,69 @@ import javax.inject.Inject;
 @Route(value = SigninView.VIEW_NAME)
 @HtmlImport("styles/shared-styles.html")
 @HtmlImport("frontend://bower_components/iron-form/iron-form.html")
-public class SigninView extends Composite<VerticalLayout> implements LocaleChangeObserver,
-    HasDynamicTitle, PageConfigurator, AfterNavigationObserver, BaseComponent {
+public class SigninView extends LoginOverlay implements LocaleChangeObserver, HasDynamicTitle,
+    AfterNavigationObserver, BeforeEnterObserver, BaseComponent {
   public static final String VIEW_NAME = "signin";
   public static final String HEADER = "header";
+  public static final String DESCRIPTION = "description";
+  public static final String FORM_TITLE = "form.title";
   public static final String USERNAME = "username";
   public static final String PASSWORD = "password";
   public static final String SIGNIN = "signin";
-  public static final String DO_SIGNIN = "dosignin";
   public static final String FAIL = "fail";
   public static final String DISABLED = "disabled";
-  public static final String EXCESSIVE_ATTEMPTS = "excessiveAttempts";
+  public static final String LOCKED = "locked";
   private static final long serialVersionUID = 638443368018456019L;
-  protected H2 header = new H2();
-  protected Element ironForm = new Element("iron-form");
-  protected Element form = new Element("form");
-  protected TextField email = new TextField();
-  protected PasswordField password = new PasswordField();
-  protected Button signin = new Button();
-  protected Button doSignin = new Button();
-  protected Div error = new Div();
-  @Inject
-  private transient SigninViewPresenter presenter;
+  @SuppressWarnings("unused")
+  private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
+  protected LoginI18n i18n;
+  protected String error;
 
   public SigninView() {
   }
 
-  protected SigninView(SigninViewPresenter presenter) {
-    this.presenter = presenter;
-  }
-
   @PostConstruct
   void init() {
-    VerticalLayout root = getContent();
-    root.setId(VIEW_NAME);
-    root.add(header);
-    header.addClassName(HEADER);
-    root.getElement().appendChild(ironForm);
-    ironForm.setAttribute("id", "ironform");
-    ironForm.setAttribute("allow-redirect", "");
-    ironForm.appendChild(form);
-    form.setAttribute("method", "post");
-    form.setAttribute("action", WebSecurityConfiguration.SIGNIN_PROCESSING_URL);
-    VerticalLayout formLayout = new VerticalLayout();
-    form.appendChild(formLayout.getElement());
-    formLayout.add(email);
-    email.addClassName(EMAIL);
-    email.getElement().setAttribute("name", USERNAME);
-    formLayout.add(password);
-    password.addClassName(HASHED_PASSWORD);
-    password.getElement().setAttribute("name", PASSWORD);
-    formLayout.add(signin);
-    signin.addClassName(SIGNIN);
-    formLayout.add(doSignin);
-    doSignin.setId(DO_SIGNIN);
-    doSignin.getStyle().set("display", "none");
-    root.add(error);
-    error.addClassName(FAIL);
-    presenter.init(this);
+    setId(VIEW_NAME);
+    addLoginListener(e -> setError(false));
+    setForgotPasswordButtonVisible(false);
+    setAction(VIEW_NAME);
+    setOpened(true);
   }
 
   @Override
-  public void configurePage(InitialPageSettings settings) {
-    // Force login page to use Shady DOM to avoid problems with browsers and
-    // password managers not supporting shadow DOM
-    settings.addInlineWithContents(InitialPageSettings.Position.PREPEND,
-        "window.customElements=window.customElements||{};"
-            + "window.customElements.forcePolyfill=true;" + "window.ShadyDOM={force:true};",
-        InitialPageSettings.WrapMode.JAVASCRIPT);
+  public void beforeEnter(BeforeEnterEvent event) {
+    // TODO Redirect to main view if user is known.
+    /*
+    if (SecurityUtils.isUserLoggedIn()) {
+      // Needed manually to change the URL because of https://github.com/vaadin/flow/issues/4189
+      UI.getCurrent().getPage().getHistory().replaceState(null, "");
+      event.rerouteTo(StorefrontView.class);
+    }
+    */
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final MessageResource resources = new MessageResource(getClass(), getLocale());
     final MessageResource userResources = new MessageResource(User.class, getLocale());
-    header.setText(resources.message(HEADER));
-    email.setLabel(userResources.message(EMAIL));
-    password.setLabel(userResources.message(HASHED_PASSWORD));
-    signin.setText(resources.message(SIGNIN));
-    presenter.localeChange(getLocale());
+    i18n = LoginI18n.createDefault();
+    i18n.setHeader(new LoginI18n.Header());
+    i18n.getHeader().setTitle(resources.message(HEADER));
+    i18n.getHeader().setDescription(resources.message(DESCRIPTION));
+    i18n.setAdditionalInformation(null);
+    i18n.setForm(new LoginI18n.Form());
+    i18n.getForm().setSubmit(resources.message(SIGNIN));
+    i18n.getForm().setTitle(resources.message(FORM_TITLE));
+    i18n.getForm().setUsername(userResources.message(EMAIL));
+    i18n.getForm().setPassword(userResources.message(HASHED_PASSWORD));
+    i18n.setErrorMessage(new ErrorMessage());
+    if (error == null) {
+      error = FAIL;
+    }
+    i18n.getErrorMessage().setTitle(resources.message(property(error, TITLE)));
+    i18n.getErrorMessage().setMessage(resources.message(error));
+    setI18n(i18n);
   }
 
   @Override
@@ -143,14 +124,17 @@ public class SigninView extends Composite<VerticalLayout> implements LocaleChang
   }
 
   @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
-    getCurrentUi().getPage().executeJavaScript("document.getElementById('" + DO_SIGNIN
-        + "').addEventListener('click', () => document.getElementById('ironform').submit());");
-  }
-
-  @Override
   public void afterNavigation(AfterNavigationEvent event) {
-    presenter.showError(event.getLocation().getQueryParameters().getParameters(), getLocale());
+    Map<String, List<String>> parameters = event.getLocation().getQueryParameters().getParameters();
+    if (parameters.containsKey(DISABLED)) {
+      error = DISABLED;
+      setError(true);
+    } else if (parameters.containsKey(LOCKED)) {
+      error = LOCKED;
+      setError(true);
+    } else if (parameters.containsKey(FAIL)) {
+      error = FAIL;
+      setError(true);
+    }
   }
 }

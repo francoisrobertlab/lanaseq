@@ -70,8 +70,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
       Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.FAIL;
-  private static final String SIGNIN_EXCESSIVE_ATTEMPTS_URL =
-      SIGNIN_PROCESSING_URL + "?" + SigninView.EXCESSIVE_ATTEMPTS;
+  private static final String SIGNIN_LOCKED_URL =
+      SIGNIN_PROCESSING_URL + "?" + SigninView.LOCKED;
   private static final String SIGNIN_DISABLED_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
@@ -135,7 +135,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   public AuthenticationFailureHandler authenticationFailureHandler() {
     final Map<String, String> failureUrlMap = new HashMap<>();
-    failureUrlMap.put(LockedException.class.getName(), SIGNIN_EXCESSIVE_ATTEMPTS_URL);
+    failureUrlMap.put(LockedException.class.getName(), SIGNIN_LOCKED_URL);
     failureUrlMap.put(DisabledException.class.getName(), SIGNIN_DISABLED_URL);
     ExceptionMappingAuthenticationFailureHandler authenticationFailureHandler =
         new ExceptionMappingAuthenticationFailureHandler();
