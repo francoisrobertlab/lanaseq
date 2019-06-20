@@ -33,7 +33,8 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.data.renderer.BasicRenderer;
+import com.vaadin.flow.function.ValueProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -137,21 +138,44 @@ public class VaadinTestUtils {
   }
 
   /**
-   * Validates that icon is present on button.
+   * Validates that actual icon is the same as the expected icon.
    *
-   * @param button
-   *          button
-   * @param icon
-   *          icon
+   * @param expected
+   *          expected icon
+   * @param actual
+   *          actual icon
    */
-  public static void validateIcon(Icon icon, Button button) {
-    Element iconOnComponent;
-    if (button.isIconAfterText()) {
-      iconOnComponent = button.getElement().getChild(button.getElement().getChildCount() - 1);
-    } else {
-      iconOnComponent = button.getElement().getChild(0);
+  public static void validateIcon(Icon expected, Component actual) {
+    assertEquals(expected.getElement().getAttribute(ICON_ATTRIBUTE),
+        actual.getElement().getAttribute(ICON_ATTRIBUTE));
+  }
+
+  /**
+   * Returns the renderer's formatted value for item.
+   *
+   * @param <T>
+   *          item's type
+   * @param renderer
+   *          renderer
+   * @param item
+   *          item
+   * @return the renderer's formatted value for item
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> String getFormattedValue(BasicRenderer<T, ?> renderer, T item) {
+    try {
+      Method getValueProvider = BasicRenderer.class.getDeclaredMethod("getValueProvider");
+      getValueProvider.setAccessible(true);
+      ValueProvider<T, ?> vp = (ValueProvider<T, ?>) getValueProvider.invoke(renderer);
+      Object value = vp.apply(item);
+      Method getFormattedValue =
+          BasicRenderer.class.getDeclaredMethod("getFormattedValue", Object.class);
+      getFormattedValue.setAccessible(true);
+      return (String) getFormattedValue.invoke(renderer, value);
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      e.printStackTrace();
     }
-    assertEquals(icon.getElement().getAttribute(ICON_ATTRIBUTE),
-        iconOnComponent.getAttribute(ICON_ATTRIBUTE));
+    return null;
   }
 }

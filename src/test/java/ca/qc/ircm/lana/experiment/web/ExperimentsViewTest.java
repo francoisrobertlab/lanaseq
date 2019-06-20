@@ -27,6 +27,7 @@ import static ca.qc.ircm.lana.experiment.web.ExperimentsView.PERMISSIONS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.doubleClickItem;
+import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.web.WebConstants.ALL;
 import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
@@ -48,7 +49,6 @@ import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.text.MessageResource;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -238,9 +238,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
         localDateTimeRendererCaptor.getValue();
     for (Experiment experiment : experiments) {
-      Component component = localDateTimeRenderer.createComponent(experiment);
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(experiment.getDate()),
-          component.getElement().getText());
+          getFormattedValue(localDateTimeRenderer, experiment));
     }
     verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(OWNER));
     valueProvider = valueProviderCaptor.getValue();
