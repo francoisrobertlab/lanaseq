@@ -195,9 +195,9 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertEquals(userResources.message(property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(resources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add);
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(SWITCH_USER), view.switchUser.getText());
-    validateIcon(VaadinIcon.BUG.create(), view.switchUser);
+    validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
     verify(presenter).localeChange(locale);
   }
 
@@ -232,9 +232,9 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertEquals(userResources.message(property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(resources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add);
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(SWITCH_USER), view.switchUser.getText());
-    validateIcon(VaadinIcon.BUG.create(), view.switchUser);
+    validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
     verify(presenter).localeChange(locale);
   }
 
@@ -321,7 +321,7 @@ public class UsersViewTest extends AbstractViewTestCase {
       assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
       assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
-          button);
+          button.getIcon());
       boolean previousActive = user.isActive();
       clickButton(button);
       verify(presenter, atLeastOnce()).toggleActive(user);
@@ -329,7 +329,7 @@ public class UsersViewTest extends AbstractViewTestCase {
       assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
       assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
-          button);
+          button.getIcon());
     }
     verify(view.active).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();

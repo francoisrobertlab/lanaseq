@@ -163,9 +163,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(resources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add);
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
-    validateIcon(VaadinIcon.LOCK.create(), view.permissions);
+    validateIcon(VaadinIcon.LOCK.create(), view.permissions.getIcon());
     verify(presenter).localeChange(locale);
   }
 
@@ -191,9 +191,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(resources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add);
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
-    validateIcon(VaadinIcon.LOCK.create(), view.permissions);
+    validateIcon(VaadinIcon.LOCK.create(), view.permissions.getIcon());
     verify(presenter).localeChange(locale);
   }
 

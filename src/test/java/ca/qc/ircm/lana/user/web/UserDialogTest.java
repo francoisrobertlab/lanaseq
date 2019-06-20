@@ -125,9 +125,9 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());
     assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
-    validateIcon(VaadinIcon.CHECK.create(), dialog.save);
+    validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel);
+    validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
     verify(presenter).localeChange(locale);
   }
 

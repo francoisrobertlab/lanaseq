@@ -83,7 +83,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
     assertEquals(PRIMARY, view.save.getElement().getAttribute(THEME));
-    validateIcon(VaadinIcon.CHECK.create(), view.save);
+    validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
     assertEquals(PRIMARY, view.save.getElement().getAttribute(THEME));
-    validateIcon(VaadinIcon.CHECK.create(), view.save);
+    validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
   @Test
