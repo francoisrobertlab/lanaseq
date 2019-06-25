@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
  */
 @Route(value = SigninView.VIEW_NAME)
 @HtmlImport("styles/shared-styles.html")
-@HtmlImport("frontend://bower_components/iron-form/iron-form.html")
 public class SigninView extends LoginOverlay implements LocaleChangeObserver, HasDynamicTitle,
     AfterNavigationObserver, BeforeEnterObserver, BaseComponent {
   public static final String VIEW_NAME = "signin";
