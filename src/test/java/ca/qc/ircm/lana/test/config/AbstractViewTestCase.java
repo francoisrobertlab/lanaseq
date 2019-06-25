@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.page.History;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.internal.CurrentInstance;
@@ -46,6 +47,8 @@ public abstract class AbstractViewTestCase {
   protected VaadinSession session;
   @Mock
   protected Page page;
+  @Mock
+  protected History history;
   @Captor
   private ArgumentCaptor<SerializableConsumer<ExecutionContext>> openDialogCaptor;
   @Captor
@@ -60,6 +63,7 @@ public abstract class AbstractViewTestCase {
   public void setUi() {
     when(ui.getSession()).thenReturn(session);
     when(ui.getPage()).thenReturn(page);
+    when(page.getHistory()).thenReturn(history);
     CurrentInstance.setCurrent(ui);
   }
 
