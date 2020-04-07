@@ -28,6 +28,9 @@ spring:
       test-on-borrow: true
       validationQuery: SELECT 1
 
+app:
+  serverUrl: http://localhost:8080
+
 security:
   lockAttemps: 5
   lock-duration: PT3M
@@ -93,6 +96,9 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: none
+
+app:
+  serverUrl: http://localhost:${local.server.port}
 
 vaadin:
   productionMode: false
