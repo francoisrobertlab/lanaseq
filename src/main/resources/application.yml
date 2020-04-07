@@ -49,6 +49,7 @@ server:
 vaadin:
   productionMode: false
   closeIdleSessions: true
+  compatibilityMode: true
 
 logging:
   file: ${spring.application.name}.log
