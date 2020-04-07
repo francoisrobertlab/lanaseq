@@ -39,6 +39,7 @@ import javax.validation.constraints.Size;
 @Entity
 @GeneratePropertyNames
 public class User implements Data, Owned, Serializable {
+  public static final long ROBOT_ID = 1;
   private static final long serialVersionUID = -3200958473089020837L;
   /**
    * Database identifier.

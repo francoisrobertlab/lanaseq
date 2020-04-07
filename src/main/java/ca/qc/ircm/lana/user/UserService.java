@@ -90,6 +90,21 @@ public class UserService {
   }
 
   /**
+   * Returns true if a user exists with this email.
+   *
+   * @param email
+   *          email
+   * @return true if a user exists with this email
+   */
+  public boolean exists(String email) {
+    if (email == null) {
+      return false;
+    }
+
+    return repository.findByEmail(email) != null;
+  }
+
+  /**
    * Returns all users.
    *
    * @return all users

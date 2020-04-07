@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
@@ -55,9 +56,9 @@ public class UserServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
   @Autowired
-  private UserService userService;
+  private UserService service;
   @Autowired
-  private UserRepository userRepository;
+  private UserRepository repository;
   @Autowired
   private LaboratoryRepository laboratoryRepository;
   @MockBean
@@ -80,7 +81,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get() {
-    User user = userService.get(1L);
+    User user = service.get(1L);
 
     assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
@@ -105,7 +106,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get_Invalid() {
-    User user = userService.get(0L);
+    User user = service.get(0L);
 
     assertNull(user);
   }
@@ -113,7 +114,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get_Null() {
-    User user = userService.get(null);
+    User user = service.get(null);
 
     assertNull(user);
   }
@@ -121,7 +122,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail() {
-    User user = userService.getByEmail("francois.robert@ircm.qc.ca");
+    User user = service.getByEmail("francois.robert@ircm.qc.ca");
 
     assertNotNull(user);
     assertEquals((Long) 2L, user.getId());
@@ -145,7 +146,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail_Invalid() {
-    User user = userService.getByEmail("a");
+    User user = service.getByEmail("a");
 
     assertNull(user);
   }
@@ -153,17 +154,42 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail_Null() {
-    User user = userService.getByEmail(null);
+    User user = service.getByEmail(null);
 
     assertNull(user);
   }
 
   @Test
+  public void exists_Email_True() throws Throwable {
+    boolean exists = service.exists("christian.poitras@ircm.qc.ca");
+
+    assertEquals(true, exists);
+
+    verifyNoInteractions(authorizationService);
+  }
+
+  @Test
+  public void exists_Email_False() throws Throwable {
+    boolean exists = service.exists("abc@ircm.qc.ca");
+
+    assertEquals(false, exists);
+
+    verifyNoInteractions(authorizationService);
+  }
+
+  @Test
+  public void exists_Email_Null() throws Throwable {
+    boolean exists = service.exists(null);
+
+    assertEquals(false, exists);
+  }
+
+  @Test
   @WithMockUser
   public void all() {
-    when(authorizationService.currentUser()).thenReturn(userRepository.findById(3L).get());
+    when(authorizationService.currentUser()).thenReturn(repository.findById(3L).get());
 
-    List<User> users = userService.all();
+    List<User> users = service.all();
 
     assertEquals(9, users.size());
     assertTrue(find(users, 1L).isPresent());
@@ -179,7 +205,7 @@ public class UserServiceTest {
   public void all_Laboratory() {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
 
-    List<User> users = userService.all(laboratory);
+    List<User> users = service.all(laboratory);
 
     assertEquals(3, users.size());
     assertTrue(find(users, 2L).isPresent());
@@ -194,7 +220,7 @@ public class UserServiceTest {
   @WithMockUser
   public void manager() {
     Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    User user = userService.manager(laboratory);
+    User user = service.manager(laboratory);
     assertEquals((Long) 2L, user.getId());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
@@ -203,7 +229,7 @@ public class UserServiceTest {
   @WithMockUser
   public void manager_OnlyActive() {
     Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    User user = userService.manager(laboratory);
+    User user = service.manager(laboratory);
     assertEquals((Long) 5L, user.getId());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
@@ -217,10 +243,10 @@ public class UserServiceTest {
     user.setAdmin(true);
     user.setLaboratory(laboratoryRepository.findById(1L).get());
 
-    userService.save(user, "password");
+    service.save(user, "password");
 
     assertNotNull(user.getId());
-    user = userRepository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).get();
     assertNotNull(user);
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
@@ -246,7 +272,7 @@ public class UserServiceTest {
     user.setEmail("test.user@ircm.qc.ca");
     user.setAdmin(true);
 
-    userService.save(user, "password");
+    service.save(user, "password");
   }
 
   @Test
@@ -259,10 +285,10 @@ public class UserServiceTest {
     user.setManager(true);
     user.setLaboratory(laboratoryRepository.findById(1L).get());
 
-    userService.save(user, "password");
+    service.save(user, "password");
 
     assertNotNull(user.getId());
-    user = userRepository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).get();
     assertNotNull(user);
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
@@ -289,10 +315,10 @@ public class UserServiceTest {
     user.setLaboratory(laboratoryRepository.findById(2L).get());
     user.setLocale(Locale.ENGLISH);
 
-    userService.save(user, "password");
+    service.save(user, "password");
 
     assertNotNull(user.getId());
-    user = userRepository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).get();
     assertNotNull(user);
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
@@ -319,7 +345,7 @@ public class UserServiceTest {
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.ENGLISH);
 
-    userService.save(user, "password");
+    service.save(user, "password");
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -332,7 +358,7 @@ public class UserServiceTest {
     user.setLaboratory(new Laboratory());
     user.getLaboratory().setId(0L);
 
-    userService.save(user, "password");
+    service.save(user, "password");
   }
 
   @Test
@@ -344,10 +370,10 @@ public class UserServiceTest {
     user.setManager(true);
     user.setLaboratory(laboratoryRepository.findById(2L).get());
 
-    userService.save(user, "password");
+    service.save(user, "password");
 
     assertNotNull(user.getId());
-    user = userRepository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).get();
     assertNotNull(user);
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
@@ -377,11 +403,11 @@ public class UserServiceTest {
     laboratory.setName("Test Lab");
     user.setLaboratory(laboratory);
 
-    userService.save(user, "password");
+    service.save(user, "password");
 
     assertNotNull(user.getId());
     assertNotNull(laboratory.getId());
-    user = userRepository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).get();
     assertNotNull(user);
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
@@ -409,7 +435,7 @@ public class UserServiceTest {
     user.setEmail("test.user@ircm.qc.ca");
     user.setManager(true);
 
-    userService.save(user, "password");
+    service.save(user, "password");
   }
 
   @Test
@@ -421,10 +447,10 @@ public class UserServiceTest {
     user.setLaboratory(laboratoryRepository.findById(2L).get());
     user.setLocale(Locale.ENGLISH);
 
-    userService.save(user, null);
+    service.save(user, null);
 
     assertNotNull(user.getId());
-    user = userRepository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).get();
     assertNotNull(user);
     assertNotNull(user.getId());
     assertEquals("Test User", user.getName());
@@ -444,14 +470,14 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_Update() {
-    User user = userRepository.findById(6L).get();
+    User user = repository.findById(6L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
 
-    userService.save(user, "newpassword");
+    service.save(user, "newpassword");
 
-    user = userRepository.findById(6L).get();
+    user = repository.findById(6L).get();
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -477,15 +503,15 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_UpdateChangeLaboratory() {
-    User user = userRepository.findById(3L).get();
+    User user = repository.findById(3L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
     user.setLaboratory(laboratoryRepository.findById(3L).get());
 
-    userService.save(user, "newpassword");
+    service.save(user, "newpassword");
 
-    user = userRepository.findById(3L).get();
+    user = repository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -511,15 +537,15 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_UpdateDeleteEmptyLaboratory() {
-    User user = userRepository.findById(2L).get();
+    User user = repository.findById(2L).get();
     user.setLaboratory(laboratoryRepository.findById(3L).get());
-    userService.save(user, null);
-    user = userRepository.findById(3L).get();
+    service.save(user, null);
+    user = repository.findById(3L).get();
     user.setLaboratory(laboratoryRepository.findById(3L).get());
-    userService.save(user, null);
-    user = userRepository.findById(9L).get();
+    service.save(user, null);
+    user = repository.findById(9L).get();
     user.setLaboratory(laboratoryRepository.findById(3L).get());
-    userService.save(user, null);
+    service.save(user, null);
 
     assertFalse(laboratoryRepository.findById(2L).isPresent());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
@@ -528,7 +554,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_UpdateNewLaboratory() {
-    User user = userRepository.findById(3L).get();
+    User user = repository.findById(3L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setManager(true);
@@ -537,10 +563,10 @@ public class UserServiceTest {
     laboratory.setName("Test Lab");
     user.setLaboratory(laboratory);
 
-    userService.save(user, "newpassword");
+    service.save(user, "newpassword");
 
     assertNotNull(laboratory.getId());
-    user = userRepository.findById(3L).get();
+    user = repository.findById(3L).get();
     assertEquals((Long) 3L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -566,14 +592,14 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_UpdateKeepPassword() {
-    User user = userRepository.findById(6L).get();
+    User user = repository.findById(6L).get();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
 
-    userService.save(user, null);
+    service.save(user, null);
 
-    user = userRepository.findById(6L).orElse(null);
+    user = repository.findById(6L).orElse(null);
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -598,36 +624,36 @@ public class UserServiceTest {
   @Test(expected = AccessDeniedException.class)
   @WithMockUser
   public void save_UpdateFirstUserRemoveAdmin() {
-    User user = userRepository.findById(1L).get();
+    User user = repository.findById(1L).get();
     user.setAdmin(false);
 
-    userService.save(user, "newpassword");
+    service.save(user, "newpassword");
   }
 
   @Test(expected = AccessDeniedException.class)
   @WithMockUser
   public void save_UpdateFirstUserRemoveActive() {
-    User user = userRepository.findById(1L).get();
+    User user = repository.findById(1L).get();
     user.setActive(false);
 
-    userService.save(user, "newpassword");
+    service.save(user, "newpassword");
   }
 
   @Test(expected = NullPointerException.class)
   @WithMockUser
   public void save_Null() {
-    userService.save(null, null);
+    service.save(null, null);
   }
 
   @Test
   @WithMockUser
   public void save_Password() {
-    User user = userRepository.findById(6L).get();
+    User user = repository.findById(6L).get();
     when(authorizationService.currentUser()).thenReturn(user);
 
-    userService.save("newpassword");
+    service.save("newpassword");
 
-    user = userRepository.findById(6L).get();
+    user = repository.findById(6L).get();
     assertEquals("Christian Poitras", user.getName());
     assertEquals("christian.poitras@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("newpassword");
@@ -650,12 +676,12 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_PasswordNoAuthorityChange() {
-    User user = userRepository.findById(3L).get();
+    User user = repository.findById(3L).get();
     when(authorizationService.currentUser()).thenReturn(user);
 
-    userService.save("newpassword");
+    service.save("newpassword");
 
-    user = userRepository.findById(3L).get();
+    user = repository.findById(3L).get();
     assertEquals("Jonh Smith", user.getName());
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("newpassword");
@@ -678,18 +704,18 @@ public class UserServiceTest {
   @Test(expected = AccessDeniedException.class)
   @WithAnonymousUser
   public void save_PasswordAnonymousDenied() {
-    User user = userRepository.findById(3L).get();
+    User user = repository.findById(3L).get();
     when(authorizationService.currentUser()).thenReturn(user);
 
-    userService.save("new password");
+    service.save("new password");
   }
 
   @Test(expected = NullPointerException.class)
   @WithMockUser
   public void save_PasswordNull() {
-    User user = userRepository.findById(3L).get();
+    User user = repository.findById(3L).get();
     when(authorizationService.currentUser()).thenReturn(user);
 
-    userService.save(null);
+    service.save(null);
   }
 }
