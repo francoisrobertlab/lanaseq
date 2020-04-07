@@ -17,10 +17,17 @@
 
 package ca.qc.ircm.lana;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Constants.
  */
 public class Constants {
+  public static final Locale ENGLISH = Locale.CANADA;
+  public static final Locale FRENCH = Locale.CANADA_FRENCH;
+  public static final Locale DEFAULT_LOCALE = ENGLISH;
   public static final String APPLICATION_NAME = "application.name";
   public static final String TITLE = "title";
   public static final String THEME = "theme";
@@ -44,4 +51,16 @@ public class Constants {
   public static final String CANCEL = "cancel";
   public static final String ALL = "all";
   public static final String ADD = "add";
+
+  /**
+   * Returns all valid locales for program.
+   *
+   * @return all valid locales for program
+   */
+  public static List<Locale> getLocales() {
+    List<Locale> locales = new ArrayList<>();
+    locales.add(ENGLISH);
+    locales.add(FRENCH);
+    return locales;
+  }
 }

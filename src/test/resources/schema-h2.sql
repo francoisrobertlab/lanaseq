@@ -39,6 +39,16 @@ CREATE TABLE IF NOT EXISTS user (
   UNIQUE KEY email (email),
   CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS forgotpassword (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  user_id bigint(20) NOT NULL,
+  request_moment datetime NOT NULL,
+  confirm_number varchar(100) NOT NULL,
+  used tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  KEY user (user_id),
+  CONSTRAINT forgotpasswordUser_ibfk FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 CREATE TABLE IF NOT EXISTS experiment (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
