@@ -23,9 +23,9 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.Collection;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
@@ -45,11 +45,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SpringAuthorizationService implements AuthorizationService {
   private static final Logger logger = LoggerFactory.getLogger(SpringAuthorizationService.class);
-  @Inject
+  @Autowired
   private UserRepository userRepository;
-  @Inject
+  @Autowired
   private UserDetailsService userDetailsService;
-  @Inject
+  @Autowired
   private PermissionEvaluator permissionEvaluator;
 
   protected SpringAuthorizationService() {

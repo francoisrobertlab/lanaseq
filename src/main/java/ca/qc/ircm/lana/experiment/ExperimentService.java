@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,13 +53,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ExperimentService {
-  @Inject
+  @Autowired
   private ExperimentRepository repository;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
-  @Inject
+  @Autowired
   private MutableAclService aclService;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
 
   protected ExperimentService() {

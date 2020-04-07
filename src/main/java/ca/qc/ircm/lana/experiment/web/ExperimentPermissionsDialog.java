@@ -49,9 +49,9 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -79,7 +79,7 @@ public class ExperimentPermissionsDialog extends Dialog
   protected TextField emailFilter = new TextField();
   protected Button save = new Button();
   protected Button cancel = new Button();
-  @Inject
+  @Autowired
   private ExperimentPermissionsDialogPresenter presenter;
 
   protected ExperimentPermissionsDialog() {

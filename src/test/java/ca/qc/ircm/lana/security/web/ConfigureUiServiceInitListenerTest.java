@@ -39,13 +39,13 @@ import com.vaadin.flow.server.UIInitListener;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.shared.Registration;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -53,7 +53,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
-  @Inject
+  @Autowired
   private ConfigureUiServiceInitListener configurer;
   @MockBean
   private AuthorizationService authorizationService;
@@ -72,8 +72,8 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   @Captor
   private ArgumentCaptor<BeforeEnterListener> beforeEnterListenerCaptor;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(ConfigureUiServiceInitListener.class,
-      locale);
+  private MessageResource resources =
+      new MessageResource(ConfigureUiServiceInitListener.class, locale);
   private User user = new User(1L, "myuser");
 
   /**

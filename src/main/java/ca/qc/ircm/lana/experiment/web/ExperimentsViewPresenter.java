@@ -30,9 +30,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.acls.domain.BasePermission;
@@ -45,9 +45,9 @@ import org.springframework.security.acls.domain.BasePermission;
 public class ExperimentsViewPresenter {
   private static final Logger logger = LoggerFactory.getLogger(ExperimentsViewPresenter.class);
   private ExperimentsView view;
-  @Inject
+  @Autowired
   private ExperimentService experimentService;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
   private ListDataProvider<Experiment> experimentsDataProvider;
   private WebExperimentFilter filter = new WebExperimentFilter();

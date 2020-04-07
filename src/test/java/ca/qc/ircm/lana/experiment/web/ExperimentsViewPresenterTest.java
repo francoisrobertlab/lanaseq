@@ -52,13 +52,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -77,9 +77,9 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<Experiment> experimentCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<ExperimentDialog>>> savedListenerCaptor;
-  @Inject
+  @Autowired
   private ExperimentRepository experimentRepository;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(ExperimentsView.class, locale);

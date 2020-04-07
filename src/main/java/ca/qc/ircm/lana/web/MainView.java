@@ -31,9 +31,9 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Main view.
@@ -45,7 +45,7 @@ public class MainView extends Composite<VerticalLayout>
   public static final String VIEW_NAME = "";
   private static final long serialVersionUID = -8440231785563887343L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
-  @Inject
+  @Autowired
   private transient AuthorizationService authorizationService;
 
   public MainView() {

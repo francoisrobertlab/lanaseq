@@ -33,13 +33,13 @@ import ca.qc.ircm.lana.web.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -58,7 +58,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<User> userCaptor;
   @Captor
   private ArgumentCaptor<Boolean> booleanCaptor;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   private String password = "test_password";
   private User currentUser;

@@ -22,7 +22,7 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
@@ -37,13 +37,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService {
-  @Inject
+  @Autowired
   private UserRepository repository;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
-  @Inject
+  @Autowired
   private PasswordEncoder passwordEncoder;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
 
   protected UserService() {

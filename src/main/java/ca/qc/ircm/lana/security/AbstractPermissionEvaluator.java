@@ -8,7 +8,7 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * Implements common methods to use for {@link PermissionEvaluator} implementations.
  */
 public abstract class AbstractPermissionEvaluator implements PermissionEvaluator {
-  @Inject
+  @Autowired
   private UserRepository userRepository;
 
   protected UserDetails getUserDetails(Authentication authentication) {

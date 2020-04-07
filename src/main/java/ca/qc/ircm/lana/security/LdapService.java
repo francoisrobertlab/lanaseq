@@ -20,10 +20,10 @@ package ca.qc.ircm.lana.security;
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 import java.util.Optional;
-import javax.inject.Inject;
 import javax.naming.NamingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
@@ -35,9 +35,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class LdapService {
   private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
-  @Inject
+  @Autowired
   private LdapTemplate ldapTemplate;
-  @Inject
+  @Autowired
   private LdapConfiguration ldapConfiguration;
 
   protected LdapService() {

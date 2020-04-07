@@ -29,9 +29,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -45,7 +45,7 @@ public class ExperimentDialogPresenter {
   private ExperimentDialog dialog;
   private Binder<Experiment> binder = new BeanValidationBinder<>(Experiment.class);
   private Experiment experiment;
-  @Inject
+  @Autowired
   private ExperimentService experimentService;
 
   protected ExperimentDialogPresenter() {

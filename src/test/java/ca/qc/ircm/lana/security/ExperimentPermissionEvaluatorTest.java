@@ -35,13 +35,13 @@ import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
 import java.util.List;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
@@ -65,11 +65,11 @@ public class ExperimentPermissionEvaluatorTest {
   private static final Permission BASE_READ = BasePermission.READ;
   private static final String WRITE = "write";
   private static final Permission BASE_WRITE = BasePermission.WRITE;
-  @Inject
+  @Autowired
   private ExperimentPermissionEvaluator permissionEvaluator;
-  @Inject
+  @Autowired
   private ExperimentRepository experimentRepository;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
   @MockBean
   private MutableAclService aclService;

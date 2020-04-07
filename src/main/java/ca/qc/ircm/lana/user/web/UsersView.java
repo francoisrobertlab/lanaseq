@@ -64,7 +64,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Users view.
@@ -95,11 +95,11 @@ public class UsersView extends Composite<VerticalLayout>
   protected Button add = new Button();
   protected Button switchUser = new Button();
   private Map<User, Button> actives = new HashMap<>();
-  @Inject
+  @Autowired
   protected UserDialog userDialog;
-  @Inject
+  @Autowired
   protected LaboratoryDialog laboratoryDialog;
-  @Inject
+  @Autowired
   private transient UsersViewPresenter presenter;
 
   public UsersView() {

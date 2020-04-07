@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,6 +62,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -84,11 +84,11 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   private DataProvider<User, ?> managersDataProvider;
   @Captor
   private ArgumentCaptor<Collection<Laboratory>> laboratoriesCaptor;
-  @Inject
+  @Autowired
   private ExperimentRepository experimentRepository;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   private Experiment experiment;
   private List<Laboratory> laboratories;

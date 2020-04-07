@@ -41,13 +41,13 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import java.util.Locale;
 import java.util.Optional;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -60,7 +60,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   private ExperimentService experimentService;
   @Captor
   private ArgumentCaptor<Experiment> experimentCaptor;
-  @Inject
+  @Autowired
   private ExperimentRepository experimentRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource webResources = new MessageResource(WebConstants.class, locale);

@@ -59,13 +59,13 @@ import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -80,9 +80,9 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
   private ArgumentCaptor<ValueProvider<User, String>> userValueProviderCaptor;
   @Captor
   private ArgumentCaptor<ValueProvider<User, Checkbox>> userCheckboxValueProviderCaptor;
-  @Inject
+  @Autowired
   private ExperimentRepository experimentRepository;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources =

@@ -21,9 +21,9 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.test.context.TestContext;
@@ -47,7 +47,7 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
   @SuppressWarnings("checkstyle:linelength")
   public static final String PASSWORD_PASS2 =
       "$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu";
-  @Inject
+  @Autowired
   private UserRepository userRepository;
 
   @Override

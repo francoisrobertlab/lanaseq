@@ -32,11 +32,11 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -47,13 +47,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class DaoAuthenticationProviderWithLdapTest {
-  @Inject
+  @Autowired
   private DaoAuthenticationProviderWithLdap ldapDaoAuthenticationProvider;
   @Mock
   private LdapService ldapService;
   @Mock
   private LdapConfiguration ldapConfiguration;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
 
   @Before

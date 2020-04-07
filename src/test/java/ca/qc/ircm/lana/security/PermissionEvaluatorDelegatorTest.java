@@ -27,10 +27,10 @@ import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
-import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -49,7 +49,7 @@ public class PermissionEvaluatorDelegatorTest {
   private static final Permission BASE_READ = BasePermission.READ;
   private static final String WRITE = "write";
   private static final Permission BASE_WRITE = BasePermission.WRITE;
-  @Inject
+  @Autowired
   private PermissionEvaluatorDelegator permissionEvaluator;
   @MockBean
   private LaboratoryPermissionEvaluator laboratoryPermissionEvaluator;

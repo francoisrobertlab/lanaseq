@@ -4,7 +4,7 @@ import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import java.io.Serializable;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PermissionEvaluatorDelegator implements PermissionEvaluator {
-  @Inject
+  @Autowired
   private LaboratoryPermissionEvaluator laboratoryPermissionEvaluator;
-  @Inject
+  @Autowired
   private UserPermissionEvaluator userPermissionEvaluator;
-  @Inject
+  @Autowired
   private ExperimentPermissionEvaluator experimentPermissionEvaluator;
 
   @Override

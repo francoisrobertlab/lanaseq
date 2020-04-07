@@ -33,10 +33,10 @@ import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -47,11 +47,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class LaboratoryServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
-  @Inject
+  @Autowired
   private LaboratoryService laboratoryService;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   @MockBean
   private AuthorizationService authorizationService;

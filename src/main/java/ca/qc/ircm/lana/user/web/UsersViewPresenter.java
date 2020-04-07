@@ -40,9 +40,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -54,11 +54,11 @@ import org.springframework.context.annotation.Scope;
 public class UsersViewPresenter {
   private static final Logger logger = LoggerFactory.getLogger(UsersViewPresenter.class);
   private UsersView view;
-  @Inject
+  @Autowired
   private UserService userService;
-  @Inject
+  @Autowired
   private LaboratoryService laboratoryService;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
   private Locale locale;
   private ListDataProvider<User> usersDataProvider;

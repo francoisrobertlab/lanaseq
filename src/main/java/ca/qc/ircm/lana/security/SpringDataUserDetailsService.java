@@ -27,7 +27,7 @@ import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SpringDataUserDetailsService implements UserDetailsService {
-  @Inject
+  @Autowired
   private UserRepository userRepository;
 
   protected SpringDataUserDetailsService() {

@@ -10,9 +10,9 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -21,9 +21,9 @@ import org.springframework.security.access.AccessDeniedException;
 @SpringComponent
 public class ConfigureUiServiceInitListener implements VaadinServiceInitListener {
   private static final long serialVersionUID = 1796331428220223698L;
-  private static final Logger logger = LoggerFactory
-      .getLogger(ConfigureUiServiceInitListener.class);
-  @Inject
+  private static final Logger logger =
+      LoggerFactory.getLogger(ConfigureUiServiceInitListener.class);
+  @Autowired
   private AuthorizationService authorizationService;
 
   @Override
@@ -52,8 +52,8 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
         event.rerouteTo(SigninView.class);
       } else {
         UI ui = event.getUI();
-        MessageResource resources = new MessageResource(ConfigureUiServiceInitListener.class,
-            ui.getLocale());
+        MessageResource resources =
+            new MessageResource(ConfigureUiServiceInitListener.class, ui.getLocale());
         String message = resources.message(AccessDeniedException.class.getSimpleName(),
             authorizationService.currentUser().getEmail(),
             event.getNavigationTarget().getSimpleName());

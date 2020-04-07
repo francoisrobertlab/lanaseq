@@ -44,13 +44,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
@@ -72,9 +72,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SpringAuthorizationServiceTest {
   private static final String DEFAULT_ROLE = USER;
   private SpringAuthorizationService authorizationService;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
-  @Inject
+  @Autowired
   private UserDetailsService userDetailsService;
   @Mock
   private PermissionEvaluator permissionEvaluator;

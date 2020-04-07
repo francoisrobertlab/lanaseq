@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -48,11 +48,11 @@ public class ExperimentPermissionsDialogPresenter {
   private static final Logger logger =
       LoggerFactory.getLogger(ExperimentPermissionsDialogPresenter.class);
   private ExperimentPermissionsDialog dialog;
-  @Inject
+  @Autowired
   private ExperimentService experimentService;
-  @Inject
+  @Autowired
   private LaboratoryService laboratoryService;
-  @Inject
+  @Autowired
   private UserService userService;
   private Experiment experiment;
   private ListDataProvider<User> managersDataProvider;

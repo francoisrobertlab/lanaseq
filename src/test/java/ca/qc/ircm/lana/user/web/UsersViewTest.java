@@ -76,13 +76,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -101,7 +101,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, User>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<User>> comparatorCaptor;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(UsersView.class, locale);

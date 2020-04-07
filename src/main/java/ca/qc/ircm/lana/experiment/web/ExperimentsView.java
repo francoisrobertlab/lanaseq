@@ -54,7 +54,7 @@ import com.vaadin.flow.router.Route;
 import java.time.format.DateTimeFormatter;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Experiments view.
@@ -81,11 +81,11 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button permissions = new Button();
-  @Inject
+  @Autowired
   protected ExperimentDialog experimentDialog;
-  @Inject
+  @Autowired
   protected ExperimentPermissionsDialog experimentPermissionsDialog;
-  @Inject
+  @Autowired
   private transient ExperimentsViewPresenter presenter;
 
   public ExperimentsView() {

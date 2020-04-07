@@ -7,7 +7,7 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.io.Serializable;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
-  @Inject
+  @Autowired
   private UserRepository repository;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
 
   @Override

@@ -54,11 +54,11 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -71,7 +71,7 @@ public class UserDialogTest extends AbstractViewTestCase {
   private User user;
   @Mock
   private ComponentEventListener<SavedEvent<UserDialog>> savedListener;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(UserDialog.class, locale);

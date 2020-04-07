@@ -26,16 +26,16 @@ import ca.qc.ircm.lana.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class UserServiceInjectionTest {
-  @Inject
+  @Autowired
   private UserService userService;
 
   @Test

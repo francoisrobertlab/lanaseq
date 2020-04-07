@@ -43,10 +43,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
@@ -67,15 +67,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExperimentServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
-  @Inject
+  @Autowired
   private ExperimentService service;
-  @Inject
+  @Autowired
   private ExperimentRepository repository;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
-  @Inject
+  @Autowired
   private MutableAclService aclService;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
   @MockBean
   private AuthorizationService authorizationService;

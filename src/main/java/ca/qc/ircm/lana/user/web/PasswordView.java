@@ -19,7 +19,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Change password view.
@@ -33,7 +33,7 @@ public class PasswordView extends Composite<VerticalLayout>
   protected H2 header = new H2();
   protected PasswordsForm passwords = new PasswordsForm();
   protected Button save = new Button();
-  @Inject
+  @Autowired
   private PasswordViewPresenter presenter;
 
   protected PasswordView() {

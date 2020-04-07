@@ -41,7 +41,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -59,7 +59,7 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
-  @Inject
+  @Autowired
   private ExperimentDialogPresenter presenter;
 
   protected ExperimentDialog() {

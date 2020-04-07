@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,9 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class LaboratoryService {
-  @Inject
+  @Autowired
   private LaboratoryRepository repository;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
 
   protected LaboratoryService() {

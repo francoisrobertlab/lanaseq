@@ -22,10 +22,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -33,9 +33,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ServiceTestAnnotations
 public class LdapServiceTest {
   private LdapService ldapService;
-  @Inject
+  @Autowired
   private LdapTemplate ldapTemplate;
-  @Inject
+  @Autowired
   private LdapConfiguration ldapConfiguration;
 
   @Before

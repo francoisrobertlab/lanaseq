@@ -49,9 +49,9 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.acls.domain.BasePermission;
@@ -68,11 +68,11 @@ public class UserDialogPresenter {
   private Binder<Laboratory> laboratoryBinder = new BeanValidationBinder<>(Laboratory.class);
   private ListDataProvider<Laboratory> laboratoriesDataProvider;
   private User user;
-  @Inject
+  @Autowired
   private UserService userService;
-  @Inject
+  @Autowired
   private LaboratoryService laboratoryService;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
 
   protected UserDialogPresenter() {

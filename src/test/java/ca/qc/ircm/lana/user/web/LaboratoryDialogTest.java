@@ -45,11 +45,11 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -62,7 +62,7 @@ public class LaboratoryDialogTest extends AbstractViewTestCase {
   private Laboratory laboratory;
   @Mock
   private ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
   private Locale locale = Locale.ENGLISH;
   private MessageResource resources = new MessageResource(LaboratoryDialog.class, locale);

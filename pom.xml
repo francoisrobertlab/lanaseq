@@ -56,7 +56,6 @@
     <!-- Dependencies -->
     <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
     <vaadin.version>14.0.12</vaadin.version>
-    <javax.inject.version>1</javax.inject.version>
     <generate-property-names.version>0.5</generate-property-names.version>
     <guava.version>27.0.1-jre</guava.version>
     <mariadb-java-client.version>2.6.0</mariadb-java-client.version>
@@ -102,11 +101,6 @@
       <groupId>com.unboundid</groupId>
       <artifactId>unboundid-ldapsdk</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <version>${javax.inject.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

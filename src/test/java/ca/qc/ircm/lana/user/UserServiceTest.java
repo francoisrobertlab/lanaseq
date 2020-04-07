@@ -37,10 +37,10 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
@@ -54,11 +54,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class UserServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
-  @Inject
+  @Autowired
   private UserService userService;
-  @Inject
+  @Autowired
   private UserRepository userRepository;
-  @Inject
+  @Autowired
   private LaboratoryRepository laboratoryRepository;
   @MockBean
   private PasswordEncoder passwordEncoder;

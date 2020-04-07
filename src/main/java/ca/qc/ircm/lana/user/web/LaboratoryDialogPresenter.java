@@ -30,9 +30,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.Locale;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.acls.domain.BasePermission;
@@ -47,9 +47,9 @@ public class LaboratoryDialogPresenter {
   private LaboratoryDialog dialog;
   private Binder<Laboratory> binder = new BeanValidationBinder<>(Laboratory.class);
   private Laboratory laboratory;
-  @Inject
+  @Autowired
   private LaboratoryService laboratoryService;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
 
   protected LaboratoryDialogPresenter() {

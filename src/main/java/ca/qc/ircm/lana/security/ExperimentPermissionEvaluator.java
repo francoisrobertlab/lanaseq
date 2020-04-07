@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
@@ -29,11 +29,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ExperimentPermissionEvaluator extends AbstractPermissionEvaluator {
-  @Inject
+  @Autowired
   private ExperimentRepository repository;
-  @Inject
+  @Autowired
   private AuthorizationService authorizationService;
-  @Inject
+  @Autowired
   private AclService aclService;
 
   @Override
