@@ -51,6 +51,12 @@ vaadin:
   closeIdleSessions: true
   compatibilityMode: true
 
+mail:
+  enabled: true
+  host: myemailserver.com
+  from: proview@ircm.qc.ca
+  to: christian.poitras@ircm.qc.ca
+
 logging:
   file: ${spring.application.name}.log
 
