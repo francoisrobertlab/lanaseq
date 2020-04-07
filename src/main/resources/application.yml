@@ -63,9 +63,6 @@ logging:
 ---
 spring:
   profiles: test
-  data:
-    mongodb:
-      port: 0
   ldap:
     embedded:
       base-dn: dc=mycompany,dc=com
@@ -88,9 +85,6 @@ logging:
 ---
 spring:
   profiles: integration-test
-  data:
-    mongodb:
-      port: 0
 
 vaadin:
   productionMode: false
