@@ -4,7 +4,7 @@ import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.web.PasswordView;
-import ca.qc.ircm.lana.user.web.SigninView;
+import ca.qc.ircm.lana.web.SigninView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;

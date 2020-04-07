@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.user.web;
+package ca.qc.ircm.lana.web;
 
 import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.Constants.TITLE;

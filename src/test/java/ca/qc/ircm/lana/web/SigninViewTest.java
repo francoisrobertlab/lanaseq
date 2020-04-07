@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.user.web;
+package ca.qc.ircm.lana.web;
 
 import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
-import static ca.qc.ircm.lana.user.web.SigninView.DESCRIPTION;
-import static ca.qc.ircm.lana.user.web.SigninView.DISABLED;
-import static ca.qc.ircm.lana.user.web.SigninView.FAIL;
-import static ca.qc.ircm.lana.user.web.SigninView.FORM_TITLE;
-import static ca.qc.ircm.lana.user.web.SigninView.HEADER;
-import static ca.qc.ircm.lana.user.web.SigninView.LOCKED;
-import static ca.qc.ircm.lana.user.web.SigninView.SIGNIN;
-import static ca.qc.ircm.lana.user.web.SigninView.VIEW_NAME;
+import static ca.qc.ircm.lana.web.SigninView.DESCRIPTION;
+import static ca.qc.ircm.lana.web.SigninView.DISABLED;
+import static ca.qc.ircm.lana.web.SigninView.FAIL;
+import static ca.qc.ircm.lana.web.SigninView.FORM_TITLE;
+import static ca.qc.ircm.lana.web.SigninView.HEADER;
+import static ca.qc.ircm.lana.web.SigninView.LOCKED;
+import static ca.qc.ircm.lana.web.SigninView.SIGNIN;
+import static ca.qc.ircm.lana.web.SigninView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,6 +41,7 @@ import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.web.SigninView;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Location;
