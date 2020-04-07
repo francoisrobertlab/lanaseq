@@ -69,6 +69,10 @@ spring:
       credential:
         username: uid=poitrasc
         password: secret
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
 
 security:
   rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
@@ -85,6 +89,10 @@ logging:
 ---
 spring:
   profiles: integration-test
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
 
 vaadin:
   productionMode: false
