@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
@@ -68,7 +68,7 @@ public class DaoAuthenticationProviderWithLdapTest {
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass1");
     ldapDaoAuthenticationProvider.authenticate(authentication);
 
-    verifyZeroInteractions(ldapService);
+    verifyNoInteractions(ldapService);
     User user = userRepository.findById(3L).get();
     assertEquals(0, user.getSignAttempts());
     assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));

@@ -150,8 +150,7 @@ public class UsersViewPresenter {
       view.error.setVisible(true);
     } else {
       // Switch user requires a request to be made outside of Vaadin.
-      view.getCurrentUi().getPage()
-          .executeJavaScript("location.assign('" + switchUserUrl(user) + "')");
+      view.getCurrentUi().getPage().executeJs("location.assign('" + switchUserUrl(user) + "')");
     }
   }
 

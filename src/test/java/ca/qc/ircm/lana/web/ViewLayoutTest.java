@@ -120,7 +120,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.home);
 
     verify(ui).navigate(ExperimentsView.VIEW_NAME);
-    verify(page, never()).executeJavaScript(any());
+    verify(page, never()).executeJs(any());
   }
 
   @Test
@@ -132,7 +132,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.home);
 
     verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJavaScript(any());
+    verify(page, never()).executeJs(any());
   }
 
   @Test
@@ -144,7 +144,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.users);
 
     verify(ui).navigate(UsersView.VIEW_NAME);
-    verify(page, never()).executeJavaScript(any());
+    verify(page, never()).executeJs(any());
   }
 
   @Test
@@ -156,7 +156,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.users);
 
     verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJavaScript(any());
+    verify(page, never()).executeJs(any());
   }
 
   @Test
@@ -168,8 +168,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.exitSwitchUser);
 
     verify(ui, never()).navigate(any(String.class));
-    verify(page).executeJavaScript(
-        "location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
+    verify(page)
+        .executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
   }
 
   @Test
@@ -181,8 +181,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.signout);
 
     verify(ui, never()).navigate(any(String.class));
-    verify(page)
-        .executeJavaScript("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
+    verify(page).executeJs("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
   }
 
   @Test

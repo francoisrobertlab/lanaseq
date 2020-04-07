@@ -352,8 +352,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.users.select(user);
     presenter.switchUser();
     assertFalse(view.error.isVisible());
-    verify(page).executeJavaScript("location.assign('" + WebSecurityConfiguration.SWITCH_USER_URL
-        + "?" + WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER + "="
+    verify(page).executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_URL + "?"
+        + WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER + "="
         + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8.name()) + "')");
   }
 
@@ -364,7 +364,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     presenter.switchUser();
     assertEquals(resources.message(USERS_REQUIRED), view.error.getText());
     assertTrue(view.error.isVisible());
-    verify(page, never()).executeJavaScript(any());
+    verify(page, never()).executeJs(any());
   }
 
   @Test

@@ -95,12 +95,12 @@ public class ViewLayout extends VerticalLayout
       // Sign-out requires a request to be made outside of Vaadin.
       logger.debug("Redirect to sign out");
       getCurrentUi().getPage()
-          .executeJavaScript("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
+          .executeJs("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
     } else if (tabs.getSelectedTab() == exitSwitchUser) {
       // Exit switch user requires a request to be made outside of Vaadin.
       logger.debug("Redirect to exit switch user");
-      getCurrentUi().getPage().executeJavaScript(
-          "location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
+      getCurrentUi().getPage()
+          .executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
     } else {
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("Navigate to {}", tabsHref.get(tabs.getSelectedTab()));
