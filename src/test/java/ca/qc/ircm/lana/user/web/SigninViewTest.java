@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
@@ -28,19 +30,17 @@ import static ca.qc.ircm.lana.user.web.SigninView.HEADER;
 import static ca.qc.ircm.lana.user.web.SigninView.LOCKED;
 import static ca.qc.ircm.lana.user.web.SigninView.SIGNIN;
 import static ca.qc.ircm.lana.user.web.SigninView.VIEW_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Location;
@@ -66,9 +66,9 @@ public class SigninViewTest extends AbstractViewTestCase {
   @Mock
   private QueryParameters queryParameters;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(SigninView.class, locale);
-  private MessageResource userResources = new MessageResource(User.class, locale);
-  private MessageResource generalResources = new MessageResource(WebConstants.class, locale);
+  private AppResources resources = new AppResources(SigninView.class, locale);
+  private AppResources userResources = new AppResources(User.class, locale);
+  private AppResources generalResources = new AppResources(Constants.class, locale);
   private Map<String, List<String>> parameters = new HashMap<>();
 
   /**
@@ -154,8 +154,8 @@ public class SigninViewTest extends AbstractViewTestCase {
   public void localeChange() {
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources = new MessageResource(SigninView.class, locale);
-    final MessageResource userResources = new MessageResource(User.class, locale);
+    final AppResources resources = new AppResources(SigninView.class, locale);
+    final AppResources userResources = new AppResources(User.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());

@@ -17,17 +17,17 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -92,8 +92,8 @@ public class LaboratoryDialog extends Dialog implements LocaleChangeObserver, Ba
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource laboratoryResources = new MessageResource(Laboratory.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources laboratoryResources = new AppResources(Laboratory.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     name.setLabel(laboratoryResources.message(NAME));
     save.setText(webResources.message(SAVE));
@@ -102,7 +102,7 @@ public class LaboratoryDialog extends Dialog implements LocaleChangeObserver, Ba
   }
 
   private void updateHeader() {
-    final MessageResource resources = new MessageResource(LaboratoryDialog.class, getLocale());
+    final AppResources resources = new AppResources(LaboratoryDialog.class, getLocale());
     Laboratory laboratory = presenter.getLaboratory();
     if (laboratory != null && laboratory.getId() != null) {
       header.setText(resources.message(HEADER, 1, laboratory.getName()));

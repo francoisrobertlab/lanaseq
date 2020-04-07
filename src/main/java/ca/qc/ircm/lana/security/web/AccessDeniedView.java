@@ -17,13 +17,13 @@
 
 package ca.qc.ircm.lana.security.web;
 
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.TITLE;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.web.MainView;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -77,14 +77,14 @@ public class AccessDeniedView extends Composite<VerticalLayout> implements
 
   @Override
   public String getPageTitle() {
-    final MessageResource resources = new MessageResource(getClass(), getLocale());
-    final MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(getClass(), getLocale());
+    final AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources = new MessageResource(getClass(), getLocale());
+    final AppResources resources = new AppResources(getClass(), getLocale());
     header.setText(resources.message(HEADER));
     message.setText(resources.message(MESSAGE));
     home.setText(resources.message(HOME));

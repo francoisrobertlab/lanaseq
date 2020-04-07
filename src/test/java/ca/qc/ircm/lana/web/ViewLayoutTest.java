@@ -29,6 +29,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
@@ -36,7 +37,6 @@ import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.web.UsersView;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Location;
@@ -57,7 +57,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(ViewLayout.class, locale);
+  private AppResources resources = new AppResources(ViewLayout.class, locale);
   private User user = new User(1L, "myuser");
 
   /**
@@ -83,7 +83,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void localeChange() {
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources = new MessageResource(ViewLayout.class, locale);
+    final AppResources resources = new AppResources(ViewLayout.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HOME), view.home.getLabel());

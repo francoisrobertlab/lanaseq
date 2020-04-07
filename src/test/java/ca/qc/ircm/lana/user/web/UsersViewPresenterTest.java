@@ -31,6 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
@@ -42,7 +43,6 @@ import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -93,7 +93,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private List<User> users;
   private User currentUser;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(UsersView.class, locale);
+  private AppResources resources = new AppResources(UsersView.class, locale);
 
   /**
    * Before test.

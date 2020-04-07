@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.web;
+package ca.qc.ircm.lana;
 
 /**
- * Constants for Web.
+ * Constants.
  */
-public class WebConstants {
+public class Constants {
   public static final String APPLICATION_NAME = "application.name";
   public static final String TITLE = "title";
   public static final String THEME = "theme";
@@ -43,4 +43,5 @@ public class WebConstants {
   public static final String SAVE = "save";
   public static final String CANCEL = "cancel";
   public static final String ALL = "all";
+  public static final String ADD = "add";
 }

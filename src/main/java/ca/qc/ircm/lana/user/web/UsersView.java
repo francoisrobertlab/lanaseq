@@ -17,6 +17,15 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.ADD;
+import static ca.qc.ircm.lana.Constants.ALL;
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.ERROR;
+import static ca.qc.ircm.lana.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lana.Constants.REQUIRED;
+import static ca.qc.ircm.lana.Constants.SUCCESS;
+import static ca.qc.ircm.lana.Constants.THEME;
+import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.ACTIVE;
@@ -24,20 +33,12 @@ import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.UserRole.USER;
-import static ca.qc.ircm.lana.web.WebConstants.ALL;
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.ERROR;
-import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
-import static ca.qc.ircm.lana.web.WebConstants.SUCCESS;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.ViewLayout;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -79,7 +80,6 @@ public class UsersView extends Composite<VerticalLayout>
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);
   public static final String SWITCH_USER = "switchUser";
   public static final String SWITCH_FAILED = "switchFailed";
-  public static final String ADD = "add";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
@@ -179,7 +179,7 @@ public class UsersView extends Composite<VerticalLayout>
   }
 
   private void updateActiveButton(Button button, User user) {
-    final MessageResource userResources = new MessageResource(User.class, getLocale());
+    final AppResources userResources = new AppResources(User.class, getLocale());
     button.setIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create());
     button.setText(userResources.message(property(ACTIVE, user.isActive())));
     button.getElement().setAttribute(THEME, user.isActive() ? SUCCESS : ERROR);
@@ -187,9 +187,9 @@ public class UsersView extends Composite<VerticalLayout>
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources = new MessageResource(UsersView.class, getLocale());
-    final MessageResource userResources = new MessageResource(User.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(UsersView.class, getLocale());
+    final AppResources userResources = new AppResources(User.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     String emailHeader = userResources.message(EMAIL);
     email.setHeader(emailHeader).setFooter(emailHeader);
@@ -206,7 +206,7 @@ public class UsersView extends Composite<VerticalLayout>
         .map(bv -> userResources.message(property(ACTIVE, bv))).orElse(webResources.message(ALL)));
     actives.entrySet().stream().forEach(entry -> entry.getValue()
         .setText(userResources.message(property(ACTIVE, entry.getKey().isActive()))));
-    add.setText(resources.message(ADD));
+    add.setText(webResources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
     switchUser.setText(resources.message(SWITCH_USER));
     switchUser.setIcon(VaadinIcon.BUG.create());
@@ -221,8 +221,8 @@ public class UsersView extends Composite<VerticalLayout>
 
   @Override
   public String getPageTitle() {
-    MessageResource resources = new MessageResource(UsersView.class, getLocale());
-    MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    AppResources resources = new AppResources(UsersView.class, getLocale());
+    AppResources webResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, webResources.message(APPLICATION_NAME));
   }
 

@@ -17,6 +17,11 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.Constants.ALL;
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.HEADER;
 import static ca.qc.ircm.lana.experiment.web.ExperimentPermissionsDialog.MANAGERS;
@@ -26,11 +31,6 @@ import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
-import static ca.qc.ircm.lana.web.WebConstants.ALL;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -40,14 +40,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -85,10 +85,9 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources =
-      new MessageResource(ExperimentPermissionsDialog.class, locale);
-  private MessageResource userResources = new MessageResource(User.class, locale);
-  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
+  private AppResources resources = new AppResources(ExperimentPermissionsDialog.class, locale);
+  private AppResources userResources = new AppResources(User.class, locale);
+  private AppResources webResources = new AppResources(Constants.class, locale);
   private Experiment experiment;
   private List<User> users;
 
@@ -169,10 +168,9 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
     mockManagersColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources =
-        new MessageResource(ExperimentPermissionsDialog.class, locale);
-    final MessageResource userResources = new MessageResource(User.class, locale);
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources resources = new AppResources(ExperimentPermissionsDialog.class, locale);
+    final AppResources userResources = new AppResources(User.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, ""), dialog.header.getText());

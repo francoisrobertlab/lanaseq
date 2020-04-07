@@ -17,16 +17,16 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginI18n.ErrorMessage;
@@ -94,8 +94,8 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources = new MessageResource(getClass(), getLocale());
-    final MessageResource userResources = new MessageResource(User.class, getLocale());
+    final AppResources resources = new AppResources(getClass(), getLocale());
+    final AppResources userResources = new AppResources(User.class, getLocale());
     i18n = LoginI18n.createDefault();
     i18n.setHeader(new LoginI18n.Header());
     i18n.getHeader().setTitle(resources.message(HEADER));
@@ -117,8 +117,8 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
 
   @Override
   public String getPageTitle() {
-    final MessageResource resources = new MessageResource(getClass(), getLocale());
-    final MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(getClass(), getLocale());
+    final AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
   }
 

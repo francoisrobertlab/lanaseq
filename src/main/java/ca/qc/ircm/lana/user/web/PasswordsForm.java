@@ -1,11 +1,11 @@
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.REQUIRED;
 import static ca.qc.ircm.lana.text.Strings.property;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 
-import ca.qc.ircm.lana.web.WebConstants;
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -47,8 +47,8 @@ public class PasswordsForm extends Composite<VerticalLayout>
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources = new MessageResource(PasswordsForm.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(PasswordsForm.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     password.setLabel(resources.message(PASSWORD));
     passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
     passwordBinder.forField(password)

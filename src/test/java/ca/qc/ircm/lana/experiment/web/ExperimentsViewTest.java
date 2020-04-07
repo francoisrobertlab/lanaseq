@@ -17,10 +17,14 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.Constants.ADD;
+import static ca.qc.ircm.lana.Constants.ALL;
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
-import static ca.qc.ircm.lana.experiment.web.ExperimentsView.ADD;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.EXPERIMENTS;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.HEADER;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.PERMISSIONS;
@@ -29,10 +33,6 @@ import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lana.web.WebConstants.ALL;
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -43,12 +43,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -91,9 +91,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Autowired
   private ExperimentRepository experimentRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(ExperimentsView.class, locale);
-  private MessageResource experimentResources = new MessageResource(Experiment.class, locale);
-  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
+  private AppResources resources = new AppResources(ExperimentsView.class, locale);
+  private AppResources experimentResources = new AppResources(Experiment.class, locale);
+  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Experiment> experiments;
 
   /**
@@ -162,7 +162,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.owner).setFooter(experimentResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(resources.message(ADD), view.add.getText());
+    assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
     validateIcon(VaadinIcon.LOCK.create(), view.permissions.getIcon());
@@ -176,9 +176,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources = new MessageResource(ExperimentsView.class, locale);
-    final MessageResource experimentResources = new MessageResource(Experiment.class, locale);
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources resources = new AppResources(ExperimentsView.class, locale);
+    final AppResources experimentResources = new AppResources(Experiment.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
@@ -190,7 +190,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.owner, atLeastOnce()).setFooter(experimentResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(resources.message(ADD), view.add.getText());
+    assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
     validateIcon(VaadinIcon.LOCK.create(), view.permissions.getIcon());

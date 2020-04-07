@@ -24,12 +24,12 @@ import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS_REQUIRED;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
@@ -145,7 +145,7 @@ public class UsersViewPresenter {
     clearError();
     User user = view.users.getSelectedItems().stream().findFirst().orElse(null);
     if (user == null) {
-      MessageResource resources = new MessageResource(UsersView.class, locale);
+      AppResources resources = new AppResources(UsersView.class, locale);
       view.error.setText(resources.message(USERS_REQUIRED));
       view.error.setVisible(true);
     } else {
@@ -170,7 +170,7 @@ public class UsersViewPresenter {
   }
 
   void showError(Map<String, List<String>> parameters, Locale locale) {
-    MessageResource resources = new MessageResource(UsersView.class, locale);
+    AppResources resources = new AppResources(UsersView.class, locale);
     if (parameters.containsKey(SWITCH_FAILED)) {
       view.showNotification(resources.message(SWITCH_FAILED));
     }

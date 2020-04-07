@@ -17,12 +17,12 @@
 
 package ca.qc.ircm.lana.web;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -83,7 +83,7 @@ public class ViewLayout extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    MessageResource resources = new MessageResource(ViewLayout.class, getLocale());
+    AppResources resources = new AppResources(ViewLayout.class, getLocale());
     home.setLabel(resources.message(HOME));
     users.setLabel(resources.message(USERS));
     exitSwitchUser.setLabel(resources.message(EXIT_SWITCH_USER));

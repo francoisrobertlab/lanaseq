@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.REQUIRED;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.findValidationStatusByField;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,14 +27,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.LaboratoryService;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -67,7 +67,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
   @Autowired
   private LaboratoryRepository laboratoryRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
+  private AppResources webResources = new AppResources(Constants.class, locale);
   private String name = "Test Laboratory";
 
   /**

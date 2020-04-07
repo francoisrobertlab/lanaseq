@@ -17,17 +17,17 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -92,8 +92,8 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource experimentResources = new MessageResource(Experiment.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources experimentResources = new AppResources(Experiment.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     name.setLabel(experimentResources.message(NAME));
     save.setText(webResources.message(SAVE));
@@ -102,7 +102,7 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver, Ba
   }
 
   private void updateHeader() {
-    final MessageResource resources = new MessageResource(ExperimentDialog.class, getLocale());
+    final AppResources resources = new AppResources(ExperimentDialog.class, getLocale());
     Experiment experiment = presenter.getExperiment();
     if (experiment != null && experiment.getId() != null) {
       header.setText(resources.message(HEADER, 1, experiment.getName()));

@@ -17,25 +17,25 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.INVALID_EMAIL;
+import static ca.qc.ircm.lana.Constants.REQUIRED;
+import static ca.qc.ircm.lana.Constants.SAVE;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.INVALID_EMAIL;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.UserService;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -108,8 +108,8 @@ public class UserDialogPresenter {
   }
 
   void localeChange(Locale locale) {
-    final MessageResource userResources = new MessageResource(User.class, locale);
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources userResources = new AppResources(User.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.email).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
         .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL))).bind(EMAIL);

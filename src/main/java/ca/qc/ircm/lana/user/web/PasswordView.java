@@ -1,14 +1,14 @@
 package ca.qc.ircm.lana.user.web;
 
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
+import static ca.qc.ircm.lana.Constants.TITLE;
 
-import ca.qc.ircm.lana.web.WebConstants;
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
@@ -58,16 +58,16 @@ public class PasswordView extends Composite<VerticalLayout>
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    MessageResource resources = new MessageResource(PasswordView.class, getLocale());
-    MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    AppResources resources = new AppResources(PasswordView.class, getLocale());
+    AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     save.setText(webResources.message(SAVE));
   }
 
   @Override
   public String getPageTitle() {
-    MessageResource resources = new MessageResource(PasswordView.class, getLocale());
-    MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    AppResources resources = new AppResources(PasswordView.class, getLocale());
+    AppResources webResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, webResources.message(APPLICATION_NAME));
   }
 }

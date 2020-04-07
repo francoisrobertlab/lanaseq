@@ -17,20 +17,20 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.Constants.ALL;
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
-import static ca.qc.ircm.lana.web.WebConstants.ALL;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -135,10 +135,9 @@ public class ExperimentPermissionsDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources =
-        new MessageResource(ExperimentPermissionsDialog.class, getLocale());
-    final MessageResource userResources = new MessageResource(User.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(ExperimentPermissionsDialog.class, getLocale());
+    final AppResources userResources = new AppResources(User.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     String laboratoryHeader = userResources.message(LABORATORY);
     laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
@@ -153,8 +152,7 @@ public class ExperimentPermissionsDialog extends Dialog
   }
 
   private void updateHeader() {
-    final MessageResource resources =
-        new MessageResource(ExperimentPermissionsDialog.class, getLocale());
+    final AppResources resources = new AppResources(ExperimentPermissionsDialog.class, getLocale());
     Experiment experiment = presenter.getExperiment();
     if (experiment != null && experiment.getId() != null) {
       header.setText(resources.message(HEADER, experiment.getName()));

@@ -17,25 +17,25 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.BORDER;
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.text.Strings.styleName;
 import static ca.qc.ircm.lana.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.web.WebConstants.BORDER;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryProperties;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -124,10 +124,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources = new MessageResource(UserDialog.class, getLocale());
-    final MessageResource userResources = new MessageResource(User.class, getLocale());
-    final MessageResource laboratoryResources = new MessageResource(Laboratory.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(UserDialog.class, getLocale());
+    final AppResources userResources = new AppResources(User.class, getLocale());
+    final AppResources laboratoryResources = new AppResources(Laboratory.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     email.setLabel(userResources.message(EMAIL));
     name.setLabel(userResources.message(NAME));
@@ -143,7 +143,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComp
   }
 
   private void updateHeader() {
-    final MessageResource resources = new MessageResource(UserDialog.class, getLocale());
+    final AppResources resources = new AppResources(UserDialog.class, getLocale());
     if (presenter.getUser() != null && presenter.getUser().getId() != null) {
       header.setText(resources.message(HEADER, 1, presenter.getUser().getName()));
     } else {

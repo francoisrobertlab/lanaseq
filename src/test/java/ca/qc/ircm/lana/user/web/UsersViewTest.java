@@ -17,6 +17,14 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.ADD;
+import static ca.qc.ircm.lana.Constants.ALL;
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.ERROR;
+import static ca.qc.ircm.lana.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lana.Constants.SUCCESS;
+import static ca.qc.ircm.lana.Constants.THEME;
+import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.items;
@@ -26,19 +34,11 @@ import static ca.qc.ircm.lana.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.user.web.UsersView.ADD;
 import static ca.qc.ircm.lana.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_USER;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS;
 import static ca.qc.ircm.lana.user.web.UsersView.VIEW_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.ALL;
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.ERROR;
-import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
-import static ca.qc.ircm.lana.web.WebConstants.SUCCESS;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -50,13 +50,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -104,9 +104,9 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(UsersView.class, locale);
-  private MessageResource userResources = new MessageResource(User.class, locale);
-  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
+  private AppResources resources = new AppResources(UsersView.class, locale);
+  private AppResources userResources = new AppResources(User.class, locale);
+  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<User> users;
 
   /**
@@ -194,7 +194,7 @@ public class UsersViewTest extends AbstractViewTestCase {
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(false)));
     assertEquals(userResources.message(property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
-    assertEquals(resources.message(ADD), view.add.getText());
+    assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(SWITCH_USER), view.switchUser.getText());
     validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
@@ -208,9 +208,9 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources = new MessageResource(UsersView.class, locale);
-    final MessageResource userResources = new MessageResource(User.class, locale);
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources resources = new AppResources(UsersView.class, locale);
+    final AppResources userResources = new AppResources(User.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
@@ -231,7 +231,7 @@ public class UsersViewTest extends AbstractViewTestCase {
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(false)));
     assertEquals(userResources.message(property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
-    assertEquals(resources.message(ADD), view.add.getText());
+    assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(resources.message(SWITCH_USER), view.switchUser.getText());
     validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());

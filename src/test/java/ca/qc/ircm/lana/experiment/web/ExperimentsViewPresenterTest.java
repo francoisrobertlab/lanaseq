@@ -31,6 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.experiment.ExperimentService;
@@ -41,7 +42,6 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -82,7 +82,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(ExperimentsView.class, locale);
+  private AppResources resources = new AppResources(ExperimentsView.class, locale);
   private List<Experiment> experiments;
   private User currentUser;
 

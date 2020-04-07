@@ -17,6 +17,11 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.BORDER;
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lana.text.Strings.styleName;
@@ -29,11 +34,6 @@ import static ca.qc.ircm.lana.user.web.UserDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.user.web.UserDialog.CREATE_NEW_LABORATORY;
 import static ca.qc.ircm.lana.user.web.UserDialog.HEADER;
 import static ca.qc.ircm.lana.user.web.UserDialog.LABORATORY_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.BORDER;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,14 +42,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -74,10 +74,10 @@ public class UserDialogTest extends AbstractViewTestCase {
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(UserDialog.class, locale);
-  private MessageResource userResources = new MessageResource(User.class, locale);
-  private MessageResource laboratoryResources = new MessageResource(Laboratory.class, locale);
-  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
+  private AppResources resources = new AppResources(UserDialog.class, locale);
+  private AppResources userResources = new AppResources(User.class, locale);
+  private AppResources laboratoryResources = new AppResources(Laboratory.class, locale);
+  private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
    * Before test.
@@ -135,10 +135,10 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void localeChange() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources = new MessageResource(UserDialog.class, locale);
-    final MessageResource userResources = new MessageResource(User.class, locale);
-    final MessageResource laboratoryResources = new MessageResource(Laboratory.class, locale);
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources resources = new AppResources(UserDialog.class, locale);
+    final AppResources userResources = new AppResources(User.class, locale);
+    final AppResources laboratoryResources = new AppResources(Laboratory.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());

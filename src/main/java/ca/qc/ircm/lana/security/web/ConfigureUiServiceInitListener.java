@@ -1,10 +1,10 @@
 package ca.qc.ircm.lana.security.web;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.user.web.SigninView;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
@@ -52,8 +52,8 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
         event.rerouteTo(SigninView.class);
       } else {
         UI ui = event.getUI();
-        MessageResource resources =
-            new MessageResource(ConfigureUiServiceInitListener.class, ui.getLocale());
+        AppResources resources =
+            new AppResources(ConfigureUiServiceInitListener.class, ui.getLocale());
         String message = resources.message(AccessDeniedException.class.getSimpleName(),
             authorizationService.currentUser().getEmail(),
             event.getNavigationTarget().getSimpleName());

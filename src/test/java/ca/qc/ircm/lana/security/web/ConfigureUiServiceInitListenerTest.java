@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
@@ -29,7 +30,6 @@ import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.user.web.SigninView;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterListener;
@@ -72,8 +72,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   @Captor
   private ArgumentCaptor<BeforeEnterListener> beforeEnterListenerCaptor;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources =
-      new MessageResource(ConfigureUiServiceInitListener.class, locale);
+  private AppResources resources = new AppResources(ConfigureUiServiceInitListener.class, locale);
   private User user = new User(1L, "myuser");
 
   /**

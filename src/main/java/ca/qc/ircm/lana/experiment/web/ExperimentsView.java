@@ -17,23 +17,24 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.Constants.ADD;
+import static ca.qc.ircm.lana.Constants.ALL;
+import static ca.qc.ircm.lana.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lana.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lana.Constants.REQUIRED;
+import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserRole.USER;
-import static ca.qc.ircm.lana.web.WebConstants.ALL;
-import static ca.qc.ircm.lana.web.WebConstants.APPLICATION_NAME;
-import static ca.qc.ircm.lana.web.WebConstants.ERROR_TEXT;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
-import static ca.qc.ircm.lana.web.WebConstants.TITLE;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.web.ViewLayout;
-import ca.qc.ircm.lana.web.WebConstants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -67,7 +68,6 @@ public class ExperimentsView extends Composite<VerticalLayout>
   public static final String HEADER = "header";
   public static final String EXPERIMENTS = "experiments";
   public static final String EXPERIMENTS_REQUIRED = property(EXPERIMENTS, REQUIRED);
-  public static final String ADD = "add";
   public static final String PERMISSIONS = "permissions";
   public static final String PERMISSIONS_DENIED = property(PERMISSIONS, "denied");
   private static final long serialVersionUID = 2568742367790329628L;
@@ -136,9 +136,9 @@ public class ExperimentsView extends Composite<VerticalLayout>
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final MessageResource resources = new MessageResource(ExperimentsView.class, getLocale());
-    final MessageResource experimentResources = new MessageResource(Experiment.class, getLocale());
-    final MessageResource webResources = new MessageResource(WebConstants.class, getLocale());
+    final AppResources resources = new AppResources(ExperimentsView.class, getLocale());
+    final AppResources experimentResources = new AppResources(Experiment.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     String nameHeader = experimentResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
@@ -148,7 +148,7 @@ public class ExperimentsView extends Composite<VerticalLayout>
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
-    add.setText(resources.message(ADD));
+    add.setText(webResources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
     permissions.setText(resources.message(PERMISSIONS));
     permissions.setIcon(VaadinIcon.LOCK.create());
@@ -157,8 +157,8 @@ public class ExperimentsView extends Composite<VerticalLayout>
 
   @Override
   public String getPageTitle() {
-    MessageResource resources = new MessageResource(ExperimentsView.class, getLocale());
-    MessageResource generalResources = new MessageResource(WebConstants.class, getLocale());
+    AppResources resources = new AppResources(ExperimentsView.class, getLocale());
+    AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
   }
 }

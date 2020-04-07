@@ -20,11 +20,11 @@ package ca.qc.ircm.lana.experiment.web;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.EXPERIMENTS_REQUIRED;
 import static ca.qc.ircm.lana.experiment.web.ExperimentsView.PERMISSIONS_DENIED;
 
+import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentService;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.UserRole;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
@@ -106,11 +106,11 @@ public class ExperimentsViewPresenter {
     clearError();
     Experiment experiment = view.experiments.getSelectedItems().stream().findFirst().orElse(null);
     if (experiment == null) {
-      MessageResource resources = new MessageResource(ExperimentsView.class, locale);
+      AppResources resources = new AppResources(ExperimentsView.class, locale);
       view.error.setText(resources.message(EXPERIMENTS_REQUIRED));
       view.error.setVisible(true);
     } else if (!authorizationService.hasPermission(experiment, BasePermission.WRITE)) {
-      MessageResource resources = new MessageResource(ExperimentsView.class, locale);
+      AppResources resources = new AppResources(ExperimentsView.class, locale);
       view.error.setText(resources.message(PERMISSIONS_DENIED));
       view.error.setVisible(true);
     } else {

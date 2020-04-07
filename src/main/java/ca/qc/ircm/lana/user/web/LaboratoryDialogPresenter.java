@@ -17,14 +17,14 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.Constants.REQUIRED;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.web.WebConstants.REQUIRED;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -67,7 +67,7 @@ public class LaboratoryDialogPresenter {
   }
 
   void localeChange(Locale locale) {
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
     updateReadOnly();

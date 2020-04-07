@@ -17,15 +17,15 @@
 
 package ca.qc.ircm.lana.experiment.web;
 
+import static ca.qc.ircm.lana.Constants.CANCEL;
+import static ca.qc.ircm.lana.Constants.PRIMARY;
+import static ca.qc.ircm.lana.Constants.SAVE;
+import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentDialog.CLASS_NAME;
 import static ca.qc.ircm.lana.experiment.web.ExperimentDialog.HEADER;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lana.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lana.web.WebConstants.CANCEL;
-import static ca.qc.ircm.lana.web.WebConstants.PRIMARY;
-import static ca.qc.ircm.lana.web.WebConstants.SAVE;
-import static ca.qc.ircm.lana.web.WebConstants.THEME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,13 +34,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lana.AppResources;
+import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.WebConstants;
-import ca.qc.ircm.text.MessageResource;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -65,9 +65,9 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   @Autowired
   private ExperimentRepository experimentRepository;
   private Locale locale = Locale.ENGLISH;
-  private MessageResource resources = new MessageResource(ExperimentDialog.class, locale);
-  private MessageResource experimentResources = new MessageResource(Experiment.class, locale);
-  private MessageResource webResources = new MessageResource(WebConstants.class, locale);
+  private AppResources resources = new AppResources(ExperimentDialog.class, locale);
+  private AppResources experimentResources = new AppResources(Experiment.class, locale);
+  private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
    * Before test.
@@ -110,9 +110,9 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   public void localeChange() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final MessageResource resources = new MessageResource(ExperimentDialog.class, locale);
-    final MessageResource experimentResources = new MessageResource(Experiment.class, locale);
-    final MessageResource webResources = new MessageResource(WebConstants.class, locale);
+    final AppResources resources = new AppResources(ExperimentDialog.class, locale);
+    final AppResources experimentResources = new AppResources(Experiment.class, locale);
+    final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
