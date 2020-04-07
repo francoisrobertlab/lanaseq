@@ -44,6 +44,7 @@ server:
   servlet:
     session:
       persistent: false
+  forward-headers-strategy: native
 
 vaadin:
   productionMode: false
