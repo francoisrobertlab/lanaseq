@@ -53,16 +53,13 @@
     <javac.version>1.8</javac.version>
     <main-class>ca.qc.ircm.lana.Main</main-class>
     <testbench.skip>true</testbench.skip>
-    <failOnMissingWebXml>false</failOnMissingWebXml>
-    <webapp.directory>src/main/webapp</webapp.directory>
     <!-- Dependencies -->
     <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
-    <vaadin.version>14.0.0.beta2</vaadin.version>
+    <vaadin.version>14.0.12</vaadin.version>
     <javax.inject.version>1</javax.inject.version>
     <generate-property-names.version>0.5</generate-property-names.version>
     <guava.version>27.0.1-jre</guava.version>
     <mariadb-connector.version>2.3.0</mariadb-connector.version>
-    <flow.maven.plugin.version>2.0.0.rc2</flow.maven.plugin.version>
     <migrations-maven-plugin.version>1.1.3</migrations-maven-plugin.version>
     <mojolicense-maven-plugin.version>1.14</mojolicense-maven-plugin.version>
   </properties>
@@ -155,6 +152,14 @@
       <artifactId>vaadin-spring-boot-starter</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>flow-server-compatibility-mode</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>flow-server-production-mode</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
     </dependency>
@@ -182,10 +187,6 @@
       <artifactId>generate-property-names</artifactId>
       <version>${generate-property-names.version}</version>
       <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>flow-server-production-mode</artifactId>
     </dependency>
   </dependencies>
 
@@ -233,19 +234,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <configuration>
-            <filesets>
-              <fileset>
-                <directory>${webapp.directory}/frontend-es5</directory>
-              </fileset>
-              <fileset>
-                <directory>${webapp.directory}/frontend-es6</directory>
-              </fileset>
-            </filesets>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
           <configuration>
@@ -257,8 +245,8 @@
         </plugin>
         <plugin>
           <groupId>com.vaadin</groupId>
-          <artifactId>flow-maven-plugin</artifactId>
-          <version>${flow.maven.plugin.version}</version>
+          <artifactId>vaadin-maven-plugin</artifactId>
+          <version>${vaadin.version}</version>
           <executions>
             <execution>
               <goals>
@@ -266,7 +254,8 @@
                 <goal>package-for-production</goal>
               </goals>
               <configuration>
-                <transpileOutputDirectory>${webapp.directory}</transpileOutputDirectory>
+                <bundle>true</bundle>
+                <transpileOutputDirectory>${project.build.directory}/classes/static</transpileOutputDirectory>
               </configuration>
             </execution>
           </executions>
@@ -385,7 +374,7 @@
         <plugins>
           <plugin>
             <groupId>com.vaadin</groupId>
-            <artifactId>flow-maven-plugin</artifactId>
+            <artifactId>vaadin-maven-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
@@ -404,27 +393,6 @@
           <url>http://maven.vaadin.com/vaadin-addons</url>
         </repository>
       </repositories>
-    </profile>
-    <profile>
-      <id>vaadin-prereleases</id>
-      <activation>
-        <property>
-          <name>vaadin-prereleases</name>
-          <value>!false</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>vaadin-prereleases</id>
-          <url>https://maven.vaadin.com/vaadin-prereleases</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>vaadin-prereleases</id>
-          <url>https://maven.vaadin.com/vaadin-prereleases</url>
-        </pluginRepository>
-      </pluginRepositories>
     </profile>
     <profile>
       <id>test-quick</id>
@@ -447,7 +415,7 @@
         <plugins>
           <plugin>
             <groupId>com.vaadin</groupId>
-            <artifactId>flow-maven-plugin</artifactId>
+            <artifactId>vaadin-maven-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
