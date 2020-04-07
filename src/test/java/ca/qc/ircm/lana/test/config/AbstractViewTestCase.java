@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+ * Copyright (c) 2006 Institut de recherches cliniques de Montreal (IRCM)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,11 @@ import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.internal.CurrentInstance;
 import com.vaadin.flow.internal.ExecutionContext;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinServlet;
+import com.vaadin.flow.server.VaadinServletService;
 import com.vaadin.flow.server.VaadinSession;
+import javax.servlet.ServletContext;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.ArgumentCaptor;
@@ -49,6 +53,12 @@ public abstract class AbstractViewTestCase {
   protected Page page;
   @Mock
   protected History history;
+  @Mock
+  protected VaadinServletService vaadinService;
+  @Mock
+  protected VaadinServlet servlet;
+  @Mock
+  protected ServletContext servletContext;
   @Captor
   private ArgumentCaptor<SerializableConsumer<ExecutionContext>> openDialogCaptor;
   @Captor
@@ -64,7 +74,11 @@ public abstract class AbstractViewTestCase {
     when(ui.getSession()).thenReturn(session);
     when(ui.getPage()).thenReturn(page);
     when(page.getHistory()).thenReturn(history);
+    when(vaadinService.getServlet()).thenReturn(servlet);
+    when(servlet.getServletContext()).thenReturn(servletContext);
+    when(servletContext.getContextPath()).thenReturn("");
     CurrentInstance.setCurrent(ui);
+    CurrentInstance.set(VaadinService.class, vaadinService);
   }
 
   @After
