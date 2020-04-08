@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+ * Copyright (c) 2006 Institut de recherches cliniques de Montreal (IRCM)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,5 +37,6 @@ public class LdapConfigurationTest {
     assertTrue(ldapConfiguration.isEnabled());
     assertEquals("uid", ldapConfiguration.getIdAttribute());
     assertEquals("mail", ldapConfiguration.getMailAttribute());
+    assertEquals("person", ldapConfiguration.getObjectClass());
   }
 }

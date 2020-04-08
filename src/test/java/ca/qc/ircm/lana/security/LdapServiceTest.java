@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+ * Copyright (c) 2006 Institut de recherches cliniques de Montreal (IRCM)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,12 +59,17 @@ public class LdapServiceTest {
   }
 
   @Test
-  public void getUsername() {
-    assertEquals("robertf", ldapService.getUsername("francois.robert@ircm.qc.ca"));
+  public void getEmail() {
+    assertEquals("francois.robert@ircm.qc.ca", ldapService.getEmail("robertf"));
   }
 
   @Test
-  public void getUsername_Invalid() {
-    assertEquals(null, ldapService.getUsername("not.a.user@ircm.qc.ca"));
+  public void getEmail_Invalid() {
+    assertEquals(null, ldapService.getEmail("invalid"));
+  }
+
+  @Test
+  public void getUsername() {
+    assertEquals("robertf", ldapService.getUsername("francois.robert@ircm.qc.ca"));
   }
 }

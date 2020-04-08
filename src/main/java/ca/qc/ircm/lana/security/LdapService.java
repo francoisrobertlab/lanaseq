@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+ * Copyright (c) 2006 Institut de recherches cliniques de Montreal (IRCM)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.query.ContainerCriteria;
 import org.springframework.ldap.query.LdapQuery;
 import org.springframework.stereotype.Component;
 
@@ -64,9 +65,36 @@ public class LdapService {
       logger.debug("Valid LDAP password for user [{}]", username);
       return true;
     } catch (Exception e) {
-      logger.debug("Invalid LDAP password for user [{}]", username, e);
+      logger.debug("Invalid LDAP password for user [{}]", username);
       return false;
     }
+  }
+
+  /**
+   * Returns user's email from LDAP.
+   *
+   * @param username
+   *          username
+   * @return user's email from LDAP or null if user does not exists
+   */
+  public String getEmail(String username) {
+    ContainerCriteria builder = query().attributes(ldapConfiguration.getMailAttribute())
+        .where(ldapConfiguration.getIdAttribute()).is(username);
+    if (ldapConfiguration.getObjectClass() != null) {
+      builder = builder.and("objectclass").is(ldapConfiguration.getObjectClass());
+    }
+    LdapQuery query = builder;
+    AttributesMapper<String> mapper =
+        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getMailAttribute())).map(attr -> {
+          try {
+            return attr.get();
+          } catch (NamingException e) {
+            return null;
+          }
+        }).map(value -> value.toString()).orElse(null);
+    String email = ldapTemplate.search(query, mapper).stream().findFirst().orElse(null);
+    logger.debug("Found LDAP email {} for user [{}]", username, email);
+    return email;
   }
 
   /**
@@ -77,8 +105,12 @@ public class LdapService {
    * @return user's username on LDAP or null if user does not exists
    */
   public String getUsername(String email) {
-    LdapQuery query = query().attributes(ldapConfiguration.getIdAttribute())
+    ContainerCriteria builder = query().attributes(ldapConfiguration.getIdAttribute())
         .where(ldapConfiguration.getMailAttribute()).is(email);
+    if (ldapConfiguration.getObjectClass() != null) {
+      builder = builder.and("objectclass").is(ldapConfiguration.getObjectClass());
+    }
+    LdapQuery query = builder;
     AttributesMapper<String> mapper =
         attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getIdAttribute())).map(attr -> {
           try {
