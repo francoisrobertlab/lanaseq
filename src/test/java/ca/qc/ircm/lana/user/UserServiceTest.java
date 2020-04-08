@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +62,8 @@ public class UserServiceTest {
   private UserRepository repository;
   @Autowired
   private LaboratoryRepository laboratoryRepository;
+  @Autowired
+  private EntityManager entityManager;
   @MockBean
   private PasswordEncoder passwordEncoder;
   @MockBean
@@ -538,12 +541,15 @@ public class UserServiceTest {
   @WithMockUser
   public void save_UpdateDeleteEmptyLaboratory() {
     User user = repository.findById(2L).get();
+    entityManager.detach(user);
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     service.save(user, null);
     user = repository.findById(3L).get();
+    entityManager.detach(user);
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     service.save(user, null);
     user = repository.findById(9L).get();
+    entityManager.detach(user);
     user.setLaboratory(laboratoryRepository.findById(3L).get());
     service.save(user, null);
 

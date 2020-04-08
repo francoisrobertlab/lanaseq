@@ -25,6 +25,7 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
+import javax.persistence.EntityManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,8 @@ public class UserPermissionEvaluatorTest {
   private UserRepository userRepository;
   @Autowired
   private LaboratoryRepository laboratoryRepository;
+  @Autowired
+  private EntityManager entityManager;
 
   private Authentication authentication() {
     return SecurityContextHolder.getContext().getAuthentication();
@@ -250,6 +253,7 @@ public class UserPermissionEvaluatorTest {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void hasPermission_WriteUserWithOtherLaboratory_Self() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
+    entityManager.detach(user);
     user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));
@@ -322,6 +326,7 @@ public class UserPermissionEvaluatorTest {
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void hasPermission_WriteUserWithOtherLaboratory_ManagerOtherLab() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
+    entityManager.detach(user);
     user.setLaboratory(laboratoryRepository.findById(3L).orElse(null));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));

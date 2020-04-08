@@ -217,6 +217,8 @@ public class UserService {
   }
 
   private void deleteLaboratoryIfEmpty(Laboratory laboratory) {
+    System.out.println(laboratory.getId());
+    System.out.println(repository.countByLaboratory(laboratory));
     if (laboratory != null && repository.countByLaboratory(laboratory) == 0) {
       laboratoryRepository.delete(laboratory);
     }
