@@ -107,6 +107,10 @@ public class ForgotPasswordService {
     forgotPassword.setConfirmNumber(RandomStringUtils.randomAlphanumeric(40));
 
     User user = userRepository.findByEmail(email).orElse(null);
+    if (user == null) {
+      // Ignore request.
+      return null;
+    }
     if (user.getId() == User.ROBOT_ID) {
       throw new AccessDeniedException("Cannot change password for robot");
     }

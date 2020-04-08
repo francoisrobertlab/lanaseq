@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.AppConfiguration;
@@ -221,6 +222,14 @@ public class ForgotPasswordServiceTest {
     assertTrue(htmlContent.contains(url));
     assertFalse(textContent.contains("???"));
     assertFalse(htmlContent.contains("???"));
+  }
+
+  @Test
+  public void insert_NotExists() throws Exception {
+    ForgotPassword forgotPassword = service.insert("test@ircm.qc.ca", forgotPasswordWebContext());
+
+    assertNull(forgotPassword);
+    verifyNoInteractions(mailService);
   }
 
   @Test
