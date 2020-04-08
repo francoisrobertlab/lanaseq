@@ -25,8 +25,11 @@ import static ca.qc.ircm.lana.user.UserProperties.HASHED_PASSWORD;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
+import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.User;
+import ca.qc.ircm.lana.user.web.ForgotPasswordView;
 import ca.qc.ircm.lana.web.component.BaseComponent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginI18n.ErrorMessage;
@@ -55,10 +58,12 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
   public static final String VIEW_NAME = "signin";
   public static final String HEADER = "header";
   public static final String DESCRIPTION = "description";
+  public static final String ADDITIONAL_INFORMATION = "additionalInformation";
   public static final String FORM_TITLE = "form.title";
   public static final String USERNAME = "username";
   public static final String PASSWORD = "password";
   public static final String SIGNIN = "signin";
+  public static final String FORGOT_PASSWORD = "forgotPassword";
   public static final String FAIL = "fail";
   public static final String DISABLED = "disabled";
   public static final String LOCKED = "locked";
@@ -67,29 +72,28 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;
   protected String error;
+  private transient AuthorizationService authorizationService;
 
-  public SigninView() {
+  public SigninView(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
   }
 
   @PostConstruct
   void init() {
     setId(VIEW_NAME);
     addLoginListener(e -> setError(false));
-    setForgotPasswordButtonVisible(false);
+    setForgotPasswordButtonVisible(true);
     setAction(VIEW_NAME);
     setOpened(true);
+    addForgotPasswordListener(e -> UI.getCurrent().navigate(ForgotPasswordView.class));
   }
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
-    // TODO Redirect to main view if user is known.
-    /*
-    if (SecurityUtils.isUserLoggedIn()) {
-      // Needed manually to change the URL because of https://github.com/vaadin/flow/issues/4189
-      UI.getCurrent().getPage().getHistory().replaceState(null, "");
-      event.rerouteTo(StorefrontView.class);
+    // Redirect to main view if user is known.
+    if (!authorizationService.isAnonymous()) {
+      event.forwardTo(MainView.class);
     }
-    */
   }
 
   @Override
@@ -100,12 +104,13 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
     i18n.setHeader(new LoginI18n.Header());
     i18n.getHeader().setTitle(resources.message(HEADER));
     i18n.getHeader().setDescription(resources.message(DESCRIPTION));
-    i18n.setAdditionalInformation(null);
+    i18n.setAdditionalInformation(resources.message(ADDITIONAL_INFORMATION));
     i18n.setForm(new LoginI18n.Form());
     i18n.getForm().setSubmit(resources.message(SIGNIN));
     i18n.getForm().setTitle(resources.message(FORM_TITLE));
     i18n.getForm().setUsername(userResources.message(EMAIL));
     i18n.getForm().setPassword(userResources.message(HASHED_PASSWORD));
+    i18n.getForm().setForgotPassword(resources.message(FORGOT_PASSWORD));
     i18n.setErrorMessage(new ErrorMessage());
     if (error == null) {
       error = FAIL;
@@ -135,5 +140,9 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
       error = FAIL;
       setError(true);
     }
+  }
+
+  void fireForgotPasswordEvent() {
+    fireEvent(new ForgotPasswordEvent(this, false));
   }
 }
