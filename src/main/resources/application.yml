@@ -82,6 +82,7 @@ security:
 
 ldap:
   enabled: true
+  object-class: person
 
 vaadin:
   productionMode: false
@@ -100,8 +101,16 @@ spring:
 app:
   serverUrl: http://localhost:${local.server.port}
 
+security:
+  rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
+
 vaadin:
   productionMode: false
 
+mail:
+  enabled: false
+
 logging:
   file: test.log
+
+download-home: ${user.dir}/target/download
