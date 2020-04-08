@@ -24,15 +24,17 @@ import java.time.temporal.ChronoUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.test.context.TestContext;
+import org.springframework.test.context.TestExecutionListener;
 
 /**
  * Initialized test database.
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
-public class InitializeDatabaseExecutionListener extends InjectIntoTestExecutionListener {
+@Order(InitializeDatabaseExecutionListener.ORDER)
+public class InitializeDatabaseExecutionListener
+    implements TestExecutionListener, InjectDependencies {
+  public static final int ORDER = 5001;
   private static final Logger logger =
       LoggerFactory.getLogger(InitializeDatabaseExecutionListener.class);
   /**
@@ -49,6 +51,11 @@ public class InitializeDatabaseExecutionListener extends InjectIntoTestExecution
       "$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu";
   @Autowired
   private UserRepository userRepository;
+
+  @Override
+  public void beforeTestClass(TestContext testContext) throws Exception {
+    injectDependencies(testContext.getApplicationContext());
+  }
 
   @Override
   @SuppressWarnings("checkstyle:linelength")

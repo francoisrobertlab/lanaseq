@@ -35,15 +35,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestContext;
+import org.springframework.test.context.TestExecutionListener;
 
 /**
  * Saves VaadinService in current thread.
  */
-public class VaadinServiceTestExecutionListener extends InjectIntoTestExecutionListener {
+public class VaadinServiceTestExecutionListener
+    implements TestExecutionListener, InjectDependencies {
   private static final Logger logger =
       LoggerFactory.getLogger(VaadinServiceTestExecutionListener.class);
   @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
+
+  @Override
+  public void beforeTestClass(TestContext testContext) throws Exception {
+    injectDependencies(testContext.getApplicationContext());
+  }
 
   @Override
   public void beforeTestMethod(TestContext testContext) throws Exception {
