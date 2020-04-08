@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (c) 2006 Institut de recherches cliniques de Montreal (IRCM)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<configuration>
+  <property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t][%.-15mdc{user}] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
+
+  <logger name="ca.qc.ircm.lana" level="DEBUG"/>
+  <logger name="ca.qc.ircm.lana.security.web.ShiroViewAccessControl" level="INFO"/>
+  <logger name="ca.qc.ircm.lana.test.config.ShiroTestExecutionListener" level="INFO"/>
+  <logger name="ca.qc.ircm.lana.web.validator" level="TRACE"/>
+  <logger name="org.springframework" level="INFO"/>
+  <logger name="org.springframework.security" level="INFO"/>
+  <logger name="org.springframework.jdbc.datasource.init.ScriptUtils" level="WARN"/>
+  <logger name="org.springframework.test.context.transaction.TransactionContext" level="WARN"/>
+  <!-- Show SQL and parameters.
+  <logger name="org.hibernate.SQL" level="DEBUG"/>
+  <logger name="org.hibernate.type.descriptor.sql" level="TRACE"/>
+  -->
+</configuration>
