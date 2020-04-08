@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -56,6 +57,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 /**
  * Security configuration.
@@ -223,6 +225,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Switch user.
         .and().addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
+
+    // Used for TestBench.
+    try {
+      Class<?> clazz = Class.forName("ca.qc.ircm.lana.test.config.TestBenchSecurityFilter");
+      http.addFilterBefore((Filter) clazz.newInstance(), SecurityContextPersistenceFilter.class);
+    } catch (ClassNotFoundException e) {
+      // Ignore, not running unit tests.
+    }
   }
 
   /**
