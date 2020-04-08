@@ -19,6 +19,7 @@ package ca.qc.ircm.lana.test.config;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Optional;
 import org.springframework.core.annotation.AnnotationUtils;
 
 /**
@@ -34,7 +35,8 @@ public class AnnotationFinder {
    *          annotation to look for
    * @return annotation if present on class or any superclass, or null if annotation is not present
    */
-  public static <A extends Annotation> A findAnnotation(Class<?> type, Class<A> annotationClass) {
+  public static <A extends Annotation> Optional<A> findAnnotation(Class<?> type,
+      Class<A> annotationClass) {
     return findAnnotation(type, null, annotationClass);
   }
 
@@ -51,12 +53,12 @@ public class AnnotationFinder {
    * @return annotation if present on method, class or superclass, or null if annotation is not
    *         present
    */
-  public static <A extends Annotation> A findAnnotation(Class<?> type, Method method,
+  public static <A extends Annotation> Optional<A> findAnnotation(Class<?> type, Method method,
       Class<A> annotationClass) {
     A annotation = method != null ? AnnotationUtils.findAnnotation(method, annotationClass) : null;
     if (annotation == null) {
       annotation = AnnotationUtils.findAnnotation(type, annotationClass);
     }
-    return annotation;
+    return Optional.ofNullable(annotation);
   }
 }
