@@ -101,7 +101,7 @@ public class UserService {
       return false;
     }
 
-    return repository.findByEmail(email) != null;
+    return repository.findByEmail(email).isPresent();
   }
 
   /**
