@@ -27,6 +27,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
@@ -36,6 +37,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @TestExecutionListeners(
     value = { InitializeDatabaseExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+@Transactional
 @Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/experiment-data.sql",
     "/acl-data.sql" })
 public @interface ServiceTestAnnotations {
