@@ -27,7 +27,6 @@ import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -50,7 +49,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class LaboratoryDialog extends Dialog implements LocaleChangeObserver, BaseComponent {
+public class LaboratoryDialog extends Dialog implements LocaleChangeObserver {
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "laboratory-dialog";
   public static final String HEADER = "header";

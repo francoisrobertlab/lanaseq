@@ -34,7 +34,6 @@ import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.web.ViewLayout;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -63,7 +62,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = ExperimentsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
 public class ExperimentsView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
+    implements LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "experiments";
   public static final String HEADER = "header";
   public static final String EXPERIMENTS = "experiments";

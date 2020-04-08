@@ -35,7 +35,6 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryProperties;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.SavedEvent;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -61,7 +60,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class UserDialog extends Dialog implements LocaleChangeObserver, BaseComponent {
+public class UserDialog extends Dialog implements LocaleChangeObserver {
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";

@@ -30,6 +30,7 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
@@ -150,7 +151,7 @@ public class UsersViewPresenter {
       view.error.setVisible(true);
     } else {
       // Switch user requires a request to be made outside of Vaadin.
-      view.getCurrentUi().getPage().executeJs("location.assign('" + switchUserUrl(user) + "')");
+      UI.getCurrent().getPage().executeJs("location.assign('" + switchUserUrl(user) + "')");
     }
   }
 

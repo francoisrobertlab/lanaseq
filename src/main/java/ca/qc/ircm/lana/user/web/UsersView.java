@@ -38,7 +38,7 @@ import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.web.ViewLayout;
-import ca.qc.ircm.lana.web.component.BaseComponent;
+import ca.qc.ircm.lana.web.component.NotificationComponent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -72,8 +72,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class UsersView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BaseComponent {
+public class UsersView extends Composite<VerticalLayout> implements LocaleChangeObserver,
+    HasDynamicTitle, AfterNavigationObserver, NotificationComponent {
   public static final String VIEW_NAME = "users";
   public static final String HEADER = "header";
   public static final String USERS = "users";

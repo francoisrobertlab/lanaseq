@@ -21,10 +21,8 @@ import static org.junit.Assert.assertEquals;
 
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
-import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -77,9 +75,5 @@ public class NotificationComponentTest extends AbstractViewTestCase {
   }
 
   private class NotificationComponentForTest implements NotificationComponent {
-    @Override
-    public Optional<UI> getUI() {
-      return Optional.of(ui);
-    }
   }
 }

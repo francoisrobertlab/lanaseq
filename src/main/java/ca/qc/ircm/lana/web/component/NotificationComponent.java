@@ -23,7 +23,7 @@ import com.vaadin.flow.component.notification.Notification.Position;
 /**
  * Shows notification.
  */
-public interface NotificationComponent extends UiComponent {
+public interface NotificationComponent {
   public static final int DEFAULT_DURATION = 5000;
 
   public default void showNotification(String text) {

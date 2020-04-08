@@ -8,7 +8,6 @@ import static ca.qc.ircm.lana.Constants.TITLE;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
@@ -26,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = PasswordView.VIEW_NAME)
 public class PasswordView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, HasDynamicTitle, BaseComponent {
+    implements LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "password";
   public static final String HEADER = "header";
   private static final long serialVersionUID = -8554355390432590290L;

@@ -24,7 +24,6 @@ import static ca.qc.ircm.lana.user.UserRole.USER;
 import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.web.UsersView;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -40,8 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = MainView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class MainView extends Composite<VerticalLayout>
-    implements BaseComponent, BeforeEnterObserver {
+public class MainView extends Composite<VerticalLayout> implements BeforeEnterObserver {
   public static final String VIEW_NAME = "";
   private static final long serialVersionUID = -8440231785563887343L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);

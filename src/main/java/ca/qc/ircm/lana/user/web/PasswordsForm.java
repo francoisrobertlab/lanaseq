@@ -5,7 +5,6 @@ import static ca.qc.ircm.lana.text.Strings.property;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -19,7 +18,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 /**
  * Passwords form.
  */
-public class PasswordsForm extends FormLayout implements LocaleChangeObserver, BaseComponent {
+public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
   public static final String CLASS_NAME = "passwords";
   public static final String PASSWORD = "password";
   public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";

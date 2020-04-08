@@ -111,7 +111,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.switchUser = new Button();
     view.userDialog = mock(UserDialog.class);
     view.laboratoryDialog = mock(LaboratoryDialog.class);
-    when(view.getCurrentUi()).thenReturn(ui);
     users = userRepository.findAll();
     when(userService.all(any(Laboratory.class))).thenReturn(users);
     when(userService.all()).thenReturn(users);

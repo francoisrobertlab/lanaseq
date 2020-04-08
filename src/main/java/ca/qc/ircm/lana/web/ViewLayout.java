@@ -22,7 +22,7 @@ import ca.qc.ircm.lana.experiment.web.ExperimentsView;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.user.web.UsersView;
-import ca.qc.ircm.lana.web.component.BaseComponent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -46,7 +46,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
  */
 @HtmlImport("styles/shared-styles.html")
 public class ViewLayout extends VerticalLayout
-    implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver, BaseComponent {
+    implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver {
   public static final String HOME = "home";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
@@ -94,17 +94,17 @@ public class ViewLayout extends VerticalLayout
     if (tabs.getSelectedTab() == signout) {
       // Sign-out requires a request to be made outside of Vaadin.
       logger.debug("Redirect to sign out");
-      getCurrentUi().getPage()
+      UI.getCurrent().getPage()
           .executeJs("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
     } else if (tabs.getSelectedTab() == exitSwitchUser) {
       // Exit switch user requires a request to be made outside of Vaadin.
       logger.debug("Redirect to exit switch user");
-      getCurrentUi().getPage()
+      UI.getCurrent().getPage()
           .executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
     } else {
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("Navigate to {}", tabsHref.get(tabs.getSelectedTab()));
-        navigate(tabsHref.get(tabs.getSelectedTab()));
+        UI.getCurrent().navigate(tabsHref.get(tabs.getSelectedTab()));
       }
     }
   }

@@ -23,8 +23,8 @@ import static ca.qc.ircm.lana.Constants.TITLE;
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.web.MainView;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -43,8 +43,8 @@ import org.springframework.security.access.AccessDeniedException;
 /**
  * Access denied view.
  */
-public class AccessDeniedView extends Composite<VerticalLayout> implements
-    HasErrorParameter<AccessDeniedException>, LocaleChangeObserver, HasDynamicTitle, BaseComponent {
+public class AccessDeniedView extends Composite<VerticalLayout>
+    implements HasErrorParameter<AccessDeniedException>, LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "accessdenied";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
@@ -66,7 +66,7 @@ public class AccessDeniedView extends Composite<VerticalLayout> implements
     header.addClassName(HEADER);
     message.addClassName(MESSAGE);
     home.addClassName(HOME);
-    home.addClickListener(e -> navigate(MainView.class));
+    home.addClickListener(e -> UI.getCurrent().navigate(MainView.class));
   }
 
   @Override

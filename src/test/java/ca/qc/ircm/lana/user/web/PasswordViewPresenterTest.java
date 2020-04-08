@@ -93,7 +93,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     verify(service, never()).save(any());
-    verify(view, never()).navigate(any(Class.class));
+    verify(ui, never()).navigate(any(Class.class));
   }
 
   @Test
@@ -103,6 +103,6 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     verify(service).save(password);
-    verify(view).navigate(MainView.class);
+    verify(ui).navigate(MainView.class);
   }
 }

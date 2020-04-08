@@ -28,7 +28,6 @@ import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.security.AuthorizationService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.web.ForgotPasswordView;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -53,8 +52,8 @@ import org.slf4j.LoggerFactory;
  */
 @Route(value = SigninView.VIEW_NAME)
 @HtmlImport("styles/shared-styles.html")
-public class SigninView extends LoginOverlay implements LocaleChangeObserver, HasDynamicTitle,
-    AfterNavigationObserver, BeforeEnterObserver, BaseComponent {
+public class SigninView extends LoginOverlay
+    implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BeforeEnterObserver {
   public static final String VIEW_NAME = "signin";
   public static final String HEADER = "header";
   public static final String DESCRIPTION = "description";

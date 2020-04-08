@@ -30,7 +30,6 @@ import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.web.component.BaseComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -60,8 +59,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentPermissionsDialog extends Dialog
-    implements LocaleChangeObserver, BaseComponent {
+public class ExperimentPermissionsDialog extends Dialog implements LocaleChangeObserver {
   public static final String CLASS_NAME = "experiment-permissions-dialog";
   public static final String HEADER = "header";
   public static final String MANAGERS = "managers";
