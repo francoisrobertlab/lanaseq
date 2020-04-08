@@ -25,6 +25,8 @@ import ca.qc.ircm.lana.security.LdapService;
 import ca.qc.ircm.lana.security.SecurityConfiguration;
 import ca.qc.ircm.lana.user.UserRepository;
 import ca.qc.ircm.lana.user.UserRole;
+import ca.qc.ircm.lana.user.web.ForgotPasswordView;
+import ca.qc.ircm.lana.user.web.UseForgotPasswordView;
 import ca.qc.ircm.lana.user.web.UsersView;
 import ca.qc.ircm.lana.web.MainView;
 import ca.qc.ircm.lana.web.SigninView;
@@ -196,6 +198,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Only admins can switch users.
         .antMatchers(SWITCH_USER_URL).hasAuthority(ADMIN).antMatchers(SWITCH_USER_EXIT_URL)
         .authenticated()
+
+        // Allow anonymous views.
+        .antMatchers("/" + ForgotPasswordView.VIEW_NAME,
+            "/" + UseForgotPasswordView.VIEW_NAME + "/**")
+        .permitAll()
 
         // Allow all requests by logged in users.
         .anyRequest().hasAnyAuthority(UserRole.roles())

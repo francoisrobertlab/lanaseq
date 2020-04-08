@@ -6,8 +6,7 @@ import static ca.qc.ircm.lana.text.Strings.property;
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;
 import ca.qc.ircm.lana.web.component.BaseComponent;
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -20,8 +19,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 /**
  * Passwords form.
  */
-public class PasswordsForm extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, BaseComponent {
+public class PasswordsForm extends FormLayout implements LocaleChangeObserver, BaseComponent {
   public static final String CLASS_NAME = "passwords";
   public static final String PASSWORD = "password";
   public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
@@ -36,10 +34,8 @@ public class PasswordsForm extends Composite<VerticalLayout>
    * Initializes passwords form.
    */
   public PasswordsForm() {
-    VerticalLayout layout = getContent();
-    layout.addClassName(CLASS_NAME);
-    layout.add(password, passwordConfirm);
-    layout.setPadding(false);
+    addClassName(CLASS_NAME);
+    add(password, passwordConfirm);
     password.addClassName(PASSWORD);
     passwordConfirm.addClassName(PASSWORD_CONFIRM);
     passwordBinder.setBean(new Passwords());
@@ -77,6 +73,10 @@ public class PasswordsForm extends Composite<VerticalLayout>
 
   public BinderValidationStatus<Passwords> validate() {
     return passwordBinder.validate();
+  }
+
+  public boolean isValid() {
+    return passwordBinder.validate().isOk();
   }
 
   public boolean isRequired() {

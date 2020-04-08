@@ -68,7 +68,7 @@ public class PasswordsFormTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(form.getContent().getClassNames().contains(CLASS_NAME));
+    assertTrue(form.getClassNames().contains(CLASS_NAME));
     assertTrue(form.password.getClassNames().contains(PASSWORD));
     assertTrue(form.passwordConfirm.getClassNames().contains(PASSWORD_CONFIRM));
   }
@@ -214,5 +214,75 @@ public class PasswordsFormTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void isValid_PasswordEmpty() {
+    form.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
+    form.password.setValue("");
+
+    boolean valid = form.isValid();
+
+    assertTrue(valid);
+  }
+
+  @Test
+  public void isValid_RequiredPasswordEmpty() {
+    form.localeChange(mock(LocaleChangeEvent.class));
+    form.setRequired(true);
+    fillForm();
+    form.password.setValue("");
+
+    boolean valid = form.isValid();
+
+    assertFalse(valid);
+  }
+
+  @Test
+  public void isValid_RequiredBeforeLocaleChangePasswordEmpty() {
+    form.setRequired(true);
+    form.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
+    form.password.setValue("");
+
+    boolean valid = form.isValid();
+
+    assertFalse(valid);
+  }
+
+  @Test
+  public void isValid_PasswordsNotMatch() {
+    form.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
+    form.password.setValue("test");
+    form.passwordConfirm.setValue("test2");
+
+    boolean valid = form.isValid();
+
+    assertFalse(valid);
+  }
+
+  @Test
+  public void isValid_PasswordConfirmEmpty() {
+    form.localeChange(mock(LocaleChangeEvent.class));
+    fillForm();
+    form.passwordConfirm.setValue("");
+
+    boolean valid = form.isValid();
+
+    assertTrue(valid);
+  }
+
+  @Test
+  public void isValid_RequiredPasswordConfirmEmpty() {
+    form.localeChange(mock(LocaleChangeEvent.class));
+    form.setRequired(true);
+    fillForm();
+    form.passwordConfirm.setValue("");
+
+    boolean valid = form.isValid();
+
+    assertFalse(valid);
   }
 }
