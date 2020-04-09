@@ -33,7 +33,6 @@ import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;

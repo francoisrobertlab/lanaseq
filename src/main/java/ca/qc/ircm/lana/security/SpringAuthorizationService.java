@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lana.security;
 
-import static ca.qc.ircm.lana.user.UserAuthority.FORCE_CHANGE_PASSWORD;
+import static ca.qc.ircm.lana.security.UserAuthority.FORCE_CHANGE_PASSWORD;
 
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;

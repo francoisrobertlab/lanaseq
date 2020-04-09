@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lana.user;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import java.util.ArrayList;

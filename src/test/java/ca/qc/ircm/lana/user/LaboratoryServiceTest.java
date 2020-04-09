@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lana.user;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.MANAGER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

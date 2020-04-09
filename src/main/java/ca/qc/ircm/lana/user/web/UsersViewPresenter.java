@@ -17,10 +17,10 @@
 
 package ca.qc.ircm.lana.user.web;
 
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.MANAGER;
 import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER;
 import static ca.qc.ircm.lana.security.web.WebSecurityConfiguration.SWITCH_USER_URL;
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static ca.qc.ircm.lana.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lana.user.web.UsersView.USERS_REQUIRED;
 

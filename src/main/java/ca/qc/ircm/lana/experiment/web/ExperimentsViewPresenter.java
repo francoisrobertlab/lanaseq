@@ -24,7 +24,7 @@ import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentService;
 import ca.qc.ircm.lana.security.AuthorizationService;
-import ca.qc.ircm.lana.user.UserRole;
+import ca.qc.ircm.lana.security.UserRole;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;

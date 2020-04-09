@@ -1,13 +1,12 @@
 package ca.qc.ircm.lana.security;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.MANAGER;
 
 import ca.qc.ircm.lana.experiment.Experiment;
 import ca.qc.ircm.lana.experiment.ExperimentRepository;
 import ca.qc.ircm.lana.user.Owned;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -137,7 +137,11 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-hateoas</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -146,6 +150,10 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-acl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -212,11 +220,6 @@
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -303,19 +306,13 @@
             </headerDefinitions>
             <mapping>
               <java>JAVACOMMENT_STYLE</java>
+              <yml>SCRIPT_STYLE</yml>
               <ini>SEMICOLON_STYLE</ini>
               <scss>JAVADOC_STYLE</scss>
             </mapping>
             <excludes>
-              <exclude>**/README</exclude>
-              <exclude>**/*.txt</exclude>
               <exclude>**/.*</exclude>
-              <exclude>**/*.dtd</exclude>
-              <exclude>**/*.dat</exclude>
-              <exclude>src/license/THIRD-PARTY.properties</exclude>
-              <exclude>src/main/resources/VAADIN/themes/**/addons.scss</exclude>
-              <exclude>src/main/java/**/web/**/*Design.java</exclude>
-              <exclude>src/main/java/**/web/**/*Design.html</exclude>
+              <exclude>**/*.txt</exclude>
             </excludes>
             <executions>
               <execution>

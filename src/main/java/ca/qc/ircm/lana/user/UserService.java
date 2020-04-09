@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lana.user;
 
-import static ca.qc.ircm.lana.user.UserRole.USER;
+import static ca.qc.ircm.lana.security.UserRole.USER;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
 import java.time.LocalDateTime;

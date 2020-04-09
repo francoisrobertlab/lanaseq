@@ -17,9 +17,9 @@
 
 package ca.qc.ircm.lana.experiment;
 
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.MANAGER;
 import static ca.qc.ircm.lana.test.utils.SearchUtils.find;
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -31,11 +31,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.security.UserAuthority;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

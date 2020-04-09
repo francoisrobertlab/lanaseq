@@ -17,9 +17,9 @@
 
 package ca.qc.ircm.lana.web;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
-import static ca.qc.ircm.lana.user.UserRole.USER;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.MANAGER;
+import static ca.qc.ircm.lana.security.UserRole.USER;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

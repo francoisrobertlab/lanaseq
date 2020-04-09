@@ -17,14 +17,14 @@
 
 package ca.qc.ircm.lana.security.web;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
 
 import ca.qc.ircm.lana.security.DaoAuthenticationProviderWithLdap;
 import ca.qc.ircm.lana.security.LdapConfiguration;
 import ca.qc.ircm.lana.security.LdapService;
 import ca.qc.ircm.lana.security.SecurityConfiguration;
+import ca.qc.ircm.lana.security.UserRole;
 import ca.qc.ircm.lana.user.UserRepository;
-import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.web.ForgotPasswordView;
 import ca.qc.ircm.lana.user.web.UseForgotPasswordView;
 import ca.qc.ircm.lana.user.web.UsersView;

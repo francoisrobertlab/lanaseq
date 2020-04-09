@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.security.UserAuthority;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.web.PasswordView;
 import ca.qc.ircm.lana.web.SigninView;
 import com.vaadin.flow.component.UI;

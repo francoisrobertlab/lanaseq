@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.security.UserRole;
 import ca.qc.ircm.lana.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lana.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lana.test.config.ServiceTestAnnotations;
@@ -40,7 +41,6 @@ import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryService;
 import ca.qc.ircm.lana.user.User;
 import ca.qc.ircm.lana.user.UserRepository;
-import ca.qc.ircm.lana.user.UserRole;
 import ca.qc.ircm.lana.user.UserService;
 import ca.qc.ircm.lana.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;

@@ -17,13 +17,12 @@
 
 package ca.qc.ircm.lana.security;
 
-import static ca.qc.ircm.lana.user.UserAuthority.FORCE_CHANGE_PASSWORD;
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
-import static ca.qc.ircm.lana.user.UserRole.MANAGER;
-import static ca.qc.ircm.lana.user.UserRole.USER;
+import static ca.qc.ircm.lana.security.UserAuthority.FORCE_CHANGE_PASSWORD;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.MANAGER;
+import static ca.qc.ircm.lana.security.UserRole.USER;
 
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import ca.qc.ircm.lana.user.UserRepository;
 import java.util.ArrayList;
 import java.util.Collection;

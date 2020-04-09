@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lana.security;
 
-import ca.qc.ircm.lana.user.UserRole;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;

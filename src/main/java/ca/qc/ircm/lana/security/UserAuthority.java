@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lana.user;
+package ca.qc.ircm.lana.security;
+
+import ca.qc.ircm.lana.user.Laboratory;
 
 /**
  * User authorities.

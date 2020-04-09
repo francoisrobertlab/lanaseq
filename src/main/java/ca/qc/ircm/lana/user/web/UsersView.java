@@ -26,13 +26,13 @@ import static ca.qc.ircm.lana.Constants.REQUIRED;
 import static ca.qc.ircm.lana.Constants.SUCCESS;
 import static ca.qc.ircm.lana.Constants.THEME;
 import static ca.qc.ircm.lana.Constants.TITLE;
+import static ca.qc.ircm.lana.security.UserRole.USER;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.text.Strings.property;
 import static ca.qc.ircm.lana.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lana.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lana.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lana.user.UserProperties.NAME;
-import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;

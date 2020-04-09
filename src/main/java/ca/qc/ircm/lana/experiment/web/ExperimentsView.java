@@ -26,9 +26,9 @@ import static ca.qc.ircm.lana.Constants.TITLE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lana.experiment.ExperimentProperties.OWNER;
+import static ca.qc.ircm.lana.security.UserRole.USER;
 import static ca.qc.ircm.lana.text.Strings.normalize;
 import static ca.qc.ircm.lana.text.Strings.property;
-import static ca.qc.ircm.lana.user.UserRole.USER;
 
 import ca.qc.ircm.lana.AppResources;
 import ca.qc.ircm.lana.Constants;

@@ -17,13 +17,13 @@
 
 package ca.qc.ircm.lana.experiment;
 
-import static ca.qc.ircm.lana.user.UserRole.ADMIN;
+import static ca.qc.ircm.lana.security.UserRole.ADMIN;
 
 import ca.qc.ircm.lana.security.AuthorizationService;
+import ca.qc.ircm.lana.security.UserAuthority;
 import ca.qc.ircm.lana.user.Laboratory;
 import ca.qc.ircm.lana.user.LaboratoryRepository;
 import ca.qc.ircm.lana.user.User;
-import ca.qc.ircm.lana.user.UserAuthority;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
