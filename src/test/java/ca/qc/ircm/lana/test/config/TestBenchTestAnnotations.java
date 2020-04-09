@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Headless
 @Transactional
 @Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/experiment-data.sql",
-    "/acl-data.sql" })
+    "/acl-data.sql", "/fix-it-tests.sql" })
 public @interface TestBenchTestAnnotations {
   /**
    * Returns true if ScreenshotOnFailureRule is used, false otherwise.
