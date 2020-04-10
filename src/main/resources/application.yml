@@ -1,0 +1,116 @@
+#
+# Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+spring:
+  application:
+    name: lana
+  datasource:
+    platform: h2
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;IGNORECASE=TRUE;MODE=MYSQL
+    username: sa
+    password:
+    tomcat:
+      test-on-borrow: true
+      validationQuery: SELECT 1
+
+app:
+  serverUrl: http://localhost:8080
+
+security:
+  lockAttemps: 5
+  lock-duration: PT3M
+  disableSignAttemps: 20
+
+ldap:
+  enabled: false
+  id-attribute: uid
+  mail-attribute: mail
+
+# Web server.
+server:
+  port: 8080
+  servlet:
+    session:
+      persistent: false
+  forward-headers-strategy: native
+
+vaadin:
+  productionMode: false
+  closeIdleSessions: true
+  compatibilityMode: true
+
+mail:
+  enabled: true
+  host: myemailserver.com
+  from: proview@ircm.qc.ca
+  to: christian.poitras@ircm.qc.ca
+
+logging:
+  file: ${spring.application.name}.log
+
+---
+spring:
+  profiles: test
+  ldap:
+    embedded:
+      base-dn: dc=mycompany,dc=com
+      credential:
+        username: uid=poitrasc
+        password: secret
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+
+security:
+  rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
+
+ldap:
+  enabled: true
+  object-class: person
+
+vaadin:
+  productionMode: false
+
+logging:
+  file: test.log
+
+---
+spring:
+  profiles: integration-test
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+
+app:
+  serverUrl: http://localhost:${local.server.port}
+
+security:
+  rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
+
+vaadin:
+  productionMode: false
+
+mail:
+  enabled: false
+
+logging:
+  file: test.log
+
+download-home: ${user.dir}/target/download
