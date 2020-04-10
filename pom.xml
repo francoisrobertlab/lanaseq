@@ -31,7 +31,7 @@
   <version>6.0-SNAPSHOT</version>
   <inceptionYear>2018</inceptionYear>
   <packaging>war</packaging>
-  <url>http://bitbucket.org/ircm/lana-6</url>
+  <url>https://github.com/francoisrobertlab/lanaseq</url>
   <licenses>
     <license>
       <name>GNU Affero General Public License</name>
@@ -40,13 +40,13 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git@bitbucket.org:ircm/lana-6.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:ircm/lana-6.git</developerConnection>
-    <url>https://bitbucket.org/ircm/lana-6</url>
+    <connection>scm:git:https://github.com/francoisrobertlab/lanaseq.git</connection>
+    <developerConnection>scm:git:https://github.com/francoisrobertlab/lanaseq.git</developerConnection>
+    <url>https://bitbucket.org/ircm/lanaseq</url>
   </scm>
   <issueManagement>
     <system>Bitbucket</system>
-    <url>https://bitbucket.org/ircm/lana-6/issues</url>
+    <url>https://bitbucket.org/ircm/lanaseq/issues</url>
   </issueManagement>
 
   <properties>
