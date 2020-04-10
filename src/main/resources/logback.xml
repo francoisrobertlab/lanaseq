@@ -21,10 +21,10 @@
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
 
   <logger name="ca.qc.ircm.lana" level="DEBUG"/>
-  <logger name="ca.qc.ircm.lana.security.web.SkipVaadinRequestCache" level="INFO"/>
+  <logger name="ca.qc.ircm.lanaseq.security.web.SkipVaadinRequestCache" level="INFO"/>
   <logger name="com.vaadin" level="WARN"/>
   <!--
-  <logger name="ca.qc.ircm.lana.web.validation.ValidationLogger" level="TRACE"/>
+  <logger name="ca.qc.ircm.lanaseq.web.validation.ValidationLogger" level="TRACE"/>
   <logger name="org.springframework.security" level="DEBUG"/>
   <logger name="org.hibernate.SQL" level="DEBUG"/>
   <logger name="org.hibernate.type" level="TRACE"/>

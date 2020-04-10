@@ -51,7 +51,7 @@
 
   <properties>
     <javac.version>1.8</javac.version>
-    <main-class>ca.qc.ircm.lana.Main</main-class>
+    <main-class>ca.qc.ircm.lanaseq.Main</main-class>
     <testbench.skip>true</testbench.skip>
     <!-- Dependencies -->
     <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
@@ -231,7 +231,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <excludes>
-              <exclude>ca/qc/ircm/lana/test/**/*.java</exclude>
+              <exclude>ca/qc/ircm/lanaseq/test/**/*.java</exclude>
             </excludes>
             <systemPropertyVariables>
               <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>

@@ -22,9 +22,9 @@
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
 
   <logger name="ca.qc.ircm.lana" level="DEBUG"/>
-  <logger name="ca.qc.ircm.lana.security.web.ShiroViewAccessControl" level="INFO"/>
-  <logger name="ca.qc.ircm.lana.test.config.ShiroTestExecutionListener" level="INFO"/>
-  <logger name="ca.qc.ircm.lana.web.validator" level="TRACE"/>
+  <logger name="ca.qc.ircm.lanaseq.security.web.ShiroViewAccessControl" level="INFO"/>
+  <logger name="ca.qc.ircm.lanaseq.test.config.ShiroTestExecutionListener" level="INFO"/>
+  <logger name="ca.qc.ircm.lanaseq.web.validator" level="TRACE"/>
   <logger name="org.springframework" level="INFO"/>
   <logger name="org.springframework.security" level="INFO"/>
   <logger name="org.springframework.jdbc.datasource.init.ScriptUtils" level="WARN"/>
