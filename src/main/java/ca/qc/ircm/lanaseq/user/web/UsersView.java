@@ -73,7 +73,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Users view.
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ USER })
+@RolesAllowed({ MANAGER, ADMIN })
 public class UsersView extends Composite<VerticalLayout> implements LocaleChangeObserver,
     HasDynamicTitle, AfterNavigationObserver, NotificationComponent {
   public static final String VIEW_NAME = "users";
