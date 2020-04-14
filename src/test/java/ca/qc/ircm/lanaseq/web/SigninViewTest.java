@@ -20,6 +20,8 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
+import static ca.qc.ircm.lanaseq.user.UserProperties.HASHED_PASSWORD;
 import static ca.qc.ircm.lanaseq.web.SigninView.ADDITIONAL_INFORMATION;
 import static ca.qc.ircm.lanaseq.web.SigninView.DESCRIPTION;
 import static ca.qc.ircm.lanaseq.web.SigninView.DISABLED;
@@ -27,11 +29,9 @@ import static ca.qc.ircm.lanaseq.web.SigninView.FAIL;
 import static ca.qc.ircm.lanaseq.web.SigninView.FORGOT_PASSWORD;
 import static ca.qc.ircm.lanaseq.web.SigninView.FORM_TITLE;
 import static ca.qc.ircm.lanaseq.web.SigninView.HEADER;
+import static ca.qc.ircm.lanaseq.web.SigninView.ID;
 import static ca.qc.ircm.lanaseq.web.SigninView.LOCKED;
 import static ca.qc.ircm.lanaseq.web.SigninView.SIGNIN;
-import static ca.qc.ircm.lanaseq.web.SigninView.VIEW_NAME;
-import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.HASHED_PASSWORD;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -42,12 +42,11 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
-import ca.qc.ircm.lanaseq.web.MainView;
-import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -61,6 +60,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -68,6 +68,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @NonTransactionalTestAnnotations
 public class SigninViewTest extends AbstractViewTestCase {
   private SigninView view;
+  @Autowired
+  private SecurityConfiguration configuration;
   @MockBean
   private AuthorizationService authorizationService;
   @Mock
@@ -90,7 +92,7 @@ public class SigninViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new SigninView(authorizationService);
+    view = new SigninView(configuration, authorizationService);
     view.init();
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     when(location.getQueryParameters()).thenReturn(queryParameters);
@@ -99,7 +101,7 @@ public class SigninViewTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(view.getId().orElse("").equals(VIEW_NAME));
+    assertTrue(view.getId().orElse("").equals(ID));
     assertTrue(view.isForgotPasswordButtonVisible());
   }
 

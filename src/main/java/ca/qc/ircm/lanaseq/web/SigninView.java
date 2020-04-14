@@ -20,12 +20,14 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.HASHED_PASSWORD;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import com.vaadin.flow.component.UI;
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
 public class SigninView extends LoginOverlay
     implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BeforeEnterObserver {
   public static final String VIEW_NAME = "signin";
+  public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DESCRIPTION = "description";
   public static final String ADDITIONAL_INFORMATION = "additionalInformation";
@@ -71,15 +74,18 @@ public class SigninView extends LoginOverlay
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;
   protected String error;
+  private transient SecurityConfiguration configuration;
   private transient AuthorizationService authorizationService;
 
-  public SigninView(AuthorizationService authorizationService) {
+  public SigninView(SecurityConfiguration configuration,
+      AuthorizationService authorizationService) {
+    this.configuration = configuration;
     this.authorizationService = authorizationService;
   }
 
   @PostConstruct
   void init() {
-    setId(VIEW_NAME);
+    setId(ID);
     addLoginListener(e -> setError(false));
     setForgotPasswordButtonVisible(true);
     setAction(VIEW_NAME);
@@ -115,7 +121,8 @@ public class SigninView extends LoginOverlay
       error = FAIL;
     }
     i18n.getErrorMessage().setTitle(resources.message(property(error, TITLE)));
-    i18n.getErrorMessage().setMessage(resources.message(error));
+    i18n.getErrorMessage()
+        .setMessage(resources.message(error, configuration.getLockDuration().getSeconds() / 60));
     setI18n(i18n);
   }
 
