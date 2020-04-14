@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
-import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +26,6 @@ import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
-import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,31 +49,27 @@ public class MainViewTest {
 
   @Test
   public void beforeEnter_User() {
-    when(authorizationService.hasRole(USER)).thenReturn(true);
-
     view.beforeEnter(event);
 
-    verify(event).rerouteTo(ExperimentsView.class);
+    verify(event).forwardTo(ExperimentsView.class);
   }
 
   @Test
   public void beforeEnter_Admin() {
-    when(authorizationService.hasRole(USER)).thenReturn(true);
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
 
     view.beforeEnter(event);
 
-    verify(event).rerouteTo(UsersView.class);
+    verify(event).forwardTo(UsersView.class);
   }
 
   @Test
   public void beforeEnter_Manager() {
-    when(authorizationService.hasRole(USER)).thenReturn(true);
     when(authorizationService.hasRole(MANAGER)).thenReturn(true);
 
     view.beforeEnter(event);
 
-    verify(event).rerouteTo(ExperimentsView.class);
+    verify(event).forwardTo(ExperimentsView.class);
   }
 
   @Test

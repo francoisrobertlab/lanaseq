@@ -170,7 +170,8 @@ public class SigninViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(FORGOT_PASSWORD), view.i18n.getForm().getForgotPassword());
     assertEquals(resources.message(property(LOCKED, TITLE)),
         view.i18n.getErrorMessage().getTitle());
-    assertEquals(resources.message(LOCKED), view.i18n.getErrorMessage().getMessage());
+    assertEquals(resources.message(LOCKED, configuration.getLockDuration().getSeconds() / 60),
+        view.i18n.getErrorMessage().getMessage());
   }
 
   @Test
