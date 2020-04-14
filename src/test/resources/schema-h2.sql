@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS forgotpassword (
   confirm_number varchar(100) NOT NULL,
   used tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  KEY user (user_id),
   CONSTRAINT forgotpasswordUser_ibfk FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS experiment (
