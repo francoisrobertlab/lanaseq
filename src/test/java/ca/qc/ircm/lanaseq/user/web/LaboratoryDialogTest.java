@@ -23,9 +23,9 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.user.LaboratoryProperties.NAME;
 import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.HEADER;
-import static ca.qc.ircm.lanaseq.user.LaboratoryProperties.NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,8 +40,6 @@ import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
-import ca.qc.ircm.lanaseq.user.web.LaboratoryDialog;
-import ca.qc.ircm.lanaseq.user.web.LaboratoryDialogPresenter;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -194,7 +192,7 @@ public class LaboratoryDialogTest extends AbstractViewTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save();
+    verify(presenter).save(locale);
   }
 
   @Test

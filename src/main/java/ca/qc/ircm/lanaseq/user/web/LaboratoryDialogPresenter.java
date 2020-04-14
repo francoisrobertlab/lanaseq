@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
+import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -87,10 +88,12 @@ public class LaboratoryDialogPresenter {
     return validateLaboratory().isOk();
   }
 
-  void save() {
+  void save(Locale locale) {
     if (validate()) {
       logger.debug("Save laboratory {}", laboratory);
       laboratoryService.save(laboratory);
+      final AppResources resources = new AppResources(LaboratoryDialog.class, locale);
+      dialog.showNotification(resources.message(SAVED, laboratory.getName()));
       dialog.close();
       dialog.fireSavedEvent();
     }

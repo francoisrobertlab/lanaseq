@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
+import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.SAVED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,8 +36,6 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
 import ca.qc.ircm.lanaseq.user.LaboratoryService;
-import ca.qc.ircm.lanaseq.user.web.LaboratoryDialog;
-import ca.qc.ircm.lanaseq.user.web.LaboratoryDialogPresenter;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -69,6 +68,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
   @Autowired
   private LaboratoryRepository laboratoryRepository;
   private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(LaboratoryDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private String name = "Test Laboratory";
 
@@ -175,7 +175,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     fillForm();
     dialog.name.setValue("");
 
-    presenter.save();
+    presenter.save(locale);
 
     BinderValidationStatus<Laboratory> status = presenter.validateLaboratory();
     assertFalse(status.isOk());
@@ -193,12 +193,12 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     fillForm();
 
-    presenter.save();
+    presenter.save(locale);
 
     verify(laboratoryService).save(laboratoryCaptor.capture());
     Laboratory laboratory = laboratoryCaptor.getValue();
     assertEquals(name, laboratory.getName());
-    verify(dialog).close();
+    verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
@@ -210,12 +210,12 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     fillForm();
 
-    presenter.save();
+    presenter.save(locale);
 
     verify(laboratoryService).save(laboratoryCaptor.capture());
     laboratory = laboratoryCaptor.getValue();
     assertEquals(name, laboratory.getName());
-    verify(dialog).close();
+    verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
@@ -228,6 +228,7 @@ public class LaboratoryDialogPresenterTest extends AbstractViewTestCase {
     presenter.cancel();
 
     verify(dialog).close();
+    verify(dialog, never()).showNotification(any());
     verify(dialog, never()).fireSavedEvent();
   }
 }
