@@ -67,6 +67,8 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -84,6 +86,8 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
   public static final String SWITCH_USER = "switchUser";
   public static final String SWITCH_FAILED = "switchFailed";
   private static final long serialVersionUID = 2568742367790329628L;
+  @SuppressWarnings("unused")
+  private static final Logger logger = LoggerFactory.getLogger(UsersView.class);
   protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
@@ -125,14 +129,19 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     buttonsLayout.add(add, switchUser);
     header.setId(HEADER);
     users.setId(USERS);
-    users.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    users.addItemDoubleClickListener(e -> {
+      if (e.getColumn() == laboratory) {
+        presenter.viewLaboratory(e.getItem().getLaboratory());
+      } else {
+        presenter.view(e.getItem());
+      }
+    });
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME);
-    laboratory =
-        users.addColumn(new ComponentRenderer<>(user -> viewLaboratoryButton(user)), LABORATORY)
-            .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
-                .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
+    laboratory = users.addColumn(user -> user.getLaboratory().getName(), LABORATORY)
+        .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
+            .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
         .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
     users.appendHeaderRow(); // Headers.
@@ -159,14 +168,6 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     switchUser.setId(SWITCH_USER);
     switchUser.addClickListener(e -> presenter.switchUser());
     presenter.init(this);
-  }
-
-  private Button viewLaboratoryButton(User user) {
-    Button button = new Button();
-    button.addClassName(LABORATORY);
-    button.setText(user.getLaboratory().getName());
-    button.addClickListener(e -> presenter.viewLaboratory(user.getLaboratory()));
-    return button;
   }
 
   private Button activeButton(User user) {

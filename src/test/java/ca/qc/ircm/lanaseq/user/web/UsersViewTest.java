@@ -136,7 +136,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     view.laboratory = mock(Column.class);
-    when(view.users.addColumn(any(ComponentRenderer.class), eq(LABORATORY)))
+    when(view.users.addColumn(any(ValueProvider.class), eq(LABORATORY)))
         .thenReturn(view.laboratory);
     when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
     when(view.laboratory.setComparator(any(Comparator.class))).thenReturn(view.laboratory);
@@ -293,14 +293,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     for (User user : users) {
       assertEquals(user.getName() != null ? user.getName() : "", valueProvider.apply(user));
     }
-    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(LABORATORY));
-    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
+    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
+    valueProvider = valueProviderCaptor.getValue();
     for (User user : users) {
-      Button button = buttonRenderer.createComponent(user);
-      assertTrue(button.getClassNames().contains(LABORATORY));
-      assertEquals(user.getLaboratory().getName(), button.getText());
-      clickButton(button);
-      verify(presenter, atLeastOnce()).viewLaboratory(user.getLaboratory());
+      assertEquals(user.getLaboratory().getName(), valueProvider.apply(user));
     }
     verify(view.laboratory).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
@@ -315,7 +311,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(lab("Test"), lab("abc")) > 0);
     assertTrue(comparator.compare(lab("facteur"), lab("élement")) > 0);
     verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(ACTIVE));
-    buttonRenderer = buttonRendererCaptor.getValue();
+    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
     for (User user : users) {
       Button button = buttonRenderer.createComponent(user);
       assertTrue(button.getClassNames().contains(ACTIVE));
@@ -344,6 +340,14 @@ public class UsersViewTest extends AbstractViewTestCase {
   public void view() {
     User user = users.get(0);
     doubleClickItem(view.users, user);
+
+    verify(presenter).view(user);
+  }
+
+  @Test
+  public void viewLaboratory() {
+    User user = users.get(0);
+    doubleClickItem(view.users, user, view.laboratory.getKey());
 
     verify(presenter).view(user);
   }

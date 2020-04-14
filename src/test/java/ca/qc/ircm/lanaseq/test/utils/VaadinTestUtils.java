@@ -75,12 +75,24 @@ public class VaadinTestUtils {
    *          item
    */
   public static <E> void doubleClickItem(Grid<E> grid, E item) {
+    doubleClickItem(grid, item, null);
+  }
+
+  /**
+   * Simulates an item click on grid.
+   *
+   * @param grid
+   *          grid
+   * @param item
+   *          item
+   */
+  public static <E> void doubleClickItem(Grid<E> grid, E item, String key) {
     try {
-      String key = grid.getDataCommunicator().getKeyMapper().key(item);
+      String itemKey = grid.getDataCommunicator().getKeyMapper().key(item);
       Method method = Component.class.getDeclaredMethod("getEventBus");
       method.setAccessible(true);
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(grid);
-      eventBus.fireEvent(new ItemDoubleClickEvent<>(grid, false, key, null, -1, -1, -1, -1, 2, 0,
+      eventBus.fireEvent(new ItemDoubleClickEvent<>(grid, false, itemKey, key, -1, -1, -1, -1, 2, 0,
           false, false, false, false));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
