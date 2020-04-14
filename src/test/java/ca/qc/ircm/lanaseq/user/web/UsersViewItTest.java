@@ -19,14 +19,24 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.web.SigninView;
+import java.util.Locale;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,10 +49,101 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  @WithAnonymousUser
+  public void security_Anonymous() throws Throwable {
+    open();
+
+    Locale locale = currentLocale();
+    assertEquals(
+        new AppResources(SigninView.class, locale).message(TITLE,
+            new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
+        getDriver().getTitle());
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void security_User() throws Throwable {
+    open();
+
+    Locale locale = currentLocale();
+    assertEquals(
+        new AppResources(AccessDeniedView.class, locale).message(TITLE,
+            new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
+        getDriver().getTitle());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void security_Manager() throws Throwable {
+    open();
+
+    assertEquals(resources(UsersView.class).message(TITLE,
+        resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
+  }
+
+  @Test
   public void title() throws Throwable {
     open();
 
     assertEquals(resources(UsersView.class).message(TITLE,
         resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
+  }
+
+  @Test
+  public void fieldsExistence() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(() -> view.users()).isPresent());
+    assertFalse(optional(() -> view.switchFailed()).isPresent());
+    assertTrue(optional(() -> view.addButton()).isPresent());
+    assertTrue(optional(() -> view.switchUserButton()).isPresent());
+  }
+
+  @Test
+  public void add() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+
+    view.clickAdd();
+
+    assertTrue(optional(() -> $(UserDialogElement.class).first()).isPresent());
+  }
+
+  @Test
+  public void update() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+
+    view.doubleClickUser(0);
+
+    assertTrue(optional(() -> $(UserDialogElement.class).first()).isPresent());
+  }
+
+  @Test
+  public void switchUser() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    view.clickUser(1);
+
+    view.clickSwitchUser();
+
+    Locale locale = currentLocale();
+    assertEquals(
+        new AppResources(ExperimentsView.class, locale).message(TITLE,
+            new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
+        getDriver().getTitle());
+  }
+
+  @Test
+  @Ignore("Admins are allowed to switch to another admin right now")
+  public void switchUser_Fail() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    view.clickUser(0);
+
+    view.clickSwitchUser();
+
+    assertTrue(optional(() -> view.switchFailed()).isPresent());
   }
 }
