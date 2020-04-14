@@ -26,9 +26,11 @@ import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SUCCESS;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
+import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
@@ -75,6 +77,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UsersView extends Composite<VerticalLayout> implements LocaleChangeObserver,
     HasDynamicTitle, AfterNavigationObserver, NotificationComponent {
   public static final String VIEW_NAME = "users";
+  public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String USERS = "users";
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);
@@ -116,12 +119,12 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
   @PostConstruct
   void init() {
     VerticalLayout root = getContent();
-    root.setId(VIEW_NAME);
+    root.setId(ID);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     root.add(header, users, error, buttonsLayout);
     buttonsLayout.add(add, switchUser);
-    header.addClassName(HEADER);
-    users.addClassName(USERS);
+    header.setId(HEADER);
+    users.setId(USERS);
     users.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
@@ -150,10 +153,10 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     activeFilter.setItems(Optional.empty(), Optional.of(false), Optional.of(true));
     activeFilter.addValueChangeListener(e -> presenter.filterActive(e.getValue().orElse(null)));
     activeFilter.setSizeFull();
-    error.addClassName(ERROR_TEXT);
-    add.addClassName(ADD);
+    error.setId(ERROR_TEXT);
+    add.setId(ADD);
     add.addClickListener(e -> presenter.add());
-    switchUser.addClassName(SWITCH_USER);
+    switchUser.setId(SWITCH_USER);
     switchUser.addClickListener(e -> presenter.switchUser());
     presenter.init(this);
   }

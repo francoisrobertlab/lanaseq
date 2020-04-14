@@ -30,15 +30,16 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.HEADER;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.HEADER;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -57,10 +58,6 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import ca.qc.ircm.lanaseq.user.web.LaboratoryDialog;
-import ca.qc.ircm.lanaseq.user.web.UserDialog;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
-import ca.qc.ircm.lanaseq.user.web.UsersViewPresenter;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -168,12 +165,12 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
-    assertTrue(view.header.getClassNames().contains(HEADER));
-    assertTrue(view.users.getClassNames().contains(USERS));
-    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
-    assertTrue(view.add.getClassNames().contains(ADD));
-    assertTrue(view.switchUser.getClassNames().contains(SWITCH_USER));
+    assertTrue(view.getContent().getId().orElse("").equals(ID));
+    assertTrue(view.header.getId().orElse("").equals(HEADER));
+    assertTrue(view.users.getId().orElse("").equals(USERS));
+    assertTrue(view.error.getId().orElse("").equals(ERROR_TEXT));
+    assertTrue(view.add.getId().orElse("").equals(ADD));
+    assertTrue(view.switchUser.getId().orElse("").equals(SWITCH_USER));
   }
 
   @Test

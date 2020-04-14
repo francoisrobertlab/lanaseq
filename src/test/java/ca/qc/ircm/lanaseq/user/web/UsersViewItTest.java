@@ -24,9 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
-import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -41,10 +39,8 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Headless(false)
   public void title() throws Throwable {
     open();
-    Thread.sleep(5000);
 
     assertEquals(resources(UsersView.class).message(TITLE,
         resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
