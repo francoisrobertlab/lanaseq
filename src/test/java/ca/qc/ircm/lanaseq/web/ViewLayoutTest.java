@@ -17,8 +17,13 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HOME;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.TABS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -37,7 +42,6 @@ import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
-import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Location;
@@ -73,10 +77,21 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void styles() {
+    assertEquals(ID, view.getId().orElse(""));
+    assertEquals(TABS, view.tabs.getId().orElse(""));
+    assertEquals(styleName(HOME, TAB), view.home.getId().orElse(""));
+    assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
+    assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
+    assertEquals(styleName(SIGNOUT, TAB), view.signout.getId().orElse(""));
+  }
+
+  @Test
   public void labels() {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HOME), view.home.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
+    assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
     assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
   }
 
@@ -89,11 +104,22 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HOME), view.home.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
+    assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
     assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
   }
 
   @Test
   public void tabs() {
+    view.init();
+    assertTrue(view.home.isVisible());
+    assertFalse(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
+    assertTrue(view.signout.isVisible());
+  }
+
+  @Test
+  public void tabs_AllowUsersView() {
+    when(authorizationService.isAuthorized(UsersView.class)).thenReturn(true);
     view.init();
     assertTrue(view.home.isVisible());
     assertTrue(view.users.isVisible());
@@ -107,7 +133,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
         .thenReturn(true);
     view.init();
     assertTrue(view.home.isVisible());
-    assertTrue(view.users.isVisible());
+    assertFalse(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
   }

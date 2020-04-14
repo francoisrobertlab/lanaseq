@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
+
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -47,10 +49,13 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 @HtmlImport("styles/shared-styles.html")
 public class ViewLayout extends VerticalLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver {
+  public static final String ID = "view-layout";
+  public static final String TABS = styleName(ID, "tabs");
   public static final String HOME = "home";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
   public static final String SIGNOUT = "signout";
+  public static final String TAB = "tab";
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected Tabs tabs = new Tabs();
@@ -72,10 +77,20 @@ public class ViewLayout extends VerticalLayout
 
   @PostConstruct
   void init() {
+    setId(ID);
+    setSizeFull();
+    setPadding(false);
+    setSpacing(false);
     add(tabs);
+    tabs.setId(TABS);
     tabs.add(home, users, exitSwitchUser, signout);
     exitSwitchUser
         .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+    home.setId(styleName(HOME, TAB));
+    users.setId(styleName(USERS, TAB));
+    users.setVisible(authorizationService.isAuthorized(UsersView.class));
+    exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
+    signout.setId(styleName(SIGNOUT, TAB));
     tabsHref.put(home, ExperimentsView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
     tabs.addSelectedChangeListener(e -> selectTab());
