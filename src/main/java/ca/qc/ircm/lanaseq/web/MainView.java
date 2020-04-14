@@ -57,12 +57,13 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
+    logger.debug("{}", authorizationService.currentUser());
     if (authorizationService.hasRole(ADMIN)) {
-      event.rerouteTo(UsersView.class);
+      event.forwardTo(UsersView.class);
     } else if (authorizationService.hasRole(MANAGER)) {
-      event.rerouteTo(ExperimentsView.class);
+      event.forwardTo(ExperimentsView.class);
     } else {
-      event.rerouteTo(ExperimentsView.class);
+      event.forwardTo(ExperimentsView.class);
     }
   }
 }
