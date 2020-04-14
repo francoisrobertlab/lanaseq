@@ -21,7 +21,7 @@
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
 
-  <logger name="ca.qc.ircm.lana" level="DEBUG"/>
+  <logger name="ca.qc.ircm.lanaseq" level="DEBUG"/>
   <logger name="ca.qc.ircm.lanaseq.security.web.ShiroViewAccessControl" level="INFO"/>
   <logger name="ca.qc.ircm.lanaseq.test.config.ShiroTestExecutionListener" level="INFO"/>
   <logger name="ca.qc.ircm.lanaseq.web.validator" level="TRACE"/>

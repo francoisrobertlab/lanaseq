@@ -20,7 +20,7 @@
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
 
-  <logger name="ca.qc.ircm.lana" level="DEBUG"/>
+  <logger name="ca.qc.ircm.lanaseq" level="DEBUG"/>
   <logger name="ca.qc.ircm.lanaseq.security.web.SkipVaadinRequestCache" level="INFO"/>
   <logger name="com.vaadin" level="WARN"/>
   <!--
