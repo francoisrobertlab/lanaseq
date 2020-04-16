@@ -17,23 +17,21 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.Constants.BORDER;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.CLASS_NAME;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.CREATE_NEW_LABORATORY;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.HEADER;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.LABORATORY_NAME;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.CLASS_NAME;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.CREATE_NEW_LABORATORY;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.HEADER;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.NEW_LABORATORY_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,11 +44,8 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import ca.qc.ircm.lanaseq.user.web.UserDialog;
-import ca.qc.ircm.lanaseq.user.web.UserDialogPresenter;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -78,7 +73,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(UserDialog.class, locale);
   private AppResources userResources = new AppResources(User.class, locale);
-  private AppResources laboratoryResources = new AppResources(Laboratory.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
@@ -104,11 +98,9 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertTrue(dialog.name.getClassNames().contains(NAME));
     assertTrue(dialog.admin.getClassNames().contains(ADMIN));
     assertTrue(dialog.manager.getClassNames().contains(MANAGER));
-    assertTrue(dialog.createNewLaboratory.getClassNames().contains(CREATE_NEW_LABORATORY));
     assertTrue(dialog.laboratory.getClassNames().contains(LABORATORY));
-    assertTrue(dialog.newLaboratoryLayout.getClassNames().contains(BORDER));
-    assertTrue(
-        dialog.newLaboratoryName.getClassNames().contains(styleName(LABORATORY, LABORATORY_NAME)));
+    assertTrue(dialog.createNewLaboratory.getClassNames().contains(CREATE_NEW_LABORATORY));
+    assertTrue(dialog.newLaboratoryName.getClassNames().contains(NEW_LABORATORY_NAME));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
     assertTrue(dialog.save.getElement().getAttribute(THEME).contains(PRIMARY));
     assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
@@ -122,10 +114,9 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(NAME), dialog.name.getLabel());
     assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
     assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
-    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
-    assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());
-    assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
+    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
+    assertEquals(resources.message(NEW_LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -139,7 +130,6 @@ public class UserDialogTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(UserDialog.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
-    final AppResources laboratoryResources = new AppResources(Laboratory.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -148,10 +138,9 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(userResources.message(NAME), dialog.name.getLabel());
     assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
     assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
-    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
     assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
-    assertEquals(userResources.message(LABORATORY), dialog.newLaboratoryHeader.getText());
-    assertEquals(laboratoryResources.message(LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
+    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
+    assertEquals(resources.message(NEW_LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);

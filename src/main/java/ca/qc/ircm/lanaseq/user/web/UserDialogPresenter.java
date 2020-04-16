@@ -21,12 +21,12 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.LABORATORY_NAME;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.LABORATORY_NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -57,7 +57,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.acls.domain.BasePermission;
 
 /**
- * Users dialog presenter.
+ * User dialog presenter.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -90,8 +90,9 @@ public class UserDialogPresenter {
     dialog.admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
     dialog.manager.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     dialog.manager.addValueChangeListener(e -> updateManager());
-    dialog.createNewLaboratory.setReadOnly(true);
-    dialog.createNewLaboratory.addValueChangeListener(e -> updateCreateNewLaboratory());
+    dialog.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
+    dialog.laboratory.setEnabled(authorizationService.hasRole(UserRole.ADMIN));
+    dialog.laboratory.setItemLabelGenerator(lab -> lab.getName());
     if (authorizationService.hasRole(UserRole.ADMIN)) {
       laboratoriesDataProvider = new LaboratoryDataProvider(laboratoryService.all());
     } else {
@@ -100,9 +101,11 @@ public class UserDialogPresenter {
               .collect(Collectors.toCollection(ArrayList::new)));
     }
     dialog.laboratory.setDataProvider(laboratoriesDataProvider);
-    dialog.laboratory.setItemLabelGenerator(lab -> lab.getName());
-    dialog.newLaboratoryLayout.setVisible(false);
     dialog.createNewLaboratory.setVisible(authorizationService.hasRole(UserRole.ADMIN));
+    dialog.createNewLaboratory.setEnabled(false);
+    dialog.createNewLaboratory.addValueChangeListener(e -> updateCreateNewLaboratory());
+    dialog.newLaboratoryName.setVisible(authorizationService.hasRole(UserRole.ADMIN));
+    dialog.newLaboratoryName.setEnabled(false);
     setUser(null);
     laboratoryBinder.setBean(new Laboratory());
   }
@@ -138,24 +141,26 @@ public class UserDialogPresenter {
     boolean readOnly =
         user.getId() != null && !authorizationService.hasPermission(user, BasePermission.WRITE);
     binder.setReadOnly(readOnly);
-    dialog.laboratory.setReadOnly(readOnly || !authorizationService.hasRole(UserRole.ADMIN));
+    dialog.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
+    dialog.laboratory.setEnabled(
+        !authorizationService.hasRole(UserRole.ADMIN) || !dialog.createNewLaboratory.getValue());
     dialog.passwords.setVisible(!readOnly);
   }
 
   private void updateManager() {
     if (authorizationService.hasRole(UserRole.ADMIN)) {
-      dialog.createNewLaboratory.setReadOnly(!dialog.manager.getValue());
+      dialog.createNewLaboratory.setEnabled(dialog.manager.getValue());
       if (!dialog.manager.getValue()) {
         dialog.createNewLaboratory.setValue(false);
-        dialog.laboratory.setVisible(true);
-        dialog.newLaboratoryLayout.setVisible(false);
+        dialog.laboratory.setEnabled(true);
+        dialog.newLaboratoryName.setEnabled(false);
       }
     }
   }
 
   private void updateCreateNewLaboratory() {
-    dialog.laboratory.setVisible(!dialog.createNewLaboratory.getValue());
-    dialog.newLaboratoryLayout.setVisible(dialog.createNewLaboratory.getValue());
+    dialog.laboratory.setEnabled(!dialog.createNewLaboratory.getValue());
+    dialog.newLaboratoryName.setEnabled(dialog.createNewLaboratory.getValue());
   }
 
   BinderValidationStatus<User> validateUser() {
