@@ -23,15 +23,8 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
-import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
-import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
-import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.CLASS_NAME;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.CREATE_NEW_LABORATORY;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.HEADER;
-import static ca.qc.ircm.lanaseq.user.web.UserDialog.NEW_LABORATORY_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,8 +55,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ServiceTestAnnotations
 public class UserDialogTest extends AbstractViewTestCase {
   private UserDialog dialog;
+  private UserForm form;
   @Mock
   private UserDialogPresenter presenter;
+  @Mock
+  private UserFormPresenter userFormPresenter;
   @Mock
   private User user;
   @Mock
@@ -72,7 +68,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(UserDialog.class, locale);
-  private AppResources userResources = new AppResources(User.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
@@ -81,7 +76,8 @@ public class UserDialogTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    dialog = new UserDialog(presenter);
+    form = new UserForm(userFormPresenter);
+    dialog = new UserDialog(presenter, form);
     dialog.init();
   }
 
@@ -94,13 +90,6 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(CLASS_NAME, dialog.getId().orElse(""));
     assertTrue(dialog.header.getClassNames().contains(HEADER));
-    assertTrue(dialog.email.getClassNames().contains(EMAIL));
-    assertTrue(dialog.name.getClassNames().contains(NAME));
-    assertTrue(dialog.admin.getClassNames().contains(ADMIN));
-    assertTrue(dialog.manager.getClassNames().contains(MANAGER));
-    assertTrue(dialog.laboratory.getClassNames().contains(LABORATORY));
-    assertTrue(dialog.createNewLaboratory.getClassNames().contains(CREATE_NEW_LABORATORY));
-    assertTrue(dialog.newLaboratoryName.getClassNames().contains(NEW_LABORATORY_NAME));
     assertTrue(dialog.save.getClassNames().contains(SAVE));
     assertTrue(dialog.save.getElement().getAttribute(THEME).contains(PRIMARY));
     assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
@@ -110,18 +99,10 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(userResources.message(EMAIL), dialog.email.getLabel());
-    assertEquals(userResources.message(NAME), dialog.name.getLabel());
-    assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
-    assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
-    assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
-    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
-    assertEquals(resources.message(NEW_LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -129,21 +110,12 @@ public class UserDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(UserDialog.class, locale);
-    final AppResources userResources = new AppResources(User.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(userResources.message(EMAIL), dialog.email.getLabel());
-    assertEquals(userResources.message(NAME), dialog.name.getLabel());
-    assertEquals(userResources.message(ADMIN), dialog.admin.getLabel());
-    assertEquals(userResources.message(MANAGER), dialog.manager.getLabel());
-    assertEquals(userResources.message(LABORATORY), dialog.laboratory.getLabel());
-    assertEquals(resources.message(CREATE_NEW_LABORATORY), dialog.createNewLaboratory.getLabel());
-    assertEquals(resources.message(NEW_LABORATORY_NAME), dialog.newLaboratoryName.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -162,44 +134,44 @@ public class UserDialogTest extends AbstractViewTestCase {
 
   @Test
   public void getUser() {
-    when(presenter.getUser()).thenReturn(user);
+    when(userFormPresenter.getUser()).thenReturn(user);
     assertEquals(user, dialog.getUser());
-    verify(presenter).getUser();
+    verify(userFormPresenter).getUser();
   }
 
   @Test
   public void setUser_NewUser() {
     User user = new User();
-    when(presenter.getUser()).thenReturn(user);
+    when(userFormPresenter.getUser()).thenReturn(user);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setUser(user);
 
-    verify(presenter).setUser(user);
+    verify(userFormPresenter).setUser(user);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
   @Test
   public void setUser_User() {
     User user = userRepository.findById(2L).get();
-    when(presenter.getUser()).thenReturn(user);
+    when(userFormPresenter.getUser()).thenReturn(user);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setUser(user);
 
-    verify(presenter).setUser(user);
+    verify(userFormPresenter).setUser(user);
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
   }
 
   @Test
   public void setUser_UserBeforeLocaleChange() {
     User user = userRepository.findById(2L).get();
-    when(presenter.getUser()).thenReturn(user);
+    when(userFormPresenter.getUser()).thenReturn(user);
 
     dialog.setUser(user);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setUser(user);
+    verify(userFormPresenter).setUser(user);
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
   }
 
@@ -208,7 +180,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setUser(null);
 
-    verify(presenter).setUser(null);
+    verify(userFormPresenter).setUser(null);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
