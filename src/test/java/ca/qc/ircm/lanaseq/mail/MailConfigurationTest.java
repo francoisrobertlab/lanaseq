@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.mail;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lanaseq.mail.MailConfiguration;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +40,7 @@ public class MailConfigurationTest {
     assertEquals("myemailserver.com", mailConfiguration.getHost());
     assertEquals("proview@ircm.qc.ca", mailConfiguration.getFrom());
     assertEquals("christian.poitras@ircm.qc.ca", mailConfiguration.getTo());
-    assertEquals("lana", mailConfiguration.getSubject());
+    assertEquals("lanaseq", mailConfiguration.getSubject());
     assertEquals("myemailserver.com", mailSender.getHost());
   }
 }
