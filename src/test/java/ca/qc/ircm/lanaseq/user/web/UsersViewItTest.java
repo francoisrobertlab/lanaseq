@@ -82,6 +82,14 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  public void security_Admin() throws Throwable {
+    open();
+
+    assertEquals(resources(UsersView.class).message(TITLE,
+        resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
+  }
+
+  @Test
   public void title() throws Throwable {
     open();
 
@@ -118,6 +126,16 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     view.doubleClickUser(0);
 
     assertTrue(optional(() -> $(UserDialogElement.class).first()).isPresent());
+  }
+
+  @Test
+  public void update_Laboratory() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+
+    view.doubleClickLaboratory(0);
+
+    assertTrue(optional(() -> $(LaboratoryDialogElement.class).first()).isPresent());
   }
 
   @Test
