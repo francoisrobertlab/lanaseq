@@ -111,6 +111,8 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     when(authorizationService.currentUser()).thenReturn(currentUser);
     laboratories = laboratoryRepository.findAll();
     when(laboratoryService.all()).thenReturn(laboratories);
+    when(laboratoryService.get(any()))
+        .thenAnswer(i -> laboratoryRepository.findById(i.getArgument(0)).orElse(null));
     laboratory = laboratoryRepository.findById(2L).orElse(null);
     when(form.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
@@ -175,6 +177,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     presenter.init(form);
     presenter.localeChange(locale);
     assertFalse(form.laboratory.isAllowCustomValue());
+    assertTrue(form.laboratory.isRequiredIndicatorVisible());
     List<Laboratory> values = items(form.laboratory);
     assertEquals(1, values.size());
     assertEquals(currentUser.getLaboratory(), values.get(0));
@@ -188,6 +191,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     presenter.init(form);
     presenter.localeChange(locale);
     assertFalse(form.laboratory.isAllowCustomValue());
+    assertTrue(form.laboratory.isRequiredIndicatorVisible());
     List<Laboratory> values = items(form.laboratory);
     assertEquals(laboratories.size(), values.size());
     for (Laboratory laboratory : laboratories) {
@@ -398,7 +402,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(form.manager.isReadOnly());
     verify(form.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    assertEquals(user.getLaboratory(), form.laboratory.getValue());
+    assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertTrue(form.laboratory.isReadOnly());
   }
 
@@ -423,7 +427,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(booleanCaptor.getValue());
     verify(form.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    assertEquals(user.getLaboratory(), form.laboratory.getValue());
+    assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertTrue(form.laboratory.isReadOnly());
   }
 
@@ -434,6 +438,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(form);
     User user = userRepository.findById(2L).get();
+    System.out.println(user.getLaboratory());
 
     presenter.localeChange(locale);
     presenter.setUser(user);
@@ -450,7 +455,9 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(booleanCaptor.getValue());
     verify(form.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    assertEquals(user.getLaboratory(), form.laboratory.getValue());
+    System.out.println(user.getLaboratory());
+    System.out.println(form.laboratory.getValue());
+    assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertFalse(form.laboratory.isReadOnly());
   }
 
@@ -472,7 +479,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(form.manager.isReadOnly());
     verify(form.passwords, atLeastOnce()).setVisible(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    assertEquals(user.getLaboratory(), form.laboratory.getValue());
+    assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertTrue(form.laboratory.isReadOnly());
   }
 
@@ -497,7 +504,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(booleanCaptor.getValue());
     verify(form.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    assertEquals(user.getLaboratory(), form.laboratory.getValue());
+    assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertTrue(form.laboratory.isReadOnly());
   }
 
@@ -524,7 +531,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(booleanCaptor.getValue());
     verify(form.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    assertEquals(user.getLaboratory(), form.laboratory.getValue());
+    assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertFalse(form.laboratory.isReadOnly());
   }
 

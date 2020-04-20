@@ -38,14 +38,12 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -81,15 +79,15 @@ public class UserFormPresenter {
     form.admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
     form.manager.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     form.manager.addValueChangeListener(e -> updateManager());
+    form.laboratory.setRequiredIndicatorVisible(true);
     form.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
     form.laboratory.setEnabled(authorizationService.hasRole(UserRole.ADMIN));
-    form.laboratory.setItemLabelGenerator(lab -> lab.getName());
+    form.laboratory.setItemLabelGenerator(lab -> Objects.toString(lab.getName(), ""));
     if (authorizationService.hasRole(UserRole.ADMIN)) {
-      laboratoriesDataProvider = new LaboratoryDataProvider(laboratoryService.all());
+      laboratoriesDataProvider = DataProvider.ofCollection(laboratoryService.all());
     } else {
       laboratoriesDataProvider =
-          new LaboratoryDataProvider(Stream.of(authorizationService.currentUser().getLaboratory())
-              .collect(Collectors.toCollection(ArrayList::new)));
+          DataProvider.ofItems(authorizationService.currentUser().getLaboratory());
     }
     form.laboratory.setDataProvider(laboratoriesDataProvider);
     form.createNewLaboratory.setVisible(authorizationService.hasRole(UserRole.ADMIN));
@@ -102,7 +100,6 @@ public class UserFormPresenter {
   }
 
   void localeChange(Locale locale) {
-    final AppResources userResources = new AppResources(User.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(form.email).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
@@ -111,7 +108,9 @@ public class UserFormPresenter {
         .bind(NAME);
     binder.forField(form.admin).bind(ADMIN);
     binder.forField(form.manager).bind(MANAGER);
-    form.laboratory.setLabel(userResources.message(LABORATORY));
+    if (!laboratoriesDataProvider.getItems().isEmpty()) {
+      form.laboratory.setRequiredIndicatorVisible(true);
+    }
     binder.forField(form.laboratory)
         .withValidator(laboratoryRequiredValidator(webResources.message(REQUIRED)))
         .withNullRepresentation(null).bind(LABORATORY);
@@ -121,9 +120,10 @@ public class UserFormPresenter {
   }
 
   private Validator<Laboratory> laboratoryRequiredValidator(String errorMessage) {
-    return (value, context) -> !form.createNewLaboratory.getValue() && value == null
-        ? ValidationResult.error(errorMessage)
-        : ValidationResult.ok();
+    return (value,
+        context) -> !form.createNewLaboratory.getValue()
+            && (value == null || value.getName() == null) ? ValidationResult.error(errorMessage)
+                : ValidationResult.ok();
   }
 
   private void updateReadOnly() {
@@ -190,8 +190,15 @@ public class UserFormPresenter {
     if (user == null) {
       user = new User();
     }
-    if (user.getLaboratory() == null && !laboratoriesDataProvider.getItems().isEmpty()) {
-      user.setLaboratory(laboratoriesDataProvider.getItems().iterator().next());
+    if (user.getLaboratory() == null) {
+      user.setLaboratory(new Laboratory());
+    }
+    if (!laboratoriesDataProvider.getItems().isEmpty()) {
+      final Laboratory laboratory = user.getLaboratory();
+      form.laboratory.setValue(laboratoriesDataProvider.getItems().stream()
+          .filter(lab -> lab.getId().equals(laboratory.getId())).findAny()
+          .orElse(laboratoriesDataProvider.getItems().iterator().next()));
+      user.setLaboratory(laboratoryService.get(form.laboratory.getValue().getId()));
     }
     this.user = user;
     binder.setBean(user);
@@ -201,17 +208,5 @@ public class UserFormPresenter {
 
   ListDataProvider<Laboratory> laboratoryDataProvider() {
     return laboratoriesDataProvider;
-  }
-
-  @SuppressWarnings("serial")
-  private static class LaboratoryDataProvider extends ListDataProvider<Laboratory> {
-    public LaboratoryDataProvider(Collection<Laboratory> items) {
-      super(items);
-    }
-
-    @Override
-    public Object getId(Laboratory item) {
-      return item.getId();
-    }
   }
 }

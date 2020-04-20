@@ -6,6 +6,8 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.io.Serializable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
+  private static final Logger logger = LoggerFactory.getLogger(UserPermissionEvaluator.class);
   @Autowired
   private UserRepository repository;
   @Autowired
@@ -33,6 +36,10 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     User user = (User) targetDomainObject;
     User currentUser = getUser(authentication);
     Permission realPermission = resolvePermission(permission);
+    if (realPermission.equals(BasePermission.WRITE)) {
+      logger.debug("hasPermission={} for user {} and current user {}",
+          hasPermission(user, currentUser, realPermission), user, currentUser);
+    }
     return hasPermission(user, currentUser, realPermission);
   }
 
@@ -54,21 +61,26 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   }
 
   private boolean hasPermission(User user, User currentUser, Permission permission) {
+    logger.debug("before current user test for user {} and current user {}", user, currentUser);
     if (currentUser == null) {
       return false;
     }
+    logger.debug("before admin test for user {} and current user {}", user, currentUser);
     if (authorizationService.hasRole(ADMIN)) {
       return true;
     }
+    logger.debug("before new laboratory test for user {} and current user {}", user, currentUser);
     if (user.getLaboratory() == null || user.getLaboratory().getId() == null || user.isAdmin()) {
       return false;
     }
+    logger.debug("before labid test for user {} and current user {}", user, currentUser);
     if (permission.equals(BasePermission.WRITE) && user.getId() != null) {
       User unmodified = repository.findById(user.getId()).orElse(null);
       if (!unmodified.getLaboratory().getId().equals(user.getLaboratory().getId())) {
         return false;
       }
     }
+    logger.debug("before role test for user {} and current user {}", user, currentUser);
     boolean authorized = currentUser.getId().equals(user.getId());
     authorized |= permission.equals(BasePermission.READ);
     authorized |= permission.equals(BasePermission.WRITE) && authorizationService
