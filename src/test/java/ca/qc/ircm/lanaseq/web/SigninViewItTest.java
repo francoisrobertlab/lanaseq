@@ -65,7 +65,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.getUsernameField()).isPresent());
     assertTrue(optional(() -> view.getPasswordField()).isPresent());
     assertTrue(optional(() -> view.getSubmitButton()).isPresent());
-    // TODO Forgot password button should be available.
+    assertTrue(optional(() -> view.getForgotPasswordButton()).isPresent());
   }
 
   @Test
