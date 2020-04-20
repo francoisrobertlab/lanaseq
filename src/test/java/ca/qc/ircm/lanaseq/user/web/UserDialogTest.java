@@ -188,7 +188,7 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save();
+    verify(presenter).save(locale);
   }
 
   @Test

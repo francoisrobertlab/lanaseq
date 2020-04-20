@@ -17,12 +17,14 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -37,6 +39,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox.CustomValueSetEvent;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,8 +72,11 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   private UserRepository userRepository;
   @Mock
   private User user;
+  private String email = "test@ircm.qc.ca";
   private String password = "test_password";
   private User currentUser;
+  private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(UserDialog.class, locale);
 
   /**
    * Before test.
@@ -91,7 +97,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void save_ValidationFalse() {
     presenter.init(dialog);
 
-    presenter.save();
+    presenter.save(locale);
 
     verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
@@ -103,11 +109,13 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(dialog.form.isValid()).thenReturn(true);
     when(dialog.form.getUser()).thenReturn(user);
     when(dialog.form.getPassword()).thenReturn(password);
+    when(user.getEmail()).thenReturn(email);
     presenter.init(dialog);
 
-    presenter.save();
+    presenter.save(locale);
 
     verify(userService).save(user, password);
+    verify(dialog).showNotification(resources.message(SAVED, email));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
@@ -116,11 +124,13 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   public void save_ValidationTrueNullPassword() {
     when(dialog.form.isValid()).thenReturn(true);
     when(dialog.form.getUser()).thenReturn(user);
+    when(user.getEmail()).thenReturn(email);
     presenter.init(dialog);
 
-    presenter.save();
+    presenter.save(locale);
 
     verify(userService).save(user, null);
+    verify(dialog).showNotification(resources.message(SAVED, email));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }

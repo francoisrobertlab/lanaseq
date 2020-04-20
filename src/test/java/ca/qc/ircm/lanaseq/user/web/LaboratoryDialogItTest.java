@@ -56,8 +56,10 @@ public class LaboratoryDialogItTest extends AbstractTestBenchTestCase {
 
     view.doubleClickLaboratory(1);
 
-    assertTrue(optional(() -> $(LaboratoryDialogElement.class).first()).isPresent());
-    LaboratoryDialogElement dialog = $(LaboratoryDialogElement.class).first();
+    assertTrue(optional(() -> $(LaboratoryDialogElement.class).id(LaboratoryDialog.CLASS_NAME))
+        .isPresent());
+    LaboratoryDialogElement dialog =
+        $(LaboratoryDialogElement.class).id(LaboratoryDialog.CLASS_NAME);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.name()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
@@ -69,8 +71,10 @@ public class LaboratoryDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
     view.doubleClickLaboratory(1);
-    assertTrue(optional(() -> $(LaboratoryDialogElement.class).first()).isPresent());
-    LaboratoryDialogElement dialog = $(LaboratoryDialogElement.class).first();
+    assertTrue(optional(() -> $(LaboratoryDialogElement.class).id(LaboratoryDialog.CLASS_NAME))
+        .isPresent());
+    LaboratoryDialogElement dialog =
+        $(LaboratoryDialogElement.class).id(LaboratoryDialog.CLASS_NAME);
     dialog.name().setValue(name);
 
     TestTransaction.flagForCommit();
@@ -89,8 +93,10 @@ public class LaboratoryDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
     view.doubleClickLaboratory(1);
-    assertTrue(optional(() -> $(LaboratoryDialogElement.class).first()).isPresent());
-    LaboratoryDialogElement dialog = $(LaboratoryDialogElement.class).first();
+    assertTrue(optional(() -> $(LaboratoryDialogElement.class).id(LaboratoryDialog.CLASS_NAME))
+        .isPresent());
+    LaboratoryDialogElement dialog =
+        $(LaboratoryDialogElement.class).id(LaboratoryDialog.CLASS_NAME);
     dialog.name().setValue(name);
 
     TestTransaction.flagForCommit();

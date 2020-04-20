@@ -17,15 +17,30 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.HEADER;
 
+import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
-import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class UserDialogElement extends DialogElement {
-  public TextFieldElement header() {
-    return $(TextFieldElement.class).attributeContains("class", HEADER).first();
+  public H2Element header() {
+    return $(H2Element.class).attributeContains("class", HEADER).first();
+  }
+
+  public UserFormElement form() {
+    return $(UserFormElement.class).id(UserForm.CLASS_NAME);
+  }
+
+  public ButtonElement save() {
+    return $(ButtonElement.class).attributeContains("class", SAVE).first();
+  }
+
+  public ButtonElement cancel() {
+    return $(ButtonElement.class).attributeContains("class", CANCEL).first();
   }
 }

@@ -26,6 +26,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -47,10 +48,11 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class UserDialog extends Dialog implements LocaleChangeObserver {
+public class UserDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String CLASS_NAME = "user-dialog";
   public static final String HEADER = "header";
+  public static final String SAVED = "saved";
   protected H2 header = new H2();
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
@@ -83,7 +85,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver {
     save.addClassName(SAVE);
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
+    save.addClickListener(e -> presenter.save(getLocale()));
     cancel.addClassName(CANCEL);
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
