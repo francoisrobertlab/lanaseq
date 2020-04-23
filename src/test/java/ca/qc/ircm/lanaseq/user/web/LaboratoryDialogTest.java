@@ -24,8 +24,9 @@ import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.LaboratoryProperties.NAME;
-import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.HEADER;
+import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.ID;
+import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.id;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,12 +87,12 @@ public class LaboratoryDialogTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertEquals(CLASS_NAME, dialog.getId().orElse(""));
-    assertTrue(dialog.header.getClassNames().contains(HEADER));
-    assertTrue(dialog.name.getClassNames().contains(NAME));
-    assertTrue(dialog.save.getClassNames().contains(SAVE));
+    assertEquals(ID, dialog.getId().orElse(""));
+    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
+    assertEquals(id(NAME), dialog.name.getId().orElse(""));
+    assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getElement().getAttribute(THEME).contains(PRIMARY));
-    assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
+    assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
   }
 
   @Test

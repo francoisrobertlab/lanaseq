@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.user.LaboratoryProperties.NAME;
 import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.HEADER;
+import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
@@ -31,18 +32,18 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-dialog")
 public class LaboratoryDialogElement extends DialogElement {
   public H2Element header() {
-    return $(H2Element.class).attributeContains("class", HEADER).first();
+    return $(H2Element.class).id(id(HEADER));
   }
 
   public TextFieldElement name() {
-    return $(TextFieldElement.class).attributeContains("class", NAME).first();
+    return $(TextFieldElement.class).id(id(NAME));
   }
 
   public ButtonElement save() {
-    return $(ButtonElement.class).attributeContains("class", SAVE).first();
+    return $(ButtonElement.class).id(id(SAVE));
   }
 
   public ButtonElement cancel() {
-    return $(ButtonElement.class).attributeContains("class", CANCEL).first();
+    return $(ButtonElement.class).id(id(CANCEL));
   }
 }
