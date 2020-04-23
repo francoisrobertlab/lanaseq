@@ -32,7 +32,7 @@ public class ProfileViewElement extends VerticalLayoutElement {
   }
 
   public UserFormElement form() {
-    return $(UserFormElement.class).id(UserForm.CLASS_NAME);
+    return $(UserFormElement.class).id(UserForm.ID);
   }
 
   public ButtonElement save() {

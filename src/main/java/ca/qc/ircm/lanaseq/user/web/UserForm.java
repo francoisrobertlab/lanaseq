@@ -47,7 +47,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserForm extends FormLayout implements LocaleChangeObserver {
   private static final long serialVersionUID = 3285639770914046262L;
-  public static final String CLASS_NAME = "user-form";
+  public static final String ID = "user-form";
   public static final String CREATE_NEW_LABORATORY = "createNewLaboratory";
   public static final String LABORATORY_NAME = LaboratoryProperties.NAME;
   public static final String NEW_LABORATORY_NAME = "newLaboratoryName";
@@ -69,22 +69,26 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
     this.presenter = presenter;
   }
 
+  public static String id(String baseId) {
+    return styleName(ID, baseId);
+  }
+
   /**
    * Initializes user dialog.
    */
   @PostConstruct
   protected void init() {
-    setId(CLASS_NAME);
+    setId(ID);
     setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
     add(new FormLayout(email, name, admin, manager, passwords),
         new FormLayout(laboratory, createNewLaboratory, newLaboratoryName));
-    email.addClassName(EMAIL);
-    name.addClassName(NAME);
-    admin.addClassName(ADMIN);
-    manager.addClassName(MANAGER);
-    laboratory.addClassName(LABORATORY);
-    createNewLaboratory.addClassName(CREATE_NEW_LABORATORY);
-    newLaboratoryName.addClassName(styleName(NEW_LABORATORY_NAME));
+    email.setId(id(EMAIL));
+    name.setId(id(NAME));
+    admin.setId(id(ADMIN));
+    manager.setId(id(MANAGER));
+    laboratory.setId(id(LABORATORY));
+    createNewLaboratory.setId(id(CREATE_NEW_LABORATORY));
+    newLaboratoryName.setId(id(NEW_LABORATORY_NAME));
     presenter.init(this);
   }
 

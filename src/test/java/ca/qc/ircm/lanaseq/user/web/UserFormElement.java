@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.CREATE_NEW_LABORATORY;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.NEW_LABORATORY_NAME;
+import static ca.qc.ircm.lanaseq.user.web.UserForm.id;
 
 import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
@@ -34,19 +35,19 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-form-layout")
 public class UserFormElement extends FormLayoutElement {
   public TextFieldElement email() {
-    return $(TextFieldElement.class).attributeContains("class", EMAIL).first();
+    return $(TextFieldElement.class).id(id(EMAIL));
   }
 
   public TextFieldElement name() {
-    return $(TextFieldElement.class).attributeContains("class", NAME).first();
+    return $(TextFieldElement.class).id(id(NAME));
   }
 
   public CheckboxElement admin() {
-    return $(CheckboxElement.class).attributeContains("class", ADMIN).first();
+    return $(CheckboxElement.class).id(id(ADMIN));
   }
 
   public CheckboxElement manager() {
-    return $(CheckboxElement.class).attributeContains("class", MANAGER).first();
+    return $(CheckboxElement.class).id(id(MANAGER));
   }
 
   public PasswordsFormElement passwords() {
@@ -54,14 +55,14 @@ public class UserFormElement extends FormLayoutElement {
   }
 
   public ComboBoxElement laboratory() {
-    return $(ComboBoxElement.class).attributeContains("class", LABORATORY).first();
+    return $(ComboBoxElement.class).id(id(LABORATORY));
   }
 
   public CheckboxElement createNewLaboratory() {
-    return $(CheckboxElement.class).attributeContains("class", CREATE_NEW_LABORATORY).first();
+    return $(CheckboxElement.class).id(id(CREATE_NEW_LABORATORY));
   }
 
   public TextFieldElement newLaboratoryName() {
-    return $(TextFieldElement.class).attributeContains("class", NEW_LABORATORY_NAME).first();
+    return $(TextFieldElement.class).id(id(NEW_LABORATORY_NAME));
   }
 }

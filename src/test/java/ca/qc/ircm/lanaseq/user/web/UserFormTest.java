@@ -22,9 +22,10 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
-import static ca.qc.ircm.lanaseq.user.web.UserForm.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.CREATE_NEW_LABORATORY;
+import static ca.qc.ircm.lanaseq.user.web.UserForm.ID;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.NEW_LABORATORY_NAME;
+import static ca.qc.ircm.lanaseq.user.web.UserForm.id;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -73,14 +74,14 @@ public class UserFormTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertEquals(CLASS_NAME, form.getId().orElse(""));
-    assertTrue(form.email.getClassNames().contains(EMAIL));
-    assertTrue(form.name.getClassNames().contains(NAME));
-    assertTrue(form.admin.getClassNames().contains(ADMIN));
-    assertTrue(form.manager.getClassNames().contains(MANAGER));
-    assertTrue(form.laboratory.getClassNames().contains(LABORATORY));
-    assertTrue(form.createNewLaboratory.getClassNames().contains(CREATE_NEW_LABORATORY));
-    assertTrue(form.newLaboratoryName.getClassNames().contains(NEW_LABORATORY_NAME));
+    assertEquals(ID, form.getId().orElse(""));
+    assertEquals(id(EMAIL), form.email.getId().orElse(""));
+    assertEquals(id(NAME), form.name.getId().orElse(""));
+    assertEquals(id(ADMIN), form.admin.getId().orElse(""));
+    assertEquals(id(MANAGER), form.manager.getId().orElse(""));
+    assertEquals(id(LABORATORY), form.laboratory.getId().orElse(""));
+    assertEquals(id(CREATE_NEW_LABORATORY), form.createNewLaboratory.getId().orElse(""));
+    assertEquals(id(NEW_LABORATORY_NAME), form.newLaboratoryName.getId().orElse(""));
   }
 
   @Test
