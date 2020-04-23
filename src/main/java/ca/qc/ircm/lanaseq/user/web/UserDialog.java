@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -50,7 +51,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
   private static final long serialVersionUID = 3285639770914046262L;
-  public static final String CLASS_NAME = "user-dialog";
+  public static final String ID = "user-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   protected H2 header = new H2();
@@ -69,24 +70,28 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     this.form = form;
   }
 
+  public static String id(String baseId) {
+    return styleName(ID, baseId);
+  }
+
   /**
    * Initializes user dialog.
    */
   @PostConstruct
   protected void init() {
-    setId(CLASS_NAME);
+    setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
     layout.add(header, form, buttonsLayout);
     buttonsLayout.add(save, cancel);
-    header.addClassName(HEADER);
-    save.addClassName(SAVE);
+    header.setId(id(HEADER));
+    save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> presenter.save(getLocale()));
-    cancel.addClassName(CANCEL);
+    cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
     presenter.init(this);
