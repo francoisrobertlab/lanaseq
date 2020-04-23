@@ -50,6 +50,7 @@
   </issueManagement>
 
   <properties>
+    <resource.delimiter>$[*]</resource.delimiter>
     <javac.version>1.8</javac.version>
     <main-class>ca.qc.ircm.lanaseq.Main</main-class>
     <testbench.skip>true</testbench.skip>
@@ -224,9 +225,25 @@
       <testResource>
         <directory>src/test/resources</directory>
       </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+        <filtering>true</filtering>
+      </testResource>
     </testResources>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <delimiters>
+              <delimiter>${resource.delimiter}</delimiter>
+            </delimiters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+          </configuration>
+        </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>

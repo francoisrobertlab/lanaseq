@@ -15,6 +15,18 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
+INSERT INTO protocol (id,name,owner_id,date)
+VALUES ('1', 'FLAG', '3', '2018-10-20 11:28:12');
+INSERT INTO protocol (id,name,owner_id,date)
+VALUES ('2', 'BioID', '5', '2018-11-18 9:31:14');
+INSERT INTO protocol (id,name,owner_id,date)
+VALUES ('3', 'Histone FLAG', '2', '2018-10-20 9:58:12');
+INSERT INTO protocol_file (id,files_id,filename,content)
+VALUES (1,1,'FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/FLAG_Protocol.docx'));
+INSERT INTO protocol_file (id,files_id,filename,content)
+VALUES (2,2,'BioID Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/BioID_Protocol.docx'));
+INSERT INTO protocol_file (id,files_id,filename,content)
+VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'));
 INSERT INTO experiment (id,name,owner_id,date)
 VALUES ('1', 'POLR2A DNA location', '2', '2018-10-20 13:28:12');
 INSERT INTO experiment (id,name,owner_id,date)

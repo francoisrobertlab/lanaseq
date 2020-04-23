@@ -48,6 +48,22 @@ CREATE TABLE IF NOT EXISTS forgotpassword (
   PRIMARY KEY (id),
   CONSTRAINT forgotpasswordUser_ibfk FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS protocol (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  owner_id bigint(20),
+  date DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT protocolOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS protocol_file (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  files_id bigint(20) DEFAULT NULL,
+  filename varchar(255) NOT NULL,
+  content blob,
+  PRIMARY KEY (id),
+  CONSTRAINT protocolfileProtocol_ibfk FOREIGN KEY (files_id) REFERENCES protocol (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 CREATE TABLE IF NOT EXISTS experiment (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
