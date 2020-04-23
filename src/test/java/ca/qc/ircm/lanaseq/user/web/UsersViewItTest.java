@@ -115,7 +115,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     view.clickAdd();
 
-    assertTrue(optional(() -> $(UserDialogElement.class).first()).isPresent());
+    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
   }
 
   @Test
@@ -125,7 +125,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     view.doubleClickUser(0);
 
-    assertTrue(optional(() -> $(UserDialogElement.class).first()).isPresent());
+    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
   }
 
   @Test
@@ -135,7 +135,8 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     view.doubleClickLaboratory(0);
 
-    assertTrue(optional(() -> $(LaboratoryDialogElement.class).first()).isPresent());
+    assertTrue(
+        optional(() -> $(LaboratoryDialogElement.class).id(LaboratoryDialog.ID)).isPresent());
   }
 
   @Test
