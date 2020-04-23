@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HOME;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.TABS;
@@ -41,6 +42,7 @@ import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -81,6 +83,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(TABS, view.tabs.getId().orElse(""));
     assertEquals(styleName(HOME, TAB), view.home.getId().orElse(""));
+    assertEquals(styleName(PROFILE, TAB), view.profile.getId().orElse(""));
     assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
     assertEquals(styleName(SIGNOUT, TAB), view.signout.getId().orElse(""));
@@ -90,6 +93,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void labels() {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HOME), view.home.getLabel());
+    assertEquals(resources.message(PROFILE), view.profile.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
     assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
     assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
@@ -103,6 +107,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HOME), view.home.getLabel());
+    assertEquals(resources.message(PROFILE), view.profile.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
     assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
     assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
@@ -112,6 +117,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void tabs() {
     view.init();
     assertTrue(view.home.isVisible());
+    assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
@@ -122,6 +128,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     when(authorizationService.isAuthorized(UsersView.class)).thenReturn(true);
     view.init();
     assertTrue(view.home.isVisible());
+    assertTrue(view.profile.isVisible());
     assertTrue(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
@@ -133,6 +140,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
         .thenReturn(true);
     view.init();
     assertTrue(view.home.isVisible());
+    assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
     assertTrue(view.signout.isVisible());
@@ -157,6 +165,30 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.afterNavigation(afterNavigationEvent);
 
     view.tabs.setSelectedTab(view.home);
+
+    verify(ui, never()).navigate(any(String.class));
+    verify(page, never()).executeJs(any());
+  }
+
+  @Test
+  public void tabs_SelectProfile() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.profile);
+
+    verify(ui).navigate(ProfileView.VIEW_NAME);
+    verify(page, never()).executeJs(any());
+  }
+
+  @Test
+  public void tabs_SelectProfileNoChange() {
+    Location location = new Location(ProfileView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.profile);
 
     verify(ui, never()).navigate(any(String.class));
     verify(page, never()).executeJs(any());

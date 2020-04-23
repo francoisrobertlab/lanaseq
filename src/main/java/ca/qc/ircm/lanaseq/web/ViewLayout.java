@@ -23,6 +23,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
+import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
@@ -52,6 +53,7 @@ public class ViewLayout extends VerticalLayout
   public static final String ID = "view-layout";
   public static final String TABS = styleName(ID, "tabs");
   public static final String HOME = "home";
+  public static final String PROFILE = "profile";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
   public static final String SIGNOUT = "signout";
@@ -60,6 +62,7 @@ public class ViewLayout extends VerticalLayout
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected Tabs tabs = new Tabs();
   protected Tab home = new Tab();
+  protected Tab profile = new Tab();
   protected Tab users = new Tab();
   protected Tab exitSwitchUser = new Tab();
   protected Tab signout = new Tab();
@@ -83,15 +86,17 @@ public class ViewLayout extends VerticalLayout
     setSpacing(false);
     add(tabs);
     tabs.setId(TABS);
-    tabs.add(home, users, exitSwitchUser, signout);
+    tabs.add(home, profile, users, exitSwitchUser, signout);
     exitSwitchUser
         .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     home.setId(styleName(HOME, TAB));
+    profile.setId(styleName(PROFILE, TAB));
     users.setId(styleName(USERS, TAB));
     users.setVisible(authorizationService.isAuthorized(UsersView.class));
     exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
     signout.setId(styleName(SIGNOUT, TAB));
     tabsHref.put(home, ExperimentsView.VIEW_NAME);
+    tabsHref.put(profile, ProfileView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
     tabs.addSelectedChangeListener(e -> selectTab());
   }
@@ -100,6 +105,7 @@ public class ViewLayout extends VerticalLayout
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(ViewLayout.class, getLocale());
     home.setLabel(resources.message(HOME));
+    profile.setLabel(resources.message(PROFILE));
     users.setLabel(resources.message(USERS));
     exitSwitchUser.setLabel(resources.message(EXIT_SWITCH_USER));
     signout.setLabel(resources.message(SIGNOUT));
