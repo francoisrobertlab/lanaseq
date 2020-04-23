@@ -24,10 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.security.ExperimentPermissionEvaluator;
-import ca.qc.ircm.lanaseq.security.LaboratoryPermissionEvaluator;
-import ca.qc.ircm.lanaseq.security.PermissionEvaluatorDelegator;
-import ca.qc.ircm.lanaseq.security.UserPermissionEvaluator;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
@@ -49,6 +46,7 @@ public class PermissionEvaluatorDelegatorTest {
   private static final String LABORATORY_CLASS = Laboratory.class.getName();
   private static final String USER_CLASS = User.class.getName();
   private static final String EXPERIMENT_CLASS = Experiment.class.getName();
+  private static final String PROTOCOL_CLASS = Protocol.class.getName();
   private static final String READ = "read";
   private static final Permission BASE_READ = BasePermission.READ;
   private static final String WRITE = "write";
@@ -61,12 +59,16 @@ public class PermissionEvaluatorDelegatorTest {
   private UserPermissionEvaluator userPermissionEvaluator;
   @MockBean
   private ExperimentPermissionEvaluator experimentPermissionEvaluator;
+  @MockBean
+  private ProtocolPermissionEvaluator protocolPermissionEvaluator;
   @Mock
   private Laboratory laboratory;
   @Mock
   private User user;
   @Mock
   private Experiment experiment;
+  @Mock
+  private Protocol protocol;
 
   private Authentication authentication() {
     return SecurityContextHolder.getContext().getAuthentication();
@@ -247,6 +249,66 @@ public class PermissionEvaluatorDelegatorTest {
         EXPERIMENT_CLASS, WRITE);
     verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
         EXPERIMENT_CLASS, BASE_WRITE);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasPermission_Protocol_False() throws Throwable {
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, BASE_WRITE));
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, WRITE);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_WRITE);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, BASE_READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, WRITE);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, BASE_WRITE);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasPermission_Protocol_True() throws Throwable {
+    when(protocolPermissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    when(protocolPermissionEvaluator.hasPermission(any(), any(), any(), any())).thenReturn(true);
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+        READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+        BASE_READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+        WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+        BASE_WRITE));
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, WRITE);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_WRITE);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, BASE_READ);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, WRITE);
+    verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
+        PROTOCOL_CLASS, BASE_WRITE);
   }
 
   @Test

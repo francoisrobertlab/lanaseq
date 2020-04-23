@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.security;
 
 import ca.qc.ircm.lanaseq.experiment.Experiment;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.Serializable;
@@ -22,6 +23,8 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   private UserPermissionEvaluator userPermissionEvaluator;
   @Autowired
   private ExperimentPermissionEvaluator experimentPermissionEvaluator;
+  @Autowired
+  private ProtocolPermissionEvaluator protocolPermissionEvaluator;
 
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
@@ -33,6 +36,9 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
       return userPermissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
     } else if (targetDomainObject instanceof Experiment) {
       return experimentPermissionEvaluator.hasPermission(authentication, targetDomainObject,
+          permission);
+    } else if (targetDomainObject instanceof Protocol) {
+      return protocolPermissionEvaluator.hasPermission(authentication, targetDomainObject,
           permission);
     }
     return false;
@@ -49,6 +55,9 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
           permission);
     } else if (targetType.equals(Experiment.class.getName())) {
       return experimentPermissionEvaluator.hasPermission(authentication, targetId, targetType,
+          permission);
+    } else if (targetType.equals(Protocol.class.getName())) {
+      return protocolPermissionEvaluator.hasPermission(authentication, targetId, targetType,
           permission);
     }
     return false;
