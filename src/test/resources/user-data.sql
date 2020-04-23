@@ -39,11 +39,11 @@ INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,
 VALUES ('8', 'virginie.calderon@ircm.qc.ca', 'Virginie Calderon', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-04 13:31:24', 1, 0, 1, 0, 1, null, '2018-11-24 10:08:03');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,laboratory_id,locale,date)
 VALUES ('9', 'olivia.brown@ircm.qc.ca', 'Olivia Brown', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2019-01-14 15:18:24', 1, 0, 0, 0, 2, null, '2019-01-14 15:10:24');
-INSERT INTO forgotpassword (id,user_id,request_moment,confirm_number,used)
+INSERT INTO forgot_password (id,user_id,request_moment,confirm_number,used)
 VALUES (7,9,'2014-09-03 11:39:47','803369922',0);
-INSERT INTO forgotpassword (id,user_id,request_moment,confirm_number,used)
+INSERT INTO forgot_password (id,user_id,request_moment,confirm_number,used)
 VALUES (8,3,'2013-12-03 11:39:47','B1742054942',1);
-INSERT INTO forgotpassword (id,user_id,request_moment,confirm_number,used)
+INSERT INTO forgot_password (id,user_id,request_moment,confirm_number,used)
 VALUES (9,9,CURRENT_TIMESTAMP,'174407008',0);
-INSERT INTO forgotpassword (id,user_id,request_moment,confirm_number,used)
+INSERT INTO forgot_password (id,user_id,request_moment,confirm_number,used)
 VALUES (10,9,CURRENT_TIMESTAMP,'460559412',1);

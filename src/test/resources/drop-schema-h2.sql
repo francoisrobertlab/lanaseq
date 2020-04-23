@@ -22,6 +22,6 @@ DROP TABLE IF EXISTS acl_sid;
 DROP TABLE IF EXISTS experiment;
 DROP TABLE IF EXISTS protocol_file;
 DROP TABLE IF EXISTS protocol;
-DROP TABLE IF EXISTS forgotpassword;
+DROP TABLE IF EXISTS forgot_password;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS laboratory;

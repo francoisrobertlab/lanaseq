@@ -17,7 +17,7 @@
 -- // add_forgotpassword_table
 -- Migration SQL that makes the change goes here.
 
-CREATE TABLE forgotpassword (
+CREATE TABLE forgot_password (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   user_id bigint(20) NOT NULL,
   request_moment datetime NOT NULL,
@@ -31,4 +31,4 @@ CREATE TABLE forgotpassword (
 -- //@UNDO
 -- SQL to undo the change goes here.
 
-DROP TABLE forgotpassword;
+DROP TABLE forgot_password;

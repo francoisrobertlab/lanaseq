@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS user (
   UNIQUE KEY email (email),
   CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS forgotpassword (
+CREATE TABLE IF NOT EXISTS forgot_password (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   user_id bigint(20) NOT NULL,
   request_moment datetime NOT NULL,
