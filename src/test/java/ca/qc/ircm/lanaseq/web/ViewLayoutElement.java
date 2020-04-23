@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HOME;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
@@ -38,6 +39,10 @@ public class ViewLayoutElement extends VerticalLayoutElement {
 
   public TabElement experiments() {
     return $(TabElement.class).id(styleName(HOME, TAB));
+  }
+
+  public TabElement protocols() {
+    return $(TabElement.class).id(styleName(PROTOCOLS, TAB));
   }
 
   public TabElement profile() {

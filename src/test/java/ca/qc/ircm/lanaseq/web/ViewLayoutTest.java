@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
@@ -171,6 +172,30 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void tabs_SelectProtocol() {
+    Location location = new Location(ExperimentsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.protocols);
+
+    verify(ui).navigate(ProtocolsView.VIEW_NAME);
+    verify(page, never()).executeJs(any());
+  }
+
+  @Test
+  public void tabs_SelectProtocolNoChange() {
+    Location location = new Location(ProtocolsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+
+    view.tabs.setSelectedTab(view.protocols);
+
+    verify(ui, never()).navigate(any(String.class));
+    verify(page, never()).executeJs(any());
+  }
+
+  @Test
   public void tabs_SelectProfile() {
     Location location = new Location(ExperimentsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
@@ -251,6 +276,26 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.afterNavigation(afterNavigationEvent);
 
     assertEquals(view.home, view.tabs.getSelectedTab());
+  }
+
+  @Test
+  public void afterNavigation_Protocols() {
+    Location location = new Location(ProtocolsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertEquals(view.protocols, view.tabs.getSelectedTab());
+  }
+
+  @Test
+  public void afterNavigation_Profile() {
+    Location location = new Location(ProfileView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertEquals(view.profile, view.tabs.getSelectedTab());
   }
 
   @Test

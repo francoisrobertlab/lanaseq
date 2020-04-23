@@ -1,0 +1,171 @@
+package ca.qc.ircm.lanaseq.protocol.web;
+
+import static ca.qc.ircm.lanaseq.Constants.ERROR;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.REMOVE;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.FILES;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
+import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
+
+import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
+import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+
+/**
+ * Protocols dialog.
+ */
+@SpringComponent
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class ProtocolDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+  public static final String ID = "protocols-dialog";
+  public static final String HEADER = "header";
+  public static final String FILES_ERROR = property(FILES, ERROR);
+  public static final String FILES_REQUIRED = property(FILES, REQUIRED);
+  public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");
+  public static final String FILES_OVER_MAXIMUM = property(FILES, "overmaximum");
+  public static final int MAXIMUM_FILES_SIZE = 20 * 1024 * 1024; // 20MB
+  public static final int MAXIMUM_FILES_COUNT = 6;
+  public static final String REMOVE_BUTTON =
+      "<vaadin-button class='" + REMOVE + "' theme='" + ERROR + "' on-click='toggleRemove'>"
+          + "<iron-icon icon='vaadin:trash' slot='prefix'></iron-icon>" + "</vaadin-button>";
+  public static final String SAVED = "saved";
+  private static final long serialVersionUID = -7797831034001410430L;
+  protected H3 header = new H3();
+  protected TextField name = new TextField();
+  protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
+  protected Upload upload = new Upload(uploadBuffer);
+  protected Grid<ProtocolFile> files = new Grid<>();
+  protected Column<ProtocolFile> filename;
+  protected Column<ProtocolFile> remove;
+  protected Div filesError = new Div();
+  protected Button save = new Button();
+  @Autowired
+  private ProtocolDialogPresenter presenter;
+
+  public ProtocolDialog() {
+  }
+
+  public static String id(String baseId) {
+    return styleName(ID, baseId);
+  }
+
+  @PostConstruct
+  void init() {
+    setId(ID);
+    VerticalLayout layout = new VerticalLayout();
+    add(layout);
+    layout.setMaxWidth("60em");
+    layout.setMinWidth("22em");
+    FormLayout form = new FormLayout();
+    layout.add(header, form, upload, files, filesError, save);
+    form.add(name);
+    header.setId(id(HEADER));
+    name.setId(id(NAME));
+    upload.setId(UPLOAD);
+    upload.setMaxFileSize(MAXIMUM_FILES_SIZE);
+    upload.setMaxFiles(MAXIMUM_FILES_COUNT);
+    upload.setMinHeight("2.5em");
+    upload.addSucceededListener(event -> presenter.addFile(event.getFileName(),
+        uploadBuffer.getInputStream(event.getFileName()), getLocale()));
+    files.setId(FILES);
+    files.setHeight("15em");
+    files.setMinHeight("15em");
+    files.setWidth("45em");
+    files.setMinWidth("45em");
+    filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
+        .setKey(FILENAME);
+    remove =
+        files
+            .addColumn(TemplateRenderer.<ProtocolFile>of(REMOVE_BUTTON)
+                .withEventHandler("toggleRemove", file -> presenter.removeFile(file)), REMOVE)
+            .setKey(REMOVE);
+    filesError.setId(id(FILES_ERROR));
+    filesError.addClassName(ERROR_TEXT);
+    save.setId(SAVE);
+    save.addClickListener(e -> presenter.save(getLocale()));
+    presenter.init(this);
+  }
+
+  private Anchor filenameAnchor(ProtocolFile file) {
+    Anchor link = new Anchor();
+    link.setTarget("_blank");
+    link.setText(file.getFilename());
+    link.setHref(new StreamResource(file.getFilename(),
+        new ByteArrayStreamResourceWriter(file.getContent())));
+    return link;
+  }
+
+  @Override
+  public void localeChange(LocaleChangeEvent event) {
+    AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+    AppResources protocolResources = new AppResources(Protocol.class, getLocale());
+    AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
+    AppResources webResources = new AppResources(Constants.class, getLocale());
+    header.setText(resources.message(HEADER));
+    name.setLabel(protocolResources.message(NAME));
+    upload.setI18n(uploadI18N(getLocale()));
+    filename.setHeader(protocolFileResources.message(FILENAME));
+    remove.setHeader(webResources.message(REMOVE));
+    save.setText(webResources.message(SAVE));
+    presenter.localeChange(getLocale());
+  }
+
+  /**
+   * Adds listener to be informed when a protocol was saved.
+   *
+   * @param listener
+   *          listener
+   * @return listener registration
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Registration
+      addSavedListener(ComponentEventListener<SavedEvent<ProtocolDialog>> listener) {
+    return addListener((Class) SavedEvent.class, listener);
+  }
+
+  void fireSavedEvent() {
+    fireEvent(new SavedEvent<>(this, true));
+  }
+
+  public Protocol getProtocol() {
+    return presenter.getProtocol();
+  }
+
+  public void setProtocol(Protocol protocol) {
+    presenter.setProtocol(protocol);
+  }
+}

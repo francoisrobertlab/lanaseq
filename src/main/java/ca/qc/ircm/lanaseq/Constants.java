@@ -51,6 +51,8 @@ public class Constants {
   public static final String CANCEL = "cancel";
   public static final String ALL = "all";
   public static final String ADD = "add";
+  public static final String REMOVE = "remove";
+  public static final String UPLOAD = "upload";
 
   /**
    * Returns all valid locales for program.

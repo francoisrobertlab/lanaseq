@@ -24,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
@@ -107,6 +108,15 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     view.experiments().click();
     assertEquals(viewUrl(ExperimentsView.VIEW_NAME), getDriver().getCurrentUrl());
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void protocols() throws Throwable {
+    open();
+    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    view.protocols().click();
+    assertEquals(viewUrl(ProtocolsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test
