@@ -50,8 +50,7 @@ public class UserFormElement extends FormLayoutElement {
   }
 
   public PasswordsFormElement passwords() {
-    return $(PasswordsFormElement.class).attributeContains("class", PasswordsForm.CLASS_NAME)
-        .first();
+    return $(PasswordsFormElement.class).id(PasswordsForm.ID);
   }
 
   public ComboBoxElement laboratory() {

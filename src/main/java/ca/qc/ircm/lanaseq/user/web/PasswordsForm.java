@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -19,7 +20,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
  * Passwords form.
  */
 public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
-  public static final String CLASS_NAME = "passwords";
+  public static final String ID = "passwords-form";
   public static final String PASSWORD = "password";
   public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
   public static final String PASSWORDS_NOT_MATCH = property(PASSWORD, "notMatch");
@@ -33,11 +34,15 @@ public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
    * Initializes passwords form.
    */
   public PasswordsForm() {
-    addClassName(CLASS_NAME);
+    setId(ID);
     add(password, passwordConfirm);
-    password.addClassName(PASSWORD);
-    passwordConfirm.addClassName(PASSWORD_CONFIRM);
+    password.setId(id(PASSWORD));
+    passwordConfirm.setId(id(PASSWORD_CONFIRM));
     passwordBinder.setBean(new Passwords());
+  }
+
+  public static String id(String baseId) {
+    return styleName(ID, baseId);
   }
 
   @Override

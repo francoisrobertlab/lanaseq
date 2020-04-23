@@ -19,10 +19,11 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
-import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.CLASS_NAME;
+import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.ID;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.PASSWORD;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.PASSWORDS_NOT_MATCH;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.PASSWORD_CONFIRM;
+import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.id;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,8 +34,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.Passwords;
-import ca.qc.ircm.lanaseq.user.web.PasswordsForm;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -70,9 +69,9 @@ public class PasswordsFormTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(form.getClassNames().contains(CLASS_NAME));
-    assertTrue(form.password.getClassNames().contains(PASSWORD));
-    assertTrue(form.passwordConfirm.getClassNames().contains(PASSWORD_CONFIRM));
+    assertEquals(ID, form.getId().orElse(""));
+    assertEquals(id(PASSWORD), form.password.getId().orElse(""));
+    assertEquals(id(PASSWORD_CONFIRM), form.passwordConfirm.getId().orElse(""));
   }
 
   @Test

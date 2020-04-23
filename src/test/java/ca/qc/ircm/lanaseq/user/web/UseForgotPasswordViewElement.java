@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.MESSAGE;
 
-import ca.qc.ircm.lanaseq.user.web.PasswordsForm;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
@@ -39,8 +38,7 @@ public class UseForgotPasswordViewElement extends VerticalLayoutElement {
   }
 
   public PasswordsFormElement passwordsForm() {
-    return $(PasswordsFormElement.class).attributeContains("class", PasswordsForm.CLASS_NAME)
-        .first();
+    return $(PasswordsFormElement.class).id(PasswordsForm.ID);
   }
 
   public ButtonElement save() {
