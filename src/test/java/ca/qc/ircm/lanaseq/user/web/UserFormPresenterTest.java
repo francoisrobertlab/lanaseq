@@ -108,7 +108,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     form.createNewLaboratory = new Checkbox();
     form.newLaboratoryName = new TextField();
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     laboratories = laboratoryRepository.findAll();
     when(laboratoryService.all()).thenReturn(laboratories);
     when(laboratoryService.get(any()))

@@ -87,7 +87,7 @@ public class UserFormPresenter {
       laboratoriesDataProvider = DataProvider.ofCollection(laboratoryService.all());
     } else {
       laboratoriesDataProvider =
-          DataProvider.ofItems(authorizationService.currentUser().getLaboratory());
+          DataProvider.ofItems(authorizationService.getCurrentUser().getLaboratory());
     }
     form.laboratory.setDataProvider(laboratoriesDataProvider);
     form.createNewLaboratory.setVisible(authorizationService.hasRole(UserRole.ADMIN));

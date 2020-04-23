@@ -123,14 +123,14 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithAnonymousUser
   public void currentUser_Anonymous() throws Throwable {
-    assertNull(authorizationService.currentUser());
+    assertNull(authorizationService.getCurrentUser());
   }
 
   @Test
   @WithUserDetails("lana@ircm.qc.ca")
   public void currentUser() throws Throwable {
-    User user = authorizationService.currentUser();
-    assertNotNull(authorizationService.currentUser());
+    User user = authorizationService.getCurrentUser();
+    assertNotNull(authorizationService.getCurrentUser());
     assertEquals((Long) 1L, user.getId());
   }
 

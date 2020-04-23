@@ -76,7 +76,7 @@ public class SpringAuthorizationService implements AuthorizationService {
   }
 
   @Override
-  public User currentUser() {
+  public User getCurrentUser() {
     UserDetails user = getUser();
     if (user instanceof AuthenticatedUser) {
       Long userId = ((AuthenticatedUser) user).getId();

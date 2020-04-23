@@ -77,7 +77,7 @@ public class LaboratoryService {
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
     } else {
-      return Stream.of(authorizationService.currentUser().getLaboratory())
+      return Stream.of(authorizationService.getCurrentUser().getLaboratory())
           .collect(Collectors.toCollection(ArrayList::new));
     }
   }

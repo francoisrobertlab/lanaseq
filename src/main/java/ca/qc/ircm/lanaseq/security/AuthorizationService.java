@@ -29,7 +29,7 @@ public interface AuthorizationService {
    *
    * @return current user or null for anonymous
    */
-  public User currentUser();
+  public User getCurrentUser();
 
   /**
    * Returns true if current user is anonymous, false otherwise.

@@ -204,7 +204,7 @@ public class UserService {
     if (password == null) {
       throw new NullPointerException("password parameter cannot be null");
     }
-    User user = authorizationService.currentUser();
+    User user = authorizationService.getCurrentUser();
 
     final boolean reloadAuthorities = user.isExpiredPassword();
     String hashedPassword = passwordEncoder.encode(password);

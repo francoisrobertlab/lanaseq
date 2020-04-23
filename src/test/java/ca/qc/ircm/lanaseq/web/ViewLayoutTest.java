@@ -74,7 +74,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     view = new ViewLayout(authorizationService);
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
     view.init();
   }
 

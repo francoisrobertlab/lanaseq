@@ -80,7 +80,7 @@ public class MdcFilterTest {
   public void doFilter_User() throws Throwable {
     Long userId = 3L;
     String email = "test@ircm.qc.ca";
-    when(authorizationService.currentUser()).thenReturn(new User(userId, email));
+    when(authorizationService.getCurrentUser()).thenReturn(new User(userId, email));
     doAnswer(i -> {
       assertEquals("3:test", MDC.get(USER_CONTEXT_KEY));
       return null;

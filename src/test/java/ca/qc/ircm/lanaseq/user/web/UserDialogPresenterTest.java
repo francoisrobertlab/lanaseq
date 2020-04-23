@@ -90,7 +90,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     dialog.save = new Button();
     dialog.cancel = new Button();
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
   }
 
   @Test

@@ -81,7 +81,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
     when(serviceInitEvent.getSource()).thenReturn(vaadinService);
     when(vaadinService.addUIInitListener(any())).then(i -> {
       UIInitListener listener = i.getArgument(0);

@@ -109,7 +109,7 @@ public class ExperimentService {
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
     } else {
-      return repository.findByOwnerLaboratory(authorizationService.currentUser().getLaboratory());
+      return repository.findByOwnerLaboratory(authorizationService.getCurrentUser().getLaboratory());
     }
   }
 
@@ -159,7 +159,7 @@ public class ExperimentService {
   @PreAuthorize("hasPermission(#experiment, 'write')")
   public void save(Experiment experiment) {
     if (experiment.getId() == null) {
-      User user = authorizationService.currentUser();
+      User user = authorizationService.getCurrentUser();
       experiment.setOwner(user);
       experiment.setDate(LocalDateTime.now());
     }

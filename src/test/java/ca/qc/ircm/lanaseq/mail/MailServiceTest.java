@@ -208,7 +208,7 @@ public class MailServiceTest {
       error.printStackTrace(printWriter);
     }
     User user = new User(1L, "christian.poitras@ircm.qc.ca");
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
 
     mailService.sendError(error);
 

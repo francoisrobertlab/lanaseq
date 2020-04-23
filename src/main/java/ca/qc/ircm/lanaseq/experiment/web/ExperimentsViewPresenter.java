@@ -68,7 +68,7 @@ public class ExperimentsViewPresenter {
     loadExperiments();
     view.experimentDialog.addSavedListener(e -> loadExperiments());
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      view.ownerFilter.setValue(authorizationService.currentUser().getEmail());
+      view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
     }
     clearError();
   }

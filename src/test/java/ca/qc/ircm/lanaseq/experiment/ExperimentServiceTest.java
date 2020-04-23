@@ -113,7 +113,7 @@ public class ExperimentServiceTest {
   @WithMockUser
   public void all() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
 
     List<Experiment> experiments = service.all();
 
@@ -130,7 +130,7 @@ public class ExperimentServiceTest {
   @WithMockUser
   public void all_Manager() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
     when(authorizationService.hasRole(MANAGER)).thenReturn(true);
 
     List<Experiment> experiments = service.all();
@@ -148,7 +148,7 @@ public class ExperimentServiceTest {
   @WithMockUser
   public void all_Admin() {
     User user = userRepository.findById(1L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
 
     List<Experiment> experiments = service.all();
@@ -181,7 +181,7 @@ public class ExperimentServiceTest {
   @WithMockUser
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
     Experiment experiment = new Experiment();
     experiment.setName("New experiment");
 

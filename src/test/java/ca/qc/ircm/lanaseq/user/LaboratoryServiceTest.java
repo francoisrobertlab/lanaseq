@@ -101,7 +101,7 @@ public class LaboratoryServiceTest {
   @Test
   @WithMockUser
   public void all() {
-    when(authorizationService.currentUser()).thenReturn(userRepository.findById(3L).get());
+    when(authorizationService.getCurrentUser()).thenReturn(userRepository.findById(3L).get());
 
     List<Laboratory> laboratories = laboratoryService.all();
 
@@ -115,7 +115,7 @@ public class LaboratoryServiceTest {
   @Test
   @WithMockUser
   public void all_Manager() {
-    when(authorizationService.currentUser()).thenReturn(userRepository.findById(2L).get());
+    when(authorizationService.getCurrentUser()).thenReturn(userRepository.findById(2L).get());
     when(authorizationService.hasRole(MANAGER)).thenReturn(true);
 
     List<Laboratory> laboratories = laboratoryService.all();
@@ -130,7 +130,7 @@ public class LaboratoryServiceTest {
   @Test
   @WithMockUser
   public void all_Admin() {
-    when(authorizationService.currentUser()).thenReturn(userRepository.findById(1L).get());
+    when(authorizationService.getCurrentUser()).thenReturn(userRepository.findById(1L).get());
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
 
     List<Laboratory> laboratories = laboratoryService.all();

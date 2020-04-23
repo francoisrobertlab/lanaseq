@@ -77,7 +77,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     view.passwords = mock(PasswordsForm.class);
     view.save = new Button();
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.currentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
     presenter.init(view);

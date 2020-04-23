@@ -74,7 +74,7 @@ public class ProfileViewPresenterTest extends AbstractViewTestCase {
     view.buttonsLayout = new HorizontalLayout();
     view.save = new Button();
     when(service.get(any(Long.class))).thenReturn(user);
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
   }
 
   @Test

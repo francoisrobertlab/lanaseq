@@ -195,7 +195,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void all() {
-    when(authorizationService.currentUser()).thenReturn(repository.findById(3L).get());
+    when(authorizationService.getCurrentUser()).thenReturn(repository.findById(3L).get());
 
     List<User> users = service.all();
 
@@ -660,7 +660,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_Password() {
     User user = repository.findById(6L).get();
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
 
     service.save("newpassword");
 
@@ -688,7 +688,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_PasswordNoAuthorityChange() {
     User user = repository.findById(3L).get();
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
 
     service.save("newpassword");
 
@@ -716,7 +716,7 @@ public class UserServiceTest {
   @WithAnonymousUser
   public void save_PasswordAnonymousDenied() {
     User user = repository.findById(3L).get();
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
 
     service.save("new password");
   }
@@ -725,7 +725,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_PasswordNull() {
     User user = repository.findById(3L).get();
-    when(authorizationService.currentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
 
     service.save(null);
   }
