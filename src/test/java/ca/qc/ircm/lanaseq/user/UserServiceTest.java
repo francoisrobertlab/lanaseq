@@ -33,12 +33,6 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
-import ca.qc.ircm.lanaseq.user.User;
-import ca.qc.ircm.lanaseq.user.UserRepository;
-import ca.qc.ircm.lanaseq.user.UserService;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -97,9 +91,9 @@ public class UserServiceTest {
     assertEquals("lana@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
     assertEquals(1, user.getSignAttempts());
-    assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
@@ -138,9 +132,9 @@ public class UserServiceTest {
     assertEquals("francois.robert@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
-    assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(2, ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(2, ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(2, ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
@@ -492,9 +486,9 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
@@ -526,9 +520,9 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
@@ -584,9 +578,9 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
@@ -616,9 +610,9 @@ public class UserServiceTest {
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
@@ -670,9 +664,9 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());
@@ -698,9 +692,9 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
         .isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
+    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
     assertEquals(true, user.isActive());
     assertEquals(false, user.isManager());

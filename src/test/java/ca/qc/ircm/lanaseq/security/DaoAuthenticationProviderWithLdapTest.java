@@ -27,13 +27,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.security.DaoAuthenticationProviderWithLdap;
-import ca.qc.ircm.lanaseq.security.LdapConfiguration;
-import ca.qc.ircm.lanaseq.security.LdapService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,8 +71,8 @@ public class DaoAuthenticationProviderWithLdapTest {
     verifyNoInteractions(ldapService);
     User user = userRepository.findById(3L).get();
     assertEquals(0, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test()
@@ -94,8 +91,8 @@ public class DaoAuthenticationProviderWithLdapTest {
     verify(ldapService, never()).isPasswordValid(any(), any());
     User user = userRepository.findById(3L).get();
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -112,8 +109,8 @@ public class DaoAuthenticationProviderWithLdapTest {
     verify(ldapService).isPasswordValid("frobert", "test");
     User user = userRepository.findById(3L).get();
     assertEquals(0, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -134,8 +131,8 @@ public class DaoAuthenticationProviderWithLdapTest {
     verify(ldapService).isPasswordValid("frobert", "test");
     User user = userRepository.findById(3L).get();
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -149,8 +146,8 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     User user = userRepository.findById(3L).get();
     assertEquals(0, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -170,8 +167,8 @@ public class DaoAuthenticationProviderWithLdapTest {
     verify(ldapService, never()).isPasswordValid(any(), any());
     User user = userRepository.findById(3L).get();
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -187,8 +184,10 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     User user = userRepository.findById(6L).get();
     assertEquals(3, user.getSignAttempts());
-    assertTrue(Instant.now().minus(19, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(30, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minus(19, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minus(30, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -208,8 +207,8 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     user = userRepository.findById(3L).get();
     assertEquals(20, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
     assertFalse(user.isActive());
   }
 
@@ -217,7 +216,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   public void loadUserByUsername_NotLockedSignAttemp() {
     User user = userRepository.findById(3L).get();
     user.setSignAttempts(0);
-    user.setLastSignAttempt(Instant.now());
+    user.setLastSignAttempt(LocalDateTime.now());
     userRepository.save(user);
 
     Authentication authentication =
@@ -226,15 +225,15 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     user = userRepository.findById(3L).get();
     assertEquals(0, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
   public void loadUserByUsername_NotLockedLastSignAttemp() {
     User user = userRepository.findById(3L).get();
     user.setSignAttempts(5);
-    user.setLastSignAttempt(Instant.now().minus(6, ChronoUnit.MINUTES));
+    user.setLastSignAttempt(LocalDateTime.now().minus(6, ChronoUnit.MINUTES));
     userRepository.save(user);
 
     Authentication authentication =
@@ -243,15 +242,15 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     user = userRepository.findById(3L).get();
     assertEquals(0, user.getSignAttempts());
-    assertTrue(Instant.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().plusSeconds(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
   public void loadUserByUsername_Locked() {
     User user = userRepository.findById(3L).get();
     user.setSignAttempts(5);
-    user.setLastSignAttempt(Instant.now().minus(1, ChronoUnit.MINUTES));
+    user.setLastSignAttempt(LocalDateTime.now().minus(1, ChronoUnit.MINUTES));
     userRepository.save(user);
 
     Authentication authentication =
@@ -265,7 +264,8 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     user = userRepository.findById(3L).get();
     assertEquals(5, user.getSignAttempts());
-    assertTrue(Instant.now().minus(1, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
-    assertTrue(Instant.now().minus(2, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minus(1, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minus(2, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
   }
 }

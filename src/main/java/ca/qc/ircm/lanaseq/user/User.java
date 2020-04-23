@@ -22,7 +22,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import javax.persistence.Column;
@@ -75,7 +74,7 @@ public class User implements Data, Owned, Serializable {
    * User's last sign attempt.
    */
   @Column
-  private Instant lastSignAttempt;
+  private LocalDateTime lastSignAttempt;
   /**
    * True if user is active.
    * <p>
@@ -213,11 +212,11 @@ public class User implements Data, Owned, Serializable {
     this.signAttempts = signAttempts;
   }
 
-  public Instant getLastSignAttempt() {
+  public LocalDateTime getLastSignAttempt() {
     return lastSignAttempt;
   }
 
-  public void setLastSignAttempt(Instant lastSignAttempt) {
+  public void setLastSignAttempt(LocalDateTime lastSignAttempt) {
     this.lastSignAttempt = lastSignAttempt;
   }
 

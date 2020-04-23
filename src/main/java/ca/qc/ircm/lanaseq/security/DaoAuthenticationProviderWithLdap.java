@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.security;
 
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -83,8 +83,10 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
   private boolean accountLocked(User user) {
     return user.getSignAttempts() > 0
         && user.getSignAttempts() % securityConfiguration.getLockAttemps() == 0
-        && user.getLastSignAttempt() != null && user.getLastSignAttempt()
-            .plusMillis(securityConfiguration.getLockDuration().toMillis()).isAfter(Instant.now());
+        && user.getLastSignAttempt() != null
+        && user.getLastSignAttempt()
+            .plusSeconds(securityConfiguration.getLockDuration().toMillis() / 1000)
+            .isAfter(LocalDateTime.now());
   }
 
   private boolean isLdapPasswordValid(UserDetails userDetails, String password) {
@@ -95,13 +97,13 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
 
   private void resetSignAttemps(User user) {
     user.setSignAttempts(0);
-    user.setLastSignAttempt(Instant.now());
+    user.setLastSignAttempt(LocalDateTime.now());
     userRepository.save(user);
   }
 
   private void incrementSignAttemps(User user) {
     user.setSignAttempts(user.getSignAttempts() + 1);
-    user.setLastSignAttempt(Instant.now());
+    user.setLastSignAttempt(LocalDateTime.now());
     if (user.getSignAttempts() >= securityConfiguration.getDisableSignAttemps()) {
       user.setActive(false);
     }

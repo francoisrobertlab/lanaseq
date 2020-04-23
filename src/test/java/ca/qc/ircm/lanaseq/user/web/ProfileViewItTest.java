@@ -31,7 +31,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.time.TimeConverter;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -163,8 +162,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
-    assertEquals(TimeConverter.toInstant(LocalDateTime.of(2018, 12, 7, 15, 40, 12)),
-        user.getLastSignAttempt());
+    assertEquals(LocalDateTime.of(2018, 12, 7, 15, 40, 12), user.getLastSignAttempt());
     assertEquals(null, user.getLocale());
     assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(viewUrl(ProfileView.VIEW_NAME), getDriver().getCurrentUrl());
