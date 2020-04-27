@@ -22,17 +22,18 @@ import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.DATE;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.HEADER;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.ID;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.DATE;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -47,10 +48,8 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsViewPresenter;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.grid.Grid;
@@ -85,6 +84,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Mock
   private ExperimentDialog experimentDialog;
   @Mock
+  private ProtocolDialog protocolDialog;
+  @Mock
   private ExperimentPermissionsDialog experimentPermissionsDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Experiment, String>> valueProviderCaptor;
@@ -106,7 +107,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
+    view = new ExperimentsView(presenter, experimentDialog, protocolDialog,
+        experimentPermissionsDialog);
     view.init();
     experiments = experimentRepository.findAll();
   }
@@ -121,6 +123,12 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
+    view.protocol = mock(Column.class);
+    when(view.experiments.addColumn(any(ValueProvider.class), eq(PROTOCOL)))
+        .thenReturn(view.protocol);
+    when(view.protocol.setKey(any())).thenReturn(view.protocol);
+    when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
+    when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     view.date = mock(Column.class);
     when(view.experiments.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
         .thenReturn(view.date);
@@ -134,6 +142,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     when(view.experiments.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
+    HeaderCell protocolFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.protocol)).thenReturn(protocolFilterCell);
     HeaderCell ownerFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.owner)).thenReturn(ownerFilterCell);
   }
@@ -145,12 +155,12 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
-    assertTrue(view.header.getClassNames().contains(HEADER));
-    assertTrue(view.experiments.getClassNames().contains(EXPERIMENTS));
-    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
-    assertTrue(view.add.getClassNames().contains(ADD));
-    assertTrue(view.permissions.getClassNames().contains(PERMISSIONS));
+    assertEquals(ID, view.getId().orElse(""));
+    assertEquals(HEADER, view.header.getId().orElse(""));
+    assertEquals(EXPERIMENTS, view.experiments.getId().orElse(""));
+    assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
+    assertEquals(ADD, view.add.getId().orElse(""));
+    assertEquals(PERMISSIONS, view.permissions.getId().orElse(""));
   }
 
   @Test
@@ -160,6 +170,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name).setHeader(experimentResources.message(NAME));
     verify(view.name).setFooter(experimentResources.message(NAME));
+    verify(view.protocol).setHeader(experimentResources.message(PROTOCOL));
+    verify(view.protocol).setFooter(experimentResources.message(PROTOCOL));
     verify(view.date).setHeader(experimentResources.message(DATE));
     verify(view.date).setFooter(experimentResources.message(DATE));
     verify(view.owner).setHeader(experimentResources.message(OWNER));
@@ -175,7 +187,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
+    view = new ExperimentsView(presenter, experimentDialog, protocolDialog,
+        experimentPermissionsDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -188,6 +201,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name, atLeastOnce()).setHeader(experimentResources.message(NAME));
     verify(view.name, atLeastOnce()).setFooter(experimentResources.message(NAME));
+    verify(view.protocol).setHeader(experimentResources.message(PROTOCOL));
+    verify(view.protocol).setFooter(experimentResources.message(PROTOCOL));
     verify(view.date, atLeastOnce()).setHeader(experimentResources.message(DATE));
     verify(view.date, atLeastOnce()).setFooter(experimentResources.message(DATE));
     verify(view.owner, atLeastOnce()).setHeader(experimentResources.message(OWNER));
@@ -209,8 +224,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void experiments() {
-    assertEquals(3, view.experiments.getColumns().size());
+    assertEquals(4, view.experiments.getColumns().size());
     assertNotNull(view.experiments.getColumnByKey(NAME));
+    assertNotNull(view.experiments.getColumnByKey(PROTOCOL));
     assertNotNull(view.experiments.getColumnByKey(DATE));
     assertNotNull(view.experiments.getColumnByKey(OWNER));
     assertTrue(view.experiments.getSelectionModel() instanceof SelectionModel.Single);
@@ -218,7 +234,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void experiments_ColumnsValueProvider() {
-    view = new ExperimentsView(presenter, experimentDialog, experimentPermissionsDialog);
+    view = new ExperimentsView(presenter, experimentDialog, protocolDialog,
+        experimentPermissionsDialog);
     mockColumns();
     view.init();
     verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(NAME));
@@ -238,6 +255,23 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(name("test"), name("abc")) > 0);
     assertTrue(comparator.compare(name("Test"), name("abc")) > 0);
     assertTrue(comparator.compare(name("facteur"), name("élement")) > 0);
+    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
+    valueProvider = valueProviderCaptor.getValue();
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getProtocol().getName(), valueProvider.apply(experiment));
+    }
+    verify(view.protocol).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(protocol("abc"), protocol("test")) < 0);
+    assertTrue(comparator.compare(protocol("Abc"), protocol("test")) < 0);
+    assertTrue(comparator.compare(protocol("élement"), protocol("facteur")) < 0);
+    assertTrue(comparator.compare(protocol("test"), protocol("test")) == 0);
+    assertTrue(comparator.compare(protocol("Test"), protocol("test")) == 0);
+    assertTrue(comparator.compare(protocol("Expérienceà"), protocol("experiencea")) == 0);
+    assertTrue(comparator.compare(protocol("experiencea"), protocol("Expérienceà")) == 0);
+    assertTrue(comparator.compare(protocol("test"), protocol("abc")) > 0);
+    assertTrue(comparator.compare(protocol("Test"), protocol("abc")) > 0);
+    assertTrue(comparator.compare(protocol("facteur"), protocol("élement")) > 0);
     verify(view.experiments).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
         localDateTimeRendererCaptor.getValue();
@@ -260,9 +294,23 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(presenter).view(experiment);
   }
 
+  @Test
+  public void viewProtocol() {
+    Experiment experiment = experiments.get(0);
+    doubleClickItem(view.experiments, experiment, view.protocol);
+
+    verify(presenter).view(experiment.getProtocol());
+  }
+
   private Experiment name(String name) {
     Experiment experiment = new Experiment();
     experiment.setName(name);
+    return experiment;
+  }
+
+  private Experiment protocol(String name) {
+    Experiment experiment = new Experiment();
+    experiment.setProtocol(new Protocol(name));
     return experiment;
   }
 
@@ -271,6 +319,13 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.nameFilter.setValue("test");
 
     verify(presenter).filterName("test");
+  }
+
+  @Test
+  public void filterProtocol() {
+    view.protocolFilter.setValue("test");
+
+    verify(presenter).filterProtocol("test");
   }
 
   @Test

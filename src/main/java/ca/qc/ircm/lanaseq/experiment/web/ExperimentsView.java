@@ -23,18 +23,20 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.security.UserRole.USER;
-import static ca.qc.ircm.lanaseq.text.Strings.normalize;
-import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.text.Strings.normalize;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -61,9 +63,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = ExperimentsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class ExperimentsView extends Composite<VerticalLayout>
+public class ExperimentsView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "experiments";
+  public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String EXPERIMENTS = "experiments";
   public static final String EXPERIMENTS_REQUIRED = property(EXPERIMENTS, REQUIRED);
@@ -73,15 +76,19 @@ public class ExperimentsView extends Composite<VerticalLayout>
   protected H2 header = new H2();
   protected Grid<Experiment> experiments = new Grid<>();
   protected Column<Experiment> name;
+  protected Column<Experiment> protocol;
   protected Column<Experiment> date;
   protected Column<Experiment> owner;
   protected TextField nameFilter = new TextField();
+  protected TextField protocolFilter = new TextField();
   protected TextField ownerFilter = new TextField();
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button permissions = new Button();
   @Autowired
   protected ExperimentDialog experimentDialog;
+  @Autowired
+  protected ProtocolDialog protocolDialog;
   @Autowired
   protected ExperimentPermissionsDialog experimentPermissionsDialog;
   @Autowired
@@ -91,25 +98,34 @@ public class ExperimentsView extends Composite<VerticalLayout>
   }
 
   protected ExperimentsView(ExperimentsViewPresenter presenter, ExperimentDialog experimentDialog,
-      ExperimentPermissionsDialog experimentPermissionsDialog) {
+      ProtocolDialog protocolDialog, ExperimentPermissionsDialog experimentPermissionsDialog) {
     this.presenter = presenter;
     this.experimentDialog = experimentDialog;
+    this.protocolDialog = protocolDialog;
     this.experimentPermissionsDialog = experimentPermissionsDialog;
   }
 
   @PostConstruct
   void init() {
-    VerticalLayout root = getContent();
-    root.setId(VIEW_NAME);
+    setId(ID);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
-    root.add(header, experiments, error, buttonsLayout);
+    add(header, experiments, error, buttonsLayout);
     buttonsLayout.add(add, permissions);
-    header.addClassName(HEADER);
-    experiments.addClassName(EXPERIMENTS);
-    experiments.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    header.setId(HEADER);
+    experiments.setId(EXPERIMENTS);
+    experiments.addItemDoubleClickListener(e -> {
+      if (e.getColumn() == protocol) {
+        presenter.view(e.getItem().getProtocol());
+      } else {
+        presenter.view(e.getItem());
+      }
+    });
     name =
         experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME).setComparator(
             (e1, e2) -> normalize(e1.getName()).compareToIgnoreCase(normalize(e2.getName())));
+    protocol = experiments.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
+        .setComparator((e1, e2) -> normalize(e1.getProtocol().getName())
+            .compareToIgnoreCase(normalize(e2.getProtocol().getName())));
     date = experiments.addColumn(
         new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
@@ -121,14 +137,18 @@ public class ExperimentsView extends Composite<VerticalLayout>
     nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
+    filtersRow.getCell(protocol).setComponent(protocolFilter);
+    protocolFilter.addValueChangeListener(e -> presenter.filterProtocol(e.getValue()));
+    protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    protocolFilter.setSizeFull();
     filtersRow.getCell(owner).setComponent(ownerFilter);
     ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
-    error.addClassName(ERROR_TEXT);
-    add.addClassName(ADD);
+    error.setId(ERROR_TEXT);
+    add.setId(ADD);
     add.addClickListener(e -> presenter.add());
-    permissions.addClassName(PERMISSIONS);
+    permissions.setId(PERMISSIONS);
     permissions.addClickListener(e -> presenter.permissions());
     presenter.init(this);
   }
@@ -141,11 +161,14 @@ public class ExperimentsView extends Composite<VerticalLayout>
     header.setText(resources.message(HEADER));
     String nameHeader = experimentResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
+    String protocolHeader = experimentResources.message(PROTOCOL);
+    protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = experimentResources.message(DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = experimentResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
+    protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());

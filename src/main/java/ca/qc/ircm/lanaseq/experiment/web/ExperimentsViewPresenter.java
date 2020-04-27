@@ -23,6 +23,8 @@ import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS_DENI
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -46,7 +48,9 @@ public class ExperimentsViewPresenter {
   private static final Logger logger = LoggerFactory.getLogger(ExperimentsViewPresenter.class);
   private ExperimentsView view;
   @Autowired
-  private ExperimentService experimentService;
+  private ExperimentService service;
+  @Autowired
+  private ProtocolService protocolService;
   @Autowired
   private AuthorizationService authorizationService;
   private ListDataProvider<Experiment> experimentsDataProvider;
@@ -56,9 +60,10 @@ public class ExperimentsViewPresenter {
   protected ExperimentsViewPresenter() {
   }
 
-  protected ExperimentsViewPresenter(ExperimentService experimentService,
-      AuthorizationService authorizationService) {
-    this.experimentService = experimentService;
+  protected ExperimentsViewPresenter(ExperimentService service,
+      ProtocolService protocolService, AuthorizationService authorizationService) {
+    this.service = service;
+    this.protocolService = protocolService;
     this.authorizationService = authorizationService;
   }
 
@@ -67,6 +72,7 @@ public class ExperimentsViewPresenter {
     this.view = view;
     loadExperiments();
     view.experimentDialog.addSavedListener(e -> loadExperiments());
+    view.protocolDialog.addSavedListener(e -> loadExperiments());
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
     }
@@ -75,7 +81,7 @@ public class ExperimentsViewPresenter {
 
   @SuppressWarnings("checkstyle:linelength")
   private void loadExperiments() {
-    experimentsDataProvider = new ListDataProvider<>(experimentService.all());
+    experimentsDataProvider = new ListDataProvider<>(service.all());
     ConfigurableFilterDataProvider<Experiment, Void, SerializablePredicate<Experiment>> dataProvider =
         experimentsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
@@ -92,8 +98,14 @@ public class ExperimentsViewPresenter {
 
   void view(Experiment experiment) {
     clearError();
-    view.experimentDialog.setExperiment(experimentService.get(experiment.getId()));
+    view.experimentDialog.setExperiment(service.get(experiment.getId()));
     view.experimentDialog.open();
+  }
+
+  void view(Protocol protocol) {
+    clearError();
+    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
+    view.protocolDialog.open();
   }
 
   void add() {
@@ -122,6 +134,12 @@ public class ExperimentsViewPresenter {
   void filterName(String value) {
     clearError();
     filter.nameContains = value.isEmpty() ? null : value;
+    view.experiments.getDataProvider().refreshAll();
+  }
+
+  void filterProtocol(String value) {
+    clearError();
+    filter.protocolContains = value.isEmpty() ? null : value;
     view.experiments.getDataProvider().refreshAll();
   }
 

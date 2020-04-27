@@ -85,7 +85,7 @@ public class ExperimentDialog extends Dialog
     setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, name, buttonsLayout);
+    layout.add(header, name, protocol, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));

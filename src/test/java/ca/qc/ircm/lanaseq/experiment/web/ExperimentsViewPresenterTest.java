@@ -35,10 +35,9 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
 import ca.qc.ircm.lanaseq.experiment.ExperimentService;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsViewPresenter;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
@@ -72,7 +71,9 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   @Mock
   private ExperimentsView view;
   @Mock
-  private ExperimentService experimentService;
+  private ExperimentService service;
+  @Mock
+  private ProtocolService protocolService;
   @Mock
   private AuthorizationService authorizationService;
   @Mock
@@ -81,8 +82,10 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<Experiment> experimentCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<ExperimentDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
   @Autowired
-  private ExperimentRepository experimentRepository;
+  private ExperimentRepository repository;
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
@@ -95,7 +98,8 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new ExperimentsViewPresenter(experimentService, authorizationService);
+    presenter =
+        new ExperimentsViewPresenter(service, protocolService, authorizationService);
     view.header = new H2();
     view.experiments = new Grid<>();
     view.experiments.setSelectionMode(SelectionMode.MULTI);
@@ -105,9 +109,10 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     view.add = new Button();
     view.permissions = new Button();
     view.experimentDialog = mock(ExperimentDialog.class);
+    view.protocolDialog = mock(ProtocolDialog.class);
     view.experimentPermissionsDialog = mock(ExperimentPermissionsDialog.class);
-    experiments = experimentRepository.findAll();
-    when(experimentService.all()).thenReturn(experiments);
+    experiments = repository.findAll();
+    when(service.all()).thenReturn(experiments);
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
   }
@@ -171,6 +176,30 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void filterProtocol() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterProtocol("test");
+
+    assertEquals("test", presenter.filter().protocolContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterProtocol_Empty() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterProtocol("");
+
+    assertEquals(null, presenter.filter().protocolContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
   public void filterOwner() {
     presenter.init(view);
     presenter.localeChange(locale);
@@ -208,11 +237,25 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     Experiment experiment = new Experiment();
     experiment.setId(2L);
     Experiment databaseExperiment = new Experiment();
-    when(experimentService.get(any())).thenReturn(databaseExperiment);
+    when(service.get(any())).thenReturn(databaseExperiment);
     presenter.view(experiment);
-    verify(experimentService).get(2L);
+    verify(service).get(2L);
     verify(view.experimentDialog).setExperiment(databaseExperiment);
     verify(view.experimentDialog).open();
+  }
+
+  @Test
+  public void view_Protocol() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    Protocol protocol = new Protocol();
+    protocol.setId(1L);
+    Protocol databaseProtocol = new Protocol();
+    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    presenter.view(protocol);
+    verify(protocolService).get(1L);
+    verify(view.protocolDialog).setProtocol(databaseProtocol);
+    verify(view.protocolDialog).open();
   }
 
   @Test
@@ -309,6 +352,18 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     ComponentEventListener<SavedEvent<ExperimentDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(experimentService, times(2)).all();
+    verify(service, times(2)).all();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshExperimentsOnProtocolSaved() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
+        protocolSavedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(service, times(2)).all();
   }
 }
