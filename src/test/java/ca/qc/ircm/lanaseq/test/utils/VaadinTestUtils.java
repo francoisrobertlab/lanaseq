@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventBus;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
@@ -34,7 +35,9 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.BasicRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -47,6 +50,26 @@ import java.util.stream.Collectors;
  */
 public class VaadinTestUtils {
   private static final String ICON_ATTRIBUTE = "icon";
+
+  /**
+   * Fires an event on component.
+   *
+   * @param component
+   *          component
+   * @param event
+   *          event
+   */
+  public static <C extends Component> void fireEvent(C component, ComponentEvent<C> event) {
+    try {
+      Method method = Component.class.getDeclaredMethod("getEventBus");
+      method.setAccessible(true);
+      ComponentEventBus eventBus = (ComponentEventBus) method.invoke(component);
+      eventBus.fireEvent(event);
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
+  }
 
   /**
    * Simulates a click on button.
@@ -96,6 +119,24 @@ public class VaadinTestUtils {
           false, false, false, false));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Returns renderer's template.
+   *
+   * @param renderer
+   *          renderer
+   * @return renderer's template
+   */
+  public static String rendererTemplate(Renderer<?> renderer) {
+    try {
+      Field field = Renderer.class.getDeclaredField("template");
+      field.setAccessible(true);
+      return (String) field.get(renderer);
+    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
+        | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
