@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.experiment;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
@@ -58,6 +59,12 @@ public class Experiment implements Data, Owned, Serializable {
    */
   @Column
   private LocalDateTime date;
+  /**
+   * Protocol.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn
+  private Protocol protocol;
   /**
    * Owner.
    */
@@ -156,5 +163,13 @@ public class Experiment implements Data, Owned, Serializable {
 
   public void setDate(LocalDateTime date) {
     this.date = date;
+  }
+
+  public Protocol getProtocol() {
+    return protocol;
+  }
+
+  public void setProtocol(Protocol protocol) {
+    this.protocol = protocol;
   }
 }

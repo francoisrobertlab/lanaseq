@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 public class ExperimentFilter implements Predicate<Experiment> {
   public String nameContains;
   public Range<LocalDate> dateRange;
+  public String protocolContains;
   public String ownerContains;
 
   @Override
@@ -23,6 +24,10 @@ public class ExperimentFilter implements Predicate<Experiment> {
     }
     if (dateRange != null) {
       test &= dateRange.contains(experiment.getDate().toLocalDate());
+    }
+    if (protocolContains != null) {
+      test &= comparable(replaceNull(experiment.getProtocol().getName()))
+          .contains(comparable(protocolContains));
     }
     if (ownerContains != null) {
       test &= comparable(replaceNull(experiment.getOwner().getEmail()))

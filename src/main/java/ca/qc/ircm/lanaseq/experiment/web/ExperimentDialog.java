@@ -22,15 +22,20 @@ import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -49,12 +54,15 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentDialog extends Dialog implements LocaleChangeObserver {
+public class ExperimentDialog extends Dialog
+    implements LocaleChangeObserver, NotificationComponent {
   private static final long serialVersionUID = 3285639770914046262L;
-  public static final String CLASS_NAME = "experiment-dialog";
+  public static final String ID = "experiment-dialog";
   public static final String HEADER = "header";
-  protected H2 header = new H2();
+  public static final String SAVED = "saved";
+  protected H3 header = new H3();
   protected TextField name = new TextField();
+  protected ComboBox<Protocol> protocol = new ComboBox<Protocol>();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -68,22 +76,27 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver {
     this.presenter = presenter;
   }
 
+  public static String id(String baseId) {
+    return styleName(ID, baseId);
+  }
+
   @PostConstruct
   void init() {
-    setId(CLASS_NAME);
+    setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, name);
-    header.addClassName(HEADER);
-    name.addClassName(NAME);
-    layout.add(buttonsLayout);
-    buttonsLayout.add(save);
-    save.addClassName(SAVE);
+    layout.add(header, name, buttonsLayout);
+    buttonsLayout.add(save, cancel);
+    header.setId(id(HEADER));
+    name.setId(id(NAME));
+    protocol.setId(id(PROTOCOL));
+    protocol.setItemLabelGenerator(Protocol::getName);
+    protocol.setPreventInvalidInput(true);
+    save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
-    buttonsLayout.add(cancel);
-    cancel.addClassName(CANCEL);
+    save.addClickListener(e -> presenter.save(getLocale()));
+    cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
     presenter.init(this);
@@ -95,6 +108,7 @@ public class ExperimentDialog extends Dialog implements LocaleChangeObserver {
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     name.setLabel(experimentResources.message(NAME));
+    protocol.setLabel(experimentResources.message(PROTOCOL));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());

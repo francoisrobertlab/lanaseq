@@ -20,12 +20,13 @@ package ca.qc.ircm.lanaseq.experiment.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.CLASS_NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.ID;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,8 +39,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -88,12 +87,15 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertEquals(CLASS_NAME, dialog.getId().orElse(""));
-    assertTrue(dialog.header.getClassNames().contains(HEADER));
-    assertTrue(dialog.name.getClassNames().contains(NAME));
-    assertTrue(dialog.save.getClassNames().contains(SAVE));
-    assertTrue(dialog.save.getElement().getAttribute(THEME).contains(PRIMARY));
-    assertTrue(dialog.cancel.getClassNames().contains(CANCEL));
+    assertEquals(ID, dialog.getId().orElse(""));
+    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
+    assertEquals(id(NAME), dialog.name.getId().orElse(""));
+    assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
+    assertEquals(id(SAVE), dialog.save.getId().orElse(""));
+    assertTrue(dialog.save.getThemeName().contains(PRIMARY));
+    validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
+    assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
+    validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
   }
 
   @Test
@@ -101,10 +103,9 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
+    assertEquals(experimentResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
-    validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
     verify(presenter).localeChange(locale);
   }
 
@@ -119,6 +120,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
+    assertEquals(experimentResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -194,7 +196,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save();
+    verify(presenter).save(locale);
   }
 
   @Test

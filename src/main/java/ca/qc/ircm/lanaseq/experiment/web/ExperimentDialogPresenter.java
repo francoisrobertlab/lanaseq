@@ -18,12 +18,15 @@
 package ca.qc.ircm.lanaseq.experiment.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -46,17 +49,21 @@ public class ExperimentDialogPresenter {
   private Binder<Experiment> binder = new BeanValidationBinder<>(Experiment.class);
   private Experiment experiment;
   @Autowired
-  private ExperimentService experimentService;
+  private ExperimentService service;
+  @Autowired
+  private ProtocolService protocolService;
 
   protected ExperimentDialogPresenter() {
   }
 
-  protected ExperimentDialogPresenter(ExperimentService experimentService) {
-    this.experimentService = experimentService;
+  protected ExperimentDialogPresenter(ExperimentService service, ProtocolService protocolService) {
+    this.service = service;
+    this.protocolService = protocolService;
   }
 
   void init(ExperimentDialog dialog) {
     this.dialog = dialog;
+    dialog.protocol.setItems(protocolService.all());
     setExperiment(null);
   }
 
@@ -64,6 +71,7 @@ public class ExperimentDialogPresenter {
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
+    binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
   }
 
   BinderValidationStatus<Experiment> validateExperiment() {
@@ -74,10 +82,12 @@ public class ExperimentDialogPresenter {
     return validateExperiment().isOk();
   }
 
-  void save() {
+  void save(Locale locale) {
     if (validate()) {
       logger.debug("Save experiment {}", experiment);
-      experimentService.save(experiment);
+      service.save(experiment);
+      AppResources resources = new AppResources(ExperimentDialog.class, locale);
+      dialog.showNotification(resources.message(SAVED, experiment.getName()));
       dialog.close();
       dialog.fireSavedEvent();
     }

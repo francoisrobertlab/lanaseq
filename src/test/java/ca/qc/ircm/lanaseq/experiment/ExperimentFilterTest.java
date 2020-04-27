@@ -3,8 +3,7 @@ package ca.qc.ircm.lanaseq.experiment;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentFilter;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
@@ -69,6 +68,32 @@ public class ExperimentFilterTest {
     assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
     assertTrue(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
     assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+  }
+
+  @Test
+  public void test_ProtocolContains() {
+    filter.protocolContains = "test";
+
+    assertTrue(filter.test(protocol("My test")));
+    assertTrue(filter.test(protocol("Test my")));
+    assertTrue(filter.test(protocol("My test my")));
+    assertTrue(filter.test(protocol("My TEST my")));
+    assertFalse(filter.test(protocol("Christian")));
+    assertFalse(filter.test(protocol(null)));
+    assertFalse(filter.test(protocol("")));
+  }
+
+  @Test
+  public void test_ProtocolContainsNull() {
+    filter.protocolContains = null;
+
+    assertTrue(filter.test(protocol("My test")));
+    assertTrue(filter.test(protocol("Test my")));
+    assertTrue(filter.test(protocol("My test my")));
+    assertTrue(filter.test(protocol("My TEST my")));
+    assertTrue(filter.test(protocol("Christian")));
+    assertTrue(filter.test(protocol(null)));
+    assertTrue(filter.test(protocol("")));
   }
 
   @Test
@@ -155,6 +180,14 @@ public class ExperimentFilterTest {
   private Experiment date(LocalDateTime date) {
     Experiment experiment = new Experiment();
     experiment.setDate(date);
+    return experiment;
+  }
+
+  private Experiment protocol(String name) {
+    Experiment experiment = new Experiment();
+    Protocol protocol = new Protocol();
+    protocol.setName(name);
+    experiment.setProtocol(protocol);
     return experiment;
   }
 

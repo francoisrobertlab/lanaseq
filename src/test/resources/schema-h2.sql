@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS forgot_password (
 CREATE TABLE IF NOT EXISTS protocol (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
-  owner_id bigint(20),
+  owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT protocolOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
@@ -67,9 +67,11 @@ CREATE TABLE IF NOT EXISTS protocol_file (
 CREATE TABLE IF NOT EXISTS experiment (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
-  owner_id bigint(20),
+  protocol_id bigint(20) NOT NULL,
+  owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT experimentProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON UPDATE CASCADE,
   CONSTRAINT experimentOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
 

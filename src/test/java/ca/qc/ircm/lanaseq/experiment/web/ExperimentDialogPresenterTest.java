@@ -18,10 +18,12 @@
 package ca.qc.ircm.lanaseq.experiment.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,16 +33,19 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
 import ca.qc.ircm.lanaseq.experiment.ExperimentService;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentDialogPresenter;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.Before;
@@ -59,14 +64,21 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   @Mock
   private ExperimentDialog dialog;
   @Mock
-  private ExperimentService experimentService;
+  private ExperimentService service;
+  @Mock
+  private ProtocolService protocolService;
   @Captor
   private ArgumentCaptor<Experiment> experimentCaptor;
   @Autowired
-  private ExperimentRepository experimentRepository;
+  private ExperimentRepository repository;
+  @Autowired
+  private ProtocolRepository protocolRepository;
   private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(ExperimentDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
+  private List<Protocol> protocols;
   private String name = "Test Experiment";
+  private Protocol protocol;
 
   /**
    * Before test.
@@ -74,17 +86,22 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new ExperimentDialogPresenter(experimentService);
-    dialog.header = new H2();
+    presenter = new ExperimentDialogPresenter(service, protocolService);
+    dialog.header = new H3();
     dialog.name = new TextField();
+    dialog.protocol = new ComboBox<>();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
+    protocols = protocolRepository.findAll();
+    protocol = protocolRepository.findById(1L).get();
+    when(protocolService.all()).thenReturn(protocols);
     presenter.init(dialog);
   }
 
   private void fillForm() {
     dialog.name.setValue(name);
+    dialog.protocol.setValue(protocol);
   }
 
   @Test
@@ -106,7 +123,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setExperiment_Experiment() {
-    Experiment experiment = experimentRepository.findById(2L).get();
+    Experiment experiment = repository.findById(2L).get();
 
     presenter.localeChange(locale);
     presenter.setExperiment(experiment);
@@ -116,7 +133,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setExperiment_BeforeLocaleChange() {
-    Experiment experiment = experimentRepository.findById(2L).get();
+    Experiment experiment = repository.findById(2L).get();
 
     presenter.setExperiment(experiment);
     presenter.localeChange(locale);
@@ -138,7 +155,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     fillForm();
     dialog.name.setValue("");
 
-    presenter.save();
+    presenter.save(locale);
 
     BinderValidationStatus<Experiment> status = presenter.validateExperiment();
     assertFalse(status.isOk());
@@ -147,6 +164,29 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_ProtocolEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.protocol.setItems();
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Experiment> status = presenter.validateExperiment();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.protocol);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
@@ -156,27 +196,31 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     fillForm();
 
-    presenter.save();
+    presenter.save(locale);
 
-    verify(experimentService).save(experimentCaptor.capture());
+    verify(service).save(experimentCaptor.capture());
     Experiment experiment = experimentCaptor.getValue();
     assertEquals(name, experiment.getName());
+    assertEquals(protocol.getId(), experiment.getProtocol().getId());
+    verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
 
   @Test
   public void save_UpdateExperiment() {
-    Experiment experiment = experimentRepository.findById(2L).get();
+    Experiment experiment = repository.findById(2L).get();
     presenter.setExperiment(experiment);
     presenter.localeChange(locale);
     fillForm();
 
-    presenter.save();
+    presenter.save(locale);
 
-    verify(experimentService).save(experimentCaptor.capture());
+    verify(service).save(experimentCaptor.capture());
     experiment = experimentCaptor.getValue();
     assertEquals(name, experiment.getName());
+    assertEquals(protocol.getId(), experiment.getProtocol().getId());
+    verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
@@ -188,6 +232,8 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.cancel();
 
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
     verify(dialog).close();
     verify(dialog, never()).fireSavedEvent();
   }
