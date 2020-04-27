@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -36,8 +35,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.PasswordView;
-import ca.qc.ircm.lanaseq.user.web.PasswordViewPresenter;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
@@ -74,9 +71,11 @@ public class PasswordViewTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
-    assertTrue(view.header.getClassNames().contains(HEADER));
-    assertTrue(view.save.getClassNames().contains(SAVE));
+    assertEquals(VIEW_NAME, view.getId().orElse(""));
+    assertEquals(HEADER, view.header.getId().orElse(""));
+    assertEquals(SAVE, view.save.getId().orElse(""));
+    assertTrue(view.save.getThemeName().contains(PRIMARY));
+    validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
   @Test
@@ -84,8 +83,6 @@ public class PasswordViewTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
-    assertEquals(PRIMARY, view.save.getElement().getAttribute(THEME));
-    validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
   @Test
@@ -98,8 +95,6 @@ public class PasswordViewTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
-    assertEquals(PRIMARY, view.save.getElement().getAttribute(THEME));
-    validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
   @Test

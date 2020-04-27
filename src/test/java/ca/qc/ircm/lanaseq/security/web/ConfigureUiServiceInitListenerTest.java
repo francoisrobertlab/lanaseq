@@ -19,21 +19,21 @@ package ca.qc.ircm.lanaseq.security.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
-import ca.qc.ircm.lanaseq.security.web.ConfigureUiServiceInitListener;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterListener;
+import com.vaadin.flow.router.Location;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.UIInitEvent;
 import com.vaadin.flow.server.UIInitListener;
@@ -63,13 +63,13 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   @Mock
   private VaadinService vaadinService;
   @Mock
-  private UI ui;
-  @Mock
   private UIInitEvent uiInitEvent;
   @Mock
   private Registration registration;
   @Mock
   private BeforeEnterEvent beforeEnterEvent;
+  @Mock
+  private Location location;
   @Captor
   private ArgumentCaptor<BeforeEnterListener> beforeEnterListenerCaptor;
   private Locale locale = Locale.ENGLISH;
@@ -92,6 +92,8 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
     when(beforeEnterEvent.getUI()).thenReturn(ui);
+    when(beforeEnterEvent.getLocation()).thenReturn(location);
+    when(location.getPath()).thenReturn("");
   }
 
   private void doBeforeEnter() {
@@ -128,7 +130,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
 
     doBeforeEnter();
 
-    verify(beforeEnterEvent).rerouteTo(SigninView.class);
+    verify(ui).navigate(SigninView.class);
     verify(authorizationService).isAuthorized(ViewTest.class);
     verify(authorizationService).isAnonymous();
   }
@@ -141,7 +143,19 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
     doBeforeEnter();
 
     verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(beforeEnterEvent).rerouteTo(PasswordView.class);
+    verify(ui).navigate(PasswordView.class);
+  }
+
+  @Test
+  public void beforeEnter_AuthorizedForceChangePasswordAlreadyOnView() {
+    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
+    when(authorizationService.isAuthorized(any())).thenReturn(true);
+    when(location.getPath()).thenReturn(PasswordView.VIEW_NAME);
+
+    doBeforeEnter();
+
+    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(ui, never()).navigate(PasswordView.class);
   }
 
   @Test
@@ -151,7 +165,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
     doBeforeEnter();
 
     verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(beforeEnterEvent).rerouteTo(PasswordView.class);
+    verify(ui).navigate(PasswordView.class);
   }
 
   public static class ViewTest {

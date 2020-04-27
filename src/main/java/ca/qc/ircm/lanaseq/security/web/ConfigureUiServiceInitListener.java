@@ -41,15 +41,16 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
    *          before navigation event with event details
    */
   private void beforeEnter(BeforeEnterEvent event) {
-    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)) {
+    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)
+        && !event.getLocation().getPath().equals(PasswordView.VIEW_NAME)) {
       logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
           PasswordView.class.getSimpleName());
-      event.rerouteTo(PasswordView.class);
+      UI.getCurrent().navigate(PasswordView.class);
     }
     if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
       if (authorizationService.isAnonymous()) {
         logger.debug("user is anonymous, redirect to {}", SigninView.class.getSimpleName());
-        event.rerouteTo(SigninView.class);
+        UI.getCurrent().navigate(SigninView.class);
       } else {
         UI ui = event.getUI();
         AppResources resources =

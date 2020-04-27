@@ -3,13 +3,12 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -24,8 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Change password view.
  */
 @Route(value = PasswordView.VIEW_NAME)
-public class PasswordView extends Composite<VerticalLayout>
-    implements LocaleChangeObserver, HasDynamicTitle {
+public class PasswordView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "password";
   public static final String HEADER = "header";
   private static final long serialVersionUID = -8554355390432590290L;
@@ -44,12 +42,13 @@ public class PasswordView extends Composite<VerticalLayout>
 
   @PostConstruct
   void init() {
-    VerticalLayout layout = getContent();
-    layout.setId(VIEW_NAME);
-    layout.add(header, passwords, save);
-    header.addClassName(HEADER);
-    save.addClassName(SAVE);
-    save.getElement().setAttribute(THEME, PRIMARY);
+    setId(VIEW_NAME);
+    add(header, passwords, save);
+    header.setId(HEADER);
+    passwords.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    passwords.setMaxWidth("30em");
+    save.setId(SAVE);
+    save.setThemeName(PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> presenter.save());
     presenter.init(this);
