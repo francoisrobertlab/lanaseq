@@ -20,6 +20,7 @@ import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,7 +87,11 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     Protocol protocol =
         repository.findByNameAndOwnerLaboratory(name, new Laboratory(2L)).orElse(null);
     assertNotNull(protocol);
+    assertNotNull(protocol.getId());
     assertEquals(name, protocol.getName());
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(protocol.getDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(protocol.getDate()));
+    assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(2, protocol.getFiles().size());
     ProtocolFile file = protocol.getFiles().get(0);
     assertEquals("FLAG_Protocol.docx", file.getFilename());
@@ -113,6 +118,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(resources.message(SAVED, name), notification.getText());
     Protocol protocol = repository.findById(1L).get();
     assertEquals(name, protocol.getName());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(3, protocol.getFiles().size());
     ProtocolFile file = protocol.getFiles().get(0);
     assertEquals("FLAG Protocol.docx", file.getFilename());
@@ -143,6 +150,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Protocol protocol = repository.findById(1L).get();
     assertEquals("FLAG", protocol.getName());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(1, protocol.getFiles().size());
     ProtocolFile file = protocol.getFiles().get(0);
     assertEquals("FLAG Protocol.docx", file.getFilename());
