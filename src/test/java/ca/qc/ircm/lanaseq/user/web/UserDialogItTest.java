@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.SAVED;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
