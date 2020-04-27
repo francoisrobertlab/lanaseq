@@ -202,6 +202,8 @@ public class UserFormPresenter {
     }
     this.user = user;
     binder.setBean(user);
+    form.passwords.password.setValue("");
+    form.passwords.passwordConfirm.setValue("");
     form.passwords.setRequired(user.getId() == null);
     updateReadOnly();
   }

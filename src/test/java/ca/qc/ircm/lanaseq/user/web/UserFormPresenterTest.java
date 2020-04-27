@@ -46,6 +46,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox.CustomValueSetEvent;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
@@ -104,6 +105,8 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     form.admin = new Checkbox();
     form.manager = new Checkbox();
     form.passwords = mock(PasswordsForm.class);
+    form.passwords.password = new PasswordField();
+    form.passwords.passwordConfirm = new PasswordField();
     form.laboratory = new ComboBox<>();
     form.createNewLaboratory = new Checkbox();
     form.newLaboratoryName = new TextField();
@@ -548,6 +551,18 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     verify(form.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertTrue(booleanCaptor.getValue());
     assertEquals(laboratory.getId(), form.laboratory.getValue().getId());
+  }
+
+  @Test
+  public void setUser_PasswordReset() {
+    presenter.init(form);
+    presenter.localeChange(locale);
+    form.passwords.password.setValue("test");
+    form.passwords.passwordConfirm.setValue("test");
+    presenter.setUser(null);
+
+    assertEquals("", form.passwords.password.getValue());
+    assertEquals("", form.passwords.passwordConfirm.getValue());
   }
 
   @Test
