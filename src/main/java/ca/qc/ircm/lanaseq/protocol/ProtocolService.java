@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.protocol;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
+import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
@@ -67,16 +68,24 @@ public class ProtocolService {
   }
 
   /**
+   * Returns true if a protocol of the same name exists in user's laboratory, false otherwise.
+   *
+   * @param name
+   *          protocol's name
+   * @return true if a protocol of the same name exists in user's laboratory, false otherwise
+   */
+  @PreAuthorize("hasRole('" + USER + "')")
+  public boolean nameExists(String name) {
+    if (name == null) {
+      return false;
+    }
+
+    return repository.existsByNameAndOwnerLaboratory(name,
+        authorizationService.getCurrentUser().getLaboratory());
+  }
+
+  /**
    * Returns all protocols for current user.
-   * <p>
-   * If current user is a regular user, returns all protocols owned by him.
-   * </p>
-   * <p>
-   * If current user is a manager, returns all protocols made by users in his lab.
-   * </p>
-   * <p>
-   * If current user is an admin, returns all protocols.
-   * </p>
    *
    * @return all protocols for current user
    */

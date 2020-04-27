@@ -1,7 +1,9 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
@@ -9,6 +11,7 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.FILES;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
+import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
@@ -29,6 +32,8 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -60,7 +65,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final int MAXIMUM_FILES_SIZE = 20 * 1024 * 1024; // 20MB
   public static final int MAXIMUM_FILES_COUNT = 6;
   public static final String REMOVE_BUTTON =
-      "<vaadin-button class='" + REMOVE + "' theme='" + ERROR + "' on-click='toggleRemove'>"
+      "<vaadin-button class='" + REMOVE + "' theme='" + ERROR + "' on-click='removeFile'>"
           + "<iron-icon icon='vaadin:trash' slot='prefix'></iron-icon>" + "</vaadin-button>";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = -7797831034001410430L;
@@ -73,10 +78,15 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   protected Column<ProtocolFile> remove;
   protected Div filesError = new Div();
   protected Button save = new Button();
+  protected Button cancel = new Button();
   @Autowired
   private ProtocolDialogPresenter presenter;
 
   public ProtocolDialog() {
+  }
+
+  ProtocolDialog(ProtocolDialogPresenter presenter) {
+    this.presenter = presenter;
   }
 
   public static String id(String baseId) {
@@ -90,39 +100,45 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     add(layout);
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
-    FormLayout form = new FormLayout();
-    layout.add(header, form, upload, files, filesError, save);
-    form.add(name);
+    FormLayout form = new FormLayout(name);
+    HorizontalLayout buttonsLayout = new HorizontalLayout(save, cancel);
+    layout.add(header, form, upload, files, filesError, buttonsLayout);
     header.setId(id(HEADER));
     name.setId(id(NAME));
-    upload.setId(UPLOAD);
+    upload.setId(id(UPLOAD));
     upload.setMaxFileSize(MAXIMUM_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_FILES_COUNT);
     upload.setMinHeight("2.5em");
     upload.addSucceededListener(event -> presenter.addFile(event.getFileName(),
         uploadBuffer.getInputStream(event.getFileName()), getLocale()));
-    files.setId(FILES);
+    files.setId(id(FILES));
     files.setHeight("15em");
     files.setMinHeight("15em");
     files.setWidth("45em");
     files.setMinWidth("45em");
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
-        .setKey(FILENAME);
+        .setKey(FILENAME).setComparator((f1, f2) -> normalize(f1.getFilename())
+            .compareToIgnoreCase(normalize(f2.getFilename())));
     remove =
         files
             .addColumn(TemplateRenderer.<ProtocolFile>of(REMOVE_BUTTON)
-                .withEventHandler("toggleRemove", file -> presenter.removeFile(file)), REMOVE)
+                .withEventHandler("removeFile", file -> presenter.removeFile(file)), REMOVE)
             .setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
-    save.setId(SAVE);
+    save.setId(id(SAVE));
+    save.setThemeName(PRIMARY);
+    save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> presenter.save(getLocale()));
+    cancel.setId(id(CANCEL));
+    cancel.setIcon(VaadinIcon.CLOSE.create());
+    cancel.addClickListener(e -> presenter.cancel());
     presenter.init(this);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {
     Anchor link = new Anchor();
-    link.setTarget("_blank");
+    link.getElement().setAttribute("download", "true");
     link.setText(file.getFilename());
     link.setHref(new StreamResource(file.getFilename(),
         new ByteArrayStreamResourceWriter(file.getContent())));
@@ -131,17 +147,27 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
     AppResources protocolResources = new AppResources(Protocol.class, getLocale());
     AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
     AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
+    updateHeader();
     name.setLabel(protocolResources.message(NAME));
     upload.setI18n(uploadI18N(getLocale()));
     filename.setHeader(protocolFileResources.message(FILENAME));
     remove.setHeader(webResources.message(REMOVE));
     save.setText(webResources.message(SAVE));
+    cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());
+  }
+
+  private void updateHeader() {
+    final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+    Protocol protocol = presenter.getProtocol();
+    if (protocol != null && protocol.getId() != null) {
+      header.setText(resources.message(HEADER, 1, protocol.getName()));
+    } else {
+      header.setText(resources.message(HEADER, 0));
+    }
   }
 
   /**
@@ -167,5 +193,6 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   public void setProtocol(Protocol protocol) {
     presenter.setProtocol(protocol);
+    updateHeader();
   }
 }

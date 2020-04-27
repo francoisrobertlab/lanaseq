@@ -62,10 +62,6 @@ public class ProtocolFile implements Data, Serializable {
     this.filename = filename;
   }
 
-  public String getName() {
-    return filename;
-  }
-
   public String getFilename() {
     return filename;
   }

@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.FILES;
@@ -46,5 +47,9 @@ public class ProtocolDialogElement extends DialogElement {
 
   public ButtonElement save() {
     return $(ButtonElement.class).id(id(SAVE));
+  }
+
+  public ButtonElement cancel() {
+    return $(ButtonElement.class).id(id(CANCEL));
   }
 }

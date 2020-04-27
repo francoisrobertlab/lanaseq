@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -45,7 +46,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -65,10 +68,13 @@ public class ProtocolServiceTest {
   @MockBean
   private PermissionEvaluator permissionEvaluator;
   private Random random = new Random();
+  private User currentUser;
 
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    currentUser = userRepository.getOne(3L);
+    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
   }
 
   @Test
@@ -100,10 +106,31 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
-  public void all() {
-    User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+  public void nameExists_False() {
+    assertFalse(service.nameExists("test protocol"));
+  }
 
+  @Test
+  @WithMockUser
+  public void nameExists_True() {
+    assertTrue(service.nameExists("FLAG"));
+  }
+
+  @Test
+  @WithMockUser
+  public void nameExists_Null() {
+    assertFalse(service.nameExists(null));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void nameExists_Anonymous() {
+    service.nameExists("test protocol");
+  }
+
+  @Test
+  @WithMockUser
+  public void all() {
     List<Protocol> protocols = service.all();
 
     assertEquals(2, protocols.size());
@@ -152,8 +179,6 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void save_New() {
-    User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
     Protocol protocol = new Protocol();
     protocol.setName("New protocol");
     byte[] content = new byte[5120];
@@ -169,7 +194,7 @@ public class ProtocolServiceTest {
     assertNotNull(protocol.getId());
     Protocol database = repository.findById(protocol.getId()).orElse(null);
     assertEquals(protocol.getName(), database.getName());
-    assertEquals(user.getId(), database.getOwner().getId());
+    assertEquals(currentUser.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(protocol.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(protocol.getDate()));
     assertEquals(1, database.getFiles().size());
@@ -183,8 +208,6 @@ public class ProtocolServiceTest {
   @Test(expected = IllegalArgumentException.class)
   @WithMockUser
   public void save_New_NoFile() {
-    User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
     Protocol protocol = new Protocol();
     protocol.setName("New protocol");
 
