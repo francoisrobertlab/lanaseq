@@ -17,9 +17,39 @@
 
 package ca.qc.ircm.lanaseq.experiment.web;
 
+import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
+import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.id;
+
+import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
+import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class ExperimentDialogElement extends DialogElement {
+  public H3Element header() {
+    return $(H3Element.class).id(id(HEADER));
+  }
+
+  public TextFieldElement name() {
+    return $(TextFieldElement.class).id(id(NAME));
+  }
+
+  public ComboBoxElement protocol() {
+    return $(ComboBoxElement.class).id(id(PROTOCOL));
+  }
+
+  public ButtonElement save() {
+    return $(ButtonElement.class).id(id(SAVE));
+  }
+
+  public ButtonElement cancel() {
+    return $(ButtonElement.class).id(id(CANCEL));
+  }
 }
