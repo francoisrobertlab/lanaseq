@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.test.config;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.HOME;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.EXPERIMENTS;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -81,7 +81,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     TabElement home =
         optional(() -> $(TabsElement.class).first().$(TabElement.class).first()).orElse(null);
     Optional<Locale> optlocale =
-        locales.stream().filter(locale -> new AppResources(ViewLayout.class, locale).message(HOME)
+        locales.stream().filter(locale -> new AppResources(ViewLayout.class, locale).message(EXPERIMENTS)
             .equals(home != null ? home.getText() : "")).findAny();
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
