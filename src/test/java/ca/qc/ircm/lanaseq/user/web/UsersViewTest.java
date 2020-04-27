@@ -347,9 +347,9 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Test
   public void viewLaboratory() {
     User user = users.get(0);
-    doubleClickItem(view.users, user, view.laboratory.getKey());
+    doubleClickItem(view.users, user, view.laboratory);
 
-    verify(presenter).view(user);
+    verify(presenter).viewLaboratory(user.getLaboratory());
   }
 
   private User email(String email) {

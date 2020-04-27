@@ -109,13 +109,14 @@ public class VaadinTestUtils {
    * @param item
    *          item
    */
-  public static <E> void doubleClickItem(Grid<E> grid, E item, String key) {
+  public static <E> void doubleClickItem(Grid<E> grid, E item, Grid.Column<E> column) {
     try {
       String itemKey = grid.getDataCommunicator().getKeyMapper().key(item);
       Method method = Component.class.getDeclaredMethod("getEventBus");
       method.setAccessible(true);
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(grid);
-      eventBus.fireEvent(new ItemDoubleClickEvent<>(grid, false, itemKey, key, -1, -1, -1, -1, 2, 0,
+      eventBus.fireEvent(new ItemDoubleClickEvent<>(grid, false, itemKey,
+          column != null ? column.getElement().getProperty("_flowId") : null, -1, -1, -1, -1, 2, 0,
           false, false, false, false));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
