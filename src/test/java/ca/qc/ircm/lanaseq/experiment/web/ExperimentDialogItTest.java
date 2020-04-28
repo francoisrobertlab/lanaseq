@@ -53,6 +53,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private ProtocolRepository protocolRepository;
   private String name = "test experiment";
+  private String project = "test project";
   private Protocol protocol;
 
   @Before
@@ -66,6 +67,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
 
   private void fill(ExperimentDialogElement dialog) {
     dialog.name().setValue(name);
+    dialog.project().setValue(project);
     dialog.protocol().selectByText(protocol.getName());
   }
 
@@ -77,6 +79,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     ExperimentDialogElement dialog = $(ExperimentDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.name()).isPresent());
+    assertTrue(optional(() -> dialog.project()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -103,6 +106,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     assertNotNull(experiment);
     assertNotNull(experiment.getId());
     assertEquals(name, experiment.getName());
+    assertEquals(project, experiment.getProject());
     assertEquals(protocol.getId(), experiment.getProtocol().getId());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(experiment.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(experiment.getDate()));
@@ -126,6 +130,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(resources.message(SAVED, name), notification.getText());
     Experiment experiment = repository.findById(2L).get();
     assertEquals(name, experiment.getName());
+    assertEquals(project, experiment.getProject());
     assertEquals(protocol.getId(), experiment.getProtocol().getId());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), experiment.getDate());
     assertEquals((Long) 3L, experiment.getOwner().getId());
@@ -146,6 +151,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Experiment experiment = repository.findById(2L).get();
     assertEquals("Histone location", experiment.getName());
+    assertEquals("histone", experiment.getProject());
     assertEquals((Long) 3L, experiment.getProtocol().getId());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), experiment.getDate());
     assertEquals((Long) 3L, experiment.getOwner().getId());

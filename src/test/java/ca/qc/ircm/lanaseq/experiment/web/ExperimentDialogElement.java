@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.experiment.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.id;
@@ -39,6 +40,10 @@ public class ExperimentDialogElement extends DialogElement {
 
   public TextFieldElement name() {
     return $(TextFieldElement.class).id(id(NAME));
+  }
+
+  public TextFieldElement project() {
+    return $(TextFieldElement.class).id(id(PROJECT));
   }
 
   public ComboBoxElement protocol() {

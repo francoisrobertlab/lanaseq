@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -78,6 +79,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
   private String name = "Test Experiment";
+  private String project = "Test Project";
   private Protocol protocol;
 
   /**
@@ -89,6 +91,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     presenter = new ExperimentDialogPresenter(service, protocolService);
     dialog.header = new H3();
     dialog.name = new TextField();
+    dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
@@ -101,6 +104,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
   private void fillForm() {
     dialog.name.setValue(name);
+    dialog.project.setValue(project);
     dialog.protocol.setValue(protocol);
   }
 
@@ -171,6 +175,24 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_ProjectEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.project.setValue("");
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Experiment> status = presenter.validateExperiment();
+    assertTrue(status.isOk());
+    verify(service).save(experimentCaptor.capture());
+    Experiment experiment = experimentCaptor.getValue();
+    assertNull(experiment.getProject());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
   public void save_ProtocolEmpty() {
     presenter.localeChange(locale);
     fillForm();
@@ -201,6 +223,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(experimentCaptor.capture());
     Experiment experiment = experimentCaptor.getValue();
     assertEquals(name, experiment.getName());
+    assertEquals(project, experiment.getProject());
     assertEquals(protocol.getId(), experiment.getProtocol().getId());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
@@ -219,6 +242,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(experimentCaptor.capture());
     experiment = experimentCaptor.getValue();
     assertEquals(name, experiment.getName());
+    assertEquals(project, experiment.getProject());
     assertEquals(protocol.getId(), experiment.getProtocol().getId());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();

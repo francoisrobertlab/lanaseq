@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS protocol_file (
 CREATE TABLE IF NOT EXISTS experiment (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
+  project varchar(255),
   protocol_id bigint(20) NOT NULL,
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,

@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
@@ -62,6 +63,7 @@ public class ExperimentDialog extends Dialog
   public static final String SAVED = "saved";
   protected H3 header = new H3();
   protected TextField name = new TextField();
+  protected TextField project = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<Protocol>();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
@@ -85,10 +87,11 @@ public class ExperimentDialog extends Dialog
     setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, name, protocol, buttonsLayout);
+    layout.add(header, name, project, protocol, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));
+    project.setId(id(PROJECT));
     protocol.setId(id(PROTOCOL));
     protocol.setItemLabelGenerator(Protocol::getName);
     protocol.setPreventInvalidInput(true);
@@ -108,6 +111,7 @@ public class ExperimentDialog extends Dialog
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     name.setLabel(experimentResources.message(NAME));
+    project.setLabel(experimentResources.message(PROJECT));
     protocol.setLabel(experimentResources.message(PROTOCOL));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));

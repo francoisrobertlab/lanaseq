@@ -55,6 +55,12 @@ public class Experiment implements Data, Owned, Serializable {
   @Size(max = 255)
   private String name;
   /**
+   * Project.
+   */
+  @Column
+  @Size(max = 255)
+  private String project;
+  /**
    * Creation date.
    */
   @Column
@@ -151,6 +157,14 @@ public class Experiment implements Data, Owned, Serializable {
   @Override
   public User getOwner() {
     return owner;
+  }
+
+  public String getProject() {
+    return project;
+  }
+
+  public void setProject(String project) {
+    this.project = project;
   }
 
   public void setOwner(User owner) {

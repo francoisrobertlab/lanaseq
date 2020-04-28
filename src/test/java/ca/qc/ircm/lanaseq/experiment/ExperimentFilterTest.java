@@ -45,29 +45,29 @@ public class ExperimentFilterTest {
   }
 
   @Test
-  public void test_dateRange() {
-    LocalDate from = LocalDate.of(2011, 1, 2);
-    LocalDate to = LocalDate.of(2011, 10, 9);
-    filter.dateRange = Range.closed(from, to);
+  public void test_ProjectContains() {
+    filter.projectContains = "test";
 
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+    assertTrue(filter.test(project("My test")));
+    assertTrue(filter.test(project("Test my")));
+    assertTrue(filter.test(project("My test my")));
+    assertTrue(filter.test(project("My TEST my")));
+    assertFalse(filter.test(project(null)));
+    assertFalse(filter.test(project("")));
+    assertFalse(filter.test(project("christian")));
   }
 
   @Test
-  public void test_dateRange_Null() {
-    filter.dateRange = null;
+  public void test_ProjectContainsNull() {
+    filter.projectContains = null;
 
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+    assertTrue(filter.test(project("My test")));
+    assertTrue(filter.test(project("Test my")));
+    assertTrue(filter.test(project("My test my")));
+    assertTrue(filter.test(project("My TEST my")));
+    assertTrue(filter.test(project(null)));
+    assertTrue(filter.test(project("")));
+    assertTrue(filter.test(project("christian")));
   }
 
   @Test
@@ -94,6 +94,32 @@ public class ExperimentFilterTest {
     assertTrue(filter.test(protocol("Christian")));
     assertTrue(filter.test(protocol(null)));
     assertTrue(filter.test(protocol("")));
+  }
+
+  @Test
+  public void test_dateRange() {
+    LocalDate from = LocalDate.of(2011, 1, 2);
+    LocalDate to = LocalDate.of(2011, 10, 9);
+    filter.dateRange = Range.closed(from, to);
+
+    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
+    assertFalse(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
+    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+  }
+
+  @Test
+  public void test_dateRange_Null() {
+    filter.dateRange = null;
+
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
+    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
   }
 
   @Test
@@ -174,6 +200,12 @@ public class ExperimentFilterTest {
   private Experiment name(String name) {
     Experiment experiment = new Experiment();
     experiment.setName(name);
+    return experiment;
+  }
+
+  private Experiment project(String project) {
+    Experiment experiment = new Experiment();
+    experiment.setProject(project);
     return experiment;
   }
 

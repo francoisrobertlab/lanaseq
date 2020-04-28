@@ -97,6 +97,7 @@ public class ExperimentServiceTest {
 
     assertEquals((Long) 1L, experiment.getId());
     assertEquals("POLR2A DNA location", experiment.getName());
+    assertEquals("polymerase", experiment.getProject());
     assertEquals((Long) 1L, experiment.getProtocol().getId());
     assertEquals((Long) 2L, experiment.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
@@ -185,6 +186,7 @@ public class ExperimentServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Experiment experiment = new Experiment();
     experiment.setName("New experiment");
+    experiment.setProject("my project");
     experiment.setProtocol(protocolRepository.findById(1L).get());
 
     service.save(experiment);
@@ -192,6 +194,7 @@ public class ExperimentServiceTest {
     assertNotNull(experiment.getId());
     Experiment database = repository.findById(experiment.getId()).orElse(null);
     assertEquals(experiment.getName(), database.getName());
+    assertEquals("my project", database.getProject());
     assertEquals((Long) 1L, database.getProtocol().getId());
     assertEquals(user.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(experiment.getDate()));
@@ -204,12 +207,14 @@ public class ExperimentServiceTest {
   public void save_Update() {
     Experiment experiment = repository.findById(1L).orElse(null);
     experiment.setName("New name");
+    experiment.setProject("my project");
     experiment.setProtocol(protocolRepository.findById(3L).get());
 
     service.save(experiment);
 
     experiment = repository.findById(1L).orElse(null);
     assertEquals("New name", experiment.getName());
+    assertEquals("my project", experiment.getProject());
     assertEquals((Long) 3L, experiment.getProtocol().getId());
     assertEquals((Long) 2L, experiment.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());

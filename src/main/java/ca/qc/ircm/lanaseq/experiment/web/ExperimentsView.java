@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.normalize;
@@ -76,10 +77,12 @@ public class ExperimentsView extends VerticalLayout
   protected H2 header = new H2();
   protected Grid<Experiment> experiments = new Grid<>();
   protected Column<Experiment> name;
+  protected Column<Experiment> project;
   protected Column<Experiment> protocol;
   protected Column<Experiment> date;
   protected Column<Experiment> owner;
   protected TextField nameFilter = new TextField();
+  protected TextField projectFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected TextField ownerFilter = new TextField();
   protected Div error = new Div();
@@ -123,6 +126,9 @@ public class ExperimentsView extends VerticalLayout
     name =
         experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME).setComparator(
             (e1, e2) -> normalize(e1.getName()).compareToIgnoreCase(normalize(e2.getName())));
+    project = experiments.addColumn(experiment -> experiment.getProject(), PROJECT).setKey(PROJECT)
+        .setComparator(
+            (e1, e2) -> normalize(e1.getProject()).compareToIgnoreCase(normalize(e2.getProject())));
     protocol = experiments.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator((e1, e2) -> normalize(e1.getProtocol().getName())
             .compareToIgnoreCase(normalize(e2.getProtocol().getName())));
@@ -137,6 +143,10 @@ public class ExperimentsView extends VerticalLayout
     nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
+    filtersRow.getCell(project).setComponent(projectFilter);
+    projectFilter.addValueChangeListener(e -> presenter.filterProject(e.getValue()));
+    projectFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    projectFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
     protocolFilter.addValueChangeListener(e -> presenter.filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -161,6 +171,8 @@ public class ExperimentsView extends VerticalLayout
     header.setText(resources.message(HEADER));
     String nameHeader = experimentResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
+    String projectHeader = experimentResources.message(PROJECT);
+    project.setHeader(projectHeader).setFooter(projectHeader);
     String protocolHeader = experimentResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = experimentResources.message(DATE);
@@ -168,6 +180,7 @@ public class ExperimentsView extends VerticalLayout
     String ownerHeader = experimentResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
+    projectFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));

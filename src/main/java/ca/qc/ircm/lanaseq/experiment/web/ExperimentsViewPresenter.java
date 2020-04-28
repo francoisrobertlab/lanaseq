@@ -60,8 +60,8 @@ public class ExperimentsViewPresenter {
   protected ExperimentsViewPresenter() {
   }
 
-  protected ExperimentsViewPresenter(ExperimentService service,
-      ProtocolService protocolService, AuthorizationService authorizationService) {
+  protected ExperimentsViewPresenter(ExperimentService service, ProtocolService protocolService,
+      AuthorizationService authorizationService) {
     this.service = service;
     this.protocolService = protocolService;
     this.authorizationService = authorizationService;
@@ -134,6 +134,12 @@ public class ExperimentsViewPresenter {
   void filterName(String value) {
     clearError();
     filter.nameContains = value.isEmpty() ? null : value;
+    view.experiments.getDataProvider().refreshAll();
+  }
+
+  void filterProject(String value) {
+    clearError();
+    filter.projectContains = value.isEmpty() ? null : value;
     view.experiments.getDataProvider().refreshAll();
   }
 

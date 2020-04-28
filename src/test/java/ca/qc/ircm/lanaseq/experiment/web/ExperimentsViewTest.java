@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.DATE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.HEADER;
@@ -123,6 +124,12 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
+    view.project = mock(Column.class);
+    when(view.experiments.addColumn(any(ValueProvider.class), eq(PROJECT)))
+        .thenReturn(view.project);
+    when(view.project.setKey(any())).thenReturn(view.project);
+    when(view.project.setComparator(any(Comparator.class))).thenReturn(view.project);
+    when(view.project.setHeader(any(String.class))).thenReturn(view.project);
     view.protocol = mock(Column.class);
     when(view.experiments.addColumn(any(ValueProvider.class), eq(PROTOCOL)))
         .thenReturn(view.protocol);
@@ -142,6 +149,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     when(view.experiments.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
+    HeaderCell projectFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.project)).thenReturn(projectFilterCell);
     HeaderCell protocolFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.protocol)).thenReturn(protocolFilterCell);
     HeaderCell ownerFilterCell = mock(HeaderCell.class);
@@ -170,6 +179,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name).setHeader(experimentResources.message(NAME));
     verify(view.name).setFooter(experimentResources.message(NAME));
+    verify(view.project).setHeader(experimentResources.message(PROJECT));
+    verify(view.project).setFooter(experimentResources.message(PROJECT));
     verify(view.protocol).setHeader(experimentResources.message(PROTOCOL));
     verify(view.protocol).setFooter(experimentResources.message(PROTOCOL));
     verify(view.date).setHeader(experimentResources.message(DATE));
@@ -177,6 +188,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.owner).setHeader(experimentResources.message(OWNER));
     verify(view.owner).setFooter(experimentResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
@@ -201,6 +214,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name, atLeastOnce()).setHeader(experimentResources.message(NAME));
     verify(view.name, atLeastOnce()).setFooter(experimentResources.message(NAME));
+    verify(view.project).setHeader(experimentResources.message(PROJECT));
+    verify(view.project).setFooter(experimentResources.message(PROJECT));
     verify(view.protocol).setHeader(experimentResources.message(PROTOCOL));
     verify(view.protocol).setFooter(experimentResources.message(PROTOCOL));
     verify(view.date, atLeastOnce()).setHeader(experimentResources.message(DATE));
@@ -208,6 +223,8 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     verify(view.owner, atLeastOnce()).setHeader(experimentResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(experimentResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
+    assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
@@ -224,8 +241,9 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void experiments() {
-    assertEquals(4, view.experiments.getColumns().size());
+    assertEquals(5, view.experiments.getColumns().size());
     assertNotNull(view.experiments.getColumnByKey(NAME));
+    assertNotNull(view.experiments.getColumnByKey(PROJECT));
     assertNotNull(view.experiments.getColumnByKey(PROTOCOL));
     assertNotNull(view.experiments.getColumnByKey(DATE));
     assertNotNull(view.experiments.getColumnByKey(OWNER));
@@ -255,6 +273,28 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(name("test"), name("abc")) > 0);
     assertTrue(comparator.compare(name("Test"), name("abc")) > 0);
     assertTrue(comparator.compare(name("facteur"), name("élement")) > 0);
+    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
+    valueProvider = valueProviderCaptor.getValue();
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getProtocol().getName(), valueProvider.apply(experiment));
+    }
+    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROJECT));
+    valueProvider = valueProviderCaptor.getValue();
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getProject(), valueProvider.apply(experiment));
+    }
+    verify(view.project).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(project("abc"), project("test")) < 0);
+    assertTrue(comparator.compare(project("Abc"), project("test")) < 0);
+    assertTrue(comparator.compare(project("élement"), project("facteur")) < 0);
+    assertTrue(comparator.compare(project("test"), project("test")) == 0);
+    assertTrue(comparator.compare(project("Test"), project("test")) == 0);
+    assertTrue(comparator.compare(project("Expérienceà"), project("experiencea")) == 0);
+    assertTrue(comparator.compare(project("experiencea"), project("Expérienceà")) == 0);
+    assertTrue(comparator.compare(project("test"), project("abc")) > 0);
+    assertTrue(comparator.compare(project("Test"), project("abc")) > 0);
+    assertTrue(comparator.compare(project("facteur"), project("élement")) > 0);
     verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
     valueProvider = valueProviderCaptor.getValue();
     for (Experiment experiment : experiments) {
@@ -308,6 +348,12 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     return experiment;
   }
 
+  private Experiment project(String project) {
+    Experiment experiment = new Experiment();
+    experiment.setProject(project);
+    return experiment;
+  }
+
   private Experiment protocol(String name) {
     Experiment experiment = new Experiment();
     experiment.setProtocol(new Protocol(name));
@@ -319,6 +365,13 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.nameFilter.setValue("test");
 
     verify(presenter).filterName("test");
+  }
+
+  @Test
+  public void filterProject() {
+    view.projectFilter.setValue("test");
+
+    verify(presenter).filterProject("test");
   }
 
   @Test

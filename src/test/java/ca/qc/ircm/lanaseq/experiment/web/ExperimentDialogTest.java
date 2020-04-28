@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.ID;
@@ -90,6 +91,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(NAME), dialog.name.getId().orElse(""));
+    assertEquals(id(PROJECT), dialog.project.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
@@ -103,6 +105,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
+    assertEquals(experimentResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(experimentResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -120,6 +123,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
+    assertEquals(experimentResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(experimentResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());

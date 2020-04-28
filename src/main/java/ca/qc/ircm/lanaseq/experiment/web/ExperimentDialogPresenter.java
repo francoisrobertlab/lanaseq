@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.experiment.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
 
@@ -71,6 +72,7 @@ public class ExperimentDialogPresenter {
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(NAME);
+    binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
   }
 

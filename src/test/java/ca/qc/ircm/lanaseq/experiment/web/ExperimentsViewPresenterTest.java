@@ -98,12 +98,12 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter =
-        new ExperimentsViewPresenter(service, protocolService, authorizationService);
+    presenter = new ExperimentsViewPresenter(service, protocolService, authorizationService);
     view.header = new H2();
     view.experiments = new Grid<>();
     view.experiments.setSelectionMode(SelectionMode.MULTI);
     view.nameFilter = new TextField();
+    view.projectFilter = new TextField();
     view.ownerFilter = new TextField();
     view.error = new Div();
     view.add = new Button();
@@ -172,6 +172,30 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     presenter.filterName("");
 
     assertEquals(null, presenter.filter().nameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterProject() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterProject("test");
+
+    assertEquals("test", presenter.filter().projectContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterProject_Empty() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.experiments.setDataProvider(dataProvider);
+
+    presenter.filterProject("");
+
+    assertEquals(null, presenter.filter().projectContains);
     verify(dataProvider).refreshAll();
   }
 
