@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -29,6 +30,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -77,6 +79,7 @@ public class DatasetDialogPresenter {
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
     binder.forField(dialog.assay).withNullRepresentation(Assay.NULL).bind(ASSAY);
+    binder.forField(dialog.type).withNullRepresentation(DatasetType.NULL).bind(TYPE);
   }
 
   BinderValidationStatus<Dataset> validateDataset() {

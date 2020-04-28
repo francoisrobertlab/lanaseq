@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 
@@ -53,6 +54,10 @@ public class DatasetDialogElement extends DialogElement {
 
   public ComboBoxElement assay() {
     return $(ComboBoxElement.class).id(id(ASSAY));
+  }
+
+  public ComboBoxElement type() {
+    return $(ComboBoxElement.class).id(id(TYPE));
   }
 
   public ButtonElement save() {

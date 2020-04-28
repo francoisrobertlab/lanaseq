@@ -30,6 +30,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
@@ -58,6 +59,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String project = "test project";
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
+  private DatasetType type = DatasetType.IMMUNO_PRECIPITATION;
 
   @Before
   public void beforeTest() {
@@ -73,6 +75,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.project().setValue(project);
     dialog.protocol().selectByText(protocol.getName());
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
+    dialog.type().selectByText(type.getLabel(currentLocale()));
   }
 
   @Test
@@ -86,6 +89,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.project()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
+    assertTrue(optional(() -> dialog.type()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
   }
@@ -114,6 +118,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
+    assertEquals(type, dataset.getType());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -139,6 +144,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
+    assertEquals(type, dataset.getType());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
   }
@@ -161,6 +167,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("histone", dataset.getProject());
     assertEquals((Long) 3L, dataset.getProtocol().getId());
     assertNull(dataset.getAssay());
+    assertNull(dataset.getType());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
   }

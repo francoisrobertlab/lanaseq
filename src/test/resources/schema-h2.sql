@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS dataset (
   name varchar(255) NOT NULL,
   project varchar(255),
   assay varchar(255),
+  type varchar(255),
   protocol_id bigint(20) NOT NULL,
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,

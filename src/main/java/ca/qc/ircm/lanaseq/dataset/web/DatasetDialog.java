@@ -25,12 +25,14 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -67,6 +69,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField project = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
   protected ComboBox<Assay> assay = new ComboBox<>();
+  protected ComboBox<DatasetType> type = new ComboBox<>();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -89,7 +92,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, name, project, protocol, assay, buttonsLayout);
+    layout.add(header, name, project, protocol, assay, type, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));
@@ -101,6 +104,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     assay.setItemLabelGenerator(a -> a.getLabel(getLocale()));
     assay.setItems(Assay.values());
     assay.setPreventInvalidInput(true);
+    type.setId(id(TYPE));
+    type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
+    type.setItems(DatasetType.values());
+    type.setPreventInvalidInput(true);
     save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -120,6 +127,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     project.setLabel(datasetResources.message(PROJECT));
     protocol.setLabel(datasetResources.message(PROTOCOL));
     assay.setLabel(datasetResources.message(ASSAY));
+    type.setLabel(datasetResources.message(TYPE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());

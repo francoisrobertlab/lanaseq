@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
@@ -44,6 +45,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
@@ -103,6 +105,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(PROJECT), dialog.project.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
+    assertEquals(id(TYPE), dialog.type.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -118,6 +121,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
+    assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -137,6 +141,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
+    assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -155,6 +160,15 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertArrayEquals(Assay.values(), assays.toArray(new Assay[0]));
     for (Assay assay : assays) {
       assertEquals(assay.getLabel(locale), dialog.assay.getItemLabelGenerator().apply(assay));
+    }
+  }
+
+  @Test
+  public void type() {
+    List<DatasetType> types = items(dialog.type);
+    assertArrayEquals(DatasetType.values(), types.toArray(new DatasetType[0]));
+    for (DatasetType type : types) {
+      assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
     }
   }
 

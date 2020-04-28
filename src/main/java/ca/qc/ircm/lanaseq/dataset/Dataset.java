@@ -63,6 +63,12 @@ public class Dataset implements Data, Owned, Serializable {
   @Enumerated(STRING)
   private Assay assay;
   /**
+   * Type.
+   */
+  @Column
+  @Enumerated(STRING)
+  private DatasetType type;
+  /**
    * Project.
    */
   @Column
@@ -201,5 +207,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setAssay(Assay assay) {
     this.assay = assay;
+  }
+
+  public DatasetType getType() {
+    return type;
+  }
+
+  public void setType(DatasetType type) {
+    this.type = type;
   }
 }
