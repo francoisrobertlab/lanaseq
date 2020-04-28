@@ -29,7 +29,6 @@ import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
-import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
@@ -37,6 +36,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -123,20 +123,17 @@ public class ExperimentsView extends VerticalLayout
         presenter.view(e.getItem());
       }
     });
-    name =
-        experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME).setComparator(
-            (e1, e2) -> normalize(e1.getName()).compareToIgnoreCase(normalize(e2.getName())));
+    name = experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME)
+        .setComparator(NormalizedComparator.of(Experiment::getName));
     project = experiments.addColumn(experiment -> experiment.getProject(), PROJECT).setKey(PROJECT)
-        .setComparator(
-            (e1, e2) -> normalize(e1.getProject()).compareToIgnoreCase(normalize(e2.getProject())));
+        .setComparator(NormalizedComparator.of(Experiment::getProject));
     protocol = experiments.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
-        .setComparator((e1, e2) -> normalize(e1.getProtocol().getName())
-            .compareToIgnoreCase(normalize(e2.getProtocol().getName())));
+        .setComparator(NormalizedComparator.of(e -> e.getProtocol().getName()));
     date = experiments.addColumn(
         new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
-    owner =
-        experiments.addColumn(experiment -> experiment.getOwner().getEmail(), OWNER).setKey(OWNER);
+    owner = experiments.addColumn(experiment -> experiment.getOwner().getEmail(), OWNER)
+        .setKey(OWNER).setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail()));
     experiments.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = experiments.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);

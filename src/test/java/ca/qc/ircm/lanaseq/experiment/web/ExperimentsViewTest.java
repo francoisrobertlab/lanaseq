@@ -49,10 +49,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.experiment.Experiment;
 import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -144,6 +144,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     view.owner = mock(Column.class);
     when(view.experiments.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
+    when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.experiments.appendHeaderRow()).thenReturn(filtersRow);
@@ -263,20 +264,10 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     }
     verify(view.name).setComparator(comparatorCaptor.capture());
     Comparator<Experiment> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(name("abc"), name("test")) < 0);
-    assertTrue(comparator.compare(name("Abc"), name("test")) < 0);
-    assertTrue(comparator.compare(name("élement"), name("facteur")) < 0);
-    assertTrue(comparator.compare(name("test"), name("test")) == 0);
-    assertTrue(comparator.compare(name("Test"), name("test")) == 0);
-    assertTrue(comparator.compare(name("Expérienceà"), name("experiencea")) == 0);
-    assertTrue(comparator.compare(name("experiencea"), name("Expérienceà")) == 0);
-    assertTrue(comparator.compare(name("test"), name("abc")) > 0);
-    assertTrue(comparator.compare(name("Test"), name("abc")) > 0);
-    assertTrue(comparator.compare(name("facteur"), name("élement")) > 0);
-    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
-    valueProvider = valueProviderCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
     for (Experiment experiment : experiments) {
-      assertEquals(experiment.getProtocol().getName(), valueProvider.apply(experiment));
+      assertEquals(experiment.getName(),
+          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
     }
     verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROJECT));
     valueProvider = valueProviderCaptor.getValue();
@@ -285,16 +276,11 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     }
     verify(view.project).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(project("abc"), project("test")) < 0);
-    assertTrue(comparator.compare(project("Abc"), project("test")) < 0);
-    assertTrue(comparator.compare(project("élement"), project("facteur")) < 0);
-    assertTrue(comparator.compare(project("test"), project("test")) == 0);
-    assertTrue(comparator.compare(project("Test"), project("test")) == 0);
-    assertTrue(comparator.compare(project("Expérienceà"), project("experiencea")) == 0);
-    assertTrue(comparator.compare(project("experiencea"), project("Expérienceà")) == 0);
-    assertTrue(comparator.compare(project("test"), project("abc")) > 0);
-    assertTrue(comparator.compare(project("Test"), project("abc")) > 0);
-    assertTrue(comparator.compare(project("facteur"), project("élement")) > 0);
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getProject(),
+          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
+    }
     verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
     valueProvider = valueProviderCaptor.getValue();
     for (Experiment experiment : experiments) {
@@ -302,16 +288,11 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     }
     verify(view.protocol).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(protocol("abc"), protocol("test")) < 0);
-    assertTrue(comparator.compare(protocol("Abc"), protocol("test")) < 0);
-    assertTrue(comparator.compare(protocol("élement"), protocol("facteur")) < 0);
-    assertTrue(comparator.compare(protocol("test"), protocol("test")) == 0);
-    assertTrue(comparator.compare(protocol("Test"), protocol("test")) == 0);
-    assertTrue(comparator.compare(protocol("Expérienceà"), protocol("experiencea")) == 0);
-    assertTrue(comparator.compare(protocol("experiencea"), protocol("Expérienceà")) == 0);
-    assertTrue(comparator.compare(protocol("test"), protocol("abc")) > 0);
-    assertTrue(comparator.compare(protocol("Test"), protocol("abc")) > 0);
-    assertTrue(comparator.compare(protocol("facteur"), protocol("élement")) > 0);
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getProtocol().getName(),
+          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
+    }
     verify(view.experiments).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
         localDateTimeRendererCaptor.getValue();
@@ -323,6 +304,13 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     valueProvider = valueProviderCaptor.getValue();
     for (Experiment experiment : experiments) {
       assertEquals(experiment.getOwner().getEmail(), valueProvider.apply(experiment));
+    }
+    verify(view.owner).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Experiment experiment : experiments) {
+      assertEquals(experiment.getOwner().getEmail(),
+          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
     }
   }
 
@@ -340,24 +328,6 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     doubleClickItem(view.experiments, experiment, view.protocol);
 
     verify(presenter).view(experiment.getProtocol());
-  }
-
-  private Experiment name(String name) {
-    Experiment experiment = new Experiment();
-    experiment.setName(name);
-    return experiment;
-  }
-
-  private Experiment project(String project) {
-    Experiment experiment = new Experiment();
-    experiment.setProject(project);
-    return experiment;
-  }
-
-  private Experiment protocol(String name) {
-    Experiment experiment = new Experiment();
-    experiment.setProtocol(new Protocol(name));
-    return experiment;
   }
 
   @Test
