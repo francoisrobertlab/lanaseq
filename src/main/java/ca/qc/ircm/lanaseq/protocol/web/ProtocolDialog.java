@@ -11,7 +11,6 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.FILES;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
-import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
@@ -20,6 +19,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -117,8 +117,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     files.setWidth("45em");
     files.setMinWidth("45em");
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
-        .setKey(FILENAME).setComparator((f1, f2) -> normalize(f1.getFilename())
-            .compareToIgnoreCase(normalize(f2.getFilename())));
+        .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename));
     remove =
         files
             .addColumn(TemplateRenderer.<ProtocolFile>of(REMOVE_BUTTON)

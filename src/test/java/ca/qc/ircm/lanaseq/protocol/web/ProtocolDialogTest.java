@@ -37,6 +37,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
@@ -218,16 +219,11 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
     }
     verify(dialog.filename).setComparator(comparatorCaptor.capture());
     Comparator<ProtocolFile> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(filename("abc"), filename("test")) < 0);
-    assertTrue(comparator.compare(filename("Abc"), filename("test")) < 0);
-    assertTrue(comparator.compare(filename("élement"), filename("facteur")) < 0);
-    assertTrue(comparator.compare(filename("test"), filename("test")) == 0);
-    assertTrue(comparator.compare(filename("Test"), filename("test")) == 0);
-    assertTrue(comparator.compare(filename("Expérienceà"), filename("experiencea")) == 0);
-    assertTrue(comparator.compare(filename("experiencea"), filename("Expérienceà")) == 0);
-    assertTrue(comparator.compare(filename("test"), filename("abc")) > 0);
-    assertTrue(comparator.compare(filename("Test"), filename("abc")) > 0);
-    assertTrue(comparator.compare(filename("facteur"), filename("élement")) > 0);
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (ProtocolFile file : protocolFiles) {
+      assertEquals(file.getFilename(),
+          ((NormalizedComparator<ProtocolFile>) comparator).getConverter().apply(file));
+    }
     verify(dialog.files).addColumn(templateRendererCaptor.capture(), eq(REMOVE));
     TemplateRenderer<ProtocolFile> templateRenderer = templateRendererCaptor.getValue();
     for (ProtocolFile file : protocolFiles) {
@@ -236,12 +232,6 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
       templateRenderer.getEventHandlers().get("removeFile").accept(file);
       verify(presenter).removeFile(file);
     }
-  }
-
-  private ProtocolFile filename(String filename) {
-    ProtocolFile file = new ProtocolFile();
-    file.setFilename(filename);
-    return file;
   }
 
   @Test
