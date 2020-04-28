@@ -3,8 +3,8 @@ package ca.qc.ircm.lanaseq.security;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.ExperimentRepository;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.Serializable;

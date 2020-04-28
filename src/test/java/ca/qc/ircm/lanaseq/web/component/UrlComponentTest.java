@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.web.component;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.ExperimentsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;

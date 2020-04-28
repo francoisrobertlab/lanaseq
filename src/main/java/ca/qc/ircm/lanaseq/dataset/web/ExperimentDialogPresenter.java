@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.PROTOCOL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.ExperimentService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;

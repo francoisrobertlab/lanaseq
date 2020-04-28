@@ -1,4 +1,4 @@
-package ca.qc.ircm.lanaseq.experiment;
+package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 

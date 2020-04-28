@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.EXPERIMENTS;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.PERMISSIONS;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;

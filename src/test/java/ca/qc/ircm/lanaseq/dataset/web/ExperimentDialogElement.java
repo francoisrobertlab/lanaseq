@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.PROTOCOL;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;

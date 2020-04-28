@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -31,11 +31,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialogPresenter;
+import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.ExperimentService;
+import ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog;
+import ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;

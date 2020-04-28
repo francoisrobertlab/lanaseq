@@ -17,13 +17,13 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.ExperimentsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;

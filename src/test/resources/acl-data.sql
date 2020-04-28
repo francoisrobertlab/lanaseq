@@ -20,7 +20,7 @@ VALUES (1, 0, 'Laboratory_2');
 INSERT INTO acl_sid (id, principal, sid)
 VALUES (2, 0, 'Laboratory_3');
 INSERT INTO acl_class (id, class)
-VALUES (1, 'ca.qc.ircm.lanaseq.experiment.Experiment');
+VALUES (1, 'ca.qc.ircm.lanaseq.dataset.Experiment');
 INSERT INTO acl_object_identity (id, object_id_class, object_id_identity, parent_object, owner_sid, entries_inheriting)
 VALUES (1, 1, 2, null, 2, 0);
 INSERT INTO acl_entry (id, acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure)

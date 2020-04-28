@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.CLASS_NAME;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.MANAGERS;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.READ;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog.CLASS_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog.MANAGERS;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog.READ;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -42,10 +42,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialogPresenter;
+import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog;
+import ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS_REQUIRED;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS_DENIED;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.EXPERIMENTS_REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.PERMISSIONS_DENIED;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.ExperimentService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
