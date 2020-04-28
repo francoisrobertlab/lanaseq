@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
@@ -28,6 +29,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -55,8 +57,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DatasetDialog extends Dialog
-    implements LocaleChangeObserver, NotificationComponent {
+public class DatasetDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
@@ -64,7 +65,8 @@ public class DatasetDialog extends Dialog
   protected H3 header = new H3();
   protected TextField name = new TextField();
   protected TextField project = new TextField();
-  protected ComboBox<Protocol> protocol = new ComboBox<Protocol>();
+  protected ComboBox<Protocol> protocol = new ComboBox<>();
+  protected ComboBox<Assay> assay = new ComboBox<>();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -87,7 +89,7 @@ public class DatasetDialog extends Dialog
     setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, name, project, protocol, buttonsLayout);
+    layout.add(header, name, project, protocol, assay, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));
@@ -95,6 +97,10 @@ public class DatasetDialog extends Dialog
     protocol.setId(id(PROTOCOL));
     protocol.setItemLabelGenerator(Protocol::getName);
     protocol.setPreventInvalidInput(true);
+    assay.setId(id(ASSAY));
+    assay.setItemLabelGenerator(a -> a.getLabel(getLocale()));
+    assay.setItems(Assay.values());
+    assay.setPreventInvalidInput(true);
     save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -113,6 +119,7 @@ public class DatasetDialog extends Dialog
     name.setLabel(datasetResources.message(NAME));
     project.setLabel(datasetResources.message(PROJECT));
     protocol.setLabel(datasetResources.message(PROTOCOL));
+    assay.setLabel(datasetResources.message(ASSAY));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());
@@ -136,8 +143,7 @@ public class DatasetDialog extends Dialog
    * @return listener registration
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Registration
-      addSavedListener(ComponentEventListener<SavedEvent<DatasetDialog>> listener) {
+  public Registration addSavedListener(ComponentEventListener<SavedEvent<DatasetDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 

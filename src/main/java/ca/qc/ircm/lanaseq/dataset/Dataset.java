@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
@@ -28,6 +29,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -54,6 +56,12 @@ public class Dataset implements Data, Owned, Serializable {
   @Column(unique = true, nullable = false)
   @Size(max = 255)
   private String name;
+  /**
+   * Assay.
+   */
+  @Column
+  @Enumerated(STRING)
+  private Assay assay;
   /**
    * Project.
    */
@@ -185,5 +193,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setProtocol(Protocol protocol) {
     this.protocol = protocol;
+  }
+
+  public Assay getAssay() {
+    return assay;
+  }
+
+  public void setAssay(Assay assay) {
+    this.assay = assay;
   }
 }

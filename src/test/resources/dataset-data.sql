@@ -27,13 +27,13 @@ INSERT INTO protocol_file (id,files_id,filename,content)
 VALUES (2,2,'BioID Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/BioID_Protocol.docx'));
 INSERT INTO protocol_file (id,files_id,filename,content)
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'));
-INSERT INTO dataset (id,name,project,protocol_id,owner_id,date)
-VALUES ('1', 'POLR2A DNA location', 'polymerase', '1', '2', '2018-10-20 13:28:12');
-INSERT INTO dataset (id,name,project,protocol_id,owner_id,date)
-VALUES ('2', 'Histone location', 'histone', '3', '3', '2018-10-22 9:48:20');
-INSERT INTO dataset (id,name,project,protocol_id,owner_id,date)
-VALUES ('3', 'POLR1A location', 'polymerase', '1', '3', '2018-11-12 11:53:09');
-INSERT INTO dataset (id,name,project,protocol_id,owner_id,date)
-VALUES ('4', 'POLR2A', 'polymerase 2', '2', '5', '2018-11-18 9:31:14');
-INSERT INTO dataset (id,name,project,protocol_id,owner_id,date)
-VALUES ('5', 'POLR2B', 'polymerase 2', '2', '5', '2018-12-05 9:28:23');
+INSERT INTO dataset (id,name,project,assay,protocol_id,owner_id,date)
+VALUES ('1', 'POLR2A DNA location', 'polymerase', 'MNASE_SEQ', '1', '2', '2018-10-20 13:28:12');
+INSERT INTO dataset (id,name,project,assay,protocol_id,owner_id,date)
+VALUES ('2', 'Histone location', 'histone', null, '3', '3', '2018-10-22 9:48:20');
+INSERT INTO dataset (id,name,project,assay,protocol_id,owner_id,date)
+VALUES ('3', 'POLR1A location', 'polymerase', 'MNASE_SEQ', '1', '3', '2018-11-12 11:53:09');
+INSERT INTO dataset (id,name,project,assay,protocol_id,owner_id,date)
+VALUES ('4', 'POLR2A', 'polymerase 2', 'CHIP_SEQ', '2', '5', '2018-11-18 9:31:14');
+INSERT INTO dataset (id,name,project,assay,protocol_id,owner_id,date)
+VALUES ('5', 'POLR2B', 'polymerase 2', 'CHIP_SEQ', '2', '5', '2018-12-05 9:28:23');

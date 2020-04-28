@@ -19,11 +19,12 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
@@ -48,6 +49,10 @@ public class DatasetDialogElement extends DialogElement {
 
   public ComboBoxElement protocol() {
     return $(ComboBoxElement.class).id(id(PROTOCOL));
+  }
+
+  public ComboBoxElement assay() {
+    return $(ComboBoxElement.class).id(id(ASSAY));
   }
 
   public ButtonElement save() {

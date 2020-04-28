@@ -20,14 +20,17 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,16 +41,18 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialogPresenter;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +73,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Autowired
   private DatasetRepository datasetRepository;
+  @Autowired
+  private ProtocolRepository protocolRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources datasetResources = new AppResources(Dataset.class, locale);
@@ -95,6 +102,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(NAME), dialog.name.getId().orElse(""));
     assertEquals(id(PROJECT), dialog.project.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
+    assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -109,6 +117,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -127,9 +136,26 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
+  }
+
+  @Test
+  public void protocol() {
+    for (Protocol protocol : protocolRepository.findAll()) {
+      assertEquals(protocol.getName(), dialog.protocol.getItemLabelGenerator().apply(protocol));
+    }
+  }
+
+  @Test
+  public void assay() {
+    List<Assay> assays = items(dialog.assay);
+    assertArrayEquals(Assay.values(), assays.toArray(new Assay[0]));
+    for (Assay assay : assays) {
+      assertEquals(assay.getLabel(locale), dialog.assay.getItemLabelGenerator().apply(assay));
+    }
   }
 
   @Test

@@ -30,9 +30,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
@@ -101,6 +98,7 @@ public class DatasetServiceTest {
     assertEquals((Long) 1L, dataset.getId());
     assertEquals("POLR2A DNA location", dataset.getName());
     assertEquals("polymerase", dataset.getProject());
+    assertEquals(Assay.MNASE_SEQ, dataset.getAssay());
     assertEquals((Long) 1L, dataset.getProtocol().getId());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
@@ -190,6 +188,7 @@ public class DatasetServiceTest {
     Dataset dataset = new Dataset();
     dataset.setName("New dataset");
     dataset.setProject("my project");
+    dataset.setAssay(Assay.CHIP_SEQ);
     dataset.setProtocol(protocolRepository.findById(1L).get());
 
     service.save(dataset);
@@ -198,6 +197,7 @@ public class DatasetServiceTest {
     Dataset database = repository.findById(dataset.getId()).orElse(null);
     assertEquals(dataset.getName(), database.getName());
     assertEquals("my project", database.getProject());
+    assertEquals(Assay.CHIP_SEQ, database.getAssay());
     assertEquals((Long) 1L, database.getProtocol().getId());
     assertEquals(user.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
@@ -211,6 +211,7 @@ public class DatasetServiceTest {
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.setName("New name");
     dataset.setProject("my project");
+    dataset.setAssay(Assay.CHIP_SEQ);
     dataset.setProtocol(protocolRepository.findById(3L).get());
 
     service.save(dataset);
@@ -218,6 +219,7 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElse(null);
     assertEquals("New name", dataset.getName());
     assertEquals("my project", dataset.getProject());
+    assertEquals(Assay.CHIP_SEQ, dataset.getAssay());
     assertEquals((Long) 3L, dataset.getProtocol().getId());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());

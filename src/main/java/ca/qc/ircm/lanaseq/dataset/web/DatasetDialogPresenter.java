@@ -18,13 +18,15 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -74,6 +76,7 @@ public class DatasetDialogPresenter {
         .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
+    binder.forField(dialog.assay).withNullRepresentation(Assay.NULL).bind(ASSAY);
   }
 
   BinderValidationStatus<Dataset> validateDataset() {

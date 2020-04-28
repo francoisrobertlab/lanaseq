@@ -31,11 +31,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialogPresenter;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -83,6 +82,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private String name = "Test Dataset";
   private String project = "Test Project";
   private Protocol protocol;
+  private Assay assay = Assay.CHIP_SEQ;
 
   /**
    * Before test.
@@ -95,6 +95,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.name = new TextField();
     dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
+    dialog.assay = new ComboBox<>();
+    dialog.assay.setItems(Assay.values());
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
@@ -108,6 +110,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.name.setValue(name);
     dialog.project.setValue(project);
     dialog.protocol.setValue(protocol);
+    dialog.assay.setValue(assay);
   }
 
   @Test
@@ -195,6 +198,24 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_AssayEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.assay.setValue(Assay.NULL);
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getAssay());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
   public void save_ProtocolEmpty() {
     presenter.localeChange(locale);
     fillForm();
@@ -227,6 +248,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
+    assertEquals(assay, dataset.getAssay());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -246,6 +268,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
+    assertEquals(assay, dataset.getAssay());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
