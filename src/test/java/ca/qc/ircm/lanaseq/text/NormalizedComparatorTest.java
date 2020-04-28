@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.text;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
 import org.junit.Test;
 
 public class NormalizedComparatorTest {
@@ -73,51 +72,51 @@ public class NormalizedComparatorTest {
 
   @Test
   public void compare_ExperimentName() {
-    NormalizedComparator<Experiment> comparator = new NormalizedComparator<>(Experiment::getName);
-    assertTrue(comparator.compare(expName("bateau"), expName("bàteau")) == 0);
-    assertTrue(comparator.compare(expName("bateau"), expName("bàteau")) == 0);
-    assertTrue(comparator.compare(expName("bateau"), expName("BÀTEAU")) == 0);
-    assertTrue(comparator.compare(expName("BATEAU"), expName("BÀTEAU")) == 0);
-    assertTrue(comparator.compare(expName("bateau"), expName("bâteau")) == 0);
-    assertTrue(comparator.compare(expName("BATEAU"), expName("BÂTEAU")) == 0);
-    assertTrue(comparator.compare(expName("bateau"), expName("bäteau")) == 0);
-    assertTrue(comparator.compare(expName("BATEAU"), expName("BÄTEAU")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pépin")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pèpin")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pêpin")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pëpin")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pepîn")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pepïn")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("PÉPIN")) == 0);
-    assertTrue(comparator.compare(expName("pepon"), expName("pepôn")) == 0);
-    assertTrue(comparator.compare(expName("pepon"), expName("pepön")) == 0);
-    assertTrue(comparator.compare(expName("pepun"), expName("pepùn")) == 0);
-    assertTrue(comparator.compare(expName("pepun"), expName("pepûn")) == 0);
-    assertTrue(comparator.compare(expName("pepun"), expName("pepün")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pépîn")) == 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("peqin")) < 0);
-    assertTrue(comparator.compare(expName("peqin"), expName("pepin")) > 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("pepin1")) < 0);
-    assertTrue(comparator.compare(expName("pepin1"), expName("pepin")) > 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("péqîn")) < 0);
-    assertTrue(comparator.compare(expName("peqin"), expName("pépîn")) > 0);
-    assertTrue(comparator.compare(null, expName("pepin")) < 0);
-    assertTrue(comparator.compare(expName(null), expName("pepin")) < 0);
-    assertTrue(comparator.compare(expName("pepin"), null) > 0);
-    assertTrue(comparator.compare(expName("pepin"), expName(null)) > 0);
-    assertTrue(comparator.compare(expName(""), expName("pepin")) < 0);
-    assertTrue(comparator.compare(expName("pepin"), expName("")) > 0);
+    NormalizedComparator<TestName> comparator = new NormalizedComparator<>(TestName::getName);
+    assertTrue(comparator.compare(name("bateau"), name("bàteau")) == 0);
+    assertTrue(comparator.compare(name("bateau"), name("bàteau")) == 0);
+    assertTrue(comparator.compare(name("bateau"), name("BÀTEAU")) == 0);
+    assertTrue(comparator.compare(name("BATEAU"), name("BÀTEAU")) == 0);
+    assertTrue(comparator.compare(name("bateau"), name("bâteau")) == 0);
+    assertTrue(comparator.compare(name("BATEAU"), name("BÂTEAU")) == 0);
+    assertTrue(comparator.compare(name("bateau"), name("bäteau")) == 0);
+    assertTrue(comparator.compare(name("BATEAU"), name("BÄTEAU")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pépin")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pèpin")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pêpin")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pëpin")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pepîn")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pepïn")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("PÉPIN")) == 0);
+    assertTrue(comparator.compare(name("pepon"), name("pepôn")) == 0);
+    assertTrue(comparator.compare(name("pepon"), name("pepön")) == 0);
+    assertTrue(comparator.compare(name("pepun"), name("pepùn")) == 0);
+    assertTrue(comparator.compare(name("pepun"), name("pepûn")) == 0);
+    assertTrue(comparator.compare(name("pepun"), name("pepün")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("pépîn")) == 0);
+    assertTrue(comparator.compare(name("pepin"), name("peqin")) < 0);
+    assertTrue(comparator.compare(name("peqin"), name("pepin")) > 0);
+    assertTrue(comparator.compare(name("pepin"), name("pepin1")) < 0);
+    assertTrue(comparator.compare(name("pepin1"), name("pepin")) > 0);
+    assertTrue(comparator.compare(name("pepin"), name("péqîn")) < 0);
+    assertTrue(comparator.compare(name("peqin"), name("pépîn")) > 0);
+    assertTrue(comparator.compare(null, name("pepin")) < 0);
+    assertTrue(comparator.compare(name(null), name("pepin")) < 0);
+    assertTrue(comparator.compare(name("pepin"), null) > 0);
+    assertTrue(comparator.compare(name("pepin"), name(null)) > 0);
+    assertTrue(comparator.compare(name(""), name("pepin")) < 0);
+    assertTrue(comparator.compare(name("pepin"), name("")) > 0);
     // Test Polish, out of curiosity.
-    assertTrue(comparator.compare(expName("a"), expName("ą")) == 0);
-    assertTrue(comparator.compare(expName("c"), expName("ć")) == 0);
-    assertTrue(comparator.compare(expName("e"), expName("ę")) == 0);
+    assertTrue(comparator.compare(name("a"), name("ą")) == 0);
+    assertTrue(comparator.compare(name("c"), name("ć")) == 0);
+    assertTrue(comparator.compare(name("e"), name("ę")) == 0);
     // Doesn't work because ł in Unicode is not l with a slash, but its own character.
-    //assertTrue(comparator.compare(expName("l"), expName("ł")) == 0);
-    assertTrue(comparator.compare(expName("n"), expName("ń")) == 0);
-    assertTrue(comparator.compare(expName("o"), expName("ó")) == 0);
-    assertTrue(comparator.compare(expName("s"), expName("ś")) == 0);
-    assertTrue(comparator.compare(expName("z"), expName("ź")) == 0);
-    assertTrue(comparator.compare(expName("z"), expName("ż")) == 0);
+    //assertTrue(comparator.compare(name("l"), name("ł")) == 0);
+    assertTrue(comparator.compare(name("n"), name("ń")) == 0);
+    assertTrue(comparator.compare(name("o"), name("ó")) == 0);
+    assertTrue(comparator.compare(name("s"), name("ś")) == 0);
+    assertTrue(comparator.compare(name("z"), name("ź")) == 0);
+    assertTrue(comparator.compare(name("z"), name("ż")) == 0);
   }
 
   @Test
@@ -131,16 +130,24 @@ public class NormalizedComparatorTest {
 
   @Test
   public void getConverter_ExperimentName() {
-    NormalizedComparator<Experiment> comparator = new NormalizedComparator<>(Experiment::getName);
-    assertEquals("test", comparator.getConverter().apply(expName("test")));
-    assertEquals("abc", comparator.getConverter().apply(expName("abc")));
-    assertEquals("pépîn", comparator.getConverter().apply(expName("pépîn")));
-    assertEquals(null, comparator.getConverter().apply(expName(null)));
+    NormalizedComparator<TestName> comparator = new NormalizedComparator<>(TestName::getName);
+    assertEquals("test", comparator.getConverter().apply(name("test")));
+    assertEquals("abc", comparator.getConverter().apply(name("abc")));
+    assertEquals("pépîn", comparator.getConverter().apply(name("pépîn")));
+    assertEquals(null, comparator.getConverter().apply(name(null)));
   }
 
-  private Experiment expName(String name) {
-    Experiment experiment = new Experiment();
-    experiment.setName(name);
-    return experiment;
+  private TestName name(String name) {
+    TestName testName = new TestName();
+    testName.name = name;
+    return testName;
+  }
+
+  private static class TestName {
+    private String name;
+
+    public String getName() {
+      return name;
+    }
   }
 }
