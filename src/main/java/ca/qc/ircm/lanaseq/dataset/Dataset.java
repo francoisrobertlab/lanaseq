@@ -69,6 +69,12 @@ public class Dataset implements Data, Owned, Serializable {
   @Enumerated(STRING)
   private DatasetType type;
   /**
+   * Target.
+   */
+  @Column
+  @Size(max = 255)
+  private String target;
+  /**
    * Project.
    */
   @Column
@@ -215,5 +221,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setType(DatasetType type) {
     this.type = type;
+  }
+
+  public String getTarget() {
+    return target;
+  }
+
+  public void setTarget(String target) {
+    this.target = target;
   }
 }

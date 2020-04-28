@@ -86,6 +86,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private Protocol protocol;
   private Assay assay = Assay.CHIP_SEQ;
   private DatasetType type = DatasetType.IMMUNO_PRECIPITATION;
+  private String target = "polr3a";
 
   /**
    * Before test.
@@ -102,6 +103,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.assay.setItems(Assay.values());
     dialog.type = new ComboBox<>();
     dialog.type.setItems(DatasetType.values());
+    dialog.target = new TextField();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
@@ -117,6 +119,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.protocol.setValue(protocol);
     dialog.assay.setValue(assay);
     dialog.type.setValue(type);
+    dialog.target.setValue(target);
   }
 
   @Test
@@ -138,6 +141,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertNull(dialog.protocol.getValue());
     assertEquals(Assay.NULL, dialog.assay.getValue());
     assertEquals(DatasetType.NULL, dialog.type.getValue());
+    assertEquals("", dialog.target.getValue());
   }
 
   @Test
@@ -153,6 +157,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
   }
 
   @Test
@@ -168,6 +173,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
   }
 
   @Test
@@ -218,6 +224,27 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_ProtocolEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.protocol.setItems();
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.protocol);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
   public void save_AssayEmpty() {
     presenter.localeChange(locale);
     fillForm();
@@ -254,24 +281,21 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void save_ProtocolEmpty() {
+  public void save_TargetEmpty() {
     presenter.localeChange(locale);
     fillForm();
-    dialog.protocol.setItems();
+    dialog.target.setValue("");
 
     presenter.save(locale);
 
     BinderValidationStatus<Dataset> status = presenter.validateDataset();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.protocol);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getTarget());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -288,6 +312,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
     assertEquals(type, dataset.getType());
+    assertEquals(target, dataset.getTarget());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -309,6 +334,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
     assertEquals(type, dataset.getType());
+    assertEquals(target, dataset.getTarget());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();

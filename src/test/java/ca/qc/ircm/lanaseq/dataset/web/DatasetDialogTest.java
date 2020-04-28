@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
@@ -106,6 +107,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
     assertEquals(id(TYPE), dialog.type.getId().orElse(""));
+    assertEquals(id(TARGET), dialog.target.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -122,6 +124,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
+    assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -142,6 +145,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
+    assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);

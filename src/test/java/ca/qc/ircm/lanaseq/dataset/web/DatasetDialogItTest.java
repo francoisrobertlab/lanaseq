@@ -60,6 +60,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
   private DatasetType type = DatasetType.IMMUNO_PRECIPITATION;
+  private String target = "polr3a";
 
   @Before
   public void beforeTest() {
@@ -76,6 +77,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.protocol().selectByText(protocol.getName());
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
     dialog.type().selectByText(type.getLabel(currentLocale()));
+    dialog.target().setValue(target);
   }
 
   @Test
@@ -90,6 +92,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
     assertTrue(optional(() -> dialog.type()).isPresent());
+    assertTrue(optional(() -> dialog.target()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
   }
@@ -119,6 +122,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
     assertEquals(type, dataset.getType());
+    assertEquals(target, dataset.getTarget());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -145,6 +149,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
     assertEquals(type, dataset.getType());
+    assertEquals(target, dataset.getTarget());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
   }
@@ -168,6 +173,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals((Long) 3L, dataset.getProtocol().getId());
     assertNull(dataset.getAssay());
     assertNull(dataset.getType());
+    assertEquals("Spt16", dataset.getTarget());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
   }
