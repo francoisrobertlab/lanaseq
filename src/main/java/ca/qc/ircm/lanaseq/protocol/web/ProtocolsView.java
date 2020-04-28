@@ -8,12 +8,12 @@ import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
-import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -72,13 +72,14 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     add(header, protocols, add);
     header.setId(HEADER);
     protocols.setId(PROTOCOLS);
-    name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME).setComparator(
-        (p1, p2) -> normalize(p1.getName()).compareToIgnoreCase(normalize(p2.getName())));
+    name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
+        .setComparator(NormalizedComparator.of(Protocol::getName));
     date = protocols
         .addColumn(new LocalDateTimeRenderer<>(Protocol::getDate, DateTimeFormatter.ISO_LOCAL_DATE),
             DATE)
         .setKey(DATE);
-    owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER);
+    owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
+        .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     protocols.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     protocols.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = protocols.appendHeaderRow();

@@ -30,6 +30,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -104,6 +105,7 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     view.owner = mock(Column.class);
     when(view.protocols.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
+    when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.protocols.appendHeaderRow()).thenReturn(filtersRow);
@@ -195,16 +197,11 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     }
     verify(view.name).setComparator(comparatorCaptor.capture());
     Comparator<Protocol> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(name("abc"), name("test")) < 0);
-    assertTrue(comparator.compare(name("Abc"), name("test")) < 0);
-    assertTrue(comparator.compare(name("élement"), name("facteur")) < 0);
-    assertTrue(comparator.compare(name("test"), name("test")) == 0);
-    assertTrue(comparator.compare(name("Test"), name("test")) == 0);
-    assertTrue(comparator.compare(name("Expérienceà"), name("experiencea")) == 0);
-    assertTrue(comparator.compare(name("experiencea"), name("Expérienceà")) == 0);
-    assertTrue(comparator.compare(name("test"), name("abc")) > 0);
-    assertTrue(comparator.compare(name("Test"), name("abc")) > 0);
-    assertTrue(comparator.compare(name("facteur"), name("élement")) > 0);
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Protocol protocol : protocols) {
+      assertEquals(protocol.getName(),
+          ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
+    }
     verify(view.protocols).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Protocol> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
     for (Protocol protocol : protocols) {
@@ -216,6 +213,13 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     for (Protocol protocol : protocols) {
       assertEquals(protocol.getOwner().getEmail(), valueProvider.apply(protocol));
     }
+    verify(view.owner).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Protocol protocol : protocols) {
+      assertEquals(protocol.getOwner().getEmail(),
+          ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
+    }
   }
 
   @Test
@@ -224,12 +228,6 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     doubleClickItem(view.protocols, protocol);
 
     verify(presenter).view(protocol);
-  }
-
-  private Protocol name(String name) {
-    Protocol protocol = new Protocol();
-    protocol.setName(name);
-    return protocol;
   }
 
   @Test
