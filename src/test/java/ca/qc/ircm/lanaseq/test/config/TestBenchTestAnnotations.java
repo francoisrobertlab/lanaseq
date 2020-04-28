@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Headless
 @Transactional
-@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/experiment-data.sql",
+@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
     "/acl-data.sql", "/fix-it-tests.sql" })
 public @interface TestBenchTestAnnotations {
   /**

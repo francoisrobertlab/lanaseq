@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
@@ -53,7 +53,7 @@ public class ViewLayout extends VerticalLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver {
   public static final String ID = "view-layout";
   public static final String TABS = styleName(ID, "tabs");
-  public static final String EXPERIMENTS = "experiments";
+  public static final String DATASETS = "datasets";
   public static final String PROTOCOLS = "protocols";
   public static final String PROFILE = "profile";
   public static final String USERS = "users";
@@ -63,7 +63,7 @@ public class ViewLayout extends VerticalLayout
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected Tabs tabs = new Tabs();
-  protected Tab experiments = new Tab();
+  protected Tab datasets = new Tab();
   protected Tab protocols = new Tab();
   protected Tab profile = new Tab();
   protected Tab users = new Tab();
@@ -89,17 +89,17 @@ public class ViewLayout extends VerticalLayout
     setSpacing(false);
     add(tabs);
     tabs.setId(TABS);
-    tabs.add(experiments, protocols, profile, users, exitSwitchUser, signout);
+    tabs.add(datasets, protocols, profile, users, exitSwitchUser, signout);
     exitSwitchUser
         .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
-    experiments.setId(styleName(EXPERIMENTS, TAB));
+    datasets.setId(styleName(DATASETS, TAB));
     protocols.setId(styleName(PROTOCOLS, TAB));
     profile.setId(styleName(PROFILE, TAB));
     users.setId(styleName(USERS, TAB));
     users.setVisible(authorizationService.isAuthorized(UsersView.class));
     exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
     signout.setId(styleName(SIGNOUT, TAB));
-    tabsHref.put(experiments, ExperimentsView.VIEW_NAME);
+    tabsHref.put(datasets, DatasetsView.VIEW_NAME);
     tabsHref.put(protocols, ProtocolsView.VIEW_NAME);
     tabsHref.put(profile, ProfileView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
@@ -109,7 +109,7 @@ public class ViewLayout extends VerticalLayout
   @Override
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(ViewLayout.class, getLocale());
-    experiments.setLabel(resources.message(EXPERIMENTS));
+    datasets.setLabel(resources.message(DATASETS));
     protocols.setLabel(resources.message(PROTOCOLS));
     profile.setLabel(resources.message(PROFILE));
     users.setLabel(resources.message(USERS));

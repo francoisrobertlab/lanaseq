@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
@@ -45,7 +45,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class PermissionEvaluatorDelegatorTest {
   private static final String LABORATORY_CLASS = Laboratory.class.getName();
   private static final String USER_CLASS = User.class.getName();
-  private static final String EXPERIMENT_CLASS = Experiment.class.getName();
+  private static final String DATASET_CLASS = Dataset.class.getName();
   private static final String PROTOCOL_CLASS = Protocol.class.getName();
   private static final String READ = "read";
   private static final Permission BASE_READ = BasePermission.READ;
@@ -58,7 +58,7 @@ public class PermissionEvaluatorDelegatorTest {
   @MockBean
   private UserPermissionEvaluator userPermissionEvaluator;
   @MockBean
-  private ExperimentPermissionEvaluator experimentPermissionEvaluator;
+  private DatasetPermissionEvaluator datasetPermissionEvaluator;
   @MockBean
   private ProtocolPermissionEvaluator protocolPermissionEvaluator;
   @Mock
@@ -66,7 +66,7 @@ public class PermissionEvaluatorDelegatorTest {
   @Mock
   private User user;
   @Mock
-  private Experiment experiment;
+  private Dataset dataset;
   @Mock
   private Protocol protocol;
 
@@ -193,62 +193,62 @@ public class PermissionEvaluatorDelegatorTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_Experiment_False() throws Throwable {
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_WRITE));
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, BASE_READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, WRITE);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, BASE_WRITE);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, WRITE);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_WRITE);
+  public void hasPermission_Dataset_False() throws Throwable {
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_WRITE));
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, BASE_READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, WRITE);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, BASE_WRITE);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, WRITE);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_WRITE);
   }
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_Experiment_True() throws Throwable {
-    when(experimentPermissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    when(experimentPermissionEvaluator.hasPermission(any(), any(), any(), any())).thenReturn(true);
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment, READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment, BASE_READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment, WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment, BASE_WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_WRITE));
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, BASE_READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, WRITE);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment, BASE_WRITE);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_READ);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, WRITE);
-    verify(experimentPermissionEvaluator).hasPermission(authentication(), experiment.getId(),
-        EXPERIMENT_CLASS, BASE_WRITE);
+  public void hasPermission_Dataset_True() throws Throwable {
+    when(datasetPermissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    when(datasetPermissionEvaluator.hasPermission(any(), any(), any(), any())).thenReturn(true);
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, BASE_READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, BASE_WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_WRITE));
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, BASE_READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, WRITE);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, BASE_WRITE);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_READ);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, WRITE);
+    verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset.getId(),
+        DATASET_CLASS, BASE_WRITE);
   }
 
   @Test

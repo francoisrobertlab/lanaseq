@@ -35,11 +35,11 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 /**
- * An experiment.
+ * An dataset.
  */
 @Entity
 @GeneratePropertyNames
-public class Experiment implements Data, Owned, Serializable {
+public class Dataset implements Data, Owned, Serializable {
   private static final long serialVersionUID = -8296884268335212959L;
   /**
    * Database identifier.
@@ -78,25 +78,25 @@ public class Experiment implements Data, Owned, Serializable {
   @JoinColumn
   private User owner;
 
-  public Experiment() {
+  public Dataset() {
   }
 
-  public Experiment(Long id) {
+  public Dataset(Long id) {
     this.id = id;
   }
 
-  public Experiment(String name) {
+  public Dataset(String name) {
     this.name = name;
   }
 
-  public Experiment(Long id, String name) {
+  public Dataset(Long id, String name) {
     this.id = id;
     this.name = name;
   }
 
   @Override
   public String toString() {
-    return "Experiment [id=" + id + ", name=" + name + "]";
+    return "Dataset [id=" + id + ", name=" + name + "]";
   }
 
   @Override
@@ -116,10 +116,10 @@ public class Experiment implements Data, Owned, Serializable {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof Experiment)) {
+    if (!(obj instanceof Dataset)) {
       return false;
     }
-    Experiment other = (Experiment) obj;
+    Dataset other = (Dataset) obj;
     if (date == null) {
       if (other.date != null) {
         return false;

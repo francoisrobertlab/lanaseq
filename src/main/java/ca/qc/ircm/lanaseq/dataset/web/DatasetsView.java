@@ -23,18 +23,18 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.OWNER;
-import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.dataset.ExperimentProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
@@ -60,27 +60,27 @@ import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Experiments view.
+ * Datasets view.
  */
-@Route(value = ExperimentsView.VIEW_NAME, layout = ViewLayout.class)
+@Route(value = DatasetsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class ExperimentsView extends VerticalLayout
+public class DatasetsView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle {
-  public static final String VIEW_NAME = "experiments";
+  public static final String VIEW_NAME = "datasets";
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
-  public static final String EXPERIMENTS = "experiments";
-  public static final String EXPERIMENTS_REQUIRED = property(EXPERIMENTS, REQUIRED);
+  public static final String DATASETS = "datasets";
+  public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
   public static final String PERMISSIONS = "permissions";
   public static final String PERMISSIONS_DENIED = property(PERMISSIONS, "denied");
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
-  protected Grid<Experiment> experiments = new Grid<>();
-  protected Column<Experiment> name;
-  protected Column<Experiment> project;
-  protected Column<Experiment> protocol;
-  protected Column<Experiment> date;
-  protected Column<Experiment> owner;
+  protected Grid<Dataset> datasets = new Grid<>();
+  protected Column<Dataset> name;
+  protected Column<Dataset> project;
+  protected Column<Dataset> protocol;
+  protected Column<Dataset> date;
+  protected Column<Dataset> owner;
   protected TextField nameFilter = new TextField();
   protected TextField projectFilter = new TextField();
   protected TextField protocolFilter = new TextField();
@@ -89,53 +89,53 @@ public class ExperimentsView extends VerticalLayout
   protected Button add = new Button();
   protected Button permissions = new Button();
   @Autowired
-  protected ExperimentDialog experimentDialog;
+  protected DatasetDialog datasetDialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
   @Autowired
-  protected ExperimentPermissionsDialog experimentPermissionsDialog;
+  protected DatasetPermissionsDialog datasetPermissionsDialog;
   @Autowired
-  private transient ExperimentsViewPresenter presenter;
+  private transient DatasetsViewPresenter presenter;
 
-  public ExperimentsView() {
+  public DatasetsView() {
   }
 
-  protected ExperimentsView(ExperimentsViewPresenter presenter, ExperimentDialog experimentDialog,
-      ProtocolDialog protocolDialog, ExperimentPermissionsDialog experimentPermissionsDialog) {
+  protected DatasetsView(DatasetsViewPresenter presenter, DatasetDialog datasetDialog,
+      ProtocolDialog protocolDialog, DatasetPermissionsDialog datasetPermissionsDialog) {
     this.presenter = presenter;
-    this.experimentDialog = experimentDialog;
+    this.datasetDialog = datasetDialog;
     this.protocolDialog = protocolDialog;
-    this.experimentPermissionsDialog = experimentPermissionsDialog;
+    this.datasetPermissionsDialog = datasetPermissionsDialog;
   }
 
   @PostConstruct
   void init() {
     setId(ID);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
-    add(header, experiments, error, buttonsLayout);
+    add(header, datasets, error, buttonsLayout);
     buttonsLayout.add(add, permissions);
     header.setId(HEADER);
-    experiments.setId(EXPERIMENTS);
-    experiments.addItemDoubleClickListener(e -> {
+    datasets.setId(DATASETS);
+    datasets.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol) {
         presenter.view(e.getItem().getProtocol());
       } else {
         presenter.view(e.getItem());
       }
     });
-    name = experiments.addColumn(experiment -> experiment.getName(), NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Experiment::getName));
-    project = experiments.addColumn(experiment -> experiment.getProject(), PROJECT).setKey(PROJECT)
-        .setComparator(NormalizedComparator.of(Experiment::getProject));
-    protocol = experiments.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
+    name = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
+        .setComparator(NormalizedComparator.of(Dataset::getName));
+    project = datasets.addColumn(dataset -> dataset.getProject(), PROJECT).setKey(PROJECT)
+        .setComparator(NormalizedComparator.of(Dataset::getProject));
+    protocol = datasets.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator(NormalizedComparator.of(e -> e.getProtocol().getName()));
-    date = experiments.addColumn(
-        new LocalDateTimeRenderer<>(Experiment::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
+    date = datasets.addColumn(
+        new LocalDateTimeRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
-    owner = experiments.addColumn(experiment -> experiment.getOwner().getEmail(), OWNER)
+    owner = datasets.addColumn(dataset -> dataset.getOwner().getEmail(), OWNER)
         .setKey(OWNER).setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail()));
-    experiments.appendHeaderRow(); // Headers.
-    HeaderRow filtersRow = experiments.appendHeaderRow();
+    datasets.appendHeaderRow(); // Headers.
+    HeaderRow filtersRow = datasets.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
     nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -162,19 +162,19 @@ public class ExperimentsView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(ExperimentsView.class, getLocale());
-    final AppResources experimentResources = new AppResources(Experiment.class, getLocale());
+    final AppResources resources = new AppResources(DatasetsView.class, getLocale());
+    final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
-    String nameHeader = experimentResources.message(NAME);
+    String nameHeader = datasetResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String projectHeader = experimentResources.message(PROJECT);
+    String projectHeader = datasetResources.message(PROJECT);
     project.setHeader(projectHeader).setFooter(projectHeader);
-    String protocolHeader = experimentResources.message(PROTOCOL);
+    String protocolHeader = datasetResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
-    String dateHeader = experimentResources.message(DATE);
+    String dateHeader = datasetResources.message(DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
-    String ownerHeader = experimentResources.message(OWNER);
+    String ownerHeader = datasetResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
     projectFilter.setPlaceholder(webResources.message(ALL));
@@ -189,7 +189,7 @@ public class ExperimentsView extends VerticalLayout
 
   @Override
   public String getPageTitle() {
-    AppResources resources = new AppResources(ExperimentsView.class, getLocale());
+    AppResources resources = new AppResources(DatasetsView.class, getLocale());
     AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
   }

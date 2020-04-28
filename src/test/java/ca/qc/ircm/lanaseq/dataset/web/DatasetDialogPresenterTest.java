@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.ExperimentDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,11 +31,11 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.Experiment;
-import ca.qc.ircm.lanaseq.dataset.ExperimentRepository;
-import ca.qc.ircm.lanaseq.dataset.ExperimentService;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentDialog;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentDialogPresenter;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialogPresenter;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -62,25 +62,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
-  private ExperimentDialogPresenter presenter;
+public class DatasetDialogPresenterTest extends AbstractViewTestCase {
+  private DatasetDialogPresenter presenter;
   @Mock
-  private ExperimentDialog dialog;
+  private DatasetDialog dialog;
   @Mock
-  private ExperimentService service;
+  private DatasetService service;
   @Mock
   private ProtocolService protocolService;
   @Captor
-  private ArgumentCaptor<Experiment> experimentCaptor;
+  private ArgumentCaptor<Dataset> datasetCaptor;
   @Autowired
-  private ExperimentRepository repository;
+  private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ExperimentDialog.class, locale);
+  private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
-  private String name = "Test Experiment";
+  private String name = "Test Dataset";
   private String project = "Test Project";
   private Protocol protocol;
 
@@ -90,7 +90,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new ExperimentDialogPresenter(service, protocolService);
+    presenter = new DatasetDialogPresenter(service, protocolService);
     dialog.header = new H3();
     dialog.name = new TextField();
     dialog.project = new TextField();
@@ -111,46 +111,46 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void getExperiment() {
-    Experiment experiment = new Experiment();
-    presenter.setExperiment(experiment);
-    assertEquals(experiment, presenter.getExperiment());
+  public void getDataset() {
+    Dataset dataset = new Dataset();
+    presenter.setDataset(dataset);
+    assertEquals(dataset, presenter.getDataset());
   }
 
   @Test
-  public void setExperiment_NewExperiment() {
-    Experiment experiment = new Experiment();
+  public void setDataset_NewDataset() {
+    Dataset dataset = new Dataset();
 
     presenter.localeChange(locale);
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
 
     assertEquals("", dialog.name.getValue());
   }
 
   @Test
-  public void setExperiment_Experiment() {
-    Experiment experiment = repository.findById(2L).get();
+  public void setDataset_Dataset() {
+    Dataset dataset = repository.findById(2L).get();
 
     presenter.localeChange(locale);
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
 
-    assertEquals(experiment.getName(), dialog.name.getValue());
+    assertEquals(dataset.getName(), dialog.name.getValue());
   }
 
   @Test
-  public void setExperiment_BeforeLocaleChange() {
-    Experiment experiment = repository.findById(2L).get();
+  public void setDataset_BeforeLocaleChange() {
+    Dataset dataset = repository.findById(2L).get();
 
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
     presenter.localeChange(locale);
 
-    assertEquals(experiment.getName(), dialog.name.getValue());
+    assertEquals(dataset.getName(), dialog.name.getValue());
   }
 
   @Test
-  public void setExperiment_Null() {
+  public void setDataset_Null() {
     presenter.localeChange(locale);
-    presenter.setExperiment(null);
+    presenter.setDataset(null);
 
     assertEquals("", dialog.name.getValue());
   }
@@ -163,7 +163,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Experiment> status = presenter.validateExperiment();
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.name);
@@ -184,11 +184,11 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Experiment> status = presenter.validateExperiment();
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
     assertTrue(status.isOk());
-    verify(service).save(experimentCaptor.capture());
-    Experiment experiment = experimentCaptor.getValue();
-    assertNull(experiment.getProject());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getProject());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -202,7 +202,7 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Experiment> status = presenter.validateExperiment();
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.protocol);
@@ -216,36 +216,36 @@ public class ExperimentDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void save_NewExperiment() {
+  public void save_NewDataset() {
     presenter.localeChange(locale);
     fillForm();
 
     presenter.save(locale);
 
-    verify(service).save(experimentCaptor.capture());
-    Experiment experiment = experimentCaptor.getValue();
-    assertEquals(name, experiment.getName());
-    assertEquals(project, experiment.getProject());
-    assertEquals(protocol.getId(), experiment.getProtocol().getId());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertEquals(name, dataset.getName());
+    assertEquals(project, dataset.getProject());
+    assertEquals(protocol.getId(), dataset.getProtocol().getId());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
 
   @Test
-  public void save_UpdateExperiment() {
-    Experiment experiment = repository.findById(2L).get();
-    presenter.setExperiment(experiment);
+  public void save_UpdateDataset() {
+    Dataset dataset = repository.findById(2L).get();
+    presenter.setDataset(dataset);
     presenter.localeChange(locale);
     fillForm();
 
     presenter.save(locale);
 
-    verify(service).save(experimentCaptor.capture());
-    experiment = experimentCaptor.getValue();
-    assertEquals(name, experiment.getName());
-    assertEquals(project, experiment.getProject());
-    assertEquals(protocol.getId(), experiment.getProtocol().getId());
+    verify(service).save(datasetCaptor.capture());
+    dataset = datasetCaptor.getValue();
+    assertEquals(name, dataset.getName());
+    assertEquals(project, dataset.getProject());
+    assertEquals(protocol.getId(), dataset.getProtocol().getId());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();

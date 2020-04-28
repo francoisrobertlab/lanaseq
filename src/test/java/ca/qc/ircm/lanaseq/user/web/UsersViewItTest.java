@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
@@ -149,7 +149,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     Locale locale = currentLocale();
     assertEquals(
-        new AppResources(ExperimentsView.class, locale).message(TITLE,
+        new AppResources(DatasetsView.class, locale).message(TITLE,
             new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
         getDriver().getTitle());
   }

@@ -71,7 +71,7 @@ public class NormalizedComparatorTest {
   }
 
   @Test
-  public void compare_ExperimentName() {
+  public void compare_DatasetName() {
     NormalizedComparator<TestName> comparator = new NormalizedComparator<>(TestName::getName);
     assertTrue(comparator.compare(name("bateau"), name("bàteau")) == 0);
     assertTrue(comparator.compare(name("bateau"), name("bàteau")) == 0);
@@ -129,7 +129,7 @@ public class NormalizedComparatorTest {
   }
 
   @Test
-  public void getConverter_ExperimentName() {
+  public void getConverter_DatasetName() {
     NormalizedComparator<TestName> comparator = new NormalizedComparator<>(TestName::getName);
     assertEquals("test", comparator.getConverter().apply(name("test")));
     assertEquals("abc", comparator.getConverter().apply(name("abc")));

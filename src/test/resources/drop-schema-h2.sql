@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS acl_entry;
 DROP TABLE IF EXISTS acl_object_identity;
 DROP TABLE IF EXISTS acl_class;
 DROP TABLE IF EXISTS acl_sid;
-DROP TABLE IF EXISTS experiment;
+DROP TABLE IF EXISTS dataset;
 DROP TABLE IF EXISTS protocol_file;
 DROP TABLE IF EXISTS protocol;
 DROP TABLE IF EXISTS forgot_password;

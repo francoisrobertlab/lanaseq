@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.EXPERIMENTS_REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.ExperimentsView.PERMISSIONS_DENIED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS_DENIED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,13 +32,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.dataset.Experiment;
-import ca.qc.ircm.lanaseq.dataset.ExperimentRepository;
-import ca.qc.ircm.lanaseq.dataset.ExperimentService;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentDialog;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentsView;
-import ca.qc.ircm.lanaseq.dataset.web.ExperimentsViewPresenter;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPresenter;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
@@ -70,31 +70,31 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
-  private ExperimentsViewPresenter presenter;
+public class DatasetsViewPresenterTest extends AbstractViewTestCase {
+  private DatasetsViewPresenter presenter;
   @Mock
-  private ExperimentsView view;
+  private DatasetsView view;
   @Mock
-  private ExperimentService service;
+  private DatasetService service;
   @Mock
   private ProtocolService protocolService;
   @Mock
   private AuthorizationService authorizationService;
   @Mock
-  private DataProvider<Experiment, ?> dataProvider;
+  private DataProvider<Dataset, ?> dataProvider;
   @Captor
-  private ArgumentCaptor<Experiment> experimentCaptor;
+  private ArgumentCaptor<Dataset> datasetCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<ExperimentDialog>>> savedListenerCaptor;
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<DatasetDialog>>> savedListenerCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
   @Autowired
-  private ExperimentRepository repository;
+  private DatasetRepository repository;
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ExperimentsView.class, locale);
-  private List<Experiment> experiments;
+  private AppResources resources = new AppResources(DatasetsView.class, locale);
+  private List<Dataset> datasets;
   private User currentUser;
 
   /**
@@ -102,37 +102,37 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new ExperimentsViewPresenter(service, protocolService, authorizationService);
+    presenter = new DatasetsViewPresenter(service, protocolService, authorizationService);
     view.header = new H2();
-    view.experiments = new Grid<>();
-    view.experiments.setSelectionMode(SelectionMode.MULTI);
+    view.datasets = new Grid<>();
+    view.datasets.setSelectionMode(SelectionMode.MULTI);
     view.nameFilter = new TextField();
     view.projectFilter = new TextField();
     view.ownerFilter = new TextField();
     view.error = new Div();
     view.add = new Button();
     view.permissions = new Button();
-    view.experimentDialog = mock(ExperimentDialog.class);
+    view.datasetDialog = mock(DatasetDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
-    view.experimentPermissionsDialog = mock(ExperimentPermissionsDialog.class);
-    experiments = repository.findAll();
-    when(service.all()).thenReturn(experiments);
+    view.datasetPermissionsDialog = mock(DatasetPermissionsDialog.class);
+    datasets = repository.findAll();
+    when(service.all()).thenReturn(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
   }
 
   @Test
-  public void experiments() {
+  public void datasets() {
     presenter.init(view);
     presenter.localeChange(locale);
-    List<Experiment> experiments = items(view.experiments);
-    assertEquals(this.experiments.size(), experiments.size());
-    for (Experiment experiment : this.experiments) {
-      assertTrue(experiment.toString(), experiments.contains(experiment));
+    List<Dataset> datasets = items(view.datasets);
+    assertEquals(this.datasets.size(), datasets.size());
+    for (Dataset dataset : this.datasets) {
+      assertTrue(dataset.toString(), datasets.contains(dataset));
     }
-    assertEquals(0, view.experiments.getSelectedItems().size());
-    experiments.forEach(experiment -> view.experiments.select(experiment));
-    assertEquals(experiments.size(), view.experiments.getSelectedItems().size());
+    assertEquals(0, view.datasets.getSelectedItems().size());
+    datasets.forEach(dataset -> view.datasets.select(dataset));
+    assertEquals(datasets.size(), view.datasets.getSelectedItems().size());
   }
 
   @Test
@@ -159,7 +159,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterName() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterName("test");
 
@@ -171,7 +171,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterName_Empty() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterName("");
 
@@ -183,7 +183,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterProject() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProject("test");
 
@@ -195,7 +195,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterProject_Empty() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProject("");
 
@@ -207,7 +207,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterProtocol() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProtocol("test");
 
@@ -219,7 +219,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterProtocol_Empty() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProtocol("");
 
@@ -231,7 +231,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterOwner() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterOwner("test");
 
@@ -243,7 +243,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void filterOwner_Empty() {
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
 
     presenter.filterOwner("");
 
@@ -262,14 +262,14 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
   public void view() {
     presenter.init(view);
     presenter.localeChange(locale);
-    Experiment experiment = new Experiment();
-    experiment.setId(2L);
-    Experiment databaseExperiment = new Experiment();
-    when(service.get(any())).thenReturn(databaseExperiment);
-    presenter.view(experiment);
+    Dataset dataset = new Dataset();
+    dataset.setId(2L);
+    Dataset databaseDataset = new Dataset();
+    when(service.get(any())).thenReturn(databaseDataset);
+    presenter.view(dataset);
     verify(service).get(2L);
-    verify(view.experimentDialog).setExperiment(databaseExperiment);
-    verify(view.experimentDialog).open();
+    verify(view.datasetDialog).setDataset(databaseDataset);
+    verify(view.datasetDialog).open();
   }
 
   @Test
@@ -291,48 +291,48 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     presenter.init(view);
     presenter.localeChange(locale);
     presenter.add();
-    verify(view.experimentDialog).setExperiment(experimentCaptor.capture());
-    Experiment experiment = experimentCaptor.getValue();
-    assertNull(experiment.getId());
-    assertNull(experiment.getName());
-    verify(view.experimentDialog).open();
+    verify(view.datasetDialog).setDataset(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertNull(dataset.getName());
+    verify(view.datasetDialog).open();
   }
 
   @Test
   public void permissions() {
-    final Experiment experiment = experiments.get(2);
+    final Dataset dataset = datasets.get(2);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.select(experiment);
+    view.datasets.select(dataset);
     presenter.permissions();
     assertFalse(view.error.isVisible());
-    verify(view.experimentPermissionsDialog).setExperiment(experiment);
-    verify(view.experimentPermissionsDialog).open();
+    verify(view.datasetPermissionsDialog).setDataset(dataset);
+    verify(view.datasetPermissionsDialog).open();
   }
 
   @Test
-  public void permissions_NoExperiment() {
+  public void permissions_NoDataset() {
     presenter.init(view);
     presenter.localeChange(locale);
     presenter.permissions();
-    assertEquals(resources.message(EXPERIMENTS_REQUIRED), view.error.getText());
+    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
     assertTrue(view.error.isVisible());
-    verify(view.experimentPermissionsDialog, never()).setExperiment(any());
-    verify(view.experimentPermissionsDialog, never()).open();
+    verify(view.datasetPermissionsDialog, never()).setDataset(any());
+    verify(view.datasetPermissionsDialog, never()).open();
   }
 
   @Test
   public void permissions_Denied() {
-    Experiment experiment = experiments.get(2);
+    Dataset dataset = datasets.get(2);
     presenter.init(view);
     presenter.localeChange(locale);
-    view.experiments.select(experiment);
+    view.datasets.select(dataset);
     presenter.permissions();
     assertEquals(resources.message(PERMISSIONS_DENIED), view.error.getText());
     assertTrue(view.error.isVisible());
-    verify(view.experimentPermissionsDialog, never()).setExperiment(any());
-    verify(view.experimentPermissionsDialog, never()).open();
+    verify(view.datasetPermissionsDialog, never()).setDataset(any());
+    verify(view.datasetPermissionsDialog, never()).open();
   }
 
   @Test
@@ -340,7 +340,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
     presenter.init(view);
     presenter.localeChange(locale);
     presenter.permissions();
-    presenter.view(experiments.get(1));
+    presenter.view(datasets.get(1));
     assertFalse(view.error.isVisible());
   }
 
@@ -373,11 +373,11 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void refreshExperimentsOnSaved() {
+  public void refreshDatasetsOnSaved() {
     presenter.init(view);
     presenter.localeChange(locale);
-    verify(view.experimentDialog).addSavedListener(savedListenerCaptor.capture());
-    ComponentEventListener<SavedEvent<ExperimentDialog>> savedListener =
+    verify(view.datasetDialog).addSavedListener(savedListenerCaptor.capture());
+    ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
     verify(service, times(2)).all();
@@ -385,7 +385,7 @@ public class ExperimentsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void refreshExperimentsOnProtocolSaved() {
+  public void refreshDatasetsOnProtocolSaved() {
     presenter.init(view);
     presenter.localeChange(locale);
     verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());

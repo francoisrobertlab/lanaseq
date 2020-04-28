@@ -3,8 +3,8 @@ package ca.qc.ircm.lanaseq.dataset;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.dataset.Experiment;
-import ca.qc.ircm.lanaseq.dataset.ExperimentFilter;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetFilter;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -17,8 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
-public class ExperimentFilterTest {
-  private ExperimentFilter filter = new ExperimentFilter();
+public class DatasetFilterTest {
+  private DatasetFilter filter = new DatasetFilter();
 
   @Test
   public void test_NameContains() {
@@ -199,47 +199,47 @@ public class ExperimentFilterTest {
     assertFalse(filter.test(nameOwner("", "my.test@abc.com")));
   }
 
-  private Experiment name(String name) {
-    Experiment experiment = new Experiment();
-    experiment.setName(name);
-    return experiment;
+  private Dataset name(String name) {
+    Dataset dataset = new Dataset();
+    dataset.setName(name);
+    return dataset;
   }
 
-  private Experiment project(String project) {
-    Experiment experiment = new Experiment();
-    experiment.setProject(project);
-    return experiment;
+  private Dataset project(String project) {
+    Dataset dataset = new Dataset();
+    dataset.setProject(project);
+    return dataset;
   }
 
-  private Experiment date(LocalDateTime date) {
-    Experiment experiment = new Experiment();
-    experiment.setDate(date);
-    return experiment;
+  private Dataset date(LocalDateTime date) {
+    Dataset dataset = new Dataset();
+    dataset.setDate(date);
+    return dataset;
   }
 
-  private Experiment protocol(String name) {
-    Experiment experiment = new Experiment();
+  private Dataset protocol(String name) {
+    Dataset dataset = new Dataset();
     Protocol protocol = new Protocol();
     protocol.setName(name);
-    experiment.setProtocol(protocol);
-    return experiment;
+    dataset.setProtocol(protocol);
+    return dataset;
   }
 
-  private Experiment owner(String email, String name) {
-    Experiment experiment = new Experiment();
+  private Dataset owner(String email, String name) {
+    Dataset dataset = new Dataset();
     User user = new User();
     user.setEmail(email);
     user.setName(name);
-    experiment.setOwner(user);
-    return experiment;
+    dataset.setOwner(user);
+    return dataset;
   }
 
-  private Experiment nameOwner(String name, String email) {
-    Experiment experiment = new Experiment();
-    experiment.setName(name);
+  private Dataset nameOwner(String name, String email) {
+    Dataset dataset = new Dataset();
+    dataset.setName(name);
     User user = new User();
     user.setEmail(email);
-    experiment.setOwner(user);
-    return experiment;
+    dataset.setOwner(user);
+    return dataset;
   }
 }

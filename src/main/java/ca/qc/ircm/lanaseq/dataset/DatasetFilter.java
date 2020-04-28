@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Filters experiments.
+ * Filters datasets.
  */
-public class ExperimentFilter implements Predicate<Experiment> {
+public class DatasetFilter implements Predicate<Dataset> {
   public String nameContains;
   public String projectContains;
   public String protocolContains;
@@ -18,26 +18,26 @@ public class ExperimentFilter implements Predicate<Experiment> {
   public String ownerContains;
 
   @Override
-  public boolean test(Experiment experiment) {
+  public boolean test(Dataset dataset) {
     boolean test = true;
     if (nameContains != null) {
-      test &= comparable(replaceNull(experiment.getName())).contains(comparable(nameContains));
+      test &= comparable(replaceNull(dataset.getName())).contains(comparable(nameContains));
     }
     if (projectContains != null) {
       test &=
-          comparable(replaceNull(experiment.getProject())).contains(comparable(projectContains));
+          comparable(replaceNull(dataset.getProject())).contains(comparable(projectContains));
     }
     if (protocolContains != null) {
-      test &= comparable(replaceNull(experiment.getProtocol().getName()))
+      test &= comparable(replaceNull(dataset.getProtocol().getName()))
           .contains(comparable(protocolContains));
     }
     if (dateRange != null) {
-      test &= dateRange.contains(experiment.getDate().toLocalDate());
+      test &= dateRange.contains(dataset.getDate().toLocalDate());
     }
     if (ownerContains != null) {
-      test &= comparable(replaceNull(experiment.getOwner().getEmail()))
+      test &= comparable(replaceNull(dataset.getOwner().getEmail()))
           .contains(comparable(ownerContains))
-          || comparable(replaceNull(experiment.getOwner().getName()))
+          || comparable(replaceNull(dataset.getOwner().getName()))
               .contains(comparable(ownerContains));
     }
     return test;

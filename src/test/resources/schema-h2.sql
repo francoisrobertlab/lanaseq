@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS protocol_file (
   PRIMARY KEY (id),
   CONSTRAINT protocolfileProtocol_ibfk FOREIGN KEY (files_id) REFERENCES protocol (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS experiment (
+CREATE TABLE IF NOT EXISTS dataset (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   project varchar(255),
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS experiment (
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT experimentProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON UPDATE CASCADE,
-  CONSTRAINT experimentOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+  CONSTRAINT datasetProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON UPDATE CASCADE,
+  CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
 
 -- Spring Security ACL.

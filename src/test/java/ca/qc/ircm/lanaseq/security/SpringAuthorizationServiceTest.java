@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.dataset.Experiment;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SpringAuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
@@ -85,7 +85,7 @@ public class SpringAuthorizationServiceTest {
   @Mock
   private User user;
   @Mock
-  private Experiment experiment;
+  private Dataset dataset;
   @Mock
   private Object object;
   @Mock

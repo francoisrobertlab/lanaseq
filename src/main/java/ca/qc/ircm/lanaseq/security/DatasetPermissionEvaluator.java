@@ -3,8 +3,8 @@ package ca.qc.ircm.lanaseq.security;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 
-import ca.qc.ircm.lanaseq.dataset.Experiment;
-import ca.qc.ircm.lanaseq.dataset.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.Serializable;
@@ -24,12 +24,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link PermissionEvaluator} that can evaluate permission for {@link Experiment}.
+ * {@link PermissionEvaluator} that can evaluate permission for {@link Dataset}.
  */
 @Component
-public class ExperimentPermissionEvaluator extends AbstractPermissionEvaluator {
+public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
   @Autowired
-  private ExperimentRepository repository;
+  private DatasetRepository repository;
   @Autowired
   private AuthorizationService authorizationService;
   @Autowired
@@ -38,51 +38,51 @@ public class ExperimentPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if ((authentication == null) || !(targetDomainObject instanceof Experiment)
+    if ((authentication == null) || !(targetDomainObject instanceof Dataset)
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
-    Experiment experiment = (Experiment) targetDomainObject;
+    Dataset dataset = (Dataset) targetDomainObject;
     User currentUser = getUser(authentication);
     Permission realPermission = resolvePermission(permission);
-    return hasPermission(experiment, currentUser, realPermission);
+    return hasPermission(dataset, currentUser, realPermission);
   }
 
   @Override
   public boolean hasPermission(Authentication authentication, Serializable targetId,
       String targetType, Object permission) {
     if ((authentication == null) || !(targetId instanceof Long)
-        || !targetType.equals(Experiment.class.getName())
+        || !targetType.equals(Dataset.class.getName())
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
-    Experiment experiment = repository.findById((Long) targetId).orElse(null);
-    if (experiment == null) {
+    Dataset dataset = repository.findById((Long) targetId).orElse(null);
+    if (dataset == null) {
       return false;
     }
     User currentUser = getUser(authentication);
     Permission realPermission = resolvePermission(permission);
-    return hasPermission(experiment, currentUser, realPermission);
+    return hasPermission(dataset, currentUser, realPermission);
   }
 
-  private boolean hasPermission(Experiment experiment, User currentUser, Permission permission) {
+  private boolean hasPermission(Dataset dataset, User currentUser, Permission permission) {
     if (currentUser == null) {
       return false;
     }
     if (authorizationService.hasRole(ADMIN)) {
       return true;
     }
-    if (experiment.getId() == null) {
+    if (dataset.getId() == null) {
       return true;
     }
-    User owner = experiment.getOwner();
+    User owner = dataset.getOwner();
     boolean authorized = owner.getId().equals(currentUser.getId());
     authorized |= permission.equals(BasePermission.READ)
         && authorizationService.hasRole(UserAuthority.laboratoryMember(owner.getLaboratory()));
     authorized |= permission.equals(BasePermission.WRITE) && authorizationService
         .hasAllRoles(MANAGER, UserAuthority.laboratoryMember(owner.getLaboratory()));
     if (!authorized) {
-      authorized |= hasAclPermission(experiment, permission, currentUser);
+      authorized |= hasAclPermission(dataset, permission, currentUser);
     }
     return authorized;
   }
