@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -31,11 +31,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialogPresenter;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
@@ -69,15 +69,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCase {
+public class DatasetPermissionsDialogPresenterTest extends AbstractViewTestCase {
   @SuppressWarnings("unused")
   private static final Logger logger =
-      LoggerFactory.getLogger(ExperimentPermissionsDialogPresenterTest.class);
-  private ExperimentPermissionsDialogPresenter presenter;
+      LoggerFactory.getLogger(DatasetPermissionsDialogPresenterTest.class);
+  private DatasetPermissionsDialogPresenter presenter;
   @Mock
-  private ExperimentPermissionsDialog dialog;
+  private DatasetPermissionsDialog dialog;
   @Mock
-  private ExperimentService experimentService;
+  private DatasetService datasetService;
   @Mock
   private LaboratoryService laboratoryService;
   @Mock
@@ -87,12 +87,12 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   @Captor
   private ArgumentCaptor<Collection<Laboratory>> laboratoriesCaptor;
   @Autowired
-  private ExperimentRepository experimentRepository;
+  private DatasetRepository datasetRepository;
   @Autowired
   private LaboratoryRepository laboratoryRepository;
   @Autowired
   private UserRepository userRepository;
-  private Experiment experiment;
+  private Dataset dataset;
   private List<Laboratory> laboratories;
   private List<User> managers;
   private Map<Laboratory, User> managersByLaboratory;
@@ -104,12 +104,12 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   @Before
   public void beforeTest() {
     presenter =
-        new ExperimentPermissionsDialogPresenter(experimentService, laboratoryService, userService);
+        new DatasetPermissionsDialogPresenter(datasetService, laboratoryService, userService);
     dialog.header = new H2();
     dialog.managers = new Grid<>();
     dialog.save = new Button();
     dialog.cancel = new Button();
-    experiment = experimentRepository.findById(2L).orElse(null);
+    dataset = datasetRepository.findById(2L).orElse(null);
     laboratories = laboratoryRepository.findAll();
     when(laboratoryService.all()).thenReturn(laboratories);
     managers = userRepository.findByManagerTrueAndActiveTrue();
@@ -147,14 +147,14 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   public void init_Reads() {
     Set<Laboratory> permissions = new HashSet<>();
     permissions.add(laboratoryRepository.findById(3L).orElse(null));
-    when(experimentService.permissions(any())).thenReturn(permissions);
+    when(datasetService.permissions(any())).thenReturn(permissions);
 
     presenter.init(dialog);
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
 
     for (User manager : managers) {
       verify(dialog, atLeastOnce()).read(manager);
-      if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+      if (manager.getLaboratory().getId().equals(dataset.getOwner().getLaboratory().getId())) {
         assertTrue(dialog.reads.get(manager).getValue());
         assertTrue(dialog.reads.get(manager).isReadOnly());
       } else if (manager.getLaboratory().getId().equals(3L)) {
@@ -168,16 +168,16 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   }
 
   @Test
-  public void init_ReadsSetExperimentBeforeInit() {
+  public void init_ReadsSetDatasetBeforeInit() {
     Set<Laboratory> permissions = new HashSet<>();
     permissions.add(laboratoryRepository.findById(3L).orElse(null));
-    when(experimentService.permissions(any())).thenReturn(permissions);
+    when(datasetService.permissions(any())).thenReturn(permissions);
 
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
     presenter.init(dialog);
 
     for (User manager : managers) {
-      if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+      if (manager.getLaboratory().getId().equals(dataset.getOwner().getLaboratory().getId())) {
         assertTrue(dialog.reads.get(manager).getValue());
         assertTrue(dialog.reads.get(manager).isReadOnly());
       } else if (manager.getLaboratory().getId().equals(3L)) {
@@ -192,13 +192,13 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
 
   @Test
   public void init_ReadsNoAclPermissions() {
-    when(experimentService.permissions(any())).thenReturn(new HashSet<>());
+    when(datasetService.permissions(any())).thenReturn(new HashSet<>());
 
     presenter.init(dialog);
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
 
     for (User manager : managers) {
-      if (manager.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+      if (manager.getLaboratory().getId().equals(dataset.getOwner().getLaboratory().getId())) {
         assertTrue(dialog.reads.get(manager).getValue());
         assertTrue(dialog.reads.get(manager).isReadOnly());
       } else {
@@ -253,7 +253,7 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   }
 
   @Test
-  public void save_NullExperiment() {
+  public void save_NullDataset() {
     presenter.init(dialog);
     dialog.reads.get(managers.get(2)).setValue(true);
 
@@ -264,18 +264,18 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
       // Success.
     }
 
-    verify(experimentService, never()).savePermissions(any(), any());
+    verify(datasetService, never()).savePermissions(any(), any());
   }
 
   @Test
   public void save() {
     presenter.init(dialog);
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
     dialog.reads.get(managers.get(2)).setValue(true);
 
     presenter.save();
 
-    verify(experimentService).savePermissions(eq(experiment), laboratoriesCaptor.capture());
+    verify(datasetService).savePermissions(eq(dataset), laboratoriesCaptor.capture());
     Collection<Laboratory> laboratories = laboratoriesCaptor.getValue();
     assertEquals(1, laboratories.size());
     assertTrue(find(laboratories, 3L).isPresent());
@@ -285,13 +285,13 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   @Test
   public void save_Many() {
     presenter.init(dialog);
-    presenter.setExperiment(experiment);
+    presenter.setDataset(dataset);
     dialog.reads.get(managers.get(0)).setValue(true);
     dialog.reads.get(managers.get(2)).setValue(true);
 
     presenter.save();
 
-    verify(experimentService).savePermissions(eq(experiment), laboratoriesCaptor.capture());
+    verify(datasetService).savePermissions(eq(dataset), laboratoriesCaptor.capture());
     Collection<Laboratory> laboratories = laboratoriesCaptor.getValue();
     assertEquals(2, laboratories.size());
     assertTrue(find(laboratories, 1L).isPresent());
@@ -309,17 +309,17 @@ public class ExperimentPermissionsDialogPresenterTest extends AbstractViewTestCa
   }
 
   @Test
-  public void getExperiment() {
+  public void getDataset() {
     presenter.init(dialog);
-    assertNull(presenter.getExperiment());
-    presenter.setExperiment(experiment);
-    assertEquals(experiment, presenter.getExperiment());
+    assertNull(presenter.getDataset());
+    presenter.setDataset(dataset);
+    assertEquals(dataset, presenter.getDataset());
   }
 
   @Test
-  public void setExperiment() {
+  public void setDataset() {
     presenter.init(dialog);
-    presenter.setExperiment(experiment);
-    assertEquals(experiment, presenter.getExperiment());
+    presenter.setDataset(dataset);
+    assertEquals(dataset, presenter.getDataset());
   }
 }

@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
@@ -113,7 +113,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getUsernameField().setValue("jonh.smith@ircm.qc.ca");
     view.getPasswordField().setValue("pass1");
     view.getSubmitButton().click();
-    assertEquals(viewUrl(ExperimentsView.VIEW_NAME), getDriver().getCurrentUrl());
+    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test
@@ -128,6 +128,6 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void already_User() throws Throwable {
     open();
-    assertEquals(viewUrl(ExperimentsView.VIEW_NAME), getDriver().getCurrentUrl());
+    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 }

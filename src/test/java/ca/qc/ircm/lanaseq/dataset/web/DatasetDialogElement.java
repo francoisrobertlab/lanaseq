@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
@@ -33,7 +33,7 @@ import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
-public class ExperimentDialogElement extends DialogElement {
+public class DatasetDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }

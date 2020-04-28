@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
@@ -28,7 +28,7 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -55,18 +55,18 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
- * Experiments permissions dialog.
+ * Datasets permissions dialog.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentPermissionsDialog extends Dialog implements LocaleChangeObserver {
-  public static final String CLASS_NAME = "experiment-permissions-dialog";
+public class DatasetPermissionsDialog extends Dialog implements LocaleChangeObserver {
+  public static final String CLASS_NAME = "dataset-permissions-dialog";
   public static final String HEADER = "header";
   public static final String MANAGERS = "managers";
   public static final String READ = "read";
   private static final long serialVersionUID = 3285639770914046262L;
   @SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.getLogger(ExperimentPermissionsDialog.class);
+  private static final Logger logger = LoggerFactory.getLogger(DatasetPermissionsDialog.class);
   protected H2 header = new H2();
   protected Grid<User> managers = new Grid<>();
   protected Column<User> laboratory;
@@ -78,12 +78,12 @@ public class ExperimentPermissionsDialog extends Dialog implements LocaleChangeO
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Autowired
-  private ExperimentPermissionsDialogPresenter presenter;
+  private DatasetPermissionsDialogPresenter presenter;
 
-  protected ExperimentPermissionsDialog() {
+  protected DatasetPermissionsDialog() {
   }
 
-  protected ExperimentPermissionsDialog(ExperimentPermissionsDialogPresenter presenter) {
+  protected DatasetPermissionsDialog(DatasetPermissionsDialogPresenter presenter) {
     this.presenter = presenter;
   }
 
@@ -133,7 +133,7 @@ public class ExperimentPermissionsDialog extends Dialog implements LocaleChangeO
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(ExperimentPermissionsDialog.class, getLocale());
+    final AppResources resources = new AppResources(DatasetPermissionsDialog.class, getLocale());
     final AppResources userResources = new AppResources(User.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
@@ -150,21 +150,21 @@ public class ExperimentPermissionsDialog extends Dialog implements LocaleChangeO
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(ExperimentPermissionsDialog.class, getLocale());
-    Experiment experiment = presenter.getExperiment();
-    if (experiment != null && experiment.getId() != null) {
-      header.setText(resources.message(HEADER, experiment.getName()));
+    final AppResources resources = new AppResources(DatasetPermissionsDialog.class, getLocale());
+    Dataset dataset = presenter.getDataset();
+    if (dataset != null && dataset.getId() != null) {
+      header.setText(resources.message(HEADER, dataset.getName()));
     } else {
       header.setText(resources.message(HEADER, ""));
     }
   }
 
-  public Experiment getExperiment() {
-    return presenter.getExperiment();
+  public Dataset getDataset() {
+    return presenter.getDataset();
   }
 
-  public void setExperiment(Experiment experiment) {
-    presenter.setExperiment(experiment);
+  public void setDataset(Dataset dataset) {
+    presenter.setDataset(dataset);
     updateHeader();
   }
 }

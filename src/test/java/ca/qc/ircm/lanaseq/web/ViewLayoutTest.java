@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.EXPERIMENTS;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
@@ -83,7 +83,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(TABS, view.tabs.getId().orElse(""));
-    assertEquals(styleName(EXPERIMENTS, TAB), view.experiments.getId().orElse(""));
+    assertEquals(styleName(DATASETS, TAB), view.datasets.getId().orElse(""));
     assertEquals(styleName(PROFILE, TAB), view.profile.getId().orElse(""));
     assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
@@ -93,7 +93,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   @Test
   public void labels() {
     view.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(EXPERIMENTS), view.experiments.getLabel());
+    assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(PROFILE), view.profile.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
     assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
@@ -107,7 +107,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     final AppResources resources = new AppResources(ViewLayout.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(EXPERIMENTS), view.experiments.getLabel());
+    assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(PROFILE), view.profile.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
     assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
@@ -117,7 +117,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   @Test
   public void tabs() {
     view.init();
-    assertTrue(view.experiments.isVisible());
+    assertTrue(view.datasets.isVisible());
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
@@ -128,7 +128,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   public void tabs_AllowUsersView() {
     when(authorizationService.isAuthorized(UsersView.class)).thenReturn(true);
     view.init();
-    assertTrue(view.experiments.isVisible());
+    assertTrue(view.datasets.isVisible());
     assertTrue(view.profile.isVisible());
     assertTrue(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
@@ -140,7 +140,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     when(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
         .thenReturn(true);
     view.init();
-    assertTrue(view.experiments.isVisible());
+    assertTrue(view.datasets.isVisible());
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
@@ -148,24 +148,24 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void tabs_SelectExperiments() {
+  public void tabs_SelectDatasets() {
     Location location = new Location(UsersView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
-    view.tabs.setSelectedTab(view.experiments);
+    view.tabs.setSelectedTab(view.datasets);
 
-    verify(ui).navigate(ExperimentsView.VIEW_NAME);
+    verify(ui).navigate(DatasetsView.VIEW_NAME);
     verify(page, never()).executeJs(any());
   }
 
   @Test
-  public void tabs_SelectExperimentsNoChange() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+  public void tabs_SelectDatasetsNoChange() {
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
-    view.tabs.setSelectedTab(view.experiments);
+    view.tabs.setSelectedTab(view.datasets);
 
     verify(ui, never()).navigate(any(String.class));
     verify(page, never()).executeJs(any());
@@ -173,7 +173,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
   @Test
   public void tabs_SelectProtocol() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
@@ -197,7 +197,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
   @Test
   public void tabs_SelectProfile() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
@@ -221,7 +221,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
   @Test
   public void tabs_SelectUsers() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
@@ -245,7 +245,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
   @Test
   public void tabs_SelectExitSwitchUser() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
@@ -258,7 +258,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
   @Test
   public void tabs_SelectSignout() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
@@ -269,13 +269,13 @@ public class ViewLayoutTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void afterNavigation_Experiments() {
-    Location location = new Location(ExperimentsView.VIEW_NAME);
+  public void afterNavigation_Datasets() {
+    Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
 
     view.afterNavigation(afterNavigationEvent);
 
-    assertEquals(view.experiments, view.tabs.getSelectedTab());
+    assertEquals(view.datasets, view.tabs.getSelectedTab());
   }
 
   @Test

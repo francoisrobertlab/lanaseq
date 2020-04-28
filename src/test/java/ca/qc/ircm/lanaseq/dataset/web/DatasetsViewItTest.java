@@ -15,17 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.ID;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -39,7 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ExperimentsViewItTest extends AbstractTestBenchTestCase {
+public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   private void open() {
     openView(VIEW_NAME);
   }
@@ -58,16 +60,16 @@ public class ExperimentsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void title() throws Throwable {
     open();
-    assertEquals(resources(ExperimentsView.class).message(TITLE,
+    assertEquals(resources(DatasetsView.class).message(TITLE,
         resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
   }
 
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
     assertTrue(optional(() -> view.header()).isPresent());
-    assertTrue(optional(() -> view.experiments()).isPresent());
+    assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.permissions()).isPresent());
   }
@@ -75,18 +77,18 @@ public class ExperimentsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void view() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ID);
-    view.doubleClickExperiment(0);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.doubleClickDataset(0);
     assertTrue(
-        optional(() -> $(ExperimentDialogElement.class).id(ExperimentDialog.ID)).isPresent());
+        optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
   }
 
   @Test
   public void add() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
     view.add().click();
     assertTrue(
-        optional(() -> $(ExperimentDialogElement.class).id(ExperimentDialog.ID)).isPresent());
+        optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
   }
 }

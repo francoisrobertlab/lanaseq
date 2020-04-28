@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.web.MainView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
@@ -50,7 +50,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   public void userRedirected() throws Throwable {
     open();
 
-    assertEquals(viewUrl(ExperimentsView.VIEW_NAME), getDriver().getCurrentUrl());
+    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   public void managerRedirected() throws Throwable {
     open();
 
-    assertEquals(viewUrl(ExperimentsView.VIEW_NAME), getDriver().getCurrentUrl());
+    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test

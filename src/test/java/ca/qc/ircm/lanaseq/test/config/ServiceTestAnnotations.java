@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
     value = { InitializeDatabaseExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional
-@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/experiment-data.sql",
+@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
     "/acl-data.sql" })
 public @interface ServiceTestAnnotations {
 

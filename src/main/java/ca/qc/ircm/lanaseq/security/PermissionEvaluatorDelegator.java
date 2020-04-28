@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.security;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
@@ -22,7 +22,7 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   @Autowired
   private UserPermissionEvaluator userPermissionEvaluator;
   @Autowired
-  private ExperimentPermissionEvaluator experimentPermissionEvaluator;
+  private DatasetPermissionEvaluator datasetPermissionEvaluator;
   @Autowired
   private ProtocolPermissionEvaluator protocolPermissionEvaluator;
 
@@ -34,8 +34,8 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
           permission);
     } else if (targetDomainObject instanceof User) {
       return userPermissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
-    } else if (targetDomainObject instanceof Experiment) {
-      return experimentPermissionEvaluator.hasPermission(authentication, targetDomainObject,
+    } else if (targetDomainObject instanceof Dataset) {
+      return datasetPermissionEvaluator.hasPermission(authentication, targetDomainObject,
           permission);
     } else if (targetDomainObject instanceof Protocol) {
       return protocolPermissionEvaluator.hasPermission(authentication, targetDomainObject,
@@ -53,8 +53,8 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
     } else if (targetType.equals(User.class.getName())) {
       return userPermissionEvaluator.hasPermission(authentication, targetId, targetType,
           permission);
-    } else if (targetType.equals(Experiment.class.getName())) {
-      return experimentPermissionEvaluator.hasPermission(authentication, targetId, targetType,
+    } else if (targetType.equals(Dataset.class.getName())) {
+      return datasetPermissionEvaluator.hasPermission(authentication, targetId, targetType,
           permission);
     } else if (targetType.equals(Protocol.class.getName())) {
       return protocolPermissionEvaluator.hasPermission(authentication, targetId, targetType,

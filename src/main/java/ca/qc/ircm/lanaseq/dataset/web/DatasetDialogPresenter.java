@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -40,32 +40,32 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
- * Experiment dialog.
+ * Dataset dialog.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentDialogPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(ExperimentDialogPresenter.class);
-  private ExperimentDialog dialog;
-  private Binder<Experiment> binder = new BeanValidationBinder<>(Experiment.class);
-  private Experiment experiment;
+public class DatasetDialogPresenter {
+  private static final Logger logger = LoggerFactory.getLogger(DatasetDialogPresenter.class);
+  private DatasetDialog dialog;
+  private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
+  private Dataset dataset;
   @Autowired
-  private ExperimentService service;
+  private DatasetService service;
   @Autowired
   private ProtocolService protocolService;
 
-  protected ExperimentDialogPresenter() {
+  protected DatasetDialogPresenter() {
   }
 
-  protected ExperimentDialogPresenter(ExperimentService service, ProtocolService protocolService) {
+  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService) {
     this.service = service;
     this.protocolService = protocolService;
   }
 
-  void init(ExperimentDialog dialog) {
+  void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
-    setExperiment(null);
+    setDataset(null);
   }
 
   void localeChange(Locale locale) {
@@ -76,20 +76,20 @@ public class ExperimentDialogPresenter {
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
   }
 
-  BinderValidationStatus<Experiment> validateExperiment() {
+  BinderValidationStatus<Dataset> validateDataset() {
     return binder.validate();
   }
 
   private boolean validate() {
-    return validateExperiment().isOk();
+    return validateDataset().isOk();
   }
 
   void save(Locale locale) {
     if (validate()) {
-      logger.debug("Save experiment {}", experiment);
-      service.save(experiment);
-      AppResources resources = new AppResources(ExperimentDialog.class, locale);
-      dialog.showNotification(resources.message(SAVED, experiment.getName()));
+      logger.debug("Save dataset {}", dataset);
+      service.save(dataset);
+      AppResources resources = new AppResources(DatasetDialog.class, locale);
+      dialog.showNotification(resources.message(SAVED, dataset.getName()));
       dialog.close();
       dialog.fireSavedEvent();
     }
@@ -99,21 +99,21 @@ public class ExperimentDialogPresenter {
     dialog.close();
   }
 
-  Experiment getExperiment() {
-    return experiment;
+  Dataset getDataset() {
+    return dataset;
   }
 
   /**
-   * Sets experiment.
+   * Sets dataset.
    *
-   * @param experiment
-   *          experiment
+   * @param dataset
+   *          dataset
    */
-  void setExperiment(Experiment experiment) {
-    if (experiment == null) {
-      experiment = new Experiment();
+  void setDataset(Dataset dataset) {
+    if (dataset == null) {
+      dataset = new Dataset();
     }
-    this.experiment = experiment;
-    binder.setBean(experiment);
+    this.dataset = dataset;
+    binder.setBean(dataset);
   }
 }

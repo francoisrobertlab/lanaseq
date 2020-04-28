@@ -21,7 +21,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.Composite;
@@ -60,9 +60,9 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
     if (authorizationService.hasRole(ADMIN)) {
       event.forwardTo(UsersView.class);
     } else if (authorizationService.hasRole(MANAGER)) {
-      event.forwardTo(ExperimentsView.class);
+      event.forwardTo(DatasetsView.class);
     } else {
-      event.forwardTo(ExperimentsView.class);
+      event.forwardTo(DatasetsView.class);
     }
   }
 }

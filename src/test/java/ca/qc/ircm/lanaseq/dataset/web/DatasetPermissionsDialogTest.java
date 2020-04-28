@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.CLASS_NAME;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.MANAGERS;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog.READ;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog.CLASS_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog.MANAGERS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog.READ;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -42,10 +42,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialog;
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentPermissionsDialogPresenter;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -72,25 +72,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
-  private ExperimentPermissionsDialog dialog;
+public class DatasetPermissionsDialogTest extends AbstractViewTestCase {
+  private DatasetPermissionsDialog dialog;
   @Mock
-  private ExperimentPermissionsDialogPresenter presenter;
+  private DatasetPermissionsDialogPresenter presenter;
   @Captor
-  private ArgumentCaptor<ValueProvider<Experiment, String>> experimentValueProviderCaptor;
+  private ArgumentCaptor<ValueProvider<Dataset, String>> datasetValueProviderCaptor;
   @Captor
   private ArgumentCaptor<ValueProvider<User, String>> userValueProviderCaptor;
   @Captor
   private ArgumentCaptor<ValueProvider<User, Checkbox>> userCheckboxValueProviderCaptor;
   @Autowired
-  private ExperimentRepository experimentRepository;
+  private DatasetRepository datasetRepository;
   @Autowired
   private UserRepository userRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ExperimentPermissionsDialog.class, locale);
+  private AppResources resources = new AppResources(DatasetPermissionsDialog.class, locale);
   private AppResources userResources = new AppResources(User.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private Experiment experiment;
+  private Dataset dataset;
   private List<User> users;
 
   /**
@@ -99,9 +99,9 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    dialog = new ExperimentPermissionsDialog(presenter);
+    dialog = new DatasetPermissionsDialog(presenter);
     dialog.init();
-    experiment = experimentRepository.findById(2L).orElse(null);
+    dataset = datasetRepository.findById(2L).orElse(null);
     users = userRepository.findAll();
   }
 
@@ -170,7 +170,7 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
     mockManagersColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ExperimentPermissionsDialog.class, locale);
+    final AppResources resources = new AppResources(DatasetPermissionsDialog.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
@@ -200,7 +200,7 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
 
   @Test
   public void managers_ColumnsValueProvider() {
-    dialog = new ExperimentPermissionsDialog(presenter);
+    dialog = new DatasetPermissionsDialog(presenter);
     mockManagersColumns();
     dialog.init();
     verify(dialog.managers).addColumn(userValueProviderCaptor.capture(), eq(LABORATORY));
@@ -222,48 +222,48 @@ public class ExperimentPermissionsDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void getExperiment() {
-    experiment = mock(Experiment.class);
-    when(presenter.getExperiment()).thenReturn(experiment);
-    assertEquals(experiment, dialog.getExperiment());
-    verify(presenter).getExperiment();
+  public void getDataset() {
+    dataset = mock(Dataset.class);
+    when(presenter.getDataset()).thenReturn(dataset);
+    assertEquals(dataset, dialog.getDataset());
+    verify(presenter).getDataset();
   }
 
   @Test
-  public void setExperiments() {
-    when(presenter.getExperiment()).thenReturn(experiment);
-    dialog.setExperiment(experiment);
-    verify(presenter).setExperiment(experiment);
-    assertEquals(resources.message(HEADER, experiment.getName()), dialog.header.getText());
+  public void setDatasets() {
+    when(presenter.getDataset()).thenReturn(dataset);
+    dialog.setDataset(dataset);
+    verify(presenter).setDataset(dataset);
+    assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
   }
 
   @Test
-  public void setExperiments_NullExperiment() {
-    when(presenter.getExperiment()).thenReturn(null);
-    dialog.setExperiment(null);
-    verify(presenter).setExperiment(null);
+  public void setDatasets_NullDataset() {
+    when(presenter.getDataset()).thenReturn(null);
+    dialog.setDataset(null);
+    verify(presenter).setDataset(null);
     assertEquals(resources.message(HEADER, ""), dialog.header.getText());
   }
 
   @Test
-  public void setExperiments_NullName() {
-    experiment = new Experiment();
-    when(presenter.getExperiment()).thenReturn(experiment);
-    dialog.setExperiment(experiment);
-    verify(presenter).setExperiment(experiment);
+  public void setDatasets_NullName() {
+    dataset = new Dataset();
+    when(presenter.getDataset()).thenReturn(dataset);
+    dialog.setDataset(dataset);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, ""), dialog.header.getText());
   }
 
   @Test
-  public void setExperiment_BeforeLocaleChange() {
-    Experiment experiment = experimentRepository.findById(2L).get();
-    when(presenter.getExperiment()).thenReturn(experiment);
+  public void setDataset_BeforeLocaleChange() {
+    Dataset dataset = datasetRepository.findById(2L).get();
+    when(presenter.getDataset()).thenReturn(dataset);
 
-    dialog.setExperiment(experiment);
+    dialog.setDataset(dataset);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setExperiment(experiment);
-    assertEquals(resources.message(HEADER, experiment.getName()), dialog.header.getText());
+    verify(presenter).setDataset(dataset);
+    assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
   }
 
   @Test

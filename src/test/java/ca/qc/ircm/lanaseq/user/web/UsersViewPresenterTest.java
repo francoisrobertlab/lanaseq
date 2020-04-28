@@ -297,7 +297,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void refreshExperimentsOnUserSaved() {
+  public void refreshDatasetsOnUserSaved() {
     presenter.init(view);
     verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<UserDialog>> savedListener =
@@ -321,7 +321,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void refreshExperimentsOnLaboratorySaved() {
+  public void refreshDatasetsOnLaboratorySaved() {
     presenter.init(view);
     verify(view.laboratoryDialog).addSavedListener(laboratorySavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener =

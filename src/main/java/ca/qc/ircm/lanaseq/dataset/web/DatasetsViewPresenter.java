@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS_REQUIRED;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS_DENIED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS_DENIED;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -40,39 +40,39 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.acls.domain.BasePermission;
 
 /**
- * Experiments view presenter.
+ * Datasets view presenter.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentsViewPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(ExperimentsViewPresenter.class);
-  private ExperimentsView view;
+public class DatasetsViewPresenter {
+  private static final Logger logger = LoggerFactory.getLogger(DatasetsViewPresenter.class);
+  private DatasetsView view;
   @Autowired
-  private ExperimentService service;
+  private DatasetService service;
   @Autowired
   private ProtocolService protocolService;
   @Autowired
   private AuthorizationService authorizationService;
-  private ListDataProvider<Experiment> experimentsDataProvider;
-  private WebExperimentFilter filter = new WebExperimentFilter();
+  private ListDataProvider<Dataset> datasetsDataProvider;
+  private WebDatasetFilter filter = new WebDatasetFilter();
   private Locale locale = Locale.getDefault();
 
-  protected ExperimentsViewPresenter() {
+  protected DatasetsViewPresenter() {
   }
 
-  protected ExperimentsViewPresenter(ExperimentService service, ProtocolService protocolService,
+  protected DatasetsViewPresenter(DatasetService service, ProtocolService protocolService,
       AuthorizationService authorizationService) {
     this.service = service;
     this.protocolService = protocolService;
     this.authorizationService = authorizationService;
   }
 
-  void init(ExperimentsView view) {
-    logger.debug("Experiments view");
+  void init(DatasetsView view) {
+    logger.debug("Datasets view");
     this.view = view;
-    loadExperiments();
-    view.experimentDialog.addSavedListener(e -> loadExperiments());
-    view.protocolDialog.addSavedListener(e -> loadExperiments());
+    loadDatasets();
+    view.datasetDialog.addSavedListener(e -> loadDatasets());
+    view.protocolDialog.addSavedListener(e -> loadDatasets());
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
     }
@@ -80,12 +80,12 @@ public class ExperimentsViewPresenter {
   }
 
   @SuppressWarnings("checkstyle:linelength")
-  private void loadExperiments() {
-    experimentsDataProvider = new ListDataProvider<>(service.all());
-    ConfigurableFilterDataProvider<Experiment, Void, SerializablePredicate<Experiment>> dataProvider =
-        experimentsDataProvider.withConfigurableFilter();
+  private void loadDatasets() {
+    datasetsDataProvider = new ListDataProvider<>(service.all());
+    ConfigurableFilterDataProvider<Dataset, Void, SerializablePredicate<Dataset>> dataProvider =
+        datasetsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
-    view.experiments.setDataProvider(dataProvider);
+    view.datasets.setDataProvider(dataProvider);
   }
 
   void localeChange(Locale locale) {
@@ -96,10 +96,10 @@ public class ExperimentsViewPresenter {
     view.error.setVisible(false);
   }
 
-  void view(Experiment experiment) {
+  void view(Dataset dataset) {
     clearError();
-    view.experimentDialog.setExperiment(service.get(experiment.getId()));
-    view.experimentDialog.open();
+    view.datasetDialog.setDataset(service.get(dataset.getId()));
+    view.datasetDialog.open();
   }
 
   void view(Protocol protocol) {
@@ -110,52 +110,52 @@ public class ExperimentsViewPresenter {
 
   void add() {
     clearError();
-    view.experimentDialog.setExperiment(new Experiment());
-    view.experimentDialog.open();
+    view.datasetDialog.setDataset(new Dataset());
+    view.datasetDialog.open();
   }
 
   void permissions() {
     clearError();
-    Experiment experiment = view.experiments.getSelectedItems().stream().findFirst().orElse(null);
-    if (experiment == null) {
-      AppResources resources = new AppResources(ExperimentsView.class, locale);
-      view.error.setText(resources.message(EXPERIMENTS_REQUIRED));
+    Dataset dataset = view.datasets.getSelectedItems().stream().findFirst().orElse(null);
+    if (dataset == null) {
+      AppResources resources = new AppResources(DatasetsView.class, locale);
+      view.error.setText(resources.message(DATASETS_REQUIRED));
       view.error.setVisible(true);
-    } else if (!authorizationService.hasPermission(experiment, BasePermission.WRITE)) {
-      AppResources resources = new AppResources(ExperimentsView.class, locale);
+    } else if (!authorizationService.hasPermission(dataset, BasePermission.WRITE)) {
+      AppResources resources = new AppResources(DatasetsView.class, locale);
       view.error.setText(resources.message(PERMISSIONS_DENIED));
       view.error.setVisible(true);
     } else {
-      view.experimentPermissionsDialog.setExperiment(experiment);
-      view.experimentPermissionsDialog.open();
+      view.datasetPermissionsDialog.setDataset(dataset);
+      view.datasetPermissionsDialog.open();
     }
   }
 
   void filterName(String value) {
     clearError();
     filter.nameContains = value.isEmpty() ? null : value;
-    view.experiments.getDataProvider().refreshAll();
+    view.datasets.getDataProvider().refreshAll();
   }
 
   void filterProject(String value) {
     clearError();
     filter.projectContains = value.isEmpty() ? null : value;
-    view.experiments.getDataProvider().refreshAll();
+    view.datasets.getDataProvider().refreshAll();
   }
 
   void filterProtocol(String value) {
     clearError();
     filter.protocolContains = value.isEmpty() ? null : value;
-    view.experiments.getDataProvider().refreshAll();
+    view.datasets.getDataProvider().refreshAll();
   }
 
   void filterOwner(String value) {
     clearError();
     filter.ownerContains = value.isEmpty() ? null : value;
-    view.experiments.getDataProvider().refreshAll();
+    view.datasets.getDataProvider().refreshAll();
   }
 
-  WebExperimentFilter filter() {
+  WebDatasetFilter filter() {
     return filter;
   }
 }

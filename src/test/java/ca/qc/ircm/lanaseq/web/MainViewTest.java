@@ -22,7 +22,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
@@ -51,7 +51,7 @@ public class MainViewTest {
   public void beforeEnter_User() {
     view.beforeEnter(event);
 
-    verify(event).forwardTo(ExperimentsView.class);
+    verify(event).forwardTo(DatasetsView.class);
   }
 
   @Test
@@ -69,7 +69,7 @@ public class MainViewTest {
 
     view.beforeEnter(event);
 
-    verify(event).forwardTo(ExperimentsView.class);
+    verify(event).forwardTo(DatasetsView.class);
   }
 
   @Test

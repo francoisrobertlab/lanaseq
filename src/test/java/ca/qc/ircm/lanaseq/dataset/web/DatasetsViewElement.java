@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
@@ -31,19 +31,19 @@ import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
-public class ExperimentsViewElement extends VerticalLayoutElement {
-  public static final int EXPERIMENT_COLUMN = 0;
+public class DatasetsViewElement extends VerticalLayoutElement {
+  public static final int DATASET_COLUMN = 0;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }
 
-  public GridElement experiments() {
-    return $(GridElement.class).id(EXPERIMENTS);
+  public GridElement datasets() {
+    return $(GridElement.class).id(DATASETS);
   }
 
-  public void doubleClickExperiment(int row) {
-    experiments().getCell(0, 0).doubleClick();
+  public void doubleClickDataset(int row) {
+    datasets().getCell(0, 0).doubleClick();
   }
 
   public DivElement error() {

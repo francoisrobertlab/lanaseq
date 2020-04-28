@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment;
+package ca.qc.ircm.lanaseq.dataset;
 
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
@@ -23,10 +23,10 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repository for {@link Experiment}.
+ * Repository for {@link Dataset}.
  */
-public interface ExperimentRepository extends JpaRepository<Experiment, Long> {
-  public List<Experiment> findByOwner(User owner);
+public interface DatasetRepository extends JpaRepository<Dataset, Long> {
+  public List<Dataset> findByOwner(User owner);
 
-  public List<Experiment> findByOwnerLaboratory(Laboratory ownerLaboratory);
+  public List<Dataset> findByOwnerLaboratory(Laboratory ownerLaboratory);
 }

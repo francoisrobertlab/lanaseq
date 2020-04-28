@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment;
+package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
@@ -30,6 +30,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
@@ -65,13 +68,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentServiceTest {
+public class DatasetServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
   @Autowired
-  private ExperimentService service;
+  private DatasetService service;
   @Autowired
-  private ExperimentRepository repository;
+  private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
   @Autowired
@@ -93,22 +96,22 @@ public class ExperimentServiceTest {
   @Test
   @WithMockUser
   public void get() {
-    Experiment experiment = service.get(1L);
+    Dataset dataset = service.get(1L);
 
-    assertEquals((Long) 1L, experiment.getId());
-    assertEquals("POLR2A DNA location", experiment.getName());
-    assertEquals("polymerase", experiment.getProject());
-    assertEquals((Long) 1L, experiment.getProtocol().getId());
-    assertEquals((Long) 2L, experiment.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
-    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    assertEquals((Long) 1L, dataset.getId());
+    assertEquals("POLR2A DNA location", dataset.getName());
+    assertEquals("polymerase", dataset.getProject());
+    assertEquals((Long) 1L, dataset.getProtocol().getId());
+    assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @WithMockUser
   public void get_Null() {
-    Experiment experiment = service.get(null);
-    assertNull(experiment);
+    Dataset dataset = service.get(null);
+    assertNull(dataset);
   }
 
   @Test
@@ -117,14 +120,14 @@ public class ExperimentServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
 
-    List<Experiment> experiments = service.all();
+    List<Dataset> datasets = service.all();
 
-    assertEquals(3, experiments.size());
-    assertTrue(find(experiments, 1L).isPresent());
-    assertTrue(find(experiments, 2L).isPresent());
-    assertTrue(find(experiments, 3L).isPresent());
-    for (Experiment experiment : experiments) {
-      verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    assertEquals(3, datasets.size());
+    assertTrue(find(datasets, 1L).isPresent());
+    assertTrue(find(datasets, 2L).isPresent());
+    assertTrue(find(datasets, 3L).isPresent());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
   }
 
@@ -135,14 +138,14 @@ public class ExperimentServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(user);
     when(authorizationService.hasRole(MANAGER)).thenReturn(true);
 
-    List<Experiment> experiments = service.all();
+    List<Dataset> datasets = service.all();
 
-    assertEquals(3, experiments.size());
-    assertTrue(find(experiments, 1L).isPresent());
-    assertTrue(find(experiments, 2L).isPresent());
-    assertTrue(find(experiments, 3L).isPresent());
-    for (Experiment experiment : experiments) {
-      verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    assertEquals(3, datasets.size());
+    assertTrue(find(datasets, 1L).isPresent());
+    assertTrue(find(datasets, 2L).isPresent());
+    assertTrue(find(datasets, 3L).isPresent());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
   }
 
@@ -153,30 +156,30 @@ public class ExperimentServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(user);
     when(authorizationService.hasRole(ADMIN)).thenReturn(true);
 
-    List<Experiment> experiments = service.all();
+    List<Dataset> datasets = service.all();
 
-    assertEquals(5, experiments.size());
-    assertTrue(find(experiments, 1L).isPresent());
-    assertTrue(find(experiments, 2L).isPresent());
-    assertTrue(find(experiments, 3L).isPresent());
-    assertTrue(find(experiments, 4L).isPresent());
-    assertTrue(find(experiments, 5L).isPresent());
-    for (Experiment experiment : experiments) {
-      verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(READ));
+    assertEquals(5, datasets.size());
+    assertTrue(find(datasets, 1L).isPresent());
+    assertTrue(find(datasets, 2L).isPresent());
+    assertTrue(find(datasets, 3L).isPresent());
+    assertTrue(find(datasets, 4L).isPresent());
+    assertTrue(find(datasets, 5L).isPresent());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
   }
 
   @Test
   @WithMockUser
   public void permissions() {
-    Experiment experiment = repository.findById(2L).orElse(null);
+    Dataset dataset = repository.findById(2L).orElse(null);
 
-    Set<Laboratory> laboratories = service.permissions(experiment);
+    Set<Laboratory> laboratories = service.permissions(dataset);
 
     assertEquals(2, laboratories.size());
     assertTrue(find(laboratories, 2L).isPresent());
     assertTrue(find(laboratories, 3L).isPresent());
-    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   @Test
@@ -184,59 +187,59 @@ public class ExperimentServiceTest {
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
-    Experiment experiment = new Experiment();
-    experiment.setName("New experiment");
-    experiment.setProject("my project");
-    experiment.setProtocol(protocolRepository.findById(1L).get());
+    Dataset dataset = new Dataset();
+    dataset.setName("New dataset");
+    dataset.setProject("my project");
+    dataset.setProtocol(protocolRepository.findById(1L).get());
 
-    service.save(experiment);
+    service.save(dataset);
 
-    assertNotNull(experiment.getId());
-    Experiment database = repository.findById(experiment.getId()).orElse(null);
-    assertEquals(experiment.getName(), database.getName());
+    assertNotNull(dataset.getId());
+    Dataset database = repository.findById(dataset.getId()).orElse(null);
+    assertEquals(dataset.getName(), database.getName());
     assertEquals("my project", database.getProject());
     assertEquals((Long) 1L, database.getProtocol().getId());
     assertEquals(user.getId(), database.getOwner().getId());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(experiment.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(experiment.getDate()));
-    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getDate()));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   @Test
   @WithMockUser
   public void save_Update() {
-    Experiment experiment = repository.findById(1L).orElse(null);
-    experiment.setName("New name");
-    experiment.setProject("my project");
-    experiment.setProtocol(protocolRepository.findById(3L).get());
+    Dataset dataset = repository.findById(1L).orElse(null);
+    dataset.setName("New name");
+    dataset.setProject("my project");
+    dataset.setProtocol(protocolRepository.findById(3L).get());
 
-    service.save(experiment);
+    service.save(dataset);
 
-    experiment = repository.findById(1L).orElse(null);
-    assertEquals("New name", experiment.getName());
-    assertEquals("my project", experiment.getProject());
-    assertEquals((Long) 3L, experiment.getProtocol().getId());
-    assertEquals((Long) 2L, experiment.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), experiment.getDate());
-    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
+    dataset = repository.findById(1L).orElse(null);
+    assertEquals("New name", dataset.getName());
+    assertEquals("my project", dataset.getProject());
+    assertEquals((Long) 3L, dataset.getProtocol().getId());
+    assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   @Test
   @WithUserDetails("christian.poitras@ircm.qc.ca")
   @Transactional
   public void savePermissions() {
-    Experiment experiment = repository.findById(5L).orElse(null);
+    Dataset dataset = repository.findById(5L).orElse(null);
     List<Laboratory> laboratories = new ArrayList<>();
     laboratories.add(laboratoryRepository.findById(2L).orElse(null));
 
-    service.savePermissions(experiment, laboratories);
+    service.savePermissions(dataset, laboratories);
 
-    ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
+    ObjectIdentity oi = new ObjectIdentityImpl(dataset.getClass(), dataset.getId());
     Acl acl = aclService.readAclById(oi);
     assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(1L).orElse(null)));
     assertTrue(granted(acl, BasePermission.READ, laboratoryRepository.findById(2L).orElse(null)));
     assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(3L).orElse(null)));
-    verify(permissionEvaluator).hasPermission(any(), eq(experiment), eq(WRITE));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   private boolean granted(Acl acl, Permission permission, Laboratory laboratory) {

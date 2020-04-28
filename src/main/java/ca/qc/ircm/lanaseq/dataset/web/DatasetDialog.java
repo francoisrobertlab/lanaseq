@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -51,14 +51,14 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
- * Experiment dialog.
+ * Dataset dialog.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentDialog extends Dialog
+public class DatasetDialog extends Dialog
     implements LocaleChangeObserver, NotificationComponent {
   private static final long serialVersionUID = 3285639770914046262L;
-  public static final String ID = "experiment-dialog";
+  public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   protected H3 header = new H3();
@@ -69,12 +69,12 @@ public class ExperimentDialog extends Dialog
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Autowired
-  private ExperimentDialogPresenter presenter;
+  private DatasetDialogPresenter presenter;
 
-  protected ExperimentDialog() {
+  protected DatasetDialog() {
   }
 
-  protected ExperimentDialog(ExperimentDialogPresenter presenter) {
+  protected DatasetDialog(DatasetDialogPresenter presenter) {
     this.presenter = presenter;
   }
 
@@ -107,29 +107,29 @@ public class ExperimentDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources experimentResources = new AppResources(Experiment.class, getLocale());
+    final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
-    name.setLabel(experimentResources.message(NAME));
-    project.setLabel(experimentResources.message(PROJECT));
-    protocol.setLabel(experimentResources.message(PROTOCOL));
+    name.setLabel(datasetResources.message(NAME));
+    project.setLabel(datasetResources.message(PROJECT));
+    protocol.setLabel(datasetResources.message(PROTOCOL));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(ExperimentDialog.class, getLocale());
-    Experiment experiment = presenter.getExperiment();
-    if (experiment != null && experiment.getId() != null) {
-      header.setText(resources.message(HEADER, 1, experiment.getName()));
+    final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
+    Dataset dataset = presenter.getDataset();
+    if (dataset != null && dataset.getId() != null) {
+      header.setText(resources.message(HEADER, 1, dataset.getName()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }
   }
 
   /**
-   * Adds listener to be informed when an experiment was saved.
+   * Adds listener to be informed when an dataset was saved.
    *
    * @param listener
    *          listener
@@ -137,7 +137,7 @@ public class ExperimentDialog extends Dialog
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Registration
-      addSavedListener(ComponentEventListener<SavedEvent<ExperimentDialog>> listener) {
+      addSavedListener(ComponentEventListener<SavedEvent<DatasetDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 
@@ -145,18 +145,18 @@ public class ExperimentDialog extends Dialog
     fireEvent(new SavedEvent<>(this, true));
   }
 
-  public Experiment getExperiment() {
-    return presenter.getExperiment();
+  public Dataset getDataset() {
+    return presenter.getDataset();
   }
 
   /**
-   * Sets experiment.
+   * Sets dataset.
    *
-   * @param experiment
-   *          experiment
+   * @param dataset
+   *          dataset
    */
-  public void setExperiment(Experiment experiment) {
-    presenter.setExperiment(experiment);
+  public void setDataset(Dataset dataset) {
+    presenter.setDataset(dataset);
     updateHeader();
   }
 }

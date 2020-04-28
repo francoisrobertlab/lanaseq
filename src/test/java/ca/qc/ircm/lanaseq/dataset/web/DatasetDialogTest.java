@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.ID;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.Assert.assertEquals;
@@ -38,8 +38,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -56,19 +58,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentDialogTest extends AbstractViewTestCase {
-  private ExperimentDialog dialog;
+public class DatasetDialogTest extends AbstractViewTestCase {
+  private DatasetDialog dialog;
   @Mock
-  private ExperimentDialogPresenter presenter;
+  private DatasetDialogPresenter presenter;
   @Mock
-  private Experiment experiment;
+  private Dataset dataset;
   @Mock
-  private ComponentEventListener<SavedEvent<ExperimentDialog>> savedListener;
+  private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Autowired
-  private ExperimentRepository experimentRepository;
+  private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ExperimentDialog.class, locale);
-  private AppResources experimentResources = new AppResources(Experiment.class, locale);
+  private AppResources resources = new AppResources(DatasetDialog.class, locale);
+  private AppResources datasetResources = new AppResources(Dataset.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
@@ -77,7 +79,7 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    dialog = new ExperimentDialog(presenter);
+    dialog = new DatasetDialog(presenter);
     dialog.init();
   }
 
@@ -104,9 +106,9 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
-    assertEquals(experimentResources.message(PROJECT), dialog.project.getLabel());
-    assertEquals(experimentResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
+    assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
+    assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -116,15 +118,15 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   public void localeChange() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ExperimentDialog.class, locale);
-    final AppResources experimentResources = new AppResources(Experiment.class, locale);
+    final AppResources resources = new AppResources(DatasetDialog.class, locale);
+    final AppResources datasetResources = new AppResources(Dataset.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(experimentResources.message(NAME), dialog.name.getLabel());
-    assertEquals(experimentResources.message(PROJECT), dialog.project.getLabel());
-    assertEquals(experimentResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
+    assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
+    assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -145,54 +147,54 @@ public class ExperimentDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void getExperiment() {
-    when(presenter.getExperiment()).thenReturn(experiment);
-    assertEquals(experiment, dialog.getExperiment());
-    verify(presenter).getExperiment();
+  public void getDataset() {
+    when(presenter.getDataset()).thenReturn(dataset);
+    assertEquals(dataset, dialog.getDataset());
+    verify(presenter).getDataset();
   }
 
   @Test
-  public void setExperiment_NewExperiment() {
-    Experiment experiment = new Experiment();
-    when(presenter.getExperiment()).thenReturn(experiment);
+  public void setDataset_NewDataset() {
+    Dataset dataset = new Dataset();
+    when(presenter.getDataset()).thenReturn(dataset);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setExperiment(experiment);
+    dialog.setDataset(dataset);
 
-    verify(presenter).setExperiment(experiment);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
   @Test
-  public void setExperiment_Experiment() {
-    Experiment experiment = experimentRepository.findById(2L).get();
-    when(presenter.getExperiment()).thenReturn(experiment);
+  public void setDataset_Dataset() {
+    Dataset dataset = datasetRepository.findById(2L).get();
+    when(presenter.getDataset()).thenReturn(dataset);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setExperiment(experiment);
+    dialog.setDataset(dataset);
 
-    verify(presenter).setExperiment(experiment);
-    assertEquals(resources.message(HEADER, 1, experiment.getName()), dialog.header.getText());
+    verify(presenter).setDataset(dataset);
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
   }
 
   @Test
-  public void setExperiment_BeforeLocaleChange() {
-    Experiment experiment = experimentRepository.findById(2L).get();
-    when(presenter.getExperiment()).thenReturn(experiment);
+  public void setDataset_BeforeLocaleChange() {
+    Dataset dataset = datasetRepository.findById(2L).get();
+    when(presenter.getDataset()).thenReturn(dataset);
 
-    dialog.setExperiment(experiment);
+    dialog.setDataset(dataset);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setExperiment(experiment);
-    assertEquals(resources.message(HEADER, 1, experiment.getName()), dialog.header.getText());
+    verify(presenter).setDataset(dataset);
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
   }
 
   @Test
-  public void setExperiment_Null() {
+  public void setDataset_Null() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setExperiment(null);
+    dialog.setDataset(null);
 
-    verify(presenter).setExperiment(null);
+    verify(presenter).setDataset(null);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentService;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
@@ -40,38 +40,38 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
- * Experiment dialog.
+ * Dataset dialog.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ExperimentPermissionsDialogPresenter {
+public class DatasetPermissionsDialogPresenter {
   private static final Logger logger =
-      LoggerFactory.getLogger(ExperimentPermissionsDialogPresenter.class);
-  private ExperimentPermissionsDialog dialog;
+      LoggerFactory.getLogger(DatasetPermissionsDialogPresenter.class);
+  private DatasetPermissionsDialog dialog;
   @Autowired
-  private ExperimentService experimentService;
+  private DatasetService datasetService;
   @Autowired
   private LaboratoryService laboratoryService;
   @Autowired
   private UserService userService;
-  private Experiment experiment;
+  private Dataset dataset;
   private ListDataProvider<User> managersDataProvider;
   private WebUserFilter filter = new WebUserFilter();
 
-  protected ExperimentPermissionsDialogPresenter() {
+  protected DatasetPermissionsDialogPresenter() {
   }
 
-  protected ExperimentPermissionsDialogPresenter(ExperimentService experimentService,
+  protected DatasetPermissionsDialogPresenter(DatasetService datasetService,
       LaboratoryService laboratoryService, UserService userService) {
-    this.experimentService = experimentService;
+    this.datasetService = datasetService;
     this.laboratoryService = laboratoryService;
     this.userService = userService;
   }
 
-  void init(ExperimentPermissionsDialog dialog) {
+  void init(DatasetPermissionsDialog dialog) {
     dialog.addOpenedChangeListener(e -> {
       if (e.isOpened()) {
-        logger.debug("open experiments permissions dialog for experiment {}", experiment);
+        logger.debug("open datasets permissions dialog for dataset {}", dataset);
       }
     });
     this.dialog = dialog;
@@ -100,15 +100,15 @@ public class ExperimentPermissionsDialogPresenter {
     }
     dialog.reads.clear();
     managersDataProvider.getItems().forEach(user -> dialog.read(user));
-    if (experiment != null) {
-      Set<Long> laboratoriesId = experimentService.permissions(experiment).stream()
+    if (dataset != null) {
+      Set<Long> laboratoriesId = datasetService.permissions(dataset).stream()
           .map(lab -> lab.getId()).collect(Collectors.toSet());
       dialog.reads.entrySet().stream().forEach(entry -> {
         User user = entry.getKey();
         Checkbox read = entry.getValue();
         read.setValue(laboratoriesId.contains(user.getLaboratory().getId()));
         read.setReadOnly(false);
-        if (user.getLaboratory().getId().equals(experiment.getOwner().getLaboratory().getId())) {
+        if (user.getLaboratory().getId().equals(dataset.getOwner().getLaboratory().getId())) {
           read.setValue(true);
           read.setReadOnly(true);
         }
@@ -132,15 +132,15 @@ public class ExperimentPermissionsDialogPresenter {
   }
 
   void save() {
-    if (experiment == null) {
-      throw new IllegalStateException("Cannot update permissions without an experiment");
+    if (dataset == null) {
+      throw new IllegalStateException("Cannot update permissions without an dataset");
     }
     List<Laboratory> laboratories = dialog.reads.entrySet().stream()
         .filter(entry -> entry.getValue().getValue()).map(entry -> entry.getKey().getLaboratory())
-        .filter(lab -> !lab.getId().equals(experiment.getOwner().getLaboratory().getId()))
+        .filter(lab -> !lab.getId().equals(dataset.getOwner().getLaboratory().getId()))
         .collect(Collectors.toList());
-    logger.info("save read for laboratories {} for experiment {}", laboratories, experiment);
-    experimentService.savePermissions(experiment, laboratories);
+    logger.info("save read for laboratories {} for dataset {}", laboratories, dataset);
+    datasetService.savePermissions(dataset, laboratories);
     dialog.close();
   }
 
@@ -148,12 +148,12 @@ public class ExperimentPermissionsDialogPresenter {
     dialog.close();
   }
 
-  Experiment getExperiment() {
-    return experiment;
+  Dataset getDataset() {
+    return dataset;
   }
 
-  void setExperiment(Experiment experiment) {
-    this.experiment = experiment;
+  void setDataset(Dataset dataset) {
+    this.dataset = dataset;
     initReads();
   }
 

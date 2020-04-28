@@ -17,13 +17,13 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.experiment.web.ExperimentsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
@@ -56,7 +56,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_User() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
-    assertTrue(optional(() -> view.experiments()).isPresent());
+    assertTrue(optional(() -> view.datasets()).isPresent());
     assertFalse(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -67,7 +67,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Manager() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
-    assertTrue(optional(() -> view.experiments()).isPresent());
+    assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -78,7 +78,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Admin() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
-    assertTrue(optional(() -> view.experiments()).isPresent());
+    assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -95,7 +95,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     usersView.clickUser(1);
     usersView.clickSwitchUser();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
-    assertTrue(optional(() -> view.experiments()).isPresent());
+    assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertTrue(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -103,11 +103,11 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void experiments() throws Throwable {
+  public void datasets() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
-    view.experiments().click();
-    assertEquals(viewUrl(ExperimentsView.VIEW_NAME), getDriver().getCurrentUrl());
+    view.datasets().click();
+    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test

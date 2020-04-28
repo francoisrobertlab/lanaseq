@@ -15,19 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.ID;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentDialog.SAVED;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
@@ -47,12 +49,12 @@ import org.springframework.test.context.transaction.TestTransaction;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
+public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
-  private ExperimentRepository repository;
+  private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
-  private String name = "test experiment";
+  private String name = "test dataset";
   private String project = "test project";
   private Protocol protocol;
 
@@ -65,7 +67,7 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  private void fill(ExperimentDialogElement dialog) {
+  private void fill(DatasetDialogElement dialog) {
     dialog.name().setValue(name);
     dialog.project().setValue(project);
     dialog.protocol().selectByText(protocol.getName());
@@ -74,9 +76,9 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ExperimentsView.ID);
-    view.doubleClickExperiment(0);
-    ExperimentDialogElement dialog = $(ExperimentDialogElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.doubleClickDataset(0);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.name()).isPresent());
     assertTrue(optional(() -> dialog.project()).isPresent());
@@ -88,9 +90,9 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_New() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ExperimentsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.add().click();
-    ExperimentDialogElement dialog = $(ExperimentDialogElement.class).id(ID);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -98,27 +100,27 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ExperimentDialog.class);
+    AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
-    List<Experiment> experiments = repository.findByOwner(new User(3L));
-    Experiment experiment =
-        experiments.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
-    assertNotNull(experiment);
-    assertNotNull(experiment.getId());
-    assertEquals(name, experiment.getName());
-    assertEquals(project, experiment.getProject());
-    assertEquals(protocol.getId(), experiment.getProtocol().getId());
-    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(experiment.getDate()));
-    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(experiment.getDate()));
-    assertEquals((Long) 3L, experiment.getOwner().getId());
+    List<Dataset> datasets = repository.findByOwner(new User(3L));
+    Dataset dataset =
+        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
+    assertNotNull(dataset);
+    assertNotNull(dataset.getId());
+    assertEquals(name, dataset.getName());
+    assertEquals(project, dataset.getProject());
+    assertEquals(protocol.getId(), dataset.getProtocol().getId());
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
+    assertEquals((Long) 3L, dataset.getOwner().getId());
   }
 
   @Test
   public void save_Update() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ExperimentsView.ID);
-    view.doubleClickExperiment(0);
-    ExperimentDialogElement dialog = $(ExperimentDialogElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.doubleClickDataset(0);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -126,22 +128,22 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ExperimentDialog.class);
+    AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
-    Experiment experiment = repository.findById(2L).get();
-    assertEquals(name, experiment.getName());
-    assertEquals(project, experiment.getProject());
-    assertEquals(protocol.getId(), experiment.getProtocol().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), experiment.getDate());
-    assertEquals((Long) 3L, experiment.getOwner().getId());
+    Dataset dataset = repository.findById(2L).get();
+    assertEquals(name, dataset.getName());
+    assertEquals(project, dataset.getProject());
+    assertEquals(protocol.getId(), dataset.getProtocol().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
   }
 
   @Test
   public void cancel() throws Throwable {
     open();
-    ExperimentsViewElement view = $(ExperimentsViewElement.class).id(ExperimentsView.ID);
-    view.doubleClickExperiment(1);
-    ExperimentDialogElement dialog = $(ExperimentDialogElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.doubleClickDataset(1);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -149,11 +151,11 @@ public class ExperimentDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
-    Experiment experiment = repository.findById(2L).get();
-    assertEquals("Histone location", experiment.getName());
-    assertEquals("histone", experiment.getProject());
-    assertEquals((Long) 3L, experiment.getProtocol().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), experiment.getDate());
-    assertEquals((Long) 3L, experiment.getOwner().getId());
+    Dataset dataset = repository.findById(2L).get();
+    assertEquals("Histone location", dataset.getName());
+    assertEquals("histone", dataset.getProject());
+    assertEquals((Long) 3L, dataset.getProtocol().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
   }
 }

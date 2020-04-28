@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment;
+package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 
@@ -48,13 +48,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Services for {@link Experiment}.
+ * Services for {@link Dataset}.
  */
 @Service
 @Transactional
-public class ExperimentService {
+public class DatasetService {
   @Autowired
-  private ExperimentRepository repository;
+  private DatasetRepository repository;
   @Autowired
   private LaboratoryRepository laboratoryRepository;
   @Autowired
@@ -62,10 +62,10 @@ public class ExperimentService {
   @Autowired
   private AuthorizationService authorizationService;
 
-  protected ExperimentService() {
+  protected DatasetService() {
   }
 
-  protected ExperimentService(ExperimentRepository repository,
+  protected DatasetService(DatasetRepository repository,
       LaboratoryRepository laboratoryRepository, MutableAclService aclService,
       AuthorizationService authorizationService) {
     this.repository = repository;
@@ -75,14 +75,14 @@ public class ExperimentService {
   }
 
   /**
-   * Returns experiment having specified id.
+   * Returns dataset having specified id.
    *
    * @param id
-   *          experiment's id
-   * @return experiment having specified id
+   *          dataset's id
+   * @return dataset having specified id
    */
   @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
-  public Experiment get(Long id) {
+  public Dataset get(Long id) {
     if (id == null) {
       return null;
     }
@@ -91,21 +91,21 @@ public class ExperimentService {
   }
 
   /**
-   * Returns all experiments for current user.
+   * Returns all datasets for current user.
    * <p>
-   * If current user is a regular user, returns all experiments owned by him.
+   * If current user is a regular user, returns all datasets owned by him.
    * </p>
    * <p>
-   * If current user is a manager, returns all experiments made by users in his lab.
+   * If current user is a manager, returns all datasets made by users in his lab.
    * </p>
    * <p>
-   * If current user is an admin, returns all experiments.
+   * If current user is an admin, returns all datasets.
    * </p>
    *
-   * @return all experiments for current user
+   * @return all datasets for current user
    */
   @PostFilter("hasPermission(filterObject, 'read')")
-  public List<Experiment> all() {
+  public List<Dataset> all() {
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
     } else {
@@ -114,16 +114,16 @@ public class ExperimentService {
   }
 
   /**
-   * Returns laboratories that can read experiment.
+   * Returns laboratories that can read dataset.
    *
-   * @param experiment
-   *          experiment
-   * @return laboratories that can read experiment
+   * @param dataset
+   *          dataset
+   * @return laboratories that can read dataset
    */
-  @PreAuthorize("hasPermission(#experiment, 'write')")
-  public Set<Laboratory> permissions(Experiment experiment) {
-    Laboratory ownerLaboratory = experiment.getOwner().getLaboratory();
-    ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public Set<Laboratory> permissions(Dataset dataset) {
+    Laboratory ownerLaboratory = dataset.getOwner().getLaboratory();
+    ObjectIdentity oi = new ObjectIdentityImpl(dataset.getClass(), dataset.getId());
     try {
       Acl acl = aclService.readAclById(oi);
       List<Laboratory> allLaboratories = laboratoryRepository.findAll();
@@ -151,32 +151,32 @@ public class ExperimentService {
   }
 
   /**
-   * Saves experiment into database.
+   * Saves dataset into database.
    *
-   * @param experiment
-   *          experiment
+   * @param dataset
+   *          dataset
    */
-  @PreAuthorize("hasPermission(#experiment, 'write')")
-  public void save(Experiment experiment) {
-    if (experiment.getId() == null) {
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public void save(Dataset dataset) {
+    if (dataset.getId() == null) {
       User user = authorizationService.getCurrentUser();
-      experiment.setOwner(user);
-      experiment.setDate(LocalDateTime.now());
+      dataset.setOwner(user);
+      dataset.setDate(LocalDateTime.now());
     }
-    repository.save(experiment);
+    repository.save(dataset);
   }
 
   /**
-   * Saves experiment's permissions into database.
+   * Saves dataset's permissions into database.
    *
-   * @param experiment
-   *          experiment
+   * @param dataset
+   *          dataset
    * @param laboratories
-   *          laboratories that can read experiment
+   *          laboratories that can read dataset
    */
-  @PreAuthorize("hasPermission(#experiment, 'write')")
-  public void savePermissions(Experiment experiment, Collection<Laboratory> laboratories) {
-    ObjectIdentity oi = new ObjectIdentityImpl(experiment.getClass(), experiment.getId());
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public void savePermissions(Dataset dataset, Collection<Laboratory> laboratories) {
+    ObjectIdentity oi = new ObjectIdentityImpl(dataset.getClass(), dataset.getId());
     aclService.deleteAcl(oi, false);
     MutableAcl acl = aclService.createAcl(oi);
     for (Laboratory laboratory : laboratories) {

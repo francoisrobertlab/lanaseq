@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.experiment.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.DATE;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.NAME;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.OWNER;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.experiment.ExperimentProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.EXPERIMENTS;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.HEADER;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.ID;
-import static ca.qc.ircm.lanaseq.experiment.web.ExperimentsView.PERMISSIONS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
@@ -47,8 +47,12 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.experiment.Experiment;
-import ca.qc.ircm.lanaseq.experiment.ExperimentRepository;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPresenter;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -78,29 +82,29 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ExperimentsViewTest extends AbstractViewTestCase {
-  private ExperimentsView view;
+public class DatasetsViewTest extends AbstractViewTestCase {
+  private DatasetsView view;
   @Mock
-  private ExperimentsViewPresenter presenter;
+  private DatasetsViewPresenter presenter;
   @Mock
-  private ExperimentDialog experimentDialog;
+  private DatasetDialog datasetDialog;
   @Mock
   private ProtocolDialog protocolDialog;
   @Mock
-  private ExperimentPermissionsDialog experimentPermissionsDialog;
+  private DatasetPermissionsDialog datasetPermissionsDialog;
   @Captor
-  private ArgumentCaptor<ValueProvider<Experiment, String>> valueProviderCaptor;
+  private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
   @Captor
-  private ArgumentCaptor<LocalDateTimeRenderer<Experiment>> localDateTimeRendererCaptor;
+  private ArgumentCaptor<LocalDateTimeRenderer<Dataset>> localDateTimeRendererCaptor;
   @Captor
-  private ArgumentCaptor<Comparator<Experiment>> comparatorCaptor;
+  private ArgumentCaptor<Comparator<Dataset>> comparatorCaptor;
   @Autowired
-  private ExperimentRepository experimentRepository;
+  private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ExperimentsView.class, locale);
-  private AppResources experimentResources = new AppResources(Experiment.class, locale);
+  private AppResources resources = new AppResources(DatasetsView.class, locale);
+  private AppResources datasetResources = new AppResources(Dataset.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Experiment> experiments;
+  private List<Dataset> datasets;
 
   /**
    * Before test.
@@ -108,46 +112,46 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new ExperimentsView(presenter, experimentDialog, protocolDialog,
-        experimentPermissionsDialog);
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog,
+        datasetPermissionsDialog);
     view.init();
-    experiments = experimentRepository.findAll();
+    datasets = datasetRepository.findAll();
   }
 
   @SuppressWarnings("unchecked")
   private void mockColumns() {
-    Element experimentsElement = view.experiments.getElement();
-    view.experiments = mock(Grid.class);
-    when(view.experiments.getElement()).thenReturn(experimentsElement);
+    Element datasetsElement = view.datasets.getElement();
+    view.datasets = mock(Grid.class);
+    when(view.datasets.getElement()).thenReturn(datasetsElement);
     view.name = mock(Column.class);
-    when(view.experiments.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     view.project = mock(Column.class);
-    when(view.experiments.addColumn(any(ValueProvider.class), eq(PROJECT)))
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROJECT)))
         .thenReturn(view.project);
     when(view.project.setKey(any())).thenReturn(view.project);
     when(view.project.setComparator(any(Comparator.class))).thenReturn(view.project);
     when(view.project.setHeader(any(String.class))).thenReturn(view.project);
     view.protocol = mock(Column.class);
-    when(view.experiments.addColumn(any(ValueProvider.class), eq(PROTOCOL)))
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROTOCOL)))
         .thenReturn(view.protocol);
     when(view.protocol.setKey(any())).thenReturn(view.protocol);
     when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     view.date = mock(Column.class);
-    when(view.experiments.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
+    when(view.datasets.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
         .thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
     view.owner = mock(Column.class);
-    when(view.experiments.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
     when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     HeaderRow filtersRow = mock(HeaderRow.class);
-    when(view.experiments.appendHeaderRow()).thenReturn(filtersRow);
+    when(view.datasets.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
     HeaderCell projectFilterCell = mock(HeaderCell.class);
@@ -167,7 +171,7 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
-    assertEquals(EXPERIMENTS, view.experiments.getId().orElse(""));
+    assertEquals(DATASETS, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
     assertEquals(PERMISSIONS, view.permissions.getId().orElse(""));
@@ -178,16 +182,16 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
     mockColumns();
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    verify(view.name).setHeader(experimentResources.message(NAME));
-    verify(view.name).setFooter(experimentResources.message(NAME));
-    verify(view.project).setHeader(experimentResources.message(PROJECT));
-    verify(view.project).setFooter(experimentResources.message(PROJECT));
-    verify(view.protocol).setHeader(experimentResources.message(PROTOCOL));
-    verify(view.protocol).setFooter(experimentResources.message(PROTOCOL));
-    verify(view.date).setHeader(experimentResources.message(DATE));
-    verify(view.date).setFooter(experimentResources.message(DATE));
-    verify(view.owner).setHeader(experimentResources.message(OWNER));
-    verify(view.owner).setFooter(experimentResources.message(OWNER));
+    verify(view.name).setHeader(datasetResources.message(NAME));
+    verify(view.name).setFooter(datasetResources.message(NAME));
+    verify(view.project).setHeader(datasetResources.message(PROJECT));
+    verify(view.project).setFooter(datasetResources.message(PROJECT));
+    verify(view.protocol).setHeader(datasetResources.message(PROTOCOL));
+    verify(view.protocol).setFooter(datasetResources.message(PROTOCOL));
+    verify(view.date).setHeader(datasetResources.message(DATE));
+    verify(view.date).setFooter(datasetResources.message(DATE));
+    verify(view.owner).setHeader(datasetResources.message(OWNER));
+    verify(view.owner).setFooter(datasetResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
@@ -201,28 +205,28 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new ExperimentsView(presenter, experimentDialog, protocolDialog,
-        experimentPermissionsDialog);
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog,
+        datasetPermissionsDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ExperimentsView.class, locale);
-    final AppResources experimentResources = new AppResources(Experiment.class, locale);
+    final AppResources resources = new AppResources(DatasetsView.class, locale);
+    final AppResources datasetResources = new AppResources(Dataset.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    verify(view.name, atLeastOnce()).setHeader(experimentResources.message(NAME));
-    verify(view.name, atLeastOnce()).setFooter(experimentResources.message(NAME));
-    verify(view.project).setHeader(experimentResources.message(PROJECT));
-    verify(view.project).setFooter(experimentResources.message(PROJECT));
-    verify(view.protocol).setHeader(experimentResources.message(PROTOCOL));
-    verify(view.protocol).setFooter(experimentResources.message(PROTOCOL));
-    verify(view.date, atLeastOnce()).setHeader(experimentResources.message(DATE));
-    verify(view.date, atLeastOnce()).setFooter(experimentResources.message(DATE));
-    verify(view.owner, atLeastOnce()).setHeader(experimentResources.message(OWNER));
-    verify(view.owner, atLeastOnce()).setFooter(experimentResources.message(OWNER));
+    verify(view.name, atLeastOnce()).setHeader(datasetResources.message(NAME));
+    verify(view.name, atLeastOnce()).setFooter(datasetResources.message(NAME));
+    verify(view.project).setHeader(datasetResources.message(PROJECT));
+    verify(view.project).setFooter(datasetResources.message(PROJECT));
+    verify(view.protocol).setHeader(datasetResources.message(PROTOCOL));
+    verify(view.protocol).setFooter(datasetResources.message(PROTOCOL));
+    verify(view.date, atLeastOnce()).setHeader(datasetResources.message(DATE));
+    verify(view.date, atLeastOnce()).setFooter(datasetResources.message(DATE));
+    verify(view.owner, atLeastOnce()).setHeader(datasetResources.message(OWNER));
+    verify(view.owner, atLeastOnce()).setFooter(datasetResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
@@ -241,93 +245,93 @@ public class ExperimentsViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void experiments() {
-    assertEquals(5, view.experiments.getColumns().size());
-    assertNotNull(view.experiments.getColumnByKey(NAME));
-    assertNotNull(view.experiments.getColumnByKey(PROJECT));
-    assertNotNull(view.experiments.getColumnByKey(PROTOCOL));
-    assertNotNull(view.experiments.getColumnByKey(DATE));
-    assertNotNull(view.experiments.getColumnByKey(OWNER));
-    assertTrue(view.experiments.getSelectionModel() instanceof SelectionModel.Single);
+  public void datasets() {
+    assertEquals(5, view.datasets.getColumns().size());
+    assertNotNull(view.datasets.getColumnByKey(NAME));
+    assertNotNull(view.datasets.getColumnByKey(PROJECT));
+    assertNotNull(view.datasets.getColumnByKey(PROTOCOL));
+    assertNotNull(view.datasets.getColumnByKey(DATE));
+    assertNotNull(view.datasets.getColumnByKey(OWNER));
+    assertTrue(view.datasets.getSelectionModel() instanceof SelectionModel.Single);
   }
 
   @Test
-  public void experiments_ColumnsValueProvider() {
-    view = new ExperimentsView(presenter, experimentDialog, protocolDialog,
-        experimentPermissionsDialog);
+  public void datasets_ColumnsValueProvider() {
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog,
+        datasetPermissionsDialog);
     mockColumns();
     view.init();
-    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<Experiment, String> valueProvider = valueProviderCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getName(), valueProvider.apply(experiment));
+    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(NAME));
+    ValueProvider<Dataset, String> valueProvider = valueProviderCaptor.getValue();
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getName(), valueProvider.apply(dataset));
     }
     verify(view.name).setComparator(comparatorCaptor.capture());
-    Comparator<Experiment> comparator = comparatorCaptor.getValue();
+    Comparator<Dataset> comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getName(),
-          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getName(),
+          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
-    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROJECT));
+    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(PROJECT));
     valueProvider = valueProviderCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getProject(), valueProvider.apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getProject(), valueProvider.apply(dataset));
     }
     verify(view.project).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getProject(),
-          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getProject(),
+          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
-    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
+    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
     valueProvider = valueProviderCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getProtocol().getName(), valueProvider.apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getProtocol().getName(), valueProvider.apply(dataset));
     }
     verify(view.protocol).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getProtocol().getName(),
-          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getProtocol().getName(),
+          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
-    verify(view.experiments).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
-    LocalDateTimeRenderer<Experiment> localDateTimeRenderer =
+    verify(view.datasets).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
+    LocalDateTimeRenderer<Dataset> localDateTimeRenderer =
         localDateTimeRendererCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(experiment.getDate()),
-          getFormattedValue(localDateTimeRenderer, experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
+          getFormattedValue(localDateTimeRenderer, dataset));
     }
-    verify(view.experiments).addColumn(valueProviderCaptor.capture(), eq(OWNER));
+    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(OWNER));
     valueProvider = valueProviderCaptor.getValue();
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getOwner().getEmail(), valueProvider.apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getOwner().getEmail(), valueProvider.apply(dataset));
     }
     verify(view.owner).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
-    for (Experiment experiment : experiments) {
-      assertEquals(experiment.getOwner().getEmail(),
-          ((NormalizedComparator<Experiment>) comparator).getConverter().apply(experiment));
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getOwner().getEmail(),
+          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
   }
 
   @Test
   public void view() {
-    Experiment experiment = experiments.get(0);
-    doubleClickItem(view.experiments, experiment);
+    Dataset dataset = datasets.get(0);
+    doubleClickItem(view.datasets, dataset);
 
-    verify(presenter).view(experiment);
+    verify(presenter).view(dataset);
   }
 
   @Test
   public void viewProtocol() {
-    Experiment experiment = experiments.get(0);
-    doubleClickItem(view.experiments, experiment, view.protocol);
+    Dataset dataset = datasets.get(0);
+    doubleClickItem(view.datasets, dataset, view.protocol);
 
-    verify(presenter).view(experiment.getProtocol());
+    verify(presenter).view(dataset.getProtocol());
   }
 
   @Test

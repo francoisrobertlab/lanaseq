@@ -15,10 +15,10 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
--- // create experiment table
+-- // create dataset table
 -- Migration SQL that makes the change goes here.
 
-CREATE TABLE experiment (
+CREATE TABLE dataset (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   owner_id bigint(20),
@@ -26,11 +26,11 @@ CREATE TABLE experiment (
   PRIMARY KEY (id),
   KEY name (name),
   KEY owner (owner_id),
-  CONSTRAINT experimentOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+  CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
 
 
 -- //@UNDO
 -- SQL to undo the change goes here.
 
-DROP TABLE experiment;
+DROP TABLE dataset;
