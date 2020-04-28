@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -133,26 +134,40 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.setDataset(dataset);
 
     assertEquals("", dialog.name.getValue());
+    assertEquals("", dialog.project.getValue());
+    assertNull(dialog.protocol.getValue());
+    assertEquals(Assay.NULL, dialog.assay.getValue());
+    assertEquals(DatasetType.NULL, dialog.type.getValue());
   }
 
   @Test
   public void setDataset_Dataset() {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(1L).get();
 
     presenter.localeChange(locale);
     presenter.setDataset(dataset);
 
-    assertEquals(dataset.getName(), dialog.name.getValue());
+    assertEquals("POLR2A DNA location", dialog.name.getValue());
+    assertEquals("polymerase", dialog.project.getValue());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
   }
 
   @Test
   public void setDataset_BeforeLocaleChange() {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(1L).get();
 
     presenter.setDataset(dataset);
     presenter.localeChange(locale);
 
-    assertEquals(dataset.getName(), dialog.name.getValue());
+    assertEquals("POLR2A DNA location", dialog.name.getValue());
+    assertEquals("polymerase", dialog.project.getValue());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
   }
 
   @Test
