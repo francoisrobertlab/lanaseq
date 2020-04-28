@@ -99,6 +99,7 @@ public class DatasetServiceTest {
     assertEquals("POLR2A DNA location", dataset.getName());
     assertEquals("polymerase", dataset.getProject());
     assertEquals(Assay.MNASE_SEQ, dataset.getAssay());
+    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dataset.getType());
     assertEquals((Long) 1L, dataset.getProtocol().getId());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
@@ -189,6 +190,7 @@ public class DatasetServiceTest {
     dataset.setName("New dataset");
     dataset.setProject("my project");
     dataset.setAssay(Assay.CHIP_SEQ);
+    dataset.setType(DatasetType.IMMUNO_PRECIPITATION);
     dataset.setProtocol(protocolRepository.findById(1L).get());
 
     service.save(dataset);
@@ -198,6 +200,7 @@ public class DatasetServiceTest {
     assertEquals(dataset.getName(), database.getName());
     assertEquals("my project", database.getProject());
     assertEquals(Assay.CHIP_SEQ, database.getAssay());
+    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dataset.getType());
     assertEquals((Long) 1L, database.getProtocol().getId());
     assertEquals(user.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
@@ -212,6 +215,7 @@ public class DatasetServiceTest {
     dataset.setName("New name");
     dataset.setProject("my project");
     dataset.setAssay(Assay.CHIP_SEQ);
+    dataset.setType(DatasetType.INPUT);
     dataset.setProtocol(protocolRepository.findById(3L).get());
 
     service.save(dataset);
@@ -220,6 +224,7 @@ public class DatasetServiceTest {
     assertEquals("New name", dataset.getName());
     assertEquals("my project", dataset.getProject());
     assertEquals(Assay.CHIP_SEQ, dataset.getAssay());
+    assertEquals(DatasetType.INPUT, dataset.getType());
     assertEquals((Long) 3L, dataset.getProtocol().getId());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
