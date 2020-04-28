@@ -137,7 +137,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   private Anchor filenameAnchor(ProtocolFile file) {
     Anchor link = new Anchor();
-    link.getElement().setAttribute("download", "true");
+    link.getElement().setAttribute("download", file.getFilename());
     link.setText(file.getFilename());
     link.setHref(new StreamResource(file.getFilename(),
         new ByteArrayStreamResourceWriter(file.getContent())));

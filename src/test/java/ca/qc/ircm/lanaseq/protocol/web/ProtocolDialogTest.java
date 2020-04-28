@@ -214,7 +214,7 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
     for (ProtocolFile file : protocolFiles) {
       Anchor anchor = anchorComponentRenderer.createComponent(file);
       assertEquals(file.getFilename(), anchor.getText());
-      assertEquals("true", anchor.getElement().getAttribute("download"));
+      assertEquals(file.getFilename(), anchor.getElement().getAttribute("download"));
       assertTrue(anchor.getHref().startsWith("VAADIN/dynamic/resource"));
     }
     verify(dialog.filename).setComparator(comparatorCaptor.capture());

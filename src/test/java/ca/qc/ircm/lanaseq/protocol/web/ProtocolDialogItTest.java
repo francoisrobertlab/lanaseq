@@ -14,8 +14,10 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
+import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TestTransaction;
@@ -35,6 +38,8 @@ import org.springframework.test.context.transaction.TestTransaction;
 public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private ProtocolRepository repository;
+  @Value("${download-home}")
+  protected Path downloadHome;
   private String name = "test protocol";
   private Path file1;
   private Path file2;
@@ -159,5 +164,29 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
         Files.readAllBytes(
             Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
         file.getContent());
+  }
+
+  @Test
+  @Download
+  public void downloadFile() throws Throwable {
+    Files.createDirectories(downloadHome);
+    Path downloaded = downloadHome.resolve("FLAG Protocol.docx");
+    Files.deleteIfExists(downloaded);
+    Path source = Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI());
+    open();
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    view.doubleClickProtocol(0);
+    ProtocolDialogElement dialog = $(ProtocolDialogElement.class).id(ID);
+    AnchorElement filename = dialog.filename(0);
+    filename.click();
+
+    // Wait for file to download.
+    Thread.sleep(2000);
+    assertTrue(Files.exists(downloaded));
+    try {
+      assertArrayEquals(Files.readAllBytes(source), Files.readAllBytes(downloaded));
+    } finally {
+      Files.delete(downloaded);
+    }
   }
 }
