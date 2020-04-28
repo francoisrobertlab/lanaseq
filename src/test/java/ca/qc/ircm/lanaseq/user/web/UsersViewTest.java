@@ -55,7 +55,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import com.vaadin.flow.component.AttachEvent;
@@ -134,6 +134,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.name = mock(Column.class);
     when(view.users.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
+    when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     view.laboratory = mock(Column.class);
     when(view.users.addColumn(any(ValueProvider.class), eq(LABORATORY)))
@@ -280,18 +281,22 @@ public class UsersViewTest extends AbstractViewTestCase {
     }
     verify(view.email).setComparator(comparatorCaptor.capture());
     Comparator<User> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(email("abc@site.com"), email("test@site.com")) < 0);
-    assertTrue(comparator.compare(email("Abc@site.com"), email("test@site.com")) < 0);
-    assertTrue(comparator.compare(email("test@abc.com"), email("test@site.com")) < 0);
-    assertTrue(comparator.compare(email("test@site.com"), email("test@site.com")) == 0);
-    assertTrue(comparator.compare(email("Test@site.com"), email("test@site.com")) == 0);
-    assertTrue(comparator.compare(email("test@site.com"), email("abc@site.com")) > 0);
-    assertTrue(comparator.compare(email("Test@site.com"), email("abc@site.com")) > 0);
-    assertTrue(comparator.compare(email("test@site.com"), email("test@abc.com")) > 0);
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (User user : users) {
+      assertEquals(user.getEmail(),
+          ((NormalizedComparator<User>) comparator).getConverter().apply(user));
+    }
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(NAME));
     valueProvider = valueProviderCaptor.getValue();
     for (User user : users) {
       assertEquals(user.getName() != null ? user.getName() : "", valueProvider.apply(user));
+    }
+    verify(view.name).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (User user : users) {
+      assertEquals(user.getName(),
+          ((NormalizedComparator<User>) comparator).getConverter().apply(user));
     }
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
     valueProvider = valueProviderCaptor.getValue();
@@ -300,16 +305,11 @@ public class UsersViewTest extends AbstractViewTestCase {
     }
     verify(view.laboratory).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
-    assertTrue(comparator.compare(lab("abc"), lab("test")) < 0);
-    assertTrue(comparator.compare(lab("Abc"), lab("test")) < 0);
-    assertTrue(comparator.compare(lab("élement"), lab("facteur")) < 0);
-    assertTrue(comparator.compare(lab("test"), lab("test")) == 0);
-    assertTrue(comparator.compare(lab("Test"), lab("test")) == 0);
-    assertTrue(comparator.compare(lab("Expérienceà"), lab("experiencea")) == 0);
-    assertTrue(comparator.compare(lab("experiencea"), lab("Expérienceà")) == 0);
-    assertTrue(comparator.compare(lab("test"), lab("abc")) > 0);
-    assertTrue(comparator.compare(lab("Test"), lab("abc")) > 0);
-    assertTrue(comparator.compare(lab("facteur"), lab("élement")) > 0);
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (User user : users) {
+      assertEquals(user.getLaboratory().getName(),
+          ((NormalizedComparator<User>) comparator).getConverter().apply(user));
+    }
     verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(ACTIVE));
     ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
     for (User user : users) {
@@ -350,20 +350,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     doubleClickItem(view.users, user, view.laboratory);
 
     verify(presenter).viewLaboratory(user.getLaboratory());
-  }
-
-  private User email(String email) {
-    User user = new User();
-    user.setEmail(email);
-    return user;
-  }
-
-  private User lab(String name) {
-    User user = new User();
-    Laboratory laboratory = new Laboratory();
-    laboratory.setName(name);
-    user.setLaboratory(laboratory);
-    return user;
   }
 
   private User active(boolean active) {

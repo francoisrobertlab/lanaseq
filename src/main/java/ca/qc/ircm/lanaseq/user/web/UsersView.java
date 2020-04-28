@@ -28,7 +28,6 @@ import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
-import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
@@ -38,6 +37,7 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -137,11 +137,12 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
       }
     });
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
-        .setComparator((u1, u2) -> u1.getEmail().compareToIgnoreCase(u2.getEmail()));
-    name = users.addColumn(user -> user.getName(), NAME).setKey(NAME);
-    laboratory = users.addColumn(user -> user.getLaboratory().getName(), LABORATORY)
-        .setKey(LABORATORY).setComparator((u1, u2) -> normalize(u1.getLaboratory().getName())
-            .compareToIgnoreCase(normalize(u2.getLaboratory().getName())));
+        .setComparator(NormalizedComparator.of(User::getEmail));
+    name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
+        .setComparator(NormalizedComparator.of(User::getName));
+    laboratory =
+        users.addColumn(user -> user.getLaboratory().getName(), LABORATORY).setKey(LABORATORY)
+            .setComparator(NormalizedComparator.of(u -> u.getLaboratory().getName()));
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
         .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
     users.appendHeaderRow(); // Headers.
