@@ -108,9 +108,6 @@ public class UserFormPresenter {
         .bind(NAME);
     binder.forField(form.admin).bind(ADMIN);
     binder.forField(form.manager).bind(MANAGER);
-    if (!laboratoriesDataProvider.getItems().isEmpty()) {
-      form.laboratory.setRequiredIndicatorVisible(true);
-    }
     binder.forField(form.laboratory)
         .withValidator(laboratoryRequiredValidator(webResources.message(REQUIRED)))
         .withNullRepresentation(null).bind(LABORATORY);

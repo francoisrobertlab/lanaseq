@@ -441,7 +441,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(form);
     User user = userRepository.findById(2L).get();
-    System.out.println(user.getLaboratory());
 
     presenter.localeChange(locale);
     presenter.setUser(user);
@@ -458,8 +457,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertTrue(booleanCaptor.getValue());
     verify(form.passwords, atLeastOnce()).setRequired(booleanCaptor.capture());
     assertFalse(booleanCaptor.getValue());
-    System.out.println(user.getLaboratory());
-    System.out.println(form.laboratory.getValue());
     assertEquals(user.getLaboratory().getId(), form.laboratory.getValue().getId());
     assertFalse(form.laboratory.isReadOnly());
   }
