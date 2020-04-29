@@ -26,6 +26,7 @@ import com.vaadin.flow.component.ComponentEventBus;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
@@ -231,5 +232,25 @@ public class VaadinTestUtils {
       e.printStackTrace();
     }
     return null;
+  }
+
+  /**
+   * Validates that two {@link DatePickerI18n} are identical.
+   *
+   * @param expected
+   *          expected
+   * @param actual
+   *          actual
+   */
+  public static void validateEquals(DatePickerI18n expected, DatePickerI18n actual) {
+    assertEquals(expected.getWeek(), actual.getWeek());
+    assertEquals(expected.getCalendar(), actual.getCalendar());
+    assertEquals(expected.getClear(), actual.getClear());
+    assertEquals(expected.getToday(), actual.getToday());
+    assertEquals(expected.getCancel(), actual.getCancel());
+    assertEquals(expected.getFirstDayOfWeek(), actual.getFirstDayOfWeek());
+    assertEquals(expected.getMonthNames(), actual.getMonthNames());
+    assertEquals(expected.getWeekdays(), actual.getWeekdays());
+    assertEquals(expected.getWeekdaysShort(), actual.getWeekdaysShort());
   }
 }
