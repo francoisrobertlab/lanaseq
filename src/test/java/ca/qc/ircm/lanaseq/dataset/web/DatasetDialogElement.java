@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
@@ -73,6 +74,10 @@ public class DatasetDialogElement extends DialogElement {
 
   public TextFieldElement strainDescription() {
     return $(TextFieldElement.class).id(id(STRAIN_DESCRIPTION));
+  }
+
+  public TextFieldElement treatment() {
+    return $(TextFieldElement.class).id(id(TREATMENT));
   }
 
   public ButtonElement save() {

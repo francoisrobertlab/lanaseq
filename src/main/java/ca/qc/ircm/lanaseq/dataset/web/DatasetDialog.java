@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
@@ -80,6 +81,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField target = new TextField();
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
+  protected TextField treatment = new TextField();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -104,7 +106,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     add(layout);
     FormLayout datasetForm = new FormLayout(name, project, protocol, assay, type, target);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
-    FormLayout strainForm = new FormLayout(strain, strainDescription);
+    FormLayout strainForm = new FormLayout(strain, strainDescription, treatment);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(datasetForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
@@ -127,6 +129,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     target.setId(id(TARGET));
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
+    treatment.setId(id(TREATMENT));
     save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -153,6 +156,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainDescription.setLabel(datasetResources.message(STRAIN_DESCRIPTION));
     strainDescription
         .setPlaceholder(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
+    treatment.setLabel(datasetResources.message(TREATMENT));
+    treatment.setPlaceholder(datasetResources.message(property(TREATMENT, PLACEHOLDER)));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());

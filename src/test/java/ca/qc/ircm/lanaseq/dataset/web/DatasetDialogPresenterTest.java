@@ -89,6 +89,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private String target = "polr3a";
   private String strain = "yFR20";
   private String strainDescription = "WT";
+  private String treatment = "37C";
 
   /**
    * Before test.
@@ -108,6 +109,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.target = new TextField();
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
+    dialog.treatment = new TextField();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
@@ -126,6 +128,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.target.setValue(target);
     dialog.strain.setValue(strain);
     dialog.strainDescription.setValue(strainDescription);
+    dialog.treatment.setValue(treatment);
   }
 
   @Test
@@ -150,6 +153,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.target.getValue());
     assertEquals("", dialog.strain.getValue());
     assertEquals("", dialog.strainDescription.getValue());
+    assertEquals("", dialog.treatment.getValue());
   }
 
   @Test
@@ -168,6 +172,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("polr2a", dialog.target.getValue());
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
   }
 
   @Test
@@ -347,6 +352,24 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_TreatmentEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.treatment.setValue("");
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getTreatment());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
   public void save_NewDataset() {
     presenter.localeChange(locale);
     fillForm();
@@ -363,6 +386,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(target, dataset.getTarget());
     assertEquals(strain, dataset.getStrain());
     assertEquals(strainDescription, dataset.getStrainDescription());
+    assertEquals(treatment, dataset.getTreatment());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -387,6 +411,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(target, dataset.getTarget());
     assertEquals(strain, dataset.getStrain());
     assertEquals(strainDescription, dataset.getStrainDescription());
+    assertEquals(treatment, dataset.getTreatment());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();

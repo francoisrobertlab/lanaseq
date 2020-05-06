@@ -28,6 +28,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
@@ -114,6 +115,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(TARGET), dialog.target.getId().orElse(""));
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
+    assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -137,6 +139,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
     assertEquals(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
         dialog.strainDescription.getPlaceholder());
+    assertEquals(datasetResources.message(TREATMENT), dialog.treatment.getLabel());
+    assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
+        dialog.treatment.getPlaceholder());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -164,6 +169,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
     assertEquals(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
         dialog.strainDescription.getPlaceholder());
+    assertEquals(datasetResources.message(TREATMENT), dialog.treatment.getLabel());
+    assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
+        dialog.treatment.getPlaceholder());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);

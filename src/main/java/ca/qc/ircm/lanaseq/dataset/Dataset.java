@@ -93,6 +93,12 @@ public class Dataset implements Data, Owned, Serializable {
   @Size(max = 255)
   private String strainDescription;
   /**
+   * Treatment.
+   */
+  @Column
+  @Size(max = 255)
+  private String treatment;
+  /**
    * Creation date.
    */
   @Column
@@ -257,5 +263,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setStrainDescription(String strainDescription) {
     this.strainDescription = strainDescription;
+  }
+
+  public String getTreatment() {
+    return treatment;
+  }
+
+  public void setTreatment(String treatment) {
+    this.treatment = treatment;
   }
 }

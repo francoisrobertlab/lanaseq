@@ -63,6 +63,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String target = "polr3a";
   private String strain = "yFR20";
   private String strainDescription = "WT";
+  private String treatment = "37C";
 
   @Before
   public void beforeTest() {
@@ -82,6 +83,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.target().setValue(target);
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
+    dialog.treatment().setValue(treatment);
   }
 
   @Test
@@ -99,6 +101,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.target()).isPresent());
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
+    assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
   }
@@ -131,6 +134,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(target, dataset.getTarget());
     assertEquals(strain, dataset.getStrain());
     assertEquals(strainDescription, dataset.getStrainDescription());
+    assertEquals(treatment, dataset.getTreatment());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -160,6 +164,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(target, dataset.getTarget());
     assertEquals(strain, dataset.getStrain());
     assertEquals(strainDescription, dataset.getStrainDescription());
+    assertEquals(treatment, dataset.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
   }
@@ -186,6 +191,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Spt16", dataset.getTarget());
     assertEquals("yFR101", dataset.getStrain());
     assertEquals("G24D", dataset.getStrainDescription());
+    assertNull(dataset.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
   }

@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 
@@ -86,6 +87,7 @@ public class DatasetDialogPresenter {
     binder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
     binder.forField(dialog.strain).withNullRepresentation("").bind(STRAIN);
     binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
+    binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }
 
   BinderValidationStatus<Dataset> validateDataset() {
