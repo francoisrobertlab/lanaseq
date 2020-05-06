@@ -151,6 +151,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     assay.setLabel(datasetResources.message(ASSAY));
     type.setLabel(datasetResources.message(TYPE));
     target.setLabel(datasetResources.message(TARGET));
+    target.setPlaceholder(datasetResources.message(property(TARGET, PLACEHOLDER)));
     strain.setLabel(datasetResources.message(STRAIN));
     strain.setPlaceholder(datasetResources.message(property(STRAIN, PLACEHOLDER)));
     strainDescription.setLabel(datasetResources.message(STRAIN_DESCRIPTION));

@@ -133,6 +133,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
     assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(datasetResources.message(property(TARGET, PLACEHOLDER)),
+        dialog.target.getPlaceholder());
     assertEquals(datasetResources.message(STRAIN), dialog.strain.getLabel());
     assertEquals(datasetResources.message(property(STRAIN, PLACEHOLDER)),
         dialog.strain.getPlaceholder());
@@ -163,6 +165,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
     assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(datasetResources.message(property(TARGET, PLACEHOLDER)),
+        dialog.target.getPlaceholder());
     assertEquals(datasetResources.message(STRAIN), dialog.strain.getLabel());
     assertEquals(datasetResources.message(property(STRAIN, PLACEHOLDER)),
         dialog.strain.getPlaceholder());
