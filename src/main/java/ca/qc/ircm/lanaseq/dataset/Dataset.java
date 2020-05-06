@@ -81,6 +81,18 @@ public class Dataset implements Data, Owned, Serializable {
   @Size(max = 255)
   private String target;
   /**
+   * Strain.
+   */
+  @Column
+  @Size(max = 255)
+  private String strain;
+  /**
+   * Strain description.
+   */
+  @Column
+  @Size(max = 255)
+  private String strainDescription;
+  /**
    * Creation date.
    */
   @Column
@@ -229,5 +241,21 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setTarget(String target) {
     this.target = target;
+  }
+
+  public String getStrain() {
+    return strain;
+  }
+
+  public void setStrain(String strain) {
+    this.strain = strain;
+  }
+
+  public String getStrainDescription() {
+    return strainDescription;
+  }
+
+  public void setStrainDescription(String strainDescription) {
+    this.strainDescription = strainDescription;
   }
 }

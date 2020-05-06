@@ -27,13 +27,13 @@ INSERT INTO protocol_file (id,files_id,filename,content)
 VALUES (2,2,'BioID Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/BioID_Protocol.docx'));
 INSERT INTO protocol_file (id,files_id,filename,content)
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'));
-INSERT INTO dataset (id,name,project,assay,type,target,protocol_id,owner_id,date)
-VALUES ('1', 'POLR2A DNA location', 'polymerase', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', '1', '2', '2018-10-20 13:28:12');
-INSERT INTO dataset (id,name,project,assay,type,target,protocol_id,owner_id,date)
-VALUES ('2', 'Histone location', 'histone', null, null, 'Spt16', '3', '3', '2018-10-22 9:48:20');
-INSERT INTO dataset (id,name,project,assay,type,target,protocol_id,owner_id,date)
-VALUES ('3', 'POLR1A location', 'polymerase', 'MNASE_SEQ', 'INPUT', 'polr1a', '1', '3', '2018-11-12 11:53:09');
-INSERT INTO dataset (id,name,project,assay,type,target,protocol_id,owner_id,date)
-VALUES ('4', 'POLR2A', 'polymerase 2', 'CHIP_SEQ', 'IMMUNO_PRECIPITATION', null, '2', '5', '2018-11-18 9:31:14');
-INSERT INTO dataset (id,name,project,assay,type,target,protocol_id,owner_id,date)
-VALUES ('5', 'POLR2B', 'polymerase 2', 'CHIP_SEQ', 'IMMUNO_PRECIPITATION', 'polr2b', '2', '5', '2018-12-05 9:28:23');
+INSERT INTO dataset (id,name,project,assay,type,target,strain,strain_description,protocol_id,owner_id,date)
+VALUES ('1', 'POLR2A DNA location', 'polymerase', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', '1', '2', '2018-10-20 13:28:12');
+INSERT INTO dataset (id,name,project,assay,type,target,strain,strain_description,protocol_id,owner_id,date)
+VALUES ('2', 'Histone location', 'histone', null, null, 'Spt16', 'yFR101', 'G24D', '3', '3', '2018-10-22 9:48:20');
+INSERT INTO dataset (id,name,project,assay,type,target,strain,strain_description,protocol_id,owner_id,date)
+VALUES ('3', 'POLR1A location', 'polymerase', 'MNASE_SEQ', 'INPUT', 'polr1a', 'yFR102', 'WT', '1', '3', '2018-11-12 11:53:09');
+INSERT INTO dataset (id,name,project,assay,type,target,strain,strain_description,protocol_id,owner_id,date)
+VALUES ('4', 'POLR2A', 'polymerase 2', 'CHIP_SEQ', 'IMMUNO_PRECIPITATION', null, 'yBC102', 'R103S', '2', '5', '2018-11-18 9:31:14');
+INSERT INTO dataset (id,name,project,assay,type,target,strain,strain_description,protocol_id,owner_id,date)
+VALUES ('5', 'POLR2B', 'polymerase 2', 'CHIP_SEQ', 'IMMUNO_PRECIPITATION', 'polr2b', 'yBC103', 'WT', '2', '5', '2018-12-05 9:28:23');
