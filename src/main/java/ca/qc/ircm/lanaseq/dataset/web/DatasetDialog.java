@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
@@ -25,8 +26,11 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -42,6 +46,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -73,6 +78,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected ComboBox<Assay> assay = new ComboBox<>();
   protected ComboBox<DatasetType> type = new ComboBox<>();
   protected TextField target = new TextField();
+  protected TextField strain = new TextField();
+  protected TextField strainDescription = new TextField();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -95,7 +102,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout form = new FormLayout(name, project, protocol, assay, type, target);
+    FormLayout datasetForm = new FormLayout(name, project, protocol, assay, type, target);
+    datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    FormLayout strainForm = new FormLayout(strain, strainDescription);
+    strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    FormLayout form = new FormLayout(datasetForm, strainForm);
+    form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
     layout.add(header, form, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
@@ -113,6 +125,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     type.setItems(DatasetType.values());
     type.setPreventInvalidInput(true);
     target.setId(id(TARGET));
+    strain.setId(id(STRAIN));
+    strainDescription.setId(id(STRAIN_DESCRIPTION));
     save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -134,6 +148,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     assay.setLabel(datasetResources.message(ASSAY));
     type.setLabel(datasetResources.message(TYPE));
     target.setLabel(datasetResources.message(TARGET));
+    strain.setLabel(datasetResources.message(STRAIN));
+    strain.setPlaceholder(datasetResources.message(property(STRAIN, PLACEHOLDER)));
+    strainDescription.setLabel(datasetResources.message(STRAIN_DESCRIPTION));
+    strainDescription
+        .setPlaceholder(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());

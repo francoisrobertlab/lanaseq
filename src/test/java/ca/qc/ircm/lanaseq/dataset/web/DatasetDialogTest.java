@@ -18,12 +18,15 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
@@ -32,6 +35,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -108,6 +112,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
     assertEquals(id(TYPE), dialog.type.getId().orElse(""));
     assertEquals(id(TARGET), dialog.target.getId().orElse(""));
+    assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
+    assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -125,6 +131,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
     assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(datasetResources.message(STRAIN), dialog.strain.getLabel());
+    assertEquals(datasetResources.message(property(STRAIN, PLACEHOLDER)),
+        dialog.strain.getPlaceholder());
+    assertEquals(datasetResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
+    assertEquals(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+        dialog.strainDescription.getPlaceholder());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -146,6 +158,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
     assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(datasetResources.message(STRAIN), dialog.strain.getLabel());
+    assertEquals(datasetResources.message(property(STRAIN, PLACEHOLDER)),
+        dialog.strain.getPlaceholder());
+    assertEquals(datasetResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
+    assertEquals(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+        dialog.strainDescription.getPlaceholder());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);

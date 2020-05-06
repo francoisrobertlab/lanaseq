@@ -87,6 +87,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private Assay assay = Assay.CHIP_SEQ;
   private DatasetType type = DatasetType.IMMUNO_PRECIPITATION;
   private String target = "polr3a";
+  private String strain = "yFR20";
+  private String strainDescription = "WT";
 
   /**
    * Before test.
@@ -104,6 +106,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.type = new ComboBox<>();
     dialog.type.setItems(DatasetType.values());
     dialog.target = new TextField();
+    dialog.strain = new TextField();
+    dialog.strainDescription = new TextField();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
@@ -120,6 +124,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.assay.setValue(assay);
     dialog.type.setValue(type);
     dialog.target.setValue(target);
+    dialog.strain.setValue(strain);
+    dialog.strainDescription.setValue(strainDescription);
   }
 
   @Test
@@ -142,6 +148,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(Assay.NULL, dialog.assay.getValue());
     assertEquals(DatasetType.NULL, dialog.type.getValue());
     assertEquals("", dialog.target.getValue());
+    assertEquals("", dialog.strain.getValue());
+    assertEquals("", dialog.strainDescription.getValue());
   }
 
   @Test
@@ -158,6 +166,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
   }
 
   @Test
@@ -174,6 +184,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
   }
 
   @Test
@@ -299,6 +311,42 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_StrainEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.strain.setValue("");
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getStrain());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
+  public void save_StrainDescriptionEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.strainDescription.setValue("");
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getStrainDescription());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
   public void save_NewDataset() {
     presenter.localeChange(locale);
     fillForm();
@@ -313,6 +361,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(assay, dataset.getAssay());
     assertEquals(type, dataset.getType());
     assertEquals(target, dataset.getTarget());
+    assertEquals(strain, dataset.getStrain());
+    assertEquals(strainDescription, dataset.getStrainDescription());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -335,6 +385,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(assay, dataset.getAssay());
     assertEquals(type, dataset.getType());
     assertEquals(target, dataset.getTarget());
+    assertEquals(strain, dataset.getStrain());
+    assertEquals(strainDescription, dataset.getStrainDescription());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
