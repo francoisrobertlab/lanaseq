@@ -40,6 +40,9 @@ import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleProperties;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -48,7 +51,10 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -71,6 +77,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
+  public static final String SAMPLES_HEADER = "samplesHeader";
+  public static final String SAMPLES = "samples";
   public static final String SAVED = "saved";
   protected H3 header = new H3();
   protected TextField name = new TextField();
@@ -82,11 +90,15 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
   protected TextField treatment = new TextField();
+  protected H4 samplesHeader = new H4();
+  protected Grid<Sample> samples = new Grid<>();
+  protected Column<Sample> sampleName;
+  protected Column<Sample> sampleReplicate;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Autowired
-  private DatasetDialogPresenter presenter;
+  private transient DatasetDialogPresenter presenter;
 
   protected DatasetDialog() {
   }
@@ -110,7 +122,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(datasetForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
-    layout.add(header, form, buttonsLayout);
+    layout.add(header, form, samplesHeader, samples, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));
@@ -130,6 +142,15 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
+    samplesHeader.setId(id(SAMPLES_HEADER));
+    samples.setId(id(SAMPLES));
+    samples.setHeight("15em");
+    sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
+        .setKey(SampleProperties.NAME)
+        .setComparator(NormalizedComparator.of(sample -> sample.getName()));
+    sampleReplicate = samples.addColumn(sample -> sample.getReplicate(), SampleProperties.REPLICATE)
+        .setKey(SampleProperties.REPLICATE)
+        .setComparator(NormalizedComparator.of(sample -> sample.getReplicate()));
     save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -142,7 +163,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
     final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
+    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     name.setLabel(datasetResources.message(NAME));
@@ -159,6 +182,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         .setPlaceholder(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
     treatment.setLabel(datasetResources.message(TREATMENT));
     treatment.setPlaceholder(datasetResources.message(property(TREATMENT, PLACEHOLDER)));
+    samplesHeader.setText(resources.message(SAMPLES_HEADER));
+    sampleName.setHeader(sampleResources.message(SampleProperties.NAME));
+    sampleReplicate.setHeader(sampleResources.message(SampleProperties.REPLICATE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());

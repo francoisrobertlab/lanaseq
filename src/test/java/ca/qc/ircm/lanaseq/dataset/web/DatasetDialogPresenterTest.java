@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -40,11 +41,16 @@ import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -71,16 +77,21 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private DatasetService service;
   @Mock
   private ProtocolService protocolService;
+  @Mock
+  private SampleService sampleService;
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
   @Autowired
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
+  private List<Sample> samples;
   private String name = "Test Dataset";
   private String project = "Test Project";
   private Protocol protocol;
@@ -97,7 +108,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new DatasetDialogPresenter(service, protocolService);
+    presenter = new DatasetDialogPresenter(service, protocolService, sampleService);
     dialog.header = new H3();
     dialog.name = new TextField();
     dialog.project = new TextField();
@@ -110,12 +121,16 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
+    dialog.samplesHeader = new H4();
+    dialog.samples = new Grid<>();
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
+    samples = sampleRepository.findAll();
+    when(sampleService.all(any())).thenReturn(samples);
     presenter.init(dialog);
   }
 
@@ -154,6 +169,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.strain.getValue());
     assertEquals("", dialog.strainDescription.getValue());
     assertEquals("", dialog.treatment.getValue());
+    verify(sampleService, never()).all(dataset);
+    assertTrue(items(dialog.samples).isEmpty());
   }
 
   @Test
@@ -173,6 +190,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());
     assertEquals("Rappa", dialog.treatment.getValue());
+    verify(sampleService).all(dataset);
+    assertEquals(samples, items(dialog.samples));
   }
 
   @Test
@@ -191,6 +210,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("polr2a", dialog.target.getValue());
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());
+    verify(sampleService).all(dataset);
+    assertEquals(samples, items(dialog.samples));
   }
 
   @Test
@@ -199,6 +220,16 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.setDataset(null);
 
     assertEquals("", dialog.name.getValue());
+    assertEquals("", dialog.project.getValue());
+    assertNull(dialog.protocol.getValue());
+    assertEquals(Assay.NULL, dialog.assay.getValue());
+    assertEquals(DatasetType.NULL, dialog.type.getValue());
+    assertEquals("", dialog.target.getValue());
+    assertEquals("", dialog.strain.getValue());
+    assertEquals("", dialog.strainDescription.getValue());
+    assertEquals("", dialog.treatment.getValue());
+    verify(sampleService, never()).all(any());
+    assertTrue(items(dialog.samples).isEmpty());
   }
 
   @Test

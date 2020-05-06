@@ -32,6 +32,8 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -41,6 +43,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -54,12 +57,19 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
@@ -86,6 +96,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources datasetResources = new AppResources(Dataset.class, locale);
+  private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
@@ -96,6 +107,26 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new DatasetDialog(presenter);
     dialog.init();
+  }
+
+  @SuppressWarnings("unchecked")
+  private void mockSamplesColumns() {
+    Element samplesElement = new Grid<>().getElement();
+    dialog.samples = mock(Grid.class);
+    when(dialog.samples.getElement()).thenReturn(samplesElement);
+    dialog.sampleName = mock(Column.class);
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.NAME)))
+        .thenReturn(dialog.sampleName);
+    when(dialog.sampleName.setKey(any())).thenReturn(dialog.sampleName);
+    when(dialog.sampleName.setComparator(any(Comparator.class))).thenReturn(dialog.sampleName);
+    when(dialog.sampleName.setHeader(any(String.class))).thenReturn(dialog.sampleName);
+    dialog.sampleReplicate = mock(Column.class);
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.REPLICATE)))
+        .thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setKey(any())).thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setComparator(any(Comparator.class)))
+        .thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setHeader(any(String.class))).thenReturn(dialog.sampleReplicate);
   }
 
   @Test
@@ -116,6 +147,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
+    assertEquals(id(SAMPLES_HEADER), dialog.samplesHeader.getId().orElse(""));
+    assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -125,6 +158,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
   @Test
   public void labels() {
+    mockSamplesColumns();
+    dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
@@ -144,6 +179,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
+    verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
+    verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -151,6 +189,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
+    mockSamplesColumns();
+    dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetDialog.class, locale);
@@ -176,6 +216,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
+    verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
+    verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
