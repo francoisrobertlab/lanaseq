@@ -57,6 +57,12 @@ public class Dataset implements Data, Owned, Serializable {
   @Size(max = 255)
   private String name;
   /**
+   * Project.
+   */
+  @Column
+  @Size(max = 255)
+  private String project;
+  /**
    * Assay.
    */
   @Column
@@ -74,12 +80,6 @@ public class Dataset implements Data, Owned, Serializable {
   @Column
   @Size(max = 255)
   private String target;
-  /**
-   * Project.
-   */
-  @Column
-  @Size(max = 255)
-  private String project;
   /**
    * Creation date.
    */
