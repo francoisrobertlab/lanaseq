@@ -41,6 +41,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -94,7 +95,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setId(ID);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, name, project, protocol, assay, type, target, buttonsLayout);
+    FormLayout form = new FormLayout(name, project, protocol, assay, type, target);
+    layout.add(header, form, buttonsLayout);
     buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));
