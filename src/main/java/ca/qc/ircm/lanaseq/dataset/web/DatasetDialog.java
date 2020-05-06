@@ -94,7 +94,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleReplicate;
-  protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Autowired
@@ -122,8 +121,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(datasetForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
+    HorizontalLayout buttonsLayout = new HorizontalLayout(save, cancel);
     layout.add(header, form, samplesHeader, samples, buttonsLayout);
-    buttonsLayout.add(save, cancel);
     header.setId(id(HEADER));
     name.setId(id(NAME));
     project.setId(id(PROJECT));
