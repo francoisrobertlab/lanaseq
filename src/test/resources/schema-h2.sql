@@ -81,6 +81,15 @@ CREATE TABLE IF NOT EXISTS dataset (
   CONSTRAINT datasetProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON UPDATE CASCADE,
   CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS sample (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  replicate varchar(255),
+  dataset_id bigint(20) NOT NULL,
+  date DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT sampleDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 -- Spring Security ACL.
 CREATE TABLE IF NOT EXISTS acl_sid (

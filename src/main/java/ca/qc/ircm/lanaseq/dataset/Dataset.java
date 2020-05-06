@@ -37,7 +37,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 /**
- * An dataset.
+ * Dataset or group of samples.
  */
 @Entity
 @GeneratePropertyNames
