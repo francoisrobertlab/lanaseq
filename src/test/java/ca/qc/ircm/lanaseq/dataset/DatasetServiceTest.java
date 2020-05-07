@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -106,6 +107,10 @@ public class DatasetServiceTest {
     assertEquals("Rappa", dataset.getTreatment());
     assertEquals((Long) 1L, dataset.getProtocol().getId());
     assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertEquals(3, dataset.getSamples().size());
+    assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
+    assertEquals((Long) 3L, dataset.getSamples().get(2).getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
@@ -200,6 +205,15 @@ public class DatasetServiceTest {
     dataset.setStrainDescription("F56G");
     dataset.setTreatment("37C");
     dataset.setProtocol(protocolRepository.findById(1L).get());
+    dataset.setSamples(new ArrayList<>());
+    Sample sample1 = new Sample();
+    sample1.setName("sample1");
+    sample1.setReplicate("r1");
+    dataset.getSamples().add(sample1);
+    Sample sample2 = new Sample();
+    sample2.setName("sample2");
+    sample2.setReplicate("r2");
+    dataset.getSamples().add(sample2);
 
     service.save(dataset);
 
@@ -217,6 +231,13 @@ public class DatasetServiceTest {
     assertEquals(user.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getDate()));
+    assertEquals(2, database.getSamples().size());
+    assertNotNull(database.getSamples().get(0).getId());
+    assertEquals("sample1", database.getSamples().get(0).getName());
+    assertEquals("r1", database.getSamples().get(0).getReplicate());
+    assertNotNull(database.getSamples().get(1).getId());
+    assertEquals("sample2", database.getSamples().get(1).getName());
+    assertEquals("r2", database.getSamples().get(1).getReplicate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
@@ -233,6 +254,14 @@ public class DatasetServiceTest {
     dataset.setStrainDescription("F56G");
     dataset.setTreatment("37C");
     dataset.setProtocol(protocolRepository.findById(3L).get());
+    Sample sample1 = dataset.getSamples().get(0);
+    sample1.setName("sample1");
+    sample1.setReplicate("r1");
+    dataset.getSamples().remove(1);
+    Sample sample3 = new Sample();
+    sample3.setName("sample3");
+    sample3.setReplicate("r3");
+    dataset.getSamples().add(sample3);
 
     service.save(dataset);
 
@@ -248,6 +277,16 @@ public class DatasetServiceTest {
     assertEquals((Long) 3L, dataset.getProtocol().getId());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(3, dataset.getSamples().size());
+    assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
+    assertEquals("sample1", dataset.getSamples().get(0).getName());
+    assertEquals("r1", dataset.getSamples().get(0).getReplicate());
+    assertEquals((Long) 3L, dataset.getSamples().get(1).getId());
+    assertEquals("FR3", dataset.getSamples().get(1).getName());
+    assertEquals("R3", dataset.getSamples().get(1).getReplicate());
+    assertNotNull(dataset.getSamples().get(2).getId());
+    assertEquals("sample3", dataset.getSamples().get(2).getName());
+    assertEquals("r3", dataset.getSamples().get(2).getReplicate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 

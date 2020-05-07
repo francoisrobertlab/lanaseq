@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS sample (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   replicate varchar(255),
+  samples_order int,
   dataset_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),

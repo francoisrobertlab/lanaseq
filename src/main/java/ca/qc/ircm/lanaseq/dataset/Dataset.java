@@ -22,11 +22,14 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -34,6 +37,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.validation.constraints.Size;
 
 /**
@@ -115,6 +120,12 @@ public class Dataset implements Data, Owned, Serializable {
   @ManyToOne(optional = false)
   @JoinColumn
   private User owner;
+  /**
+   * Samples that are part of this submission.
+   */
+  @OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderColumn
+  private List<Sample> samples;
 
   public Dataset() {
   }
@@ -271,5 +282,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setTreatment(String treatment) {
     this.treatment = treatment;
+  }
+
+  public List<Sample> getSamples() {
+    return samples;
+  }
+
+  public void setSamples(List<Sample> samples) {
+    this.samples = samples;
   }
 }

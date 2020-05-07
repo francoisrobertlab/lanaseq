@@ -44,6 +44,8 @@ import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.html.testbench.H4Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Element("vaadin-dialog")
 public class DatasetDialogElement extends DialogElement {
@@ -106,7 +108,13 @@ public class DatasetDialogElement extends DialogElement {
   }
 
   public SampleDialogElement sampleDialog() {
-    return $(SampleDialogElement.class).id(SampleDialog.ID);
+    return new WebDriverWait(getDriver(), 10).until(driver -> {
+      try {
+        return $(SampleDialogElement.class).id(SampleDialog.ID);
+      } catch (NoSuchElementException e) {
+        return null;
+      }
+    });
   }
 
   public ButtonElement save() {

@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
 import ca.qc.ircm.lanaseq.user.Laboratory;
@@ -65,9 +66,8 @@ public class DatasetService {
   protected DatasetService() {
   }
 
-  protected DatasetService(DatasetRepository repository,
-      LaboratoryRepository laboratoryRepository, MutableAclService aclService,
-      AuthorizationService authorizationService) {
+  protected DatasetService(DatasetRepository repository, LaboratoryRepository laboratoryRepository,
+      MutableAclService aclService, AuthorizationService authorizationService) {
     this.repository = repository;
     this.laboratoryRepository = laboratoryRepository;
     this.aclService = aclService;
@@ -109,7 +109,8 @@ public class DatasetService {
     if (authorizationService.hasRole(ADMIN)) {
       return repository.findAll();
     } else {
-      return repository.findByOwnerLaboratory(authorizationService.getCurrentUser().getLaboratory());
+      return repository
+          .findByOwnerLaboratory(authorizationService.getCurrentUser().getLaboratory());
     }
   }
 
@@ -158,10 +159,19 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void save(Dataset dataset) {
+    LocalDateTime now = LocalDateTime.now();
     if (dataset.getId() == null) {
       User user = authorizationService.getCurrentUser();
       dataset.setOwner(user);
-      dataset.setDate(LocalDateTime.now());
+      dataset.setDate(now);
+    }
+    if (dataset.getSamples() != null) {
+      for (Sample sample : dataset.getSamples()) {
+        if (sample.getId() == null) {
+          sample.setDate(now);
+        }
+        sample.setDataset(dataset);
+      }
     }
     repository.save(dataset);
   }
