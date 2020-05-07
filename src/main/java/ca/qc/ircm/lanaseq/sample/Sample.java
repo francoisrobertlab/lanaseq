@@ -103,6 +103,11 @@ public class Sample implements Data, Owned, Serializable {
   }
 
   @Override
+  public String toString() {
+    return "Sample [id=" + id + ", name=" + name + "]";
+  }
+
+  @Override
   public User getOwner() {
     return dataset.getOwner();
   }

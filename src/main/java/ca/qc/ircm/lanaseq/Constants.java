@@ -49,6 +49,7 @@ public class Constants {
   public static final String OUT_OF_RANGE = "outOfRange";
   public static final String SAVE = "save";
   public static final String CANCEL = "cancel";
+  public static final String DELETE = "delete";
   public static final String ALL = "all";
   public static final String ADD = "add";
   public static final String REMOVE = "remove";

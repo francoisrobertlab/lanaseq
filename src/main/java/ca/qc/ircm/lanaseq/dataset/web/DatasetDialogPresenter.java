@@ -36,11 +36,15 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.ArrayList;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,8 @@ public class DatasetDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogPresenter.class);
   private DatasetDialog dialog;
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
+  private ListDataProvider<Sample> samplesDataProvider =
+      DataProvider.ofCollection(new ArrayList<>());
   private Dataset dataset;
   private DatasetService service;
   private ProtocolService protocolService;
@@ -73,6 +79,8 @@ public class DatasetDialogPresenter {
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
+    dialog.sampleDialog.addSavedListener(e -> savedSample());
+    dialog.sampleDialog.addDeletedListener(e -> deletedSample());
     setDataset(null);
   }
 
@@ -88,6 +96,35 @@ public class DatasetDialogPresenter {
     binder.forField(dialog.strain).withNullRepresentation("").bind(STRAIN);
     binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
     binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
+  }
+
+  void addSample() {
+    dialog.sampleDialog.setSample(null);
+    dialog.sampleDialog.open();
+  }
+
+  void editSample(Sample sample) {
+    dialog.sampleDialog.setSample(sample);
+    dialog.sampleDialog.open();
+  }
+
+  private void savedSample() {
+    Sample sample = dialog.sampleDialog.getSample();
+    if (!samplesDataProvider.getItems().contains(sample)) {
+      samplesDataProvider.getItems().add(sample);
+    }
+    refreshSamplesDataProvider();
+  }
+
+  private void deletedSample() {
+    Sample sample = dialog.sampleDialog.getSample();
+    samplesDataProvider.getItems().remove(sample);
+    refreshSamplesDataProvider();
+  }
+
+  private void refreshSamplesDataProvider() {
+    samplesDataProvider = DataProvider.ofCollection(samplesDataProvider.getItems());
+    dialog.samples.setDataProvider(samplesDataProvider);
   }
 
   BinderValidationStatus<Dataset> validateDataset() {
@@ -130,7 +167,8 @@ public class DatasetDialogPresenter {
     this.dataset = dataset;
     binder.setBean(dataset);
     if (dataset.getId() != null) {
-      dialog.samples.setItems(sampleService.all(dataset));
+      samplesDataProvider = DataProvider.ofCollection(sampleService.all(dataset));
     }
+    dialog.samples.setDataProvider(samplesDataProvider);
   }
 }

@@ -28,11 +28,14 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
@@ -44,6 +47,8 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class DatasetDialogElement extends DialogElement {
+  private static final int NAME_COLUMN = 0;
+
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }
@@ -90,6 +95,18 @@ public class DatasetDialogElement extends DialogElement {
 
   public GridElement samples() {
     return $(GridElement.class).id(id(SAMPLES));
+  }
+
+  public void doubleClickSample(int row) {
+    samples().getCell(row, NAME_COLUMN).doubleClick();
+  }
+
+  public ButtonElement addSample() {
+    return $(ButtonElement.class).id(id(ADD_SAMPLE));
+  }
+
+  public SampleDialogElement sampleDialog() {
+    return $(SampleDialogElement.class).id(SampleDialog.ID);
   }
 
   public ButtonElement save() {

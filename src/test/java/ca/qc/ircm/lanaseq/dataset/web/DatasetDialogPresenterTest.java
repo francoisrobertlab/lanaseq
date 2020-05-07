@@ -27,6 +27,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,8 +45,12 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
+import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
@@ -54,6 +59,8 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -78,8 +85,16 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private ProtocolService protocolService;
   @Mock
   private SampleService sampleService;
+  @Mock
+  private Sample sample;
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<SampleDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<DeletedEvent<SampleDialog>>> deletedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ListDataProvider<Sample>> samplesDataProviderCaptor;
   @Autowired
   private DatasetRepository repository;
   @Autowired
@@ -124,6 +139,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.samples = new Grid<>();
     dialog.save = new Button();
     dialog.cancel = new Button();
+    dialog.sampleDialog = mock(SampleDialog.class);
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
@@ -228,6 +244,79 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.treatment.getValue());
     verify(sampleService, never()).all(any());
     assertTrue(items(dialog.samples).isEmpty());
+  }
+
+  @Test
+  public void addSample() {
+    presenter.addSample();
+    verify(dialog.sampleDialog).setSample(null);
+    verify(dialog.sampleDialog).open();
+  }
+
+  @Test
+  public void editSample() {
+    presenter.editSample(sample);
+    verify(dialog.sampleDialog).setSample(sample);
+    verify(dialog.sampleDialog).open();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void savedSample_New() {
+    presenter.setDataset(new Dataset(1L));
+    List<Sample> samples = new ArrayList<Sample>(this.samples);
+    dialog.samples = mock(Grid.class);
+    verify(dialog.sampleDialog).addSavedListener(savedListenerCaptor.capture());
+    Sample sample = mock(Sample.class);
+    when(dialog.sampleDialog.getSample()).thenReturn(sample);
+    ComponentEventListener<SavedEvent<SampleDialog>> savedListener = savedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(dialog.samples).setDataProvider(samplesDataProviderCaptor.capture());
+    List<Sample> items = new ArrayList<>(samplesDataProviderCaptor.getValue().getItems());
+    assertEquals(samples.size() + 1, items.size());
+    for (int i = 0; i < samples.size(); i++) {
+      assertEquals(samples.get(i), items.get(i));
+    }
+    assertEquals(sample, items.get(items.size() - 1));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void savedSample() {
+    presenter.setDataset(new Dataset(1L));
+    List<Sample> samples = new ArrayList<Sample>(this.samples);
+    dialog.samples = mock(Grid.class);
+    verify(dialog.sampleDialog).addSavedListener(savedListenerCaptor.capture());
+    Sample sample = samples.get(0);
+    when(dialog.sampleDialog.getSample()).thenReturn(sample);
+    ComponentEventListener<SavedEvent<SampleDialog>> savedListener = savedListenerCaptor.getValue();
+    savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(dialog.samples).setDataProvider(samplesDataProviderCaptor.capture());
+    List<Sample> items = new ArrayList<>(samplesDataProviderCaptor.getValue().getItems());
+    assertEquals(samples.size(), items.size());
+    for (int i = 0; i < samples.size(); i++) {
+      assertEquals(samples.get(i), items.get(i));
+    }
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void deletedSample() {
+    presenter.setDataset(new Dataset(1L));
+    List<Sample> samples = new ArrayList<Sample>(this.samples);
+    dialog.samples = mock(Grid.class);
+    verify(dialog.sampleDialog).addDeletedListener(deletedListenerCaptor.capture());
+    Sample sample = samples.get(0);
+    when(dialog.sampleDialog.getSample()).thenReturn(sample);
+    ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener =
+        deletedListenerCaptor.getValue();
+    deletedListener.onComponentEvent(mock(DeletedEvent.class));
+    verify(dialog.samples).setDataProvider(samplesDataProviderCaptor.capture());
+    List<Sample> items = new ArrayList<>(samplesDataProviderCaptor.getValue().getItems());
+    assertEquals(samples.size() - 1, items.size());
+    for (int i = 1; i < samples.size(); i++) {
+      assertEquals(samples.get(i), items.get(i - 1));
+    }
   }
 
   @Test
@@ -448,7 +537,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void cancel_Close() {
-    presenter.init(dialog);
     presenter.localeChange(locale);
 
     presenter.cancel();

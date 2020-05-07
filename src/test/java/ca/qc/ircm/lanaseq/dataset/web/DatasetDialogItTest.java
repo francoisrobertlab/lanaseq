@@ -64,6 +64,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
+  private String sampleName = "FR1";
+  private String sampleReplicate = "R1";
 
   @Before
   public void beforeTest() {
@@ -84,6 +86,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
+    dialog.addSample().click();
+    dialog.sampleDialog().name().setValue(sampleName);
+    dialog.sampleDialog().replicate().setValue(sampleReplicate);
+    dialog.sampleDialog().save().click();
   }
 
   @Test
@@ -104,6 +110,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.samplesHeader()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
+    assertTrue(optional(() -> dialog.addSample()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
   }

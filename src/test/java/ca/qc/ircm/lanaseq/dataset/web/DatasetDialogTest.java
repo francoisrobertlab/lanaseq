@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
@@ -30,17 +31,20 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,13 +63,19 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.grid.FooterRow;
+import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -75,6 +85,8 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -86,18 +98,29 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   @Mock
   private DatasetDialogPresenter presenter;
   @Mock
+  private SampleDialog sampleDialog;
+  @Mock
   private Dataset dataset;
+  @Mock
+  private Sample sample;
+  @Captor
+  private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Autowired
   private DatasetRepository datasetRepository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources datasetResources = new AppResources(Dataset.class, locale);
   private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
+  private List<Sample> samples;
 
   /**
    * Before test.
@@ -106,7 +129,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new DatasetDialog(presenter);
+    dialog.sampleDialog = sampleDialog;
     dialog.init();
+    samples = sampleRepository.findAll();
   }
 
   @SuppressWarnings("unchecked")
@@ -127,6 +152,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     when(dialog.sampleReplicate.setComparator(any(Comparator.class)))
         .thenReturn(dialog.sampleReplicate);
     when(dialog.sampleReplicate.setHeader(any(String.class))).thenReturn(dialog.sampleReplicate);
+    FooterRow footerRow = mock(FooterRow.class);
+    when(dialog.samples.appendFooterRow()).thenReturn(footerRow);
+    FooterCell nameFooterCell = mock(FooterCell.class);
+    when(footerRow.getCell(dialog.sampleName)).thenReturn(nameFooterCell);
+    FooterCell replicateFooterCell = mock(FooterCell.class);
+    when(footerRow.getCell(dialog.sampleReplicate)).thenReturn(replicateFooterCell);
   }
 
   @Test
@@ -149,6 +180,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(SAMPLES_HEADER), dialog.samplesHeader.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
+    assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -182,6 +214,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
+    assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -219,6 +252,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
+    assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -246,6 +280,44 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertArrayEquals(DatasetType.values(), types.toArray(new DatasetType[0]));
     for (DatasetType type : types) {
       assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
+    }
+  }
+
+  @Test
+  public void samples() {
+    assertEquals(2, dialog.samples.getColumns().size());
+    assertNotNull(dialog.samples.getColumnByKey(SampleProperties.NAME));
+    assertNotNull(dialog.samples.getColumnByKey(SampleProperties.REPLICATE));
+    assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
+  }
+
+  @Test
+  public void samples_ColumnsValueProvider() {
+    mockSamplesColumns();
+    dialog.init();
+    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.NAME));
+    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
+    for (Sample sample : samples) {
+      assertEquals(sample.getName(), valueProvider.apply(sample));
+    }
+    verify(dialog.sampleName).setComparator(comparatorCaptor.capture());
+    Comparator<Sample> comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Sample sample : samples) {
+      assertEquals(sample.getName(),
+          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
+    }
+    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.REPLICATE));
+    valueProvider = valueProviderCaptor.getValue();
+    for (Sample sample : samples) {
+      assertEquals(sample.getReplicate(), valueProvider.apply(sample));
+    }
+    verify(dialog.sampleReplicate).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Sample sample : samples) {
+      assertEquals(sample.getReplicate(),
+          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
   }
 
@@ -313,6 +385,20 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
     verify(presenter).setDataset(null);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+  }
+
+  @Test
+  public void editSample() {
+    doubleClickItem(dialog.samples, sample);
+
+    verify(presenter).editSample(sample);
+  }
+
+  @Test
+  public void addSample() {
+    clickButton(dialog.addSample);
+
+    verify(presenter).addSample();
   }
 
   @Test
