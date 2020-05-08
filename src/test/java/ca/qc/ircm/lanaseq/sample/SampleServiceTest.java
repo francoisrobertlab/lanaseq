@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.sample;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,11 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,15 +27,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ServiceTestAnnotations
 public class SampleServiceTest {
   private static final String READ = "read";
-  private static final String WRITE = "write";
   @Autowired
   private SampleService service;
-  @Autowired
-  private SampleRepository repository;
-  @Autowired
-  private DatasetRepository datasetRepository;
-  @Autowired
-  private EntityManager entityManager;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
 
@@ -115,45 +105,5 @@ public class SampleServiceTest {
   public void all_Null() {
     List<Sample> samples = service.all(null);
     assertTrue(samples.isEmpty());
-  }
-
-  @Test
-  @WithMockUser
-  public void save_New() {
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-    Sample sample = new Sample();
-    sample.setName("my name");
-    sample.setReplicate("R3");
-    sample.setDataset(dataset);
-
-    service.save(sample);
-
-    entityManager.flush();
-    assertNotNull(sample.getId());
-    sample = repository.findById(sample.getId()).orElse(null);
-    assertEquals("my name", sample.getName());
-    assertEquals((Long) 2L, sample.getDataset().getId());
-    assertEquals("R3", sample.getReplicate());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
-  }
-
-  @Test
-  @WithMockUser
-  public void save_Update() {
-    Sample sample = repository.findById(4L).get();
-    sample.setName("my name");
-    sample.setReplicate("R3");
-
-    service.save(sample);
-
-    entityManager.flush();
-    sample = repository.findById(sample.getId()).orElse(null);
-    assertEquals("my name", sample.getName());
-    assertEquals((Long) 2L, sample.getDataset().getId());
-    assertEquals("R3", sample.getReplicate());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getDate());
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 }

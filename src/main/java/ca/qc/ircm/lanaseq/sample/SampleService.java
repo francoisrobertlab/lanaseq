@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -69,19 +68,5 @@ public class SampleService {
     }
 
     return repository.findAllByDataset(dataset);
-  }
-
-  /**
-   * Saves sample in database.
-   *
-   * @param sample
-   *          sample
-   */
-  @PreAuthorize("hasPermission(#sample, 'write')")
-  public void save(Sample sample) {
-    if (sample.getId() == null) {
-      sample.setDate(LocalDateTime.now());
-    }
-    repository.save(sample);
   }
 }
