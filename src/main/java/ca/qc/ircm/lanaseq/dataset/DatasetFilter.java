@@ -28,6 +28,7 @@ import java.util.function.Predicate;
  * Filters datasets.
  */
 public class DatasetFilter implements Predicate<Dataset> {
+  public String filenameContains;
   public String nameContains;
   public String projectContains;
   public String protocolContains;
@@ -37,12 +38,14 @@ public class DatasetFilter implements Predicate<Dataset> {
   @Override
   public boolean test(Dataset dataset) {
     boolean test = true;
+    if (filenameContains != null) {
+      test &= comparable(replaceNull(dataset.getFilename())).contains(comparable(filenameContains));
+    }
     if (nameContains != null) {
       test &= comparable(replaceNull(dataset.getName())).contains(comparable(nameContains));
     }
     if (projectContains != null) {
-      test &=
-          comparable(replaceNull(dataset.getProject())).contains(comparable(projectContains));
+      test &= comparable(replaceNull(dataset.getProject())).contains(comparable(projectContains));
     }
     if (protocolContains != null) {
       test &= comparable(replaceNull(dataset.getProtocol().getName()))
@@ -52,10 +55,10 @@ public class DatasetFilter implements Predicate<Dataset> {
       test &= dateRange.contains(dataset.getDate().toLocalDate());
     }
     if (ownerContains != null) {
-      test &= comparable(replaceNull(dataset.getOwner().getEmail()))
-          .contains(comparable(ownerContains))
-          || comparable(replaceNull(dataset.getOwner().getName()))
-              .contains(comparable(ownerContains));
+      test &=
+          comparable(replaceNull(dataset.getOwner().getEmail())).contains(comparable(ownerContains))
+              || comparable(replaceNull(dataset.getOwner().getName()))
+                  .contains(comparable(ownerContains));
     }
     return test;
   }

@@ -23,12 +23,15 @@ import static javax.persistence.GenerationType.IDENTITY;
 import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,7 +49,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @GeneratePropertyNames
-public class Dataset implements Data, Owned, Serializable {
+public class Dataset implements Data, Owned, HasFiles, Serializable {
   private static final long serialVersionUID = -8296884268335212959L;
   /**
    * Database identifier.
@@ -184,6 +187,26 @@ public class Dataset implements Data, Owned, Serializable {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public String getFilename() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(assay != null ? "_" + assay.getLabel(Locale.ENGLISH) : "");
+    builder.append(type != null ? "_" + type.getLabel(Locale.ENGLISH) : "");
+    builder.append(target != null ? "_" + target : "");
+    builder.append(strain != null ? "_" + strain : "");
+    builder.append(strainDescription != null ? "_" + strainDescription : "");
+    builder.append(treatment != null ? "_" + treatment : "");
+    DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+    builder.append(date != null ? "_" + formatter.format(date) : "");
+    if (builder.length() > 0) {
+      builder.deleteCharAt(0);
+    }
+    String filename = builder.toString();
+    filename = Strings.normalize(filename);
+    filename = filename.replaceAll("[^\\w-]", "");
+    return filename;
   }
 
   @Override

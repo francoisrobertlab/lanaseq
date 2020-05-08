@@ -131,6 +131,12 @@ public class DatasetsViewPresenter {
     }
   }
 
+  void filterFilename(String value) {
+    clearError();
+    filter.filenameContains = value.isEmpty() ? null : value;
+    view.datasets.getDataProvider().refreshAll();
+  }
+
   void filterName(String value) {
     clearError();
     filter.nameContains = value.isEmpty() ? null : value;

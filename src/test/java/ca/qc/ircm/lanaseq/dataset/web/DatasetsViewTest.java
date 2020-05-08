@@ -22,15 +22,16 @@ import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
@@ -49,10 +50,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPresenter;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -112,8 +109,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog,
-        datasetPermissionsDialog);
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog, datasetPermissionsDialog);
     view.init();
     datasets = datasetRepository.findAll();
   }
@@ -123,26 +119,28 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     Element datasetsElement = view.datasets.getElement();
     view.datasets = mock(Grid.class);
     when(view.datasets.getElement()).thenReturn(datasetsElement);
+    view.filename = mock(Column.class);
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(FILENAME))).thenReturn(view.filename);
+    when(view.filename.setKey(any())).thenReturn(view.filename);
+    when(view.filename.setComparator(any(Comparator.class))).thenReturn(view.filename);
+    when(view.filename.setHeader(any(String.class))).thenReturn(view.filename);
     view.name = mock(Column.class);
     when(view.datasets.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     view.project = mock(Column.class);
-    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROJECT)))
-        .thenReturn(view.project);
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROJECT))).thenReturn(view.project);
     when(view.project.setKey(any())).thenReturn(view.project);
     when(view.project.setComparator(any(Comparator.class))).thenReturn(view.project);
     when(view.project.setHeader(any(String.class))).thenReturn(view.project);
     view.protocol = mock(Column.class);
-    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROTOCOL)))
-        .thenReturn(view.protocol);
+    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROTOCOL))).thenReturn(view.protocol);
     when(view.protocol.setKey(any())).thenReturn(view.protocol);
     when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     view.date = mock(Column.class);
-    when(view.datasets.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
-        .thenReturn(view.date);
+    when(view.datasets.addColumn(any(LocalDateTimeRenderer.class), eq(DATE))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
     view.owner = mock(Column.class);
@@ -152,6 +150,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.datasets.appendHeaderRow()).thenReturn(filtersRow);
+    HeaderCell filenameFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.filename)).thenReturn(filenameFilterCell);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
     HeaderCell projectFilterCell = mock(HeaderCell.class);
@@ -182,6 +182,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     mockColumns();
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
+    verify(view.filename).setHeader(datasetResources.message(FILENAME));
+    verify(view.filename).setFooter(datasetResources.message(FILENAME));
     verify(view.name).setHeader(datasetResources.message(NAME));
     verify(view.name).setFooter(datasetResources.message(NAME));
     verify(view.project).setHeader(datasetResources.message(PROJECT));
@@ -192,6 +194,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.date).setFooter(datasetResources.message(DATE));
     verify(view.owner).setHeader(datasetResources.message(OWNER));
     verify(view.owner).setFooter(datasetResources.message(OWNER));
+    assertEquals(webResources.message(ALL), view.filenameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
@@ -205,10 +208,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog,
-        datasetPermissionsDialog);
     mockColumns();
-    view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetsView.class, locale);
@@ -217,6 +217,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
+    verify(view.filename).setHeader(datasetResources.message(FILENAME));
+    verify(view.filename).setFooter(datasetResources.message(FILENAME));
     verify(view.name, atLeastOnce()).setHeader(datasetResources.message(NAME));
     verify(view.name, atLeastOnce()).setFooter(datasetResources.message(NAME));
     verify(view.project).setHeader(datasetResources.message(PROJECT));
@@ -227,6 +229,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.date, atLeastOnce()).setFooter(datasetResources.message(DATE));
     verify(view.owner, atLeastOnce()).setHeader(datasetResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(datasetResources.message(OWNER));
+    assertEquals(webResources.message(ALL), view.filenameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
@@ -246,7 +249,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
 
   @Test
   public void datasets() {
-    assertEquals(5, view.datasets.getColumns().size());
+    assertEquals(6, view.datasets.getColumns().size());
+    assertNotNull(view.datasets.getColumnByKey(FILENAME));
     assertNotNull(view.datasets.getColumnByKey(NAME));
     assertNotNull(view.datasets.getColumnByKey(PROJECT));
     assertNotNull(view.datasets.getColumnByKey(PROTOCOL));
@@ -257,17 +261,28 @@ public class DatasetsViewTest extends AbstractViewTestCase {
 
   @Test
   public void datasets_ColumnsValueProvider() {
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog,
-        datasetPermissionsDialog);
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog, datasetPermissionsDialog);
     mockColumns();
     view.init();
-    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(NAME));
+    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
     ValueProvider<Dataset, String> valueProvider = valueProviderCaptor.getValue();
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getFilename(), valueProvider.apply(dataset));
+    }
+    verify(view.filename).setComparator(comparatorCaptor.capture());
+    Comparator<Dataset> comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Dataset dataset : datasets) {
+      assertEquals(dataset.getFilename(),
+          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
+    }
+    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(NAME));
+    valueProvider = valueProviderCaptor.getValue();
     for (Dataset dataset : datasets) {
       assertEquals(dataset.getName(), valueProvider.apply(dataset));
     }
     verify(view.name).setComparator(comparatorCaptor.capture());
-    Comparator<Dataset> comparator = comparatorCaptor.getValue();
+    comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
     for (Dataset dataset : datasets) {
       assertEquals(dataset.getName(),
@@ -298,8 +313,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
     verify(view.datasets).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
-    LocalDateTimeRenderer<Dataset> localDateTimeRenderer =
-        localDateTimeRendererCaptor.getValue();
+    LocalDateTimeRenderer<Dataset> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
     for (Dataset dataset : datasets) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
           getFormattedValue(localDateTimeRenderer, dataset));
@@ -332,6 +346,13 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     doubleClickItem(view.datasets, dataset, view.protocol);
 
     verify(presenter).view(dataset.getProtocol());
+  }
+
+  @Test
+  public void filterFilename() {
+    view.filenameFilter.setValue("test");
+
+    verify(presenter).filterFilename("test");
   }
 
   @Test

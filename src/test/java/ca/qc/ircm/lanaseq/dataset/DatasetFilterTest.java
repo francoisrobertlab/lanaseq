@@ -19,9 +19,9 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.dataset.DatasetFilter;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -36,6 +36,32 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @NonTransactionalTestAnnotations
 public class DatasetFilterTest {
   private DatasetFilter filter = new DatasetFilter();
+
+  @Test
+  public void test_FilenameContains() {
+    filter.filenameContains = "test";
+
+    assertTrue(filter.test(filename("My test")));
+    assertTrue(filter.test(filename("Test my")));
+    assertTrue(filter.test(filename("My test my")));
+    assertTrue(filter.test(filename("My TEST my")));
+    assertFalse(filter.test(filename(null)));
+    assertFalse(filter.test(filename("")));
+    assertFalse(filter.test(filename("christian")));
+  }
+
+  @Test
+  public void test_FilenameContainsNull() {
+    filter.filenameContains = null;
+
+    assertTrue(filter.test(filename("My test")));
+    assertTrue(filter.test(filename("Test my")));
+    assertTrue(filter.test(filename("My test my")));
+    assertTrue(filter.test(filename("My TEST my")));
+    assertTrue(filter.test(filename(null)));
+    assertTrue(filter.test(filename("")));
+    assertTrue(filter.test(filename("christian")));
+  }
 
   @Test
   public void test_NameContains() {
@@ -214,6 +240,12 @@ public class DatasetFilterTest {
     assertFalse(filter.test(nameOwner("My test", "")));
     assertFalse(filter.test(nameOwner(null, "my.test@abc.com")));
     assertFalse(filter.test(nameOwner("", "my.test@abc.com")));
+  }
+
+  private Dataset filename(String filename) {
+    Dataset dataset = mock(Dataset.class);
+    when(dataset.getFilename()).thenReturn(filename);
+    return dataset;
   }
 
   private Dataset name(String name) {

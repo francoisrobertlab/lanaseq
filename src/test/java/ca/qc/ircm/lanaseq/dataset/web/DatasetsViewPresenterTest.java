@@ -35,10 +35,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewPresenter;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
@@ -153,6 +149,30 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
     assertEquals("", view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+  }
+
+  @Test
+  public void filterFilename() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.datasets.setDataProvider(dataProvider);
+
+    presenter.filterFilename("test");
+
+    assertEquals("test", presenter.filter().filenameContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterFilename_Empty() {
+    presenter.init(view);
+    presenter.localeChange(locale);
+    view.datasets.setDataProvider(dataProvider);
+
+    presenter.filterFilename("");
+
+    assertEquals(null, presenter.filter().filenameContains);
+    verify(dataProvider).refreshAll();
   }
 
   @Test

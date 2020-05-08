@@ -64,23 +64,25 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = DatasetsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class DatasetsView extends VerticalLayout
-    implements LocaleChangeObserver, HasDynamicTitle {
+public class DatasetsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "datasets";
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
+  public static final String FILENAME = "filename";
   public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
   public static final String PERMISSIONS = "permissions";
   public static final String PERMISSIONS_DENIED = property(PERMISSIONS, "denied");
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<Dataset> datasets = new Grid<>();
+  protected Column<Dataset> filename;
   protected Column<Dataset> name;
   protected Column<Dataset> project;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
+  protected TextField filenameFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected TextField projectFilter = new TextField();
   protected TextField protocolFilter = new TextField();
@@ -123,19 +125,26 @@ public class DatasetsView extends VerticalLayout
         presenter.view(e.getItem());
       }
     });
+    filename = datasets.addColumn(dataset -> dataset.getFilename(), FILENAME).setKey(FILENAME)
+        .setComparator(NormalizedComparator.of(Dataset::getFilename));
     name = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName));
     project = datasets.addColumn(dataset -> dataset.getProject(), PROJECT).setKey(PROJECT)
         .setComparator(NormalizedComparator.of(Dataset::getProject));
     protocol = datasets.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator(NormalizedComparator.of(e -> e.getProtocol().getName()));
-    date = datasets.addColumn(
-        new LocalDateTimeRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
+    date = datasets
+        .addColumn(new LocalDateTimeRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE),
+            DATE)
         .setKey(DATE);
-    owner = datasets.addColumn(dataset -> dataset.getOwner().getEmail(), OWNER)
-        .setKey(OWNER).setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail()));
+    owner = datasets.addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
+        .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail()));
     datasets.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = datasets.appendHeaderRow();
+    filtersRow.getCell(filename).setComponent(filenameFilter);
+    filenameFilter.addValueChangeListener(e -> presenter.filterFilename(e.getValue()));
+    filenameFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    filenameFilter.setSizeFull();
     filtersRow.getCell(name).setComponent(nameFilter);
     nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -166,6 +175,8 @@ public class DatasetsView extends VerticalLayout
     final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
+    String filenameHeader = datasetResources.message(FILENAME);
+    filename.setHeader(filenameHeader).setFooter(filenameHeader);
     String nameHeader = datasetResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
     String projectHeader = datasetResources.message(PROJECT);
@@ -176,6 +187,7 @@ public class DatasetsView extends VerticalLayout
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = datasetResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
+    filenameFilter.setPlaceholder(webResources.message(ALL));
     nameFilter.setPlaceholder(webResources.message(ALL));
     projectFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
