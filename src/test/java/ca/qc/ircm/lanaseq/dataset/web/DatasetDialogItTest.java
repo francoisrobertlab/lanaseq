@@ -213,7 +213,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Histone location", dataset.getName());
     assertEquals("histone", dataset.getProject());
     assertEquals((Long) 3L, dataset.getProtocol().getId());
-    assertNull(dataset.getAssay());
+    assertEquals(Assay.CHIP_SEQ, dataset.getAssay());
     assertNull(dataset.getType());
     assertEquals("Spt16", dataset.getTarget());
     assertEquals("yFR101", dataset.getStrain());

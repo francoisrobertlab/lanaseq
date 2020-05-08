@@ -31,7 +31,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
@@ -90,10 +89,11 @@ public class DatasetDialogPresenter {
         .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
-    binder.forField(dialog.assay).withNullRepresentation(Assay.NULL).bind(ASSAY);
+    binder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
     binder.forField(dialog.type).withNullRepresentation(DatasetType.NULL).bind(TYPE);
     binder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
-    binder.forField(dialog.strain).withNullRepresentation("").bind(STRAIN);
+    binder.forField(dialog.strain).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("").bind(STRAIN);
     binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
     binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }

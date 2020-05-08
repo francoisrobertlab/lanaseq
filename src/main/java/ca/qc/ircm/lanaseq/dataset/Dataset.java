@@ -73,7 +73,7 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   /**
    * Assay.
    */
-  @Column
+  @Column(nullable = false)
   @Enumerated(STRING)
   private Assay assay;
   /**
@@ -91,7 +91,7 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   /**
    * Strain.
    */
-  @Column
+  @Column(nullable = false)
   @Size(max = 255)
   private String strain;
   /**

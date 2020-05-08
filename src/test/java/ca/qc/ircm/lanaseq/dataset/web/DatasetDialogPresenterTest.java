@@ -195,7 +195,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.name.getValue());
     assertEquals("", dialog.project.getValue());
     assertNull(dialog.protocol.getValue());
-    assertEquals(Assay.NULL, dialog.assay.getValue());
+    assertNull(dialog.assay.getValue());
     assertEquals(DatasetType.NULL, dialog.type.getValue());
     assertEquals("", dialog.target.getValue());
     assertEquals("", dialog.strain.getValue());
@@ -254,7 +254,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.name.getValue());
     assertEquals("", dialog.project.getValue());
     assertNull(dialog.protocol.getValue());
-    assertEquals(Assay.NULL, dialog.assay.getValue());
+    assertNull(dialog.assay.getValue());
     assertEquals(DatasetType.NULL, dialog.type.getValue());
     assertEquals("", dialog.target.getValue());
     assertEquals("", dialog.strain.getValue());
@@ -262,6 +262,20 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.treatment.getValue());
     verify(sampleService, never()).all(any());
     assertTrue(items(dialog.samples).isEmpty());
+  }
+
+  @Test
+  public void requiredIndicator() {
+    presenter.localeChange(locale);
+    assertTrue(dialog.name.isRequiredIndicatorVisible());
+    assertFalse(dialog.project.isRequiredIndicatorVisible());
+    assertTrue(dialog.protocol.isRequiredIndicatorVisible());
+    assertTrue(dialog.assay.isRequiredIndicatorVisible());
+    assertFalse(dialog.type.isRequiredIndicatorVisible());
+    assertFalse(dialog.target.isRequiredIndicatorVisible());
+    assertTrue(dialog.strain.isRequiredIndicatorVisible());
+    assertFalse(dialog.strainDescription.isRequiredIndicatorVisible());
+    assertFalse(dialog.treatment.isRequiredIndicatorVisible());
   }
 
   @Test
@@ -401,18 +415,21 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   public void save_AssayEmpty() {
     presenter.localeChange(locale);
     fillForm();
-    dialog.assay.setValue(Assay.NULL);
+    dialog.assay.clear();
 
     presenter.save(locale);
 
     BinderValidationStatus<Dataset> status = presenter.validateDataset();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getAssay());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.assay);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -460,13 +477,16 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.save(locale);
 
     BinderValidationStatus<Dataset> status = presenter.validateDataset();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getStrain());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.strain);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
