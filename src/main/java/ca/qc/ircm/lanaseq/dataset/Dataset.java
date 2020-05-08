@@ -59,12 +59,6 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   @GeneratedValue(strategy = IDENTITY)
   private Long id;
   /**
-   * Name.
-   */
-  @Column(unique = true, nullable = false)
-  @Size(max = 255)
-  private String name;
-  /**
    * Project.
    */
   @Column
@@ -137,56 +131,70 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
     this.id = id;
   }
 
-  public Dataset(String name) {
-    this.name = name;
-  }
-
-  public Dataset(Long id, String name) {
-    this.id = id;
-    this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return "Dataset [id=" + id + ", name=" + name + "]";
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((assay == null) ? 0 : assay.hashCode());
     result = prime * result + ((date == null) ? 0 : date.hashCode());
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((project == null) ? 0 : project.hashCode());
+    result = prime * result + ((strain == null) ? 0 : strain.hashCode());
+    result = prime * result + ((strainDescription == null) ? 0 : strainDescription.hashCode());
+    result = prime * result + ((target == null) ? 0 : target.hashCode());
+    result = prime * result + ((treatment == null) ? 0 : treatment.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (!(obj instanceof Dataset)) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     Dataset other = (Dataset) obj;
+    if (assay != other.assay)
+      return false;
     if (date == null) {
-      if (other.date != null) {
+      if (other.date != null)
         return false;
-      }
-    } else if (!date.equals(other.date)) {
+    } else if (!date.equals(other.date))
       return false;
-    }
-    if (name == null) {
-      if (other.name != null) {
+    if (project == null) {
+      if (other.project != null)
         return false;
-      }
-    } else if (!name.equals(other.name)) {
+    } else if (!project.equals(other.project))
       return false;
-    }
+    if (strain == null) {
+      if (other.strain != null)
+        return false;
+    } else if (!strain.equals(other.strain))
+      return false;
+    if (strainDescription == null) {
+      if (other.strainDescription != null)
+        return false;
+    } else if (!strainDescription.equals(other.strainDescription))
+      return false;
+    if (target == null) {
+      if (other.target != null)
+        return false;
+    } else if (!target.equals(other.target))
+      return false;
+    if (treatment == null) {
+      if (other.treatment != null)
+        return false;
+    } else if (!treatment.equals(other.treatment))
+      return false;
+    if (type != other.type)
+      return false;
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "Dataset [id=" + id + ", getFilename()=" + getFilename() + "]";
   }
 
   @Override
@@ -216,14 +224,6 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override

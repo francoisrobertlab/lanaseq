@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
@@ -77,13 +76,11 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   protected H2 header = new H2();
   protected Grid<Dataset> datasets = new Grid<>();
   protected Column<Dataset> filename;
-  protected Column<Dataset> name;
   protected Column<Dataset> project;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
   protected TextField filenameFilter = new TextField();
-  protected TextField nameFilter = new TextField();
   protected TextField projectFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected TextField ownerFilter = new TextField();
@@ -127,8 +124,6 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     });
     filename = datasets.addColumn(dataset -> dataset.getFilename(), FILENAME).setKey(FILENAME)
         .setComparator(NormalizedComparator.of(Dataset::getFilename));
-    name = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Dataset::getName));
     project = datasets.addColumn(dataset -> dataset.getProject(), PROJECT).setKey(PROJECT)
         .setComparator(NormalizedComparator.of(Dataset::getProject));
     protocol = datasets.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
@@ -145,10 +140,6 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     filenameFilter.addValueChangeListener(e -> presenter.filterFilename(e.getValue()));
     filenameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     filenameFilter.setSizeFull();
-    filtersRow.getCell(name).setComponent(nameFilter);
-    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
-    nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
-    nameFilter.setSizeFull();
     filtersRow.getCell(project).setComponent(projectFilter);
     projectFilter.addValueChangeListener(e -> presenter.filterProject(e.getValue()));
     projectFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -177,8 +168,6 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     header.setText(resources.message(HEADER));
     String filenameHeader = datasetResources.message(FILENAME);
     filename.setHeader(filenameHeader).setFooter(filenameHeader);
-    String nameHeader = datasetResources.message(NAME);
-    name.setHeader(nameHeader).setFooter(nameHeader);
     String projectHeader = datasetResources.message(PROJECT);
     project.setHeader(projectHeader).setFooter(projectHeader);
     String protocolHeader = datasetResources.message(PROTOCOL);
@@ -188,7 +177,6 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     String ownerHeader = datasetResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     filenameFilter.setPlaceholder(webResources.message(ALL));
-    nameFilter.setPlaceholder(webResources.message(ALL));
     projectFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));

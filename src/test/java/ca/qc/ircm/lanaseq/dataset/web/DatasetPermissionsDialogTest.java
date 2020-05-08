@@ -44,8 +44,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetPermissionsDialogPresenter;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -234,7 +232,7 @@ public class DatasetPermissionsDialogTest extends AbstractViewTestCase {
     when(presenter.getDataset()).thenReturn(dataset);
     dialog.setDataset(dataset);
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, dataset.getFilename()), dialog.header.getText());
   }
 
   @Test
@@ -263,7 +261,7 @@ public class DatasetPermissionsDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, dataset.getFilename()), dialog.header.getText());
   }
 
   @Test

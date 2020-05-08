@@ -97,7 +97,6 @@ public class DatasetServiceTest {
     Dataset dataset = service.get(1L);
 
     assertEquals((Long) 1L, dataset.getId());
-    assertEquals("POLR2A DNA location", dataset.getName());
     assertEquals("polymerase", dataset.getProject());
     assertEquals(Assay.MNASE_SEQ, dataset.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dataset.getType());
@@ -196,7 +195,6 @@ public class DatasetServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = new Dataset();
-    dataset.setName("New dataset");
     dataset.setProject("my project");
     dataset.setAssay(Assay.CHIP_SEQ);
     dataset.setType(DatasetType.IMMUNO_PRECIPITATION);
@@ -219,7 +217,6 @@ public class DatasetServiceTest {
 
     assertNotNull(dataset.getId());
     Dataset database = repository.findById(dataset.getId()).orElse(null);
-    assertEquals(dataset.getName(), database.getName());
     assertEquals("my project", database.getProject());
     assertEquals(Assay.CHIP_SEQ, database.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dataset.getType());
@@ -245,7 +242,6 @@ public class DatasetServiceTest {
   @WithMockUser
   public void save_Update() {
     Dataset dataset = repository.findById(1L).orElse(null);
-    dataset.setName("New name");
     dataset.setProject("my project");
     dataset.setAssay(Assay.CHIP_SEQ);
     dataset.setType(DatasetType.INPUT);
@@ -266,7 +262,6 @@ public class DatasetServiceTest {
     service.save(dataset);
 
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("New name", dataset.getName());
     assertEquals("my project", dataset.getProject());
     assertEquals(Assay.CHIP_SEQ, dataset.getAssay());
     assertEquals(DatasetType.INPUT, dataset.getType());

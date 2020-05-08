@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
@@ -169,7 +168,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
-    assertEquals(id(NAME), dialog.name.getId().orElse(""));
     assertEquals(id(PROJECT), dialog.project.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
@@ -194,7 +192,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
@@ -232,7 +229,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
@@ -363,7 +359,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.setDataset(dataset);
 
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, dataset.getFilename()), dialog.header.getText());
   }
 
   @Test
@@ -375,7 +371,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, dataset.getFilename()), dialog.header.getText());
   }
 
   @Test

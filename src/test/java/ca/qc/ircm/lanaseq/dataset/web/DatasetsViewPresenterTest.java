@@ -22,7 +22,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS_DENIED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -102,7 +101,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     view.header = new H2();
     view.datasets = new Grid<>();
     view.datasets.setSelectionMode(SelectionMode.MULTI);
-    view.nameFilter = new TextField();
     view.projectFilter = new TextField();
     view.ownerFilter = new TextField();
     view.error = new Div();
@@ -172,30 +170,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     presenter.filterFilename("");
 
     assertEquals(null, presenter.filter().filenameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterName() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterName("test");
-
-    assertEquals("test", presenter.filter().nameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterName_Empty() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterName("");
-
-    assertEquals(null, presenter.filter().nameContains);
     verify(dataProvider).refreshAll();
   }
 
@@ -311,10 +285,7 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     presenter.init(view);
     presenter.localeChange(locale);
     presenter.add();
-    verify(view.datasetDialog).setDataset(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getId());
-    assertNull(dataset.getName());
+    verify(view.datasetDialog).setDataset(null);
     verify(view.datasetDialog).open();
   }
 
@@ -374,11 +345,11 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void permissions_ErrorThenFilterName() {
+  public void permissions_ErrorThenFilterFilename() {
     presenter.init(view);
     presenter.localeChange(locale);
     presenter.permissions();
-    presenter.filterName("");
+    presenter.filterFilename("");
     assertFalse(view.error.isVisible());
   }
 

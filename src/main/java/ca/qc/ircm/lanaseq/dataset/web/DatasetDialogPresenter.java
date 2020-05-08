@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
@@ -85,8 +84,6 @@ public class DatasetDialogPresenter {
 
   void localeChange(Locale locale) {
     final AppResources webResources = new AppResources(Constants.class, locale);
-    binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
-        .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
     binder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
@@ -141,7 +138,7 @@ public class DatasetDialogPresenter {
       dataset.setSamples(new ArrayList<>(samplesDataProvider.getItems()));
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
-      dialog.showNotification(resources.message(SAVED, dataset.getName()));
+      dialog.showNotification(resources.message(SAVED, dataset.getFilename()));
       dialog.close();
       dialog.fireSavedEvent();
     }

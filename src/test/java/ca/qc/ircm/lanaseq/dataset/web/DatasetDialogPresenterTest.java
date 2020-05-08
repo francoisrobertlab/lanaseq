@@ -106,7 +106,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
   private List<Sample> samples;
-  private String name = "Test Dataset";
   private String project = "Test Project";
   private Protocol protocol;
   private Assay assay = Assay.CHIP_SEQ;
@@ -128,7 +127,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     presenter = new DatasetDialogPresenter(service, protocolService, sampleService);
     dialog.header = new H3();
-    dialog.name = new TextField();
     dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
     dialog.assay = new ComboBox<>();
@@ -154,7 +152,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
   @SuppressWarnings("unchecked")
   private void fillForm() {
-    dialog.name.setValue(name);
     dialog.project.setValue(project);
     dialog.protocol.setValue(protocol);
     dialog.assay.setValue(assay);
@@ -192,7 +189,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset);
 
-    assertEquals("", dialog.name.getValue());
     assertEquals("", dialog.project.getValue());
     assertNull(dialog.protocol.getValue());
     assertNull(dialog.assay.getValue());
@@ -212,7 +208,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset);
 
-    assertEquals("POLR2A DNA location", dialog.name.getValue());
     assertEquals("polymerase", dialog.project.getValue());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
@@ -233,7 +228,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.setDataset(dataset);
     presenter.localeChange(locale);
 
-    assertEquals("POLR2A DNA location", dialog.name.getValue());
     assertEquals("polymerase", dialog.project.getValue());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
@@ -251,7 +245,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(null);
 
-    assertEquals("", dialog.name.getValue());
     assertEquals("", dialog.project.getValue());
     assertNull(dialog.protocol.getValue());
     assertNull(dialog.assay.getValue());
@@ -267,7 +260,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void requiredIndicator() {
     presenter.localeChange(locale);
-    assertTrue(dialog.name.isRequiredIndicatorVisible());
     assertFalse(dialog.project.isRequiredIndicatorVisible());
     assertTrue(dialog.protocol.isRequiredIndicatorVisible());
     assertTrue(dialog.assay.isRequiredIndicatorVisible());
@@ -349,27 +341,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     for (int i = 1; i < samples.size(); i++) {
       assertEquals(samples.get(i), items.get(i - 1));
     }
-  }
-
-  @Test
-  public void save_NameEmpty() {
-    presenter.localeChange(locale);
-    fillForm();
-    dialog.name.setValue("");
-
-    presenter.save(locale);
-
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.name);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
@@ -534,7 +505,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
@@ -550,7 +520,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     sample = dataset.getSamples().get(1);
     assertEquals(sampleName2, sample.getName());
     assertEquals(sampleReplicate2, sample.getReplicate());
-    verify(dialog).showNotification(resources.message(SAVED, name));
+    verify(dialog).showNotification(resources.message(SAVED, dataset.getFilename()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
@@ -566,7 +536,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     verify(service).save(datasetCaptor.capture());
     dataset = datasetCaptor.getValue();
-    assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
@@ -582,7 +551,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     sample = dataset.getSamples().get(1);
     assertEquals(sampleName2, sample.getName());
     assertEquals(sampleReplicate2, sample.getReplicate());
-    verify(dialog).showNotification(resources.message(SAVED, name));
+    verify(dialog).showNotification(resources.message(SAVED, dataset.getFilename()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }

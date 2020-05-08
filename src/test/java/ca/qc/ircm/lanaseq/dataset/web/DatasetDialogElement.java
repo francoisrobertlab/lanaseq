@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
@@ -49,10 +48,6 @@ public class DatasetDialogElement extends DialogElement {
 
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
-  }
-
-  public TextFieldElement name() {
-    return $(TextFieldElement.class).id(id(NAME));
   }
 
   public TextFieldElement project() {

@@ -40,8 +40,11 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +61,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
-  private String name = "test dataset";
   private String project = "test project";
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
@@ -80,7 +82,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void fill(DatasetDialogElement dialog) {
-    dialog.name().setValue(name);
     dialog.project().setValue(project);
     dialog.protocol().selectByText(protocol.getName());
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
@@ -96,6 +97,12 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     sampleDialog.save().click();
   }
 
+  private String filename(LocalDate date) {
+    return assay.getLabel(Locale.ENGLISH) + "_" + type.getLabel(Locale.ENGLISH) + "_" + target + "_"
+        + strain + "_" + strainDescription + "_" + treatment + "_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(date);
+  }
+
   @Test
   public void fieldsExistence() throws Throwable {
     open();
@@ -103,7 +110,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     view.doubleClickDataset(0);
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.name()).isPresent());
     assertTrue(optional(() -> dialog.project()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
@@ -131,15 +137,15 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
+    String filename = filename(LocalDate.now());
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(resources.message(SAVED, filename), notification.getText());
     List<Dataset> datasets = repository.findByOwner(new User(3L));
     Dataset dataset =
-        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
+        datasets.stream().filter(ex -> filename.equals(ex.getFilename())).findFirst().orElse(null);
     assertNotNull(dataset);
     assertNotNull(dataset.getId());
-    assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
@@ -171,9 +177,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(resources.message(SAVED, filename(LocalDate.of(2018, 10, 22))),
+        notification.getText());
     Dataset dataset = repository.findById(2L).get();
-    assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(protocol.getId(), dataset.getProtocol().getId());
     assertEquals(assay, dataset.getAssay());
@@ -210,7 +216,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Dataset dataset = repository.findById(2L).get();
-    assertEquals("Histone location", dataset.getName());
     assertEquals("histone", dataset.getProject());
     assertEquals((Long) 3L, dataset.getProtocol().getId());
     assertEquals(Assay.CHIP_SEQ, dataset.getAssay());

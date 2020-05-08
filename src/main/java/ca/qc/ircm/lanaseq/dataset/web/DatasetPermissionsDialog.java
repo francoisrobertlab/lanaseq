@@ -153,7 +153,7 @@ public class DatasetPermissionsDialog extends Dialog implements LocaleChangeObse
     final AppResources resources = new AppResources(DatasetPermissionsDialog.class, getLocale());
     Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getId() != null) {
-      header.setText(resources.message(HEADER, dataset.getName()));
+      header.setText(resources.message(HEADER, dataset.getFilename()));
     } else {
       header.setText(resources.message(HEADER, ""));
     }

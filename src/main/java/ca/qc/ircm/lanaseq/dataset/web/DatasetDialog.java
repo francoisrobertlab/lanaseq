@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
@@ -85,7 +84,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String SAMPLES = "samples";
   public static final String SAVED = "saved";
   protected H3 header = new H3();
-  protected TextField name = new TextField();
   protected TextField project = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
   protected ComboBox<Assay> assay = new ComboBox<>();
@@ -124,7 +122,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     add(layout);
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
-    FormLayout datasetForm = new FormLayout(name, project, protocol, assay, type);
+    FormLayout datasetForm = new FormLayout(project, protocol, assay, type);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
@@ -132,7 +130,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
     layout.add(header, form, samplesHeader, samples, new HorizontalLayout(save, cancel));
     header.setId(id(HEADER));
-    name.setId(id(NAME));
     project.setId(id(PROJECT));
     protocol.setId(id(PROTOCOL));
     protocol.setItemLabelGenerator(Protocol::getName);
@@ -181,7 +178,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
-    name.setLabel(datasetResources.message(NAME));
     project.setLabel(datasetResources.message(PROJECT));
     protocol.setLabel(datasetResources.message(PROTOCOL));
     assay.setLabel(datasetResources.message(ASSAY));
@@ -208,7 +204,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
     Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getId() != null) {
-      header.setText(resources.message(HEADER, 1, dataset.getName()));
+      header.setText(resources.message(HEADER, 1, dataset.getFilename()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }
