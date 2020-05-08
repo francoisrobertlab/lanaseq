@@ -33,6 +33,9 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -86,12 +89,11 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
-    /* Does not work with current TestBench version.
     dialog.addSample().click();
-    dialog.sampleDialog().name().setValue(sampleName);
-    dialog.sampleDialog().replicate().setValue(sampleReplicate);
-    dialog.sampleDialog().save().click();
-     */
+    SampleDialogElement sampleDialog = $(SampleDialogElement.class).id(SampleDialog.ID);
+    sampleDialog.name().setValue(sampleName);
+    sampleDialog.replicate().setValue(sampleReplicate);
+    sampleDialog.save().click();
   }
 
   @Test
@@ -149,6 +151,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(1, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals(sampleName, sample.getName());
+    assertEquals(sampleReplicate, sample.getReplicate());
   }
 
   @Test
@@ -178,13 +184,23 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(treatment, dataset.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(3, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals("JS1", sample.getName());
+    assertEquals("R1", sample.getReplicate());
+    sample = dataset.getSamples().get(1);
+    assertEquals("JS2", sample.getName());
+    assertEquals("R2", sample.getReplicate());
+    sample = dataset.getSamples().get(2);
+    assertEquals(sampleName, sample.getName());
+    assertEquals(sampleReplicate, sample.getReplicate());
   }
 
   @Test
   public void cancel() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.doubleClickDataset(1);
+    view.doubleClickDataset(0);
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     fill(dialog);
 
@@ -205,5 +221,12 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertNull(dataset.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(2, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals("JS1", sample.getName());
+    assertEquals("R1", sample.getReplicate());
+    sample = dataset.getSamples().get(1);
+    assertEquals("JS2", sample.getName());
+    assertEquals("R2", sample.getReplicate());
   }
 }

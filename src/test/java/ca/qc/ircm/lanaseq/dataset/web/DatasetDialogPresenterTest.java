@@ -115,6 +115,10 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
+  private String sampleName1 = "test sample 1";
+  private String sampleReplicate1 = "rep1";
+  private String sampleName2 = "test sample 2";
+  private String sampleReplicate2 = "rep2";
 
   /**
    * Before test.
@@ -148,6 +152,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.init(dialog);
   }
 
+  @SuppressWarnings("unchecked")
   private void fillForm() {
     dialog.name.setValue(name);
     dialog.project.setValue(project);
@@ -158,6 +163,19 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.strain.setValue(strain);
     dialog.strainDescription.setValue(strainDescription);
     dialog.treatment.setValue(treatment);
+    List<Sample> samples = new ArrayList<Sample>();
+    Sample sample1 = new Sample();
+    sample1.setName(sampleName1);
+    sample1.setReplicate(sampleReplicate1);
+    samples.add(sample1);
+    Sample sample2 = new Sample();
+    sample2.setName(sampleName2);
+    sample2.setReplicate(sampleReplicate2);
+    samples.add(sample2);
+    ListDataProvider<Sample> samplesDataProvider =
+        (ListDataProvider<Sample>) dialog.samples.getDataProvider();
+    samplesDataProvider.getItems().clear();
+    samplesDataProvider.getItems().addAll(samples);
   }
 
   @Test
@@ -505,6 +523,13 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strain, dataset.getStrain());
     assertEquals(strainDescription, dataset.getStrainDescription());
     assertEquals(treatment, dataset.getTreatment());
+    assertEquals(2, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals(sampleName1, sample.getName());
+    assertEquals(sampleReplicate1, sample.getReplicate());
+    sample = dataset.getSamples().get(1);
+    assertEquals(sampleName2, sample.getName());
+    assertEquals(sampleReplicate2, sample.getReplicate());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -530,6 +555,13 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strain, dataset.getStrain());
     assertEquals(strainDescription, dataset.getStrainDescription());
     assertEquals(treatment, dataset.getTreatment());
+    assertEquals(2, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals(sampleName1, sample.getName());
+    assertEquals(sampleReplicate1, sample.getReplicate());
+    sample = dataset.getSamples().get(1);
+    assertEquals(sampleName2, sample.getName());
+    assertEquals(sampleReplicate2, sample.getReplicate());
     verify(dialog).showNotification(resources.message(SAVED, name));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();

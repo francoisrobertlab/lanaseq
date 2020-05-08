@@ -34,8 +34,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 
-import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
-import ca.qc.ircm.lanaseq.sample.web.SampleDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
@@ -44,8 +42,6 @@ import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.html.testbench.H4Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Element("vaadin-dialog")
 public class DatasetDialogElement extends DialogElement {
@@ -105,16 +101,6 @@ public class DatasetDialogElement extends DialogElement {
 
   public ButtonElement addSample() {
     return $(ButtonElement.class).id(id(ADD_SAMPLE));
-  }
-
-  public SampleDialogElement sampleDialog() {
-    return new WebDriverWait(getDriver(), 10).until(driver -> {
-      try {
-        return $(SampleDialogElement.class).id(SampleDialog.ID);
-      } catch (NoSuchElementException e) {
-        return null;
-      }
-    });
   }
 
   public ButtonElement save() {

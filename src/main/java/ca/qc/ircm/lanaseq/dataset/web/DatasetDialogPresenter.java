@@ -138,6 +138,7 @@ public class DatasetDialogPresenter {
   void save(Locale locale) {
     if (validate()) {
       logger.debug("Save dataset {}", dataset);
+      dataset.setSamples(new ArrayList<>(samplesDataProvider.getItems()));
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, dataset.getName()));
