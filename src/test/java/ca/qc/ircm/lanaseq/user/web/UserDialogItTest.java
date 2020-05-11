@@ -127,7 +127,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
   }
 
@@ -152,7 +151,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Jonh Smith", user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertTrue(passwordEncoder.matches("pass1", user.getHashedPassword()));
   }
 
@@ -175,7 +173,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Jonh Smith", user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertTrue(passwordEncoder.matches("pass1", user.getHashedPassword()));
   }
 }

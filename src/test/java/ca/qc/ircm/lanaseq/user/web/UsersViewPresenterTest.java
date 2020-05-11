@@ -329,7 +329,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     assertNull(user.getId());
     assertNull(user.getEmail());
     assertNull(user.getName());
-    assertNull(user.getLaboratory());
     verify(view.userDialog).open();
   }
 

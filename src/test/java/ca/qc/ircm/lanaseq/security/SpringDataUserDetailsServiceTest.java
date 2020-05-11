@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.util.ArrayList;
@@ -66,7 +65,6 @@ public class SpringDataUserDetailsServiceTest {
     user.setName("A User");
     user.setHashedPassword(InitializeDatabaseExecutionListener.PASSWORD_PASS1);
     user.setActive(true);
-    user.setLaboratory(new Laboratory(1L));
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
   }
 

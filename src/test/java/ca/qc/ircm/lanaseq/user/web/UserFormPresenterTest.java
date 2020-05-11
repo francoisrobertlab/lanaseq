@@ -22,7 +22,6 @@ import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -422,7 +421,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertNotNull(user.getLaboratory());
   }
 
   @Test
@@ -440,7 +438,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertTrue(user.isManager());
-    assertNotNull(user.getLaboratory());
   }
 
   @Test
@@ -460,7 +457,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertTrue(user.isManager());
-    assertNotNull(user.getLaboratory());
   }
 
   @Test
@@ -482,7 +478,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertNotNull(user.getLaboratory());
   }
 
   @Test
@@ -501,7 +496,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertTrue(user.isManager());
-    assertNotNull(user.getLaboratory());
   }
 
   @Test
@@ -521,7 +515,6 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     assertEquals(name, user.getName());
     assertTrue(user.isAdmin());
     assertFalse(user.isManager());
-    assertNotNull(user.getLaboratory());
   }
 
   @Test
