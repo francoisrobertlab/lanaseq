@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +43,7 @@ public class DatasetService {
   protected DatasetService() {
   }
 
-  protected DatasetService(DatasetRepository repository, LaboratoryRepository laboratoryRepository,
+  protected DatasetService(DatasetRepository repository,
       AuthorizationService authorizationService) {
     this.repository = repository;
     this.authorizationService = authorizationService;
