@@ -20,16 +20,13 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryProperties;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -56,9 +53,6 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   protected Checkbox admin = new Checkbox();
   protected Checkbox manager = new Checkbox();
   protected PasswordsForm passwords = new PasswordsForm();
-  protected ComboBox<Laboratory> laboratory = new ComboBox<>();
-  protected Checkbox createNewLaboratory = new Checkbox();
-  protected TextField newLaboratoryName = new TextField();
   @Autowired
   private transient UserFormPresenter presenter;
 
@@ -79,30 +73,22 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   @PostConstruct
   protected void init() {
     setId(ID);
-    setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
-    add(new FormLayout(email, name, admin, manager, passwords),
-        new FormLayout(laboratory, createNewLaboratory, newLaboratoryName));
+    setResponsiveSteps(new ResponsiveStep("30em", 1));
+    add(new FormLayout(email, name, admin, manager, passwords));
     email.setId(id(EMAIL));
     name.setId(id(NAME));
     admin.setId(id(ADMIN));
     manager.setId(id(MANAGER));
-    laboratory.setId(id(LABORATORY));
-    createNewLaboratory.setId(id(CREATE_NEW_LABORATORY));
-    newLaboratoryName.setId(id(NEW_LABORATORY_NAME));
     presenter.init(this);
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(UserForm.class, getLocale());
     final AppResources userResources = new AppResources(User.class, getLocale());
     email.setLabel(userResources.message(EMAIL));
     name.setLabel(userResources.message(NAME));
     admin.setLabel(userResources.message(ADMIN));
     manager.setLabel(userResources.message(MANAGER));
-    laboratory.setLabel(userResources.message(LABORATORY));
-    createNewLaboratory.setLabel(resources.message(CREATE_NEW_LABORATORY));
-    newLaboratoryName.setLabel(resources.message(NEW_LABORATORY_NAME));
     presenter.localeChange(getLocale());
   }
 

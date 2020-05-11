@@ -19,12 +19,9 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
-import static ca.qc.ircm.lanaseq.user.web.UserForm.CREATE_NEW_LABORATORY;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.ID;
-import static ca.qc.ircm.lanaseq.user.web.UserForm.NEW_LABORATORY_NAME;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.id;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -54,7 +51,6 @@ public class UserFormTest extends AbstractViewTestCase {
   @Mock
   private User user;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(UserForm.class, locale);
   private AppResources userResources = new AppResources(User.class, locale);
 
   /**
@@ -79,9 +75,6 @@ public class UserFormTest extends AbstractViewTestCase {
     assertEquals(id(NAME), form.name.getId().orElse(""));
     assertEquals(id(ADMIN), form.admin.getId().orElse(""));
     assertEquals(id(MANAGER), form.manager.getId().orElse(""));
-    assertEquals(id(LABORATORY), form.laboratory.getId().orElse(""));
-    assertEquals(id(CREATE_NEW_LABORATORY), form.createNewLaboratory.getId().orElse(""));
-    assertEquals(id(NEW_LABORATORY_NAME), form.newLaboratoryName.getId().orElse(""));
   }
 
   @Test
@@ -91,9 +84,6 @@ public class UserFormTest extends AbstractViewTestCase {
     assertEquals(userResources.message(NAME), form.name.getLabel());
     assertEquals(userResources.message(ADMIN), form.admin.getLabel());
     assertEquals(userResources.message(MANAGER), form.manager.getLabel());
-    assertEquals(userResources.message(LABORATORY), form.laboratory.getLabel());
-    assertEquals(resources.message(CREATE_NEW_LABORATORY), form.createNewLaboratory.getLabel());
-    assertEquals(resources.message(NEW_LABORATORY_NAME), form.newLaboratoryName.getLabel());
     verify(presenter).localeChange(locale);
   }
 
@@ -101,7 +91,6 @@ public class UserFormTest extends AbstractViewTestCase {
   public void localeChange() {
     form.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(UserForm.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     form.localeChange(mock(LocaleChangeEvent.class));
@@ -109,9 +98,6 @@ public class UserFormTest extends AbstractViewTestCase {
     assertEquals(userResources.message(NAME), form.name.getLabel());
     assertEquals(userResources.message(ADMIN), form.admin.getLabel());
     assertEquals(userResources.message(MANAGER), form.manager.getLabel());
-    assertEquals(userResources.message(LABORATORY), form.laboratory.getLabel());
-    assertEquals(resources.message(CREATE_NEW_LABORATORY), form.createNewLaboratory.getLabel());
-    assertEquals(resources.message(NEW_LABORATORY_NAME), form.newLaboratoryName.getLabel());
     verify(presenter).localeChange(locale);
   }
 

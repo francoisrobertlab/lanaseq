@@ -19,15 +19,11 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
-import static ca.qc.ircm.lanaseq.user.web.UserForm.CREATE_NEW_LABORATORY;
-import static ca.qc.ircm.lanaseq.user.web.UserForm.NEW_LABORATORY_NAME;
 import static ca.qc.ircm.lanaseq.user.web.UserForm.id;
 
 import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
-import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.formlayout.testbench.FormLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
@@ -52,17 +48,5 @@ public class UserFormElement extends FormLayoutElement {
 
   public PasswordsFormElement passwords() {
     return $(PasswordsFormElement.class).id(PasswordsForm.ID);
-  }
-
-  public ComboBoxElement laboratory() {
-    return $(ComboBoxElement.class).id(id(LABORATORY));
-  }
-
-  public CheckboxElement createNewLaboratory() {
-    return $(CheckboxElement.class).id(id(CREATE_NEW_LABORATORY));
-  }
-
-  public TextFieldElement newLaboratoryName() {
-    return $(TextFieldElement.class).id(id(NEW_LABORATORY_NAME));
   }
 }
