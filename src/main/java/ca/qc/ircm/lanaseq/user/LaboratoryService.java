@@ -17,17 +17,8 @@
 
 package ca.qc.ircm.lanaseq.user;
 
-import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
-
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PostFilter;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,16 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class LaboratoryService {
   @Autowired
   private LaboratoryRepository repository;
-  @Autowired
-  private AuthorizationService authorizationService;
 
   protected LaboratoryService() {
   }
 
-  protected LaboratoryService(LaboratoryRepository repository,
-      AuthorizationService authorizationService) {
+  protected LaboratoryService(LaboratoryRepository repository) {
     this.repository = repository;
-    this.authorizationService = authorizationService;
   }
 
   /**
@@ -58,7 +45,6 @@ public class LaboratoryService {
    *          laboratory's id
    * @return laboratory having specified id
    */
-  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
   public Laboratory get(Long id) {
     if (id == null) {
       return null;
@@ -72,28 +58,7 @@ public class LaboratoryService {
    *
    * @return all laboratories the user can access
    */
-  @PostFilter("hasPermission(filterObject, 'read')")
   public List<Laboratory> all() {
-    if (authorizationService.hasRole(ADMIN)) {
-      return repository.findAll();
-    } else {
-      return Stream.of(authorizationService.getCurrentUser().getLaboratory())
-          .collect(Collectors.toCollection(ArrayList::new));
-    }
-  }
-
-  /**
-   * Saves laboratory into database.
-   *
-   * @param laboratory
-   *          laboratory
-   */
-  @PreAuthorize("hasPermission(#laboratory, 'write')")
-  public void save(Laboratory laboratory) {
-    if (laboratory.getId() == null) {
-      throw new IllegalArgumentException("cannot create a new laboratory without a user");
-    }
-
-    repository.save(laboratory);
+    return repository.findAll();
   }
 }
