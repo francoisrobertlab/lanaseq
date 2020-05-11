@@ -37,7 +37,6 @@ import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
@@ -74,8 +73,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private UsersView view;
   @Mock
   private UserService userService;
-  @Mock
-  private LaboratoryService laboratoryService;
   @Mock
   private AuthorizationService authorizationService;
   @Mock

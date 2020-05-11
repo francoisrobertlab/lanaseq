@@ -29,7 +29,6 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
@@ -57,8 +56,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   private UserDialog dialog;
   @Mock
   private UserService userService;
-  @Mock
-  private LaboratoryService laboratoryService;
   @Mock
   private AuthorizationService authorizationService;
   @Captor
