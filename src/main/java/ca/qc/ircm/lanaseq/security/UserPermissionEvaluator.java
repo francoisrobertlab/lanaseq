@@ -78,30 +78,18 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   }
 
   private boolean hasPermission(User user, User currentUser, Permission permission) {
-    logger.debug("before current user test for user {} and current user {}", user, currentUser);
     if (currentUser == null) {
       return false;
     }
-    logger.debug("before admin test for user {} and current user {}", user, currentUser);
     if (authorizationService.hasRole(ADMIN)) {
       return true;
     }
-    logger.debug("before new laboratory test for user {} and current user {}", user, currentUser);
-    if (user.getLaboratory() == null || user.getLaboratory().getId() == null || user.isAdmin()) {
+    if (user.isAdmin()) {
       return false;
     }
-    logger.debug("before labid test for user {} and current user {}", user, currentUser);
-    if (permission.equals(BasePermission.WRITE) && user.getId() != null) {
-      User unmodified = repository.findById(user.getId()).orElse(null);
-      if (!unmodified.getLaboratory().getId().equals(user.getLaboratory().getId())) {
-        return false;
-      }
-    }
-    logger.debug("before role test for user {} and current user {}", user, currentUser);
     boolean authorized = currentUser.getId().equals(user.getId());
     authorized |= permission.equals(BasePermission.READ);
-    authorized |= permission.equals(BasePermission.WRITE) && authorizationService
-        .hasAllRoles(MANAGER, UserAuthority.laboratoryMember(user.getLaboratory()));
+    authorized |= permission.equals(BasePermission.WRITE) && authorizationService.hasRole(MANAGER);
     return authorized;
   }
 }
