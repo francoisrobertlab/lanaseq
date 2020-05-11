@@ -41,7 +41,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class PermissionEvaluatorDelegatorTest {
-  private static final String LABORATORY_CLASS = Laboratory.class.getName();
   private static final String USER_CLASS = User.class.getName();
   private static final String DATASET_CLASS = Dataset.class.getName();
   private static final String PROTOCOL_CLASS = Protocol.class.getName();
@@ -51,8 +50,6 @@ public class PermissionEvaluatorDelegatorTest {
   private static final Permission BASE_WRITE = Permission.WRITE;
   @Autowired
   private PermissionEvaluatorDelegator permissionEvaluator;
-  @MockBean
-  private LaboratoryPermissionEvaluator laboratoryPermissionEvaluator;
   @MockBean
   private UserPermissionEvaluator userPermissionEvaluator;
   @MockBean
@@ -70,66 +67,6 @@ public class PermissionEvaluatorDelegatorTest {
 
   private Authentication authentication() {
     return SecurityContextHolder.getContext().getAuthentication();
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_Laboratory_False() throws Throwable {
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_WRITE));
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, BASE_READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, WRITE);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, BASE_WRITE);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, WRITE);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_WRITE);
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_Laboratory_True() throws Throwable {
-    when(laboratoryPermissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    when(laboratoryPermissionEvaluator.hasPermission(any(), any(), any(), any())).thenReturn(true);
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory, READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory, BASE_READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory, WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory, BASE_WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_WRITE));
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, BASE_READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, WRITE);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory, BASE_WRITE);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_READ);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, WRITE);
-    verify(laboratoryPermissionEvaluator).hasPermission(authentication(), laboratory.getId(),
-        LABORATORY_CLASS, BASE_WRITE);
   }
 
   @Test

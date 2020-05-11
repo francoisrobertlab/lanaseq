@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.security;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +34,6 @@ import org.springframework.stereotype.Component;
 @Primary
 public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   @Autowired
-  private LaboratoryPermissionEvaluator laboratoryPermissionEvaluator;
-  @Autowired
   private UserPermissionEvaluator userPermissionEvaluator;
   @Autowired
   private DatasetPermissionEvaluator datasetPermissionEvaluator;
@@ -46,10 +43,7 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if (targetDomainObject instanceof Laboratory) {
-      return laboratoryPermissionEvaluator.hasPermission(authentication, targetDomainObject,
-          permission);
-    } else if (targetDomainObject instanceof User) {
+    if (targetDomainObject instanceof User) {
       return userPermissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
     } else if (targetDomainObject instanceof Dataset) {
       return datasetPermissionEvaluator.hasPermission(authentication, targetDomainObject,
@@ -64,10 +58,7 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Serializable targetId,
       String targetType, Object permission) {
-    if (targetType.equals(Laboratory.class.getName())) {
-      return laboratoryPermissionEvaluator.hasPermission(authentication, targetId, targetType,
-          permission);
-    } else if (targetType.equals(User.class.getName())) {
+    if (targetType.equals(User.class.getName())) {
       return userPermissionEvaluator.hasPermission(authentication, targetId, targetType,
           permission);
     } else if (targetType.equals(Dataset.class.getName())) {
