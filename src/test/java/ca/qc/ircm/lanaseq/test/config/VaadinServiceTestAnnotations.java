@@ -35,8 +35,7 @@ import org.springframework.test.context.jdbc.Sql;
 @TestExecutionListeners(
     value = { InitializeDatabaseExecutionListener.class, VaadinServiceTestExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
-@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
-    "/acl-data.sql" })
+@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql" })
 public @interface VaadinServiceTestAnnotations {
 
 }

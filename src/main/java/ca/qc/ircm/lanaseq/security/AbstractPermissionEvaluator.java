@@ -17,18 +17,11 @@
 
 package ca.qc.ircm.lanaseq.security;
 
-import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
-import static org.springframework.security.acls.domain.BasePermission.CREATE;
-import static org.springframework.security.acls.domain.BasePermission.DELETE;
-import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.security.acls.domain.BasePermission.WRITE;
-
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -65,20 +58,11 @@ public abstract class AbstractPermissionEvaluator implements PermissionEvaluator
     if (permission instanceof Permission) {
       return (Permission) permission;
     }
-    switch (permission.toString().toUpperCase()) {
-      case "READ":
-        return READ;
-      case "WRITE":
-        return WRITE;
-      case "CREATE":
-        return CREATE;
-      case "DELETE":
-        return DELETE;
-      case "ADMINISTRATION":
-        return ADMINISTRATION;
-      default:
-        throw new IllegalArgumentException("Permission " + permission + " does not exists in "
-            + BasePermission.class.getSimpleName());
+    try {
+      return Enum.valueOf(Permission.class, Objects.toString(permission).toUpperCase());
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          "Permission " + permission + " does not exists in " + Permission.class.getSimpleName());
     }
   }
 }

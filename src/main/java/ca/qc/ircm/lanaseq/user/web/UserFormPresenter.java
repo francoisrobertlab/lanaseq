@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.user.web.UserForm.LABORATORY_NAME;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryService;
@@ -47,7 +48,6 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.acls.domain.BasePermission;
 
 /**
  * User form presenter.
@@ -125,7 +125,7 @@ public class UserFormPresenter {
 
   private void updateReadOnly() {
     boolean readOnly =
-        user.getId() != null && !authorizationService.hasPermission(user, BasePermission.WRITE);
+        user.getId() != null && !authorizationService.hasPermission(user, Permission.WRITE);
     binder.setReadOnly(readOnly);
     form.laboratory.setReadOnly(!authorizationService.hasRole(UserRole.ADMIN));
     form.laboratory.setEnabled(
