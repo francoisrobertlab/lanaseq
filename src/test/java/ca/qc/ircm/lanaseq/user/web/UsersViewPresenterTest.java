@@ -42,10 +42,6 @@ import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
-import ca.qc.ircm.lanaseq.user.web.LaboratoryDialog;
-import ca.qc.ircm.lanaseq.user.web.UserDialog;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
-import ca.qc.ircm.lanaseq.user.web.UsersViewPresenter;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -89,9 +85,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<User> userCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<UserDialog>>> userSavedListenerCaptor;
-  @Captor
-  @SuppressWarnings("checkstyle:linelength")
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<LaboratoryDialog>>> laboratorySavedListenerCaptor;
   @Autowired
   private UserRepository userRepository;
   private List<User> users;
@@ -105,7 +98,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   @Before
   @SuppressWarnings("unchecked")
   public void beforeTest() {
-    presenter = new UsersViewPresenter(userService, laboratoryService, authorizationService);
+    presenter = new UsersViewPresenter(userService, authorizationService);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
@@ -114,7 +107,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.add = new Button();
     view.switchUser = new Button();
     view.userDialog = mock(UserDialog.class);
-    view.laboratoryDialog = mock(LaboratoryDialog.class);
     users = userRepository.findAll();
     when(userService.all(any(Laboratory.class))).thenReturn(users);
     when(userService.all()).thenReturn(users);
@@ -221,28 +213,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void filterLaboratory() {
-    presenter.init(view);
-    view.users.setDataProvider(dataProvider);
-
-    presenter.filterLaboratory("test");
-
-    assertEquals("test", presenter.filter().laboratoryNameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterLaboratory_Empty() {
-    presenter.init(view);
-    view.users.setDataProvider(dataProvider);
-
-    presenter.filterLaboratory("");
-
-    assertEquals(null, presenter.filter().laboratoryNameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
   public void filterActive_False() {
     presenter.init(view);
     view.users.setDataProvider(dataProvider);
@@ -302,30 +272,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<UserDialog>> savedListener =
         userSavedListenerCaptor.getValue();
-    savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(userService, times(2)).all(currentUser.getLaboratory());
-  }
-
-  @Test
-  public void viewLaboratory() {
-    presenter.init(view);
-    Laboratory laboratory = new Laboratory();
-    laboratory.setId(2L);
-    User databaseUser = userRepository.findById(2L).orElse(null);
-    when(laboratoryService.get(any())).thenReturn(databaseUser.getLaboratory());
-    presenter.viewLaboratory(laboratory);
-    verify(laboratoryService).get(2L);
-    verify(view.laboratoryDialog).setLaboratory(databaseUser.getLaboratory());
-    verify(view.laboratoryDialog).open();
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void refreshDatasetsOnLaboratorySaved() {
-    presenter.init(view);
-    verify(view.laboratoryDialog).addSavedListener(laboratorySavedListenerCaptor.capture());
-    ComponentEventListener<SavedEvent<LaboratoryDialog>> savedListener =
-        laboratorySavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
     verify(userService, times(2)).all(currentUser.getLaboratory());
   }

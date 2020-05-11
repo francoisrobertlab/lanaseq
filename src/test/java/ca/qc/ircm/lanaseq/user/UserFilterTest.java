@@ -21,9 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.User;
-import ca.qc.ircm.lanaseq.user.UserFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -92,32 +89,6 @@ public class UserFilterTest {
   }
 
   @Test
-  public void test_LaboratoryNameContains() {
-    filter.laboratoryNameContains = "test";
-
-    assertTrue(filter.test(laboratoryName("My test")));
-    assertTrue(filter.test(laboratoryName("Test my")));
-    assertTrue(filter.test(laboratoryName("My test my")));
-    assertTrue(filter.test(laboratoryName("My TEST my")));
-    assertFalse(filter.test(laboratoryName(null)));
-    assertFalse(filter.test(laboratoryName("")));
-    assertFalse(filter.test(laboratoryName("christian")));
-  }
-
-  @Test
-  public void test_LaboratoryNameContainsNull() {
-    filter.laboratoryNameContains = null;
-
-    assertTrue(filter.test(laboratoryName("My test")));
-    assertTrue(filter.test(laboratoryName("Test my")));
-    assertTrue(filter.test(laboratoryName("My test my")));
-    assertTrue(filter.test(laboratoryName("My TEST my")));
-    assertTrue(filter.test(laboratoryName(null)));
-    assertTrue(filter.test(laboratoryName("")));
-    assertTrue(filter.test(laboratoryName("christian")));
-  }
-
-  @Test
   public void test_ActiveFalse() {
     filter.active = false;
 
@@ -181,14 +152,6 @@ public class UserFilterTest {
   private User name(String name) {
     User user = new User();
     user.setName(name);
-    return user;
-  }
-
-  private User laboratoryName(String name) {
-    Laboratory laboratory = new Laboratory();
-    laboratory.setName(name);
-    User user = new User();
-    user.setLaboratory(laboratory);
     return user;
   }
 

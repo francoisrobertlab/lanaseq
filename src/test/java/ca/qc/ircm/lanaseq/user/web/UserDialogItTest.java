@@ -69,7 +69,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.doubleClickUser(1);
+    view.doubleClick(1);
 
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
@@ -94,7 +94,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.doubleClickUser(2);
+    view.doubleClick(2);
 
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
@@ -118,7 +118,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void save() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.doubleClickUser(2);
+    view.doubleClick(2);
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
     setFields(dialog);
@@ -143,7 +143,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void save_Fail() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.doubleClickUser(2);
+    view.doubleClick(2);
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
     setFields(dialog);
@@ -168,7 +168,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.doubleClickUser(2);
+    view.doubleClick(2);
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
     setFields(dialog);

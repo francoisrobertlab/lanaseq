@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 public class UserFilter implements Predicate<User> {
   public String emailContains;
   public String nameContains;
-  public String laboratoryNameContains;
   public Boolean active;
 
   @Override
@@ -39,10 +38,6 @@ public class UserFilter implements Predicate<User> {
     }
     if (nameContains != null) {
       test &= comparable(replaceNull(user.getName())).contains(comparable(nameContains));
-    }
-    if (laboratoryNameContains != null) {
-      test &= comparable(replaceNull(user.getLaboratory().getName()))
-          .contains(comparable(laboratoryNameContains));
     }
     if (active != null) {
       test &= active == user.isActive();

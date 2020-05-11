@@ -123,20 +123,9 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.doubleClickUser(0);
+    view.doubleClick(0);
 
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-  }
-
-  @Test
-  public void update_Laboratory() throws Throwable {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
-
-    view.doubleClickLaboratory(0);
-
-    assertTrue(
-        optional(() -> $(LaboratoryDialogElement.class).id(LaboratoryDialog.ID)).isPresent());
   }
 
   @Test

@@ -32,7 +32,6 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-vertical-layout")
 public class UsersViewElement extends VerticalLayoutElement {
   private static final int EMAIL_COLUMN = 0;
-  private static final int LABORATORY_COLUMN = 2;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
@@ -46,12 +45,8 @@ public class UsersViewElement extends VerticalLayoutElement {
     users().getCell(row, EMAIL_COLUMN).click();
   }
 
-  public void doubleClickUser(int row) {
+  public void doubleClick(int row) {
     users().getCell(row, EMAIL_COLUMN).doubleClick();
-  }
-
-  public void doubleClickLaboratory(int row) {
-    users().getCell(row, LABORATORY_COLUMN).doubleClick();
   }
 
   public String email(int row) {
