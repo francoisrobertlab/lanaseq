@@ -69,8 +69,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
-  private String sampleName = "FR1";
-  private String sampleReplicate = "R1";
+  private String sampleName = "FR3";
+  private String sampleReplicate = "R3";
 
   @Before
   public void beforeTest() {

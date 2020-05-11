@@ -255,8 +255,8 @@ public class DatasetServiceTest {
     sample1.setReplicate("r1");
     dataset.getSamples().remove(1);
     Sample sample3 = new Sample();
-    sample3.setName("sample3");
-    sample3.setReplicate("r3");
+    sample3.setName("sample4");
+    sample3.setReplicate("r4");
     dataset.getSamples().add(sample3);
 
     service.save(dataset);
@@ -280,8 +280,8 @@ public class DatasetServiceTest {
     assertEquals("FR3", dataset.getSamples().get(1).getName());
     assertEquals("R3", dataset.getSamples().get(1).getReplicate());
     assertNotNull(dataset.getSamples().get(2).getId());
-    assertEquals("sample3", dataset.getSamples().get(2).getName());
-    assertEquals("r3", dataset.getSamples().get(2).getReplicate());
+    assertEquals("sample4", dataset.getSamples().get(2).getName());
+    assertEquals("r4", dataset.getSamples().get(2).getReplicate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 

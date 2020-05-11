@@ -88,6 +88,35 @@ public class SampleServiceTest {
 
   @Test
   @WithMockUser
+  public void existsReplicate_True() {
+    Dataset dataset = new Dataset(1L);
+    assertTrue(service.existsReplicate("R1", dataset));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void existsReplicate_False() {
+    Dataset dataset = new Dataset(1L);
+    assertFalse(service.existsReplicate("R4", dataset));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void existsReplicate_NameNull() {
+    Dataset dataset = new Dataset(1L);
+    assertFalse(service.existsReplicate(null, dataset));
+  }
+
+  @Test
+  @WithMockUser
+  public void existsReplicate_DatasetNull() {
+    assertFalse(service.existsReplicate("FR1", null));
+  }
+
+  @Test
+  @WithMockUser
   public void all() {
     Dataset dataset = new Dataset(1L);
 

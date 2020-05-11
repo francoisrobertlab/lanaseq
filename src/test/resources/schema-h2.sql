@@ -88,6 +88,8 @@ CREATE TABLE IF NOT EXISTS sample (
   dataset_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE (name, dataset_id),
+  UNIQUE (replicate, dataset_id),
   CONSTRAINT sampleDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

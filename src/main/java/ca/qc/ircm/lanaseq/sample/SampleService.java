@@ -39,11 +39,13 @@ public class SampleService {
   }
 
   /**
-   * Returns sample with id.
+   * Returns true if a sample with this name exists in the dataset, false otherwise.
    *
-   * @param id
-   *          sample's id
-   * @return sample with id
+   * @param name
+   *          sample's name
+   * @param dataset
+   *          dataset
+   * @return true if a sample with this name exists in the dataset, false otherwise
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public boolean exists(String name, Dataset dataset) {
@@ -52,6 +54,24 @@ public class SampleService {
     }
 
     return repository.existsByNameAndDataset(name, dataset);
+  }
+
+  /**
+   * Returns true if a sample with this replicate exists in the dataset, false otherwise.
+   *
+   * @param name
+   *          sample's name
+   * @param dataset
+   *          dataset
+   * @return true if a sample with this replicate exists in the dataset, false otherwise
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public boolean existsReplicate(String replicate, Dataset dataset) {
+    if (replicate == null || dataset == null) {
+      return false;
+    }
+
+    return repository.existsByReplicateAndDataset(replicate, dataset);
   }
 
   /**
