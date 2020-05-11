@@ -56,7 +56,7 @@ public class UserDialogPresenter {
     if (dialog.form.isValid()) {
       User user = dialog.form.getUser();
       String password = dialog.form.getPassword();
-      logger.debug("save user {} in laboratory {}", user, user.getLaboratory());
+      logger.debug("save user {}", user);
       userService.save(user, password);
       final AppResources resources = new AppResources(UserDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, user.getEmail()));

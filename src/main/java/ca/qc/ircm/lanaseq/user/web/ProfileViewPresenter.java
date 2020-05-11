@@ -60,7 +60,7 @@ public class ProfileViewPresenter {
     if (view.form.isValid()) {
       User user = view.form.getUser();
       String password = view.form.getPassword();
-      logger.debug("save user {} in laboratory {}", user, user.getLaboratory());
+      logger.debug("save user {}", user);
       service.save(user, password);
       final AppResources resources = new AppResources(ProfileView.class, locale);
       view.showNotification(resources.message(SAVED, user.getEmail()));
