@@ -195,7 +195,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(3, oldAuthentication.getAuthorities().size());
     assertTrue(findAuthority(oldAuthentication.getAuthorities(), UserRole.USER).isPresent());
     assertTrue(findAuthority(oldAuthentication.getAuthorities(),
-        UserAuthority.laboratoryMember(new Laboratory(3L))).isPresent());
+        UserAuthority.laboratoryMember(new Laboratory(2L))).isPresent());
     assertTrue(
         findAuthority(oldAuthentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
             .isPresent());
@@ -207,7 +207,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(3, user.getAuthorities().size());
     assertTrue(findAuthority(user.getAuthorities(), UserRole.USER).isPresent());
     assertTrue(
-        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(3L)))
+        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(2L)))
             .isPresent());
     assertTrue(
         findAuthority(user.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
@@ -227,7 +227,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(2, authentication.getAuthorities().size());
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
     assertTrue(findAuthority(authentication.getAuthorities(),
-        UserAuthority.laboratoryMember(new Laboratory(3L))).isPresent());
+        UserAuthority.laboratoryMember(new Laboratory(2L))).isPresent());
     assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
         .isPresent());
     assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
@@ -238,7 +238,7 @@ public class SpringAuthorizationServiceTest {
     assertEquals(2, user.getAuthorities().size());
     assertTrue(findAuthority(user.getAuthorities(), UserRole.USER).isPresent());
     assertTrue(
-        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(3L)))
+        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(2L)))
             .isPresent());
     assertFalse(
         findAuthority(user.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
@@ -267,7 +267,7 @@ public class SpringAuthorizationServiceTest {
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.MANAGER).isPresent());
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.ADMIN).isPresent());
     assertTrue(findAuthority(authentication.getAuthorities(),
-        UserAuthority.laboratoryMember(new Laboratory(1L))).isPresent());
+        UserAuthority.laboratoryMember(new Laboratory(2L))).isPresent());
     assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
         .isPresent());
     assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
@@ -280,7 +280,7 @@ public class SpringAuthorizationServiceTest {
     assertTrue(findAuthority(user.getAuthorities(), UserRole.MANAGER).isPresent());
     assertTrue(findAuthority(user.getAuthorities(), UserRole.ADMIN).isPresent());
     assertTrue(
-        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(1L)))
+        findAuthority(user.getAuthorities(), UserAuthority.laboratoryMember(new Laboratory(2L)))
             .isPresent());
     assertFalse(
         findAuthority(user.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());

@@ -56,7 +56,7 @@ public class UserServiceInjectionTest {
     assertEquals(true, user.isActive());
     assertEquals(true, user.isManager());
     assertEquals(true, user.isAdmin());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertNull(user.getLocale());
   }
 }

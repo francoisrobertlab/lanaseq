@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -37,7 +36,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
-import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,8 +59,6 @@ public class UserServiceTest {
   private UserRepository repository;
   @Autowired
   private LaboratoryRepository laboratoryRepository;
-  @Autowired
-  private EntityManager entityManager;
   @MockBean
   private PasswordEncoder passwordEncoder;
   @MockBean
@@ -99,7 +95,7 @@ public class UserServiceTest {
     assertEquals(true, user.isManager());
     assertEquals(true, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertEquals((Long) 1L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertNull(user.getLocale());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
@@ -462,7 +458,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 3L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService).reloadAuthorities();
@@ -500,26 +496,6 @@ public class UserServiceTest {
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService, never()).reloadAuthorities();
-  }
-
-  @Test
-  @WithMockUser
-  public void save_UpdateDeleteEmptyLaboratory() {
-    User user = repository.findById(2L).get();
-    entityManager.detach(user);
-    user.setLaboratory(laboratoryRepository.findById(3L).get());
-    service.save(user, null);
-    user = repository.findById(3L).get();
-    entityManager.detach(user);
-    user.setLaboratory(laboratoryRepository.findById(3L).get());
-    service.save(user, null);
-    user = repository.findById(9L).get();
-    entityManager.detach(user);
-    user.setLaboratory(laboratoryRepository.findById(3L).get());
-    service.save(user, null);
-
-    assertFalse(laboratoryRepository.findById(2L).isPresent());
-    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
 
   @Test
@@ -586,7 +562,7 @@ public class UserServiceTest {
     assertEquals(true, user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
     assertNotNull(user.getLaboratory());
-    assertEquals((Long) 3L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService, never()).reloadAuthorities();
@@ -639,7 +615,7 @@ public class UserServiceTest {
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
-    assertEquals((Long) 3L, user.getLaboratory().getId());
+    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertNull(user.getLocale());
     verify(authorizationService).reloadAuthorities();
   }
