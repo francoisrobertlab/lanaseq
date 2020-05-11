@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -33,36 +32,20 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.security.UserAuthority;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.MutableAclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
@@ -75,10 +58,6 @@ public class DatasetServiceTest {
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
-  @Autowired
-  private LaboratoryRepository laboratoryRepository;
-  @Autowired
-  private MutableAclService aclService;
   @Autowired
   private UserRepository userRepository;
   @MockBean
@@ -178,19 +157,6 @@ public class DatasetServiceTest {
 
   @Test
   @WithMockUser
-  public void permissions() {
-    Dataset dataset = repository.findById(2L).orElse(null);
-
-    Set<Laboratory> laboratories = service.permissions(dataset);
-
-    assertEquals(2, laboratories.size());
-    assertTrue(find(laboratories, 2L).isPresent());
-    assertTrue(find(laboratories, 3L).isPresent());
-    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
-  }
-
-  @Test
-  @WithMockUser
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -283,37 +249,5 @@ public class DatasetServiceTest {
     assertEquals("sample4", dataset.getSamples().get(2).getName());
     assertEquals("r4", dataset.getSamples().get(2).getReplicate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  @Transactional
-  public void savePermissions() {
-    Dataset dataset = repository.findById(5L).orElse(null);
-    List<Laboratory> laboratories = new ArrayList<>();
-    laboratories.add(laboratoryRepository.findById(2L).orElse(null));
-
-    service.savePermissions(dataset, laboratories);
-
-    ObjectIdentity oi = new ObjectIdentityImpl(dataset.getClass(), dataset.getId());
-    Acl acl = aclService.readAclById(oi);
-    assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(1L).orElse(null)));
-    assertTrue(granted(acl, BasePermission.READ, laboratoryRepository.findById(2L).orElse(null)));
-    assertFalse(granted(acl, BasePermission.READ, laboratoryRepository.findById(3L).orElse(null)));
-    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
-  }
-
-  private boolean granted(Acl acl, Permission permission, Laboratory laboratory) {
-    try {
-      return acl.isGranted(list(permission),
-          list(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory))), false);
-    } catch (NotFoundException e) {
-      return false;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> List<T> list(T... values) {
-    return Stream.of(values).collect(Collectors.toList());
   }
 }

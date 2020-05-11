@@ -17,39 +17,19 @@
 
 package ca.qc.ircm.lanaseq.security;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
 import ca.qc.ircm.lanaseq.user.User;
 import java.util.List;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.MutableAclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -61,36 +41,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DatasetPermissionEvaluatorTest {
   private static final String DATASET_CLASS = Dataset.class.getName();
   private static final String READ = "read";
-  private static final Permission BASE_READ = BasePermission.READ;
+  private static final Permission BASE_READ = Permission.READ;
   private static final String WRITE = "write";
-  private static final Permission BASE_WRITE = BasePermission.WRITE;
+  private static final Permission BASE_WRITE = Permission.WRITE;
   @Autowired
   private DatasetPermissionEvaluator permissionEvaluator;
   @Autowired
   private DatasetRepository datasetRepository;
-  @Autowired
-  private LaboratoryRepository laboratoryRepository;
-  @MockBean
-  private MutableAclService aclService;
-  @Mock
-  private Acl acl;
   @Captor
   private ArgumentCaptor<List<Permission>> permissionsCaptor;
-  @Captor
-  private ArgumentCaptor<List<Sid>> sidsCaptor;
-
-  /**
-   * Before test.
-   */
-  @Before
-  public void beforeTest() {
-    when(aclService.readAclById(any())).thenAnswer(i -> {
-      if (i.getArgument(0) != null) {
-        throw new NotFoundException("Cannot find ACL");
-      }
-      return null;
-    });
-  }
 
   private Authentication authentication() {
     return SecurityContextHolder.getContext().getAuthentication();
@@ -177,76 +136,6 @@ public class DatasetPermissionEvaluatorTest {
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadDataset_AclAllowed() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, BASE_READ));
-    assertTrue(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, READ));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_READ));
-
-    verify(aclService, times(4)).readAclById(new ObjectIdentityImpl(Dataset.class, 2L));
-    verify(acl, times(4)).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
-    List<Permission> permissions = permissionsCaptor.getValue();
-    assertEquals(1, permissions.size());
-    assertEquals(BASE_READ, permissions.get(0));
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    List<Sid> sids = sidsCaptor.getValue();
-    assertEquals(1, sids.size());
-    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadDataset_AclDenied() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_READ));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadDataset_AclNotFoundExceptionOnRead() throws Throwable {
-    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_READ));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadDataset_AclNotFoundExceptionOnIsGrandted() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_READ));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
         BASE_READ));
   }
 
@@ -347,76 +236,6 @@ public class DatasetPermissionEvaluatorTest {
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteDataset_AclAllowed() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, BASE_WRITE));
-    assertTrue(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, WRITE));
-    assertTrue(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_WRITE));
-
-    verify(aclService, times(4)).readAclById(new ObjectIdentityImpl(Dataset.class, 2L));
-    verify(acl, times(4)).isGranted(permissionsCaptor.capture(), sidsCaptor.capture(), eq(false));
-    List<Permission> permissions = permissionsCaptor.getValue();
-    assertEquals(1, permissions.size());
-    assertEquals(BASE_WRITE, permissions.get(0));
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    List<Sid> sids = sidsCaptor.getValue();
-    assertEquals(1, sids.size());
-    assertEquals(new GrantedAuthoritySid(UserAuthority.laboratoryMember(laboratory)), sids.get(0));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteDataset_AclDenied() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(false);
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_WRITE));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteDataset_AclNotFoundExceptionOnRead() throws Throwable {
-    when(aclService.readAclById(any())).thenThrow(new NotFoundException("test"));
-    when(acl.isGranted(any(), any(), anyBoolean())).thenReturn(true);
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_WRITE));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
-        BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_WriteDataset_AclNotFoundExceptionOnIsGrandted() throws Throwable {
-    when(aclService.readAclById(any())).thenReturn(acl);
-    when(acl.isGranted(any(), any(), anyBoolean())).thenThrow(new NotFoundException("test"));
-    Dataset dataset = datasetRepository.findById(2L).orElse(null);
-
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset, BASE_WRITE));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), dataset.getId(), DATASET_CLASS,
         BASE_WRITE));
   }
 

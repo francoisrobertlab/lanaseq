@@ -17,20 +17,16 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS_DENIED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -53,7 +49,6 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
-import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,8 +82,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   private DatasetRepository repository;
   @Autowired
   private UserRepository userRepository;
-  private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(DatasetsView.class, locale);
   private List<Dataset> datasets;
   private User currentUser;
 
@@ -105,10 +98,8 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     view.ownerFilter = new TextField();
     view.error = new Div();
     view.add = new Button();
-    view.permissions = new Button();
     view.datasetDialog = mock(DatasetDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
-    view.datasetPermissionsDialog = mock(DatasetPermissionsDialog.class);
     datasets = repository.findAll();
     when(service.all()).thenReturn(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -118,7 +109,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void datasets() {
     presenter.init(view);
-    presenter.localeChange(locale);
     List<Dataset> datasets = items(view.datasets);
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
@@ -132,7 +122,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void ownerFilter_User() {
     presenter.init(view);
-    presenter.localeChange(locale);
 
     assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
@@ -143,7 +132,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
 
     presenter.init(view);
-    presenter.localeChange(locale);
 
     assertEquals("", view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
@@ -152,7 +140,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterFilename() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterFilename("test");
@@ -164,7 +151,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterFilename_Empty() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterFilename("");
@@ -176,7 +162,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterProject() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProject("test");
@@ -188,7 +173,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterProject_Empty() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProject("");
@@ -200,7 +184,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterProtocol() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProtocol("test");
@@ -212,7 +195,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterProtocol_Empty() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProtocol("");
@@ -224,7 +206,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterOwner() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterOwner("test");
@@ -236,7 +217,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void filterOwner_Empty() {
     presenter.init(view);
-    presenter.localeChange(locale);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterOwner("");
@@ -248,14 +228,12 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void error() {
     presenter.init(view);
-    presenter.localeChange(locale);
     assertFalse(view.error.isVisible());
   }
 
   @Test
   public void view() {
     presenter.init(view);
-    presenter.localeChange(locale);
     Dataset dataset = new Dataset();
     dataset.setId(2L);
     Dataset databaseDataset = new Dataset();
@@ -269,7 +247,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void view_Protocol() {
     presenter.init(view);
-    presenter.localeChange(locale);
     Protocol protocol = new Protocol();
     protocol.setId(1L);
     Protocol databaseProtocol = new Protocol();
@@ -283,90 +260,15 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void add() {
     presenter.init(view);
-    presenter.localeChange(locale);
     presenter.add();
     verify(view.datasetDialog).setDataset(null);
     verify(view.datasetDialog).open();
   }
 
   @Test
-  public void permissions() {
-    final Dataset dataset = datasets.get(2);
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
-    presenter.init(view);
-    presenter.localeChange(locale);
-    view.datasets.select(dataset);
-    presenter.permissions();
-    assertFalse(view.error.isVisible());
-    verify(view.datasetPermissionsDialog).setDataset(dataset);
-    verify(view.datasetPermissionsDialog).open();
-  }
-
-  @Test
-  public void permissions_NoDataset() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    presenter.permissions();
-    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
-    assertTrue(view.error.isVisible());
-    verify(view.datasetPermissionsDialog, never()).setDataset(any());
-    verify(view.datasetPermissionsDialog, never()).open();
-  }
-
-  @Test
-  public void permissions_Denied() {
-    Dataset dataset = datasets.get(2);
-    presenter.init(view);
-    presenter.localeChange(locale);
-    view.datasets.select(dataset);
-    presenter.permissions();
-    assertEquals(resources.message(PERMISSIONS_DENIED), view.error.getText());
-    assertTrue(view.error.isVisible());
-    verify(view.datasetPermissionsDialog, never()).setDataset(any());
-    verify(view.datasetPermissionsDialog, never()).open();
-  }
-
-  @Test
-  public void permissions_ErrorThenView() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    presenter.permissions();
-    presenter.view(datasets.get(1));
-    assertFalse(view.error.isVisible());
-  }
-
-  @Test
-  public void permissions_ErrorThenAdd() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    presenter.permissions();
-    presenter.add();
-    assertFalse(view.error.isVisible());
-  }
-
-  @Test
-  public void permissions_ErrorThenFilterFilename() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    presenter.permissions();
-    presenter.filterFilename("");
-    assertFalse(view.error.isVisible());
-  }
-
-  @Test
-  public void permissions_ErrorThenFilterOwner() {
-    presenter.init(view);
-    presenter.localeChange(locale);
-    presenter.permissions();
-    presenter.filterOwner("");
-    assertFalse(view.error.isVisible());
-  }
-
-  @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnSaved() {
     presenter.init(view);
-    presenter.localeChange(locale);
     verify(view.datasetDialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
@@ -378,7 +280,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnProtocolSaved() {
     presenter.init(view);
-    presenter.localeChange(locale);
     verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         protocolSavedListenerCaptor.getValue();

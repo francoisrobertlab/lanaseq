@@ -32,6 +32,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -50,7 +51,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -98,7 +98,7 @@ public class ProtocolDialogPresenter {
   private void setReadOnly() {
     boolean readOnly = false;
     if (binder.getBean() != null && binder.getBean().getId() != null) {
-      readOnly = !authorizationService.hasPermission(binder.getBean(), BasePermission.WRITE);
+      readOnly = !authorizationService.hasPermission(binder.getBean(), Permission.WRITE);
     }
     binder.setReadOnly(readOnly);
     dialog.upload.setVisible(!readOnly);

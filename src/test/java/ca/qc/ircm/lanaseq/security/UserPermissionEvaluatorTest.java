@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.security;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.security.UserPermissionEvaluator;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryRepository;
@@ -30,8 +29,6 @@ import javax.persistence.EntityManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -43,9 +40,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class UserPermissionEvaluatorTest {
   private static final String USER_CLASS = User.class.getName();
   private static final String READ = "read";
-  private static final Permission BASE_READ = BasePermission.READ;
+  private static final Permission BASE_READ = Permission.READ;
   private static final String WRITE = "write";
-  private static final Permission BASE_WRITE = BasePermission.WRITE;
+  private static final Permission BASE_WRITE = Permission.WRITE;
   @Autowired
   private UserPermissionEvaluator permissionEvaluator;
   @Autowired

@@ -30,7 +30,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
@@ -86,8 +85,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   private DatasetDialog datasetDialog;
   @Mock
   private ProtocolDialog protocolDialog;
-  @Mock
-  private DatasetPermissionsDialog datasetPermissionsDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
   @Captor
@@ -108,7 +105,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog, datasetPermissionsDialog);
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog);
     view.init();
     datasets = datasetRepository.findAll();
   }
@@ -166,7 +163,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(DATASETS, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
-    assertEquals(PERMISSIONS, view.permissions.getId().orElse(""));
   }
 
   @Test
@@ -190,9 +186,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
-    assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
-    validateIcon(VaadinIcon.LOCK.create(), view.permissions.getIcon());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -222,9 +215,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
-    assertEquals(resources.message(PERMISSIONS), view.permissions.getText());
-    validateIcon(VaadinIcon.LOCK.create(), view.permissions.getIcon());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -246,7 +236,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
 
   @Test
   public void datasets_ColumnsValueProvider() {
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog, datasetPermissionsDialog);
+    view = new DatasetsView(presenter, datasetDialog, protocolDialog);
     mockColumns();
     view.init();
     verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
@@ -353,11 +343,5 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   public void add() {
     clickButton(view.add);
     verify(presenter).add();
-  }
-
-  @Test
-  public void permissions() {
-    clickButton(view.permissions);
-    verify(presenter).permissions();
   }
 }

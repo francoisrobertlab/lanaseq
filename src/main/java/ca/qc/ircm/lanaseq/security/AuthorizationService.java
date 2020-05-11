@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.security;
 
 import ca.qc.ircm.lanaseq.user.User;
-import org.springframework.security.acls.model.Permission;
 
 /**
  * Authorization service.
