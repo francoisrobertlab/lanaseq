@@ -17,8 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
-import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
-import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -105,42 +103,6 @@ public class DatasetServiceTest {
   public void all() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
-
-    List<Dataset> datasets = service.all();
-
-    assertEquals(3, datasets.size());
-    assertTrue(find(datasets, 1L).isPresent());
-    assertTrue(find(datasets, 2L).isPresent());
-    assertTrue(find(datasets, 3L).isPresent());
-    for (Dataset dataset : datasets) {
-      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
-    }
-  }
-
-  @Test
-  @WithMockUser
-  public void all_Manager() {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
-    when(authorizationService.hasRole(MANAGER)).thenReturn(true);
-
-    List<Dataset> datasets = service.all();
-
-    assertEquals(3, datasets.size());
-    assertTrue(find(datasets, 1L).isPresent());
-    assertTrue(find(datasets, 2L).isPresent());
-    assertTrue(find(datasets, 3L).isPresent());
-    for (Dataset dataset : datasets) {
-      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
-    }
-  }
-
-  @Test
-  @WithMockUser
-  public void all_Admin() {
-    User user = userRepository.findById(1L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
-    when(authorizationService.hasRole(ADMIN)).thenReturn(true);
 
     List<Dataset> datasets = service.all();
 
