@@ -83,7 +83,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_OtherLabMember() throws Throwable {
+  public void hasPermission_ReadProtocol_NotOwner() throws Throwable {
     Protocol protocol = protocolRepository.findById(1L).orElse(null);
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
@@ -91,18 +91,6 @@ public class ProtocolPermissionEvaluatorTest {
         READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
         BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_NotOwner() throws Throwable {
-    Protocol protocol = protocolRepository.findById(1L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_READ));
   }
 
   @Test
@@ -115,18 +103,6 @@ public class ProtocolPermissionEvaluatorTest {
         READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
         BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_ManagerOtherLab() throws Throwable {
-    Protocol protocol = protocolRepository.findById(1L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_READ));
   }
 
   @Test
@@ -183,18 +159,6 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_WriteProtocol_OtherLabMember() throws Throwable {
-    Protocol protocol = protocolRepository.findById(1L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void hasPermission_WriteProtocol_NotOwner() throws Throwable {
     Protocol protocol = protocolRepository.findById(1L).orElse(null);
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
@@ -215,18 +179,6 @@ public class ProtocolPermissionEvaluatorTest {
         WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
         BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_WriteProtocol_ManagerOtherLab() throws Throwable {
-    Protocol protocol = protocolRepository.findById(1L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_WRITE));
   }
 
   @Test

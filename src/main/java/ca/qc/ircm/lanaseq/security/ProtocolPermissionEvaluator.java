@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package ca.qc.ircm.lanaseq.security;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
@@ -84,10 +83,8 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
     }
     User owner = protocol.getOwner();
     boolean authorized = owner.getId().equals(currentUser.getId());
-    authorized |= permission.equals(BasePermission.READ)
-        && authorizationService.hasRole(UserAuthority.laboratoryMember(owner.getLaboratory()));
-    authorized |= permission.equals(BasePermission.WRITE) && authorizationService
-        .hasAllRoles(MANAGER, UserAuthority.laboratoryMember(owner.getLaboratory()));
+    authorized |= permission.equals(BasePermission.READ);
+    authorized |= permission.equals(BasePermission.WRITE) && authorizationService.hasRole(MANAGER);
     return authorized;
   }
 }
