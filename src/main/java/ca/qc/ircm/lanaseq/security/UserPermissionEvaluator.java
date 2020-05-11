@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.security.Permission.READ;
+import static ca.qc.ircm.lanaseq.security.Permission.WRITE;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 
@@ -27,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +53,7 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     User user = (User) targetDomainObject;
     User currentUser = getUser(authentication);
     Permission realPermission = resolvePermission(permission);
-    if (realPermission.equals(BasePermission.WRITE)) {
+    if (realPermission.equals(WRITE)) {
       logger.debug("hasPermission={} for user {} and current user {}",
           hasPermission(user, currentUser, realPermission), user, currentUser);
     }
@@ -88,8 +88,8 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
       return false;
     }
     boolean authorized = currentUser.getId().equals(user.getId());
-    authorized |= permission.equals(BasePermission.READ);
-    authorized |= permission.equals(BasePermission.WRITE) && authorizationService.hasRole(MANAGER);
+    authorized |= permission.equals(READ);
+    authorized |= permission.equals(WRITE) && authorizationService.hasRole(MANAGER);
     return authorized;
   }
 }

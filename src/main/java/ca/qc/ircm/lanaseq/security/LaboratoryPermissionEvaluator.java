@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.security.Permission.READ;
+import static ca.qc.ircm.lanaseq.security.Permission.WRITE;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 
@@ -26,8 +28,6 @@ import ca.qc.ircm.lanaseq.user.User;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -82,8 +82,8 @@ public class LaboratoryPermissionEvaluator extends AbstractPermissionEvaluator {
       return false;
     }
     boolean authorized = false;
-    authorized |= permission.equals(BasePermission.READ);
-    authorized |= permission.equals(BasePermission.WRITE)
+    authorized |= permission.equals(READ);
+    authorized |= permission.equals(WRITE)
         && authorizationService.hasAllRoles(MANAGER, UserAuthority.laboratoryMember(laboratory));
     return authorized;
   }

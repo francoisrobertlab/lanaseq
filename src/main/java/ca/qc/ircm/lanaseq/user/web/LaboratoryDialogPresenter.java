@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.user.web.LaboratoryDialog.SAVED;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.acls.domain.BasePermission;
 
 /**
  * Laboratory dialog.
@@ -75,7 +75,7 @@ public class LaboratoryDialogPresenter {
   }
 
   private void updateReadOnly() {
-    boolean readOnly = !authorizationService.hasPermission(laboratory, BasePermission.WRITE);
+    boolean readOnly = !authorizationService.hasPermission(laboratory, Permission.WRITE);
     binder.setReadOnly(readOnly);
     dialog.buttonsLayout.setVisible(!readOnly);
   }

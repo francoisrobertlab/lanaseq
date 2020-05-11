@@ -86,13 +86,10 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   protected TextField ownerFilter = new TextField();
   protected Div error = new Div();
   protected Button add = new Button();
-  protected Button permissions = new Button();
   @Autowired
   protected DatasetDialog datasetDialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
-  @Autowired
-  protected DatasetPermissionsDialog datasetPermissionsDialog;
   @Autowired
   private transient DatasetsViewPresenter presenter;
 
@@ -100,11 +97,10 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   }
 
   protected DatasetsView(DatasetsViewPresenter presenter, DatasetDialog datasetDialog,
-      ProtocolDialog protocolDialog, DatasetPermissionsDialog datasetPermissionsDialog) {
+      ProtocolDialog protocolDialog) {
     this.presenter = presenter;
     this.datasetDialog = datasetDialog;
     this.protocolDialog = protocolDialog;
-    this.datasetPermissionsDialog = datasetPermissionsDialog;
   }
 
   @PostConstruct
@@ -112,7 +108,7 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     setId(ID);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     add(header, datasets, error, buttonsLayout);
-    buttonsLayout.add(add, permissions);
+    buttonsLayout.add(add);
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.addItemDoubleClickListener(e -> {
@@ -155,8 +151,6 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     error.setId(ERROR_TEXT);
     add.setId(ADD);
     add.addClickListener(e -> presenter.add());
-    permissions.setId(PERMISSIONS);
-    permissions.addClickListener(e -> presenter.permissions());
     presenter.init(this);
   }
 
@@ -182,9 +176,6 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
-    permissions.setText(resources.message(PERMISSIONS));
-    permissions.setIcon(VaadinIcon.LOCK.create());
-    presenter.localeChange(getLocale());
   }
 
   @Override

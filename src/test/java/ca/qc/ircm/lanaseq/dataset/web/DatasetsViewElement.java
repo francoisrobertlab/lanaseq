@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
@@ -52,9 +51,5 @@ public class DatasetsViewElement extends VerticalLayoutElement {
 
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
-  }
-
-  public ButtonElement permissions() {
-    return $(ButtonElement.class).id(PERMISSIONS);
   }
 }

@@ -26,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -71,7 +69,6 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
-    assertTrue(optional(() -> view.permissions()).isPresent());
   }
 
   @Test
@@ -79,8 +76,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
     view.doubleClickDataset(0);
-    assertTrue(
-        optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
+    assertTrue(optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
   }
 
   @Test
@@ -88,7 +84,6 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
     view.add().click();
-    assertTrue(
-        optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
+    assertTrue(optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
   }
 }

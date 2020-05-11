@@ -32,10 +32,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.security.SpringAuthorizationService;
-import ca.qc.ircm.lanaseq.security.UserAuthority;
-import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.Laboratory;
@@ -54,8 +50,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -88,12 +82,8 @@ public class SpringAuthorizationServiceTest {
   private Dataset dataset;
   @Mock
   private Object object;
-  @Mock
-  private Permission permission;
   @Captor
   private ArgumentCaptor<List<Permission>> permissionsCaptor;
-  @Captor
-  private ArgumentCaptor<List<Sid>> sidsCaptor;
 
   /**
    * Before test.
@@ -373,6 +363,7 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithAnonymousUser
   public void hasPermission_False() throws Throwable {
+    Permission permission = Permission.READ;
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertFalse(authorizationService.hasPermission(object, permission));
     verify(permissionEvaluator).hasPermission(authentication, object, permission);
@@ -381,6 +372,7 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithAnonymousUser
   public void hasPermission_True() throws Throwable {
+    Permission permission = Permission.READ;
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     assertTrue(authorizationService.hasPermission(object, permission));

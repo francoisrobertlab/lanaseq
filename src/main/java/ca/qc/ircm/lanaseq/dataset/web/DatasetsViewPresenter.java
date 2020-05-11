@@ -17,10 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.PERMISSIONS_DENIED;
-
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
@@ -31,13 +27,11 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.acls.domain.BasePermission;
 
 /**
  * Datasets view presenter.
@@ -55,7 +49,6 @@ public class DatasetsViewPresenter {
   private AuthorizationService authorizationService;
   private ListDataProvider<Dataset> datasetsDataProvider;
   private WebDatasetFilter filter = new WebDatasetFilter();
-  private Locale locale = Locale.getDefault();
 
   protected DatasetsViewPresenter() {
   }
@@ -88,10 +81,6 @@ public class DatasetsViewPresenter {
     view.datasets.setDataProvider(dataProvider);
   }
 
-  void localeChange(Locale locale) {
-    this.locale = locale;
-  }
-
   private void clearError() {
     view.error.setVisible(false);
   }
@@ -112,23 +101,6 @@ public class DatasetsViewPresenter {
     clearError();
     view.datasetDialog.setDataset(null);
     view.datasetDialog.open();
-  }
-
-  void permissions() {
-    clearError();
-    Dataset dataset = view.datasets.getSelectedItems().stream().findFirst().orElse(null);
-    if (dataset == null) {
-      AppResources resources = new AppResources(DatasetsView.class, locale);
-      view.error.setText(resources.message(DATASETS_REQUIRED));
-      view.error.setVisible(true);
-    } else if (!authorizationService.hasPermission(dataset, BasePermission.WRITE)) {
-      AppResources resources = new AppResources(DatasetsView.class, locale);
-      view.error.setText(resources.message(PERMISSIONS_DENIED));
-      view.error.setVisible(true);
-    } else {
-      view.datasetPermissionsDialog.setDataset(dataset);
-      view.datasetPermissionsDialog.open();
-    }
   }
 
   void filterFilename(String value) {
