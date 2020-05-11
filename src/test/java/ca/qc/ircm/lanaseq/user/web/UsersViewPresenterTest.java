@@ -37,7 +37,6 @@ import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -108,7 +107,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.switchUser = new Button();
     view.userDialog = mock(UserDialog.class);
     users = userRepository.findAll();
-    when(userService.all(any(Laboratory.class))).thenReturn(users);
     when(userService.all()).thenReturn(users);
     currentUser = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
@@ -117,7 +115,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void users_User() {
     presenter.init(view);
-    verify(userService).all(currentUser.getLaboratory());
+    verify(userService).all();
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -135,7 +133,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   public void users_Manager() {
     when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
     presenter.init(view);
-    verify(userService).all(currentUser.getLaboratory());
+    verify(userService).all();
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -273,7 +271,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     ComponentEventListener<SavedEvent<UserDialog>> savedListener =
         userSavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(userService, times(2)).all(currentUser.getLaboratory());
+    verify(userService, times(2)).all();
   }
 
   @Test

@@ -115,32 +115,6 @@ public class UserService {
   }
 
   /**
-   * Returns all users in laboratory.
-   *
-   * @param laboratory
-   *          laboratory
-   * @return all users in laboratory
-   */
-  @PostFilter("hasPermission(filterObject, 'read')")
-  public List<User> all(Laboratory laboratory) {
-    return repository.findByLaboratory(laboratory);
-  }
-
-  /**
-   * Returns laboratory's manager. <br>
-   * If laboratory has many managers, returns anyone of them.
-   *
-   * @param laboratory
-   *          laboratory
-   * @return laboratory's manager
-   */
-  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
-  public User manager(Laboratory laboratory) {
-    List<User> users = repository.findByLaboratoryAndManagerTrueAndActiveTrue(laboratory);
-    return !users.isEmpty() ? users.get(0) : null;
-  }
-
-  /**
    * Saves user into database.
    * <p>
    * If user is a normal user, his laboratory must exists.

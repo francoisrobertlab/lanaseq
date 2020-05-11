@@ -204,40 +204,6 @@ public class UserServiceTest {
 
   @Test
   @WithMockUser
-  public void all_Laboratory() {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-
-    List<User> users = service.all(laboratory);
-
-    assertEquals(3, users.size());
-    assertTrue(find(users, 2L).isPresent());
-    assertTrue(find(users, 3L).isPresent());
-    assertTrue(find(users, 9L).isPresent());
-    for (User user : users) {
-      verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
-    }
-  }
-
-  @Test
-  @WithMockUser
-  public void manager() {
-    Laboratory laboratory = laboratoryRepository.findById(2L).orElse(null);
-    User user = service.manager(laboratory);
-    assertEquals((Long) 2L, user.getId());
-    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
-  }
-
-  @Test
-  @WithMockUser
-  public void manager_OnlyActive() {
-    Laboratory laboratory = laboratoryRepository.findById(3L).orElse(null);
-    User user = service.manager(laboratory);
-    assertEquals((Long) 5L, user.getId());
-    verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
-  }
-
-  @Test
-  @WithMockUser
   public void save_AddAdmin() {
     User user = new User();
     user.setName("Test User");
