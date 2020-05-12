@@ -21,4 +21,3 @@ DROP TABLE IF EXISTS protocol_file;
 DROP TABLE IF EXISTS protocol;
 DROP TABLE IF EXISTS forgot_password;
 DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS laboratory;

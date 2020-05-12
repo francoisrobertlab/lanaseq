@@ -15,12 +15,6 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-CREATE TABLE IF NOT EXISTS laboratory (
-  id bigint(20) NOT NULL AUTO_INCREMENT,
-  name varchar(255) NOT NULL,
-  date DATETIME NOT NULL,
-  PRIMARY KEY (id)
-);
 CREATE TABLE IF NOT EXISTS user (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   email varchar(255) NOT NULL,
@@ -32,12 +26,10 @@ CREATE TABLE IF NOT EXISTS user (
   manager tinyint NOT NULL DEFAULT 0,
   admin tinyint NOT NULL DEFAULT 0,
   expired_password tinyint NOT NULL DEFAULT 0,
-  laboratory_id bigint(20) NOT NULL,
   locale varchar(255),
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY email (email),
-  CONSTRAINT userLaboratory_ibfk FOREIGN KEY (laboratory_id) REFERENCES laboratory (id) ON UPDATE CASCADE
+  UNIQUE KEY email (email)
 );
 CREATE TABLE IF NOT EXISTS forgot_password (
   id bigint(20) NOT NULL AUTO_INCREMENT,

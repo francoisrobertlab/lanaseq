@@ -108,9 +108,6 @@ public class UserFormPresenter {
     if (user == null) {
       user = new User();
     }
-    if (user.getLaboratory() == null) {
-      user.setLaboratory(authorizationService.getCurrentUser().getLaboratory());
-    }
     this.user = user;
     binder.setBean(user);
     form.passwords.password.setValue("");

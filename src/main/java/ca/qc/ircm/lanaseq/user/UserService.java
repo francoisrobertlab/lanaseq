@@ -40,8 +40,6 @@ public class UserService {
   @Autowired
   private UserRepository repository;
   @Autowired
-  private LaboratoryRepository laboratoryRepository;
-  @Autowired
   private PasswordEncoder passwordEncoder;
   @Autowired
   private AuthorizationService authorizationService;
@@ -49,10 +47,9 @@ public class UserService {
   protected UserService() {
   }
 
-  protected UserService(UserRepository repository, LaboratoryRepository laboratoryRepository,
-      PasswordEncoder passwordEncoder, AuthorizationService authorizationService) {
+  protected UserService(UserRepository repository, PasswordEncoder passwordEncoder,
+      AuthorizationService authorizationService) {
     this.repository = repository;
-    this.laboratoryRepository = laboratoryRepository;
     this.passwordEncoder = passwordEncoder;
     this.authorizationService = authorizationService;
   }
@@ -134,14 +131,6 @@ public class UserService {
     if (user.getId() != null && user.getId() == 1L && (!user.isAdmin() || !user.isActive())) {
       throw new AccessDeniedException("user 1 must be an admin and active");
     }
-    if (user.getLaboratory() == null) {
-      throw new IllegalArgumentException("users must be in a laboratory");
-    }
-    if (!user.isManager()
-        && !laboratoryRepository.findById(user.getLaboratory().getId()).isPresent()) {
-      throw new IllegalArgumentException(
-          "laboratory " + user.getLaboratory().getId() + " does not exists");
-    }
 
     final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
     if (user.getId() == null) {
@@ -153,15 +142,7 @@ public class UserService {
       user.setHashedPassword(hashedPassword);
       user.setExpiredPassword(false);
     }
-    if (user.getLaboratory().getId() == null) {
-      user.getLaboratory().setDate(LocalDateTime.now());
-      laboratoryRepository.save(user.getLaboratory());
-    }
-    final Laboratory oldLaboratory = user.getId() != null
-        ? repository.findById(user.getId()).map(old -> old.getLaboratory()).orElse(null)
-        : null;
     repository.save(user);
-    deleteLaboratoryIfEmpty(oldLaboratory);
     if (reloadAuthorities) {
       authorizationService.reloadAuthorities();
     }
@@ -187,12 +168,6 @@ public class UserService {
     repository.save(user);
     if (reloadAuthorities) {
       authorizationService.reloadAuthorities();
-    }
-  }
-
-  private void deleteLaboratoryIfEmpty(Laboratory laboratory) {
-    if (laboratory != null && repository.countByLaboratory(laboratory) == 0) {
-      laboratoryRepository.delete(laboratory);
     }
   }
 }
