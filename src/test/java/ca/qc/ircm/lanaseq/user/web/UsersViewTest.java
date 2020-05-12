@@ -32,7 +32,6 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
@@ -94,8 +93,6 @@ public class UsersViewTest extends AbstractViewTestCase {
   private UsersViewPresenter presenter;
   @Mock
   private UserDialog userDialog;
-  @Mock
-  private LaboratoryDialog laboratoryDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
   @Captor
@@ -116,7 +113,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new UsersView(presenter, userDialog, laboratoryDialog);
+    view = new UsersView(presenter, userDialog);
     view.init();
     users = userRepository.findAll();
   }
@@ -136,12 +133,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
-    view.laboratory = mock(Column.class);
-    when(view.users.addColumn(any(ValueProvider.class), eq(LABORATORY)))
-        .thenReturn(view.laboratory);
-    when(view.laboratory.setKey(any())).thenReturn(view.laboratory);
-    when(view.laboratory.setComparator(any(Comparator.class))).thenReturn(view.laboratory);
-    when(view.laboratory.setHeader(any(String.class))).thenReturn(view.laboratory);
     view.active = mock(Column.class);
     when(view.users.addColumn(any(ComponentRenderer.class), eq(ACTIVE))).thenReturn(view.active);
     when(view.active.setKey(any())).thenReturn(view.active);
@@ -153,8 +144,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(filtersRow.getCell(view.email)).thenReturn(emailFilterCell);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
-    HeaderCell laboratoryFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.laboratory)).thenReturn(laboratoryFilterCell);
     HeaderCell activeFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.active)).thenReturn(activeFilterCell);
   }
@@ -183,13 +172,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.name).setHeader(userResources.message(NAME));
     verify(view.name).setFooter(userResources.message(NAME));
-    verify(view.laboratory).setHeader(userResources.message(LABORATORY));
-    verify(view.laboratory).setFooter(userResources.message(LABORATORY));
     verify(view.active).setHeader(userResources.message(ACTIVE));
     verify(view.active).setFooter(userResources.message(ACTIVE));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
     assertEquals(webResources.message(ALL),
         view.activeFilter.getItemLabelGenerator().apply(Optional.empty()));
     assertEquals(userResources.message(property(ACTIVE, false)),
@@ -205,7 +191,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new UsersView(presenter, userDialog, laboratoryDialog);
+    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -220,13 +206,10 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.email).setFooter(userResources.message(EMAIL));
     verify(view.name).setHeader(userResources.message(NAME));
     verify(view.name).setFooter(userResources.message(NAME));
-    verify(view.laboratory).setHeader(userResources.message(LABORATORY));
-    verify(view.laboratory).setFooter(userResources.message(LABORATORY));
     verify(view.active).setHeader(userResources.message(ACTIVE));
     verify(view.active).setFooter(userResources.message(ACTIVE));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.laboratoryFilter.getPlaceholder());
     assertEquals(webResources.message(ALL),
         view.activeFilter.getItemLabelGenerator().apply(Optional.empty()));
     assertEquals(userResources.message(property(ACTIVE, false)),
@@ -253,13 +236,11 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_Columns() {
-    assertEquals(4, view.users.getColumns().size());
+    assertEquals(3, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertTrue(view.users.getColumnByKey(EMAIL).isSortable());
     assertNotNull(view.users.getColumnByKey(NAME));
     assertTrue(view.users.getColumnByKey(NAME).isSortable());
-    assertNotNull(view.users.getColumnByKey(LABORATORY));
-    assertTrue(view.users.getColumnByKey(LABORATORY).isSortable());
     assertNotNull(view.users.getColumnByKey(ACTIVE));
     assertTrue(view.users.getColumnByKey(ACTIVE).isSortable());
   }
@@ -271,7 +252,7 @@ public class UsersViewTest extends AbstractViewTestCase {
       user.setActive(!user.isActive());
       return null;
     }).when(presenter).toggleActive(any());
-    view = new UsersView(presenter, userDialog, laboratoryDialog);
+    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));
@@ -296,18 +277,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator instanceof NormalizedComparator);
     for (User user : users) {
       assertEquals(user.getName(),
-          ((NormalizedComparator<User>) comparator).getConverter().apply(user));
-    }
-    verify(view.users).addColumn(valueProviderCaptor.capture(), eq(LABORATORY));
-    valueProvider = valueProviderCaptor.getValue();
-    for (User user : users) {
-      assertEquals(user.getLaboratory().getName(), valueProvider.apply(user));
-    }
-    verify(view.laboratory).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (User user : users) {
-      assertEquals(user.getLaboratory().getName(),
           ((NormalizedComparator<User>) comparator).getConverter().apply(user));
     }
     verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(ACTIVE));
@@ -344,14 +313,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(presenter).view(user);
   }
 
-  @Test
-  public void viewLaboratory() {
-    User user = users.get(0);
-    doubleClickItem(view.users, user, view.laboratory);
-
-    verify(presenter).viewLaboratory(user.getLaboratory());
-  }
-
   private User active(boolean active) {
     User user = new User();
     user.setActive(active);
@@ -382,19 +343,6 @@ public class UsersViewTest extends AbstractViewTestCase {
     view.nameFilter.setValue("test");
 
     verify(presenter).filterName("test");
-  }
-
-  @Test
-  public void laboratoryFilter() {
-    assertEquals("", view.laboratoryFilter.getValue());
-    assertEquals(ValueChangeMode.EAGER, view.laboratoryFilter.getValueChangeMode());
-  }
-
-  @Test
-  public void filterLaboratory() {
-    view.laboratoryFilter.setValue("test");
-
-    verify(presenter).filterLaboratory("test");
   }
 
   @Test

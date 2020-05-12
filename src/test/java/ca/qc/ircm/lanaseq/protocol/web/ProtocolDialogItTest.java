@@ -33,7 +33,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
@@ -106,8 +105,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(ProtocolDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
-    Protocol protocol =
-        repository.findByNameAndOwnerLaboratory(name, new Laboratory(2L)).orElse(null);
+    Protocol protocol = repository.findByName(name).orElse(null);
     assertNotNull(protocol);
     assertNotNull(protocol.getId());
     assertEquals(name, protocol.getName());

@@ -32,7 +32,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
-import static ca.qc.ircm.lanaseq.user.UserProperties.LABORATORY;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -92,11 +91,9 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
   protected Column<User> name;
-  protected Column<User> laboratory;
   protected Column<User> active;
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
-  protected TextField laboratoryFilter = new TextField();
   protected ComboBox<Optional<Boolean>> activeFilter = new ComboBox<>();
   protected Div error = new Div();
   protected Button add = new Button();
@@ -105,18 +102,14 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
   @Autowired
   protected UserDialog userDialog;
   @Autowired
-  protected LaboratoryDialog laboratoryDialog;
-  @Autowired
   private transient UsersViewPresenter presenter;
 
   public UsersView() {
   }
 
-  protected UsersView(UsersViewPresenter presenter, UserDialog userDialog,
-      LaboratoryDialog laboratoryDialog) {
+  protected UsersView(UsersViewPresenter presenter, UserDialog userDialog) {
     this.presenter = presenter;
     this.userDialog = userDialog;
-    this.laboratoryDialog = laboratoryDialog;
   }
 
   @SuppressWarnings("unchecked")
@@ -129,20 +122,11 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     buttonsLayout.add(add, switchUser);
     header.setId(HEADER);
     users.setId(USERS);
-    users.addItemDoubleClickListener(e -> {
-      if (e.getColumn() == laboratory) {
-        presenter.viewLaboratory(e.getItem().getLaboratory());
-      } else {
-        presenter.view(e.getItem());
-      }
-    });
+    users.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator(NormalizedComparator.of(User::getEmail));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(User::getName));
-    laboratory =
-        users.addColumn(user -> user.getLaboratory().getName(), LABORATORY).setKey(LABORATORY)
-            .setComparator(NormalizedComparator.of(u -> u.getLaboratory().getName()));
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
         .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
     users.appendHeaderRow(); // Headers.
@@ -155,10 +139,6 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
-    filtersRow.getCell(laboratory).setComponent(laboratoryFilter);
-    laboratoryFilter.addValueChangeListener(e -> presenter.filterLaboratory(e.getValue()));
-    laboratoryFilter.setValueChangeMode(ValueChangeMode.EAGER);
-    laboratoryFilter.setSizeFull();
     filtersRow.getCell(active).setComponent(activeFilter);
     activeFilter.setItems(Optional.empty(), Optional.of(false), Optional.of(true));
     activeFilter.addValueChangeListener(e -> presenter.filterActive(e.getValue().orElse(null)));
@@ -200,13 +180,10 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     email.setHeader(emailHeader).setFooter(emailHeader);
     String nameHeader = userResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String laboratoryHeader = userResources.message(LABORATORY);
-    laboratory.setHeader(laboratoryHeader).setFooter(laboratoryHeader);
     String activeHeader = userResources.message(ACTIVE);
     active.setHeader(activeHeader).setFooter(activeHeader);
     emailFilter.setPlaceholder(webResources.message(ALL));
     nameFilter.setPlaceholder(webResources.message(ALL));
-    laboratoryFilter.setPlaceholder(webResources.message(ALL));
     activeFilter.setItemLabelGenerator(value -> value
         .map(bv -> userResources.message(property(ACTIVE, bv))).orElse(webResources.message(ALL)));
     actives.entrySet().stream().forEach(entry -> entry.getValue()

@@ -17,8 +17,6 @@
 
 package ca.qc.ircm.lanaseq.protocol;
 
-import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
-import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -131,40 +129,6 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void all() {
-    List<Protocol> protocols = service.all();
-
-    assertEquals(2, protocols.size());
-    assertTrue(find(protocols, 1L).isPresent());
-    assertTrue(find(protocols, 3L).isPresent());
-    for (Protocol protocol : protocols) {
-      verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
-    }
-  }
-
-  @Test
-  @WithMockUser
-  public void all_Manager() {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
-    when(authorizationService.hasRole(MANAGER)).thenReturn(true);
-
-    List<Protocol> protocols = service.all();
-
-    assertEquals(2, protocols.size());
-    assertTrue(find(protocols, 1L).isPresent());
-    assertTrue(find(protocols, 3L).isPresent());
-    for (Protocol protocol : protocols) {
-      verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
-    }
-  }
-
-  @Test
-  @WithMockUser
-  public void all_Admin() {
-    User user = userRepository.findById(1L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
-    when(authorizationService.hasRole(ADMIN)).thenReturn(true);
-
     List<Protocol> protocols = service.all();
 
     assertEquals(3, protocols.size());

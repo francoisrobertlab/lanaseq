@@ -27,12 +27,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.security.SpringDataUserDetailsService;
-import ca.qc.ircm.lanaseq.security.UserAuthority;
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.util.ArrayList;
@@ -69,7 +65,6 @@ public class SpringDataUserDetailsServiceTest {
     user.setName("A User");
     user.setHashedPassword(InitializeDatabaseExecutionListener.PASSWORD_PASS1);
     user.setActive(true);
-    user.setLaboratory(new Laboratory(1L));
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
   }
 
@@ -86,13 +81,11 @@ public class SpringDataUserDetailsServiceTest {
     assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(2, authorities.size());
+    assertEquals(1, authorities.size());
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
-    assertTrue(findAuthority(authorities, UserAuthority.laboratoryMember(user.getLaboratory()))
-        .isPresent());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
@@ -109,13 +102,11 @@ public class SpringDataUserDetailsServiceTest {
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
 
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(3, authorities.size());
+    assertEquals(2, authorities.size());
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
-    assertTrue(findAuthority(authorities, UserAuthority.laboratoryMember(user.getLaboratory()))
-        .isPresent());
     assertTrue(findAuthority(authorities, ADMIN).isPresent());
   }
 
@@ -126,13 +117,11 @@ public class SpringDataUserDetailsServiceTest {
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
 
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(3, authorities.size());
+    assertEquals(2, authorities.size());
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
-    assertTrue(findAuthority(authorities, UserAuthority.laboratoryMember(user.getLaboratory()))
-        .isPresent());
     assertTrue(findAuthority(authorities, MANAGER).isPresent());
   }
 
@@ -144,13 +133,11 @@ public class SpringDataUserDetailsServiceTest {
     UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
 
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-    assertEquals(4, authorities.size());
+    assertEquals(3, authorities.size());
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
-    assertTrue(findAuthority(authorities, UserAuthority.laboratoryMember(user.getLaboratory()))
-        .isPresent());
     assertTrue(findAuthority(authorities, ADMIN).isPresent());
     assertTrue(findAuthority(authorities, MANAGER).isPresent());
   }
@@ -171,13 +158,11 @@ public class SpringDataUserDetailsServiceTest {
     assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     List<? extends GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
-    assertEquals(3, authorities.size());
+    assertEquals(2, authorities.size());
     for (GrantedAuthority authority : authorities) {
       assertTrue(authority instanceof SimpleGrantedAuthority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
-    assertTrue(findAuthority(authorities, UserAuthority.laboratoryMember(user.getLaboratory()))
-        .isPresent());
     assertTrue(findAuthority(authorities, FORCE_CHANGE_PASSWORD).isPresent());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());

@@ -57,8 +57,6 @@ public class SpringDataUserDetailsService implements UserDetailsService {
     } else {
       Collection<GrantedAuthority> authorities = new ArrayList<>();
       authorities.add(new SimpleGrantedAuthority(USER));
-      authorities
-          .add(new SimpleGrantedAuthority(UserAuthority.laboratoryMember(user.getLaboratory())));
       if (user.isAdmin()) {
         authorities.add(new SimpleGrantedAuthority(ADMIN));
       }

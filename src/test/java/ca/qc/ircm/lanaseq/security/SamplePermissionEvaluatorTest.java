@@ -81,25 +81,13 @@ public class SamplePermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_ReadSample_OtherLabMember() throws Throwable {
+  public void hasPermission_ReadSample_NotOwner() throws Throwable {
     Sample sample = repository.findById(4L).orElse(null);
     assertTrue(permissionEvaluator.hasPermission(authentication(), sample, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), sample, BASE_READ));
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
-        BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
-  public void hasPermission_ReadSample_NotOwner() throws Throwable {
-    Sample sample = repository.findById(4L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, BASE_READ));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
         BASE_READ));
   }
 
@@ -112,18 +100,6 @@ public class SamplePermissionEvaluatorTest {
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
-        BASE_READ));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_ReadSample_ManagerOtherLab() throws Throwable {
-    Sample sample = repository.findById(4L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, BASE_READ));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
         BASE_READ));
   }
 
@@ -181,18 +157,6 @@ public class SamplePermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_WriteSample_OtherLabMember() throws Throwable {
-    Sample sample = repository.findById(4L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, BASE_WRITE));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
-        BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void hasPermission_WriteSample_NotOwner() throws Throwable {
     Sample sample = repository.findById(4L).orElse(null);
     assertFalse(permissionEvaluator.hasPermission(authentication(), sample, WRITE));
@@ -212,18 +176,6 @@ public class SamplePermissionEvaluatorTest {
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
-        BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void hasPermission_WriteSample_ManagerOtherLab() throws Throwable {
-    Sample sample = repository.findById(4L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, BASE_WRITE));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), sample.getId(), DATASET_CLASS,
         BASE_WRITE));
   }
 

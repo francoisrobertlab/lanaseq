@@ -104,11 +104,11 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     when(service.all()).thenReturn(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    presenter.init(view);
   }
 
   @Test
   public void datasets() {
-    presenter.init(view);
     List<Dataset> datasets = items(view.datasets);
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
@@ -121,25 +121,21 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void ownerFilter_User() {
-    presenter.init(view);
-
     assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void ownerFilter_ManagerOrAdmin() {
+    view.ownerFilter.setValue("");
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
-
     presenter.init(view);
-
     assertEquals("", view.ownerFilter.getValue());
-    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authorizationService, times(2)).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void filterFilename() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterFilename("test");
@@ -150,7 +146,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterFilename_Empty() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterFilename("");
@@ -161,7 +156,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterProject() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProject("test");
@@ -172,7 +166,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterProject_Empty() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProject("");
@@ -183,7 +176,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterProtocol() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProtocol("test");
@@ -194,7 +186,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterProtocol_Empty() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterProtocol("");
@@ -205,7 +196,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterOwner() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterOwner("test");
@@ -216,7 +206,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterOwner_Empty() {
-    presenter.init(view);
     view.datasets.setDataProvider(dataProvider);
 
     presenter.filterOwner("");
@@ -227,13 +216,11 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void error() {
-    presenter.init(view);
     assertFalse(view.error.isVisible());
   }
 
   @Test
   public void view() {
-    presenter.init(view);
     Dataset dataset = new Dataset();
     dataset.setId(2L);
     Dataset databaseDataset = new Dataset();
@@ -246,7 +233,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void view_Protocol() {
-    presenter.init(view);
     Protocol protocol = new Protocol();
     protocol.setId(1L);
     Protocol databaseProtocol = new Protocol();
@@ -259,7 +245,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void add() {
-    presenter.init(view);
     presenter.add();
     verify(view.datasetDialog).setDataset(null);
     verify(view.datasetDialog).open();
@@ -268,7 +253,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnSaved() {
-    presenter.init(view);
     verify(view.datasetDialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
@@ -279,7 +263,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnProtocolSaved() {
-    presenter.init(view);
     verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         protocolSavedListenerCaptor.getValue();

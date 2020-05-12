@@ -95,9 +95,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.form().passwords()).isPresent());
     assertTrue(optional(() -> view.form().passwords().password()).isPresent());
     assertTrue(optional(() -> view.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.form().laboratory()).isPresent());
-    assertFalse(optional(() -> view.form().createNewLaboratory()).isPresent());
-    assertFalse(optional(() -> view.form().newLaboratoryName()).isPresent());
     assertTrue(optional(() -> view.save()).isPresent());
   }
 
@@ -115,9 +112,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.form().passwords()).isPresent());
     assertTrue(optional(() -> view.form().passwords().password()).isPresent());
     assertTrue(optional(() -> view.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.form().laboratory()).isPresent());
-    assertFalse(optional(() -> view.form().createNewLaboratory()).isPresent());
-    assertFalse(optional(() -> view.form().newLaboratoryName()).isPresent());
     assertTrue(optional(() -> view.save()).isPresent());
   }
 
@@ -135,9 +129,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.form().passwords()).isPresent());
     assertTrue(optional(() -> view.form().passwords().password()).isPresent());
     assertTrue(optional(() -> view.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.form().laboratory()).isPresent());
-    assertTrue(optional(() -> view.form().createNewLaboratory()).isPresent());
-    assertTrue(optional(() -> view.form().newLaboratoryName()).isPresent());
     assertTrue(optional(() -> view.save()).isPresent());
   }
 
@@ -164,7 +155,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
     assertEquals(LocalDateTime.of(2018, 12, 7, 15, 40, 12), user.getLastSignAttempt());
     assertEquals(null, user.getLocale());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertEquals(viewUrl(ProfileView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 }

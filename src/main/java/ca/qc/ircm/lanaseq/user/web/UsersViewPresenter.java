@@ -26,8 +26,6 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS_REQUIRED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.UI;
@@ -58,8 +56,6 @@ public class UsersViewPresenter {
   @Autowired
   private UserService userService;
   @Autowired
-  private LaboratoryService laboratoryService;
-  @Autowired
   private AuthorizationService authorizationService;
   private Locale locale;
   private ListDataProvider<User> usersDataProvider;
@@ -68,10 +64,8 @@ public class UsersViewPresenter {
   protected UsersViewPresenter() {
   }
 
-  protected UsersViewPresenter(UserService userService, LaboratoryService laboratoryService,
-      AuthorizationService authorizationService) {
+  protected UsersViewPresenter(UserService userService, AuthorizationService authorizationService) {
     this.userService = userService;
-    this.laboratoryService = laboratoryService;
     this.authorizationService = authorizationService;
   }
 
@@ -83,13 +77,10 @@ public class UsersViewPresenter {
     view.add.setVisible(authorizationService.hasAnyRole(ADMIN, MANAGER));
     view.switchUser.setVisible(authorizationService.hasRole(ADMIN));
     view.userDialog.addSavedListener(e -> loadUsers());
-    view.laboratoryDialog.addSavedListener(e -> loadUsers());
   }
 
   private void loadUsers() {
-    List<User> users = authorizationService.hasRole(ADMIN) ? userService.all()
-        : userService.all(authorizationService.getCurrentUser().getLaboratory());
-    usersDataProvider = new ListDataProvider<>(users);
+    usersDataProvider = new ListDataProvider<>(userService.all());
     ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
         usersDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
@@ -110,11 +101,6 @@ public class UsersViewPresenter {
     view.users.getDataProvider().refreshAll();
   }
 
-  void filterLaboratory(String value) {
-    filter.laboratoryNameContains = value.isEmpty() ? null : value;
-    view.users.getDataProvider().refreshAll();
-  }
-
   void filterActive(Boolean value) {
     filter.active = value;
     view.users.getDataProvider().refreshAll();
@@ -128,12 +114,6 @@ public class UsersViewPresenter {
     clearError();
     view.userDialog.setUser(userService.get(user.getId()));
     view.userDialog.open();
-  }
-
-  void viewLaboratory(Laboratory laboratory) {
-    clearError();
-    view.laboratoryDialog.setLaboratory(laboratoryService.get(laboratory.getId()));
-    view.laboratoryDialog.open();
   }
 
   void toggleActive(User user) {

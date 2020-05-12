@@ -84,19 +84,12 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     if (authorizationService.hasRole(ADMIN)) {
       return true;
     }
-    if (user.getLaboratory() == null || user.getLaboratory().getId() == null || user.isAdmin()) {
+    if (user.isAdmin()) {
       return false;
-    }
-    if (permission.equals(WRITE) && user.getId() != null) {
-      User unmodified = repository.findById(user.getId()).orElse(null);
-      if (!unmodified.getLaboratory().getId().equals(user.getLaboratory().getId())) {
-        return false;
-      }
     }
     boolean authorized = currentUser.getId().equals(user.getId());
     authorized |= permission.equals(READ);
-    authorized |= permission.equals(WRITE) && authorizationService.hasAllRoles(MANAGER,
-        UserAuthority.laboratoryMember(user.getLaboratory()));
+    authorized |= permission.equals(WRITE) && authorizationService.hasRole(MANAGER);
     return authorized;
   }
 }

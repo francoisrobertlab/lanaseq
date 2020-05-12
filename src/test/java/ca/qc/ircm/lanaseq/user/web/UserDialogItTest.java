@@ -49,7 +49,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   private String email = "it_test@ircm.qc.ca";
   private String name = "test_name";
   private String password = "test_password";
-  private String laboratoryName = "Translational Proteomics Research Unit";
 
   private void open() {
     openView(VIEW_NAME);
@@ -60,7 +59,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     dialog.form().name().setValue(name);
     dialog.form().passwords().password().setValue(password);
     dialog.form().passwords().passwordConfirm().setValue(password);
-    dialog.form().laboratory().selectByText(laboratoryName);
   }
 
   @Test
@@ -69,7 +67,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.doubleClickUser(1);
+    view.doubleClick(1);
 
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
@@ -82,9 +80,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.form().passwords()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().password()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> dialog.form().laboratory()).isPresent());
-    assertFalse(optional(() -> dialog.form().createNewLaboratory()).isPresent());
-    assertFalse(optional(() -> dialog.form().newLaboratoryName()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
   }
@@ -94,7 +89,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.doubleClickUser(2);
+    view.doubleClick(2);
 
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
@@ -107,9 +102,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.form().passwords()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().password()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> dialog.form().laboratory()).isPresent());
-    assertTrue(optional(() -> dialog.form().createNewLaboratory()).isPresent());
-    assertTrue(optional(() -> dialog.form().newLaboratoryName()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
   }
@@ -118,7 +110,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void save() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.doubleClickUser(2);
+    view.doubleClick(2);
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
     setFields(dialog);
@@ -135,7 +127,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertEquals((Long) 3L, user.getLaboratory().getId());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
   }
 
@@ -143,7 +134,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void save_Fail() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.doubleClickUser(2);
+    view.doubleClick(2);
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
     setFields(dialog);
@@ -160,7 +151,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Jonh Smith", user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertTrue(passwordEncoder.matches("pass1", user.getHashedPassword()));
   }
 
@@ -168,7 +158,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.doubleClickUser(2);
+    view.doubleClick(2);
     assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
     UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
     setFields(dialog);
@@ -183,7 +173,6 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Jonh Smith", user.getName());
     assertFalse(user.isAdmin());
     assertFalse(user.isManager());
-    assertEquals((Long) 2L, user.getLaboratory().getId());
     assertTrue(passwordEncoder.matches("pass1", user.getHashedPassword()));
   }
 }

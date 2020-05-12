@@ -28,15 +28,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
-import ca.qc.ircm.lanaseq.user.LaboratoryService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox.CustomValueSetEvent;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Locale;
@@ -58,16 +53,11 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   @Mock
   private UserService userService;
   @Mock
-  private LaboratoryService laboratoryService;
-  @Mock
   private AuthorizationService authorizationService;
   @Captor
   private ArgumentCaptor<User> userCaptor;
   @Captor
   private ArgumentCaptor<Boolean> booleanCaptor;
-  @Captor
-  @SuppressWarnings("checkstyle:linelength")
-  private ArgumentCaptor<ComponentEventListener<CustomValueSetEvent<ComboBox<Laboratory>>>> laboratoryComponentEventListenerCaptor;
   @Autowired
   private UserRepository userRepository;
   @Mock

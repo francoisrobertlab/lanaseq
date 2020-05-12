@@ -28,8 +28,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 /**
@@ -98,12 +96,6 @@ public class User implements Data, Owned, Serializable {
    */
   @Column
   private boolean expiredPassword;
-  /**
-   * User's lab.
-   */
-  @ManyToOne(optional = false)
-  @JoinColumn
-  private Laboratory laboratory;
   /**
    * User's prefered locale.
    */
@@ -234,14 +226,6 @@ public class User implements Data, Owned, Serializable {
 
   public void setManager(boolean manager) {
     this.manager = manager;
-  }
-
-  public Laboratory getLaboratory() {
-    return laboratory;
-  }
-
-  public void setLaboratory(Laboratory laboratory) {
-    this.laboratory = laboratory;
   }
 
   public Locale getLocale() {

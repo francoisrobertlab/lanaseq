@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.protocol;
 
-import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -80,8 +79,7 @@ public class ProtocolService {
       return false;
     }
 
-    return repository.existsByNameAndOwnerLaboratory(name,
-        authorizationService.getCurrentUser().getLaboratory());
+    return repository.existsByName(name);
   }
 
   /**
@@ -91,12 +89,7 @@ public class ProtocolService {
    */
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Protocol> all() {
-    if (authorizationService.hasRole(ADMIN)) {
-      return repository.findAll();
-    } else {
-      return repository
-          .findByOwnerLaboratory(authorizationService.getCurrentUser().getLaboratory());
-    }
+    return repository.findAll();
   }
 
   /**
