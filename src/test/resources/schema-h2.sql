@@ -59,6 +59,15 @@ CREATE TABLE IF NOT EXISTS protocol_file (
 CREATE TABLE IF NOT EXISTS dataset (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   project varchar(255),
+  owner_id bigint(20) NOT NULL,
+  date DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS sample (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  replicate varchar(255),
   assay varchar(255) NOT NULL,
   type varchar(255),
   target varchar(255),
@@ -69,20 +78,14 @@ CREATE TABLE IF NOT EXISTS dataset (
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT datasetProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON UPDATE CASCADE,
-  CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+  CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS sample (
+CREATE TABLE IF NOT EXISTS dataset_samples (
   id bigint(20) NOT NULL AUTO_INCREMENT,
-  name varchar(255) NOT NULL,
-  replicate varchar(255),
-  samples_order int,
-  owner_id bigint(20) NOT NULL,
   dataset_id bigint(20) NOT NULL,
-  date DATETIME NOT NULL,
+  samples_order int,
+  samples_id bigint(20) NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE (name, dataset_id),
-  UNIQUE (replicate, dataset_id),
-  CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE,
-  CONSTRAINT sampleDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT datasetSamplesDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT datasetSamplesSample_ibfk FOREIGN KEY (samples_id) REFERENCES sample (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

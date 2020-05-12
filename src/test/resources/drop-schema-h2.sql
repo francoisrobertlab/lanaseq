@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
+DROP TABLE IF EXISTS dataset_samples;
 DROP TABLE IF EXISTS sample;
 DROP TABLE IF EXISTS dataset;
 DROP TABLE IF EXISTS protocol_file;

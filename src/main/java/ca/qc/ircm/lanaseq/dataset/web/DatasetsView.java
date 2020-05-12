@@ -34,6 +34,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
@@ -112,8 +113,8 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.addItemDoubleClickListener(e -> {
-      if (e.getColumn() == protocol) {
-        presenter.view(e.getItem().getProtocol());
+      if (e.getColumn() == protocol && protocol(e.getItem()).getId() != null) {
+        presenter.view(protocol(e.getItem()));
       } else {
         presenter.view(e.getItem());
       }
@@ -122,8 +123,8 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
         .setComparator(NormalizedComparator.of(Dataset::getFilename));
     project = datasets.addColumn(dataset -> dataset.getProject(), PROJECT).setKey(PROJECT)
         .setComparator(NormalizedComparator.of(Dataset::getProject));
-    protocol = datasets.addColumn(ex -> ex.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
-        .setComparator(NormalizedComparator.of(e -> e.getProtocol().getName()));
+    protocol = datasets.addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
+        .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()));
     date = datasets
         .addColumn(new LocalDateTimeRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE),
             DATE)
@@ -152,6 +153,12 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     add.setId(ADD);
     add.addClickListener(e -> presenter.add());
     presenter.init(this);
+  }
+
+  private Protocol protocol(Dataset dataset) {
+    return dataset.getSamples() != null
+        ? dataset.getSamples().stream().findFirst().map(s -> s.getProtocol()).orElse(new Protocol())
+        : new Protocol();
   }
 
   @Override

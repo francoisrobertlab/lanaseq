@@ -18,15 +18,15 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -35,7 +35,6 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -59,19 +58,17 @@ public class DatasetDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogPresenter.class);
   private DatasetDialog dialog;
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
+  private Binder<Sample> sampleBinder = new BeanValidationBinder<>(Sample.class);
   private ListDataProvider<Sample> samplesDataProvider =
       DataProvider.ofCollection(new ArrayList<>());
   private Dataset dataset;
   private DatasetService service;
   private ProtocolService protocolService;
-  private SampleService sampleService;
 
   @Autowired
-  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService,
-      SampleService sampleService) {
+  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService) {
     this.service = service;
     this.protocolService = protocolService;
-    this.sampleService = sampleService;
   }
 
   void init(DatasetDialog dialog) {
@@ -85,14 +82,16 @@ public class DatasetDialogPresenter {
   void localeChange(Locale locale) {
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
-    binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
-    binder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
-    binder.forField(dialog.type).withNullRepresentation(DatasetType.NULL).bind(TYPE);
-    binder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
-    binder.forField(dialog.strain).asRequired(webResources.message(REQUIRED))
+    sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
+        .bind(PROTOCOL);
+    sampleBinder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
+    sampleBinder.forField(dialog.type).withNullRepresentation(DatasetType.NULL).bind(TYPE);
+    sampleBinder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
+    sampleBinder.forField(dialog.strain).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(STRAIN);
-    binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
-    binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
+    sampleBinder.forField(dialog.strainDescription).withNullRepresentation("")
+        .bind(STRAIN_DESCRIPTION);
+    sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }
 
   void addSample() {
@@ -128,14 +127,22 @@ public class DatasetDialogPresenter {
     return binder.validate();
   }
 
+  BinderValidationStatus<Sample> validateSample() {
+    return sampleBinder.validate();
+  }
+
   private boolean validate() {
-    return validateDataset().isOk();
+    return validateDataset().isOk() && validateSample().isOk();
   }
 
   void save(Locale locale) {
     if (validate()) {
       logger.debug("Save dataset {}", dataset);
       dataset.setSamples(new ArrayList<>(samplesDataProvider.getItems()));
+      Sample from = sampleBinder.getBean();
+      for (Sample sample : dataset.getSamples()) {
+        copy(from, sample);
+      }
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, dataset.getFilename()));
@@ -162,11 +169,25 @@ public class DatasetDialogPresenter {
     if (dataset == null) {
       dataset = new Dataset();
     }
+    if (dataset.getSamples() == null) {
+      dataset.setSamples(new ArrayList<>());
+    }
+    Sample sample = new Sample();
+    copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
     this.dataset = dataset;
     binder.setBean(dataset);
-    if (dataset.getId() != null) {
-      samplesDataProvider = DataProvider.ofCollection(sampleService.all(dataset));
-    }
+    sampleBinder.setBean(sample);
+    samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
+  }
+
+  private void copy(Sample from, Sample to) {
+    to.setAssay(from.getAssay());
+    to.setType(from.getType());
+    to.setTarget(from.getTarget());
+    to.setStrain(from.getStrain());
+    to.setStrainDescription(from.getStrainDescription());
+    to.setTreatment(from.getTreatment());
+    to.setProtocol(from.getProtocol());
   }
 }

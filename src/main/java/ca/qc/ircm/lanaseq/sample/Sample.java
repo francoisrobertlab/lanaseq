@@ -1,9 +1,12 @@
 package ca.qc.ircm.lanaseq.sample;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
-import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.Assay;
+import ca.qc.ircm.lanaseq.dataset.DatasetType;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
@@ -11,6 +14,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -44,22 +48,58 @@ public class Sample implements Data, Owned, Serializable {
   @Size(max = 255)
   private String replicate;
   /**
+   * Assay.
+   */
+  @Column(nullable = false)
+  @Enumerated(STRING)
+  private Assay assay;
+  /**
+   * Type.
+   */
+  @Column
+  @Enumerated(STRING)
+  private DatasetType type;
+  /**
+   * Target.
+   */
+  @Column
+  @Size(max = 255)
+  private String target;
+  /**
+   * Strain.
+   */
+  @Column(nullable = false)
+  @Size(max = 255)
+  private String strain;
+  /**
+   * Strain description.
+   */
+  @Column
+  @Size(max = 255)
+  private String strainDescription;
+  /**
+   * Treatment.
+   */
+  @Column
+  @Size(max = 255)
+  private String treatment;
+  /**
    * Creation date.
    */
   @Column
   private LocalDateTime date;
+  /**
+   * Protocol.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn
+  private Protocol protocol;
   /**
    * Owner.
    */
   @ManyToOne(optional = false)
   @JoinColumn
   private User owner;
-  /**
-   * Dataset.
-   */
-  @ManyToOne(optional = false)
-  @JoinColumn
-  private Dataset dataset;
 
   public Sample() {
   }
@@ -81,7 +121,6 @@ public class Sample implements Data, Owned, Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((dataset == null) ? 0 : dataset.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     return result;
   }
@@ -95,11 +134,6 @@ public class Sample implements Data, Owned, Serializable {
     if (getClass() != obj.getClass())
       return false;
     Sample other = (Sample) obj;
-    if (dataset == null) {
-      if (other.dataset != null)
-        return false;
-    } else if (!dataset.equals(other.dataset))
-      return false;
     if (name == null) {
       if (other.name != null)
         return false;
@@ -138,14 +172,6 @@ public class Sample implements Data, Owned, Serializable {
     this.replicate = replicate;
   }
 
-  public Dataset getDataset() {
-    return dataset;
-  }
-
-  public void setDataset(Dataset dataset) {
-    this.dataset = dataset;
-  }
-
   public LocalDateTime getDate() {
     return date;
   }
@@ -161,5 +187,61 @@ public class Sample implements Data, Owned, Serializable {
 
   public void setOwner(User owner) {
     this.owner = owner;
+  }
+
+  public Assay getAssay() {
+    return assay;
+  }
+
+  public void setAssay(Assay assay) {
+    this.assay = assay;
+  }
+
+  public DatasetType getType() {
+    return type;
+  }
+
+  public void setType(DatasetType type) {
+    this.type = type;
+  }
+
+  public String getTarget() {
+    return target;
+  }
+
+  public void setTarget(String target) {
+    this.target = target;
+  }
+
+  public String getStrain() {
+    return strain;
+  }
+
+  public void setStrain(String strain) {
+    this.strain = strain;
+  }
+
+  public String getStrainDescription() {
+    return strainDescription;
+  }
+
+  public void setStrainDescription(String strainDescription) {
+    this.strainDescription = strainDescription;
+  }
+
+  public String getTreatment() {
+    return treatment;
+  }
+
+  public void setTreatment(String treatment) {
+    this.treatment = treatment;
+  }
+
+  public Protocol getProtocol() {
+    return protocol;
+  }
+
+  public void setProtocol(Protocol protocol) {
+    this.protocol = protocol;
   }
 }

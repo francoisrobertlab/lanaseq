@@ -1,8 +1,8 @@
 package ca.qc.ircm.lanaseq.sample;
 
-import ca.qc.ircm.lanaseq.dataset.Dataset;
-import java.util.ArrayList;
-import java.util.List;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.user.User;
+import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -16,10 +16,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class SampleService {
   private SampleRepository repository;
+  private AuthorizationService authorizationService;
 
   @Autowired
-  protected SampleService(SampleRepository repository) {
+  protected SampleService(SampleRepository repository, AuthorizationService authorizationService) {
     this.repository = repository;
+    this.authorizationService = authorizationService;
   }
 
   /**
@@ -39,54 +41,19 @@ public class SampleService {
   }
 
   /**
-   * Returns true if a sample with this name exists in the dataset, false otherwise.
+   * Saves sample into database.
    *
-   * @param name
-   *          sample's name
-   * @param dataset
-   *          dataset
-   * @return true if a sample with this name exists in the dataset, false otherwise
+   * @param sample
+   *          sample
    */
-  @PreAuthorize("hasPermission(#dataset, 'read')")
-  public boolean exists(String name, Dataset dataset) {
-    if (name == null || dataset == null) {
-      return false;
+  @PreAuthorize("hasPermission(#sample, 'write')")
+  public void save(Sample sample) {
+    LocalDateTime now = LocalDateTime.now();
+    User user = authorizationService.getCurrentUser();
+    if (sample.getId() == null) {
+      sample.setOwner(user);
+      sample.setDate(now);
     }
-
-    return repository.existsByNameAndDataset(name, dataset);
-  }
-
-  /**
-   * Returns true if a sample with this replicate exists in the dataset, false otherwise.
-   *
-   * @param name
-   *          sample's name
-   * @param dataset
-   *          dataset
-   * @return true if a sample with this replicate exists in the dataset, false otherwise
-   */
-  @PreAuthorize("hasPermission(#dataset, 'read')")
-  public boolean existsReplicate(String replicate, Dataset dataset) {
-    if (replicate == null || dataset == null) {
-      return false;
-    }
-
-    return repository.existsByReplicateAndDataset(replicate, dataset);
-  }
-
-  /**
-   * Returns all samples of a dataset.
-   *
-   * @param dataset
-   *          dataset
-   * @return all samples of a dataset
-   */
-  @PreAuthorize("hasPermission(#dataset, 'read')")
-  public List<Sample> all(Dataset dataset) {
-    if (dataset == null) {
-      return new ArrayList<>();
-    }
-
-    return repository.findAllByDataset(dataset);
+    repository.save(sample);
   }
 }

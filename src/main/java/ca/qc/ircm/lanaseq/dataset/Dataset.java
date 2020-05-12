@@ -17,11 +17,9 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
-import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
@@ -32,10 +30,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -65,52 +61,10 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   @Size(max = 255)
   private String project;
   /**
-   * Assay.
-   */
-  @Column(nullable = false)
-  @Enumerated(STRING)
-  private Assay assay;
-  /**
-   * Type.
-   */
-  @Column
-  @Enumerated(STRING)
-  private DatasetType type;
-  /**
-   * Target.
-   */
-  @Column
-  @Size(max = 255)
-  private String target;
-  /**
-   * Strain.
-   */
-  @Column(nullable = false)
-  @Size(max = 255)
-  private String strain;
-  /**
-   * Strain description.
-   */
-  @Column
-  @Size(max = 255)
-  private String strainDescription;
-  /**
-   * Treatment.
-   */
-  @Column
-  @Size(max = 255)
-  private String treatment;
-  /**
    * Creation date.
    */
   @Column
   private LocalDateTime date;
-  /**
-   * Protocol.
-   */
-  @ManyToOne(optional = false)
-  @JoinColumn
-  private Protocol protocol;
   /**
    * Owner.
    */
@@ -120,7 +74,7 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   /**
    * Samples that are part of this submission.
    */
-  @OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany
   @OrderColumn
   private List<Sample> samples;
 
@@ -135,14 +89,8 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((assay == null) ? 0 : assay.hashCode());
     result = prime * result + ((date == null) ? 0 : date.hashCode());
     result = prime * result + ((project == null) ? 0 : project.hashCode());
-    result = prime * result + ((strain == null) ? 0 : strain.hashCode());
-    result = prime * result + ((strainDescription == null) ? 0 : strainDescription.hashCode());
-    result = prime * result + ((target == null) ? 0 : target.hashCode());
-    result = prime * result + ((treatment == null) ? 0 : treatment.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
@@ -155,8 +103,6 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
     if (getClass() != obj.getClass())
       return false;
     Dataset other = (Dataset) obj;
-    if (assay != other.assay)
-      return false;
     if (date == null) {
       if (other.date != null)
         return false;
@@ -166,28 +112,6 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
       if (other.project != null)
         return false;
     } else if (!project.equals(other.project))
-      return false;
-    if (strain == null) {
-      if (other.strain != null)
-        return false;
-    } else if (!strain.equals(other.strain))
-      return false;
-    if (strainDescription == null) {
-      if (other.strainDescription != null)
-        return false;
-    } else if (!strainDescription.equals(other.strainDescription))
-      return false;
-    if (target == null) {
-      if (other.target != null)
-        return false;
-    } else if (!target.equals(other.target))
-      return false;
-    if (treatment == null) {
-      if (other.treatment != null)
-        return false;
-    } else if (!treatment.equals(other.treatment))
-      return false;
-    if (type != other.type)
       return false;
     return true;
   }
@@ -200,12 +124,15 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   @Override
   public String getFilename() {
     StringBuilder builder = new StringBuilder();
-    builder.append(assay != null ? "_" + assay.getLabel(Locale.ENGLISH) : "");
-    builder.append(type != null ? "_" + type.getLabel(Locale.ENGLISH) : "");
-    builder.append(target != null ? "_" + target : "");
-    builder.append(strain != null ? "_" + strain : "");
-    builder.append(strainDescription != null ? "_" + strainDescription : "");
-    builder.append(treatment != null ? "_" + treatment : "");
+    Sample sample = samples.stream().findFirst().orElse(new Sample());
+    builder
+        .append(sample.getAssay() != null ? "_" + sample.getAssay().getLabel(Locale.ENGLISH) : "");
+    builder.append(sample.getType() != null ? "_" + sample.getType().getLabel(Locale.ENGLISH) : "");
+    builder.append(sample.getTarget() != null ? "_" + sample.getTarget() : "");
+    builder.append(sample.getStrain() != null ? "_" + sample.getStrain() : "");
+    builder
+        .append(sample.getStrainDescription() != null ? "_" + sample.getStrainDescription() : "");
+    builder.append(sample.getTreatment() != null ? "_" + sample.getTreatment() : "");
     DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
     builder.append(date != null ? "_" + formatter.format(date) : "");
     if (builder.length() > 0) {
@@ -249,62 +176,6 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
 
   public void setDate(LocalDateTime date) {
     this.date = date;
-  }
-
-  public Protocol getProtocol() {
-    return protocol;
-  }
-
-  public void setProtocol(Protocol protocol) {
-    this.protocol = protocol;
-  }
-
-  public Assay getAssay() {
-    return assay;
-  }
-
-  public void setAssay(Assay assay) {
-    this.assay = assay;
-  }
-
-  public DatasetType getType() {
-    return type;
-  }
-
-  public void setType(DatasetType type) {
-    this.type = type;
-  }
-
-  public String getTarget() {
-    return target;
-  }
-
-  public void setTarget(String target) {
-    this.target = target;
-  }
-
-  public String getStrain() {
-    return strain;
-  }
-
-  public void setStrain(String strain) {
-    this.strain = strain;
-  }
-
-  public String getStrainDescription() {
-    return strainDescription;
-  }
-
-  public void setStrainDescription(String strainDescription) {
-    this.strainDescription = strainDescription;
-  }
-
-  public String getTreatment() {
-    return treatment;
-  }
-
-  public void setTreatment(String treatment) {
-    this.treatment = treatment;
   }
 
   public List<Sample> getSamples() {

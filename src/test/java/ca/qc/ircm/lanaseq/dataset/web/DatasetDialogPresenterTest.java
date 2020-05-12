@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
@@ -43,8 +44,6 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -84,8 +83,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Mock
   private ProtocolService protocolService;
   @Mock
-  private SampleService sampleService;
-  @Mock
   private Sample sample;
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
@@ -99,13 +96,10 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
-  @Autowired
-  private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
-  private List<Sample> samples;
   private String project = "Test Project";
   private Protocol protocol;
   private Assay assay = Assay.CHIP_SEQ;
@@ -125,7 +119,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new DatasetDialogPresenter(service, protocolService, sampleService);
+    presenter = new DatasetDialogPresenter(service, protocolService);
     dialog.header = new H3();
     dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
@@ -145,8 +139,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
-    samples = sampleRepository.findAll();
-    when(sampleService.all(any())).thenReturn(samples);
     presenter.init(dialog);
   }
 
@@ -197,7 +189,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.strain.getValue());
     assertEquals("", dialog.strainDescription.getValue());
     assertEquals("", dialog.treatment.getValue());
-    verify(sampleService, never()).all(dataset);
     assertTrue(items(dialog.samples).isEmpty());
   }
 
@@ -217,8 +208,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());
     assertEquals("Rappa", dialog.treatment.getValue());
-    verify(sampleService).all(dataset);
-    assertEquals(samples, items(dialog.samples));
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertTrue(find(samples, 2L).isPresent());
+    assertTrue(find(samples, 3L).isPresent());
   }
 
   @Test
@@ -236,8 +230,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("polr2a", dialog.target.getValue());
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());
-    verify(sampleService).all(dataset);
-    assertEquals(samples, items(dialog.samples));
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertTrue(find(samples, 2L).isPresent());
+    assertTrue(find(samples, 3L).isPresent());
   }
 
   @Test
@@ -253,7 +250,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.strain.getValue());
     assertEquals("", dialog.strainDescription.getValue());
     assertEquals("", dialog.treatment.getValue());
-    verify(sampleService, never()).all(any());
     assertTrue(items(dialog.samples).isEmpty());
   }
 
@@ -287,8 +283,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void savedSample_New() {
-    presenter.setDataset(new Dataset(1L));
-    List<Sample> samples = new ArrayList<Sample>(this.samples);
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    List<Sample> samples = new ArrayList<Sample>(dataset.getSamples());
     dialog.samples = mock(Grid.class);
     verify(dialog.sampleDialog).addSavedListener(savedListenerCaptor.capture());
     Sample sample = mock(Sample.class);
@@ -307,8 +304,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void savedSample() {
-    presenter.setDataset(new Dataset(1L));
-    List<Sample> samples = new ArrayList<Sample>(this.samples);
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    List<Sample> samples = new ArrayList<Sample>(dataset.getSamples());
     dialog.samples = mock(Grid.class);
     verify(dialog.sampleDialog).addSavedListener(savedListenerCaptor.capture());
     Sample sample = samples.get(0);
@@ -326,8 +324,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void deletedSample() {
-    presenter.setDataset(new Dataset(1L));
-    List<Sample> samples = new ArrayList<Sample>(this.samples);
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    List<Sample> samples = new ArrayList<Sample>(dataset.getSamples());
     dialog.samples = mock(Grid.class);
     verify(dialog.sampleDialog).addDeletedListener(deletedListenerCaptor.capture());
     Sample sample = samples.get(0);
@@ -369,7 +368,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.protocol);
@@ -390,7 +389,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.assay);
@@ -411,11 +410,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getType());
+    assertNull(dataset.getSamples().get(0).getType());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -429,11 +428,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getTarget());
+    assertNull(dataset.getSamples().get(0).getTarget());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -447,7 +446,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.strain);
@@ -468,11 +467,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getStrainDescription());
+    assertNull(dataset.getSamples().get(0).getStrainDescription());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -486,11 +485,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.save(locale);
 
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getTreatment());
+    assertNull(dataset.getSamples().get(0).getTreatment());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -506,20 +505,27 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertEquals(project, dataset.getProject());
-    assertEquals(protocol.getId(), dataset.getProtocol().getId());
-    assertEquals(assay, dataset.getAssay());
-    assertEquals(type, dataset.getType());
-    assertEquals(target, dataset.getTarget());
-    assertEquals(strain, dataset.getStrain());
-    assertEquals(strainDescription, dataset.getStrainDescription());
-    assertEquals(treatment, dataset.getTreatment());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals(sampleName1, sample.getName());
     assertEquals(sampleReplicate1, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(1);
     assertEquals(sampleName2, sample.getName());
     assertEquals(sampleReplicate2, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
     verify(dialog).showNotification(resources.message(SAVED, dataset.getFilename()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -537,20 +543,27 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(datasetCaptor.capture());
     dataset = datasetCaptor.getValue();
     assertEquals(project, dataset.getProject());
-    assertEquals(protocol.getId(), dataset.getProtocol().getId());
-    assertEquals(assay, dataset.getAssay());
-    assertEquals(type, dataset.getType());
-    assertEquals(target, dataset.getTarget());
-    assertEquals(strain, dataset.getStrain());
-    assertEquals(strainDescription, dataset.getStrainDescription());
-    assertEquals(treatment, dataset.getTreatment());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals(sampleName1, sample.getName());
     assertEquals(sampleReplicate1, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(1);
     assertEquals(sampleName2, sample.getName());
     assertEquals(sampleReplicate2, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
     verify(dialog).showNotification(resources.message(SAVED, dataset.getFilename()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
