@@ -34,7 +34,6 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.util.ArrayList;
@@ -74,8 +73,6 @@ public class SpringAuthorizationServiceTest {
   private UserDetailsService userDetailsService;
   @Mock
   private PermissionEvaluator permissionEvaluator;
-  @Mock
-  private Laboratory laboratory;
   @Mock
   private User user;
   @Mock

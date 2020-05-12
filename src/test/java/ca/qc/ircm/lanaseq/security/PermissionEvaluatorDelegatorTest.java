@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,8 +55,6 @@ public class PermissionEvaluatorDelegatorTest {
   private DatasetPermissionEvaluator datasetPermissionEvaluator;
   @MockBean
   private ProtocolPermissionEvaluator protocolPermissionEvaluator;
-  @Mock
-  private Laboratory laboratory;
   @Mock
   private User user;
   @Mock

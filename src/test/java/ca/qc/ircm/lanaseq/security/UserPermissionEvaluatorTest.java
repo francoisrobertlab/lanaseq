@@ -20,8 +20,8 @@ package ca.qc.ircm.lanaseq.security;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.Laboratory;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import org.junit.Test;
@@ -266,18 +266,17 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("lana@ircm.qc.ca")
   public void hasPermission_NotUser() throws Throwable {
-    assertFalse(permissionEvaluator.hasPermission(authentication(), new Laboratory(1L), READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), new Laboratory(1L), WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), new Laboratory(1L), BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), new Protocol(1L), READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), new Protocol(1L), WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), new Protocol(1L), BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), new Protocol(1L), BASE_WRITE));
     assertFalse(
-        permissionEvaluator.hasPermission(authentication(), new Laboratory(1L), BASE_WRITE));
+        permissionEvaluator.hasPermission(authentication(), 1L, Protocol.class.getName(), READ));
     assertFalse(
-        permissionEvaluator.hasPermission(authentication(), 1L, Laboratory.class.getName(), READ));
-    assertFalse(
-        permissionEvaluator.hasPermission(authentication(), 1L, Laboratory.class.getName(), WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), 1L, Laboratory.class.getName(),
+        permissionEvaluator.hasPermission(authentication(), 1L, Protocol.class.getName(), WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), 1L, Protocol.class.getName(),
         BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), 1L, Laboratory.class.getName(),
+    assertFalse(permissionEvaluator.hasPermission(authentication(), 1L, Protocol.class.getName(),
         BASE_WRITE));
   }
 
