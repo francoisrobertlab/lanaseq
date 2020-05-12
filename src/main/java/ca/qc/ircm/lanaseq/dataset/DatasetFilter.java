@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 
+import ca.qc.ircm.lanaseq.sample.Sample;
 import com.google.common.collect.Range;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -44,7 +45,10 @@ public class DatasetFilter implements Predicate<Dataset> {
       test &= comparable(replaceNull(dataset.getProject())).contains(comparable(projectContains));
     }
     if (protocolContains != null) {
-      test &= comparable(replaceNull(dataset.getProtocol().getName()))
+      Sample sample = dataset.getSamples() != null
+          ? dataset.getSamples().stream().findFirst().orElse(new Sample())
+          : new Sample();
+      test &= comparable(replaceNull(sample.getProtocol().getName()))
           .contains(comparable(protocolContains));
     }
     if (dateRange != null) {

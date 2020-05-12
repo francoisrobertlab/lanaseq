@@ -99,13 +99,6 @@ public class DatasetService {
           sample.setOwner(user);
           sample.setDate(now);
         }
-        sample.setAssay(dataset.getAssay());
-        sample.setType(dataset.getType());
-        sample.setTarget(dataset.getTarget());
-        sample.setStrain(dataset.getStrain());
-        sample.setStrainDescription(dataset.getStrainDescription());
-        sample.setTreatment(dataset.getTreatment());
-        sample.setProtocol(dataset.getProtocol());
       }
     }
     repository.save(dataset);

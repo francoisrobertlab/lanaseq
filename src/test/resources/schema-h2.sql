@@ -59,17 +59,9 @@ CREATE TABLE IF NOT EXISTS protocol_file (
 CREATE TABLE IF NOT EXISTS dataset (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   project varchar(255),
-  assay varchar(255) NOT NULL,
-  type varchar(255),
-  target varchar(255),
-  strain varchar(255) NOT NULL,
-  strain_description varchar(255),
-  treatment varchar(255),
-  protocol_id bigint(20) NOT NULL,
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT datasetProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON UPDATE CASCADE,
   CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS sample (

@@ -23,11 +23,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -236,9 +238,12 @@ public class DatasetFilterTest {
 
   private Dataset protocol(String name) {
     Dataset dataset = new Dataset();
+    Sample sample = new Sample();
     Protocol protocol = new Protocol();
     protocol.setName(name);
-    dataset.setProtocol(protocol);
+    sample.setProtocol(protocol);
+    dataset.setSamples(new ArrayList<>());
+    dataset.getSamples().add(sample);
     return dataset;
   }
 

@@ -147,13 +147,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertNotNull(dataset);
     assertNotNull(dataset.getId());
     assertEquals(project, dataset.getProject());
-    assertEquals(protocol.getId(), dataset.getProtocol().getId());
-    assertEquals(assay, dataset.getAssay());
-    assertEquals(type, dataset.getType());
-    assertEquals(target, dataset.getTarget());
-    assertEquals(strain, dataset.getStrain());
-    assertEquals(strainDescription, dataset.getStrainDescription());
-    assertEquals(treatment, dataset.getTreatment());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -161,6 +154,13 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     Sample sample = dataset.getSamples().get(0);
     assertEquals(sampleName, sample.getName());
     assertEquals(sampleReplicate, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
   }
 
   @Test
@@ -181,25 +181,39 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
         notification.getText());
     Dataset dataset = repository.findById(2L).get();
     assertEquals(project, dataset.getProject());
-    assertEquals(protocol.getId(), dataset.getProtocol().getId());
-    assertEquals(assay, dataset.getAssay());
-    assertEquals(type, dataset.getType());
-    assertEquals(target, dataset.getTarget());
-    assertEquals(strain, dataset.getStrain());
-    assertEquals(strainDescription, dataset.getStrainDescription());
-    assertEquals(treatment, dataset.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(3, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals("JS1", sample.getName());
     assertEquals("R1", sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getName());
     assertEquals("R2", sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(2);
     assertEquals(sampleName, sample.getName());
     assertEquals(sampleReplicate, sample.getReplicate());
+    assertEquals(protocol.getId(), sample.getProtocol().getId());
+    assertEquals(assay, sample.getAssay());
+    assertEquals(type, sample.getType());
+    assertEquals(target, sample.getTarget());
+    assertEquals(strain, sample.getStrain());
+    assertEquals(strainDescription, sample.getStrainDescription());
+    assertEquals(treatment, sample.getTreatment());
   }
 
   @Test
@@ -217,21 +231,28 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Dataset dataset = repository.findById(2L).get();
     assertEquals("histone", dataset.getProject());
-    assertEquals((Long) 3L, dataset.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, dataset.getAssay());
-    assertNull(dataset.getType());
-    assertEquals("Spt16", dataset.getTarget());
-    assertEquals("yFR101", dataset.getStrain());
-    assertEquals("G24D", dataset.getStrainDescription());
-    assertNull(dataset.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals("JS1", sample.getName());
     assertEquals("R1", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getName());
     assertEquals("R2", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
   }
 }

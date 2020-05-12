@@ -30,6 +30,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
@@ -48,6 +49,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -108,6 +110,12 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     view = new DatasetsView(presenter, datasetDialog, protocolDialog);
     view.init();
     datasets = datasetRepository.findAll();
+  }
+
+  private Protocol protocol(Dataset dataset) {
+    return dataset.getSamples() != null
+        ? dataset.getSamples().stream().findFirst().map(s -> s.getProtocol()).orElse(new Protocol())
+        : new Protocol();
   }
 
   @SuppressWarnings("unchecked")
@@ -266,13 +274,13 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
     valueProvider = valueProviderCaptor.getValue();
     for (Dataset dataset : datasets) {
-      assertEquals(dataset.getProtocol().getName(), valueProvider.apply(dataset));
+      assertEquals(protocol(dataset).getName(), valueProvider.apply(dataset));
     }
     verify(view.protocol).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
     for (Dataset dataset : datasets) {
-      assertEquals(dataset.getProtocol().getName(),
+      assertEquals(protocol(dataset).getName(),
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
     verify(view.datasets).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
@@ -308,7 +316,15 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     Dataset dataset = datasets.get(0);
     doubleClickItem(view.datasets, dataset, view.protocol);
 
-    verify(presenter).view(dataset.getProtocol());
+    verify(presenter).view(protocol(dataset));
+  }
+
+  @Test
+  public void viewProtocol_NoProtocol() {
+    Dataset dataset = find(datasets, 3L).get();
+    doubleClickItem(view.datasets, dataset, view.protocol);
+
+    verify(presenter).view(dataset);
   }
 
   @Test
