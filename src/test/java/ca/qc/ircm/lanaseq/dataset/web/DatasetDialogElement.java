@@ -19,19 +19,19 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.STRAIN_DESCRIPTION;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TARGET;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TREATMENT;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TYPE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
