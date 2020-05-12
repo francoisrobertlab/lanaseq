@@ -5,7 +5,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.lanaseq.dataset.Assay;
-import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.Owned;
@@ -19,7 +18,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
@@ -102,12 +100,6 @@ public class Sample implements Data, Owned, Serializable {
   @ManyToOne(optional = false)
   @JoinColumn
   private User owner;
-  /**
-   * Dataset.
-   */
-  @ManyToOne(optional = false)
-  @JoinTable(name = "dataset_samples", joinColumns = @JoinColumn(name = "samples_id"))
-  private Dataset dataset;
 
   public Sample() {
   }
@@ -129,7 +121,6 @@ public class Sample implements Data, Owned, Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((dataset == null) ? 0 : dataset.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     return result;
   }
@@ -143,11 +134,6 @@ public class Sample implements Data, Owned, Serializable {
     if (getClass() != obj.getClass())
       return false;
     Sample other = (Sample) obj;
-    if (dataset == null) {
-      if (other.dataset != null)
-        return false;
-    } else if (!dataset.equals(other.dataset))
-      return false;
     if (name == null) {
       if (other.name != null)
         return false;
@@ -184,14 +170,6 @@ public class Sample implements Data, Owned, Serializable {
 
   public void setReplicate(String replicate) {
     this.replicate = replicate;
-  }
-
-  public Dataset getDataset() {
-    return dataset;
-  }
-
-  public void setDataset(Dataset dataset) {
-    this.dataset = dataset;
   }
 
   public LocalDateTime getDate() {

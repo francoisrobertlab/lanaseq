@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Assay;
-import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -36,8 +35,6 @@ public class SampleServiceTest {
   private SampleService service;
   @Autowired
   private SampleRepository repository;
-  @Autowired
-  private DatasetRepository datasetRepository;
   @Autowired
   private ProtocolRepository protocolRepository;
   @Autowired
@@ -69,7 +66,6 @@ public class SampleServiceTest {
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
-    assertEquals((Long) 1L, sample.getDataset().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }
 
@@ -95,7 +91,6 @@ public class SampleServiceTest {
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
     sample.setProtocol(protocolRepository.findById(1L).get());
-    sample.setDataset(datasetRepository.findById(1L).get());
 
     service.save(sample);
 
@@ -111,7 +106,6 @@ public class SampleServiceTest {
     assertEquals("F56G", sample.getStrainDescription());
     assertEquals("37C", sample.getTreatment());
     assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals((Long) 1L, sample.getDataset().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
@@ -148,7 +142,6 @@ public class SampleServiceTest {
     assertEquals("37C", sample.getTreatment());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
-    assertEquals((Long) 1L, sample.getDataset().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }

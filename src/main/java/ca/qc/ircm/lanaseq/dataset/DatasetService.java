@@ -99,7 +99,6 @@ public class DatasetService {
           sample.setOwner(user);
           sample.setDate(now);
         }
-        sample.setDataset(dataset);
         sample.setAssay(dataset.getAssay());
         sample.setType(dataset.getType());
         sample.setTarget(dataset.getTarget());
