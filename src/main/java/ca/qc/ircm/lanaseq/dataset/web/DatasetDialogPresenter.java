@@ -35,7 +35,6 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleService;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -64,14 +63,11 @@ public class DatasetDialogPresenter {
   private Dataset dataset;
   private DatasetService service;
   private ProtocolService protocolService;
-  private SampleService sampleService;
 
   @Autowired
-  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService,
-      SampleService sampleService) {
+  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService) {
     this.service = service;
     this.protocolService = protocolService;
-    this.sampleService = sampleService;
   }
 
   void init(DatasetDialog dialog) {
@@ -162,11 +158,12 @@ public class DatasetDialogPresenter {
     if (dataset == null) {
       dataset = new Dataset();
     }
+    if (dataset.getSamples() == null) {
+      dataset.setSamples(new ArrayList<>());
+    }
     this.dataset = dataset;
     binder.setBean(dataset);
-    if (dataset.getId() != null) {
-      samplesDataProvider = DataProvider.ofCollection(sampleService.all(dataset));
-    }
+    samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
   }
 }

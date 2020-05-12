@@ -1,11 +1,8 @@
 package ca.qc.ircm.lanaseq.sample;
 
-import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -41,22 +38,6 @@ public class SampleService {
     }
 
     return repository.findById(id).orElse(null);
-  }
-
-  /**
-   * Returns all samples of a dataset.
-   *
-   * @param dataset
-   *          dataset
-   * @return all samples of a dataset
-   */
-  @PreAuthorize("hasPermission(#dataset, 'read')")
-  public List<Sample> all(Dataset dataset) {
-    if (dataset == null) {
-      return new ArrayList<>();
-    }
-
-    return repository.findAllByDataset(dataset);
   }
 
   /**

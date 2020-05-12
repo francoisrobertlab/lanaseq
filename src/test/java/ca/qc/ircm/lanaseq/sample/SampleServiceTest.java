@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.sample;
 
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -11,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Assay;
-import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
@@ -20,7 +18,6 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,27 +78,6 @@ public class SampleServiceTest {
   public void get_Null() {
     Sample sample = service.get(null);
     assertNull(sample);
-  }
-
-  @Test
-  @WithMockUser
-  public void all() {
-    Dataset dataset = new Dataset(1L);
-
-    List<Sample> samples = service.all(dataset);
-
-    assertEquals(3, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertTrue(find(samples, 2L).isPresent());
-    assertTrue(find(samples, 3L).isPresent());
-    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
-  }
-
-  @Test
-  @WithMockUser
-  public void all_Null() {
-    List<Sample> samples = service.all(null);
-    assertTrue(samples.isEmpty());
   }
 
   @Test
