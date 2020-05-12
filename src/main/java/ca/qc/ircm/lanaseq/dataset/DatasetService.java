@@ -22,6 +22,8 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
@@ -35,6 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class DatasetService {
+  @SuppressWarnings("unused")
+  private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   @Autowired
   private DatasetRepository repository;
   @Autowired
@@ -84,14 +88,15 @@ public class DatasetService {
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void save(Dataset dataset) {
     LocalDateTime now = LocalDateTime.now();
+    User user = authorizationService.getCurrentUser();
     if (dataset.getId() == null) {
-      User user = authorizationService.getCurrentUser();
       dataset.setOwner(user);
       dataset.setDate(now);
     }
     if (dataset.getSamples() != null) {
       for (Sample sample : dataset.getSamples()) {
         if (sample.getId() == null) {
+          sample.setOwner(user);
           sample.setDate(now);
         }
         sample.setDataset(dataset);

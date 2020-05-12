@@ -49,6 +49,12 @@ public class Sample implements Data, Owned, Serializable {
   @Column
   private LocalDateTime date;
   /**
+   * Owner.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn
+  private User owner;
+  /**
    * Dataset.
    */
   @ManyToOne(optional = false)
@@ -108,11 +114,6 @@ public class Sample implements Data, Owned, Serializable {
   }
 
   @Override
-  public User getOwner() {
-    return dataset.getOwner();
-  }
-
-  @Override
   public Long getId() {
     return id;
   }
@@ -151,5 +152,14 @@ public class Sample implements Data, Owned, Serializable {
 
   public void setDate(LocalDateTime date) {
     this.date = date;
+  }
+
+  @Override
+  public User getOwner() {
+    return owner;
+  }
+
+  public void setOwner(User owner) {
+    this.owner = owner;
   }
 }

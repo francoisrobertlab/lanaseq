@@ -46,6 +46,7 @@ public class SampleServiceTest {
     assertEquals("FR1", sample.getName());
     assertEquals("R1", sample.getReplicate());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
+    assertEquals((Long) 2L, sample.getOwner().getId());
     assertEquals((Long) 1L, sample.getDataset().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }

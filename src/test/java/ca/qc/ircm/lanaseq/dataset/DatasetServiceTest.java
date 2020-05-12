@@ -143,6 +143,7 @@ public class DatasetServiceTest {
 
     service.save(dataset);
 
+    repository.flush();
     assertNotNull(dataset.getId());
     Dataset database = repository.findById(dataset.getId()).orElse(null);
     assertEquals("my project", database.getProject());
@@ -160,15 +161,19 @@ public class DatasetServiceTest {
     assertNotNull(database.getSamples().get(0).getId());
     assertEquals("sample1", database.getSamples().get(0).getName());
     assertEquals("r1", database.getSamples().get(0).getReplicate());
+    assertEquals(user.getId(), database.getSamples().get(0).getOwner().getId());
     assertNotNull(database.getSamples().get(1).getId());
     assertEquals("sample2", database.getSamples().get(1).getName());
     assertEquals("r2", database.getSamples().get(1).getReplicate());
+    assertEquals(user.getId(), database.getSamples().get(1).getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   @Test
   @WithMockUser
   public void save_Update() {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.setProject("my project");
     dataset.setAssay(Assay.CHIP_SEQ);
@@ -189,6 +194,7 @@ public class DatasetServiceTest {
 
     service.save(dataset);
 
+    repository.flush();
     dataset = repository.findById(1L).orElse(null);
     assertEquals("my project", dataset.getProject());
     assertEquals(Assay.CHIP_SEQ, dataset.getAssay());
@@ -204,12 +210,15 @@ public class DatasetServiceTest {
     assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
     assertEquals("sample1", dataset.getSamples().get(0).getName());
     assertEquals("r1", dataset.getSamples().get(0).getReplicate());
+    assertEquals((Long) 2L, dataset.getSamples().get(0).getOwner().getId());
     assertEquals((Long) 3L, dataset.getSamples().get(1).getId());
     assertEquals("FR3", dataset.getSamples().get(1).getName());
     assertEquals("R3", dataset.getSamples().get(1).getReplicate());
+    assertEquals((Long) 2L, dataset.getSamples().get(1).getOwner().getId());
     assertNotNull(dataset.getSamples().get(2).getId());
     assertEquals("sample4", dataset.getSamples().get(2).getName());
     assertEquals("r4", dataset.getSamples().get(2).getReplicate());
+    assertEquals((Long) 2L, dataset.getSamples().get(2).getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 }
