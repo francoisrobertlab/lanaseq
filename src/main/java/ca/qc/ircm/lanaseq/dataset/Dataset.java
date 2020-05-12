@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -75,7 +74,7 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   /**
    * Samples that are part of this submission.
    */
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany
   @OrderColumn
   private List<Sample> samples;
 

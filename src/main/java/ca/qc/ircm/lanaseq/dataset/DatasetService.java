@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset;
 
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
@@ -41,6 +42,8 @@ public class DatasetService {
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   @Autowired
   private DatasetRepository repository;
+  @Autowired
+  private SampleRepository sampleRepository;
   @Autowired
   private AuthorizationService authorizationService;
 
@@ -99,6 +102,7 @@ public class DatasetService {
           sample.setOwner(user);
           sample.setDate(now);
         }
+        sampleRepository.save(sample);
       }
     }
     repository.save(dataset);
