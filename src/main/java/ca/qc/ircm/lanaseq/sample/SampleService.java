@@ -1,6 +1,9 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.user.User;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -16,10 +19,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class SampleService {
   private SampleRepository repository;
+  private AuthorizationService authorizationService;
 
   @Autowired
-  protected SampleService(SampleRepository repository) {
+  protected SampleService(SampleRepository repository, AuthorizationService authorizationService) {
     this.repository = repository;
+    this.authorizationService = authorizationService;
   }
 
   /**
@@ -88,5 +93,22 @@ public class SampleService {
     }
 
     return repository.findAllByDataset(dataset);
+  }
+
+  /**
+   * Saves sample into database.
+   *
+   * @param sample
+   *          sample
+   */
+  @PreAuthorize("hasPermission(#sample, 'write')")
+  public void save(Sample sample) {
+    LocalDateTime now = LocalDateTime.now();
+    User user = authorizationService.getCurrentUser();
+    if (sample.getId() == null) {
+      sample.setOwner(user);
+      sample.setDate(now);
+    }
+    repository.save(sample);
   }
 }
