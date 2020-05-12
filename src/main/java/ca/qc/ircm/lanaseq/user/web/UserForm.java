@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.user.LaboratoryProperties;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -45,9 +44,6 @@ import org.springframework.context.annotation.Scope;
 public class UserForm extends FormLayout implements LocaleChangeObserver {
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "user-form";
-  public static final String CREATE_NEW_LABORATORY = "createNewLaboratory";
-  public static final String LABORATORY_NAME = LaboratoryProperties.NAME;
-  public static final String NEW_LABORATORY_NAME = "newLaboratoryName";
   protected TextField email = new TextField();
   protected TextField name = new TextField();
   protected Checkbox admin = new Checkbox();
