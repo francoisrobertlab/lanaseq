@@ -19,6 +19,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
@@ -105,7 +106,7 @@ public class Sample implements Data, Owned, Serializable {
    * Dataset.
    */
   @ManyToOne(optional = false)
-  @JoinColumn
+  @JoinTable(name = "dataset_samples", joinColumns = @JoinColumn(name = "samples_id"))
   private Dataset dataset;
 
   public Sample() {

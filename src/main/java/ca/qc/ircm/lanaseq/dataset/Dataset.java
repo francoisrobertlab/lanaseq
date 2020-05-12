@@ -120,7 +120,7 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   /**
    * Samples that are part of this submission.
    */
-  @OneToMany(mappedBy = "dataset", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderColumn
   private List<Sample> samples;
 

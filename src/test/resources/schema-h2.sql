@@ -83,11 +83,17 @@ CREATE TABLE IF NOT EXISTS sample (
   strain_description varchar(255),
   treatment varchar(255),
   protocol_id bigint(20) NOT NULL,
-  samples_order int,
   owner_id bigint(20) NOT NULL,
-  dataset_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE,
-  CONSTRAINT sampleDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS dataset_samples (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  dataset_id bigint(20) NOT NULL,
+  samples_order int,
+  samples_id bigint(20) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT datasetSamplesDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT datasetSamplesSample_ibfk FOREIGN KEY (samples_id) REFERENCES sample (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
