@@ -27,16 +27,16 @@ INSERT INTO protocol_file (id,files_id,filename,content)
 VALUES (2,2,'BioID Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/BioID_Protocol.docx'));
 INSERT INTO protocol_file (id,files_id,filename,content)
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'));
-INSERT INTO dataset (id,project,owner_id,date)
-VALUES ('1', 'polymerase', '2', '2018-10-20 13:28:12');
-INSERT INTO dataset (id,project,owner_id,date)
-VALUES ('2', 'histone', '3', '2018-10-22 9:48:20');
-INSERT INTO dataset (id,project,owner_id,date)
-VALUES ('3', 'polymerase', '3', '2018-11-12 11:53:09');
-INSERT INTO dataset (id,project,owner_id,date)
-VALUES ('4', 'polymerase 2', '5', '2018-11-18 9:31:14');
-INSERT INTO dataset (id,project,owner_id,date)
-VALUES ('5', 'polymerase 2', '5', '2018-12-05 9:28:23');
+INSERT INTO dataset (id,name,project,owner_id,date)
+VALUES ('1', 'MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020', 'polymerase', '2', '2018-10-20 13:28:12');
+INSERT INTO dataset (id,name,project,owner_id,date)
+VALUES ('2', 'ChIPSeq_Spt16_yFR101_G24D_JS1-JS2_20181022', 'histone', '3', '2018-10-22 9:48:20');
+INSERT INTO dataset (id,name,project,owner_id,date)
+VALUES ('3', '20181112', 'polymerase', '3', '2018-11-12 11:53:09');
+INSERT INTO dataset (id,name,project,owner_id,date)
+VALUES ('4', 'ChIPSeq_IP_yBC102_R103S_BC1-BC2_20181118', 'polymerase 2', '5', '2018-11-18 9:31:14');
+INSERT INTO dataset (id,name,project,owner_id,date)
+VALUES ('5', 'ChIPSeq_IP_polr2b_yBC103_WT_BC1_20181118', 'polymerase 2', '5', '2018-12-05 9:28:23');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,protocol_id,owner_id,date)
 VALUES (1, 'FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '1', 2, '2018-10-20 13:29:23');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,protocol_id,owner_id,date)

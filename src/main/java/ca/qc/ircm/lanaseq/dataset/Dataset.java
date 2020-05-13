@@ -45,7 +45,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @GeneratePropertyNames
-public class Dataset implements Data, Owned, HasFiles, Serializable {
+public class Dataset implements Data, Owned, Serializable {
   private static final long serialVersionUID = -8296884268335212959L;
   /**
    * Database identifier.
@@ -54,6 +54,12 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
   private Long id;
+  /**
+   * Name that is used for files associated with dataset.
+   */
+  @Column
+  @Size(max = 255)
+  private String name;
   /**
    * Project.
    */
@@ -85,32 +91,35 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
     this.id = id;
   }
 
-  @Override
-  public String toString() {
-    return "Dataset [id=" + id + ", getFilename()=" + getFilename() + "]";
-  }
-
-  @Override
-  public String getFilename() {
+  public void generateName() {
     StringBuilder builder = new StringBuilder();
-    Sample sample = samples.stream().findFirst().orElse(new Sample());
-    builder
-        .append(sample.getAssay() != null ? "_" + sample.getAssay().getLabel(Locale.ENGLISH) : "");
-    builder.append(sample.getType() != null ? "_" + sample.getType().getLabel(Locale.ENGLISH) : "");
-    builder.append(sample.getTarget() != null ? "_" + sample.getTarget() : "");
-    builder.append(sample.getStrain() != null ? "_" + sample.getStrain() : "");
-    builder
-        .append(sample.getStrainDescription() != null ? "_" + sample.getStrainDescription() : "");
-    builder.append(sample.getTreatment() != null ? "_" + sample.getTreatment() : "");
-    DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
-    builder.append(date != null ? "_" + formatter.format(date) : "");
-    if (builder.length() > 0) {
-      builder.deleteCharAt(0);
+    Sample first =
+        samples != null ? samples.stream().findFirst().orElse(new Sample()) : new Sample();
+    builder.append(first.getAssay() != null ? first.getAssay().getLabel(Locale.ENGLISH) + "_" : "");
+    builder.append(first.getType() != null ? first.getType().getLabel(Locale.ENGLISH) + "_" : "");
+    builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
+    builder.append(first.getStrain() != null ? first.getStrain() + "_" : "");
+    builder.append(first.getStrainDescription() != null ? first.getStrainDescription() + "_" : "");
+    builder.append(first.getTreatment() != null ? first.getTreatment() + "_" : "");
+    if (samples != null) {
+      StringBuilder samplesBuilder = new StringBuilder();
+      for (Sample sample : samples) {
+        samplesBuilder.append(sample.getSampleId() != null ? sample.getSampleId() + "-" : "");
+      }
+      if (samplesBuilder.length() > 0) {
+        samplesBuilder.setCharAt(samplesBuilder.length() - 1, '_');
+      }
+      builder.append(samplesBuilder);
     }
-    String filename = builder.toString();
-    filename = Strings.normalize(filename);
-    filename = filename.replaceAll("[^\\w-]", "");
-    return filename;
+    DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+    builder.append(date != null ? formatter.format(date) + "_" : "");
+    if (builder.length() > 0) {
+      builder.deleteCharAt(builder.length() - 1);
+    }
+    String name = builder.toString();
+    name = Strings.normalize(name);
+    name = name.replaceAll("[^\\w-]", "");
+    this.name = name;
   }
 
   @Override
@@ -153,5 +162,13 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
 
   public void setSamples(List<Sample> samples) {
     this.samples = samples;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }

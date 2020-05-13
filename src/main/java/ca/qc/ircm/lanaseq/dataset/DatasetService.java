@@ -106,6 +106,7 @@ public class DatasetService {
         sampleRepository.save(sample);
       }
     }
+    dataset.generateName();
     repository.save(dataset);
   }
 }

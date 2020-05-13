@@ -75,6 +75,7 @@ public class DatasetServiceTest {
     Dataset dataset = service.get(1L);
 
     assertEquals((Long) 1L, dataset.getId());
+    assertEquals("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
     assertEquals("polymerase", dataset.getProject());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(3, dataset.getSamples().size());
@@ -147,6 +148,8 @@ public class DatasetServiceTest {
     repository.flush();
     assertNotNull(dataset.getId());
     dataset = repository.findById(dataset.getId()).orElse(null);
+    assertEquals("ChIPSeq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(dataset.getDate()), dataset.getName());
     assertEquals("my project", dataset.getProject());
     assertEquals(user.getId(), dataset.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
@@ -221,6 +224,8 @@ public class DatasetServiceTest {
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
+    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20181020",
+        dataset.getName());
     assertEquals("my project", dataset.getProject());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());

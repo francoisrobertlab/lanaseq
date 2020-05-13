@@ -145,7 +145,7 @@ public class DatasetDialogPresenter {
       }
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
-      dialog.showNotification(resources.message(SAVED, dataset.getFilename()));
+      dialog.showNotification(resources.message(SAVED, dataset.getName()));
       dialog.close();
       dialog.fireSavedEvent();
     }

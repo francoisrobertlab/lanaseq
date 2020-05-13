@@ -97,10 +97,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     sampleDialog.save().click();
   }
 
-  private String filename(LocalDate date) {
+  private String name() {
     return assay.getLabel(Locale.ENGLISH) + "_" + type.getLabel(Locale.ENGLISH) + "_" + target + "_"
-        + strain + "_" + strainDescription + "_" + treatment + "_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(date);
+        + strain + "_" + strainDescription + "_" + treatment;
   }
 
   @Test
@@ -137,15 +136,17 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String filename = filename(LocalDate.now());
+    String name =
+        name() + "_" + sampleId + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDate.now());
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, filename), notification.getText());
+    assertEquals(resources.message(SAVED, name), notification.getText());
     List<Dataset> datasets = repository.findByOwner(new User(3L));
     Dataset dataset =
-        datasets.stream().filter(ex -> filename.equals(ex.getFilename())).findFirst().orElse(null);
+        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
     assertNotNull(dataset);
     assertNotNull(dataset.getId());
+    assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
@@ -175,11 +176,13 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
+    String name = name() + "_JS1-JS2-" + sampleId + "_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDate.of(2018, 10, 22));
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, filename(LocalDate.of(2018, 10, 22))),
-        notification.getText());
+    assertEquals(resources.message(SAVED, name), notification.getText());
     Dataset dataset = repository.findById(2L).get();
+    assertEquals(name, dataset.getName());
     assertEquals(project, dataset.getProject());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());

@@ -140,7 +140,7 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
     presenter.filterFilename("test");
 
-    assertEquals("test", presenter.filter().filenameContains);
+    assertEquals("test", presenter.filter().nameContains);
     verify(dataProvider).refreshAll();
   }
 
@@ -150,7 +150,7 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
 
     presenter.filterFilename("");
 
-    assertEquals(null, presenter.filter().filenameContains);
+    assertEquals(null, presenter.filter().nameContains);
     verify(dataProvider).refreshAll();
   }
 

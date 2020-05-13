@@ -380,7 +380,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.setDataset(dataset);
 
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, 1, dataset.getFilename()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
   }
 
   @Test
@@ -392,7 +392,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, 1, dataset.getFilename()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
   }
 
   @Test

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class SampleTest {
   @Test
-  public void generateFilename() {
+  public void generateName() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -25,7 +25,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_NullSampleId() {
+  public void generateName_NullSampleId() {
     Sample sample = new Sample();
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
@@ -40,7 +40,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_InvalidSampleId() {
+  public void generateName_InvalidSampleId() {
     Sample sample = new Sample();
     sample.setSampleId("F*R 1");
     sample.setReplicate("R1");
@@ -56,7 +56,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_FrenchSampleId() {
+  public void generateName_FrenchSampleId() {
     Sample sample = new Sample();
     sample.setSampleId("FÙR1");
     sample.setReplicate("R1");
@@ -72,7 +72,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_NullReplicate() {
+  public void generateName_NullReplicate() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setAssay(Assay.RNA_SEQ);
@@ -87,7 +87,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_InvalidReplicate() {
+  public void generateName_InvalidReplicate() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("#R 1");
@@ -103,7 +103,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_FrenchReplicate() {
+  public void generateName_FrenchReplicate() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1ï");
@@ -351,7 +351,7 @@ public class SampleTest {
   }
 
   @Test
-  public void generateFilename_NullDate() {
+  public void generateName_NullDate() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");

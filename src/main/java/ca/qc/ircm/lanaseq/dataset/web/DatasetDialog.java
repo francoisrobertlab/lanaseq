@@ -209,7 +209,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
     Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getId() != null) {
-      header.setText(resources.message(HEADER, 1, dataset.getFilename()));
+      header.setText(resources.message(HEADER, 1, dataset.getName()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }

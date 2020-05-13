@@ -105,7 +105,7 @@ public class DatasetsViewPresenter {
 
   void filterFilename(String value) {
     clearError();
-    filter.filenameContains = value.isEmpty() ? null : value;
+    filter.nameContains = value.isEmpty() ? null : value;
     view.datasets.getDataProvider().refreshAll();
   }
 

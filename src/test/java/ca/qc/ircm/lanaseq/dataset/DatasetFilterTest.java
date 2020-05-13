@@ -19,8 +19,6 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -40,29 +38,29 @@ public class DatasetFilterTest {
   private DatasetFilter filter = new DatasetFilter();
 
   @Test
-  public void test_FilenameContains() {
-    filter.filenameContains = "test";
+  public void test_NameContains() {
+    filter.nameContains = "test";
 
-    assertTrue(filter.test(filename("My test")));
-    assertTrue(filter.test(filename("Test my")));
-    assertTrue(filter.test(filename("My test my")));
-    assertTrue(filter.test(filename("My TEST my")));
-    assertFalse(filter.test(filename(null)));
-    assertFalse(filter.test(filename("")));
-    assertFalse(filter.test(filename("christian")));
+    assertTrue(filter.test(name("My test")));
+    assertTrue(filter.test(name("Test my")));
+    assertTrue(filter.test(name("My test my")));
+    assertTrue(filter.test(name("My TEST my")));
+    assertFalse(filter.test(name(null)));
+    assertFalse(filter.test(name("")));
+    assertFalse(filter.test(name("christian")));
   }
 
   @Test
-  public void test_FilenameContainsNull() {
-    filter.filenameContains = null;
+  public void test_NameContainsNull() {
+    filter.nameContains = null;
 
-    assertTrue(filter.test(filename("My test")));
-    assertTrue(filter.test(filename("Test my")));
-    assertTrue(filter.test(filename("My test my")));
-    assertTrue(filter.test(filename("My TEST my")));
-    assertTrue(filter.test(filename(null)));
-    assertTrue(filter.test(filename("")));
-    assertTrue(filter.test(filename("christian")));
+    assertTrue(filter.test(name("My test")));
+    assertTrue(filter.test(name("Test my")));
+    assertTrue(filter.test(name("My test my")));
+    assertTrue(filter.test(name("My TEST my")));
+    assertTrue(filter.test(name(null)));
+    assertTrue(filter.test(name("")));
+    assertTrue(filter.test(name("christian")));
   }
 
   @Test
@@ -218,9 +216,9 @@ public class DatasetFilterTest {
     assertFalse(filter.test(projectOwner("", "my.test@abc.com")));
   }
 
-  private Dataset filename(String filename) {
-    Dataset dataset = mock(Dataset.class);
-    when(dataset.getFilename()).thenReturn(filename);
+  private Dataset name(String name) {
+    Dataset dataset = new Dataset();
+    dataset.setName(name);
     return dataset;
   }
 

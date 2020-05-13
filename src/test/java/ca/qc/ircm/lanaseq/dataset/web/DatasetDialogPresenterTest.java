@@ -526,7 +526,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    verify(dialog).showNotification(resources.message(SAVED, dataset.getFilename()));
+    verify(dialog).showNotification(resources.message(SAVED, dataset.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
@@ -564,7 +564,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    verify(dialog).showNotification(resources.message(SAVED, dataset.getFilename()));
+    verify(dialog).showNotification(resources.message(SAVED, dataset.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
   }
