@@ -56,7 +56,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   private SampleRepository repository;
   private Locale locale = Locale.ENGLISH;
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private String name = "Test Sample";
+  private String sampleId = "Test Sample";
   private String replicate = "Test Replicate";
 
   /**
@@ -67,7 +67,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     presenter = new SampleDialogPresenter();
     dialog.header = new H3();
-    dialog.name = new TextField();
+    dialog.sampleId = new TextField();
     dialog.replicate = new TextField();
     dialog.save = new Button();
     dialog.cancel = new Button();
@@ -76,7 +76,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   }
 
   private void fillForm() {
-    dialog.name.setValue(name);
+    dialog.sampleId.setValue(sampleId);
     dialog.replicate.setValue(replicate);
   }
 
@@ -94,7 +94,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setSample(sample);
 
-    assertEquals("", dialog.name.getValue());
+    assertEquals("", dialog.sampleId.getValue());
     assertEquals("", dialog.replicate.getValue());
   }
 
@@ -105,7 +105,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setSample(sample);
 
-    assertEquals("FR1", dialog.name.getValue());
+    assertEquals("FR1", dialog.sampleId.getValue());
     assertEquals("R1", dialog.replicate.getValue());
   }
 
@@ -116,7 +116,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.setSample(sample);
     presenter.localeChange(locale);
 
-    assertEquals("FR1", dialog.name.getValue());
+    assertEquals("FR1", dialog.sampleId.getValue());
     assertEquals("R1", dialog.replicate.getValue());
   }
 
@@ -125,7 +125,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setSample(null);
 
-    assertEquals("", dialog.name.getValue());
+    assertEquals("", dialog.sampleId.getValue());
     assertEquals("", dialog.replicate.getValue());
   }
 
@@ -133,14 +133,14 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   public void save_NameEmpty() {
     presenter.localeChange(locale);
     fillForm();
-    dialog.name.setValue("");
+    dialog.sampleId.setValue("");
 
     presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.name);
+        findValidationStatusByField(status, dialog.sampleId);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
@@ -175,7 +175,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     Sample sample = presenter.getSample();
-    assertEquals(name, sample.getName());
+    assertEquals(sampleId, sample.getSampleId());
     assertEquals(replicate, sample.getReplicate());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -192,7 +192,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     sample = presenter.getSample();
-    assertEquals(name, sample.getName());
+    assertEquals(sampleId, sample.getSampleId());
     assertEquals(replicate, sample.getReplicate());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -208,7 +208,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.cancel();
 
-    assertEquals("FR2", sample.getName());
+    assertEquals("FR2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     verify(dialog).close();
     verify(dialog, never()).fireSavedEvent();
@@ -226,7 +226,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.cancel();
 
-    assertEquals("FR2", sample.getName());
+    assertEquals("FR2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     verify(dialog).close();
     verify(dialog, never()).fireSavedEvent();

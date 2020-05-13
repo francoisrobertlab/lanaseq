@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS dataset (
 );
 CREATE TABLE IF NOT EXISTS sample (
   id bigint(20) NOT NULL AUTO_INCREMENT,
-  name varchar(255) NOT NULL,
+  sample_id varchar(255) NOT NULL,
   replicate varchar(255),
   assay varchar(255) NOT NULL,
   type varchar(255),

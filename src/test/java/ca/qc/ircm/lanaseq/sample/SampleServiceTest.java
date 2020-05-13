@@ -55,7 +55,7 @@ public class SampleServiceTest {
     Sample sample = service.get(1L);
 
     assertEquals((Long) 1L, sample.getId());
-    assertEquals("FR1", sample.getName());
+    assertEquals("FR1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
@@ -82,7 +82,7 @@ public class SampleServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Sample sample = new Sample();
-    sample.setName("my sample");
+    sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay(Assay.CHIP_SEQ);
     sample.setType(DatasetType.IMMUNO_PRECIPITATION);
@@ -97,7 +97,7 @@ public class SampleServiceTest {
     repository.flush();
     assertNotNull(sample.getId());
     sample = repository.findById(sample.getId()).orElse(null);
-    assertEquals("my sample", sample.getName());
+    assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
@@ -118,7 +118,7 @@ public class SampleServiceTest {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Sample sample = repository.findById(1L).orElse(null);
-    sample.setName("my sample");
+    sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay(Assay.CHIP_SEQ);
     sample.setType(DatasetType.INPUT);
@@ -132,7 +132,7 @@ public class SampleServiceTest {
 
     repository.flush();
     sample = repository.findById(1L).orElse(null);
-    assertEquals("my sample", sample.getName());
+    assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
     assertEquals(DatasetType.INPUT, sample.getType());

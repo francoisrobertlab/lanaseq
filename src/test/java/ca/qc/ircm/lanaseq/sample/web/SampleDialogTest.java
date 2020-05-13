@@ -22,8 +22,8 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
@@ -94,7 +94,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
-    assertEquals(id(NAME), dialog.name.getId().orElse(""));
+    assertEquals(id(SAMPLE_ID), dialog.sampleId.getId().orElse(""));
     assertEquals(id(REPLICATE), dialog.replicate.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
@@ -110,7 +110,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(sampleResources.message(NAME), dialog.name.getLabel());
+    assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
     assertEquals(sampleResources.message(REPLICATE), dialog.replicate.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -128,7 +128,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(sampleResources.message(NAME), dialog.name.getLabel());
+    assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
     assertEquals(sampleResources.message(REPLICATE), dialog.replicate.getLabel());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -186,14 +186,14 @@ public class SampleDialogTest extends AbstractViewTestCase {
   @Test
   public void setSample_NewSampleWithName() {
     Sample sample = new Sample();
-    sample.setName("my sample");
+    sample.setSampleId("my sample");
     when(presenter.getSample()).thenReturn(sample);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getSampleId()), dialog.header.getText());
   }
 
   @Test
@@ -205,7 +205,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getSampleId()), dialog.header.getText());
   }
 
   @Test
@@ -217,7 +217,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getSampleId()), dialog.header.getText());
   }
 
   @Test

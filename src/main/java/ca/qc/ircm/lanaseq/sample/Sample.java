@@ -36,11 +36,11 @@ public class Sample implements Data, Owned, Serializable {
   @GeneratedValue(strategy = IDENTITY)
   private Long id;
   /**
-   * Name.
+   * Sample id as defined by user.
    */
   @Column(nullable = false)
   @Size(max = 255)
-  private String name;
+  private String sampleId;
   /**
    * Replicate number.
    */
@@ -108,20 +108,20 @@ public class Sample implements Data, Owned, Serializable {
     this.id = id;
   }
 
-  public Sample(String name) {
-    this.name = name;
+  public Sample(String sampleId) {
+    this.sampleId = sampleId;
   }
 
-  public Sample(Long id, String name) {
+  public Sample(Long id, String sampleId) {
     this.id = id;
-    this.name = name;
+    this.sampleId = sampleId;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((sampleId == null) ? 0 : sampleId.hashCode());
     return result;
   }
 
@@ -134,17 +134,17 @@ public class Sample implements Data, Owned, Serializable {
     if (getClass() != obj.getClass())
       return false;
     Sample other = (Sample) obj;
-    if (name == null) {
-      if (other.name != null)
+    if (sampleId == null) {
+      if (other.sampleId != null)
         return false;
-    } else if (!name.equals(other.name))
+    } else if (!sampleId.equals(other.sampleId))
       return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "Sample [id=" + id + ", name=" + name + "]";
+    return "Sample [id=" + id + ", sampleId=" + sampleId + "]";
   }
 
   @Override
@@ -156,12 +156,12 @@ public class Sample implements Data, Owned, Serializable {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public String getSampleId() {
+    return sampleId;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setSampleId(String sampleId) {
+    this.sampleId = sampleId;
   }
 
   public String getReplicate() {

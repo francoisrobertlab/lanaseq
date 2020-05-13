@@ -154,11 +154,11 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.treatment.setValue(treatment);
     List<Sample> samples = new ArrayList<Sample>();
     Sample sample1 = new Sample();
-    sample1.setName(sampleName1);
+    sample1.setSampleId(sampleName1);
     sample1.setReplicate(sampleReplicate1);
     samples.add(sample1);
     Sample sample2 = new Sample();
-    sample2.setName(sampleName2);
+    sample2.setSampleId(sampleName2);
     sample2.setReplicate(sampleReplicate2);
     samples.add(sample2);
     ListDataProvider<Sample> samplesDataProvider =
@@ -507,7 +507,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(project, dataset.getProject());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleName1, sample.getName());
+    assertEquals(sampleName1, sample.getSampleId());
     assertEquals(sampleReplicate1, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -517,7 +517,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(1);
-    assertEquals(sampleName2, sample.getName());
+    assertEquals(sampleName2, sample.getSampleId());
     assertEquals(sampleReplicate2, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -545,7 +545,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(project, dataset.getProject());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleName1, sample.getName());
+    assertEquals(sampleName1, sample.getSampleId());
     assertEquals(sampleReplicate1, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -555,7 +555,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(1);
-    assertEquals(sampleName2, sample.getName());
+    assertEquals(sampleName2, sample.getSampleId());
     assertEquals(sampleReplicate2, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());

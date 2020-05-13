@@ -1,8 +1,8 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -31,8 +31,8 @@ public class SampleDialogPresenter {
 
   public void localeChange(Locale locale) {
     final AppResources webResources = new AppResources(Constants.class, locale);
-    binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
-        .withNullRepresentation("").bind(NAME);
+    binder.forField(dialog.sampleId).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("").bind(SAMPLE_ID);
     binder.forField(dialog.replicate).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(REPLICATE);
   }

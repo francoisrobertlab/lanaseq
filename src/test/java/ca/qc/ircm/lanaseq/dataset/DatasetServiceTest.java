@@ -119,7 +119,7 @@ public class DatasetServiceTest {
     dataset.setProject("my project");
     dataset.setSamples(new ArrayList<>());
     Sample sample1 = new Sample();
-    sample1.setName("sample1");
+    sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
     sample1.setAssay(Assay.CHIP_SEQ);
     sample1.setType(DatasetType.IMMUNO_PRECIPITATION);
@@ -130,7 +130,7 @@ public class DatasetServiceTest {
     sample1.setProtocol(protocolRepository.findById(1L).get());
     dataset.getSamples().add(sample1);
     Sample sample2 = new Sample();
-    sample2.setName("sample2");
+    sample2.setSampleId("sample2");
     sample2.setReplicate("r2");
     sample2.setAssay(Assay.CHIP_SEQ);
     sample2.setType(DatasetType.IMMUNO_PRECIPITATION);
@@ -153,7 +153,7 @@ public class DatasetServiceTest {
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertNotNull(sample.getId());
-    assertEquals("sample1", sample.getName());
+    assertEquals("sample1", sample.getSampleId());
     assertEquals("r1", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
@@ -167,7 +167,7 @@ public class DatasetServiceTest {
     assertEquals(user.getId(), sample.getOwner().getId());
     sample = dataset.getSamples().get(1);
     assertNotNull(sample.getId());
-    assertEquals("sample2", sample.getName());
+    assertEquals("sample2", sample.getSampleId());
     assertEquals("r2", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
@@ -190,7 +190,7 @@ public class DatasetServiceTest {
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.setProject("my project");
     Sample sample1 = dataset.getSamples().get(0);
-    sample1.setName("sample1");
+    sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
     sample1.setAssay(Assay.CHIP_SEQ);
     sample1.setType(DatasetType.INPUT);
@@ -201,7 +201,7 @@ public class DatasetServiceTest {
     sample1.setProtocol(protocolRepository.findById(3L).get());
     dataset.getSamples().remove(1);
     Sample sample3 = new Sample();
-    sample3.setName("sample4");
+    sample3.setSampleId("sample4");
     sample3.setReplicate("r4");
     sample3.setAssay(Assay.CHIP_SEQ);
     sample3.setType(DatasetType.INPUT);
@@ -222,7 +222,7 @@ public class DatasetServiceTest {
     assertEquals(3, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals((Long) 1L, sample.getId());
-    assertEquals("sample1", sample.getName());
+    assertEquals("sample1", sample.getSampleId());
     assertEquals("r1", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
     assertEquals(DatasetType.INPUT, sample.getType());
@@ -235,7 +235,7 @@ public class DatasetServiceTest {
     assertEquals((Long) 2L, sample.getOwner().getId());
     sample = dataset.getSamples().get(1);
     assertEquals((Long) 3L, sample.getId());
-    assertEquals("FR3", sample.getName());
+    assertEquals("FR3", sample.getSampleId());
     assertEquals("R3", sample.getReplicate());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
@@ -248,7 +248,7 @@ public class DatasetServiceTest {
     assertEquals((Long) 2L, sample.getOwner().getId());
     sample = dataset.getSamples().get(2);
     assertNotNull(sample.getId());
-    assertEquals("sample4", sample.getName());
+    assertEquals("sample4", sample.getSampleId());
     assertEquals("r4", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
     assertEquals(DatasetType.INPUT, sample.getType());

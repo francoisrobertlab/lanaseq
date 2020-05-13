@@ -19,8 +19,8 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 
@@ -36,8 +36,8 @@ public class SampleDialogElement extends DialogElement {
     return $(H3Element.class).id(id(HEADER));
   }
 
-  public TextFieldElement name() {
-    return $(TextFieldElement.class).id(id(NAME));
+  public TextFieldElement sampleId() {
+    return $(TextFieldElement.class).id(id(SAMPLE_ID));
   }
 
   public TextFieldElement replicate() {

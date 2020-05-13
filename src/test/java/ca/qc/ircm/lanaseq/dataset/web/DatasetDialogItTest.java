@@ -69,7 +69,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
-  private String sampleName = "FR3";
+  private String sampleId = "FR3";
   private String sampleReplicate = "R3";
 
   @Before
@@ -92,7 +92,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.treatment().setValue(treatment);
     dialog.addSample().click();
     SampleDialogElement sampleDialog = $(SampleDialogElement.class).id(SampleDialog.ID);
-    sampleDialog.name().setValue(sampleName);
+    sampleDialog.sampleId().setValue(sampleId);
     sampleDialog.replicate().setValue(sampleReplicate);
     sampleDialog.save().click();
   }
@@ -152,7 +152,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(1, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleName, sample.getName());
+    assertEquals(sampleId, sample.getSampleId());
     assertEquals(sampleReplicate, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -185,7 +185,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(3, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals("JS1", sample.getName());
+    assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -195,7 +195,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(1);
-    assertEquals("JS2", sample.getName());
+    assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -205,7 +205,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     sample = dataset.getSamples().get(2);
-    assertEquals(sampleName, sample.getName());
+    assertEquals(sampleId, sample.getSampleId());
     assertEquals(sampleReplicate, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
@@ -235,7 +235,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals("JS1", sample.getName());
+    assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
@@ -245,7 +245,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     sample = dataset.getSamples().get(1);
-    assertEquals("JS2", sample.getName());
+    assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());

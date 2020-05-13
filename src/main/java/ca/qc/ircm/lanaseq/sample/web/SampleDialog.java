@@ -5,8 +5,8 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -44,7 +44,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
   public static final String HEADER = "header";
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
-  protected TextField name = new TextField();
+  protected TextField sampleId = new TextField();
   protected TextField replicate = new TextField();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -70,7 +70,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
     add(layout);
     layout.setMaxWidth("30em");
     layout.setMinWidth("15em");
-    FormLayout form = new FormLayout(name, replicate);
+    FormLayout form = new FormLayout(sampleId, replicate);
     form.setResponsiveSteps(new ResponsiveStep("15em", 1));
     HorizontalLayout endButtons = new HorizontalLayout(delete);
     endButtons.setJustifyContentMode(JustifyContentMode.END);
@@ -79,7 +79,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
     buttons.setWidthFull();
     layout.add(header, form, buttons);
     header.setId(id(HEADER));
-    name.setId(id(NAME));
+    sampleId.setId(id(SAMPLE_ID));
     replicate.setId(id(REPLICATE));
     save.setId(id(SAVE));
     save.setThemeName(PRIMARY);
@@ -101,7 +101,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
-    name.setLabel(sampleResources.message(NAME));
+    sampleId.setLabel(sampleResources.message(SAMPLE_ID));
     replicate.setLabel(sampleResources.message(REPLICATE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
@@ -113,8 +113,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
   private void updateHeader() {
     final AppResources resources = new AppResources(SampleDialog.class, getLocale());
     Sample sample = presenter.getSample();
-    if (sample != null && sample.getName() != null) {
-      header.setText(resources.message(HEADER, 1, sample.getName()));
+    if (sample != null && sample.getSampleId() != null) {
+      header.setText(resources.message(HEADER, 1, sample.getSampleId()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }
