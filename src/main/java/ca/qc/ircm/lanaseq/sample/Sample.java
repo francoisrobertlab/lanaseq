@@ -127,28 +127,8 @@ public class Sample implements Data, Owned, Serializable {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((sampleId == null) ? 0 : sampleId.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    Sample other = (Sample) obj;
-    if (sampleId == null) {
-      if (other.sampleId != null)
-        return false;
-    } else if (!sampleId.equals(other.sampleId))
-      return false;
-    return true;
+  public String toString() {
+    return "Sample [id=" + id + ", name=" + name + ", sampleId=" + sampleId + "]";
   }
 
   /**
@@ -174,11 +154,6 @@ public class Sample implements Data, Owned, Serializable {
     name = Strings.normalize(name);
     name = name.replaceAll("[^\\w-]", "");
     this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return "Sample [id=" + id + ", sampleId=" + sampleId + "]";
   }
 
   @Override

@@ -86,37 +86,6 @@ public class Dataset implements Data, Owned, HasFiles, Serializable {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((date == null) ? 0 : date.hashCode());
-    result = prime * result + ((project == null) ? 0 : project.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    Dataset other = (Dataset) obj;
-    if (date == null) {
-      if (other.date != null)
-        return false;
-    } else if (!date.equals(other.date))
-      return false;
-    if (project == null) {
-      if (other.project != null)
-        return false;
-    } else if (!project.equals(other.project))
-      return false;
-    return true;
-  }
-
-  @Override
   public String toString() {
     return "Dataset [id=" + id + ", getFilename()=" + getFilename() + "]";
   }
