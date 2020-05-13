@@ -102,6 +102,7 @@ public class DatasetService {
           sample.setOwner(user);
           sample.setDate(now);
         }
+        sample.generateName();
         sampleRepository.save(sample);
       }
     }

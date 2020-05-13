@@ -7,11 +7,14 @@ import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -35,6 +38,12 @@ public class Sample implements Data, Owned, Serializable {
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
   private Long id;
+  /**
+   * Name that is used for files associated with sample.
+   */
+  @Column(nullable = false)
+  @Size(max = 255)
+  private String name;
   /**
    * Sample id as defined by user.
    */
@@ -142,6 +151,31 @@ public class Sample implements Data, Owned, Serializable {
     return true;
   }
 
+  /**
+   * Update sample's name based on it's properties.
+   */
+  public void generateName() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(sampleId != null ? sampleId + "_" : "");
+    builder.append(assay != null ? assay.getLabel(Locale.ENGLISH) + "_" : "");
+    builder.append(type != null ? type.getLabel(Locale.ENGLISH) + "_" : "");
+    builder.append(target != null ? target + "_" : "");
+    builder.append(strain != null ? strain + "_" : "");
+    builder.append(strainDescription != null ? strainDescription + "_" : "");
+    builder.append(treatment != null ? treatment + "_" : "");
+    builder.append(replicate != null ? replicate + "_" : "");
+    if (date != null) {
+      builder.append(DateTimeFormatter.BASIC_ISO_DATE.format(date) + "_");
+    }
+    if (builder.length() > 0) {
+      builder.deleteCharAt(builder.length() - 1);
+    }
+    String name = builder.toString();
+    name = Strings.normalize(name);
+    name = name.replaceAll("[^\\w-]", "");
+    this.name = name;
+  }
+
   @Override
   public String toString() {
     return "Sample [id=" + id + ", sampleId=" + sampleId + "]";
@@ -243,5 +277,13 @@ public class Sample implements Data, Owned, Serializable {
 
   public void setProtocol(Protocol protocol) {
     this.protocol = protocol;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }

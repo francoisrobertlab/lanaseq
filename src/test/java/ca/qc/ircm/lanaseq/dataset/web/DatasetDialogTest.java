@@ -138,8 +138,14 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     Element samplesElement = new Grid<>().getElement();
     dialog.samples = mock(Grid.class);
     when(dialog.samples.getElement()).thenReturn(samplesElement);
-    dialog.sampleName = mock(Column.class);
+    dialog.sampleId = mock(Column.class);
     when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.SAMPLE_ID)))
+        .thenReturn(dialog.sampleId);
+    when(dialog.sampleId.setKey(any())).thenReturn(dialog.sampleId);
+    when(dialog.sampleId.setComparator(any(Comparator.class))).thenReturn(dialog.sampleId);
+    when(dialog.sampleId.setHeader(any(String.class))).thenReturn(dialog.sampleId);
+    dialog.sampleName = mock(Column.class);
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.NAME)))
         .thenReturn(dialog.sampleName);
     when(dialog.sampleName.setKey(any())).thenReturn(dialog.sampleName);
     when(dialog.sampleName.setComparator(any(Comparator.class))).thenReturn(dialog.sampleName);
@@ -209,7 +215,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
     assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
-    verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
     assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
@@ -246,7 +253,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
     assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
-    verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
     assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
@@ -281,8 +289,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
   @Test
   public void samples() {
-    assertEquals(2, dialog.samples.getColumns().size());
+    assertEquals(3, dialog.samples.getColumns().size());
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.SAMPLE_ID));
+    assertNotNull(dialog.samples.getColumnByKey(SampleProperties.NAME));
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.REPLICATE));
     assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
   }
@@ -296,11 +305,23 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     for (Sample sample : samples) {
       assertEquals(sample.getSampleId(), valueProvider.apply(sample));
     }
-    verify(dialog.sampleName).setComparator(comparatorCaptor.capture());
+    verify(dialog.sampleId).setComparator(comparatorCaptor.capture());
     Comparator<Sample> comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
     for (Sample sample : samples) {
       assertEquals(sample.getSampleId(),
+          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
+    }
+    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.NAME));
+    valueProvider = valueProviderCaptor.getValue();
+    for (Sample sample : samples) {
+      assertEquals(sample.getName(), valueProvider.apply(sample));
+    }
+    verify(dialog.sampleName).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Sample sample : samples) {
+      assertEquals(sample.getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
     verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.REPLICATE));

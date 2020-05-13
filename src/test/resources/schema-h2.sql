@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS dataset (
 );
 CREATE TABLE IF NOT EXISTS sample (
   id bigint(20) NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
   sample_id varchar(255) NOT NULL,
   replicate varchar(255),
   assay varchar(255) NOT NULL,
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS sample (
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE (name),
   CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS dataset_samples (

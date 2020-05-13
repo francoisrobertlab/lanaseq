@@ -94,6 +94,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField treatment = new TextField();
   protected H4 samplesHeader = new H4();
   protected Grid<Sample> samples = new Grid<>();
+  protected Column<Sample> sampleId;
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleReplicate;
   protected Button addSample = new Button();
@@ -150,9 +151,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.setId(id(SAMPLES));
     samples.setHeight("14em");
     samples.addItemDoubleClickListener(e -> presenter.editSample(e.getItem()));
-    sampleName = samples.addColumn(sample -> sample.getSampleId(), SampleProperties.SAMPLE_ID)
+    sampleId = samples.addColumn(sample -> sample.getSampleId(), SampleProperties.SAMPLE_ID)
         .setKey(SampleProperties.SAMPLE_ID)
         .setComparator(NormalizedComparator.of(sample -> sample.getSampleId()));
+    sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
+        .setKey(SampleProperties.NAME)
+        .setComparator(NormalizedComparator.of(sample -> sample.getName()));
     sampleReplicate = samples.addColumn(sample -> sample.getReplicate(), SampleProperties.REPLICATE)
         .setKey(SampleProperties.REPLICATE)
         .setComparator(NormalizedComparator.of(sample -> sample.getReplicate()));
@@ -192,7 +196,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     treatment.setLabel(datasetResources.message(TREATMENT));
     treatment.setPlaceholder(datasetResources.message(property(TREATMENT, PLACEHOLDER)));
     samplesHeader.setText(resources.message(SAMPLES_HEADER));
-    sampleName.setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    sampleId.setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    sampleName.setHeader(sampleResources.message(SampleProperties.NAME));
     sampleReplicate.setHeader(sampleResources.message(SampleProperties.REPLICATE));
     addSample.setText(webResources.message(ADD));
     save.setText(webResources.message(SAVE));

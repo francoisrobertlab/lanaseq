@@ -17,6 +17,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +56,7 @@ public class SampleServiceTest {
     Sample sample = service.get(1L);
 
     assertEquals((Long) 1L, sample.getId());
+    assertEquals("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
     assertEquals("FR1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
@@ -109,6 +111,8 @@ public class SampleServiceTest {
     assertEquals(user.getId(), sample.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
+    assertEquals("mysample_ChIPSeq_IP_mytarget_yFR213_F56G_37C_myreplicate_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 
@@ -143,6 +147,8 @@ public class SampleServiceTest {
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
+    assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20181020",
+        sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 }

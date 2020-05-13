@@ -34,6 +34,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -163,6 +164,8 @@ public class DatasetServiceTest {
     assertEquals("37C", sample.getTreatment());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
+    assertEquals("sample1_ChIPSeq_IP_mytarget_yFR213_F56G_37C_r1_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
     sample = dataset.getSamples().get(1);
@@ -177,6 +180,8 @@ public class DatasetServiceTest {
     assertEquals("37C", sample.getTreatment());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
+    assertEquals("sample2_ChIPSeq_IP_mytarget_yFR213_F56G_37C_r2_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
@@ -231,6 +236,7 @@ public class DatasetServiceTest {
     assertEquals("F56G", sample.getStrainDescription());
     assertEquals("37C", sample.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
+    assertEquals("sample1_ChIPSeq_Input_mytarget_yFR213_F56G_37C_r1_20181020", sample.getName());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     sample = dataset.getSamples().get(1);
@@ -244,6 +250,7 @@ public class DatasetServiceTest {
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 30, 23), sample.getDate());
+    assertEquals("FR3_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R3_20181020", sample.getName());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     sample = dataset.getSamples().get(2);
@@ -258,6 +265,8 @@ public class DatasetServiceTest {
     assertEquals("37C", sample.getTreatment());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
+    assertEquals("sample4_ChIPSeq_Input_mytarget_yFR213_F56G_37C_r4_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));

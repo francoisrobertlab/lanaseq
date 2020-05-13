@@ -54,6 +54,7 @@ public class SampleService {
       sample.setOwner(user);
       sample.setDate(now);
     }
+    sample.generateName();
     repository.save(sample);
   }
 }
