@@ -167,10 +167,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
         .setKey(SampleProperties.NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getName()));
-    sampleRemove = samples
-        .addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)), REMOVE).setKey(REMOVE);
+    sampleRemove =
+        samples.addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)), REMOVE)
+            .setKey(REMOVE).setSortable(false);
     FooterRow footer = samples.appendFooterRow();
-    footer.getCell(sampleName).setComponent(addSample);
+    footer.getCell(sampleId).setComponent(addSample);
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> presenter.addSample());

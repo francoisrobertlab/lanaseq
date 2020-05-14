@@ -43,10 +43,12 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -165,6 +167,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(REMOVE)))
         .thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setKey(any())).thenReturn(dialog.sampleRemove);
+    when(dialog.sampleRemove.setSortable(anyBoolean())).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setComparator(any(Comparator.class))).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setHeader(any(String.class))).thenReturn(dialog.sampleRemove);
     FooterRow footerRow = mock(FooterRow.class);
@@ -305,9 +308,13 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   public void samples() {
     assertEquals(4, dialog.samples.getColumns().size());
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.SAMPLE_ID));
-    assertNotNull(dialog.samples.getColumnByKey(SampleProperties.NAME));
+    assertTrue(dialog.sampleId.isSortable());
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.REPLICATE));
+    assertTrue(dialog.sampleReplicate.isSortable());
+    assertNotNull(dialog.samples.getColumnByKey(SampleProperties.NAME));
+    assertTrue(dialog.sampleName.isSortable());
     assertNotNull(dialog.samples.getColumnByKey(REMOVE));
+    assertFalse(dialog.sampleRemove.isSortable());
     assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
   }
 
