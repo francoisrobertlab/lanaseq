@@ -34,8 +34,6 @@ import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
-import ca.qc.ircm.lanaseq.sample.web.SampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -90,11 +88,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
-    dialog.addSample().click();
-    SampleDialogElement sampleDialog = $(SampleDialogElement.class).id(SampleDialog.ID);
-    sampleDialog.sampleId().setValue(sampleId);
-    sampleDialog.replicate().setValue(sampleReplicate);
-    sampleDialog.save().click();
+    dialog.sampleId(0).setValue(sampleId);
+    dialog.replicate(0).setValue(sampleReplicate);
   }
 
   private String name() {
@@ -176,7 +171,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name = name() + "_JS1-JS2-" + sampleId + "_"
+    String name = name() + "_" + sampleId + "-JS2_"
         + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDate.of(2018, 10, 22));
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
@@ -186,10 +181,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(project, dataset.getProject());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(3, dataset.getSamples().size());
+    assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
+    assertEquals(sampleId, sample.getSampleId());
+    assertEquals(sampleReplicate, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
     assertEquals(type, sample.getType());
@@ -200,16 +195,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    sample = dataset.getSamples().get(2);
-    assertEquals(sampleId, sample.getSampleId());
-    assertEquals(sampleReplicate, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
     assertEquals(assay, sample.getAssay());
     assertEquals(type, sample.getType());

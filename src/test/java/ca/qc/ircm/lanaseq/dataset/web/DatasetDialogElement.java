@@ -44,7 +44,9 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class DatasetDialogElement extends DialogElement {
-  private static final int NAME_COLUMN = 0;
+  private static final int SAMPLE_ID_COLUMN = 0;
+  private static final int REPLICATE_COLUMN = 1;
+  private static final int REMOVE_COLUMN = 3;
 
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
@@ -90,8 +92,16 @@ public class DatasetDialogElement extends DialogElement {
     return $(GridElement.class).id(id(SAMPLES));
   }
 
-  public void doubleClickSample(int row) {
-    samples().getCell(row, NAME_COLUMN).doubleClick();
+  public TextFieldElement sampleId(int row) {
+    return samples().getCell(row, SAMPLE_ID_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public TextFieldElement replicate(int row) {
+    return samples().getCell(row, REPLICATE_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public ButtonElement remove(int row) {
+    return samples().getCell(row, REMOVE_COLUMN).$(ButtonElement.class).first();
   }
 
   public ButtonElement addSample() {

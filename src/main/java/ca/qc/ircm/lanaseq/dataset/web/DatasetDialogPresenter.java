@@ -35,14 +35,21 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +66,7 @@ public class DatasetDialogPresenter {
   private DatasetDialog dialog;
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
   private Binder<Sample> sampleBinder = new BeanValidationBinder<>(Sample.class);
+  private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
   private ListDataProvider<Sample> samplesDataProvider =
       DataProvider.ofCollection(new ArrayList<>());
   private Dataset dataset;
@@ -74,9 +82,7 @@ public class DatasetDialogPresenter {
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
-    dialog.sampleDialog.addSavedListener(e -> savedSample());
-    dialog.sampleDialog.addDeletedListener(e -> deletedSample());
-    setDataset(null);
+    setDataset(null, Locale.ENGLISH);
   }
 
   void localeChange(Locale locale) {
@@ -95,25 +101,11 @@ public class DatasetDialogPresenter {
   }
 
   void addSample() {
-    dialog.sampleDialog.setSample(null);
-    dialog.sampleDialog.open();
-  }
-
-  void editSample(Sample sample) {
-    dialog.sampleDialog.setSample(sample);
-    dialog.sampleDialog.open();
-  }
-
-  private void savedSample() {
-    Sample sample = dialog.sampleDialog.getSample();
-    if (!samplesDataProvider.getItems().contains(sample)) {
-      samplesDataProvider.getItems().add(sample);
-    }
+    samplesDataProvider.getItems().add(new Sample());
     refreshSamplesDataProvider();
   }
 
-  private void deletedSample() {
-    Sample sample = dialog.sampleDialog.getSample();
+  void removeSample(Sample sample) {
     samplesDataProvider.getItems().remove(sample);
     refreshSamplesDataProvider();
   }
@@ -131,14 +123,25 @@ public class DatasetDialogPresenter {
     return sampleBinder.validate();
   }
 
+  List<BinderValidationStatus<Sample>> validateSamples() {
+    return samplesDataProvider.getItems().stream()
+        .map(sample -> sampleBinders.get(sample).validate()).collect(Collectors.toList());
+  }
+
   private boolean validate() {
-    return validateDataset().isOk() && validateSample().isOk();
+    return validateDataset().isOk() && validateSample().isOk()
+        && !validateSamples().stream().filter(status -> !status.isOk()).findAny().isPresent();
   }
 
   void save(Locale locale) {
     if (validate()) {
       logger.debug("Save dataset {}", dataset);
       dataset.setSamples(new ArrayList<>(samplesDataProvider.getItems()));
+      for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
+        if (empty(dataset.getSamples().get(i))) {
+          dataset.getSamples().remove(i);
+        }
+      }
       Sample from = sampleBinder.getBean();
       for (Sample sample : dataset.getSamples()) {
         copy(from, sample);
@@ -151,6 +154,10 @@ public class DatasetDialogPresenter {
     }
   }
 
+  private boolean empty(Sample sample) {
+    return sample.getSampleId() == null && sample.getReplicate() == null;
+  }
+
   void cancel() {
     dialog.close();
   }
@@ -159,18 +166,15 @@ public class DatasetDialogPresenter {
     return dataset;
   }
 
-  /**
-   * Sets dataset.
-   *
-   * @param dataset
-   *          dataset
-   */
-  void setDataset(Dataset dataset) {
+  void setDataset(Dataset dataset, Locale locale) {
     if (dataset == null) {
       dataset = new Dataset();
     }
     if (dataset.getSamples() == null) {
       dataset.setSamples(new ArrayList<>());
+    }
+    while (dataset.getSamples().size() < 2) {
+      dataset.getSamples().add(new Sample());
     }
     Sample sample = new Sample();
     copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
@@ -179,6 +183,7 @@ public class DatasetDialogPresenter {
     sampleBinder.setBean(sample);
     samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
+    bindSampleFields(dataset.getSamples(), locale);
   }
 
   private void copy(Sample from, Sample to) {
@@ -189,5 +194,28 @@ public class DatasetDialogPresenter {
     to.setStrainDescription(from.getStrainDescription());
     to.setTreatment(from.getTreatment());
     to.setProtocol(from.getProtocol());
+  }
+
+  void bindSampleFields(List<Sample> samples, Locale locale) {
+    final AppResources webResources = new AppResources(Constants.class, locale);
+    for (Sample sample : samples) {
+      Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
+      binder.forField(dialog.sampleIdField(sample))
+          .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
+          .withNullRepresentation("").bind(SampleProperties.SAMPLE_ID);
+      binder.forField(dialog.sampleReplicateField(sample))
+          .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
+          .withNullRepresentation("").bind(SampleProperties.REPLICATE);
+      binder.setBean(sample);
+      sampleBinders.put(sample, binder);
+    }
+  }
+
+  private Validator<String> sampleRequiredValidator(Sample sample, String errorMessage) {
+    return (value,
+        context) -> (!dialog.sampleIdField(sample).isEmpty()
+            || !dialog.sampleReplicateField(sample).isEmpty()) && value.isEmpty()
+                ? ValidationResult.error(errorMessage)
+                : ValidationResult.ok();
   }
 }

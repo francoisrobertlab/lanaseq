@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
+import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
@@ -42,7 +43,6 @@ import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
-import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -61,10 +61,13 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -97,13 +100,14 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Column<Sample> sampleId;
   protected Column<Sample> sampleReplicate;
   protected Column<Sample> sampleName;
+  protected Column<Sample> sampleRemove;
   protected Button addSample = new Button();
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Autowired
-  protected SampleDialog sampleDialog;
-  @Autowired
   private transient DatasetDialogPresenter presenter;
+  private Map<Sample, TextField> sampleIdFields = new HashMap<>();
+  private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
 
   protected DatasetDialog() {
   }
@@ -150,16 +154,21 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samplesHeader.setId(id(SAMPLES_HEADER));
     samples.setId(id(SAMPLES));
     samples.setHeight("14em");
-    samples.addItemDoubleClickListener(e -> presenter.editSample(e.getItem()));
-    sampleId = samples.addColumn(sample -> sample.getSampleId(), SampleProperties.SAMPLE_ID)
+    sampleId = samples
+        .addColumn(new ComponentRenderer<>(sample -> sampleIdField(sample)),
+            SampleProperties.SAMPLE_ID)
         .setKey(SampleProperties.SAMPLE_ID)
         .setComparator(NormalizedComparator.of(sample -> sample.getSampleId()));
-    sampleReplicate = samples.addColumn(sample -> sample.getReplicate(), SampleProperties.REPLICATE)
+    sampleReplicate = samples
+        .addColumn(new ComponentRenderer<>(sample -> sampleReplicateField(sample)),
+            SampleProperties.REPLICATE)
         .setKey(SampleProperties.REPLICATE)
         .setComparator(NormalizedComparator.of(sample -> sample.getReplicate()));
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
         .setKey(SampleProperties.NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getName()));
+    sampleRemove = samples
+        .addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)), REMOVE).setKey(REMOVE);
     FooterRow footer = samples.appendFooterRow();
     footer.getCell(sampleName).setComponent(addSample);
     addSample.setId(id(ADD_SAMPLE));
@@ -173,6 +182,34 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
     presenter.init(this);
+  }
+
+  TextField sampleIdField(Sample sample) {
+    if (sampleIdFields.containsKey(sample)) {
+      return sampleIdFields.get(sample);
+    }
+    TextField field = new TextField();
+    field.addClassName(SampleProperties.SAMPLE_ID);
+    sampleIdFields.put(sample, field);
+    return field;
+  }
+
+  TextField sampleReplicateField(Sample sample) {
+    if (sampleReplicateFields.containsKey(sample)) {
+      return sampleReplicateFields.get(sample);
+    }
+    TextField field = new TextField();
+    field.addClassName(SampleProperties.REPLICATE);
+    sampleReplicateFields.put(sample, field);
+    return field;
+  }
+
+  Button sampleDelete(Sample sample) {
+    Button button = new Button();
+    button.addClassName(REMOVE);
+    button.setIcon(VaadinIcon.TRASH.create());
+    button.addClickListener(e -> presenter.removeSample(sample));
+    return button;
   }
 
   @Override
@@ -242,7 +279,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
    *          dataset
    */
   public void setDataset(Dataset dataset) {
-    presenter.setDataset(dataset);
+    presenter.setDataset(dataset, getLocale());
     updateHeader();
   }
 }

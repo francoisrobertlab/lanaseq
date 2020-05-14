@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
+import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
@@ -37,13 +38,13 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -63,17 +64,19 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -97,13 +100,15 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   @Mock
   private DatasetDialogPresenter presenter;
   @Mock
-  private SampleDialog sampleDialog;
-  @Mock
   private Dataset dataset;
   @Mock
   private Sample sample;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentRenderer<TextField, Sample>> textFieldRendererCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentRenderer<Button, Sample>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Mock
@@ -128,7 +133,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new DatasetDialog(presenter);
-    dialog.sampleDialog = sampleDialog;
     dialog.init();
     samples = sampleRepository.findAll();
   }
@@ -139,30 +143,40 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.samples = mock(Grid.class);
     when(dialog.samples.getElement()).thenReturn(samplesElement);
     dialog.sampleId = mock(Column.class);
-    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.SAMPLE_ID)))
+    when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(SampleProperties.SAMPLE_ID)))
         .thenReturn(dialog.sampleId);
     when(dialog.sampleId.setKey(any())).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setComparator(any(Comparator.class))).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setHeader(any(String.class))).thenReturn(dialog.sampleId);
+    dialog.sampleReplicate = mock(Column.class);
+    when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(SampleProperties.REPLICATE)))
+        .thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setKey(any())).thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setComparator(any(Comparator.class)))
+        .thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setHeader(any(String.class))).thenReturn(dialog.sampleReplicate);
     dialog.sampleName = mock(Column.class);
     when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.NAME)))
         .thenReturn(dialog.sampleName);
     when(dialog.sampleName.setKey(any())).thenReturn(dialog.sampleName);
     when(dialog.sampleName.setComparator(any(Comparator.class))).thenReturn(dialog.sampleName);
     when(dialog.sampleName.setHeader(any(String.class))).thenReturn(dialog.sampleName);
-    dialog.sampleReplicate = mock(Column.class);
-    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.REPLICATE)))
-        .thenReturn(dialog.sampleReplicate);
-    when(dialog.sampleReplicate.setKey(any())).thenReturn(dialog.sampleReplicate);
-    when(dialog.sampleReplicate.setComparator(any(Comparator.class)))
-        .thenReturn(dialog.sampleReplicate);
-    when(dialog.sampleReplicate.setHeader(any(String.class))).thenReturn(dialog.sampleReplicate);
+    dialog.sampleRemove = mock(Column.class);
+    when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(REMOVE)))
+        .thenReturn(dialog.sampleRemove);
+    when(dialog.sampleRemove.setKey(any())).thenReturn(dialog.sampleRemove);
+    when(dialog.sampleRemove.setComparator(any(Comparator.class))).thenReturn(dialog.sampleRemove);
+    when(dialog.sampleRemove.setHeader(any(String.class))).thenReturn(dialog.sampleRemove);
     FooterRow footerRow = mock(FooterRow.class);
     when(dialog.samples.appendFooterRow()).thenReturn(footerRow);
-    FooterCell nameFooterCell = mock(FooterCell.class);
-    when(footerRow.getCell(dialog.sampleName)).thenReturn(nameFooterCell);
+    FooterCell sampleIdFooterCell = mock(FooterCell.class);
+    when(footerRow.getCell(dialog.sampleId)).thenReturn(sampleIdFooterCell);
     FooterCell replicateFooterCell = mock(FooterCell.class);
     when(footerRow.getCell(dialog.sampleReplicate)).thenReturn(replicateFooterCell);
+    FooterCell nameFooterCell = mock(FooterCell.class);
+    when(footerRow.getCell(dialog.sampleName)).thenReturn(nameFooterCell);
+    FooterCell removeFooterCell = mock(FooterCell.class);
+    when(footerRow.getCell(dialog.sampleRemove)).thenReturn(removeFooterCell);
   }
 
   @Test
@@ -289,10 +303,11 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
   @Test
   public void samples() {
-    assertEquals(3, dialog.samples.getColumns().size());
+    assertEquals(4, dialog.samples.getColumns().size());
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.SAMPLE_ID));
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.NAME));
     assertNotNull(dialog.samples.getColumnByKey(SampleProperties.REPLICATE));
+    assertNotNull(dialog.samples.getColumnByKey(REMOVE));
     assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
   }
 
@@ -300,10 +315,13 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   public void samples_ColumnsValueProvider() {
     mockSamplesColumns();
     dialog.init();
-    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.SAMPLE_ID));
-    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
+    verify(dialog.samples).addColumn(textFieldRendererCaptor.capture(),
+        eq(SampleProperties.SAMPLE_ID));
+    ComponentRenderer<TextField, Sample> textFieldRenderer = textFieldRendererCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(sample.getSampleId(), valueProvider.apply(sample));
+      TextField textField = textFieldRenderer.createComponent(sample);
+      assertTrue(textField.getClassName().contains(SampleProperties.SAMPLE_ID));
+      assertSame(textField, dialog.sampleIdField(sample));
     }
     verify(dialog.sampleId).setComparator(comparatorCaptor.capture());
     Comparator<Sample> comparator = comparatorCaptor.getValue();
@@ -312,8 +330,23 @@ public class DatasetDialogTest extends AbstractViewTestCase {
       assertEquals(sample.getSampleId(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
+    verify(dialog.samples).addColumn(textFieldRendererCaptor.capture(),
+        eq(SampleProperties.REPLICATE));
+    textFieldRenderer = textFieldRendererCaptor.getValue();
+    for (Sample sample : samples) {
+      TextField textField = textFieldRenderer.createComponent(sample);
+      assertTrue(textField.getClassName().contains(SampleProperties.REPLICATE));
+      assertSame(textField, dialog.sampleReplicateField(sample));
+    }
+    verify(dialog.sampleReplicate).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Sample sample : samples) {
+      assertEquals(sample.getReplicate(),
+          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
+    }
     verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.NAME));
-    valueProvider = valueProviderCaptor.getValue();
+    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
     for (Sample sample : samples) {
       assertEquals(sample.getName(), valueProvider.apply(sample));
     }
@@ -324,18 +357,15 @@ public class DatasetDialogTest extends AbstractViewTestCase {
       assertEquals(sample.getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.REPLICATE));
-    valueProvider = valueProviderCaptor.getValue();
+    verify(dialog.samples).addColumn(buttonRendererCaptor.capture(), eq(REMOVE));
+    ComponentRenderer<Button, Sample> buttonRenderer = buttonRendererCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(sample.getReplicate(), valueProvider.apply(sample));
+      Button button = buttonRenderer.createComponent(sample);
+      assertTrue(button.getClassName().contains(REMOVE));
+      clickButton(button);
+      verify(presenter).removeSample(sample);
     }
-    verify(dialog.sampleReplicate).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Sample sample : samples) {
-      assertEquals(sample.getReplicate(),
-          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
-    }
+    verify(dialog.sampleRemove, never()).setComparator(comparatorCaptor.capture());
   }
 
   @Test
@@ -367,7 +397,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset);
+    verify(presenter).setDataset(dataset, locale);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
@@ -379,7 +409,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset);
+    verify(presenter).setDataset(dataset, locale);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
   }
 
@@ -391,7 +421,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.setDataset(dataset);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setDataset(dataset);
+    verify(presenter).setDataset(dataset, locale);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
   }
 
@@ -400,15 +430,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(null);
 
-    verify(presenter).setDataset(null);
+    verify(presenter).setDataset(null, locale);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-  }
-
-  @Test
-  public void editSample() {
-    doubleClickItem(dialog.samples, sample);
-
-    verify(presenter).editSample(sample);
   }
 
   @Test
