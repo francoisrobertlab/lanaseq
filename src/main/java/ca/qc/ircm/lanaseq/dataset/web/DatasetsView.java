@@ -37,6 +37,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.button.Button;
@@ -165,13 +166,14 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(DatasetsView.class, getLocale());
     final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
+    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     String filenameHeader = datasetResources.message(NAME);
     filename.setHeader(filenameHeader).setFooter(filenameHeader);
     String projectHeader = datasetResources.message(PROJECT);
     project.setHeader(projectHeader).setFooter(projectHeader);
-    String protocolHeader = datasetResources.message(PROTOCOL);
+    String protocolHeader = sampleResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = datasetResources.message(DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);

@@ -51,6 +51,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
@@ -98,6 +99,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetsView.class, locale);
   private AppResources datasetResources = new AppResources(Dataset.class, locale);
+  private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Dataset> datasets;
 
@@ -182,8 +184,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.filename).setFooter(datasetResources.message(NAME));
     verify(view.project).setHeader(datasetResources.message(PROJECT));
     verify(view.project).setFooter(datasetResources.message(PROJECT));
-    verify(view.protocol).setHeader(datasetResources.message(PROTOCOL));
-    verify(view.protocol).setFooter(datasetResources.message(PROTOCOL));
+    verify(view.protocol).setHeader(sampleResources.message(PROTOCOL));
+    verify(view.protocol).setFooter(sampleResources.message(PROTOCOL));
     verify(view.date).setHeader(datasetResources.message(DATE));
     verify(view.date).setFooter(datasetResources.message(DATE));
     verify(view.owner).setHeader(datasetResources.message(OWNER));
@@ -203,6 +205,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetsView.class, locale);
     final AppResources datasetResources = new AppResources(Dataset.class, locale);
+    final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -211,8 +214,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.filename).setFooter(datasetResources.message(NAME));
     verify(view.project).setHeader(datasetResources.message(PROJECT));
     verify(view.project).setFooter(datasetResources.message(PROJECT));
-    verify(view.protocol).setHeader(datasetResources.message(PROTOCOL));
-    verify(view.protocol).setFooter(datasetResources.message(PROTOCOL));
+    verify(view.protocol).setHeader(sampleResources.message(PROTOCOL));
+    verify(view.protocol).setFooter(sampleResources.message(PROTOCOL));
     verify(view.date, atLeastOnce()).setHeader(datasetResources.message(DATE));
     verify(view.date, atLeastOnce()).setFooter(datasetResources.message(DATE));
     verify(view.owner, atLeastOnce()).setHeader(datasetResources.message(OWNER));

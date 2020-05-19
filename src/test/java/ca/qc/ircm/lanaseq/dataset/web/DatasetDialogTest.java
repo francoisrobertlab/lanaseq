@@ -216,20 +216,20 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
-    assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
-    assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
-    assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
-    assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
-    assertEquals(datasetResources.message(property(TARGET, PLACEHOLDER)),
+    assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
+    assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
+    assertEquals(sampleResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(sampleResources.message(property(TARGET, PLACEHOLDER)),
         dialog.target.getPlaceholder());
-    assertEquals(datasetResources.message(STRAIN), dialog.strain.getLabel());
-    assertEquals(datasetResources.message(property(STRAIN, PLACEHOLDER)),
+    assertEquals(sampleResources.message(STRAIN), dialog.strain.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN, PLACEHOLDER)),
         dialog.strain.getPlaceholder());
-    assertEquals(datasetResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
-    assertEquals(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+    assertEquals(sampleResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
         dialog.strainDescription.getPlaceholder());
-    assertEquals(datasetResources.message(TREATMENT), dialog.treatment.getLabel());
-    assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
+    assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
+    assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
     assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
@@ -249,25 +249,26 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetDialog.class, locale);
     final AppResources datasetResources = new AppResources(Dataset.class, locale);
+    final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     when(ui.getLocale()).thenReturn(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
-    assertEquals(datasetResources.message(PROTOCOL), dialog.protocol.getLabel());
-    assertEquals(datasetResources.message(ASSAY), dialog.assay.getLabel());
-    assertEquals(datasetResources.message(TYPE), dialog.type.getLabel());
-    assertEquals(datasetResources.message(TARGET), dialog.target.getLabel());
-    assertEquals(datasetResources.message(property(TARGET, PLACEHOLDER)),
+    assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
+    assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
+    assertEquals(sampleResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(sampleResources.message(property(TARGET, PLACEHOLDER)),
         dialog.target.getPlaceholder());
-    assertEquals(datasetResources.message(STRAIN), dialog.strain.getLabel());
-    assertEquals(datasetResources.message(property(STRAIN, PLACEHOLDER)),
+    assertEquals(sampleResources.message(STRAIN), dialog.strain.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN, PLACEHOLDER)),
         dialog.strain.getPlaceholder());
-    assertEquals(datasetResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
-    assertEquals(datasetResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+    assertEquals(sampleResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
         dialog.strainDescription.getPlaceholder());
-    assertEquals(datasetResources.message(TREATMENT), dialog.treatment.getLabel());
-    assertEquals(datasetResources.message(property(TREATMENT, PLACEHOLDER)),
+    assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
+    assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
     assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
