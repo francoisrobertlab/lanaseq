@@ -17,15 +17,23 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_EMPTY;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
@@ -45,11 +53,14 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,24 +68,32 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class SamplesViewPresenterTest extends AbstractViewTestCase {
+  @Autowired
   private SamplesViewPresenter presenter;
   @Mock
   private SamplesView view;
-  @Mock
+  @MockBean
   private SampleService service;
-  @Mock
+  @MockBean
   private ProtocolService protocolService;
-  @Mock
+  @MockBean
+  private DatasetService datasetService;
+  @MockBean
   private AuthorizationService authorizationService;
   @Mock
   private DataProvider<Sample, ?> dataProvider;
   @Captor
-  private ArgumentCaptor<Sample> datasetCaptor;
+  private ArgumentCaptor<Sample> sampleCaptor;
+  @Captor
+  private ArgumentCaptor<Collection<Sample>> samplesCaptor;
+  @Captor
+  private ArgumentCaptor<Dataset> datasetCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<SampleDialog>>> savedListenerCaptor;
   @Captor
@@ -83,6 +102,8 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
   private SampleRepository repository;
   @Autowired
   private UserRepository userRepository;
+  private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(SamplesView.class, locale);
   private List<Sample> samples;
   private User currentUser;
 
@@ -91,7 +112,6 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new SamplesViewPresenter(service, protocolService, authorizationService);
     view.header = new H2();
     view.samples = new Grid<>();
     view.samples.setSelectionMode(SelectionMode.MULTI);
@@ -99,7 +119,9 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     view.protocolFilter = new TextField();
     view.dateFilter = mock(DateRangeField.class);
     view.ownerFilter = new TextField();
+    view.error = new Div();
     view.add = new Button();
+    view.merge = new Button();
     view.dialog = mock(SampleDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
@@ -246,6 +268,50 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     presenter.add();
     verify(view.dialog).setSample(null);
     verify(view.dialog).open();
+  }
+
+  @Test
+  public void merge() {
+    when(service.isMergable(any())).thenReturn(true);
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+    presenter.merge(locale);
+    assertFalse(view.error.isVisible());
+    verify(service).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
+    assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
+    verify(datasetService).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertNull(dataset.getProject());
+    assertEquals(2, dataset.getSamples().size());
+    assertTrue(dataset.getSamples().contains(samples.get(0)));
+    assertTrue(dataset.getSamples().contains(samples.get(1)));
+  }
+
+  @Test
+  public void merge_NoSamples() {
+    presenter.merge(locale);
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(SAMPLES_EMPTY), view.error.getText());
+    verify(service, never()).isMergable(any());
+    verify(datasetService, never()).save(any());
+  }
+
+  @Test
+  public void merge_NotMergeable() {
+    when(service.isMergable(any())).thenReturn(false);
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+    presenter.merge(locale);
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(MERGE_ERROR), view.error.getText());
+    verify(service).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
+    assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
+    verify(datasetService, never()).save(any());
   }
 
   @Test

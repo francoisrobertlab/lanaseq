@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -20,13 +21,16 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -127,6 +131,320 @@ public class SampleServiceTest {
   @WithMockUser
   public void isDeletable_NullId() {
     assertFalse(service.isDeletable(new Sample()));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_False() {
+    List<Sample> samples = new ArrayList<>();
+    samples.add(repository.findById(1L).get());
+    samples.add(repository.findById(4L).get());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_True() {
+    List<Sample> samples = new ArrayList<>();
+    samples.add(repository.findById(1L).get());
+    samples.add(repository.findById(2L).get());
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_AllNull() {
+    List<Sample> samples = new ArrayList<>();
+    samples.add(new Sample());
+    samples.add(new Sample());
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_ProtocolTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
+    Sample sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_ProtocolFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setProtocol(new Protocol(1L));
+    samples.add(sample);
+    sample = new Sample();
+    sample.setProtocol(new Protocol(2L));
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_ProtocolOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setProtocol(new Protocol(1L));
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_AssayTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setAssay(Assay.CHIP_SEQ);
+    samples.add(sample);
+    sample = new Sample();
+    sample.setAssay(Assay.CHIP_SEQ);
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_AssayFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setAssay(Assay.CHIP_SEQ);
+    samples.add(sample);
+    sample = new Sample();
+    sample.setAssay(Assay.CHIP_EXO);
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_AssayOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setAssay(Assay.CHIP_SEQ);
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TypeTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setType(DatasetType.INPUT);
+    samples.add(sample);
+    sample = new Sample();
+    sample.setType(DatasetType.INPUT);
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TypeFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setType(DatasetType.INPUT);
+    samples.add(sample);
+    sample = new Sample();
+    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TypeOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setType(DatasetType.INPUT);
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TargetTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTarget("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setTarget("test");
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TargetFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTarget("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setTarget("test2");
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TargetOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTarget("test");
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_StrainTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setStrain("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setStrain("test");
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_StrainFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setStrain("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setStrain("test2");
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_StrainOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setStrain("test");
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_StrainDescriptionTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setStrainDescription("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setStrainDescription("test");
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_StrainDescriptionFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setStrainDescription("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setStrainDescription("test2");
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_StrainDescriptionOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setStrainDescription("test");
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TreatmentTrue() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTreatment("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setTreatment("test");
+    samples.add(sample);
+    assertTrue(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TreatmentFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTreatment("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setTreatment("test2");
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TreatmentOneNull() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTreatment("test");
+    samples.add(sample);
+    samples.add(new Sample());
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_TargetTrueTreatmentFalse() {
+    List<Sample> samples = new ArrayList<>();
+    Sample sample = new Sample();
+    sample.setTarget("test");
+    sample.setTreatment("test");
+    samples.add(sample);
+    sample = new Sample();
+    sample.setTarget("test");
+    sample.setTreatment("test2");
+    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  @WithMockUser
+  public void isMergable_Empty() {
+    assertFalse(service.isMergable(new ArrayList<>()));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithAnonymousUser
+  public void isMergable_Anonymous() {
+    assertFalse(service.isMergable(new ArrayList<>()));
   }
 
   @Test

@@ -17,6 +17,12 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_EMPTY;
+
+import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -30,6 +36,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +57,15 @@ public class SamplesViewPresenter {
   private WebSampleFilter filter = new WebSampleFilter();
   private SampleService service;
   private ProtocolService protocolService;
+  private DatasetService datasetService;
   private AuthorizationService authorizationService;
 
   @Autowired
   SamplesViewPresenter(SampleService service, ProtocolService protocolService,
-      AuthorizationService authorizationService) {
+      DatasetService datasetService, AuthorizationService authorizationService) {
     this.service = service;
     this.protocolService = protocolService;
+    this.datasetService = datasetService;
     this.authorizationService = authorizationService;
   }
 
@@ -90,6 +101,25 @@ public class SamplesViewPresenter {
   public void add() {
     view.dialog.setSample(null);
     view.dialog.open();
+  }
+
+  public void merge(Locale locale) {
+    List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
+    AppResources resources = new AppResources(SamplesView.class, locale);
+    boolean error = false;
+    if (samples.isEmpty()) {
+      view.error.setText(resources.message(SAMPLES_EMPTY));
+      error = true;
+    } else if (!service.isMergable(samples)) {
+      view.error.setText(resources.message(MERGE_ERROR));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      Dataset dataset = new Dataset();
+      dataset.setSamples(samples);
+      datasetService.save(dataset);
+    }
   }
 
   public void filterName(String value) {

@@ -27,6 +27,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
@@ -154,6 +155,9 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAMPLES, view.samples.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(MERGE, view.merge.getId().orElse(""));
+    validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
   }
 
   @Test
@@ -173,7 +177,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(webResources.message(MERGE), view.merge.getText());
   }
 
   @Test
@@ -200,7 +204,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(webResources.message(MERGE), view.merge.getText());
   }
 
   @Test
@@ -216,7 +220,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
     assertNotNull(view.samples.getColumnByKey(DATE));
     assertNotNull(view.samples.getColumnByKey(OWNER));
-    assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Single);
+    assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
   }
 
   @Test
@@ -317,5 +321,11 @@ public class SamplesViewTest extends AbstractViewTestCase {
   public void add() {
     clickButton(view.add);
     verify(presenter).add();
+  }
+
+  @Test
+  public void merge() {
+    clickButton(view.merge);
+    verify(presenter).merge(locale);
   }
 }

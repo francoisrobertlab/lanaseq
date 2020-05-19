@@ -3,12 +3,14 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -21,9 +23,12 @@ import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
@@ -47,6 +52,9 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String SAMPLES = "samples";
+  public static final String MERGE = "merge";
+  public static final String SAMPLES_EMPTY = property(SAMPLES, "empty");
+  public static final String MERGE_ERROR = property(MERGE, "error");
   private static final long serialVersionUID = -6945706067250351889L;
   protected H2 header = new H2();
   protected Grid<Sample> samples = new Grid<>();
@@ -58,7 +66,9 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
+  protected Div error = new Div();
   protected Button add = new Button();
+  protected Button merge = new Button();
   @Autowired
   protected SampleDialog dialog;
   @Autowired
@@ -77,9 +87,10 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, samples, add);
+    add(header, samples, error, new HorizontalLayout(add, merge));
     header.setId(HEADER);
     samples.setId(SAMPLES);
+    samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName));
     protocol =
@@ -115,9 +126,14 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
     ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
+    error.setId(ERROR_TEXT);
+    error.setVisible(false);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> presenter.add());
+    merge.setId(MERGE);
+    merge.setIcon(VaadinIcon.CONNECT.create());
+    merge.addClickListener(e -> presenter.merge(getLocale()));
     presenter.init(this);
   }
 
@@ -139,6 +155,7 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
+    merge.setText(webResources.message(MERGE));
   }
 
   @Override
