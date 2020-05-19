@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import org.junit.Test;
@@ -43,6 +44,7 @@ public class PermissionEvaluatorDelegatorTest {
   private static final String USER_CLASS = User.class.getName();
   private static final String DATASET_CLASS = Dataset.class.getName();
   private static final String PROTOCOL_CLASS = Protocol.class.getName();
+  private static final String SAMPLE_CLASS = Sample.class.getName();
   private static final String READ = "read";
   private static final Permission BASE_READ = Permission.READ;
   private static final String WRITE = "write";
@@ -55,12 +57,16 @@ public class PermissionEvaluatorDelegatorTest {
   private DatasetPermissionEvaluator datasetPermissionEvaluator;
   @MockBean
   private ProtocolPermissionEvaluator protocolPermissionEvaluator;
+  @MockBean
+  private SamplePermissionEvaluator samplePermissionEvaluator;
   @Mock
   private User user;
   @Mock
   private Dataset dataset;
   @Mock
   private Protocol protocol;
+  @Mock
+  private Sample sample;
 
   private Authentication authentication() {
     return SecurityContextHolder.getContext().getAuthentication();
@@ -241,6 +247,66 @@ public class PermissionEvaluatorDelegatorTest {
         PROTOCOL_CLASS, WRITE);
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol.getId(),
         PROTOCOL_CLASS, BASE_WRITE);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasPermission_Sample_False() throws Throwable {
+    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, BASE_READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), sample, BASE_WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS, READ));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_WRITE));
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, BASE_READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, WRITE);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, BASE_WRITE);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        WRITE);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_WRITE);
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void hasPermission_Sample_True() throws Throwable {
+    when(samplePermissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    when(samplePermissionEvaluator.hasPermission(any(), any(), any(), any())).thenReturn(true);
+    assertTrue(permissionEvaluator.hasPermission(authentication(), sample, READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), sample, BASE_READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), sample, WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), sample, BASE_WRITE));
+    assertTrue(
+        permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS, READ));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_READ));
+    assertTrue(
+        permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS, WRITE));
+    assertTrue(permissionEvaluator.hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_WRITE));
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, BASE_READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, WRITE);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample, BASE_WRITE);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_READ);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        WRITE);
+    verify(samplePermissionEvaluator).hasPermission(authentication(), sample.getId(), SAMPLE_CLASS,
+        BASE_WRITE);
   }
 
   @Test
