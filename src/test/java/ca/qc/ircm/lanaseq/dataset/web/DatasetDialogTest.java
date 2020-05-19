@@ -446,7 +446,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   public void addSample() {
     clickButton(dialog.addSample);
 
-    verify(presenter).addSample();
+    verify(presenter).addSample(locale);
   }
 
   @Test

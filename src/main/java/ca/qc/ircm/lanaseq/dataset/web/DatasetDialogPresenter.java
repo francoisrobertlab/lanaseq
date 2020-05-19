@@ -100,8 +100,23 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }
 
-  void addSample() {
-    samplesDataProvider.getItems().add(new Sample());
+  void bindSampleFields(Sample sample, Locale locale) {
+    final AppResources webResources = new AppResources(Constants.class, locale);
+    Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
+    binder.forField(dialog.sampleIdField(sample))
+        .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
+        .withNullRepresentation("").bind(SampleProperties.SAMPLE_ID);
+    binder.forField(dialog.sampleReplicateField(sample))
+        .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
+        .withNullRepresentation("").bind(SampleProperties.REPLICATE);
+    binder.setBean(sample);
+    sampleBinders.put(sample, binder);
+  }
+
+  void addSample(Locale locale) {
+    Sample sample = new Sample();
+    samplesDataProvider.getItems().add(sample);
+    bindSampleFields(sample, locale);
     refreshSamplesDataProvider();
   }
 
@@ -183,7 +198,7 @@ public class DatasetDialogPresenter {
     sampleBinder.setBean(sample);
     samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
-    bindSampleFields(dataset.getSamples(), locale);
+    dataset.getSamples().forEach(s -> bindSampleFields(s, locale));
   }
 
   private void copy(Sample from, Sample to) {
@@ -194,21 +209,6 @@ public class DatasetDialogPresenter {
     to.setStrainDescription(from.getStrainDescription());
     to.setTreatment(from.getTreatment());
     to.setProtocol(from.getProtocol());
-  }
-
-  void bindSampleFields(List<Sample> samples, Locale locale) {
-    final AppResources webResources = new AppResources(Constants.class, locale);
-    for (Sample sample : samples) {
-      Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
-      binder.forField(dialog.sampleIdField(sample))
-          .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
-          .withNullRepresentation("").bind(SampleProperties.SAMPLE_ID);
-      binder.forField(dialog.sampleReplicateField(sample))
-          .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
-          .withNullRepresentation("").bind(SampleProperties.REPLICATE);
-      binder.setBean(sample);
-      sampleBinders.put(sample, binder);
-    }
   }
 
   private Validator<String> sampleRequiredValidator(Sample sample, String errorMessage) {

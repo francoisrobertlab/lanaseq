@@ -174,7 +174,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     footer.getCell(sampleId).setComponent(addSample);
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
-    addSample.addClickListener(e -> presenter.addSample());
+    addSample.addClickListener(e -> presenter.addSample(getLocale()));
     save.setId(id(SAVE));
     save.getElement().setAttribute(THEME, PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());

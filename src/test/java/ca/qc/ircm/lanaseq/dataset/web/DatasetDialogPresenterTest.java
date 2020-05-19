@@ -295,7 +295,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void addSample() {
     assertEquals(2, items(dialog.samples).size());
-    presenter.addSample();
+    presenter.addSample(locale);
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     Sample sample = samples.get(samples.size() - 1);
@@ -609,6 +609,58 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NewSampleIdEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    presenter.addSample(locale);
+    List<Sample> samples = items(dialog.samples);
+    Sample sample = samples.get(2);
+    sampleReplicateFields.get(sample).setValue(sampleReplicate2 + "-new");
+    sampleIdFields.get(sample).setValue("");
+
+    presenter.save(locale);
+
+    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
+    BinderValidationStatus<Sample> status = statuses.get(2);
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, sampleIdFields.get(sample));
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NewSampleReplicateEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    presenter.addSample(locale);
+    List<Sample> samples = items(dialog.samples);
+    Sample sample = samples.get(2);
+    sampleIdFields.get(sample).setValue(sampleId2 + "-new");
+    sampleReplicateFields.get(sample).setValue("");
+
+    presenter.save(locale);
+
+    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
+    BinderValidationStatus<Sample> status = statuses.get(2);
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, sampleReplicateFields.get(sample));
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
   }
 
   @Test
