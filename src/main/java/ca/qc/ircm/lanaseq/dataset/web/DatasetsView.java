@@ -39,6 +39,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -85,6 +86,7 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   protected TextField nameFilter = new TextField();
   protected TextField projectFilter = new TextField();
   protected TextField protocolFilter = new TextField();
+  protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
   protected Div error = new Div();
   protected Button add = new Button();
@@ -146,6 +148,9 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     protocolFilter.addValueChangeListener(e -> presenter.filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
     protocolFilter.setSizeFull();
+    filtersRow.getCell(date).setComponent(dateFilter);
+    dateFilter.addValueChangeListener(e -> presenter.filterDate(e.getValue()));
+    dateFilter.setSizeFull();
     filtersRow.getCell(owner).setComponent(ownerFilter);
     ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);

@@ -40,6 +40,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -48,6 +49,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -191,6 +193,28 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     presenter.filterProtocol("");
 
     assertEquals(null, presenter.filter().protocolContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterDate() {
+    view.datasets.setDataProvider(dataProvider);
+    Range<LocalDate> range =
+        Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(2));
+
+    presenter.filterDate(range);
+
+    assertEquals(range, presenter.filter().dateRange);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterDate_Null() {
+    view.datasets.setDataProvider(dataProvider);
+
+    presenter.filterDate(null);
+
+    assertEquals(null, presenter.filter().dateRange);
     verify(dataProvider).refreshAll();
   }
 
