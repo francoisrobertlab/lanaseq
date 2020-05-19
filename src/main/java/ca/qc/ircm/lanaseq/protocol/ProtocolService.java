@@ -83,9 +83,9 @@ public class ProtocolService {
   }
 
   /**
-   * Returns all protocols for current user.
+   * Returns all protocols.
    *
-   * @return all protocols for current user
+   * @return all protocols
    */
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Protocol> all() {

@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample;
 
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -18,6 +19,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,6 +78,25 @@ public class SampleServiceTest {
   public void get_Null() {
     Sample sample = service.get(null);
     assertNull(sample);
+  }
+
+  @Test
+  @WithMockUser
+  public void all() {
+    List<Sample> samples = service.all();
+
+    assertEquals(8, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertTrue(find(samples, 2L).isPresent());
+    assertTrue(find(samples, 3L).isPresent());
+    assertTrue(find(samples, 4L).isPresent());
+    assertTrue(find(samples, 5L).isPresent());
+    assertTrue(find(samples, 6L).isPresent());
+    assertTrue(find(samples, 7L).isPresent());
+    assertTrue(find(samples, 8L).isPresent());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
   }
 
   @Test

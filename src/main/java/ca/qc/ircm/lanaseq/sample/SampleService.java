@@ -3,9 +3,11 @@ package ca.qc.ircm.lanaseq.sample;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
+import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,16 @@ public class SampleService {
     }
 
     return repository.findById(id).orElse(null);
+  }
+
+  /**
+   * Returns all samples.
+   *
+   * @return all samples
+   */
+  @PostFilter("hasPermission(filterObject, 'read')")
+  public List<Sample> all() {
+    return repository.findAll();
   }
 
   /**
