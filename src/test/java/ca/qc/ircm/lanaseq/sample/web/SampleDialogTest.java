@@ -20,15 +20,26 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR;
+import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +50,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Assay;
+import ca.qc.ircm.lanaseq.dataset.DatasetType;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
@@ -48,6 +63,7 @@ import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,6 +86,8 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener;
   @Autowired
   private SampleRepository sampleRepository;
+  @Autowired
+  private ProtocolRepository protocolRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleDialog.class, locale);
   private AppResources sampleResources = new AppResources(Sample.class, locale);
@@ -96,6 +114,13 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(SAMPLE_ID), dialog.sampleId.getId().orElse(""));
     assertEquals(id(REPLICATE), dialog.replicate.getId().orElse(""));
+    assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
+    assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
+    assertEquals(id(TYPE), dialog.type.getId().orElse(""));
+    assertEquals(id(TARGET), dialog.target.getId().orElse(""));
+    assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
+    assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
+    assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.getThemeName().contains(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -112,6 +137,21 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
     assertEquals(sampleResources.message(REPLICATE), dialog.replicate.getLabel());
+    assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
+    assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
+    assertEquals(sampleResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(sampleResources.message(property(TARGET, PLACEHOLDER)),
+        dialog.target.getPlaceholder());
+    assertEquals(sampleResources.message(STRAIN), dialog.strain.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN, PLACEHOLDER)),
+        dialog.strain.getPlaceholder());
+    assertEquals(sampleResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+        dialog.strainDescription.getPlaceholder());
+    assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
+    assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
+        dialog.treatment.getPlaceholder());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -130,10 +170,50 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
     assertEquals(sampleResources.message(REPLICATE), dialog.replicate.getLabel());
+    assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
+    assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
+    assertEquals(sampleResources.message(TARGET), dialog.target.getLabel());
+    assertEquals(sampleResources.message(property(TARGET, PLACEHOLDER)),
+        dialog.target.getPlaceholder());
+    assertEquals(sampleResources.message(STRAIN), dialog.strain.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN, PLACEHOLDER)),
+        dialog.strain.getPlaceholder());
+    assertEquals(sampleResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
+    assertEquals(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+        dialog.strainDescription.getPlaceholder());
+    assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
+    assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
+        dialog.treatment.getPlaceholder());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
     verify(presenter).localeChange(locale);
+  }
+
+  @Test
+  public void protocol() {
+    for (Protocol protocol : protocolRepository.findAll()) {
+      assertEquals(protocol.getName(), dialog.protocol.getItemLabelGenerator().apply(protocol));
+    }
+  }
+
+  @Test
+  public void assay() {
+    List<Assay> assays = items(dialog.assay);
+    assertArrayEquals(Assay.values(), assays.toArray(new Assay[0]));
+    for (Assay assay : assays) {
+      assertEquals(assay.getLabel(locale), dialog.assay.getItemLabelGenerator().apply(assay));
+    }
+  }
+
+  @Test
+  public void type() {
+    List<DatasetType> types = items(dialog.type);
+    assertArrayEquals(DatasetType.values(), types.toArray(new DatasetType[0]));
+    for (DatasetType type : types) {
+      assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
+    }
   }
 
   @Test
@@ -233,7 +313,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save();
+    verify(presenter).save(locale);
   }
 
   @Test

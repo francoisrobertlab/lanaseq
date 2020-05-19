@@ -18,13 +18,22 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
@@ -44,11 +53,43 @@ public class SampleDialogElement extends DialogElement {
     return $(TextFieldElement.class).id(id(REPLICATE));
   }
 
+  public ComboBoxElement protocol() {
+    return $(ComboBoxElement.class).id(id(PROTOCOL));
+  }
+
+  public ComboBoxElement assay() {
+    return $(ComboBoxElement.class).id(id(ASSAY));
+  }
+
+  public ComboBoxElement type() {
+    return $(ComboBoxElement.class).id(id(TYPE));
+  }
+
+  public TextFieldElement target() {
+    return $(TextFieldElement.class).id(id(TARGET));
+  }
+
+  public TextFieldElement strain() {
+    return $(TextFieldElement.class).id(id(STRAIN));
+  }
+
+  public TextFieldElement strainDescription() {
+    return $(TextFieldElement.class).id(id(STRAIN_DESCRIPTION));
+  }
+
+  public TextFieldElement treatment() {
+    return $(TextFieldElement.class).id(id(TREATMENT));
+  }
+
   public ButtonElement save() {
     return $(ButtonElement.class).id(id(SAVE));
   }
 
   public ButtonElement cancel() {
     return $(ButtonElement.class).id(id(CANCEL));
+  }
+
+  public ButtonElement delete() {
+    return $(ButtonElement.class).id(id(DELETE));
   }
 }
