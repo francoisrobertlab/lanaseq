@@ -284,6 +284,15 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void protocols() {
+    List<Protocol> protocols = items(dialog.protocol);
+    assertEquals(this.protocols.size(), protocols.size());
+    for (int i = 0; i < protocols.size(); i++) {
+      assertEquals(this.protocols.get(i), protocols.get(i));
+    }
+  }
+
+  @Test
   public void addSample() {
     assertEquals(2, items(dialog.samples).size());
     presenter.addSample();
