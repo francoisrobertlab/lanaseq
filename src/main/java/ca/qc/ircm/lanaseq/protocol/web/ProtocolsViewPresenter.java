@@ -21,11 +21,13 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
+import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,11 @@ public class ProtocolsViewPresenter {
 
   public void filterName(String value) {
     filter.nameContains = value.isEmpty() ? null : value;
+    view.protocols.getDataProvider().refreshAll();
+  }
+
+  public void filterDate(Range<LocalDate> value) {
+    filter.dateRange = value;
     view.protocols.getDataProvider().refreshAll();
   }
 

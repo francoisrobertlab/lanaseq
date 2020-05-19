@@ -188,7 +188,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void filterDate_Empty() {
+  public void filterDate_Null() {
     view.samples.setDataProvider(dataProvider);
 
     presenter.filterDate(null);

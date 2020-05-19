@@ -48,6 +48,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import com.google.common.collect.Range;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -58,6 +59,7 @@ import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -128,6 +130,8 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     when(view.protocols.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
+    HeaderCell dateFilterCell = mock(HeaderCell.class);
+    when(filtersRow.getCell(view.date)).thenReturn(dateFilterCell);
     HeaderCell ownerFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.owner)).thenReturn(ownerFilterCell);
   }
@@ -252,6 +256,15 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     view.nameFilter.setValue("test");
 
     verify(presenter).filterName("test");
+  }
+
+  @Test
+  public void filterRange() {
+    Range<LocalDate> range =
+        Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
+    view.dateFilter.setValue(range);
+
+    verify(presenter).filterDate(range);
   }
 
   @Test
