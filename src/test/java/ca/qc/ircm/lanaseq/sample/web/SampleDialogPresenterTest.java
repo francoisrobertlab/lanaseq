@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -116,6 +117,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
     presenter.init(dialog);
+    presenter.localeChange(locale);
   }
 
   private void fillForm() {
@@ -141,7 +143,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   public void setSample_NewSample() {
     Sample sample = new Sample();
 
-    presenter.localeChange(locale);
     presenter.setSample(sample);
 
     assertEquals("", dialog.sampleId.getValue());
@@ -160,7 +161,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   public void setSample_Sample() {
     Sample sample = repository.findById(1L).get();
 
-    presenter.localeChange(locale);
     presenter.setSample(sample);
 
     assertEquals("FR1", dialog.sampleId.getValue());
@@ -172,15 +172,15 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());
     assertEquals("Rappa", dialog.treatment.getValue());
-    assertTrue(dialog.delete.isVisible());
+    assertFalse(dialog.delete.isVisible());
   }
 
   @Test
-  public void setSample_BeforeLocaleChange() {
+  public void setSample_DeletableSample() {
+    when(service.isDeletable(any())).thenReturn(true);
     Sample sample = repository.findById(1L).get();
 
     presenter.setSample(sample);
-    presenter.localeChange(locale);
 
     assertEquals("FR1", dialog.sampleId.getValue());
     assertEquals("R1", dialog.replicate.getValue());
@@ -196,7 +196,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setSample_Null() {
-    presenter.localeChange(locale);
     presenter.setSample(null);
 
     assertEquals("", dialog.sampleId.getValue());
@@ -213,7 +212,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void requiredIndicator() {
-    presenter.localeChange(locale);
     assertTrue(dialog.sampleId.isRequiredIndicatorVisible());
     assertTrue(dialog.replicate.isRequiredIndicatorVisible());
     assertTrue(dialog.protocol.isRequiredIndicatorVisible());
@@ -236,7 +234,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_NameEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.sampleId.setValue("");
 
@@ -250,6 +247,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -257,7 +255,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_ReplicateEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.replicate.setValue("");
 
@@ -271,6 +268,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -278,7 +276,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_ProtocolEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.protocol.setItems();
 
@@ -292,6 +289,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -299,7 +297,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_AssayEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.assay.clear();
 
@@ -313,6 +310,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -320,7 +318,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_TypeEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.type.setValue(DatasetType.NULL);
 
@@ -331,6 +328,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getType());
+    verify(service, never()).delete(any());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -338,7 +336,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_TargetEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.target.setValue("");
 
@@ -349,6 +346,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getTarget());
+    verify(service, never()).delete(any());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -356,7 +354,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_StrainEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.strain.setValue("");
 
@@ -370,6 +367,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -377,7 +375,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_StrainDescriptionEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.strainDescription.setValue("");
 
@@ -388,6 +385,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getStrainDescription());
+    verify(service, never()).delete(any());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -395,7 +393,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_TreatmentEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.treatment.setValue("");
 
@@ -406,6 +403,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getTreatment());
+    verify(service, never()).delete(any());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -413,7 +411,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_NewSample() {
-    presenter.localeChange(locale);
     fillForm();
 
     presenter.save(locale);
@@ -429,6 +426,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    verify(service, never()).delete(any());
     verify(dialog).showNotification(resources.message(SAVED, sample.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -439,7 +437,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   public void save_UpdateSample() {
     Sample sample = repository.findById(2L).get();
     presenter.setSample(sample);
-    presenter.localeChange(locale);
     fillForm();
 
     presenter.save(locale);
@@ -455,6 +452,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    verify(service, never()).delete(any());
     verify(dialog).showNotification(resources.message(SAVED, sample.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -464,8 +462,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void cancel_SampleProperties() {
     Sample sample = repository.findById(2L).get();
-    presenter.init(dialog);
-    presenter.localeChange(locale);
     fillForm();
 
     presenter.cancel();
@@ -480,6 +476,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog).close();
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).fireSavedEvent();
@@ -489,8 +486,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void cancel_SamplePropertiesAfterValidationFail() {
     Sample sample = repository.findById(2L).get();
-    presenter.init(dialog);
-    presenter.localeChange(locale);
     fillForm();
     dialog.replicate.setValue("");
     presenter.save(locale);
@@ -507,6 +502,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog).close();
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).fireSavedEvent();
@@ -515,12 +511,10 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void cancel_Close() {
-    presenter.init(dialog);
-    presenter.localeChange(locale);
-
     presenter.cancel();
 
     verify(service, never()).save(any());
+    verify(service, never()).delete(any());
     verify(dialog).close();
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).fireSavedEvent();
@@ -529,14 +523,15 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void delete() {
-    presenter.init(dialog);
-    presenter.localeChange(locale);
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
 
-    presenter.delete();
+    presenter.delete(locale);
 
     verify(service, never()).save(any());
+    verify(service).delete(sample);
     verify(dialog).close();
-    verify(dialog, never()).showNotification(any());
+    verify(dialog).showNotification(resources.message(DELETED, sample.getName()));
     verify(dialog, never()).fireSavedEvent();
     verify(dialog).fireDeletedEvent();
   }

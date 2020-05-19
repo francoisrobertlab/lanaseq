@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -85,7 +86,7 @@ public class SampleServiceTest {
   public void all() {
     List<Sample> samples = service.all();
 
-    assertEquals(8, samples.size());
+    assertEquals(9, samples.size());
     assertTrue(find(samples, 1L).isPresent());
     assertTrue(find(samples, 2L).isPresent());
     assertTrue(find(samples, 3L).isPresent());
@@ -94,9 +95,38 @@ public class SampleServiceTest {
     assertTrue(find(samples, 6L).isPresent());
     assertTrue(find(samples, 7L).isPresent());
     assertTrue(find(samples, 8L).isPresent());
+    assertTrue(find(samples, 9L).isPresent());
     for (Sample sample : samples) {
       verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
     }
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_False() {
+    Sample sample = repository.findById(1L).get();
+    assertFalse(service.isDeletable(sample));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_True() {
+    Sample sample = repository.findById(9L).get();
+    assertTrue(service.isDeletable(sample));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_Null() {
+    assertFalse(service.isDeletable(null));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_NullId() {
+    assertFalse(service.isDeletable(new Sample()));
   }
 
   @Test
@@ -171,5 +201,22 @@ public class SampleServiceTest {
     assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20181020",
         sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
+  }
+
+  @Test
+  @WithMockUser
+  public void delete() {
+    Sample sample = repository.findById(9L).get();
+    service.delete(sample);
+    repository.flush();
+    assertFalse(repository.findById(9L).isPresent());
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @WithMockUser
+  public void delete_NotDeletable() {
+    Sample sample = repository.findById(1L).get();
+    service.delete(sample);
   }
 }

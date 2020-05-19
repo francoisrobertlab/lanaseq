@@ -10,6 +10,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -93,10 +94,12 @@ public class SampleDialogPresenter {
     dialog.close();
   }
 
-  void delete() {
+  void delete(Locale locale) {
     Sample sample = binder.getBean();
     logger.debug("delete sample {}", sample);
-    // TODO program service.delete(sample) method
+    service.delete(sample);
+    AppResources resources = new AppResources(SampleDialog.class, locale);
+    dialog.showNotification(resources.message(DELETED, sample.getName()));
     dialog.fireDeletedEvent();
     dialog.close();
   }
@@ -110,6 +113,6 @@ public class SampleDialogPresenter {
       sample = new Sample();
     }
     binder.setBean(sample);
-    dialog.delete.setVisible(sample.getId() != null);
+    dialog.delete.setVisible(service.isDeletable(sample));
   }
 }

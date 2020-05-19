@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample;
 
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
@@ -18,11 +19,14 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class SampleService {
   private SampleRepository repository;
+  private DatasetRepository datasetRepository;
   private AuthorizationService authorizationService;
 
   @Autowired
-  protected SampleService(SampleRepository repository, AuthorizationService authorizationService) {
+  protected SampleService(SampleRepository repository, DatasetRepository datasetRepository,
+      AuthorizationService authorizationService) {
     this.repository = repository;
+    this.datasetRepository = datasetRepository;
     this.authorizationService = authorizationService;
   }
 
@@ -53,6 +57,19 @@ public class SampleService {
   }
 
   /**
+   * Returns true if sample can be deleted, false otherwise.
+   *
+   * @return true if sample can be deleted, false otherwise
+   */
+  @PreAuthorize("hasPermission(#sample, 'read')")
+  public boolean isDeletable(Sample sample) {
+    if (sample == null || sample.getId() == null) {
+      return false;
+    }
+    return !datasetRepository.existsBySamples(sample);
+  }
+
+  /**
    * Saves sample into database.
    *
    * @param sample
@@ -68,5 +85,19 @@ public class SampleService {
     }
     sample.generateName();
     repository.save(sample);
+  }
+
+  /**
+   * Deletes sample from database.
+   *
+   * @param sample
+   *          sample
+   */
+  @PreAuthorize("hasPermission(#sample, 'write')")
+  public void delete(Sample sample) {
+    if (!isDeletable(sample)) {
+      throw new IllegalArgumentException("sample cannot be deleted");
+    }
+    repository.delete(sample);
   }
 }

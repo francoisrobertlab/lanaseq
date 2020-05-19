@@ -25,12 +25,14 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
+import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
 public class SamplesViewElement extends VerticalLayoutElement {
   private static final int NAME_COLUMN = 0;
   private static final int PROTOCOL_COLUMN = 1;
+  private static final int OWNER_COLUMN = 3;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
@@ -38,6 +40,18 @@ public class SamplesViewElement extends VerticalLayoutElement {
 
   public GridElement samples() {
     return $(GridElement.class).id(SAMPLES);
+  }
+
+  public TextFieldElement nameFilter() {
+    return samples().getHeaderCell(NAME_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public TextFieldElement protocolFilter() {
+    return samples().getHeaderCell(PROTOCOL_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public TextFieldElement ownerFilter() {
+    return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
 
   public void doubleClickSample(int row) {

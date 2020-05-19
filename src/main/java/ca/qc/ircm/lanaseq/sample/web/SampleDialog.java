@@ -57,6 +57,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String ID = "sample-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
+  public static final String DELETED = "deleted";
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected TextField sampleId = new TextField();
@@ -132,7 +133,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     delete.setId(id(DELETE));
     delete.setThemeName(ERROR);
     delete.setIcon(VaadinIcon.TRASH.create());
-    delete.addClickListener(e -> presenter.delete());
+    delete.addClickListener(e -> presenter.delete(getLocale()));
     presenter.init(this);
   }
 

@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
@@ -34,6 +35,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -120,6 +122,30 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.doubleClickSample(0);
+    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.sampleId()).isPresent());
+    assertTrue(optional(() -> dialog.replicate()).isPresent());
+    assertTrue(optional(() -> dialog.protocol()).isPresent());
+    assertTrue(optional(() -> dialog.assay()).isPresent());
+    assertTrue(optional(() -> dialog.type()).isPresent());
+    assertTrue(optional(() -> dialog.target()).isPresent());
+    assertTrue(optional(() -> dialog.strain()).isPresent());
+    assertTrue(optional(() -> dialog.strainDescription()).isPresent());
+    assertTrue(optional(() -> dialog.treatment()).isPresent());
+    assertTrue(optional(() -> dialog.save()).isPresent());
+    assertTrue(optional(() -> dialog.cancel()).isPresent());
+    assertFalse(optional(() -> dialog.delete()).isPresent());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  @Headless(false)
+  public void fieldsExistence_Deletable() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
+    view.doubleClickSample(3);
     SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
@@ -229,5 +255,26 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void delete() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
+    view.doubleClickSample(3);
+    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    Sample sample = repository.findById(9L).get();
+    String name = sample.getName();
+
+    TestTransaction.flagForCommit();
+    dialog.delete().click();
+    TestTransaction.end();
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(SampleDialog.class);
+    assertEquals(resources.message(DELETED, name), notification.getText());
+    assertFalse(repository.findById(9L).isPresent());
   }
 }

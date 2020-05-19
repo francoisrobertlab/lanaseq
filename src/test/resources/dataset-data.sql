@@ -53,6 +53,8 @@ INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_
 VALUES (7, 'BC2_ChIPSeq_IP_yBC102_R103S_R2_20181118', 'BC2', 'R2', 'CHIP_SEQ', 'IMMUNO_PRECIPITATION', null, 'yBC102', 'R103S', null, '2', 5, '2018-11-18 9:33:14');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,protocol_id,owner_id,date)
 VALUES (8, 'BC1_ChIPSeq_IP_polr2b_yBC103_WT_R1_20181118', 'BC1', 'R1', 'CHIP_SEQ', 'IMMUNO_PRECIPITATION', 'polr2b', 'yBC103', 'WT', null, '2', 5, '2018-12-05 9:29:23');
+INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,protocol_id,owner_id,date)
+VALUES (9, 'BC1_ChIPSeq_Input_polr2c_yBC201_WT_R1_20181208', 'BC1', 'R1', 'CHIP_SEQ', 'INPUT', 'polr2c', 'yBC201', 'WT', null, '2', 5, '2018-12-08 9:29:23');
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (1,1,0,1);
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)

@@ -327,6 +327,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
   public void delete() {
     clickButton(dialog.delete);
 
-    verify(presenter).delete();
+    verify(presenter).delete(locale);
   }
 }

@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
+import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.user.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,5 +26,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Repository for {@link Dataset}.
  */
 public interface DatasetRepository extends JpaRepository<Dataset, Long> {
+  public boolean existsBySamples(Sample sample);
+
   public List<Dataset> findByOwner(User owner);
 }
