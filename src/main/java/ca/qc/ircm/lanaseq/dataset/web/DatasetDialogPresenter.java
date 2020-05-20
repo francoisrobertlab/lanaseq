@@ -87,8 +87,8 @@ public class DatasetDialogPresenter {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
-    localeChange(Locale.ENGLISH);
-    setDataset(null, Locale.ENGLISH);
+    localeChange(Constants.DEFAULT_LOCALE);
+    setDataset(null, Constants.DEFAULT_LOCALE);
   }
 
   void localeChange(Locale locale) {

@@ -76,7 +76,7 @@ public class ProtocolDialogPresenter {
   void init(ProtocolDialog dialog) {
     this.dialog = dialog;
     dialog.files.setDataProvider(filesDataProvider);
-    localeChange(Locale.ENGLISH);
+    localeChange(Constants.DEFAULT_LOCALE);
     setProtocol(null);
   }
 
