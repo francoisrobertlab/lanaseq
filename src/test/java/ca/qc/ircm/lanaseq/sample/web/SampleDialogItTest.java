@@ -35,7 +35,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
-import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -140,7 +139,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  @Headless(false)
   public void fieldsExistence_Deletable() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
