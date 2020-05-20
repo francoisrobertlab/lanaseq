@@ -41,6 +41,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
@@ -59,18 +60,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class SampleDialogPresenterTest extends AbstractViewTestCase {
+  @Autowired
   private SampleDialogPresenter presenter;
   @Mock
   private SampleDialog dialog;
-  @Mock
+  @MockBean
   private SampleService service;
-  @Mock
+  @MockBean
   private ProtocolService protocolService;
+  @MockBean
+  private AuthorizationService authorizationService;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Autowired
@@ -97,7 +102,6 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new SampleDialogPresenter(service, protocolService);
     dialog.header = new H3();
     dialog.sampleId = new TextField();
     dialog.replicate = new TextField();
@@ -116,6 +120,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -146,14 +151,25 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.setSample(sample);
 
     assertEquals("", dialog.sampleId.getValue());
+    assertFalse(dialog.sampleId.isReadOnly());
     assertEquals("", dialog.replicate.getValue());
+    assertFalse(dialog.replicate.isReadOnly());
     assertNull(dialog.protocol.getValue());
+    assertFalse(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
     assertEquals(DatasetType.NULL, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
     assertEquals("", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
     assertEquals("", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
+    assertTrue(dialog.save.isVisible());
+    assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
   }
 
@@ -164,14 +180,55 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.setSample(sample);
 
     assertEquals("FR1", dialog.sampleId.getValue());
+    assertFalse(dialog.sampleId.isReadOnly());
     assertEquals("R1", dialog.replicate.getValue());
+    assertFalse(dialog.replicate.isReadOnly());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertFalse(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
     assertEquals("yFR100", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
     assertEquals("WT", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
+    assertTrue(dialog.save.isVisible());
+    assertTrue(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  public void setSample_CannotWrite() {
+    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    Sample sample = repository.findById(1L).get();
+
+    presenter.setSample(sample);
+
+    assertEquals("FR1", dialog.sampleId.getValue());
+    assertTrue(dialog.sampleId.isReadOnly());
+    assertEquals("R1", dialog.replicate.getValue());
+    assertTrue(dialog.replicate.isReadOnly());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("Rappa", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    assertFalse(dialog.save.isVisible());
+    assertFalse(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
   }
 
@@ -183,14 +240,25 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     presenter.setSample(sample);
 
     assertEquals("FR1", dialog.sampleId.getValue());
+    assertFalse(dialog.sampleId.isReadOnly());
     assertEquals("R1", dialog.replicate.getValue());
+    assertFalse(dialog.replicate.isReadOnly());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertFalse(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
     assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
     assertEquals("yFR100", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
     assertEquals("WT", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
+    assertTrue(dialog.save.isVisible());
+    assertTrue(dialog.cancel.isVisible());
     assertTrue(dialog.delete.isVisible());
   }
 

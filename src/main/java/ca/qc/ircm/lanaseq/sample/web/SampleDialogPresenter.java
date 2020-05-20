@@ -19,6 +19,8 @@ import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -41,16 +43,20 @@ public class SampleDialogPresenter {
   private Binder<Sample> binder = new BeanValidationBinder<>(Sample.class);
   private SampleService service;
   private ProtocolService protocolService;
+  private AuthorizationService authorizationService;
 
   @Autowired
-  protected SampleDialogPresenter(SampleService service, ProtocolService protocolService) {
+  protected SampleDialogPresenter(SampleService service, ProtocolService protocolService,
+      AuthorizationService authorizationService) {
     this.service = service;
     this.protocolService = protocolService;
+    this.authorizationService = authorizationService;
   }
 
   void init(SampleDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
+    localeChange(Constants.DEFAULT_LOCALE);
     setSample(null);
   }
 
@@ -113,6 +119,10 @@ public class SampleDialogPresenter {
       sample = new Sample();
     }
     binder.setBean(sample);
-    dialog.delete.setVisible(service.isDeletable(sample));
+    boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE);
+    binder.setReadOnly(readOnly);
+    dialog.save.setVisible(!readOnly);
+    dialog.cancel.setVisible(!readOnly);
+    dialog.delete.setVisible(!readOnly && service.isDeletable(sample));
   }
 }
