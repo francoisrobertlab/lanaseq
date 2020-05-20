@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_EMPTY;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -296,7 +296,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
   public void merge_NoSamples() {
     presenter.merge(locale);
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(SAMPLES_EMPTY), view.error.getText());
+    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
     verify(service, never()).isMergable(any());
     verify(datasetService, never()).save(any());
     verify(view, never()).showNotification(any());

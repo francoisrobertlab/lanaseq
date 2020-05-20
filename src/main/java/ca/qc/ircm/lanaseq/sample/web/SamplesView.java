@@ -56,7 +56,7 @@ public class SamplesView extends VerticalLayout
   public static final String SAMPLES = "samples";
   public static final String MERGE = "merge";
   public static final String MERGED = "merged";
-  public static final String SAMPLES_EMPTY = property(SAMPLES, "empty");
+  public static final String SAMPLES_REQUIRED = property(SAMPLES, "required");
   public static final String MERGE_ERROR = property(MERGE, "error");
   private static final long serialVersionUID = -6945706067250351889L;
   protected H2 header = new H2();

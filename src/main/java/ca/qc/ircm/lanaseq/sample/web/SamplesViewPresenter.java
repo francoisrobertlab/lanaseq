@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_EMPTY;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -109,7 +109,7 @@ public class SamplesViewPresenter {
     AppResources resources = new AppResources(SamplesView.class, locale);
     boolean error = false;
     if (samples.isEmpty()) {
-      view.error.setText(resources.message(SAMPLES_EMPTY));
+      view.error.setText(resources.message(SAMPLES_REQUIRED));
       error = true;
     } else if (!service.isMergable(samples)) {
       view.error.setText(resources.message(MERGE_ERROR));
