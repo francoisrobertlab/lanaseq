@@ -121,7 +121,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Update() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClickSample(0);
+    view.doubleClick(0);
     SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
@@ -145,7 +145,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClickSample(3);
+    view.doubleClick(3);
     SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
@@ -202,7 +202,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void save_Update() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClickSample(0);
+    view.doubleClick(0);
     SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
     fill(dialog);
 
@@ -234,7 +234,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClickSample(0);
+    view.doubleClick(0);
     SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
     fill(dialog);
 
@@ -263,7 +263,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClickSample(3);
+    view.doubleClick(3);
     SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
     Sample sample = repository.findById(9L).get();
     String name = sample.getName();

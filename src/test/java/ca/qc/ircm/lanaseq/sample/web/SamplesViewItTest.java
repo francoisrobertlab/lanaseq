@@ -19,21 +19,34 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,6 +55,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewItTest extends AbstractTestBenchTestCase {
+  @Autowired
+  private DatasetRepository datasetRepository;
+
   private void open() {
     openView(VIEW_NAME);
   }
@@ -71,13 +87,14 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.merge()).isPresent());
   }
 
   @Test
   public void view() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.doubleClickSample(0);
+    view.doubleClick(0);
     assertTrue(optional(() -> $(SampleDialogElement.class).id(SampleDialog.ID)).isPresent());
   }
 
@@ -95,5 +112,35 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.add().click();
     assertTrue(optional(() -> $(SampleDialogElement.class).id(SampleDialog.ID)).isPresent());
+  }
+
+  @Test
+  @Ignore("Cannot select multiple samples")
+  public void merge() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    view.samples().select(0);
+    view.samples().select(1);
+
+    view.merge().click();
+
+    String name = "ChIPSeq_Spt16_yFR101_G24D_JS1-JS2_"
+        + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDateTime.now());
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(SampleDialog.class);
+    assertEquals(resources.message(DELETED, name), notification.getText());
+    List<Dataset> datasets = datasetRepository.findByOwner(new User(3L));
+    Dataset dataset =
+        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
+    assertNotNull(dataset);
+    assertNotNull(dataset.getId());
+    assertEquals(name, dataset.getName());
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
+    assertNull(dataset.getProject());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(2, dataset.getSamples().size());
+    assertTrue(find(dataset.getSamples(), 4L).isPresent());
+    assertTrue(find(dataset.getSamples(), 5L).isPresent());
   }
 }

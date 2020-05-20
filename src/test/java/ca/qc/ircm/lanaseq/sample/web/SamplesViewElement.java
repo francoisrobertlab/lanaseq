@@ -18,11 +18,14 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
@@ -30,9 +33,9 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
 public class SamplesViewElement extends VerticalLayoutElement {
-  private static final int NAME_COLUMN = 0;
-  private static final int PROTOCOL_COLUMN = 1;
-  private static final int OWNER_COLUMN = 3;
+  private static final int NAME_COLUMN = 1;
+  private static final int PROTOCOL_COLUMN = 2;
+  private static final int OWNER_COLUMN = 4;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
@@ -54,7 +57,7 @@ public class SamplesViewElement extends VerticalLayoutElement {
     return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
 
-  public void doubleClickSample(int row) {
+  public void doubleClick(int row) {
     samples().getCell(row, NAME_COLUMN).doubleClick();
   }
 
@@ -62,7 +65,15 @@ public class SamplesViewElement extends VerticalLayoutElement {
     samples().getCell(row, PROTOCOL_COLUMN).doubleClick();
   }
 
+  public DivElement error() {
+    return $(DivElement.class).id(ERROR_TEXT);
+  }
+
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
+  }
+
+  public ButtonElement merge() {
+    return $(ButtonElement.class).id(MERGE);
   }
 }

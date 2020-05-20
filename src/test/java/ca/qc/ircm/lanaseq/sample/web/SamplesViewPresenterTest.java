@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_EMPTY;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -288,6 +289,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     assertEquals(2, dataset.getSamples().size());
     assertTrue(dataset.getSamples().contains(samples.get(0)));
     assertTrue(dataset.getSamples().contains(samples.get(1)));
+    verify(view).showNotification(resources.message(MERGED, dataset.getName()));
   }
 
   @Test
@@ -297,6 +299,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     assertEquals(resources.message(SAMPLES_EMPTY), view.error.getText());
     verify(service, never()).isMergable(any());
     verify(datasetService, never()).save(any());
+    verify(view, never()).showNotification(any());
   }
 
   @Test
@@ -312,6 +315,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
     assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
     verify(datasetService, never()).save(any());
+    verify(view, never()).showNotification(any());
   }
 
   @Test

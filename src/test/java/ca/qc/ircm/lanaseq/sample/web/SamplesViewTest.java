@@ -177,7 +177,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    assertEquals(webResources.message(MERGE), view.merge.getText());
+    assertEquals(resources.message(MERGE), view.merge.getText());
   }
 
   @Test
@@ -204,7 +204,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    assertEquals(webResources.message(MERGE), view.merge.getText());
+    assertEquals(resources.message(MERGE), view.merge.getText());
   }
 
   @Test

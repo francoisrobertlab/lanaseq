@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_EMPTY;
 
@@ -119,6 +120,7 @@ public class SamplesViewPresenter {
       Dataset dataset = new Dataset();
       dataset.setSamples(samples);
       datasetService.save(dataset);
+      view.showNotification(resources.message(MERGED, dataset.getName()));
     }
   }
 

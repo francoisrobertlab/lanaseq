@@ -20,6 +20,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
+import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -47,12 +48,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = SamplesView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class SamplesView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
+public class SamplesView extends VerticalLayout
+    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "samples";
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String SAMPLES = "samples";
   public static final String MERGE = "merge";
+  public static final String MERGED = "merged";
   public static final String SAMPLES_EMPTY = property(SAMPLES, "empty");
   public static final String MERGE_ERROR = property(MERGE, "error");
   private static final long serialVersionUID = -6945706067250351889L;
@@ -155,7 +158,7 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
-    merge.setText(webResources.message(MERGE));
+    merge.setText(resources.message(MERGE));
   }
 
   @Override
