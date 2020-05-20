@@ -45,6 +45,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -72,18 +73,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class DatasetDialogPresenterTest extends AbstractViewTestCase {
+  @Autowired
   private DatasetDialogPresenter presenter;
   @Mock
   private DatasetDialog dialog;
-  @Mock
+  @MockBean
   private DatasetService service;
-  @Mock
+  @MockBean
   private ProtocolService protocolService;
+  @MockBean
+  private AuthorizationService authorizationService;
   @Mock
   private Sample sample;
   @Captor
@@ -123,7 +128,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    presenter = new DatasetDialogPresenter(service, protocolService);
     dialog.header = new H3();
     dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
@@ -160,6 +164,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
       sampleReplicateFields.put(sample, field);
       return field;
     });
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
   }
 
@@ -240,6 +245,42 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(find(samples, 3L).isPresent());
     assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
+  }
+
+  @Test
+  public void setDataset_CannotUpdateOneSample() {
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true, false, true);
+    Dataset dataset = repository.findById(1L).get();
+
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    assertEquals("polymerase", dialog.project.getValue());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertTrue(find(samples, 2L).isPresent());
+    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
+    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+    assertTrue(find(samples, 3L).isPresent());
+    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
+    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
   }
 
   @Test

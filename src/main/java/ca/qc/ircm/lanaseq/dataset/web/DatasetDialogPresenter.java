@@ -36,6 +36,8 @@ import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -72,11 +74,14 @@ public class DatasetDialogPresenter {
   private Dataset dataset;
   private DatasetService service;
   private ProtocolService protocolService;
+  private AuthorizationService authorizationService;
 
   @Autowired
-  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService) {
+  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService,
+      AuthorizationService authorizationService) {
     this.service = service;
     this.protocolService = protocolService;
+    this.authorizationService = authorizationService;
   }
 
   void init(DatasetDialog dialog) {
@@ -110,6 +115,7 @@ public class DatasetDialogPresenter {
         .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
         .withNullRepresentation("").bind(SampleProperties.REPLICATE);
     binder.setBean(sample);
+    binder.setReadOnly(!authorizationService.hasPermission(sample, Permission.WRITE));
     sampleBinders.put(sample, binder);
   }
 
