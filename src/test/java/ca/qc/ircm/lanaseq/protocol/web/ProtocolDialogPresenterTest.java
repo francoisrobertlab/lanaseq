@@ -391,6 +391,24 @@ public class ProtocolDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void setProtocol_CannotWriteBeforeLocaleChange() {
+    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    presenter.setProtocol(protocol);
+    presenter.localeChange(locale);
+    assertEquals(protocol.getName(), dialog.name.getValue());
+    List<ProtocolFile> files = items(dialog.files);
+    assertEquals(this.protocol.getFiles().size(), files.size());
+    for (int i = 0; i < this.protocol.getFiles().size(); i++) {
+      assertEquals(this.protocol.getFiles().get(i), files.get(i));
+    }
+    assertTrue(dialog.name.isReadOnly());
+    assertFalse(dialog.upload.isVisible());
+    assertFalse(dialog.remove.isVisible());
+    assertFalse(dialog.save.isVisible());
+    assertFalse(dialog.cancel.isVisible());
+  }
+
+  @Test
   public void setProtocol_Null() {
     presenter.setProtocol(null);
     assertEquals("", dialog.name.getValue());
