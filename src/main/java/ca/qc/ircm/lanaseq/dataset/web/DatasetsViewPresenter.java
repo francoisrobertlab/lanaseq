@@ -17,10 +17,17 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
+
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
@@ -29,6 +36,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +58,8 @@ public class DatasetsViewPresenter {
   @Autowired
   private ProtocolService protocolService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private AuthorizationService authorizationService;
   private ListDataProvider<Dataset> datasetsDataProvider;
   private WebDatasetFilter filter = new WebDatasetFilter();
@@ -56,9 +68,10 @@ public class DatasetsViewPresenter {
   }
 
   protected DatasetsViewPresenter(DatasetService service, ProtocolService protocolService,
-      AuthorizationService authorizationService) {
+      SampleService sampleService, AuthorizationService authorizationService) {
     this.service = service;
     this.protocolService = protocolService;
+    this.sampleService = sampleService;
     this.authorizationService = authorizationService;
   }
 
@@ -103,6 +116,28 @@ public class DatasetsViewPresenter {
     clearError();
     view.datasetDialog.setDataset(null);
     view.datasetDialog.open();
+  }
+
+  void merge(Locale locale) {
+    clearError();
+    List<Sample> samples = view.datasets.getSelectedItems().stream()
+        .flatMap(dataset -> dataset.getSamples().stream()).collect(Collectors.toList());
+    AppResources resources = new AppResources(DatasetsView.class, locale);
+    boolean error = false;
+    if (samples.isEmpty()) {
+      view.error.setText(resources.message(DATASETS_REQUIRED));
+      error = true;
+    } else if (!sampleService.isMergable(samples)) {
+      view.error.setText(resources.message(MERGE_ERROR));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      Dataset dataset = new Dataset();
+      dataset.setSamples(samples);
+      service.save(dataset);
+      view.showNotification(resources.message(MERGED, dataset.getName()));
+    }
   }
 
   void filterFilename(String value) {

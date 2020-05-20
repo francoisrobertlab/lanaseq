@@ -41,6 +41,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
+import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -67,14 +68,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = DatasetsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
-public class DatasetsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
+public class DatasetsView extends VerticalLayout
+    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "datasets";
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
   public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
-  public static final String PERMISSIONS = "permissions";
-  public static final String PERMISSIONS_DENIED = property(PERMISSIONS, "denied");
+  public static final String MERGE = "merge";
+  public static final String MERGE_ERROR = property(MERGE, "error");
+  public static final String MERGED = "merged";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<Dataset> datasets = new Grid<>();
@@ -90,6 +93,7 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   protected TextField ownerFilter = new TextField();
   protected Div error = new Div();
   protected Button add = new Button();
+  protected Button merge = new Button();
   @Autowired
   protected DatasetDialog datasetDialog;
   @Autowired
@@ -110,9 +114,7 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
   @PostConstruct
   void init() {
     setId(ID);
-    HorizontalLayout buttonsLayout = new HorizontalLayout();
-    add(header, datasets, error, buttonsLayout);
-    buttonsLayout.add(add);
+    add(header, datasets, error, new HorizontalLayout(add, merge));
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.addItemDoubleClickListener(e -> {
@@ -157,7 +159,11 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     ownerFilter.setSizeFull();
     error.setId(ERROR_TEXT);
     add.setId(ADD);
+    add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> presenter.add());
+    merge.setId(MERGE);
+    merge.setIcon(VaadinIcon.CONNECT.create());
+    merge.addClickListener(e -> presenter.merge(getLocale()));
     presenter.init(this);
   }
 
@@ -189,7 +195,7 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
-    add.setIcon(VaadinIcon.PLUS.create());
+    merge.setText(resources.message(MERGE));
   }
 
   @Override

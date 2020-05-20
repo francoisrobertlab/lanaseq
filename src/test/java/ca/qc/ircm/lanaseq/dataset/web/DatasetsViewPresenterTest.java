@@ -17,22 +17,31 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
@@ -51,6 +60,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,24 +68,30 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class DatasetsViewPresenterTest extends AbstractViewTestCase {
+  @Autowired
   private DatasetsViewPresenter presenter;
   @Mock
   private DatasetsView view;
-  @Mock
+  @MockBean
   private DatasetService service;
-  @Mock
+  @MockBean
   private ProtocolService protocolService;
-  @Mock
+  @MockBean
+  private SampleService sampleService;
+  @MockBean
   private AuthorizationService authorizationService;
   @Mock
   private DataProvider<Dataset, ?> dataProvider;
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
+  @Captor
+  private ArgumentCaptor<List<Sample>> samplesCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<DatasetDialog>>> savedListenerCaptor;
   @Captor
@@ -86,13 +102,14 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   private UserRepository userRepository;
   private List<Dataset> datasets;
   private User currentUser;
+  private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(DatasetsView.class, locale);
 
   /**
    * Before test.
    */
   @Before
   public void beforeTest() {
-    presenter = new DatasetsViewPresenter(service, protocolService, authorizationService);
     view.header = new H2();
     view.datasets = new Grid<>();
     view.datasets.setSelectionMode(SelectionMode.MULTI);
@@ -272,6 +289,62 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     presenter.add();
     verify(view.datasetDialog).setDataset(null);
     verify(view.datasetDialog).open();
+  }
+
+  @Test
+  public void merge() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+    presenter.merge(locale);
+    assertFalse(view.error.isVisible());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(5, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertNull(dataset.getProject());
+    assertEquals(5, dataset.getSamples().size());
+    assertTrue(find(dataset.getSamples(), 1L).isPresent());
+    assertTrue(find(dataset.getSamples(), 2L).isPresent());
+    assertTrue(find(dataset.getSamples(), 3L).isPresent());
+    assertTrue(find(dataset.getSamples(), 4L).isPresent());
+    assertTrue(find(dataset.getSamples(), 5L).isPresent());
+    verify(view).showNotification(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_NoSamples() {
+    presenter.merge(locale);
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+    verify(sampleService, never()).isMergable(any());
+    verify(service, never()).save(any());
+    verify(view, never()).showNotification(any());
+  }
+
+  @Test
+  public void merge_NotMergeable() {
+    when(sampleService.isMergable(any())).thenReturn(false);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+    presenter.merge(locale);
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(MERGE_ERROR), view.error.getText());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(5, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service, never()).save(any());
+    verify(view, never()).showNotification(any());
   }
 
   @Test

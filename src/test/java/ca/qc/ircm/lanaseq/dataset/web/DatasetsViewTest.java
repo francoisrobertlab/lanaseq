@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
@@ -177,6 +178,9 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(DATASETS, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(MERGE, view.merge.getId().orElse(""));
+    validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
   }
 
   @Test
@@ -199,7 +203,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(resources.message(MERGE), view.merge.getText());
   }
 
   @Test
@@ -229,7 +233,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(resources.message(MERGE), view.merge.getText());
   }
 
   @Test
@@ -375,5 +379,11 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   public void add() {
     clickButton(view.add);
     verify(presenter).add();
+  }
+
+  @Test
+  public void merge() {
+    clickButton(view.merge);
+    verify(presenter).merge(locale);
   }
 }
