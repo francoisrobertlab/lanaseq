@@ -91,6 +91,11 @@ public class Dataset implements Data, Owned, Serializable {
     this.id = id;
   }
 
+  @Override
+  public String toString() {
+    return "Dataset [id=" + id + ", name=" + name + "]";
+  }
+
   public void generateName() {
     StringBuilder builder = new StringBuilder();
     Sample first =
