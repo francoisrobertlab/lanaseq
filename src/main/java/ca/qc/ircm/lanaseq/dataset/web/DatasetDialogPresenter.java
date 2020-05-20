@@ -71,7 +71,6 @@ public class DatasetDialogPresenter {
   private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
   private ListDataProvider<Sample> samplesDataProvider =
       DataProvider.ofCollection(new ArrayList<>());
-  private Dataset dataset;
   private DatasetService service;
   private ProtocolService protocolService;
   private AuthorizationService authorizationService;
@@ -87,6 +86,8 @@ public class DatasetDialogPresenter {
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
+    binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
+    localeChange(Locale.ENGLISH);
     setDataset(null, Locale.ENGLISH);
   }
 
@@ -105,7 +106,18 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }
 
+  void setReadOnly() {
+    Dataset dataset = binder.getBean();
+    boolean readOnly = !authorizationService.hasPermission(dataset, Permission.WRITE);
+    binder.setReadOnly(readOnly);
+    boolean sampleReadOnly = readOnly || !dataset.getSamples().stream()
+        .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE)).filter(val -> val)
+        .findFirst().orElse(false);
+    sampleBinder.setReadOnly(sampleReadOnly);
+  }
+
   void bindSampleFields(Sample sample, Locale locale) {
+    boolean forceReadOnly = !authorizationService.hasPermission(binder.getBean(), Permission.WRITE);
     final AppResources webResources = new AppResources(Constants.class, locale);
     Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
     binder.forField(dialog.sampleIdField(sample))
@@ -115,7 +127,8 @@ public class DatasetDialogPresenter {
         .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
         .withNullRepresentation("").bind(SampleProperties.REPLICATE);
     binder.setBean(sample);
-    binder.setReadOnly(!authorizationService.hasPermission(sample, Permission.WRITE));
+    binder.setReadOnly(
+        forceReadOnly || !authorizationService.hasPermission(sample, Permission.WRITE));
     sampleBinders.put(sample, binder);
   }
 
@@ -156,6 +169,7 @@ public class DatasetDialogPresenter {
 
   void save(Locale locale) {
     if (validate()) {
+      Dataset dataset = binder.getBean();
       logger.debug("Save dataset {}", dataset);
       dataset.setSamples(new ArrayList<>(samplesDataProvider.getItems()));
       for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
@@ -184,7 +198,7 @@ public class DatasetDialogPresenter {
   }
 
   Dataset getDataset() {
-    return dataset;
+    return binder.getBean();
   }
 
   void setDataset(Dataset dataset, Locale locale) {
@@ -199,12 +213,12 @@ public class DatasetDialogPresenter {
     }
     Sample sample = new Sample();
     copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
-    this.dataset = dataset;
     binder.setBean(dataset);
     sampleBinder.setBean(sample);
     samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
     dataset.getSamples().forEach(s -> bindSampleFields(s, locale));
+    setReadOnly();
   }
 
   private void copy(Sample from, Sample to) {
