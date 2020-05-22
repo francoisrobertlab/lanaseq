@@ -312,10 +312,10 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void filterFilename() {
+  public void filterName() {
     view.nameFilter.setValue("test");
 
-    verify(presenter).filterFilename("test");
+    verify(presenter).filterName("test");
   }
 
   @Test

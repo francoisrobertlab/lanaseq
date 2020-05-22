@@ -134,7 +134,7 @@ public class DatasetsView extends VerticalLayout
     datasets.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = datasets.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
-    nameFilter.addValueChangeListener(e -> presenter.filterFilename(e.getValue()));
+    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);

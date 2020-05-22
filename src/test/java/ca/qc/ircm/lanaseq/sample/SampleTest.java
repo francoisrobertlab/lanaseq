@@ -117,7 +117,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullAssay() {
+  public void generateName_NullAssay() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -132,7 +132,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullType() {
+  public void generateName_NullType() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -147,7 +147,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullTarget() {
+  public void generateName_NullTarget() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -162,7 +162,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_InvalidTarget() {
+  public void generateName_InvalidTarget() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -178,7 +178,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_FrenchTarget() {
+  public void generateName_FrenchTarget() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -194,7 +194,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullStrain() {
+  public void generateName_NullStrain() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -208,7 +208,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_InvalidStrain() {
+  public void generateName_InvalidStrain() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -224,7 +224,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_FrenchStrain() {
+  public void generateName_FrenchStrain() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -240,7 +240,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullStrainWithDescription() {
+  public void generateName_NullStrainWithDescription() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -255,7 +255,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullStrainDescription() {
+  public void generateName_NullStrainDescription() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -270,7 +270,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_InvalidStrainDescription() {
+  public void generateName_InvalidStrainDescription() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -286,7 +286,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_FrenchStrainDescription() {
+  public void generateName_FrenchStrainDescription() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -302,7 +302,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_NullTreatment() {
+  public void generateName_NullTreatment() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -317,7 +317,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_InvalidTreatment() {
+  public void generateName_InvalidTreatment() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -333,7 +333,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_FrenchTreatment() {
+  public void generateName_FrenchTreatment() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
@@ -364,7 +364,7 @@ public class SampleTest {
   }
 
   @Test
-  public void getFilename_AllNull() {
+  public void generateName_AllNull() {
     Sample sample = new Sample();
     sample.generateName();
     assertEquals("", sample.getName());

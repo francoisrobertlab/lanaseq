@@ -153,20 +153,20 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void filterFilename() {
+  public void filterName() {
     view.datasets.setDataProvider(dataProvider);
 
-    presenter.filterFilename("test");
+    presenter.filterName("test");
 
     assertEquals("test", presenter.filter().nameContains);
     verify(dataProvider).refreshAll();
   }
 
   @Test
-  public void filterFilename_Empty() {
+  public void filterName_Empty() {
     view.datasets.setDataProvider(dataProvider);
 
-    presenter.filterFilename("");
+    presenter.filterName("");
 
     assertEquals(null, presenter.filter().nameContains);
     verify(dataProvider).refreshAll();
