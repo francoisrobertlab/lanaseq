@@ -31,7 +31,8 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
 public class DatasetsViewElement extends VerticalLayoutElement {
-  public static final int DATASET_COLUMN = 0;
+  private static final int NAME_COLUMN = 0;
+  private static final int PROTOCOL_COLUMN = 2;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
@@ -41,8 +42,12 @@ public class DatasetsViewElement extends VerticalLayoutElement {
     return $(GridElement.class).id(DATASETS);
   }
 
-  public void doubleClickDataset(int row) {
-    datasets().getCell(0, 0).doubleClick();
+  public void doubleClick(int row) {
+    datasets().getCell(0, NAME_COLUMN).doubleClick();
+  }
+
+  public void doubleClickProtocol(int row) {
+    datasets().getCell(0, PROTOCOL_COLUMN).doubleClick();
   }
 
   public DivElement error() {

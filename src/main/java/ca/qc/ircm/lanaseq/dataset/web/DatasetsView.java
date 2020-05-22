@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -58,6 +59,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,10 +83,12 @@ public class DatasetsView extends VerticalLayout
   protected H2 header = new H2();
   protected Grid<Dataset> datasets = new Grid<>();
   protected Column<Dataset> name;
+  protected Column<Dataset> tags;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
   protected TextField nameFilter = new TextField();
+  protected TextField tagsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
@@ -123,6 +127,9 @@ public class DatasetsView extends VerticalLayout
     });
     name = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName));
+    tags = datasets
+        .addColumn(dataset -> dataset.getTags().stream().collect(Collectors.joining(", ")), TAGS)
+        .setKey(TAGS);
     protocol = datasets.addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()));
     date = datasets
@@ -137,6 +144,10 @@ public class DatasetsView extends VerticalLayout
     nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
+    filtersRow.getCell(tags).setComponent(tagsFilter);
+    tagsFilter.addValueChangeListener(e -> presenter.filterTags(e.getValue()));
+    tagsFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    tagsFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
     protocolFilter.addValueChangeListener(e -> presenter.filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -171,8 +182,10 @@ public class DatasetsView extends VerticalLayout
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
-    String filenameHeader = datasetResources.message(NAME);
-    name.setHeader(filenameHeader).setFooter(filenameHeader);
+    String nameHeader = datasetResources.message(NAME);
+    name.setHeader(nameHeader).setFooter(nameHeader);
+    String tagsHeader = datasetResources.message(TAGS);
+    tags.setHeader(tagsHeader).setFooter(tagsHeader);
     String protocolHeader = sampleResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = datasetResources.message(DATE);
@@ -180,6 +193,7 @@ public class DatasetsView extends VerticalLayout
     String ownerHeader = datasetResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
+    tagsFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));

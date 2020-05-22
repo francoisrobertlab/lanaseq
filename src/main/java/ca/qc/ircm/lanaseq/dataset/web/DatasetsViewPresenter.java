@@ -151,6 +151,12 @@ public class DatasetsViewPresenter {
     view.datasets.getDataProvider().refreshAll();
   }
 
+  void filterTags(String value) {
+    clearError();
+    filter.tagsContains = value.isEmpty() ? null : value;
+    view.datasets.getDataProvider().refreshAll();
+  }
+
   void filterProtocol(String value) {
     clearError();
     filter.protocolContains = value.isEmpty() ? null : value;

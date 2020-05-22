@@ -111,7 +111,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.doubleClickDataset(0);
+    view.doubleClick(0);
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.tags()).isPresent());
@@ -175,7 +175,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   public void save_Update() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.doubleClickDataset(0);
+    view.doubleClick(0);
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     fill(dialog);
 
@@ -223,7 +223,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.doubleClickDataset(0);
+    view.doubleClick(0);
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     fill(dialog);
 

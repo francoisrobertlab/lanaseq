@@ -26,6 +26,8 @@ import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -76,8 +78,16 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void view() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
-    view.doubleClickDataset(0);
+    view.doubleClick(0);
     assertTrue(optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
+  }
+
+  @Test
+  public void view_Protocol() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.doubleClickProtocol(0);
+    assertTrue(optional(() -> $(ProtocolDialogElement.class).id(ProtocolDialog.ID)).isPresent());
   }
 
   @Test

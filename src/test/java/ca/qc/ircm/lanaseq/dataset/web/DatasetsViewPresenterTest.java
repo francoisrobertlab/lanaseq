@@ -173,6 +173,26 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void filterTags() {
+    view.datasets.setDataProvider(dataProvider);
+
+    presenter.filterTags("test");
+
+    assertEquals("test", presenter.filter().tagsContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
+  public void filterTags_Empty() {
+    view.datasets.setDataProvider(dataProvider);
+
+    presenter.filterTags("");
+
+    assertEquals(null, presenter.filter().tagsContains);
+    verify(dataProvider).refreshAll();
+  }
+
+  @Test
   public void filterProtocol() {
     view.datasets.setDataProvider(dataProvider);
 
