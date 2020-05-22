@@ -26,7 +26,6 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -82,12 +81,10 @@ public class DatasetsView extends VerticalLayout
   protected H2 header = new H2();
   protected Grid<Dataset> datasets = new Grid<>();
   protected Column<Dataset> filename;
-  protected Column<Dataset> project;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
   protected TextField nameFilter = new TextField();
-  protected TextField projectFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
@@ -126,8 +123,6 @@ public class DatasetsView extends VerticalLayout
     });
     filename = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName));
-    project = datasets.addColumn(dataset -> dataset.getProject(), PROJECT).setKey(PROJECT)
-        .setComparator(NormalizedComparator.of(Dataset::getProject));
     protocol = datasets.addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()));
     date = datasets
@@ -142,10 +137,6 @@ public class DatasetsView extends VerticalLayout
     nameFilter.addValueChangeListener(e -> presenter.filterFilename(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
-    filtersRow.getCell(project).setComponent(projectFilter);
-    projectFilter.addValueChangeListener(e -> presenter.filterProject(e.getValue()));
-    projectFilter.setValueChangeMode(ValueChangeMode.EAGER);
-    projectFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
     protocolFilter.addValueChangeListener(e -> presenter.filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -182,8 +173,6 @@ public class DatasetsView extends VerticalLayout
     header.setText(resources.message(HEADER));
     String filenameHeader = datasetResources.message(NAME);
     filename.setHeader(filenameHeader).setFooter(filenameHeader);
-    String projectHeader = datasetResources.message(PROJECT);
-    project.setHeader(projectHeader).setFooter(projectHeader);
     String protocolHeader = sampleResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = datasetResources.message(DATE);
@@ -191,7 +180,6 @@ public class DatasetsView extends VerticalLayout
     String ownerHeader = datasetResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
-    projectFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));

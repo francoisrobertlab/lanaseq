@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.THEME;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -90,7 +89,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String SAVED = "saved";
   protected H3 header = new H3();
   protected TagsField tags = new TagsField();
-  protected TextField project = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
   protected ComboBox<Assay> assay = new ComboBox<>();
   protected ComboBox<SampleType> type = new ComboBox<>();
@@ -130,7 +128,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     add(layout);
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
-    FormLayout datasetForm = new FormLayout(project, protocol, assay, type);
+    FormLayout datasetForm = new FormLayout(protocol, assay, type);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
@@ -139,7 +137,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     layout.add(header, tags, form, samplesHeader, samples, new HorizontalLayout(save, cancel));
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
-    project.setId(id(PROJECT));
     protocol.setId(id(PROTOCOL));
     protocol.setItemLabelGenerator(Protocol::getName);
     protocol.setPreventInvalidInput(true);
@@ -225,7 +222,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     tags.setLabel(datasetResources.message(TAGS));
-    project.setLabel(datasetResources.message(PROJECT));
     protocol.setLabel(sampleResources.message(PROTOCOL));
     assay.setLabel(sampleResources.message(ASSAY));
     type.setLabel(sampleResources.message(TYPE));

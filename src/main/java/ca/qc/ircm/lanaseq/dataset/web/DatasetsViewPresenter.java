@@ -36,6 +36,7 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -134,6 +135,7 @@ public class DatasetsViewPresenter {
     view.error.setVisible(error);
     if (!error) {
       Dataset dataset = new Dataset();
+      dataset.setTags(new HashSet<>());
       dataset.setSamples(samples);
       service.save(dataset);
       view.showNotification(resources.message(MERGED, dataset.getName()));
@@ -143,12 +145,6 @@ public class DatasetsViewPresenter {
   void filterFilename(String value) {
     clearError();
     filter.nameContains = value.isEmpty() ? null : value;
-    view.datasets.getDataProvider().refreshAll();
-  }
-
-  void filterProject(String value) {
-    clearError();
-    filter.projectContains = value.isEmpty() ? null : value;
     view.datasets.getDataProvider().refreshAll();
   }
 

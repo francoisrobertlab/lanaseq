@@ -79,7 +79,6 @@ public class DatasetServiceTest {
 
     assertEquals((Long) 1L, dataset.getId());
     assertEquals("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
-    assertEquals("polymerase", dataset.getProject());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
@@ -124,7 +123,6 @@ public class DatasetServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = new Dataset();
-    dataset.setProject("my project");
     dataset.setTags(new HashSet<>());
     dataset.getTags().add("tag1");
     dataset.getTags().add("tag2");
@@ -159,7 +157,6 @@ public class DatasetServiceTest {
     dataset = repository.findById(dataset.getId()).orElse(null);
     assertEquals("ChIPSeq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_"
         + DateTimeFormatter.BASIC_ISO_DATE.format(dataset.getDate()), dataset.getName());
-    assertEquals("my project", dataset.getProject());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("tag1"));
     assertTrue(dataset.getTags().contains("tag2"));
@@ -208,7 +205,6 @@ public class DatasetServiceTest {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = repository.findById(1L).orElse(null);
-    dataset.setProject("my project");
     dataset.getTags().remove("rappa");
     dataset.getTags().add("tag1");
     Sample sample1 = dataset.getSamples().get(0);
@@ -240,7 +236,6 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20181020",
         dataset.getName());
-    assertEquals("my project", dataset.getProject());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));

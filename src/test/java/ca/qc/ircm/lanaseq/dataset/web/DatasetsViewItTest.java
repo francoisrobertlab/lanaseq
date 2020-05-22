@@ -30,6 +30,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import java.util.Locale;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -85,5 +86,10 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
     view.add().click();
     assertTrue(optional(() -> $(DatasetDialogElement.class).id(DatasetDialog.ID)).isPresent());
+  }
+
+  @Test
+  @Ignore("Cannot select multiple datasets")
+  public void merge() throws Throwable {
   }
 }

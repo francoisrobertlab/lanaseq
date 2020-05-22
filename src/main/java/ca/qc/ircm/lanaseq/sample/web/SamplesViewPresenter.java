@@ -38,6 +38,7 @@ import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
@@ -119,6 +120,7 @@ public class SamplesViewPresenter {
     if (!error) {
       Dataset dataset = new Dataset();
       dataset.setSamples(samples);
+      dataset.setTags(new HashSet<>());
       datasetService.save(dataset);
       view.showNotification(resources.message(MERGED, dataset.getName()));
     }

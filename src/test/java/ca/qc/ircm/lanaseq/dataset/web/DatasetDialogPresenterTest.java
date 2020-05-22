@@ -115,7 +115,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private List<Protocol> protocols;
   private String tag1 = "Tag 1";
   private String tag2 = "Tag 2";
-  private String project = "Test Project";
   private Protocol protocol;
   private Assay assay = Assay.CHIP_SEQ;
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
@@ -136,7 +135,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog.header = new H3();
     dialog.tags = new TagsField();
-    dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
     dialog.assay = new ComboBox<>();
     dialog.assay.setItems(Assay.values());
@@ -177,7 +175,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
   private void fillForm() {
     dialog.tags.setValue(Stream.of(tag1, tag2).collect(Collectors.toSet()));
-    dialog.project.setValue(project);
     dialog.protocol.setValue(protocol);
     dialog.assay.setValue(assay);
     dialog.type.setValue(type);
@@ -206,14 +203,22 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    assertEquals("", dialog.project.getValue());
+    assertTrue(dialog.tags.getValue().isEmpty());
+    assertFalse(dialog.tags.isReadOnly());
     assertNull(dialog.protocol.getValue());
+    assertFalse(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
     assertEquals(SampleType.NULL, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
     assertEquals("", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
     assertEquals("", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertNull(samples.get(0).getSampleId());
@@ -233,23 +238,25 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    assertEquals("polymerase", dialog.project.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertFalse(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.target.isReadOnly());
     assertEquals("yFR100", dialog.strain.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.strain.isReadOnly());
     assertEquals("WT", dialog.strainDescription.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertFalse(dialog.treatment.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     assertTrue(find(samples, 1L).isPresent());
@@ -277,8 +284,10 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    assertEquals("polymerase", dialog.project.getValue());
-    assertTrue(dialog.project.isReadOnly());
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertTrue(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertTrue(dialog.protocol.isReadOnly());
@@ -321,8 +330,10 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.setDataset(dataset, locale);
     presenter.localeChange(locale);
 
-    assertEquals("polymerase", dialog.project.getValue());
-    assertTrue(dialog.project.isReadOnly());
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertTrue(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertTrue(dialog.protocol.isReadOnly());
@@ -365,8 +376,10 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    assertEquals("polymerase", dialog.project.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertFalse(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertTrue(dialog.protocol.isReadOnly());
@@ -412,8 +425,10 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    assertEquals("polymerase", dialog.project.getValue());
-    assertFalse(dialog.project.isReadOnly());
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertFalse(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertFalse(dialog.protocol.isReadOnly());
@@ -456,15 +471,24 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    assertEquals("polymerase 2", dialog.project.getValue());
+    assertEquals(1, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("chipseq"));
+    assertTrue(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
     assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2b", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
     assertEquals("yBC103", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
     assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertTrue(find(samples, 8L).isPresent());
@@ -483,14 +507,22 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     presenter.localeChange(locale);
     presenter.setDataset(null, locale);
 
-    assertEquals("", dialog.project.getValue());
+    assertTrue(dialog.tags.getValue().isEmpty());
+    assertFalse(dialog.tags.isReadOnly());
     assertNull(dialog.protocol.getValue());
+    assertFalse(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
     assertEquals(SampleType.NULL, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
     assertEquals("", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
     assertEquals("", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertNull(samples.get(0).getSampleId());
@@ -506,7 +538,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void requiredIndicator() {
     presenter.localeChange(locale);
-    assertFalse(dialog.project.isRequiredIndicatorVisible());
+    assertFalse(dialog.tags.isRequiredIndicatorVisible());
     assertTrue(dialog.protocol.isRequiredIndicatorVisible());
     assertTrue(dialog.assay.isRequiredIndicatorVisible());
     assertFalse(dialog.type.isRequiredIndicatorVisible());
@@ -569,24 +601,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertTrue(dataset.getTags().isEmpty());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
-  public void save_ProjectEmpty() {
-    presenter.localeChange(locale);
-    fillForm();
-    dialog.project.setValue("");
-
-    presenter.save(locale);
-
-    BinderValidationStatus<Dataset> status = presenter.validateDataset();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getProject());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -950,7 +964,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
-    assertEquals(project, dataset.getProject());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals(sampleId1, sample.getSampleId());
@@ -991,7 +1004,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
-    assertEquals(project, dataset.getProject());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
     assertEquals(sampleId1, sample.getSampleId());

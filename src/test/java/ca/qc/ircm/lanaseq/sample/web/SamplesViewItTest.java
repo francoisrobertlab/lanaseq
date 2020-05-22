@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -135,9 +134,10 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertNotNull(dataset);
     assertNotNull(dataset.getId());
     assertEquals(name, dataset.getName());
+    assertTrue(dataset.getTags().isEmpty());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
-    assertNull(dataset.getProject());
+    assertTrue(dataset.getTags().isEmpty());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
     assertTrue(find(dataset.getSamples(), 4L).isPresent());

@@ -64,32 +64,6 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void test_ProjectContains() {
-    filter.projectContains = "test";
-
-    assertTrue(filter.test(project("My test")));
-    assertTrue(filter.test(project("Test my")));
-    assertTrue(filter.test(project("My test my")));
-    assertTrue(filter.test(project("My TEST my")));
-    assertFalse(filter.test(project(null)));
-    assertFalse(filter.test(project("")));
-    assertFalse(filter.test(project("christian")));
-  }
-
-  @Test
-  public void test_ProjectContainsNull() {
-    filter.projectContains = null;
-
-    assertTrue(filter.test(project("My test")));
-    assertTrue(filter.test(project("Test my")));
-    assertTrue(filter.test(project("My test my")));
-    assertTrue(filter.test(project("My TEST my")));
-    assertTrue(filter.test(project(null)));
-    assertTrue(filter.test(project("")));
-    assertTrue(filter.test(project("christian")));
-  }
-
-  @Test
   public void test_ProtocolContains() {
     filter.protocolContains = "test";
 
@@ -186,45 +160,39 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void test_ProjectAndOwnerContains() {
-    filter.projectContains = "test";
+  public void test_NameAndOwnerContains() {
+    filter.nameContains = "test";
     filter.ownerContains = "test";
 
-    assertTrue(filter.test(projectOwner("My test", "My.test@abc.com")));
-    assertTrue(filter.test(projectOwner("Test my", "Test.my@abc.com")));
-    assertTrue(filter.test(projectOwner("My test my", "My.test.my@abc.com")));
-    assertTrue(filter.test(projectOwner("My TEST my", "My.TEST.my@abc.com")));
-    assertTrue(filter.test(projectOwner("My test", "abc@test.com")));
-    assertTrue(filter.test(projectOwner("My test", "abc@a.test")));
-    assertTrue(filter.test(projectOwner("My test", "test@test.com")));
-    assertFalse(filter.test(projectOwner("christian", "My.test@abc.com")));
-    assertFalse(filter.test(projectOwner("christian", "Test.my@abc.com")));
-    assertFalse(filter.test(projectOwner("christian", "My.test.my@abc.com")));
-    assertFalse(filter.test(projectOwner("christian", "My.TEST.my@abc.com")));
-    assertFalse(filter.test(projectOwner("christian", "abc@test.com")));
-    assertFalse(filter.test(projectOwner("christian", "abc@a.test")));
-    assertFalse(filter.test(projectOwner("christian", "test@test.com")));
-    assertFalse(filter.test(projectOwner("My test", "christian@abc.com")));
-    assertFalse(filter.test(projectOwner("Test my", "christian@abc.com")));
-    assertFalse(filter.test(projectOwner("My test my", "christian@abc.com")));
-    assertFalse(filter.test(projectOwner("My TEST my", "christian@abc.com")));
-    assertFalse(filter.test(projectOwner(null, null)));
-    assertFalse(filter.test(projectOwner("", "")));
-    assertFalse(filter.test(projectOwner("My test", null)));
-    assertFalse(filter.test(projectOwner("My test", "")));
-    assertFalse(filter.test(projectOwner(null, "my.test@abc.com")));
-    assertFalse(filter.test(projectOwner("", "my.test@abc.com")));
+    assertTrue(filter.test(nameOwner("My test", "My.test@abc.com")));
+    assertTrue(filter.test(nameOwner("Test my", "Test.my@abc.com")));
+    assertTrue(filter.test(nameOwner("My test my", "My.test.my@abc.com")));
+    assertTrue(filter.test(nameOwner("My TEST my", "My.TEST.my@abc.com")));
+    assertTrue(filter.test(nameOwner("My test", "abc@test.com")));
+    assertTrue(filter.test(nameOwner("My test", "abc@a.test")));
+    assertTrue(filter.test(nameOwner("My test", "test@test.com")));
+    assertFalse(filter.test(nameOwner("christian", "My.test@abc.com")));
+    assertFalse(filter.test(nameOwner("christian", "Test.my@abc.com")));
+    assertFalse(filter.test(nameOwner("christian", "My.test.my@abc.com")));
+    assertFalse(filter.test(nameOwner("christian", "My.TEST.my@abc.com")));
+    assertFalse(filter.test(nameOwner("christian", "abc@test.com")));
+    assertFalse(filter.test(nameOwner("christian", "abc@a.test")));
+    assertFalse(filter.test(nameOwner("christian", "test@test.com")));
+    assertFalse(filter.test(nameOwner("My test", "christian@abc.com")));
+    assertFalse(filter.test(nameOwner("Test my", "christian@abc.com")));
+    assertFalse(filter.test(nameOwner("My test my", "christian@abc.com")));
+    assertFalse(filter.test(nameOwner("My TEST my", "christian@abc.com")));
+    assertFalse(filter.test(nameOwner(null, null)));
+    assertFalse(filter.test(nameOwner("", "")));
+    assertFalse(filter.test(nameOwner("My test", null)));
+    assertFalse(filter.test(nameOwner("My test", "")));
+    assertFalse(filter.test(nameOwner(null, "my.test@abc.com")));
+    assertFalse(filter.test(nameOwner("", "my.test@abc.com")));
   }
 
   private Dataset name(String name) {
     Dataset dataset = new Dataset();
     dataset.setName(name);
-    return dataset;
-  }
-
-  private Dataset project(String project) {
-    Dataset dataset = new Dataset();
-    dataset.setProject(project);
     return dataset;
   }
 
@@ -254,9 +222,9 @@ public class DatasetFilterTest {
     return dataset;
   }
 
-  private Dataset projectOwner(String project, String email) {
+  private Dataset nameOwner(String name, String email) {
     Dataset dataset = new Dataset();
-    dataset.setProject(project);
+    dataset.setName(name);
     User user = new User();
     user.setEmail(email);
     dataset.setOwner(user);

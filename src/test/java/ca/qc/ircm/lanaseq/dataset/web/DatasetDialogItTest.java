@@ -63,7 +63,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolRepository protocolRepository;
   private String tag1 = "mnase";
   private String tag2 = "ip";
-  private String project = "test project";
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
@@ -92,7 +91,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.tags().newTag().setValue(tag2);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
-    dialog.project().setValue(project);
     dialog.protocol().selectByText(protocol.getName());
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
     dialog.type().selectByText(type.getLabel(currentLocale()));
@@ -117,7 +115,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.tags()).isPresent());
-    assertTrue(optional(() -> dialog.project()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
     assertTrue(optional(() -> dialog.type()).isPresent());
@@ -158,7 +155,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
-    assertEquals(project, dataset.getProject());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -198,7 +194,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
-    assertEquals(project, dataset.getProject());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
@@ -241,7 +236,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("G24D"));
-    assertEquals("histone", dataset.getProject());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());

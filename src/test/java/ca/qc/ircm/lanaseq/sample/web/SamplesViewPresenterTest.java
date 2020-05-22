@@ -285,7 +285,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     verify(datasetService).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
-    assertNull(dataset.getProject());
+    assertTrue(dataset.getTags().isEmpty());
     assertEquals(2, dataset.getSamples().size());
     assertTrue(dataset.getSamples().contains(samples.get(0)));
     assertTrue(dataset.getSamples().contains(samples.get(1)));

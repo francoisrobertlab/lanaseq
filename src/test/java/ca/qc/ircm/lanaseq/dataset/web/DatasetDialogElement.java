@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
@@ -56,10 +55,6 @@ public class DatasetDialogElement extends DialogElement {
 
   public TagsFieldElement tags() {
     return $(TagsFieldElement.class).id(id(TAGS));
-  }
-
-  public TextFieldElement project() {
-    return $(TextFieldElement.class).id(id(PROJECT));
   }
 
   public ComboBoxElement protocol() {

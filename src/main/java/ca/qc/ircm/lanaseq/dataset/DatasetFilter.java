@@ -30,7 +30,6 @@ import java.util.function.Predicate;
  */
 public class DatasetFilter implements Predicate<Dataset> {
   public String nameContains;
-  public String projectContains;
   public String protocolContains;
   public Range<LocalDate> dateRange;
   public String ownerContains;
@@ -40,9 +39,6 @@ public class DatasetFilter implements Predicate<Dataset> {
     boolean test = true;
     if (nameContains != null) {
       test &= comparable(replaceNull(dataset.getName())).contains(comparable(nameContains));
-    }
-    if (projectContains != null) {
-      test &= comparable(replaceNull(dataset.getProject())).contains(comparable(projectContains));
     }
     if (protocolContains != null) {
       Sample sample = dataset.getSamples() != null

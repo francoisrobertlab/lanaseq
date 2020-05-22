@@ -113,7 +113,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     view.header = new H2();
     view.datasets = new Grid<>();
     view.datasets.setSelectionMode(SelectionMode.MULTI);
-    view.projectFilter = new TextField();
     view.ownerFilter = new TextField();
     view.error = new Div();
     view.add = new Button();
@@ -170,26 +169,6 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     presenter.filterFilename("");
 
     assertEquals(null, presenter.filter().nameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterProject() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterProject("test");
-
-    assertEquals("test", presenter.filter().projectContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterProject_Empty() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterProject("");
-
-    assertEquals(null, presenter.filter().projectContains);
     verify(dataProvider).refreshAll();
   }
 
@@ -308,7 +287,7 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
-    assertNull(dataset.getProject());
+    assertTrue(dataset.getTags().isEmpty());
     assertEquals(5, dataset.getSamples().size());
     assertTrue(find(dataset.getSamples(), 1L).isPresent());
     assertTrue(find(dataset.getSamples(), 2L).isPresent());

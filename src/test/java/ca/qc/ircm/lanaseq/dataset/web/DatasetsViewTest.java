@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
@@ -133,11 +132,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     when(view.filename.setKey(any())).thenReturn(view.filename);
     when(view.filename.setComparator(any(Comparator.class))).thenReturn(view.filename);
     when(view.filename.setHeader(any(String.class))).thenReturn(view.filename);
-    view.project = mock(Column.class);
-    when(view.datasets.addColumn(any(ValueProvider.class), eq(PROJECT))).thenReturn(view.project);
-    when(view.project.setKey(any())).thenReturn(view.project);
-    when(view.project.setComparator(any(Comparator.class))).thenReturn(view.project);
-    when(view.project.setHeader(any(String.class))).thenReturn(view.project);
     view.protocol = mock(Column.class);
     when(view.datasets.addColumn(any(ValueProvider.class), eq(PROTOCOL))).thenReturn(view.protocol);
     when(view.protocol.setKey(any())).thenReturn(view.protocol);
@@ -156,8 +150,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     when(view.datasets.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell filenameFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.filename)).thenReturn(filenameFilterCell);
-    HeaderCell projectFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.project)).thenReturn(projectFilterCell);
     HeaderCell protocolFilterCell = mock(HeaderCell.class);
     when(filtersRow.getCell(view.protocol)).thenReturn(protocolFilterCell);
     HeaderCell dateFilterCell = mock(HeaderCell.class);
@@ -190,8 +182,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.filename).setHeader(datasetResources.message(NAME));
     verify(view.filename).setFooter(datasetResources.message(NAME));
-    verify(view.project).setHeader(datasetResources.message(PROJECT));
-    verify(view.project).setFooter(datasetResources.message(PROJECT));
     verify(view.protocol).setHeader(sampleResources.message(PROTOCOL));
     verify(view.protocol).setFooter(sampleResources.message(PROTOCOL));
     verify(view.date).setHeader(datasetResources.message(DATE));
@@ -199,7 +189,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.owner).setHeader(datasetResources.message(OWNER));
     verify(view.owner).setFooter(datasetResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
@@ -220,8 +209,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.filename).setHeader(datasetResources.message(NAME));
     verify(view.filename).setFooter(datasetResources.message(NAME));
-    verify(view.project).setHeader(datasetResources.message(PROJECT));
-    verify(view.project).setFooter(datasetResources.message(PROJECT));
     verify(view.protocol).setHeader(sampleResources.message(PROTOCOL));
     verify(view.protocol).setFooter(sampleResources.message(PROTOCOL));
     verify(view.date, atLeastOnce()).setHeader(datasetResources.message(DATE));
@@ -229,7 +216,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     verify(view.owner, atLeastOnce()).setHeader(datasetResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(datasetResources.message(OWNER));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.projectFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
@@ -244,9 +230,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
 
   @Test
   public void datasets() {
-    assertEquals(5, view.datasets.getColumns().size());
+    assertEquals(4, view.datasets.getColumns().size());
     assertNotNull(view.datasets.getColumnByKey(NAME));
-    assertNotNull(view.datasets.getColumnByKey(PROJECT));
     assertNotNull(view.datasets.getColumnByKey(PROTOCOL));
     assertNotNull(view.datasets.getColumnByKey(DATE));
     assertNotNull(view.datasets.getColumnByKey(OWNER));
@@ -268,18 +253,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertTrue(comparator instanceof NormalizedComparator);
     for (Dataset dataset : datasets) {
       assertEquals(dataset.getName(),
-          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
-    }
-    verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(PROJECT));
-    valueProvider = valueProviderCaptor.getValue();
-    for (Dataset dataset : datasets) {
-      assertEquals(dataset.getProject(), valueProvider.apply(dataset));
-    }
-    verify(view.project).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Dataset dataset : datasets) {
-      assertEquals(dataset.getProject(),
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
     verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
@@ -343,13 +316,6 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     view.nameFilter.setValue("test");
 
     verify(presenter).filterFilename("test");
-  }
-
-  @Test
-  public void filterProject() {
-    view.projectFilter.setValue("test");
-
-    verify(presenter).filterProject("test");
   }
 
   @Test

@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
@@ -193,7 +192,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(TAGS), dialog.tags.getId().orElse(""));
-    assertEquals(id(PROJECT), dialog.project.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
     assertEquals(id(TYPE), dialog.type.getId().orElse(""));
@@ -218,7 +216,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(datasetResources.message(TAGS), dialog.tags.getLabel());
-    assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
@@ -258,7 +255,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(datasetResources.message(TAGS), dialog.tags.getLabel());
-    assertEquals(datasetResources.message(PROJECT), dialog.project.getLabel());
     assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
     assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
     assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());

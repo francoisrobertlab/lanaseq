@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
@@ -49,6 +48,7 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -87,14 +87,12 @@ public class DatasetDialogPresenter {
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
-    binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null, Constants.DEFAULT_LOCALE);
   }
 
   void localeChange(Locale locale) {
     final AppResources webResources = new AppResources(Constants.class, locale);
-    binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
     binder.forField(dialog.tags).bind(TAGS);
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
         .bind(PROTOCOL);
@@ -206,6 +204,9 @@ public class DatasetDialogPresenter {
   void setDataset(Dataset dataset, Locale locale) {
     if (dataset == null) {
       dataset = new Dataset();
+    }
+    if (dataset.getTags() == null) {
+      dataset.setTags(new HashSet<>());
     }
     if (dataset.getSamples() == null) {
       dataset.setSamples(new ArrayList<>());
