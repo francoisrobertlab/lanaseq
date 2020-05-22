@@ -33,10 +33,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -99,7 +99,7 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
         .bind(PROTOCOL);
     sampleBinder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
-    sampleBinder.forField(dialog.type).withNullRepresentation(DatasetType.NULL).bind(TYPE);
+    sampleBinder.forField(dialog.type).withNullRepresentation(SampleType.NULL).bind(TYPE);
     sampleBinder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
     sampleBinder.forField(dialog.strain).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(STRAIN);

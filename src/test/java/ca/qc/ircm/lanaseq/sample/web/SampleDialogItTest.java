@@ -28,12 +28,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -61,7 +61,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolRepository protocolRepository;
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
-  private DatasetType type = DatasetType.IMMUNO_PRECIPITATION;
+  private SampleType type = SampleType.IMMUNO_PRECIPITATION;
   private String target = "polr3a";
   private String strain = "yFR20";
   private String strainDescription = "WT";

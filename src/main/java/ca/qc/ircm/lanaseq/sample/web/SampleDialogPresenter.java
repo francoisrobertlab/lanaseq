@@ -15,10 +15,10 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -68,7 +68,7 @@ public class SampleDialogPresenter {
         .withNullRepresentation("").bind(REPLICATE);
     binder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
     binder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
-    binder.forField(dialog.type).withNullRepresentation(DatasetType.NULL).bind(TYPE);
+    binder.forField(dialog.type).withNullRepresentation(SampleType.NULL).bind(TYPE);
     binder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
     binder.forField(dialog.strain).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(STRAIN);

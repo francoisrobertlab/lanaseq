@@ -4,7 +4,6 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
@@ -66,7 +65,7 @@ public class Sample implements Data, Owned, Serializable {
    */
   @Column
   @Enumerated(STRING)
-  private DatasetType type;
+  private SampleType type;
   /**
    * Target.
    */
@@ -205,11 +204,11 @@ public class Sample implements Data, Owned, Serializable {
     this.assay = assay;
   }
 
-  public DatasetType getType() {
+  public SampleType getType() {
     return type;
   }
 
-  public void setType(DatasetType type) {
+  public void setType(SampleType type) {
     this.type = type;
   }
 

@@ -2,7 +2,6 @@ package ca.qc.ircm.lanaseq.sample;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import java.time.LocalDateTime;
 import org.junit.Test;
 
@@ -13,7 +12,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -28,7 +27,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -44,7 +43,7 @@ public class SampleTest {
     sample.setSampleId("F*R 1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -60,7 +59,7 @@ public class SampleTest {
     sample.setSampleId("FÙR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -75,7 +74,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -91,7 +90,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("#R 1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -107,7 +106,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1ï");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -122,7 +121,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -153,7 +152,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
@@ -168,7 +167,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt 16 ?");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -184,7 +183,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Sptà16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -200,7 +199,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setTreatment("IAA");
     sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
@@ -214,7 +213,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR 101$");
     sample.setStrainDescription("G24D");
@@ -230,7 +229,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yâFR101");
     sample.setStrainDescription("G24D");
@@ -246,7 +245,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
@@ -261,7 +260,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setTreatment("IAA");
@@ -276,7 +275,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G 24D@");
@@ -292,7 +291,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24DÉ");
@@ -308,7 +307,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -323,7 +322,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -339,7 +338,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -355,7 +354,7 @@ public class SampleTest {
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
     sample.setAssay(Assay.RNA_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");

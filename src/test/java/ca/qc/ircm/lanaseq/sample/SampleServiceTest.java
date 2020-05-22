@@ -11,7 +11,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -66,7 +65,7 @@ public class SampleServiceTest {
     assertEquals("FR1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
@@ -239,10 +238,10 @@ public class SampleServiceTest {
   public void isMergable_TypeTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setType(DatasetType.INPUT);
+    sample.setType(SampleType.INPUT);
     samples.add(sample);
     sample = new Sample();
-    sample.setType(DatasetType.INPUT);
+    sample.setType(SampleType.INPUT);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -252,10 +251,10 @@ public class SampleServiceTest {
   public void isMergable_TypeFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setType(DatasetType.INPUT);
+    sample.setType(SampleType.INPUT);
     samples.add(sample);
     sample = new Sample();
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -265,7 +264,7 @@ public class SampleServiceTest {
   public void isMergable_TypeOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setType(DatasetType.INPUT);
+    sample.setType(SampleType.INPUT);
     samples.add(sample);
     samples.add(new Sample());
     assertFalse(service.isMergable(samples));
@@ -455,7 +454,7 @@ public class SampleServiceTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay(Assay.CHIP_SEQ);
-    sample.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -470,7 +469,7 @@ public class SampleServiceTest {
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
@@ -493,7 +492,7 @@ public class SampleServiceTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay(Assay.CHIP_SEQ);
-    sample.setType(DatasetType.INPUT);
+    sample.setType(SampleType.INPUT);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -507,7 +506,7 @@ public class SampleServiceTest {
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(DatasetType.INPUT, sample.getType());
+    assertEquals(SampleType.INPUT, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());

@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -41,6 +40,7 @@ import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -90,7 +90,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   private String replicate = "Test Replicate";
   private Protocol protocol;
   private Assay assay = Assay.CHIP_SEQ;
-  private DatasetType type = DatasetType.IMMUNO_PRECIPITATION;
+  private SampleType type = SampleType.IMMUNO_PRECIPITATION;
   private String target = "polr3a";
   private String strain = "yFR20";
   private String strainDescription = "WT";
@@ -109,7 +109,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     dialog.assay = new ComboBox<>();
     dialog.assay.setItems(Assay.values());
     dialog.type = new ComboBox<>();
-    dialog.type.setItems(DatasetType.values());
+    dialog.type.setItems(SampleType.values());
     dialog.target = new TextField();
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
@@ -158,7 +158,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
-    assertEquals(DatasetType.NULL, dialog.type.getValue());
+    assertEquals(SampleType.NULL, dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
     assertFalse(dialog.target.isReadOnly());
@@ -187,7 +187,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertFalse(dialog.target.isReadOnly());
@@ -217,7 +217,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -247,7 +247,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertFalse(dialog.target.isReadOnly());
@@ -270,7 +270,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.replicate.getValue());
     assertNull(dialog.protocol.getValue());
     assertNull(dialog.assay.getValue());
-    assertEquals(DatasetType.NULL, dialog.type.getValue());
+    assertEquals(SampleType.NULL, dialog.type.getValue());
     assertEquals("", dialog.target.getValue());
     assertEquals("", dialog.strain.getValue());
     assertEquals("", dialog.strainDescription.getValue());
@@ -387,7 +387,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void save_TypeEmpty() {
     fillForm();
-    dialog.type.setValue(DatasetType.NULL);
+    dialog.type.setValue(SampleType.NULL);
 
     presenter.save(locale);
 
@@ -538,7 +538,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
@@ -564,7 +564,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());

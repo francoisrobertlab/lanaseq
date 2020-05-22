@@ -50,12 +50,12 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -209,9 +209,9 @@ public class SampleDialogTest extends AbstractViewTestCase {
 
   @Test
   public void type() {
-    List<DatasetType> types = items(dialog.type);
-    assertArrayEquals(DatasetType.values(), types.toArray(new DatasetType[0]));
-    for (DatasetType type : types) {
+    List<SampleType> types = items(dialog.type);
+    assertArrayEquals(SampleType.values(), types.toArray(new SampleType[0]));
+    for (SampleType type : types) {
       assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
     }
   }

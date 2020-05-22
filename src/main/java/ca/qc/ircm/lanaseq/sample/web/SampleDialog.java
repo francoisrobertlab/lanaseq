@@ -20,10 +20,10 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -64,7 +64,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField replicate = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
   protected ComboBox<Assay> assay = new ComboBox<>();
-  protected ComboBox<DatasetType> type = new ComboBox<>();
+  protected ComboBox<SampleType> type = new ComboBox<>();
   protected TextField target = new TextField();
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
@@ -117,7 +117,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     assay.setPreventInvalidInput(true);
     type.setId(id(TYPE));
     type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
-    type.setItems(DatasetType.values());
+    type.setItems(SampleType.values());
     type.setPreventInvalidInput(true);
     target.setId(id(TARGET));
     strain.setId(id(STRAIN));

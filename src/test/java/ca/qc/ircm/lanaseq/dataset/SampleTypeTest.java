@@ -17,15 +17,15 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
-import static ca.qc.ircm.lanaseq.dataset.DatasetType.IMMUNO_PRECIPITATION;
-import static ca.qc.ircm.lanaseq.dataset.DatasetType.INPUT;
-import static ca.qc.ircm.lanaseq.dataset.DatasetType.NULL;
+import static ca.qc.ircm.lanaseq.sample.SampleType.IMMUNO_PRECIPITATION;
+import static ca.qc.ircm.lanaseq.sample.SampleType.INPUT;
+import static ca.qc.ircm.lanaseq.sample.SampleType.NULL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 import org.junit.Test;
 
-public class DatasetTypeTest {
+public class SampleTypeTest {
   @Test
   public void getLabel_English() {
     Locale locale = Locale.ENGLISH;

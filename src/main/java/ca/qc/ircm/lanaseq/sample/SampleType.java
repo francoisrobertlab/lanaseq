@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.dataset;
+package ca.qc.ircm.lanaseq.sample;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import java.util.Locale;
@@ -23,7 +23,7 @@ import java.util.Locale;
 /**
  * Dataset type.
  */
-public enum DatasetType {
+public enum SampleType {
   NULL, IMMUNO_PRECIPITATION, INPUT;
 
   /**
@@ -34,7 +34,7 @@ public enum DatasetType {
    * @return assay's label to show in user interface
    */
   public String getLabel(Locale locale) {
-    final AppResources resources = new AppResources(DatasetType.class, locale);
+    final AppResources resources = new AppResources(SampleType.class, locale);
     return resources.message(this.name());
   }
 }

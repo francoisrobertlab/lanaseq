@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -132,7 +133,7 @@ public class DatasetServiceTest {
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
     sample1.setAssay(Assay.CHIP_SEQ);
-    sample1.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample1.setType(SampleType.IMMUNO_PRECIPITATION);
     sample1.setTarget("my target");
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
@@ -143,7 +144,7 @@ public class DatasetServiceTest {
     sample2.setSampleId("sample2");
     sample2.setReplicate("r2");
     sample2.setAssay(Assay.CHIP_SEQ);
-    sample2.setType(DatasetType.IMMUNO_PRECIPITATION);
+    sample2.setType(SampleType.IMMUNO_PRECIPITATION);
     sample2.setTarget("my target");
     sample2.setStrain("yFR213");
     sample2.setStrainDescription("F56G");
@@ -171,7 +172,7 @@ public class DatasetServiceTest {
     assertEquals("sample1", sample.getSampleId());
     assertEquals("r1", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
@@ -187,7 +188,7 @@ public class DatasetServiceTest {
     assertEquals("sample2", sample.getSampleId());
     assertEquals("r2", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
@@ -214,7 +215,7 @@ public class DatasetServiceTest {
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
     sample1.setAssay(Assay.CHIP_SEQ);
-    sample1.setType(DatasetType.INPUT);
+    sample1.setType(SampleType.INPUT);
     sample1.setTarget("my target");
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
@@ -225,7 +226,7 @@ public class DatasetServiceTest {
     sample3.setSampleId("sample4");
     sample3.setReplicate("r4");
     sample3.setAssay(Assay.CHIP_SEQ);
-    sample3.setType(DatasetType.INPUT);
+    sample3.setType(SampleType.INPUT);
     sample3.setTarget("my target");
     sample3.setStrain("yFR213");
     sample3.setStrainDescription("F56G");
@@ -252,7 +253,7 @@ public class DatasetServiceTest {
     assertEquals("sample1", sample.getSampleId());
     assertEquals("r1", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(DatasetType.INPUT, sample.getType());
+    assertEquals(SampleType.INPUT, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
@@ -266,7 +267,7 @@ public class DatasetServiceTest {
     assertEquals("FR3", sample.getSampleId());
     assertEquals("R3", sample.getReplicate());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(DatasetType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
@@ -280,7 +281,7 @@ public class DatasetServiceTest {
     assertEquals("sample4", sample.getSampleId());
     assertEquals("r4", sample.getReplicate());
     assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(DatasetType.INPUT, sample.getType());
+    assertEquals(SampleType.INPUT, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
