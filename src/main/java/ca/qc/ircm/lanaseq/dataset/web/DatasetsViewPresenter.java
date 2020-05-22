@@ -36,9 +36,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,8 +121,11 @@ public class DatasetsViewPresenter {
 
   void merge(Locale locale) {
     clearError();
-    List<Sample> samples = view.datasets.getSelectedItems().stream()
-        .flatMap(dataset -> dataset.getSamples().stream()).collect(Collectors.toList());
+    Set<Dataset> datasets = view.datasets.getSelectedItems();
+    Set<String> tags = datasets.stream().flatMap(dataset -> dataset.getTags().stream())
+        .collect(Collectors.toSet());
+    List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
+        .collect(Collectors.toList());
     AppResources resources = new AppResources(DatasetsView.class, locale);
     boolean error = false;
     if (samples.isEmpty()) {
@@ -135,7 +138,7 @@ public class DatasetsViewPresenter {
     view.error.setVisible(error);
     if (!error) {
       Dataset dataset = new Dataset();
-      dataset.setTags(new HashSet<>());
+      dataset.setTags(tags);
       dataset.setSamples(samples);
       service.save(dataset);
       view.showNotification(resources.message(MERGED, dataset.getName()));

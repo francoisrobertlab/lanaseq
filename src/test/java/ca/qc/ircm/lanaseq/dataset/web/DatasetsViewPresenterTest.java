@@ -287,7 +287,11 @@ public class DatasetsViewPresenterTest extends AbstractViewTestCase {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
-    assertTrue(dataset.getTags().isEmpty());
+    assertEquals(4, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("G24D"));
     assertEquals(5, dataset.getSamples().size());
     assertTrue(find(dataset.getSamples(), 1L).isPresent());
     assertTrue(find(dataset.getSamples(), 2L).isPresent());
