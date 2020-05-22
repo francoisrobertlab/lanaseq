@@ -2,7 +2,6 @@ package ca.qc.ircm.lanaseq.sample;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ca.qc.ircm.lanaseq.dataset.Assay;
 import ca.qc.ircm.lanaseq.dataset.DatasetType;
 import java.time.LocalDateTime;
 import org.junit.Test;

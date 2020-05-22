@@ -17,12 +17,12 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
-import static ca.qc.ircm.lanaseq.dataset.Assay.CHIP_EXO;
-import static ca.qc.ircm.lanaseq.dataset.Assay.CHIP_SEQ;
-import static ca.qc.ircm.lanaseq.dataset.Assay.MNASE_SEQ;
-import static ca.qc.ircm.lanaseq.dataset.Assay.NET_SEQ;
-import static ca.qc.ircm.lanaseq.dataset.Assay.RNA_SEQ;
-import static ca.qc.ircm.lanaseq.dataset.Assay.getNullLabel;
+import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_EXO;
+import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.MNASE_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.NET_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.RNA_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.getNullLabel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;

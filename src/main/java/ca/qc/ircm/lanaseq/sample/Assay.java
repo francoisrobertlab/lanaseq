@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.dataset;
+package ca.qc.ircm.lanaseq.sample;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import java.util.Locale;
