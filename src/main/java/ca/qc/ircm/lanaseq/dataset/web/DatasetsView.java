@@ -80,7 +80,7 @@ public class DatasetsView extends VerticalLayout
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
   protected Grid<Dataset> datasets = new Grid<>();
-  protected Column<Dataset> filename;
+  protected Column<Dataset> name;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
@@ -121,7 +121,7 @@ public class DatasetsView extends VerticalLayout
         presenter.view(e.getItem());
       }
     });
-    filename = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
+    name = datasets.addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName));
     protocol = datasets.addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()));
@@ -133,7 +133,7 @@ public class DatasetsView extends VerticalLayout
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail()));
     datasets.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = datasets.appendHeaderRow();
-    filtersRow.getCell(filename).setComponent(nameFilter);
+    filtersRow.getCell(name).setComponent(nameFilter);
     nameFilter.addValueChangeListener(e -> presenter.filterFilename(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
@@ -172,7 +172,7 @@ public class DatasetsView extends VerticalLayout
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     String filenameHeader = datasetResources.message(NAME);
-    filename.setHeader(filenameHeader).setFooter(filenameHeader);
+    name.setHeader(filenameHeader).setFooter(filenameHeader);
     String protocolHeader = sampleResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = datasetResources.message(DATE);
