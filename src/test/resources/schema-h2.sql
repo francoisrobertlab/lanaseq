@@ -93,3 +93,10 @@ CREATE TABLE IF NOT EXISTS dataset_samples (
   CONSTRAINT datasetSamplesDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT datasetSamplesSample_ibfk FOREIGN KEY (samples_id) REFERENCES sample (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS dataset_tags (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  dataset_id bigint(20) NOT NULL,
+  tags varchar(255) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT datasetTagsDataset_ibfk FOREIGN KEY (dataset_id) REFERENCES dataset (id) ON DELETE CASCADE ON UPDATE CASCADE
+);

@@ -50,6 +50,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.TagsField;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -62,10 +63,13 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -109,6 +113,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
   private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
   private List<Protocol> protocols;
+  private String tag1 = "Tag 1";
+  private String tag2 = "Tag 2";
   private String project = "Test Project";
   private Protocol protocol;
   private Assay assay = Assay.CHIP_SEQ;
@@ -129,6 +135,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     dialog.header = new H3();
+    dialog.tags = new TagsField();
     dialog.project = new TextField();
     dialog.protocol = new ComboBox<>();
     dialog.assay = new ComboBox<>();
@@ -169,6 +176,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   private void fillForm() {
+    dialog.tags.setValue(Stream.of(tag1, tag2).collect(Collectors.toSet()));
     dialog.project.setValue(project);
     dialog.protocol.setValue(protocol);
     dialog.assay.setValue(assay);
@@ -549,6 +557,24 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_TagsEmpty() {
+    presenter.localeChange(locale);
+    fillForm();
+    dialog.tags.setValue(new HashSet<>());
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertTrue(dataset.getTags().isEmpty());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
   public void save_ProjectEmpty() {
     presenter.localeChange(locale);
     fillForm();
@@ -921,6 +947,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
+    assertEquals(2, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains(tag1));
+    assertTrue(dataset.getTags().contains(tag2));
     assertEquals(project, dataset.getProject());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -959,6 +988,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     verify(service).save(datasetCaptor.capture());
     dataset = datasetCaptor.getValue();
+    assertEquals(2, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains(tag1));
+    assertTrue(dataset.getTags().contains(tag2));
     assertEquals(project, dataset.getProject());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);

@@ -30,7 +30,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -66,6 +68,11 @@ public class Dataset implements Data, Owned, Serializable {
   @Column
   @Size(max = 255)
   private String project;
+  /**
+   * Tags.
+   */
+  @ElementCollection
+  private Set<String> tags;
   /**
    * Creation date.
    */
@@ -175,5 +182,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Set<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(Set<String> tags) {
+    this.tags = tags;
   }
 }

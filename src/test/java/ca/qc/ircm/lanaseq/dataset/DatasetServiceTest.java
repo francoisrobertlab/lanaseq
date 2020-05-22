@@ -36,6 +36,7 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,6 +78,9 @@ public class DatasetServiceTest {
     assertEquals((Long) 1L, dataset.getId());
     assertEquals("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
     assertEquals("polymerase", dataset.getProject());
+    assertEquals(2, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(3, dataset.getSamples().size());
     assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
@@ -119,6 +123,9 @@ public class DatasetServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = new Dataset();
     dataset.setProject("my project");
+    dataset.setTags(new HashSet<>());
+    dataset.getTags().add("tag1");
+    dataset.getTags().add("tag2");
     dataset.setSamples(new ArrayList<>());
     Sample sample1 = new Sample();
     sample1.setSampleId("sample1");
@@ -151,6 +158,9 @@ public class DatasetServiceTest {
     assertEquals("ChIPSeq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_"
         + DateTimeFormatter.BASIC_ISO_DATE.format(dataset.getDate()), dataset.getName());
     assertEquals("my project", dataset.getProject());
+    assertEquals(2, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("tag1"));
+    assertTrue(dataset.getTags().contains("tag2"));
     assertEquals(user.getId(), dataset.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getDate()));
@@ -197,6 +207,8 @@ public class DatasetServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.setProject("my project");
+    dataset.getTags().remove("rappa");
+    dataset.getTags().add("tag1");
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
@@ -227,6 +239,10 @@ public class DatasetServiceTest {
     assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20181020",
         dataset.getName());
     assertEquals("my project", dataset.getProject());
+    assertEquals(3, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("tag1"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     assertEquals(3, dataset.getSamples().size());

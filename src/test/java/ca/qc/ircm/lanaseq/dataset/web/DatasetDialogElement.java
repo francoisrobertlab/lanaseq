@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
@@ -33,6 +34,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 
+import ca.qc.ircm.lanaseq.web.TagsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
@@ -50,6 +52,10 @@ public class DatasetDialogElement extends DialogElement {
 
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
+  }
+
+  public TagsFieldElement tags() {
+    return $(TagsFieldElement.class).id(id(TAGS));
   }
 
   public TextFieldElement project() {

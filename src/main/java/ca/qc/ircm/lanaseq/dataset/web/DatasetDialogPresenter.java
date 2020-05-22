@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.PROJECT;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -94,6 +95,7 @@ public class DatasetDialogPresenter {
   void localeChange(Locale locale) {
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.project).withNullRepresentation("").bind(PROJECT);
+    binder.forField(dialog.tags).bind(TAGS);
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
         .bind(PROTOCOL);
     sampleBinder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);

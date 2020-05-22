@@ -71,3 +71,15 @@ INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (7,4,1,7);
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (8,5,0,8);
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (1,1,'mnase');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (2,1,'ip');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (3,2,'chipseq');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (4,4,'chipseq');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (5,5,'chipseq');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (6,2,'G24D');
