@@ -4,15 +4,22 @@ import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.web.TagsField.CLASS_NAME;
+import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG;
+import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.web.TagsField.TAG;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.KeyPressEvent;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -21,24 +28,37 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class TagsFieldTest extends AbstractViewTestCase {
   private TagsField tagsField;
+  @Mock
+  private LocaleChangeEvent localeChangeEvent;
   private Locale locale = ENGLISH;
+  private AppResources resources = new AppResources(TagsField.class, locale);
 
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     tagsField = new TagsField();
+    when(localeChangeEvent.getLocale()).thenReturn(locale);
+    tagsField.localeChange(localeChangeEvent);
   }
 
   @Test
   public void styles() {
     assertTrue(
         tagsField.getChildren().findFirst().get().getElement().getClassList().contains(CLASS_NAME));
+    tagsField.setValue(set("test", "test2"));
+    for (int i = 0; i < 2; i++) {
+      assertTrue(tagsField.tags.get(i).hasClassName(TAG));
+      assertTrue(tagsField.tags.get(i).hasThemeName(ButtonVariant.LUMO_SMALL.getVariantName()));
+    }
+    assertTrue(tagsField.newTag.hasClassName(NEW_TAG));
+    assertTrue(tagsField.newTag.hasThemeName(TextFieldVariant.LUMO_SMALL.getVariantName()));
   }
 
   @Test
@@ -97,7 +117,27 @@ public class TagsFieldTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void addTag_Empty() {
+  public void newTag_EmptyEnter() {
+    tagsField.newTag.setValue("");
+    KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
+        false, false, false, false);
+    fireEvent(tagsField.newTag, event);
+    assertTrue(tagsField.tags.isEmpty());
+  }
+
+  @Test
+  public void newTag_InvalidEnter() {
+    tagsField.newTag.setValue("chip?");
+    KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
+        false, false, false, false);
+    fireEvent(tagsField.newTag, event);
+    assertTrue(tagsField.tags.isEmpty());
+    assertTrue(tagsField.newTag.isInvalid());
+    assertEquals(resources.message(NEW_TAG_REGEX_ERROR), tagsField.newTag.getErrorMessage());
+  }
+
+  @Test
+  public void newTag_NoTagsEnter() {
     tagsField.newTag.setValue("chip");
     KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
         false, false, false, false);
@@ -110,7 +150,7 @@ public class TagsFieldTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void addTag_WithOtherTags() {
+  public void newTag_WithOtherTagsEnter() {
     tagsField.setValue(set("input", "rappa"));
     tagsField.newTag.setValue("chip");
     KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
