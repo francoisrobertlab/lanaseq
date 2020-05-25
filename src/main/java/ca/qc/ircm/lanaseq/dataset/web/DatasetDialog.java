@@ -19,6 +19,8 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
+import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
@@ -44,6 +46,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.TagsField;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -59,6 +62,7 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -87,6 +91,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String ADD_SAMPLE = "addSample";
   public static final String SAMPLES = "samples";
   public static final String SAVED = "saved";
+  public static final String DELETED = "deleted";
   protected H3 header = new H3();
   protected TagsField tags = new TagsField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
@@ -105,6 +110,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Button addSample = new Button();
   protected Button save = new Button();
   protected Button cancel = new Button();
+  protected Button delete = new Button();
   @Autowired
   private transient DatasetDialogPresenter presenter;
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
@@ -134,7 +140,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(datasetForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
-    layout.add(header, tags, form, samplesHeader, samples, new HorizontalLayout(save, cancel));
+    HorizontalLayout endButtons = new HorizontalLayout(delete);
+    endButtons.setJustifyContentMode(JustifyContentMode.END);
+    endButtons.setWidthFull();
+    HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
+    buttons.setWidthFull();
+    layout.add(header, tags, form, samplesHeader, samples, buttons);
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));
@@ -183,6 +194,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
+    delete.setId(id(DELETE));
+    delete.setThemeName(ERROR);
+    delete.setIcon(VaadinIcon.TRASH.create());
+    delete.addClickListener(e -> presenter.delete(getLocale()));
     presenter.init(this);
   }
 
@@ -241,6 +256,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     addSample.setText(webResources.message(ADD));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
+    delete.setText(webResources.message(DELETE));
     presenter.localeChange(getLocale());
   }
 
@@ -266,8 +282,25 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     return addListener((Class) SavedEvent.class, listener);
   }
 
+  /**
+   * Adds listener to be informed when an dataset was deleted.
+   *
+   * @param listener
+   *          listener
+   * @return listener registration
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Registration
+      addDeletedListener(ComponentEventListener<DeletedEvent<DatasetDialog>> listener) {
+    return addListener((Class) DeletedEvent.class, listener);
+  }
+
   void fireSavedEvent() {
     fireEvent(new SavedEvent<>(this, true));
+  }
+
+  void fireDeletedEvent() {
+    fireEvent(new DeletedEvent<>(this, true));
   }
 
   public Dataset getDataset() {

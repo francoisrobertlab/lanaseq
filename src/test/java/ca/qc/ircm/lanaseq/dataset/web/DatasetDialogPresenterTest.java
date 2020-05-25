@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
@@ -148,6 +149,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.samples = new Grid<>();
     dialog.save = new Button();
     dialog.cancel = new Button();
+    dialog.delete = new Button();
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
@@ -1040,5 +1042,20 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     verify(dialog, never()).showNotification(any());
     verify(dialog).close();
     verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void delete() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset, locale);
+
+    presenter.delete(locale);
+
+    verify(service, never()).save(any());
+    verify(service).delete(dataset);
+    verify(dialog).close();
+    verify(dialog).showNotification(resources.message(DELETED, dataset.getName()));
+    verify(dialog, never()).fireSavedEvent();
+    verify(dialog).fireDeletedEvent();
   }
 }

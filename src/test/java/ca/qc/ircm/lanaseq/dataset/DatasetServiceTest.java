@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +117,35 @@ public class DatasetServiceTest {
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
+  }
+
+  @Test
+  @WithMockUser
+  @Ignore("Never false for a database instance")
+  public void isDeletable_False() {
+    Dataset dataset = repository.findById(1L).get();
+    assertFalse(service.isDeletable(dataset));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_True() {
+    Dataset dataset = repository.findById(5L).get();
+    assertTrue(service.isDeletable(dataset));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_Null() {
+    assertFalse(service.isDeletable(null));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_NullId() {
+    assertFalse(service.isDeletable(new Dataset()));
   }
 
   @Test
@@ -288,5 +319,23 @@ public class DatasetServiceTest {
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  @WithMockUser
+  public void delete() {
+    Dataset dataset = repository.findById(5L).get();
+    service.delete(dataset);
+    repository.flush();
+    assertFalse(repository.findById(5L).isPresent());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @WithMockUser
+  @Ignore("Never false for a database instance")
+  public void delete_NotDeletable() {
+    Dataset dataset = repository.findById(1L).get();
+    service.delete(dataset);
   }
 }

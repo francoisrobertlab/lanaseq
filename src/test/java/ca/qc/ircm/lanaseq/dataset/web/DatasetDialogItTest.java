@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
@@ -127,6 +128,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.addSample()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
+    assertTrue(optional(() -> dialog.delete()).isPresent());
   }
 
   @Test
@@ -259,5 +261,26 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void delete() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
+    view.doubleClick(1);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    Dataset dataset = repository.findById(5L).get();
+    String name = dataset.getName();
+
+    TestTransaction.flagForCommit();
+    dialog.delete().click();
+    TestTransaction.end();
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(DatasetDialog.class);
+    assertEquals(resources.message(DELETED, name), notification.getText());
+    assertFalse(repository.findById(5L).isPresent());
   }
 }

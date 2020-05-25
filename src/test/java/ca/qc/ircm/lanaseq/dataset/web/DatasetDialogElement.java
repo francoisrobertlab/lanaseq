@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
@@ -115,5 +116,9 @@ public class DatasetDialogElement extends DialogElement {
 
   public ButtonElement cancel() {
     return $(ButtonElement.class).id(id(CANCEL));
+  }
+
+  public ButtonElement delete() {
+    return $(ButtonElement.class).id(id(DELETE));
   }
 }

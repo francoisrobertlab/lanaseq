@@ -83,6 +83,19 @@ public class DatasetService {
   }
 
   /**
+   * Returns true if dataset can be deleted, false otherwise.
+   *
+   * @return true if dataset can be deleted, false otherwise
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public boolean isDeletable(Dataset dataset) {
+    if (dataset == null || dataset.getId() == null) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Saves dataset into database.
    *
    * @param dataset
@@ -108,5 +121,19 @@ public class DatasetService {
     }
     dataset.generateName();
     repository.save(dataset);
+  }
+
+  /**
+   * Deletes dataset from database.
+   *
+   * @param dataset
+   *          dataset
+   */
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public void delete(Dataset dataset) {
+    if (!isDeletable(dataset)) {
+      throw new IllegalArgumentException("dataset cannot be deleted");
+    }
+    repository.delete(dataset);
   }
 }

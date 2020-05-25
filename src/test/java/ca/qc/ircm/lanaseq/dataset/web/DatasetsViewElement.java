@@ -27,12 +27,14 @@ import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
+import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
 public class DatasetsViewElement extends VerticalLayoutElement {
   private static final int NAME_COLUMN = 0;
   private static final int PROTOCOL_COLUMN = 2;
+  private static final int OWNER_COLUMN = 4;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
@@ -42,12 +44,24 @@ public class DatasetsViewElement extends VerticalLayoutElement {
     return $(GridElement.class).id(DATASETS);
   }
 
+  public TextFieldElement nameFilter() {
+    return datasets().getHeaderCell(NAME_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public TextFieldElement protocolFilter() {
+    return datasets().getHeaderCell(PROTOCOL_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public TextFieldElement ownerFilter() {
+    return datasets().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
+  }
+
   public void doubleClick(int row) {
-    datasets().getCell(0, NAME_COLUMN).doubleClick();
+    datasets().getCell(row, NAME_COLUMN).doubleClick();
   }
 
   public void doubleClickProtocol(int row) {
-    datasets().getCell(0, PROTOCOL_COLUMN).doubleClick();
+    datasets().getCell(row, PROTOCOL_COLUMN).doubleClick();
   }
 
   public DivElement error() {

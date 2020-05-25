@@ -19,6 +19,8 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
+import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
@@ -69,6 +71,7 @@ import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -115,6 +118,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
+  @Mock
+  private ComponentEventListener<DeletedEvent<DatasetDialog>> deletedListener;
   @Autowired
   private DatasetRepository datasetRepository;
   @Autowired
@@ -207,6 +212,9 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
+    assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
+    assertTrue(dialog.delete.getThemeName().contains(ERROR));
+    validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
   }
 
   @Test
@@ -238,6 +246,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    assertEquals(webResources.message(DELETE), dialog.delete.getText());
     verify(presenter).localeChange(locale);
   }
 
@@ -277,6 +286,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    assertEquals(webResources.message(DELETE), dialog.delete.getText());
     verify(presenter).localeChange(locale);
   }
 
@@ -391,6 +401,20 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void deletedListener() {
+    dialog.addDeletedListener(deletedListener);
+    dialog.fireDeletedEvent();
+    verify(deletedListener).onComponentEvent(any());
+  }
+
+  @Test
+  public void deletedListener_Remove() {
+    dialog.addDeletedListener(deletedListener).remove();
+    dialog.fireDeletedEvent();
+    verify(deletedListener, never()).onComponentEvent(any());
+  }
+
+  @Test
   public void getDataset() {
     when(presenter.getDataset()).thenReturn(dataset);
     assertEquals(dataset, dialog.getDataset());
@@ -461,5 +485,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     clickButton(dialog.cancel);
 
     verify(presenter).cancel();
+  }
+
+  @Test
+  public void delete() {
+    clickButton(dialog.delete);
+
+    verify(presenter).delete(locale);
   }
 }

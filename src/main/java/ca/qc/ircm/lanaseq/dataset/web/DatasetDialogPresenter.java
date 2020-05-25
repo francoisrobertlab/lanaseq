@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -191,6 +192,16 @@ public class DatasetDialogPresenter {
 
   private boolean empty(Sample sample) {
     return sample.getSampleId() == null && sample.getReplicate() == null;
+  }
+
+  void delete(Locale locale) {
+    Dataset dataset = binder.getBean();
+    logger.debug("delete dataset {}", dataset);
+    service.delete(dataset);
+    AppResources resources = new AppResources(DatasetDialog.class, locale);
+    dialog.showNotification(resources.message(DELETED, dataset.getName()));
+    dialog.fireDeletedEvent();
+    dialog.close();
   }
 
   void cancel() {
