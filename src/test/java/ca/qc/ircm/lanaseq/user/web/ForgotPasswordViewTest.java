@@ -20,16 +20,14 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.Constants.FRENCH;
-import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.ID;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.MESSAGE;
-import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -41,8 +39,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
-import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewPresenter;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.BeforeEvent;
@@ -88,7 +85,7 @@ public class ForgotPasswordViewTest extends AbstractViewTestCase {
     assertEquals(MESSAGE, view.message.getId().orElse(""));
     assertEquals(EMAIL, view.email.getId().orElse(""));
     assertEquals(SAVE, view.save.getId().orElse(""));
-    assertTrue(view.save.getElement().getAttribute(THEME).contains(PRIMARY));
+    assertTrue(view.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
   }
 
   @Test

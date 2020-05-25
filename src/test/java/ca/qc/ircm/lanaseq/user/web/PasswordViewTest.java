@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
@@ -35,6 +34,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
@@ -74,7 +74,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
     assertEquals(VIEW_NAME, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAVE, view.save.getId().orElse(""));
-    assertTrue(view.save.hasThemeName(PRIMARY));
+    assertTrue(view.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 

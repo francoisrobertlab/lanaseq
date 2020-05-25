@@ -20,9 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
-import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
-import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
@@ -75,6 +73,7 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
@@ -208,12 +207,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
-    assertTrue(dialog.save.hasThemeName(PRIMARY));
+    assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
     assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
-    assertTrue(dialog.delete.hasThemeName(ERROR));
+    assertTrue(dialog.delete.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
     validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
   }
 

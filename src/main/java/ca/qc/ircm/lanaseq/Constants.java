@@ -30,12 +30,6 @@ public class Constants {
   public static final Locale DEFAULT_LOCALE = ENGLISH;
   public static final String APPLICATION_NAME = "application.name";
   public static final String TITLE = "title";
-  public static final String THEME = "theme";
-  public static final String PRIMARY = "primary";
-  public static final String TERTIARY = "tertiary";
-  public static final String CONTRAST = "contrast";
-  public static final String SUCCESS = "success";
-  public static final String ERROR = "error";
   public static final String ERROR_TEXT = "error-text";
   public static final String BORDER = "border";
   public static final String PLACEHOLDER = "placeholder";

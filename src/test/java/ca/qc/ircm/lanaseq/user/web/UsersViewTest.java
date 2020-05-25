@@ -20,10 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.Constants.SUCCESS;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
@@ -59,6 +56,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -284,7 +282,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     for (User user : users) {
       Button button = buttonRenderer.createComponent(user);
       assertTrue(button.hasClassName(ACTIVE));
-      assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
+      assertTrue(button.hasThemeName(user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
+          : ButtonVariant.LUMO_ERROR.getVariantName()));
       assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
           button.getIcon());
@@ -292,7 +291,8 @@ public class UsersViewTest extends AbstractViewTestCase {
       clickButton(button);
       verify(presenter, atLeastOnce()).toggleActive(user);
       assertEquals(!previousActive, user.isActive());
-      assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
+      assertTrue(button.hasThemeName(user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
+          : ButtonVariant.LUMO_ERROR.getVariantName()));
       assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
           button.getIcon());

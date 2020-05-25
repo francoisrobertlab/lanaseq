@@ -18,9 +18,7 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -31,6 +29,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -88,7 +87,7 @@ public class ForgotPasswordView extends VerticalLayout
     message.setId(MESSAGE);
     email.setId(EMAIL);
     save.setId(SAVE);
-    save.getElement().setAttribute(THEME, PRIMARY);
+    save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> presenter.save(getLocale()));
     presenter.init(this);

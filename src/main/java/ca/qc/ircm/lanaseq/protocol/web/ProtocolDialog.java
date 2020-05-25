@@ -18,9 +18,7 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
-import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.Constants.PRIMARY;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
@@ -42,6 +40,7 @@ import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -75,15 +74,15 @@ import org.springframework.context.annotation.Scope;
 public class ProtocolDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
   public static final String ID = "protocols-dialog";
   public static final String HEADER = "header";
-  public static final String FILES_ERROR = property(FILES, ERROR);
+  public static final String FILES_ERROR = property(FILES, "error");
   public static final String FILES_REQUIRED = property(FILES, REQUIRED);
   public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");
   public static final String FILES_OVER_MAXIMUM = property(FILES, "overmaximum");
   public static final int MAXIMUM_FILES_SIZE = 20 * 1024 * 1024; // 20MB
   public static final int MAXIMUM_FILES_COUNT = 6;
-  public static final String REMOVE_BUTTON =
-      "<vaadin-button class='" + REMOVE + "' theme='" + ERROR + "' on-click='removeFile'>"
-          + "<iron-icon icon='vaadin:trash' slot='prefix'></iron-icon>" + "</vaadin-button>";
+  public static final String REMOVE_BUTTON = "<vaadin-button class='" + REMOVE + "' theme='"
+      + ButtonVariant.LUMO_ERROR.getVariantName() + "' on-click='removeFile'>"
+      + "<iron-icon icon='vaadin:trash' slot='prefix'></iron-icon>" + "</vaadin-button>";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = -7797831034001410430L;
   protected H3 header = new H3();
@@ -143,7 +142,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
     save.setId(id(SAVE));
-    save.setThemeName(PRIMARY);
+    save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> presenter.save(getLocale()));
     cancel.setId(id(CANCEL));

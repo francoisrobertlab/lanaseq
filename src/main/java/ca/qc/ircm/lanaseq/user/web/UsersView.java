@@ -20,11 +20,8 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.ERROR;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.Constants.SUCCESS;
-import static ca.qc.ircm.lanaseq.Constants.THEME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
@@ -43,6 +40,7 @@ import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -167,7 +165,8 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
     final AppResources userResources = new AppResources(User.class, getLocale());
     button.setIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create());
     button.setText(userResources.message(property(ACTIVE, user.isActive())));
-    button.getElement().setAttribute(THEME, user.isActive() ? SUCCESS : ERROR);
+    button
+        .addThemeVariants(user.isActive() ? ButtonVariant.LUMO_SUCCESS : ButtonVariant.LUMO_ERROR);
   }
 
   @Override
