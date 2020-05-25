@@ -74,7 +74,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
     assertEquals(VIEW_NAME, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAVE, view.save.getId().orElse(""));
-    assertTrue(view.save.getThemeName().contains(PRIMARY));
+    assertTrue(view.save.hasThemeName(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 

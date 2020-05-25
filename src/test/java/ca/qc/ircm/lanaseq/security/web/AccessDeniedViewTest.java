@@ -57,9 +57,9 @@ public class AccessDeniedViewTest extends AbstractViewTestCase {
   @Test
   public void styles() {
     assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
-    assertTrue(view.header.getClassNames().contains(HEADER));
-    assertTrue(view.message.getClassNames().contains(MESSAGE));
-    assertTrue(view.home.getClassNames().contains(HOME));
+    assertTrue(view.header.hasClassName(HEADER));
+    assertTrue(view.message.hasClassName(MESSAGE));
+    assertTrue(view.home.hasClassName(HOME));
   }
 
   @Test

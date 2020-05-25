@@ -208,12 +208,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
-    assertTrue(dialog.save.getThemeName().contains(PRIMARY));
+    assertTrue(dialog.save.hasThemeName(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
     assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
-    assertTrue(dialog.delete.getThemeName().contains(ERROR));
+    assertTrue(dialog.delete.hasThemeName(ERROR));
     validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
   }
 
@@ -338,7 +338,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     ComponentRenderer<TextField, Sample> textFieldRenderer = textFieldRendererCaptor.getValue();
     for (Sample sample : samples) {
       TextField textField = textFieldRenderer.createComponent(sample);
-      assertTrue(textField.getClassName().contains(SampleProperties.SAMPLE_ID));
+      assertTrue(textField.hasClassName(SampleProperties.SAMPLE_ID));
       assertSame(textField, dialog.sampleIdField(sample));
     }
     verify(dialog.sampleId).setComparator(comparatorCaptor.capture());
@@ -353,7 +353,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     textFieldRenderer = textFieldRendererCaptor.getValue();
     for (Sample sample : samples) {
       TextField textField = textFieldRenderer.createComponent(sample);
-      assertTrue(textField.getClassName().contains(SampleProperties.REPLICATE));
+      assertTrue(textField.hasClassName(SampleProperties.REPLICATE));
       assertSame(textField, dialog.sampleReplicateField(sample));
     }
     verify(dialog.sampleReplicate).setComparator(comparatorCaptor.capture());
@@ -379,7 +379,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     ComponentRenderer<Button, Sample> buttonRenderer = buttonRendererCaptor.getValue();
     for (Sample sample : samples) {
       Button button = buttonRenderer.createComponent(sample);
-      assertTrue(button.getClassName().contains(REMOVE));
+      assertTrue(button.hasClassName(REMOVE));
       clickButton(button);
       verify(presenter).removeSample(sample);
     }

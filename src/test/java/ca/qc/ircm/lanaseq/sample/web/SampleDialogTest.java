@@ -122,12 +122,12 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
-    assertTrue(dialog.save.getThemeName().contains(PRIMARY));
+    assertTrue(dialog.save.hasThemeName(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
     assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
-    assertTrue(dialog.delete.getThemeName().contains(ERROR));
+    assertTrue(dialog.delete.hasThemeName(ERROR));
     validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
   }
 

@@ -149,9 +149,9 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
     assertEquals(id(UPLOAD), dialog.upload.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILES_ERROR), dialog.filesError.getId().orElse(""));
-    assertTrue(dialog.filesError.getClassName().contains(ERROR_TEXT));
+    assertTrue(dialog.filesError.hasClassName(ERROR_TEXT));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
-    assertTrue(dialog.save.getThemeName().contains(PRIMARY));
+    assertTrue(dialog.save.hasThemeName(PRIMARY));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());

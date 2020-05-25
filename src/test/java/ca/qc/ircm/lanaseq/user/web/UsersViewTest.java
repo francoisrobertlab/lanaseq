@@ -283,7 +283,7 @@ public class UsersViewTest extends AbstractViewTestCase {
     ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
     for (User user : users) {
       Button button = buttonRenderer.createComponent(user);
-      assertTrue(button.getClassNames().contains(ACTIVE));
+      assertTrue(button.hasClassName(ACTIVE));
       assertTrue(button.getElement().getAttribute(THEME).equals(user.isActive() ? SUCCESS : ERROR));
       assertEquals(userResources.message(property(ACTIVE, user.isActive())), button.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),

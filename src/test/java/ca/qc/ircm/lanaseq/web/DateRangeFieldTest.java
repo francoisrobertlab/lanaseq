@@ -54,10 +54,10 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(dateRange.layout.getClassName().contains(CLASS_NAME));
-    assertTrue(dateRange.from.getClassName().contains(FROM));
+    assertTrue(dateRange.layout.hasClassName(CLASS_NAME));
+    assertTrue(dateRange.from.hasClassName(FROM));
     assertTrue(dateRange.from.isClearButtonVisible());
-    assertTrue(dateRange.to.getClassName().contains(TO));
+    assertTrue(dateRange.to.hasClassName(TO));
     assertTrue(dateRange.to.isClearButtonVisible());
   }
 
