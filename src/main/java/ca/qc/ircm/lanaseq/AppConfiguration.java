@@ -17,8 +17,11 @@
 
 package ca.qc.ircm.lanaseq;
 
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,10 +38,20 @@ public class AppConfiguration {
   public static final String PREFIX = "app";
   @Value("${logging.path:${user.dir}}/${logging.file:" + APPLICATION_NAME + "log}")
   private String logfile;
+  private Path home;
   private String serverUrl;
+  private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
 
   public Path getLogFile() {
     return Paths.get(logfile);
+  }
+
+  public Path folder(Sample sample) {
+    return Paths.get(year.format(sample.getDate()), sample.getName());
+  }
+
+  public Path folder(Dataset dataset) {
+    return Paths.get(year.format(dataset.getDate()), dataset.getName());
   }
 
   /**
@@ -56,11 +69,19 @@ public class AppConfiguration {
     return serverUrl + urlEnd;
   }
 
+  public Path getHome() {
+    return home;
+  }
+
+  void setHome(Path home) {
+    this.home = home;
+  }
+
   public String getServerUrl() {
     return serverUrl;
   }
 
-  public void setServerUrl(String serverUrl) {
+  void setServerUrl(String serverUrl) {
     this.serverUrl = serverUrl;
   }
 }

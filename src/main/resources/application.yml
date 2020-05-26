@@ -33,6 +33,7 @@ spring:
         enable_lazy_load_no_trans : true
 
 app:
+  home: ${user.home}/lanaseq
   serverUrl: http://localhost:8080
 
 security:
