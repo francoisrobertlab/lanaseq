@@ -34,7 +34,6 @@ import javax.validation.constraints.Size;
 @Entity
 @GeneratePropertyNames
 public class ProtocolFile implements Data, Serializable {
-  public static final String TABLE_NAME = "protocolfile";
   private static final long serialVersionUID = 4522245557420544824L;
   /**
    * Protocol file database identifier.
