@@ -67,10 +67,6 @@ public class SamplesViewElement extends VerticalLayoutElement {
     samples().getCell(row, NAME_COLUMN).click(0, 0, key);
   }
 
-  public void metaClick(int row) {
-    samples().getCell(row, NAME_COLUMN).click(0, 0, Keys.META);
-  }
-
   public void doubleClick(int row) {
     samples().getCell(row, NAME_COLUMN).doubleClick();
   }
