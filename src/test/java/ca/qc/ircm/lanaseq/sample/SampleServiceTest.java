@@ -590,6 +590,39 @@ public class SampleServiceTest {
 
   @Test
   @WithMockUser
+  public void save_UpdateMoveFiles() throws Throwable {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Sample sample = repository.findById(1L).orElse(null);
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    Path beforeFolder = configuration.getHome().resolve(configuration.folder(sample));
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+
+    service.save(sample);
+
+    repository.flush();
+    sample = repository.findById(1L).orElse(null);
+    assertEquals("my sample", sample.getSampleId());
+    assertEquals("my replicate", sample.getReplicate());
+    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  @WithMockUser
   public void saveFiles() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
     List<Path> files = new ArrayList<>();

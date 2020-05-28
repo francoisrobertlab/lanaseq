@@ -79,7 +79,7 @@ public class SampleService {
     if (sample == null || sample.getId() == null) {
       return new ArrayList<>();
     }
-    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    Path folder = configuration.folder(sample);
     try {
       return Files.list(folder).map(Path::getFileName)
           .collect(Collectors.toCollection(ArrayList::new));
@@ -148,8 +148,21 @@ public class SampleService {
       sample.setOwner(user);
       sample.setDate(now);
     }
+    Path oldFolder = null;
+    if (sample.getName() != null) {
+      oldFolder = configuration.getHome().resolve(configuration.folder(sample));
+    }
     sample.generateName();
     repository.save(sample);
+    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
+      try {
+        logger.debug("moving folder {} to {} for sample {}", oldFolder, folder, sample);
+        Files.move(oldFolder, folder);
+      } catch (IOException e) {
+        throw new IllegalArgumentException("could not move file " + oldFolder + " to " + folder, e);
+      }
+    }
   }
 
   /**
@@ -174,7 +187,7 @@ public class SampleService {
         logger.debug("moving file {} to {} for sample {}", file, target, sample);
         Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException e) {
-        throw new IllegalArgumentException("could not move file " + file, e);
+        throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
       }
     }
   }
