@@ -150,11 +150,11 @@ public class SampleService {
     }
     Path oldFolder = null;
     if (sample.getName() != null) {
-      oldFolder = configuration.getHome().resolve(configuration.folder(sample));
+      oldFolder = configuration.folder(sample);
     }
     sample.generateName();
     repository.save(sample);
-    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    Path folder = configuration.folder(sample);
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
         logger.debug("moving folder {} to {} for sample {}", oldFolder, folder, sample);
@@ -175,7 +175,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void saveFiles(Sample sample, Collection<Path> files) {
-    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    Path folder = configuration.folder(sample);
     try {
       Files.createDirectories(folder);
     } catch (IOException e) {

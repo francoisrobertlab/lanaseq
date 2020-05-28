@@ -33,6 +33,8 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,26 +65,56 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   private Path home;
   private Path upload;
 
+  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
+      IllegalArgumentException, InvocationTargetException {
+    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
+    getHome.setAccessible(true);
+    return (Path) getHome.invoke(configuration);
+  }
+
+  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
+    setHome.setAccessible(true);
+    setHome.invoke(configuration, path);
+  }
+
+  private Path getUpload() throws NoSuchMethodException, SecurityException, IllegalAccessException,
+      IllegalArgumentException, InvocationTargetException {
+    Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
+    getUpload.setAccessible(true);
+    return (Path) getUpload.invoke(configuration);
+  }
+
+  private void setUpload(Path path) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setUpload = AppConfiguration.class.getDeclaredMethod("setUpload", Path.class);
+    setUpload.setAccessible(true);
+    setUpload.invoke(configuration, path);
+  }
+
   @Before
   public void beforeTest() throws Throwable {
-    home = configuration.getHome();
-    upload = configuration.getUpload();
-    configuration.setHome(temporaryFolder.newFolder("home").toPath());
-    configuration.setUpload(temporaryFolder.newFolder("upload").toPath());
+    home = getHome();
+    upload = getUpload();
+    setHome(temporaryFolder.newFolder("home").toPath());
+    setUpload(temporaryFolder.newFolder("upload").toPath());
   }
 
   @After
-  public void afterTest() {
-    configuration.setHome(home);
-    configuration.setUpload(upload);
+  public void afterTest() throws Throwable {
+    setHome(home);
+    setUpload(upload);
   }
 
   private void open() {
     openView(VIEW_NAME);
   }
 
-  private void copyFiles(Sample sample) throws IOException, URISyntaxException {
-    Path folder = configuration.getUpload().resolve(configuration.folder(sample));
+  private void copyFiles(Sample sample)
+      throws IOException, URISyntaxException, NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Path folder = configuration.upload(sample);
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
     file2 = folder.resolve("R2.fastq");
@@ -133,8 +165,8 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(AddSampleFilesDialog.class);
     assertEquals(resources.message(SAVED, 2, sample.getName()), notification.getText());
-    Path folder = configuration.getHome().resolve(configuration.folder(sample));
-    Path upload = configuration.getUpload().resolve(configuration.folder(sample));
+    Path folder = configuration.folder(sample);
+    Path upload = configuration.upload(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertTrue(Files.exists(folder.resolve(file2.getFileName())));
     assertFalse(Files.exists(upload.resolve(file1.getFileName())));

@@ -48,11 +48,19 @@ public class AppConfiguration {
   }
 
   public Path folder(Sample sample) {
-    return Paths.get(year.format(sample.getDate()), sample.getName());
+    return getHome().resolve(year.format(sample.getDate())).resolve(sample.getName());
+  }
+
+  public Path upload(Sample sample) {
+    return getUpload().resolve(sample.getName());
   }
 
   public Path folder(Dataset dataset) {
-    return Paths.get(year.format(dataset.getDate()), dataset.getName());
+    return getHome().resolve(year.format(dataset.getDate())).resolve(dataset.getName());
+  }
+
+  public Path upload(Dataset dataset) {
+    return getUpload().resolve(dataset.getName());
   }
 
   /**
@@ -70,19 +78,19 @@ public class AppConfiguration {
     return serverUrl + urlEnd;
   }
 
-  public Path getHome() {
+  Path getHome() {
     return home;
   }
 
-  public void setHome(Path home) {
+  void setHome(Path home) {
     this.home = home;
   }
 
-  public Path getUpload() {
+  Path getUpload() {
     return upload;
   }
 
-  public void setUpload(Path upload) {
+  void setUpload(Path upload) {
     this.upload = upload;
   }
 

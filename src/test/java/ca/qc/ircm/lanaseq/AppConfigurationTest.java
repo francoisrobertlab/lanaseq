@@ -69,7 +69,8 @@ public class AppConfigurationTest {
     sample.setDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
     sample.generateName();
     String name = sample.getName();
-    assertEquals(Paths.get("2019/" + name), appConfiguration.folder(sample));
+    assertEquals(appConfiguration.getHome().resolve("2019/" + name),
+        appConfiguration.folder(sample));
   }
 
   @Test
@@ -84,7 +85,25 @@ public class AppConfigurationTest {
     sample.setDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
     sample.generateName();
     String name = sample.getName();
-    assertEquals(Paths.get("2020/" + name), appConfiguration.folder(sample));
+    assertEquals(appConfiguration.getHome().resolve("2020/" + name),
+        appConfiguration.folder(sample));
+  }
+
+  @Test
+  public void upload_Sample() {
+    Sample sample = new Sample();
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setTarget("my target");
+    sample.setStrain("yFR213");
+    sample.setStrainDescription("F56G");
+    sample.setTreatment("37C");
+    sample.setDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    sample.generateName();
+    String name = sample.getName();
+    assertEquals(appConfiguration.getUpload().resolve(name), appConfiguration.upload(sample));
   }
 
   @Test
@@ -107,7 +126,8 @@ public class AppConfigurationTest {
     dataset.getSamples().add(sample);
     dataset.generateName();
     String name = dataset.getName();
-    assertEquals(Paths.get("2019/" + name), appConfiguration.folder(dataset));
+    assertEquals(appConfiguration.getHome().resolve("2019/" + name),
+        appConfiguration.folder(dataset));
   }
 
   @Test
@@ -128,7 +148,31 @@ public class AppConfigurationTest {
     dataset.getSamples().add(sample);
     dataset.generateName();
     String name = dataset.getName();
-    assertEquals(Paths.get("2020/" + name), appConfiguration.folder(dataset));
+    assertEquals(appConfiguration.getHome().resolve("2020/" + name),
+        appConfiguration.folder(dataset));
+  }
+
+  @Test
+  public void upload_Dataset2019() {
+    Dataset dataset = new Dataset();
+    dataset.setSamples(new ArrayList<>());
+    dataset.setDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    Sample sample = new Sample();
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setTarget("my target");
+    sample.setStrain("yFR213");
+    sample.setStrainDescription("F56G");
+    sample.setTreatment("37C");
+    dataset.getSamples().add(sample);
+    sample = new Sample();
+    sample.setSampleId("my sample2");
+    dataset.getSamples().add(sample);
+    dataset.generateName();
+    String name = dataset.getName();
+    assertEquals(appConfiguration.getUpload().resolve(name), appConfiguration.upload(dataset));
   }
 
   @Test

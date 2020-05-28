@@ -78,7 +78,7 @@ public class AddSampleFilesDialogPresenter {
   }
 
   Path folder() {
-    return sample != null ? configuration.getUpload().resolve(configuration.folder(sample)) : null;
+    return sample != null ? configuration.upload(sample) : null;
   }
 
   void save(Locale locale) {

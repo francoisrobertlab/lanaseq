@@ -107,10 +107,9 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     files.add(Paths.get("sample_R2.fastq"));
     files.add(Paths.get("sample.bw"));
     files.add(Paths.get("sample.png"));
-    folder = Paths.get("sample");
+    folder = temporaryFolder.getRoot().toPath().resolve("sample");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
-    when(configuration.getUpload()).thenReturn(temporaryFolder.getRoot().toPath());
-    when(configuration.folder(any(Sample.class))).thenReturn(folder);
+    when(configuration.upload(any(Sample.class))).thenReturn(folder);
     presenter.init(dialog);
   }
 
@@ -121,8 +120,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
   }
 
-  private Path folder(Sample sample) {
-    return configuration.getUpload().resolve(configuration.folder(sample));
+  private Path uploadFolder(Sample sample) {
+    return configuration.upload(sample);
   }
 
   @Test
@@ -143,9 +142,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
 
     presenter.setSample(sample, locale);
 
-    verify(configuration, atLeastOnce()).getUpload();
-    verify(configuration, atLeastOnce()).folder(sample);
-    assertTrue(Files.isDirectory(folder(sample)));
+    verify(configuration, atLeastOnce()).upload(sample);
+    assertTrue(Files.isDirectory(uploadFolder(sample)));
     List<Path> files = items(dialog.files);
     assertTrue(files.isEmpty());
   }
@@ -159,26 +157,26 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   public void updateFiles() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    Files.createFile(folder(sample).resolve(this.files.get(0)));
-    Files.createFile(folder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
 
     presenter.updateFiles();
 
     List<Path> files = items(dialog.files);
     assertEquals(2, files.size());
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(1))));
-    Files.createFile(folder(sample).resolve(this.files.get(2)));
-    Files.createFile(folder(sample).resolve(this.files.get(3)));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(2)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(3)));
 
     presenter.updateFiles();
 
     files = items(dialog.files);
     assertEquals(4, files.size());
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(1))));
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(2))));
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(3))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(2))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(3))));
   }
 
   @Test
@@ -201,30 +199,30 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     Thread.sleep(500);
     assertFalse(presenter.updateFilesThread().isAlive());
     Command command = commandCaptor.getValue();
-    Files.createFile(folder(sample).resolve(this.files.get(0)));
-    Files.createFile(folder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
     command.execute();
     verify(ui).push();
     List<Path> files = items(dialog.files);
     assertEquals(2, files.size());
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(1))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
   }
 
   @Test
   public void save() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    Files.createFile(folder(sample).resolve(this.files.get(0)));
-    Files.createFile(folder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
 
     presenter.save(locale);
 
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(2, files.size());
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(folder(sample).resolve(this.files.get(1))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
     verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
   }
 
