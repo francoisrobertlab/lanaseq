@@ -50,6 +50,12 @@ public class AppConfigurationTest {
   }
 
   @Test
+  public void getUpload() {
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/upload"),
+        appConfiguration.getUpload());
+  }
+
+  @Test
   public void folder_Sample2019() {
     Sample sample = new Sample();
     sample.setSampleId("my sample");

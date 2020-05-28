@@ -28,6 +28,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -84,6 +85,44 @@ public class VaadinTestUtils {
       method.setAccessible(true);
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
       eventBus.fireEvent(new ClickEvent<>(button));
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Simulates an item click on grid.
+   *
+   * @param grid
+   *          grid
+   * @param item
+   *          item
+   * @param column
+   *          grid column
+   * @param ctrlKey
+   *          <code>true</code> if the control key was down when the event was fired,
+   *          <code>false</code> otherwise
+   * @param shiftKey
+   *          <code>true</code> if the shift key was down when the event was fired,
+   *          <code>false</code> otherwise
+   * @param altKey
+   *          <code>true</code> if the alt key was down when the event was fired, <code>false</code>
+   *          otherwise
+   * @param metaKey
+   *          <code>true</code> if the meta key was down when the event was fired,
+   *          <code>false</code> otherwise
+   */
+  public static <E> void clickItem(Grid<E> grid, E item, Grid.Column<E> column, boolean ctrlKey,
+      boolean shiftKey, boolean altKey, boolean metaKey) {
+    try {
+      String key = grid.getDataCommunicator().getKeyMapper().key(item);
+      Method method = Component.class.getDeclaredMethod("getEventBus");
+      method.setAccessible(true);
+      ComponentEventBus eventBus = (ComponentEventBus) method.invoke(grid);
+      eventBus.fireEvent(new ItemClickEvent<>(grid, false, key,
+          column != null ? column.getElement().getProperty("_flowId") : null, -1, -1, -1, -1, 2, 0,
+          ctrlKey, shiftKey, altKey, metaKey));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);

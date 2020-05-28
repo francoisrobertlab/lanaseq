@@ -30,6 +30,8 @@ import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.apache.commons.lang3.SystemUtils;
+import org.openqa.selenium.Keys;
 
 @Element("vaadin-vertical-layout")
 public class SamplesViewElement extends VerticalLayoutElement {
@@ -55,6 +57,18 @@ public class SamplesViewElement extends VerticalLayoutElement {
 
   public TextFieldElement ownerFilter() {
     return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public void controlClick(int row) {
+    Keys key = Keys.CONTROL;
+    if (SystemUtils.IS_OS_MAC_OSX) {
+      key = Keys.COMMAND;
+    }
+    samples().getCell(row, NAME_COLUMN).click(0, 0, key);
+  }
+
+  public void metaClick(int row) {
+    samples().getCell(row, NAME_COLUMN).click(0, 0, Keys.META);
   }
 
   public void doubleClick(int row) {

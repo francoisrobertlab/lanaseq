@@ -34,6 +34,7 @@ spring:
 
 app:
   home: ${user.home}/lanaseq
+  upload: ${app.home}/upload
   serverUrl: http://localhost:8080
 
 security:

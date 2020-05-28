@@ -29,12 +29,14 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
+import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
@@ -79,6 +81,10 @@ public class SampleDialogElement extends DialogElement {
 
   public TextFieldElement treatment() {
     return $(TextFieldElement.class).id(id(TREATMENT));
+  }
+
+  public GridElement files() {
+    return $(GridElement.class).id(id(FILES));
   }
 
   public ButtonElement save() {

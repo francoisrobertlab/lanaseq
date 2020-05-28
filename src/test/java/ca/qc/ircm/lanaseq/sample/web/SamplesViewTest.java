@@ -30,6 +30,7 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -45,6 +46,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
@@ -83,6 +85,10 @@ public class SamplesViewTest extends AbstractViewTestCase {
   private SamplesViewPresenter presenter;
   @Mock
   private SampleDialog dialog;
+  @Mock
+  private AddSampleFilesDialog addFileDialog;
+  @Mock
+  private ProtocolDialog protocolDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
   @Captor
@@ -103,7 +109,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new SamplesView(presenter, dialog);
+    view = new SamplesView(presenter, dialog, addFileDialog, protocolDialog);
     view.init();
     samples = sampleRepository.findAll();
   }
@@ -225,7 +231,6 @@ public class SamplesViewTest extends AbstractViewTestCase {
 
   @Test
   public void samples_ColumnsValueProvider() {
-    view = new SamplesView(presenter, dialog);
     mockColumns();
     view.init();
     verify(view.samples).addColumn(valueProviderCaptor.capture(), eq(NAME));
@@ -278,6 +283,22 @@ public class SamplesViewTest extends AbstractViewTestCase {
     doubleClickItem(view.samples, sample);
 
     verify(presenter).view(sample);
+  }
+
+  @Test
+  public void addFiles_Conrol() {
+    Sample sample = samples.get(0);
+    clickItem(view.samples, sample, view.name, true, false, false, false);
+
+    verify(presenter).addFiles(sample);
+  }
+
+  @Test
+  public void addFiles_Meta() {
+    Sample sample = samples.get(0);
+    clickItem(view.samples, sample, view.name, false, false, false, true);
+
+    verify(presenter).addFiles(sample);
   }
 
   @Test

@@ -29,6 +29,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -93,6 +94,13 @@ public class SamplesViewPresenter {
   public void view(Sample sample) {
     view.dialog.setSample(service.get(sample.getId()));
     view.dialog.open();
+  }
+
+  public void addFiles(Sample sample) {
+    if (authorizationService.hasPermission(sample, Permission.WRITE)) {
+      view.addFilesDialog.setSample(sample);
+      view.addFilesDialog.open();
+    }
   }
 
   public void view(Protocol protocol) {

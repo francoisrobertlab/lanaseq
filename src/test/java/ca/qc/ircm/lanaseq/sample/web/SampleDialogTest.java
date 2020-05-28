@@ -30,6 +30,8 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
@@ -39,8 +41,10 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -60,13 +64,23 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -79,6 +93,8 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private SampleDialogPresenter presenter;
   @Mock
   private Sample sample;
+  @Captor
+  private ArgumentCaptor<ValueProvider<Path, String>> valueProviderCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
@@ -91,6 +107,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private AppResources resources = new AppResources(SampleDialog.class, locale);
   private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
+  private List<Path> files = new ArrayList<>();
 
   /**
    * Before test.
@@ -100,6 +117,23 @@ public class SampleDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new SampleDialog(presenter);
     dialog.init();
+    files.add(Paths.get("sample_R1.fastq"));
+    files.add(Paths.get("sample_R2.fastq"));
+    files.add(Paths.get("sample.bw"));
+    files.add(Paths.get("sample.png"));
+  }
+
+  @SuppressWarnings("unchecked")
+  private void mockColumns() {
+    Element filesElement = dialog.files.getElement();
+    dialog.files = mock(Grid.class);
+    when(dialog.files.getElement()).thenReturn(filesElement);
+    dialog.filename = mock(Column.class);
+    when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
+        .thenReturn(dialog.filename);
+    when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
+    when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
+    when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
   }
 
   @Test
@@ -120,6 +154,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
+    assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -132,6 +167,8 @@ public class SampleDialogTest extends AbstractViewTestCase {
 
   @Test
   public void labels() {
+    mockColumns();
+    dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
@@ -151,6 +188,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    verify(dialog.filename).setHeader(resources.message(FILENAME));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -159,6 +197,8 @@ public class SampleDialogTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
+    mockColumns();
+    dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(SampleDialog.class, locale);
@@ -184,6 +224,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    verify(dialog.filename).setHeader(resources.message(FILENAME));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -212,6 +253,23 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertArrayEquals(SampleType.values(), types.toArray(new SampleType[0]));
     for (SampleType type : types) {
       assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
+    }
+  }
+
+  @Test
+  public void files() {
+    assertEquals(1, dialog.files.getColumns().size());
+    assertNotNull(dialog.files.getColumnByKey(FILENAME));
+  }
+
+  @Test
+  public void files_ColumnsValueProvider() {
+    mockColumns();
+    dialog.init();
+    verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
+    ValueProvider<Path, String> valueProvider = valueProviderCaptor.getValue();
+    for (Path file : files) {
+      assertEquals(file.getFileName().toString(), valueProvider.apply(file));
     }
   }
 

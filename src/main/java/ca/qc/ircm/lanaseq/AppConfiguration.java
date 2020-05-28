@@ -39,6 +39,7 @@ public class AppConfiguration {
   @Value("${logging.path:${user.dir}}/${logging.file:" + APPLICATION_NAME + "log}")
   private String logfile;
   private Path home;
+  private Path upload;
   private String serverUrl;
   private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
 
@@ -73,8 +74,16 @@ public class AppConfiguration {
     return home;
   }
 
-  void setHome(Path home) {
+  public void setHome(Path home) {
     this.home = home;
+  }
+
+  public Path getUpload() {
+    return upload;
+  }
+
+  public void setUpload(Path upload) {
+    this.upload = upload;
   }
 
   public String getServerUrl() {

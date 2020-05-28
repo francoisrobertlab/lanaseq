@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -8,21 +9,29 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,13 +55,22 @@ public class SampleServiceTest {
   @Autowired
   private UserRepository userRepository;
   @MockBean
+  private AppConfiguration configuration;
+  @MockBean
   private PermissionEvaluator permissionEvaluator;
   @MockBean
   private AuthorizationService authorizationService;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    when(configuration.getHome()).thenReturn(temporaryFolder.getRoot().toPath());
+    when(configuration.folder(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null && sample.getName() != null ? Paths.get(sample.getName()) : null;
+    });
   }
 
   @Test
@@ -101,6 +119,57 @@ public class SampleServiceTest {
     for (Sample sample : samples) {
       verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
     }
+  }
+
+  @Test
+  @WithMockUser
+  public void files() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    Files.createDirectories(folder);
+    Path file = folder.resolve("sample_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("sample_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration, times(2)).getHome();
+    verify(configuration, times(2)).folder(sample);
+    assertEquals(2, files.size());
+    assertTrue(files.contains(Paths.get("sample_R1.fastq")));
+    assertTrue(files.contains(Paths.get("sample_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void files_FolderNotExists() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration).folder(sample);
+    assertTrue(files.isEmpty());
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void files_NullId() throws Throwable {
+    List<Path> files = service.files(new Sample());
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  @WithMockUser
+  public void files_Null() throws Throwable {
+    List<Path> files = service.files(null);
+
+    assertTrue(files.isEmpty());
   }
 
   @Test
@@ -516,6 +585,36 @@ public class SampleServiceTest {
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
     assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20181020",
         sample.getName());
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
+  }
+
+  @Test
+  @WithMockUser
+  public void saveFiles() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    List<Path> files = new ArrayList<>();
+    Path file = temporaryFolder.newFile("sample_R1.fastq").toPath();
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    files.add(file);
+    file = temporaryFolder.newFile("sample_R2.fastq").toPath();
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    files.add(file);
+
+    service.saveFiles(sample, files);
+
+    verify(configuration).getHome();
+    verify(configuration).folder(sample);
+    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 

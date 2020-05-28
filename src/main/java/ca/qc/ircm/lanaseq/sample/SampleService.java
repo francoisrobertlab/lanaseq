@@ -1,12 +1,21 @@
 package ca.qc.ircm.lanaseq.sample;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
@@ -19,15 +28,18 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class SampleService {
+  private static final Logger logger = LoggerFactory.getLogger(SampleService.class);
   private SampleRepository repository;
   private DatasetRepository datasetRepository;
+  private AppConfiguration configuration;
   private AuthorizationService authorizationService;
 
   @Autowired
   protected SampleService(SampleRepository repository, DatasetRepository datasetRepository,
-      AuthorizationService authorizationService) {
+      AppConfiguration configuration, AuthorizationService authorizationService) {
     this.repository = repository;
     this.datasetRepository = datasetRepository;
+    this.configuration = configuration;
     this.authorizationService = authorizationService;
   }
 
@@ -55,6 +67,25 @@ public class SampleService {
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Sample> all() {
     return repository.findAll();
+  }
+
+  /**
+   * Returns all sample's files.
+   *
+   * @return all sample's files
+   */
+  @PreAuthorize("hasPermission(#sample, 'read')")
+  public List<Path> files(Sample sample) {
+    if (sample == null || sample.getId() == null) {
+      return new ArrayList<>();
+    }
+    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    try {
+      return Files.list(folder).map(Path::getFileName)
+          .collect(Collectors.toCollection(ArrayList::new));
+    } catch (IOException e) {
+      return new ArrayList<>();
+    }
   }
 
   /**
@@ -119,6 +150,33 @@ public class SampleService {
     }
     sample.generateName();
     repository.save(sample);
+  }
+
+  /**
+   * Save files to sample folder.
+   *
+   * @param sample
+   *          sample
+   * @param files
+   *          files to save
+   */
+  @PreAuthorize("hasPermission(#sample, 'write')")
+  public void saveFiles(Sample sample, Collection<Path> files) {
+    Path folder = configuration.getHome().resolve(configuration.folder(sample));
+    try {
+      Files.createDirectories(folder);
+    } catch (IOException e) {
+      throw new IllegalStateException("could not create folder " + folder, e);
+    }
+    for (Path file : files) {
+      Path target = folder.resolve(file.getFileName());
+      try {
+        logger.debug("moving file {} to {} for sample {}", file, target, sample);
+        Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException e) {
+        throw new IllegalArgumentException("could not move file " + file, e);
+      }
+    }
   }
 
   /**

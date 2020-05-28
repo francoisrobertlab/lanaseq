@@ -111,6 +111,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
+    assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertFalse(optional(() -> dialog.delete()).isPresent());
@@ -132,6 +133,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
+    assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertFalse(optional(() -> dialog.delete()).isPresent());
@@ -155,6 +157,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
+    assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());

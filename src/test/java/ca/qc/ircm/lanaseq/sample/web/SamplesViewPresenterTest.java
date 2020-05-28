@@ -124,11 +124,13 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     view.add = new Button();
     view.merge = new Button();
     view.dialog = mock(SampleDialog.class);
+    view.addFilesDialog = mock(AddSampleFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
     when(service.all()).thenReturn(samples);
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
   }
 
@@ -250,6 +252,25 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     verify(service).get(2L);
     verify(view.dialog).setSample(databaseSample);
     verify(view.dialog).open();
+  }
+
+  @Test
+  public void addFiles() {
+    Sample sample = new Sample();
+    sample.setId(2L);
+    presenter.addFiles(sample);
+    verify(view.addFilesDialog).setSample(sample);
+    verify(view.addFilesDialog).open();
+  }
+
+  @Test
+  public void addFiles_CannotWrite() {
+    when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
+    Sample sample = new Sample();
+    sample.setId(2L);
+    presenter.addFiles(sample);
+    verify(view.addFilesDialog, never()).setSample(any());
+    verify(view.addFilesDialog, never()).open();
   }
 
   @Test
