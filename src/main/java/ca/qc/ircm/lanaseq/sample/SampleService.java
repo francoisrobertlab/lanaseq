@@ -81,8 +81,7 @@ public class SampleService {
     }
     Path folder = configuration.folder(sample);
     try {
-      return Files.list(folder).map(Path::getFileName)
-          .collect(Collectors.toCollection(ArrayList::new));
+      return Files.list(folder).collect(Collectors.toCollection(ArrayList::new));
     } catch (IOException e) {
       return new ArrayList<>();
     }

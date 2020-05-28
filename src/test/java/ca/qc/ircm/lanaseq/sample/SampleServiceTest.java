@@ -139,8 +139,8 @@ public class SampleServiceTest {
 
     verify(configuration, times(2)).folder(sample);
     assertEquals(2, files.size());
-    assertTrue(files.contains(Paths.get("sample_R1.fastq")));
-    assertTrue(files.contains(Paths.get("sample_R2.fastq")));
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }
 

@@ -117,10 +117,10 @@ public class SampleDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new SampleDialog(presenter);
     dialog.init();
-    files.add(Paths.get("sample_R1.fastq"));
-    files.add(Paths.get("sample_R2.fastq"));
-    files.add(Paths.get("sample.bw"));
-    files.add(Paths.get("sample.png"));
+    files.add(Paths.get("sample", "sample_R1.fastq"));
+    files.add(Paths.get("sample", "sample_R2.fastq"));
+    files.add(Paths.get("sample", "sample.bw"));
+    files.add(Paths.get("sample", "sample.png"));
   }
 
   @SuppressWarnings("unchecked")
