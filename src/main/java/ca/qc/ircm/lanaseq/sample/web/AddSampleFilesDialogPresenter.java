@@ -94,6 +94,8 @@ public class AddSampleFilesDialogPresenter {
     service.saveFiles(sample, files);
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
     dialog.showNotification(resources.message(SAVED, files.size(), sample.getName()));
+    dialog.fireSavedEvent();
+    dialog.close();
   }
 
   Sample getSample() {

@@ -224,6 +224,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
     verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
+    verify(dialog).fireSavedEvent();
+    verify(dialog).close();
   }
 
   @Test
@@ -237,5 +239,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(0, files.size());
     verify(dialog).showNotification(resources.message(SAVED, 0, sample.getName()));
+    verify(dialog).fireSavedEvent();
+    verify(dialog).close();
   }
 }
