@@ -1,12 +1,15 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.CREATE_FOLDER_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,9 +45,38 @@ public class AddSampleFilesDialogPresenter {
 
   void init(AddSampleFilesDialog dialog) {
     this.dialog = dialog;
-    updateFilesThread = new Thread(() -> {
+    dialog.addOpenedChangeListener(event -> {
+      if (event.isOpened()) {
+        if (updateFilesThread != null) {
+          updateFilesThread.interrupt();
+        }
+        updateFilesThread = createUpdateFilesThread();
+        updateFilesThread.setDaemon(true);
+        updateFilesThread.start();
+      } else {
+        if (updateFilesThread != null) {
+          updateFilesThread.interrupt();
+        }
+      }
+    });
+  }
+
+  void localeChange(Locale locale) {
+    final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
+    dialog.getUI().ifPresent(ui -> {
+      WebBrowser browser = ui.getSession().getBrowser();
+      boolean unix = browser.isMacOSX() || browser.isLinux();
+      if (sample != null) {
+        dialog.message.setText(resources.message(MESSAGE, configuration.uploadLabel(sample, unix)));
+      }
+      dialog.network.setText(resources.message(NETWORK, configuration.uploadNetwork(unix)));
+    });
+  }
+
+  Thread createUpdateFilesThread() {
+    return new Thread(() -> {
+      logger.debug("stat checking files in sample {} upload folder", sample);
       while (true) {
-        logger.debug("call updatefiles on ui {}", dialog.getUI());
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
           ui.push();
@@ -52,17 +84,9 @@ public class AddSampleFilesDialogPresenter {
         try {
           Thread.sleep(2000);
         } catch (InterruptedException e) {
-          logger.debug("interrupted");
+          logger.debug("stop checking files in sample {} upload folder", sample);
           return;
         }
-      }
-    });
-    updateFilesThread.setDaemon(true);
-    dialog.addOpenedChangeListener(e -> {
-      if (e.isOpened()) {
-        updateFilesThread.start();
-      } else {
-        updateFilesThread.interrupt();
       }
     });
   }
@@ -77,7 +101,7 @@ public class AddSampleFilesDialogPresenter {
     }
   }
 
-  Path folder() {
+  private Path folder() {
     return sample != null ? configuration.upload(sample) : null;
   }
 
@@ -111,6 +135,7 @@ public class AddSampleFilesDialogPresenter {
     }
     this.sample = sample;
     createFolder(locale);
+    localeChange(locale);
     updateFiles();
   }
 

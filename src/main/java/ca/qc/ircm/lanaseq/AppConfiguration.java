@@ -22,6 +22,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -40,6 +41,10 @@ public class AppConfiguration {
   private String logfile;
   private Path home;
   private Path upload;
+  private String uploadWindowsLabel;
+  private String uploadWindowsNetwork;
+  private String uploadUnixLabel;
+  private String uploadUnixNetwork;
   private String serverUrl;
   private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
 
@@ -51,16 +56,36 @@ public class AppConfiguration {
     return getHome().resolve(year.format(sample.getDate())).resolve(sample.getName());
   }
 
-  public Path upload(Sample sample) {
-    return getUpload().resolve(sample.getName());
-  }
-
   public Path folder(Dataset dataset) {
     return getHome().resolve(year.format(dataset.getDate())).resolve(dataset.getName());
   }
 
+  public Path upload(Sample sample) {
+    return getUpload().resolve(sample.getName());
+  }
+
   public Path upload(Dataset dataset) {
     return getUpload().resolve(dataset.getName());
+  }
+
+  public String uploadLabel(Sample sample, boolean unix) {
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(getUploadUnixLabel() + "/" + sample.getName());
+    } else {
+      return FilenameUtils.separatorsToWindows(getUploadWindowsLabel() + "/" + sample.getName());
+    }
+  }
+
+  public String uploadLabel(Dataset dataset, boolean unix) {
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(getUploadUnixLabel() + "/" + dataset.getName());
+    } else {
+      return FilenameUtils.separatorsToWindows(getUploadWindowsLabel() + "/" + dataset.getName());
+    }
+  }
+
+  public String uploadNetwork(boolean unix) {
+    return unix ? getUploadUnixNetwork() : getUploadWindowsNetwork();
   }
 
   /**
@@ -86,7 +111,7 @@ public class AppConfiguration {
     this.home = home;
   }
 
-  Path getUpload() {
+  public Path getUpload() {
     return upload;
   }
 
@@ -100,5 +125,37 @@ public class AppConfiguration {
 
   void setServerUrl(String serverUrl) {
     this.serverUrl = serverUrl;
+  }
+
+  String getUploadWindowsLabel() {
+    return uploadWindowsLabel;
+  }
+
+  void setUploadWindowsLabel(String uploadWindowsLabel) {
+    this.uploadWindowsLabel = uploadWindowsLabel;
+  }
+
+  String getUploadUnixLabel() {
+    return uploadUnixLabel;
+  }
+
+  void setUploadUnixLabel(String uploadUnixLabel) {
+    this.uploadUnixLabel = uploadUnixLabel;
+  }
+
+  String getUploadWindowsNetwork() {
+    return uploadWindowsNetwork;
+  }
+
+  void setUploadWindowsNetwork(String uploadWindowsNetwork) {
+    this.uploadWindowsNetwork = uploadWindowsNetwork;
+  }
+
+  String getUploadUnixNetwork() {
+    return uploadUnixNetwork;
+  }
+
+  void setUploadUnixNetwork(String uploadUnixNetwork) {
+    this.uploadUnixNetwork = uploadUnixNetwork;
   }
 }

@@ -34,6 +34,7 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.VaadinServletService;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.WebBrowser;
 import javax.servlet.ServletContext;
 import org.junit.After;
 import org.junit.Before;
@@ -49,6 +50,8 @@ public abstract class AbstractViewTestCase {
   protected UI ui;
   @Mock
   protected VaadinSession session;
+  @Mock
+  protected WebBrowser browser;
   @Mock
   protected Page page;
   @Mock
@@ -72,6 +75,7 @@ public abstract class AbstractViewTestCase {
   @Before
   public void setUi() {
     when(ui.getSession()).thenReturn(session);
+    when(session.getBrowser()).thenReturn(browser);
     when(ui.getPage()).thenReturn(page);
     when(page.getHistory()).thenReturn(history);
     when(vaadinService.getServlet()).thenReturn(servlet);

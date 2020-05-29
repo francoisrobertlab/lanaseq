@@ -42,6 +42,7 @@ public class AddSampleFilesDialog extends Dialog
   public static final String ID = "add-sample-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
+  public static final String NETWORK = "network";
   public static final String FILES = "files";
   public static final String FILENAME = "filename";
   public static final String SIZE = "size";
@@ -51,6 +52,7 @@ public class AddSampleFilesDialog extends Dialog
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
+  protected Div network = new Div();
   protected Grid<Path> files = new Grid<>();
   protected Column<Path> filename;
   protected Column<Path> size;
@@ -76,9 +78,10 @@ public class AddSampleFilesDialog extends Dialog
     add(layout);
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
-    layout.add(header, message, files, save);
+    layout.add(header, message, network, files, save);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
+    network.setId(id(NETWORK));
     files.setId(id(FILES));
     filename = files.addColumn(file -> file.getFileName().toString(), FILENAME).setKey(FILENAME);
     save.setId(id(SAVE));
@@ -94,37 +97,34 @@ public class AddSampleFilesDialog extends Dialog
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
     message.setText("");
+    network.setText("");
     filename.setHeader(resources.message(FILENAME));
     if (size != null) {
       files.removeColumn(size);
     }
     NumberFormat sizeFormat = NumberFormat.getIntegerInstance(getLocale());
     size = files.addColumn(file -> {
-      Path folder = presenter.folder();
-      if (folder != null) {
-        try {
-          return resources.message(SIZE_VALUE,
-              sizeFormat.format(Files.size(presenter.folder().resolve(file)) / Math.pow(1024, 2)));
-        } catch (IOException e1) {
-        }
+      try {
+        return resources.message(SIZE_VALUE,
+            sizeFormat.format(Files.size(file) / Math.pow(1024, 2)));
+      } catch (IOException e1) {
       }
       return "";
     }, SIZE).setKey(SIZE);
     size.setHeader(resources.message(SIZE));
     save.setText(webResources.message(SAVE));
+    presenter.localeChange(getLocale());
     updateHeader();
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
     Sample sample = presenter.getSample();
-    if (sample != null && sample.getSampleId() != null) {
-      header.setText(resources.message(HEADER, 1, sample.getSampleId()));
+    if (sample != null && sample.getName() != null) {
+      header.setText(resources.message(HEADER, sample.getName()));
     } else {
-      header.setText(resources.message(HEADER, 0));
+      header.setText(resources.message(HEADER));
     }
-    Path folder = presenter.folder();
-    message.setText(folder != null ? resources.message(MESSAGE, presenter.folder()) : "");
   }
 
   /**

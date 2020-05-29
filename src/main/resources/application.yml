@@ -35,6 +35,10 @@ spring:
 app:
   home: ${user.home}/lanaseq
   upload: ${app.home}/upload
+  upload-windows-label: 'lanaseq\upload'
+  upload-unix-label: 'lanaseq/upload'
+  upload-windows-network: '\\lanaseq01\lanaseq'
+  upload-unix-network: 'smb://lanaseq01/lanaseq'
   serverUrl: http://localhost:8080
 
 security:

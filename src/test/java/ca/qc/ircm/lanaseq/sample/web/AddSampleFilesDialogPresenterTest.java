@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
@@ -101,6 +103,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog.header = new H3();
     dialog.message = new Div();
+    dialog.network = new Div();
     dialog.files = new Grid<>();
     dialog.save = new Button();
     files.add(Paths.get("sample_R1.fastq"));
@@ -111,6 +114,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(configuration.upload(any(Sample.class))).thenReturn(folder);
     presenter.init(dialog);
+    presenter.localeChange(locale);
   }
 
   @After
@@ -122,6 +126,38 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
 
   private Path uploadFolder(Sample sample) {
     return configuration.upload(sample);
+  }
+
+  @Test
+  public void labels() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, false)),
+        dialog.message.getText());
+    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(false)),
+        dialog.network.getText());
+  }
+
+  @Test
+  public void labels_Linux() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    when(browser.isLinux()).thenReturn(true);
+    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
+        dialog.message.getText());
+    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
+        dialog.network.getText());
+  }
+
+  @Test
+  public void labels_Mac() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    when(browser.isLinux()).thenReturn(true);
+    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
+        dialog.message.getText());
+    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
+        dialog.network.getText());
   }
 
   @Test
@@ -181,13 +217,12 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void updateFiles_Thread() throws Throwable {
-    assertTrue(presenter.updateFilesThread().isDaemon());
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    assertFalse(presenter.updateFilesThread().isAlive());
     when(openedChangeEvent.isOpened()).thenReturn(true);
     verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    assertTrue(presenter.updateFilesThread().isDaemon());
     Thread.sleep(500);
     assertTrue(presenter.updateFilesThread().isAlive());
     verify(ui, atLeastOnce()).access(commandCaptor.capture());
