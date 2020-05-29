@@ -190,8 +190,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   private void updateHeader() {
     final AppResources resources = new AppResources(SampleDialog.class, getLocale());
     Sample sample = presenter.getSample();
-    if (sample != null && sample.getSampleId() != null) {
-      header.setText(resources.message(HEADER, 1, sample.getSampleId()));
+    if (sample != null && sample.getName() != null) {
+      header.setText(resources.message(HEADER, 1, sample.getName()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }

@@ -329,14 +329,14 @@ public class SampleDialogTest extends AbstractViewTestCase {
   @Test
   public void setSample_NewSampleWithName() {
     Sample sample = new Sample();
-    sample.setSampleId("my sample");
+    sample.setName("my sample");
     when(presenter.getSample()).thenReturn(sample);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getSampleId()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
   }
 
   @Test
@@ -348,7 +348,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getSampleId()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
   }
 
   @Test
@@ -360,7 +360,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getSampleId()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
   }
 
   @Test
