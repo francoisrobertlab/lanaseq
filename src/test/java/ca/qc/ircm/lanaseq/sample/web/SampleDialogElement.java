@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
@@ -85,6 +86,10 @@ public class SampleDialogElement extends DialogElement {
 
   public GridElement files() {
     return $(GridElement.class).id(id(FILES));
+  }
+
+  public TextFieldElement filenameEdit() {
+    return $(TextFieldElement.class).id(id(FILENAME));
   }
 
   public ButtonElement save() {

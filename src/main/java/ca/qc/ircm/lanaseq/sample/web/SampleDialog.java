@@ -26,6 +26,7 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -60,6 +61,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String HEADER = "header";
   public static final String FILES = "files";
   public static final String FILENAME = "filename";
+  public static final String FILENAME_REGEX = "[\\w-\\.]*";
+  public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
+  public static final String FILE_RENAME_ERROR = property("filename", "error");
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   private static final long serialVersionUID = 166699830639260659L;
@@ -73,8 +77,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
   protected TextField treatment = new TextField();
-  protected Grid<Path> files = new Grid<>();
-  protected Column<Path> filename;
+  protected Grid<SampleFile> files = new Grid<>();
+  protected Column<SampleFile> filename;
+  protected TextField filenameEdit = new TextField();
   protected Button save = new Button();
   protected Button cancel = new Button();
   protected Button delete = new Button();
@@ -130,7 +135,16 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
     files.setId(id(FILES));
-    filename = files.addColumn(file -> file.getFileName().toString(), FILENAME).setKey(FILENAME);
+    files.setHeight("12em");
+    files.getEditor().addCloseListener(e -> presenter.rename(e.getItem(), getLocale()));
+    files.addItemDoubleClickListener(e -> {
+      files.getEditor().editItem(e.getItem());
+      filenameEdit.focus();
+    });
+    filename = files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME);
+    filename.setEditorComponent(filenameEdit);
+    filenameEdit.setId(id(FILENAME));
+    filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -223,5 +237,31 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public void setSample(Sample sample) {
     presenter.setSample(sample);
     updateHeader();
+  }
+
+  public static class SampleFile {
+    private Path path;
+    private String filename;
+
+    SampleFile(Path path) {
+      this.path = path;
+      filename = path.getFileName().toString();
+    }
+
+    public Path getPath() {
+      return path;
+    }
+
+    public void setPath(Path path) {
+      this.path = path;
+    }
+
+    public String getFilename() {
+      return filename;
+    }
+
+    public void setFilename(String filename) {
+      this.filename = filename;
+    }
   }
 }

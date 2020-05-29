@@ -58,6 +58,7 @@ import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog.SampleFile;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -66,6 +67,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -94,7 +96,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
   @Mock
   private Sample sample;
   @Captor
-  private ArgumentCaptor<ValueProvider<Path, String>> valueProviderCaptor;
+  private ArgumentCaptor<ValueProvider<SampleFile, String>> valueProviderCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
@@ -127,6 +129,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private void mockColumns() {
     Element filesElement = dialog.files.getElement();
     dialog.files = mock(Grid.class);
+    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
     when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
@@ -155,6 +158,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
+    assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -267,10 +271,12 @@ public class SampleDialogTest extends AbstractViewTestCase {
     mockColumns();
     dialog.init();
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<Path, String> valueProvider = valueProviderCaptor.getValue();
-    for (Path file : files) {
-      assertEquals(file.getFileName().toString(), valueProvider.apply(file));
+    ValueProvider<SampleFile, String> valueProvider = valueProviderCaptor.getValue();
+    for (Path path : files) {
+      SampleFile file = new SampleFile(path);
+      assertEquals(file.getFilename(), valueProvider.apply(file));
     }
+    verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
   }
 
   @Test

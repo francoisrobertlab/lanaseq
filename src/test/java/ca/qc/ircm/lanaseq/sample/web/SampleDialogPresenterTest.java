@@ -17,17 +17,21 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,24 +46,30 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog.SampleFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Random;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -87,6 +97,8 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   private SampleRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -101,6 +113,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   private String strainDescription = "WT";
   private String treatment = "37C";
   private List<Path> files = new ArrayList<>();
+  private Random random = new Random();
 
   /**
    * Before test.
@@ -121,6 +134,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
     dialog.files = new Grid<>();
+    dialog.filenameEdit = new TextField();
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
@@ -181,10 +195,10 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
-    List<Path> files = items(dialog.files);
+    List<SampleFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (Path file : this.files) {
-      assertTrue(files.contains(file));
+    for (SampleFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
     }
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -216,10 +230,10 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
-    List<Path> files = items(dialog.files);
+    List<SampleFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (Path file : this.files) {
-      assertTrue(files.contains(file));
+    for (SampleFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
     }
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -252,10 +266,10 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    List<Path> files = items(dialog.files);
+    List<SampleFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (Path file : this.files) {
-      assertTrue(files.contains(file));
+    for (SampleFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
     }
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -288,10 +302,10 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
-    List<Path> files = items(dialog.files);
+    List<SampleFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (Path file : this.files) {
-      assertTrue(files.contains(file));
+    for (SampleFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
     }
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -321,10 +335,10 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
-    List<Path> files = items(dialog.files);
+    List<SampleFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (Path file : this.files) {
-      assertTrue(files.contains(file));
+    for (SampleFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
     }
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -351,6 +365,84 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (int i = 0; i < protocols.size(); i++) {
       assertEquals(this.protocols.get(i), protocols.get(i));
     }
+  }
+
+  @Test
+  public void filenameEdit_Empty() throws Throwable {
+    dialog.filenameEdit.setValue("");
+
+    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void filenameEdit_Invalid() throws Throwable {
+    dialog.filenameEdit.setValue("abc?.txt");
+
+    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(resources.message(FILENAME_REGEX_ERROR)), error.getMessage());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void filenameEdit_Exists() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    temporaryFolder.newFile("abc.txt");
+    SampleFile file = new SampleFile(path);
+    dialog.files = mock(Grid.class);
+    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    when(dialog.files.getEditor().getItem()).thenReturn(file);
+
+    dialog.filenameEdit.setValue("abc.txt");
+
+    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void filenameEdit_ExistsSameFile() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    SampleFile file = new SampleFile(path);
+    dialog.files = mock(Grid.class);
+    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    when(dialog.files.getEditor().getItem()).thenReturn(file);
+
+    dialog.filenameEdit.setValue("source.txt");
+
+    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    assertTrue(status.isOk());
+  }
+
+  @Test
+  public void rename() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    SampleFile file = new SampleFile(path);
+    file.setFilename("target.txt");
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
+    Files.write(path, bytes);
+
+    presenter.rename(file, locale);
+
+    assertTrue(Files.exists(path.resolveSibling("target.txt")));
+    assertArrayEquals(bytes, Files.readAllBytes(path.resolveSibling("target.txt")));
+    assertFalse(Files.exists(path));
   }
 
   @Test

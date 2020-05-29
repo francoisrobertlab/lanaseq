@@ -21,12 +21,14 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
@@ -38,14 +40,23 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -55,10 +66,14 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleDialogItTest extends AbstractTestBenchTestCase {
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
   private SampleRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private AppConfiguration configuration;
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
@@ -68,10 +83,32 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private String treatment = "37C";
   private String sampleId = "FR3";
   private String replicate = "R3";
+  private Path home;
+
+  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
+      IllegalArgumentException, InvocationTargetException {
+    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
+    getHome.setAccessible(true);
+    return (Path) getHome.invoke(configuration);
+  }
+
+  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
+    setHome.setAccessible(true);
+    setHome.invoke(configuration, path);
+  }
 
   @Before
-  public void beforeTest() {
+  public void beforeTest() throws Throwable {
     protocol = protocolRepository.findById(1L).get();
+    home = getHome();
+    setHome(temporaryFolder.newFolder("home").toPath());
+  }
+
+  @After
+  public void afterTest() throws Throwable {
+    setHome(home);
   }
 
   private void open() {
@@ -161,6 +198,30 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());
+  }
+
+  @Test
+  public void rename() throws Throwable {
+    Sample sample = repository.findById(4L).get();
+    Path folder = configuration.folder(sample);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    view.doubleClick(0);
+    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+
+    dialog.files().getRow(0).doubleClick();
+    dialog.filenameEdit().setValue(sample.getName() + "_R1.fastq");
+    dialog.filenameEdit().sendKeys(Keys.ENTER);
+    dialog.cancel().click();
+
+    assertTrue(Files.exists(file.resolveSibling(sample.getName() + "_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(file.resolveSibling(sample.getName() + "_R1.fastq")));
+    assertFalse(Files.exists(file));
   }
 
   @Test
