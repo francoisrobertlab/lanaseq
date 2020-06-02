@@ -26,8 +26,8 @@
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>lana</artifactId>
-  <name>lana</name>
+  <artifactId>lanaseq</artifactId>
+  <name>LANAseq</name>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2018</inceptionYear>
   <packaging>war</packaging>
