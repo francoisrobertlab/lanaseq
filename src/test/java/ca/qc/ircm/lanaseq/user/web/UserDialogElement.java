@@ -24,13 +24,13 @@ import static ca.qc.ircm.lanaseq.user.web.UserDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
-import com.vaadin.flow.component.html.testbench.H2Element;
+import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class UserDialogElement extends DialogElement {
-  public H2Element header() {
-    return $(H2Element.class).id(id(HEADER));
+  public H3Element header() {
+    return $(H3Element.class).id(id(HEADER));
   }
 
   public UserFormElement form() {

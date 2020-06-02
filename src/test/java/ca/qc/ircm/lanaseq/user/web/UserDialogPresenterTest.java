@@ -32,7 +32,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Locale;
 import org.junit.Before;
@@ -74,7 +74,7 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     presenter = new UserDialogPresenter(userService);
-    dialog.header = new H2();
+    dialog.header = new H3();
     dialog.form = mock(UserForm.class);
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();

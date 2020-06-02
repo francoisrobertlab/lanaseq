@@ -30,7 +30,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -53,7 +53,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
   public static final String ID = "user-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
-  protected H2 header = new H2();
+  protected H3 header = new H3();
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
