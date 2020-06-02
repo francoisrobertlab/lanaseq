@@ -39,6 +39,7 @@ import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.flow.component.select.testbench.SelectElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -60,12 +61,12 @@ public class SampleDialogElement extends DialogElement {
     return $(ComboBoxElement.class).id(id(PROTOCOL));
   }
 
-  public ComboBoxElement assay() {
-    return $(ComboBoxElement.class).id(id(ASSAY));
+  public SelectElement assay() {
+    return $(SelectElement.class).id(id(ASSAY));
   }
 
-  public ComboBoxElement type() {
-    return $(ComboBoxElement.class).id(id(TYPE));
+  public SelectElement type() {
+    return $(SelectElement.class).id(id(TYPE));
   }
 
   public TextFieldElement target() {

@@ -31,6 +31,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -212,6 +213,23 @@ public class VaadinTestUtils {
       return new ArrayList<>(((ListDataProvider<V>) comboBox.getDataProvider()).getItems());
     } else {
       return comboBox.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
+          .collect(Collectors.toList());
+    }
+  }
+
+  /**
+   * Returns items in select, unsorted and non-filtered.
+   *
+   * @param select
+   *          select
+   * @return items in select, unsorted and non-filtered
+   */
+  @SuppressWarnings("unchecked")
+  public static <V> List<V> items(Select<V> select) {
+    if (select.getDataProvider() instanceof ListDataProvider) {
+      return new ArrayList<>(((ListDataProvider<V>) select.getDataProvider()).getItems());
+    } else {
+      return select.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
           .collect(Collectors.toList());
     }
   }
