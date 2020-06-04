@@ -418,16 +418,28 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_ExistsSameFile() throws Throwable {
-    Path path = temporaryFolder.newFile("source.txt").toPath();
-    SampleFile file = new SampleFile(path);
+    temporaryFolder.newFile("abc.txt");
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
-    when(dialog.files.getEditor().getItem()).thenReturn(file);
+    when(dialog.files.getEditor().getItem()).thenReturn(null);
 
-    dialog.filenameEdit.setValue("source.txt");
+    dialog.filenameEdit.setValue("abc.txt");
 
     BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
     assertTrue(status.isOk());
+  }
+
+  @Test
+  public void filenameEdit_ItemNull() throws Throwable {
+    dialog.filenameEdit.setValue("");
+
+    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
   }
 
   @Test

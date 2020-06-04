@@ -98,7 +98,7 @@ public class SampleDialogPresenter {
   private Validator<String> exists(Locale locale) {
     return (value, context) -> {
       SampleFile item = dialog.files.getEditor().getItem();
-      if (value != null && !value.equals(item.getPath().getFileName().toString())
+      if (value != null && item != null && !value.equals(item.getPath().getFileName().toString())
           && Files.exists(item.getPath().resolveSibling(value))) {
         final AppResources webResources = new AppResources(Constants.class, locale);
         return ValidationResult.error(webResources.message(ALREADY_EXISTS));
@@ -120,6 +120,7 @@ public class SampleDialogPresenter {
       Files.move(source, target);
       updateFiles();
     } catch (IOException e) {
+      logger.error("renaming of file {} to {} failed", source, target);
       final AppResources resources = new AppResources(SampleDialog.class, locale);
       dialog.showNotification(
           resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));

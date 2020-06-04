@@ -247,6 +247,11 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
       filename = path.getFileName().toString();
     }
 
+    @Override
+    public String toString() {
+      return "SampleFile [path=" + path + ", filename=" + filename + "]";
+    }
+
     public Path getPath() {
       return path;
     }
