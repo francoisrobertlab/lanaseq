@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ADD_FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
@@ -85,5 +86,9 @@ public class SamplesViewElement extends VerticalLayoutElement {
 
   public ButtonElement merge() {
     return $(ButtonElement.class).id(MERGE);
+  }
+
+  public ButtonElement addFiles() {
+    return $(ButtonElement.class).id(ADD_FILES);
   }
 }
