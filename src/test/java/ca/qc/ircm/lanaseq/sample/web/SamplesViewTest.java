@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ADD_FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
@@ -164,6 +165,8 @@ public class SamplesViewTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
+    assertEquals(ADD_FILES, view.addFiles.getId().orElse(""));
+    validateIcon(VaadinIcon.FILE_ADD.create(), view.addFiles.getIcon());
   }
 
   @Test
@@ -184,6 +187,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
+    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
   }
 
   @Test
@@ -211,6 +215,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
+    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
   }
 
   @Test
@@ -290,7 +295,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     Sample sample = samples.get(0);
     clickItem(view.samples, sample, view.name, true, false, false, false);
 
-    verify(presenter).addFiles(sample);
+    verify(presenter).addFiles(sample, locale);
   }
 
   @Test
@@ -298,7 +303,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     Sample sample = samples.get(0);
     clickItem(view.samples, sample, view.name, false, false, false, true);
 
-    verify(presenter).addFiles(sample);
+    verify(presenter).addFiles(sample, locale);
   }
 
   @Test
@@ -348,5 +353,11 @@ public class SamplesViewTest extends AbstractViewTestCase {
   public void merge() {
     clickButton(view.merge);
     verify(presenter).merge(locale);
+  }
+
+  @Test
+  public void addFiles() {
+    clickButton(view.addFiles);
+    verify(presenter).addFiles(locale);
   }
 }

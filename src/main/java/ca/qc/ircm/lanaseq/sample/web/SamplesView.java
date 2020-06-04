@@ -55,8 +55,11 @@ public class SamplesView extends VerticalLayout
   public static final String HEADER = "header";
   public static final String SAMPLES = "samples";
   public static final String MERGE = "merge";
+  public static final String ADD_FILES = "addFiles";
   public static final String MERGED = "merged";
   public static final String SAMPLES_REQUIRED = property(SAMPLES, "required");
+  public static final String SAMPLES_MORE_THAN_ONE = property(SAMPLES, "moreThanOne");
+  public static final String SAMPLES_CANNOT_WRITE = property(SAMPLES, "cannotWrite");
   public static final String MERGE_ERROR = property(MERGE, "error");
   private static final long serialVersionUID = -6945706067250351889L;
   protected H2 header = new H2();
@@ -72,6 +75,7 @@ public class SamplesView extends VerticalLayout
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button merge = new Button();
+  protected Button addFiles = new Button();
   @Autowired
   protected SampleDialog dialog;
   @Autowired
@@ -119,7 +123,7 @@ public class SamplesView extends VerticalLayout
     });
     samples.addItemClickListener(e -> {
       if (e.isCtrlKey() || e.isMetaKey()) {
-        presenter.addFiles(e.getItem());
+        presenter.addFiles(e.getItem(), getLocale());
       }
     });
     samples.appendHeaderRow(); // Headers.
@@ -147,6 +151,9 @@ public class SamplesView extends VerticalLayout
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
     merge.addClickListener(e -> presenter.merge(getLocale()));
+    addFiles.setId(ADD_FILES);
+    addFiles.setIcon(VaadinIcon.FILE_ADD.create());
+    addFiles.addClickListener(e -> presenter.addFiles(getLocale()));
     presenter.init(this);
   }
 
@@ -169,6 +176,7 @@ public class SamplesView extends VerticalLayout
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
     merge.setText(resources.message(MERGE));
+    addFiles.setText(resources.message(ADD_FILES));
   }
 
   @Override

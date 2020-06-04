@@ -19,6 +19,8 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_CANNOT_WRITE;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -96,10 +98,32 @@ public class SamplesViewPresenter {
     view.dialog.open();
   }
 
-  public void addFiles(Sample sample) {
+  public void addFiles(Locale locale) {
+    List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
+    AppResources resources = new AppResources(SamplesView.class, locale);
+    boolean error = false;
+    if (samples.isEmpty()) {
+      view.error.setText(resources.message(SAMPLES_REQUIRED));
+      error = true;
+    } else if (samples.size() > 1) {
+      view.error.setText(resources.message(SAMPLES_MORE_THAN_ONE));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      Sample sample = samples.iterator().next();
+      addFiles(sample, locale);
+    }
+  }
+
+  public void addFiles(Sample sample, Locale locale) {
     if (authorizationService.hasPermission(sample, Permission.WRITE)) {
       view.addFilesDialog.setSample(sample);
       view.addFilesDialog.open();
+    } else {
+      AppResources resources = new AppResources(SamplesView.class, locale);
+      view.error.setText(resources.message(SAMPLES_CANNOT_WRITE));
+      view.error.setVisible(true);
     }
   }
 
