@@ -19,8 +19,6 @@ package ca.qc.ircm.lanaseq;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.Constants;
 import java.util.Locale;
 import org.junit.Test;
 
@@ -30,7 +28,7 @@ public class AppResourcesTest {
   @Test
   public void message_Name() {
     AppResources resources = new AppResources(Constants.class.getName(), locale);
-    assertEquals("Lana", resources.message("application.name"));
+    assertEquals("LANAseq", resources.message("application.name"));
   }
 
   @Test
@@ -48,7 +46,7 @@ public class AppResourcesTest {
   @Test
   public void message_Class() {
     AppResources resources = new AppResources(Constants.class, locale);
-    assertEquals("Lana", resources.message("application.name"));
+    assertEquals("LANAseq", resources.message("application.name"));
   }
 
   @Test
