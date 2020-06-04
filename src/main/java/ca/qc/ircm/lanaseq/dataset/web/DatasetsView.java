@@ -45,6 +45,7 @@ import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -118,6 +119,7 @@ public class DatasetsView extends VerticalLayout
     add(header, datasets, error, new HorizontalLayout(add, merge));
     header.setId(HEADER);
     datasets.setId(DATASETS);
+    datasets.setSelectionMode(SelectionMode.MULTI);
     datasets.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && protocol(e.getItem()).getId() != null) {
         presenter.view(protocol(e.getItem()));

@@ -32,9 +32,9 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
 public class DatasetsViewElement extends VerticalLayoutElement {
-  private static final int NAME_COLUMN = 0;
-  private static final int PROTOCOL_COLUMN = 2;
-  private static final int OWNER_COLUMN = 4;
+  private static final int NAME_COLUMN = 1;
+  private static final int PROTOCOL_COLUMN = 3;
+  private static final int OWNER_COLUMN = 5;
 
   public H2Element header() {
     return $(H2Element.class).id(HEADER);

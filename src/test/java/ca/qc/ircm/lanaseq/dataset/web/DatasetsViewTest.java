@@ -251,7 +251,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertNotNull(view.datasets.getColumnByKey(PROTOCOL));
     assertNotNull(view.datasets.getColumnByKey(DATE));
     assertNotNull(view.datasets.getColumnByKey(OWNER));
-    assertTrue(view.datasets.getSelectionModel() instanceof SelectionModel.Single);
+    assertTrue(view.datasets.getSelectionModel() instanceof SelectionModel.Multi);
   }
 
   @Test
