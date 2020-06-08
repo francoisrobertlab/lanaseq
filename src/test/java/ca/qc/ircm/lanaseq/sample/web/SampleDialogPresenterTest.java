@@ -201,6 +201,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -236,6 +237,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -272,6 +274,43 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertTrue(dialog.filenameEdit.isReadOnly());
+    assertFalse(dialog.save.isVisible());
+    assertFalse(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  public void setSample_NotEditable() {
+    Sample sample = repository.findById(8L).get();
+
+    presenter.setSample(sample);
+
+    verify(service).files(sample);
+    assertEquals("BC1", dialog.sampleId.getValue());
+    assertTrue(dialog.sampleId.isReadOnly());
+    assertEquals("R1", dialog.replicate.getValue());
+    assertTrue(dialog.replicate.isReadOnly());
+    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2b", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yBC103", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    List<SampleFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (SampleFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
+    assertTrue(dialog.filenameEdit.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -308,6 +347,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertTrue(dialog.delete.isVisible());
@@ -341,6 +381,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());

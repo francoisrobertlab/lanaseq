@@ -117,7 +117,7 @@ public class SamplesViewPresenter {
   }
 
   public void addFiles(Sample sample, Locale locale) {
-    if (authorizationService.hasPermission(sample, Permission.WRITE)) {
+    if (authorizationService.hasPermission(sample, Permission.WRITE) && sample.isEditable()) {
       view.addFilesDialog.setSample(sample);
       view.addFilesDialog.open();
     } else {

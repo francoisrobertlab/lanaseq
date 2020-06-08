@@ -94,6 +94,11 @@ public class Sample implements Data, Owned, Serializable {
    * Creation date.
    */
   @Column
+  private boolean editable;
+  /**
+   * Creation date.
+   */
+  @Column
   private LocalDateTime date;
   /**
    * Protocol.
@@ -258,5 +263,13 @@ public class Sample implements Data, Owned, Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean isEditable() {
+    return editable;
+  }
+
+  public void setEditable(boolean editable) {
+    this.editable = editable;
   }
 }

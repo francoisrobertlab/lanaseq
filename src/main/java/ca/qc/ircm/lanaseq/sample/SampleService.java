@@ -141,11 +141,15 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void save(Sample sample) {
+    if (sample.getId() != null && !sample.isEditable()) {
+      throw new IllegalArgumentException("sample " + sample + " cannot be edited");
+    }
     LocalDateTime now = LocalDateTime.now();
     User user = authorizationService.getCurrentUser();
     if (sample.getId() == null) {
       sample.setOwner(user);
       sample.setDate(now);
+      sample.setEditable(true);
     }
     Path oldFolder = null;
     if (sample.getName() != null) {

@@ -300,8 +300,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void addFiles_Sample() {
-    Sample sample = new Sample();
-    sample.setId(2L);
+    Sample sample = samples.get(0);
     presenter.addFiles(sample, locale);
     verify(view.addFilesDialog).setSample(sample);
     verify(view.addFilesDialog).open();
@@ -310,9 +309,19 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void addFiles_SampleCannotWrite() {
     when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
-    Sample sample = new Sample();
-    sample.setId(2L);
+    Sample sample = samples.get(0);
     presenter.addFiles(sample, locale);
+    assertEquals(resources.message(SAMPLES_CANNOT_WRITE), view.error.getText());
+    verify(view.addFilesDialog, never()).setSample(any());
+    verify(view.addFilesDialog, never()).open();
+  }
+
+  @Test
+  public void addFiles_SampleNotEditable() {
+    Sample sample = samples.get(0);
+    sample.setEditable(false);
+    presenter.addFiles(sample, locale);
+    assertEquals(resources.message(SAMPLES_CANNOT_WRITE), view.error.getText());
     verify(view.addFilesDialog, never()).setSample(any());
     verify(view.addFilesDialog, never()).open();
   }

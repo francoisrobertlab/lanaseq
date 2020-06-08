@@ -174,8 +174,10 @@ public class SampleDialogPresenter {
       sample = new Sample();
     }
     binder.setBean(sample);
-    boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE);
+    boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE)
+        || (sample.getId() != null && !sample.isEditable());
     binder.setReadOnly(readOnly);
+    fileBinder.setReadOnly(readOnly);
     updateFiles();
     dialog.save.setVisible(!readOnly);
     dialog.cancel.setVisible(!readOnly);

@@ -89,6 +89,7 @@ public class SampleServiceTest {
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
+    assertTrue(sample.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
@@ -545,6 +546,7 @@ public class SampleServiceTest {
     assertEquals("37C", sample.getTreatment());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
+    assertTrue(sample.isEditable());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
     assertEquals("mysample_ChIPSeq_IP_mytarget_yFR213_F56G_37C_myreplicate_"
@@ -582,10 +584,20 @@ public class SampleServiceTest {
     assertEquals("37C", sample.getTreatment());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
+    assertTrue(sample.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
     assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20181020",
         sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @WithMockUser
+  public void save_UpdateNotEditable() {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Sample sample = repository.findById(8L).orElse(null);
+    service.save(sample);
   }
 
   @Test
