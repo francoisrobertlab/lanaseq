@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
@@ -94,6 +95,10 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   private AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
   private Path folder;
   private List<Path> files = new ArrayList<>();
+  private String uploadLabelLinux = "lanaseq/upload";
+  private String uploadLabelWindows = "lanaseq\\upload";
+  private String uploadNetworkLinux = "smb://lanaseq01/lanaseq";
+  private String uploadNetworkWindows = "\\\\lanaseq01\\lanaseq";
 
   /**
    * Before test.
@@ -113,6 +118,15 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     folder = temporaryFolder.getRoot().toPath().resolve("sample");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(configuration.upload(any(Sample.class))).thenReturn(folder);
+    when(configuration.uploadLabel(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean linux = i.getArgument(1);
+      return (linux ? uploadLabelLinux : uploadLabelWindows) + "/" + sample.getName();
+    });
+    when(configuration.uploadNetwork(anyBoolean())).then(i -> {
+      boolean linux = i.getArgument(0);
+      return (linux ? uploadNetworkLinux : uploadNetworkWindows);
+    });
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -141,8 +155,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void labels_Linux() {
     Sample sample = repository.findById(1L).get();
-    presenter.setSample(sample, locale);
     when(browser.isLinux()).thenReturn(true);
+    presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
         dialog.message.getText());
     assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
@@ -152,8 +166,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   @Test
   public void labels_Mac() {
     Sample sample = repository.findById(1L).get();
+    when(browser.isMacOSX()).thenReturn(true);
     presenter.setSample(sample, locale);
-    when(browser.isLinux()).thenReturn(true);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
         dialog.message.getText());
     assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
