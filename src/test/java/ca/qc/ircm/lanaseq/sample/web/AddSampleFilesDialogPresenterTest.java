@@ -175,6 +175,28 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void network_Empty() {
+    Sample sample = repository.findById(1L).get();
+    when(browser.isLinux()).thenReturn(true);
+    when(configuration.uploadNetwork(anyBoolean())).thenReturn("");
+    presenter.setSample(sample, locale);
+    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
+        dialog.message.getText());
+    assertFalse(dialog.network.isVisible());
+  }
+
+  @Test
+  public void network_Null() {
+    Sample sample = repository.findById(1L).get();
+    when(browser.isLinux()).thenReturn(true);
+    when(configuration.uploadNetwork(anyBoolean())).thenReturn(null);
+    presenter.setSample(sample, locale);
+    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
+        dialog.message.getText());
+    assertFalse(dialog.network.isVisible());
+  }
+
+  @Test
   public void getSample() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);

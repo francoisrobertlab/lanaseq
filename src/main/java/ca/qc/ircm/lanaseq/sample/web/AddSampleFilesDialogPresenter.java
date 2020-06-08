@@ -69,7 +69,9 @@ public class AddSampleFilesDialogPresenter {
       if (sample != null) {
         dialog.message.setText(resources.message(MESSAGE, configuration.uploadLabel(sample, unix)));
       }
-      dialog.network.setText(resources.message(NETWORK, configuration.uploadNetwork(unix)));
+      String network = configuration.uploadNetwork(unix);
+      dialog.network.setVisible(network != null && !network.isEmpty());
+      dialog.network.setText(resources.message(NETWORK, network));
     });
   }
 
