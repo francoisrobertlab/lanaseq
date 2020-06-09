@@ -83,6 +83,36 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void minimumToAfterFromIsSet() {
+    LocalDate from = LocalDate.now().minusDays(2);
+    dateRange.from.setValue(from);
+    assertEquals(from, dateRange.to.getMin());
+  }
+
+  @Test
+  public void minimumToAfterFromIsCleared() {
+    LocalDate from = LocalDate.now().minusDays(2);
+    dateRange.from.setValue(from);
+    dateRange.from.clear();
+    assertNull(dateRange.to.getMin());
+  }
+
+  @Test
+  public void maximumFromAfterToIsSet() {
+    LocalDate to = LocalDate.now().minusDays(2);
+    dateRange.to.setValue(to);
+    assertEquals(to, dateRange.from.getMax());
+  }
+
+  @Test
+  public void maximumFromAfterToIsCleared() {
+    LocalDate to = LocalDate.now().minusDays(2);
+    dateRange.to.setValue(to);
+    dateRange.to.clear();
+    assertNull(dateRange.from.getMax());
+  }
+
+  @Test
   public void validate_FromGreaterThanTo() {
     LocalDate from = LocalDate.now().minusDays(2);
     dateRange.from.setValue(from);
