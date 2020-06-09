@@ -65,8 +65,10 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
   public void labels() {
     assertEquals(resources.message(property(FROM, PLACEHOLDER)), dateRange.from.getPlaceholder());
     validateEquals(englishDatePickerI18n(), dateRange.from.getI18n());
+    assertEquals(Locale.CANADA, dateRange.from.getLocale());
     assertEquals(resources.message(property(TO, PLACEHOLDER)), dateRange.to.getPlaceholder());
     validateEquals(englishDatePickerI18n(), dateRange.to.getI18n());
+    assertEquals(Locale.CANADA, dateRange.to.getLocale());
   }
 
   @Test
@@ -78,8 +80,10 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
     AppResources resources = new AppResources(DateRangeField.class, locale);
     assertEquals(resources.message(property(FROM, PLACEHOLDER)), dateRange.from.getPlaceholder());
     validateEquals(frenchDatePickerI18n(), dateRange.from.getI18n());
+    assertEquals(Locale.CANADA, dateRange.from.getLocale());
     assertEquals(resources.message(property(TO, PLACEHOLDER)), dateRange.to.getPlaceholder());
     validateEquals(frenchDatePickerI18n(), dateRange.to.getI18n());
+    assertEquals(Locale.CANADA, dateRange.to.getLocale());
   }
 
   @Test
