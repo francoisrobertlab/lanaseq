@@ -116,7 +116,7 @@ public class SampleDialogPresenter {
     Path source = file.getPath();
     Path target = source.resolveSibling(file.getFilename());
     try {
-      logger.debug("rename {} to {}", source, target);
+      logger.debug("rename file {} to {}", source, target);
       Files.move(source, target);
       updateFiles();
     } catch (IOException e) {
@@ -124,6 +124,19 @@ public class SampleDialogPresenter {
       final AppResources resources = new AppResources(SampleDialog.class, locale);
       dialog.showNotification(
           resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
+    }
+  }
+
+  void deleteFile(SampleFile file, Locale locale) {
+    Path path = file.getPath();
+    try {
+      logger.debug("delete file {}", path);
+      Files.delete(path);
+      updateFiles();
+    } catch (IOException e) {
+      logger.error("deleting file {} failed", path);
+      final AppResources resources = new AppResources(SampleDialog.class, locale);
+      dialog.showNotification(resources.message(FILE_RENAME_ERROR, path.getFileName()));
     }
   }
 
@@ -178,6 +191,7 @@ public class SampleDialogPresenter {
         || (sample.getId() != null && !sample.isEditable());
     binder.setReadOnly(readOnly);
     fileBinder.setReadOnly(readOnly);
+    dialog.deleteFile.setVisible(!readOnly);
     updateFiles();
     dialog.save.setVisible(!readOnly);
     dialog.cancel.setVisible(!readOnly);

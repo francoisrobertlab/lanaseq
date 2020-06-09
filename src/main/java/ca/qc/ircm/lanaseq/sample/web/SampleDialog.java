@@ -42,6 +42,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
@@ -64,7 +65,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String FILENAME = "filename";
   public static final String FILENAME_REGEX = "[\\w-\\.]*";
   public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
-  public static final String FILE_RENAME_ERROR = property("filename", "error");
+  public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
+  public static final String FILE_DELETE_ERROR = property("filename", "delete", "error");
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   private static final long serialVersionUID = 166699830639260659L;
@@ -80,6 +82,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField treatment = new TextField();
   protected Grid<SampleFile> files = new Grid<>();
   protected Column<SampleFile> filename;
+  protected Column<SampleFile> deleteFile;
   protected TextField filenameEdit = new TextField();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -141,6 +144,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
       filenameEdit.focus();
     });
     filename = files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME);
+    deleteFile =
+        files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE).setKey(DELETE);
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
@@ -156,6 +161,15 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     delete.setIcon(VaadinIcon.TRASH.create());
     delete.addClickListener(e -> presenter.delete(getLocale()));
     presenter.init(this);
+  }
+
+  private Button deleteButton(SampleFile file) {
+    Button button = new Button();
+    button.addClassName(DELETE);
+    button.setIcon(VaadinIcon.TRASH.create());
+    button.addThemeVariants(ButtonVariant.LUMO_ERROR);
+    button.addClickListener(e -> presenter.deleteFile(file, getLocale()));
+    return button;
   }
 
   @Override

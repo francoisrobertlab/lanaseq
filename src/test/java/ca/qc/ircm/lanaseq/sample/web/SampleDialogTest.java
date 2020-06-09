@@ -64,11 +64,13 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -97,6 +99,8 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private Sample sample;
   @Captor
   private ArgumentCaptor<ValueProvider<SampleFile, String>> valueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentRenderer<Button, SampleFile>> buttonRendererCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
@@ -137,6 +141,12 @@ public class SampleDialogTest extends AbstractViewTestCase {
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
+    dialog.deleteFile = mock(Column.class);
+    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DELETE)))
+        .thenReturn(dialog.deleteFile);
+    when(dialog.deleteFile.setKey(any())).thenReturn(dialog.deleteFile);
+    when(dialog.deleteFile.setComparator(any(Comparator.class))).thenReturn(dialog.deleteFile);
+    when(dialog.deleteFile.setHeader(any(String.class))).thenReturn(dialog.deleteFile);
   }
 
   @Test
@@ -262,8 +272,9 @@ public class SampleDialogTest extends AbstractViewTestCase {
 
   @Test
   public void files() {
-    assertEquals(1, dialog.files.getColumns().size());
+    assertEquals(2, dialog.files.getColumns().size());
     assertNotNull(dialog.files.getColumnByKey(FILENAME));
+    assertNotNull(dialog.files.getColumnByKey(DELETE));
   }
 
   @Test
@@ -277,6 +288,18 @@ public class SampleDialogTest extends AbstractViewTestCase {
       assertEquals(file.getFilename(), valueProvider.apply(file));
     }
     verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
+    verify(dialog.files).addColumn(buttonRendererCaptor.capture(), eq(DELETE));
+    ComponentRenderer<Button, SampleFile> buttonRenderer = buttonRendererCaptor.getValue();
+    for (Path path : files) {
+      SampleFile file = new SampleFile(path);
+      Button button = buttonRenderer.createComponent(file);
+      assertTrue(button.hasClassName(DELETE));
+      assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
+      validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
+      assertEquals("", button.getText());
+      button.click();
+      verify(presenter).deleteFile(file, locale);
+    }
   }
 
   @Test

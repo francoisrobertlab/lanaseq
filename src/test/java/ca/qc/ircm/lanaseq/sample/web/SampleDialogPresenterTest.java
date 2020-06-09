@@ -135,6 +135,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
     dialog.files = new Grid<>();
+    dialog.deleteFile = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
     dialog.save = new Button();
     dialog.cancel = new Button();
@@ -201,6 +202,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertTrue(dialog.deleteFile.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -237,6 +239,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertTrue(dialog.deleteFile.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -274,6 +277,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertFalse(dialog.deleteFile.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -310,6 +314,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertFalse(dialog.deleteFile.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -347,6 +352,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertTrue(dialog.deleteFile.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -381,6 +387,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
     for (SampleFile file : files) {
       assertTrue(this.files.contains(file.getPath()));
     }
+    assertTrue(dialog.deleteFile.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -496,6 +503,19 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
 
     assertTrue(Files.exists(path.resolveSibling("target.txt")));
     assertArrayEquals(bytes, Files.readAllBytes(path.resolveSibling("target.txt")));
+    assertFalse(Files.exists(path));
+  }
+
+  @Test
+  public void deleteFile() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    SampleFile file = new SampleFile(path);
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
+    Files.write(path, bytes);
+
+    presenter.deleteFile(file, locale);
+
     assertFalse(Files.exists(path));
   }
 
