@@ -55,6 +55,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -232,6 +233,13 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     presenter.setSample(sample, locale);
     Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+    Files.createDirectory(uploadFolder(sample).resolve("dir"));
+    Files.createFile(uploadFolder(sample).resolve("dir").resolve("test.txt"));
+    Path hiddenFile = uploadFolder(sample).resolve(".hidden.txt");
+    Files.createFile(hiddenFile);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(hiddenFile, "dos:hidden", true);
+    }
 
     presenter.updateFiles();
 

@@ -108,7 +108,13 @@ public class AddSampleFilesDialogPresenter {
     Path folder = folder();
     if (folder != null) {
       try {
-        dialog.files.setItems(Files.list(folder));
+        dialog.files.setItems(Files.list(folder).filter(file -> {
+          try {
+            return Files.isRegularFile(file) && !Files.isHidden(file);
+          } catch (IOException e) {
+            return false;
+          }
+        }));
       } catch (IOException e) {
       }
     }
