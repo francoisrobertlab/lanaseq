@@ -88,6 +88,7 @@ public class DatasetDialogPresenter {
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
+    dialog.tags.setTagSuggestions(service.topTags(50));
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null, Constants.DEFAULT_LOCALE);
   }

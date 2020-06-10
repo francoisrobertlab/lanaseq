@@ -22,10 +22,16 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,19 +46,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class DatasetService {
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
-  @Autowired
   private DatasetRepository repository;
-  @Autowired
   private SampleRepository sampleRepository;
-  @Autowired
   private AuthorizationService authorizationService;
 
   protected DatasetService() {
   }
 
-  protected DatasetService(DatasetRepository repository,
+  @Autowired
+  protected DatasetService(DatasetRepository repository, SampleRepository sampleRepository,
       AuthorizationService authorizationService) {
     this.repository = repository;
+    this.sampleRepository = sampleRepository;
     this.authorizationService = authorizationService;
   }
 
@@ -80,6 +85,26 @@ public class DatasetService {
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Dataset> all() {
     return repository.findAll();
+  }
+
+  /**
+   * Returns most recent tags.
+   *
+   * @param limit
+   *          maximum number of tags to return
+   * @return most recent tags
+   */
+  public List<String> topTags(int limit) {
+    Set<String> tags = new LinkedHashSet<>();
+    int page = 0;
+    while (tags.size() < limit) {
+      Page<Dataset> datasets = repository.findAllByOrderByIdDesc(PageRequest.of(page++, 50));
+      if (datasets.isEmpty()) {
+        break; // No more datasets.
+      }
+      tags.addAll(datasets.flatMap(d -> d.getTags().stream()).toList());
+    }
+    return tags.stream().limit(limit).collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**

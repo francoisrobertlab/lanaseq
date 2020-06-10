@@ -1,8 +1,8 @@
 package ca.qc.ircm.lanaseq.web;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.customfield.testbench.CustomFieldElement;
-import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class TagsFieldElement extends CustomFieldElement {
     return null;
   }
 
-  public TextFieldElement newTag() {
-    return $(TextFieldElement.class).first();
+  public ComboBoxElement newTag() {
+    return $(ComboBoxElement.class).first();
   }
 }

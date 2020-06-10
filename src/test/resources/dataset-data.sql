@@ -78,8 +78,10 @@ VALUES (2,1,'ip');
 INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (3,2,'chipseq');
 INSERT INTO dataset_tags (id,dataset_id,tags)
-VALUES (4,4,'chipseq');
+VALUES (4,2,'ip');
 INSERT INTO dataset_tags (id,dataset_id,tags)
-VALUES (5,5,'chipseq');
+VALUES (5,4,'chipseq');
 INSERT INTO dataset_tags (id,dataset_id,tags)
-VALUES (6,2,'G24D');
+VALUES (6,5,'chipseq');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (7,2,'G24D');

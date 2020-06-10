@@ -3,11 +3,13 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.web.TagsField.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG;
 import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.web.TagsField.TAG;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -15,10 +17,8 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import com.vaadin.flow.component.KeyDownEvent;
-import com.vaadin.flow.component.KeyPressEvent;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox.CustomValueSetEvent;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
 import java.util.Locale;
@@ -55,10 +55,8 @@ public class TagsFieldTest extends AbstractViewTestCase {
     tagsField.setValue(set("test", "test2"));
     for (int i = 0; i < 2; i++) {
       assertTrue(tagsField.tags.get(i).hasClassName(TAG));
-      assertTrue(tagsField.tags.get(i).hasThemeName(ButtonVariant.LUMO_SMALL.getVariantName()));
     }
     assertTrue(tagsField.newTag.hasClassName(NEW_TAG));
-    assertTrue(tagsField.newTag.hasThemeName(TextFieldVariant.LUMO_SMALL.getVariantName()));
   }
 
   @Test
@@ -117,19 +115,29 @@ public class TagsFieldTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void newTag_EmptyEnter() {
-    tagsField.newTag.setValue("");
-    KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
-        false, false, false, false);
-    fireEvent(tagsField.newTag, event);
-    assertTrue(tagsField.tags.isEmpty());
+  public void setTagSuggestions() {
+    List<String> items = items(tagsField.newTag);
+    assertTrue(items.isEmpty());
+    tagsField.setTagSuggestions(list("input", "chip"));
+    items = items(tagsField.newTag);
+    assertEquals(2, items.size());
+    assertTrue(items.contains("input"));
+    assertTrue(items.contains("chip"));
   }
 
   @Test
-  public void newTag_InvalidEnter() {
-    tagsField.newTag.setValue("chip?");
-    KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
-        false, false, false, false);
+  public void newTag_EmptyNew() {
+    CustomValueSetEvent<ComboBox<String>> event =
+        new CustomValueSetEvent<>(tagsField.newTag, false, "");
+    fireEvent(tagsField.newTag, event);
+    assertTrue(tagsField.tags.isEmpty());
+    assertFalse(tagsField.newTag.isInvalid());
+  }
+
+  @Test
+  public void newTag_InvalidNew() {
+    CustomValueSetEvent<ComboBox<String>> event =
+        new CustomValueSetEvent<>(tagsField.newTag, false, "chip?");
     fireEvent(tagsField.newTag, event);
     assertTrue(tagsField.tags.isEmpty());
     assertTrue(tagsField.newTag.isInvalid());
@@ -137,10 +145,9 @@ public class TagsFieldTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void newTag_NoTagsEnter() {
-    tagsField.newTag.setValue("chip");
-    KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
-        false, false, false, false);
+  public void newTag_NoTagsNew() {
+    CustomValueSetEvent<ComboBox<String>> event =
+        new CustomValueSetEvent<>(tagsField.newTag, false, "chip");
     fireEvent(tagsField.newTag, event);
     assertEquals(1, tagsField.tags.size());
     assertEquals("chip", tagsField.tags.get(0).getText());
@@ -150,12 +157,38 @@ public class TagsFieldTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void newTag_WithOtherTagsEnter() {
+  public void newTag_NoTagsExisting() {
+    tagsField.setTagSuggestions(list("input", "chip"));
+    tagsField.newTag.setValue("chip");
+    assertEquals(1, tagsField.tags.size());
+    assertEquals("chip", tagsField.tags.get(0).getText());
+    Set<String> tags = tagsField.generateModelValue();
+    assertEquals(1, tags.size());
+    assertTrue(tags.contains("chip"));
+  }
+
+  @Test
+  public void newTag_WithOtherTagsNew() {
+    tagsField.setValue(set("input", "rappa"));
+    CustomValueSetEvent<ComboBox<String>> event =
+        new CustomValueSetEvent<>(tagsField.newTag, false, "chip");
+    fireEvent(tagsField.newTag, event);
+    assertEquals(3, tagsField.tags.size());
+    assertEquals("input", tagsField.tags.get(0).getText());
+    assertEquals("rappa", tagsField.tags.get(1).getText());
+    assertEquals("chip", tagsField.tags.get(2).getText());
+    Set<String> tags = tagsField.generateModelValue();
+    assertEquals(3, tags.size());
+    assertTrue(tags.contains("input"));
+    assertTrue(tags.contains("rappa"));
+    assertTrue(tags.contains("chip"));
+  }
+
+  @Test
+  public void newTag_WithOtherTagsExisting() {
+    tagsField.setTagSuggestions(list("input", "chip"));
     tagsField.setValue(set("input", "rappa"));
     tagsField.newTag.setValue("chip");
-    KeyPressEvent event = new KeyPressEvent(tagsField.newTag, false, "Enter", "13", 0, false, false,
-        false, false, false, false);
-    fireEvent(tagsField.newTag, event);
     assertEquals(3, tagsField.tags.size());
     assertEquals("input", tagsField.tags.get(0).getText());
     assertEquals("rappa", tagsField.tags.get(1).getText());
@@ -178,36 +211,11 @@ public class TagsFieldTest extends AbstractViewTestCase {
     assertTrue(tags.contains("rappa"));
   }
 
-  @Test
-  public void removeTag_Backspace() {
-    tagsField.setValue(set("input", "rappa"));
-    KeyDownEvent event = new KeyDownEvent(tagsField.newTag, false, "Backspace", "8", 0, false,
-        false, false, false, false, false);
-    fireEvent(tagsField.newTag, event);
-    assertEquals(1, tagsField.tags.size());
-    assertEquals("input", tagsField.tags.get(0).getText());
-    Set<String> tags = tagsField.generateModelValue();
-    assertEquals(1, tags.size());
-    assertTrue(tags.contains("input"));
-  }
-
-  @Test
-  public void removeTag_BackspaceNotEmpty() {
-    tagsField.setValue(set("input", "rappa"));
-    tagsField.newTag.setValue("test");
-    KeyDownEvent event = new KeyDownEvent(tagsField.newTag, false, "Backspace", "8", 0, false,
-        false, false, false, false, false);
-    fireEvent(tagsField.newTag, event);
-    assertEquals(2, tagsField.tags.size());
-    assertEquals("input", tagsField.tags.get(0).getText());
-    assertEquals("rappa", tagsField.tags.get(1).getText());
-    Set<String> tags = tagsField.generateModelValue();
-    assertEquals(2, tags.size());
-    assertTrue(tags.contains("input"));
-    assertTrue(tags.contains("rappa"));
-  }
-
   private Set<String> set(String... values) {
     return Stream.of(values).collect(Collectors.toSet());
+  }
+
+  private List<String> list(String... values) {
+    return Stream.of(values).collect(Collectors.toList());
   }
 }

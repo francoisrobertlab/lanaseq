@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -63,6 +64,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,6 +116,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private AppResources webResources = new AppResources(Constants.class, locale);
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
   private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
+  private List<String> topTags = new ArrayList<>();
   private List<Protocol> protocols;
   private String tag1 = "Tag 1";
   private String tag2 = "Tag 2";
@@ -173,6 +176,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
       return field;
     });
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    topTags.add("input");
+    topTags.add("chip");
+    when(service.topTags(anyInt())).thenReturn(topTags);
     presenter.init(dialog);
   }
 
@@ -190,6 +196,16 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     sampleReplicateFields.get(samples.get(0)).setValue(sampleReplicate1);
     sampleIdFields.get(samples.get(1)).setValue(sampleId2);
     sampleReplicateFields.get(samples.get(1)).setValue(sampleReplicate2);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void init() throws Throwable {
+    Field newTagField = TagsField.class.getDeclaredField("newTag");
+    newTagField.setAccessible(true);
+    ComboBox<String> newTag = (ComboBox<String>) newTagField.get(dialog.tags);
+    List<String> items = items(newTag);
+    assertEquals(topTags, items);
   }
 
   @Test

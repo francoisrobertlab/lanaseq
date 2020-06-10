@@ -88,9 +88,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     if (tag != null) {
       tag.click();
     }
-    dialog.tags().newTag().setValue(tag1);
+    dialog.tags().newTag().setFilter(tag1);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
-    dialog.tags().newTag().setValue(tag2);
+    dialog.tags().newTag().setFilter(tag2);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.protocol().selectByText(protocol.getName());
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
@@ -235,8 +235,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Dataset dataset = repository.findById(2L).get();
-    assertEquals(2, dataset.getTags().size());
+    assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("G24D"));
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());

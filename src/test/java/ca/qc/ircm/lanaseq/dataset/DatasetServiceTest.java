@@ -121,6 +121,16 @@ public class DatasetServiceTest {
 
   @Test
   @WithMockUser
+  public void topTags() {
+    List<String> tags = service.topTags(3);
+    assertEquals(3, tags.size());
+    assertTrue(tags.contains("ip"));
+    assertTrue(tags.contains("chipseq"));
+    assertTrue(tags.contains("G24D"));
+  }
+
+  @Test
+  @WithMockUser
   @Ignore("Never false for a database instance")
   public void isDeletable_False() {
     Dataset dataset = repository.findById(1L).get();
