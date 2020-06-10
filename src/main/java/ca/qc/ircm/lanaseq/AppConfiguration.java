@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = AppConfiguration.PREFIX)
 public class AppConfiguration {
-  public static final String APPLICATION_NAME = "lana";
+  public static final String APPLICATION_NAME = "lanaseq";
   public static final String PREFIX = "app";
   @Value("${logging.path:${user.dir}}/${logging.file:" + APPLICATION_NAME + "log}")
   private String logfile;
