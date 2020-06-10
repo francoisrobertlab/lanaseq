@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILES;
@@ -51,7 +52,9 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -87,6 +90,8 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
   private Sample sample;
   @Captor
   private ArgumentCaptor<ValueProvider<Path, String>> valueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentRenderer<Span, Path>> spanRendererCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<AddSampleFilesDialog>> savedListener;
   @Autowired
@@ -136,7 +141,7 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
     dialog.files = mock(Grid.class);
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
+    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(FILENAME)))
         .thenReturn(dialog.filename);
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
@@ -210,13 +215,21 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
     mockColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<Path, String> valueProvider = valueProviderCaptor.getValue();
+    verify(dialog.files).addColumn(spanRendererCaptor.capture(), eq(FILENAME));
+    when(presenter.exists(any())).then(i -> {
+      Path file = i.getArgument(0);
+      return files.get(0).equals(file);
+    });
+    ComponentRenderer<Span, Path> spanRenderer = spanRendererCaptor.getValue();
     for (Path file : files) {
-      assertEquals(file.getFileName().toString(), valueProvider.apply(file));
+      Span span = spanRenderer.createComponent(file);
+      assertEquals(file.getFileName().toString(), span.getText());
+      if (presenter.exists(file)) {
+        assertTrue(span.hasClassName(ERROR_TEXT));
+      }
     }
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(SIZE));
-    valueProvider = valueProviderCaptor.getValue();
+    ValueProvider<Path, String> valueProvider = valueProviderCaptor.getValue();
     for (Path file : files) {
       assertEquals(
           resources.message(SIZE_VALUE,

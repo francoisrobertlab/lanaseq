@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
@@ -17,8 +18,10 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
@@ -83,12 +86,22 @@ public class AddSampleFilesDialog extends Dialog
     message.setId(id(MESSAGE));
     network.setId(id(NETWORK));
     files.setId(id(FILES));
-    filename = files.addColumn(file -> file.getFileName().toString(), FILENAME).setKey(FILENAME);
+    filename =
+        files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME);
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> presenter.save(getLocale()));
     presenter.init(this);
+  }
+
+  private Span filename(Path file) {
+    Span span = new Span();
+    span.setText(file.getFileName().toString());
+    if (presenter.exists(file)) {
+      span.addClassName(ERROR_TEXT);
+    }
+    return span;
   }
 
   @Override

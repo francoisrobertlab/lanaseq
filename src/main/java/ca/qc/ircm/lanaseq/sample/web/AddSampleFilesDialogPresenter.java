@@ -16,13 +16,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Sample dialog presenter.
@@ -33,6 +37,7 @@ public class AddSampleFilesDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(AddSampleFilesDialogPresenter.class);
   private AddSampleFilesDialog dialog;
   private Sample sample;
+  private Set<Path> existingFilenames = new HashSet<>();
   private Thread updateFilesThread;
   private SampleService service;
   private AppConfiguration configuration;
@@ -51,7 +56,6 @@ public class AddSampleFilesDialogPresenter {
           updateFilesThread.interrupt();
         }
         updateFilesThread = createUpdateFilesThread();
-        updateFilesThread.setDaemon(true);
         updateFilesThread.start();
       } else {
         if (updateFilesThread != null) {
@@ -76,7 +80,7 @@ public class AddSampleFilesDialogPresenter {
   }
 
   Thread createUpdateFilesThread() {
-    return new Thread(() -> {
+    Runnable updateFilesRunnable = () -> {
       logger.debug("stat checking files in sample {} upload folder", sample);
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
@@ -90,10 +94,17 @@ public class AddSampleFilesDialogPresenter {
           return;
         }
       }
-    });
+    };
+    DelegatingSecurityContextRunnable wrappedRunnable = new DelegatingSecurityContextRunnable(
+        updateFilesRunnable, SecurityContextHolder.getContext());
+    Thread thread = new Thread(wrappedRunnable);
+    thread.setDaemon(true);
+    return thread;
   }
 
   void updateFiles() {
+    existingFilenames =
+        service.files(sample).stream().map(f -> f.getFileName()).collect(Collectors.toSet());
     Path folder = folder();
     if (folder != null) {
       try {
@@ -101,6 +112,10 @@ public class AddSampleFilesDialogPresenter {
       } catch (IOException e) {
       }
     }
+  }
+
+  boolean exists(Path file) {
+    return existingFilenames.contains(file.getFileName());
   }
 
   private Path folder() {

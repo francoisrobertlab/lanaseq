@@ -127,6 +127,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
       boolean linux = i.getArgument(0);
       return (linux ? uploadNetworkLinux : uploadNetworkWindows);
     });
+    when(service.files(any())).thenReturn(files.subList(0, 2));
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -278,6 +279,25 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+  }
+
+  @Test
+  public void exists_False() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    assertFalse(presenter.exists(files.get(2)));
+  }
+
+  @Test
+  public void exists_True() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    assertTrue(presenter.exists(files.get(1)));
+  }
+
+  @Test
+  public void exists_NoSample() {
+    assertFalse(presenter.exists(files.get(1)));
   }
 
   @Test
