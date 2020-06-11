@@ -81,8 +81,8 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     TabElement home =
         optional(() -> $(TabsElement.class).first().$(TabElement.class).first()).orElse(null);
     Optional<Locale> optlocale =
-        locales.stream().filter(locale -> new AppResources(ViewLayout.class, locale).message(DATASETS)
-            .equals(home != null ? home.getText() : "")).findAny();
+        locales.stream().filter(locale -> new AppResources(ViewLayout.class, locale)
+            .message(DATASETS).equals(home != null ? home.getText() : "")).findAny();
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
           .filter(locale -> new AppResources(SigninView.class, locale)

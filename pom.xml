@@ -54,6 +54,7 @@
     <javac.version>1.8</javac.version>
     <main-class>ca.qc.ircm.lanaseq.Main</main-class>
     <testbench.skip>true</testbench.skip>
+    <testbench.maxAttempts>true</testbench.maxAttempts>
     <!-- Dependencies -->
     <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
     <vaadin.version>14.1.24</vaadin.version>
@@ -257,6 +258,7 @@
             <systemPropertyVariables>
               <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>
               <testbench.skip>${testbench.skip}</testbench.skip>
+              	<com.vaadin.testbench.Parameters.maxAttempts>${testbench.maxAttempts}</com.vaadin.testbench.Parameters.maxAttempts>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -452,6 +454,7 @@
       <id>testbench</id>
       <properties>
         <testbench.skip>false</testbench.skip>
+        <testbench.maxAttempts>3</testbench.maxAttempts>
         <argLine>-Dvaadin.productionMode=true</argLine>
       </properties>
       <build>
