@@ -664,11 +664,19 @@ public class SampleServiceTest {
 
   @Test
   @WithMockUser
-  public void delete() {
+  public void delete() throws Throwable {
     Sample sample = repository.findById(9L).get();
+    Path folder = configuration.folder(sample);
+    Path file = folder.resolve("R1.fastq");
+    Files.createDirectories(folder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
     service.delete(sample);
+
     repository.flush();
     assertFalse(repository.findById(9L).isPresent());
+    assertFalse(Files.exists(folder));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 

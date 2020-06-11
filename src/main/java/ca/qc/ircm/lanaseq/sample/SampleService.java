@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Service for {@link Sample}.
@@ -163,7 +164,8 @@ public class SampleService {
         logger.debug("moving folder {} to {} for sample {}", oldFolder, folder, sample);
         Files.move(oldFolder, folder);
       } catch (IOException e) {
-        throw new IllegalArgumentException("could not move file " + oldFolder + " to " + folder, e);
+        throw new IllegalArgumentException("could not move folder " + oldFolder + " to " + folder,
+            e);
       }
     }
   }
@@ -207,5 +209,11 @@ public class SampleService {
       throw new IllegalArgumentException("sample cannot be deleted");
     }
     repository.delete(sample);
+    Path folder = configuration.folder(sample);
+    try {
+      FileSystemUtils.deleteRecursively(folder);
+    } catch (IOException e) {
+      logger.error("could not delete folder {}", folder);
+    }
   }
 }
