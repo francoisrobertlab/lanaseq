@@ -51,6 +51,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -91,6 +92,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String SAMPLES = "samples";
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
+  public static final String DELETE_HEADER = property(DELETE, "header");
+  public static final String DELETE_MESSAGE = property(DELETE, "message");
   protected H3 header = new H3();
   protected TagsField tags = new TagsField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
@@ -110,6 +113,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Button save = new Button();
   protected Button cancel = new Button();
   protected Button delete = new Button();
+  protected ConfirmDialog confirm = new ConfirmDialog();
   @Autowired
   private transient DatasetDialogPresenter presenter;
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
@@ -194,7 +198,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     delete.setId(id(DELETE));
     delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
     delete.setIcon(VaadinIcon.TRASH.create());
-    delete.addClickListener(e -> presenter.delete(getLocale()));
+    delete.addClickListener(e -> confirm.open());
+    confirm.setCancelable(true);
+    confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
+        + ButtonVariant.LUMO_PRIMARY.getVariantName());
+    confirm.addConfirmListener(e -> presenter.delete(getLocale()));
     presenter.init(this);
   }
 
@@ -254,6 +262,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     delete.setText(webResources.message(DELETE));
+    confirm.setHeader(resources.message(DELETE_HEADER));
+    confirm.setConfirmText(webResources.message(DELETE));
+    confirm.setCancelText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());
   }
 
@@ -262,6 +273,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getId() != null) {
       header.setText(resources.message(HEADER, 1, dataset.getName()));
+      confirm.setText(resources.message(DELETE_MESSAGE, dataset.getName()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }

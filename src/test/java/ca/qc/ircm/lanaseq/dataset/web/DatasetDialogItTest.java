@@ -39,6 +39,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -277,6 +278,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     TestTransaction.flagForCommit();
     dialog.delete().click();
+    $(ConfirmDialogElement.class).waitForFirst().getConfirmButton().click();
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();

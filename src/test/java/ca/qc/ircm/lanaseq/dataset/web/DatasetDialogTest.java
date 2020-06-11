@@ -37,7 +37,10 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_HEADER;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -74,6 +77,8 @@ import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog.CancelEvent;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
@@ -214,6 +219,11 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
     assertTrue(dialog.delete.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
     validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
+    assertEquals("true", dialog.confirm.getElement().getProperty("cancel"));
+    assertTrue(dialog.confirm.getElement().getProperty("confirmTheme")
+        .contains(ButtonVariant.LUMO_ERROR.getVariantName()));
+    assertTrue(dialog.confirm.getElement().getProperty("confirmTheme")
+        .contains(ButtonVariant.LUMO_PRIMARY.getVariantName()));
   }
 
   @Test
@@ -246,6 +256,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(webResources.message(DELETE),
+        dialog.confirm.getElement().getProperty("confirmText"));
+    assertEquals(webResources.message(CANCEL),
+        dialog.confirm.getElement().getProperty("cancelText"));
     verify(presenter).localeChange(locale);
   }
 
@@ -286,6 +302,12 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(webResources.message(DELETE),
+        dialog.confirm.getElement().getProperty("confirmText"));
+    assertEquals(webResources.message(CANCEL),
+        dialog.confirm.getElement().getProperty("cancelText"));
     verify(presenter).localeChange(locale);
   }
 
@@ -442,6 +464,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
     verify(presenter).setDataset(dataset, locale);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_MESSAGE, dataset.getName()),
+        dialog.confirm.getElement().getProperty("message"));
   }
 
   @Test
@@ -454,6 +478,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
 
     verify(presenter).setDataset(dataset, locale);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_MESSAGE, dataset.getName()),
+        dialog.confirm.getElement().getProperty("message"));
   }
 
   @Test
@@ -487,9 +513,22 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void delete() {
+  public void delete_Confirm() {
     clickButton(dialog.delete);
 
+    assertTrue(dialog.confirm.isOpened());
+    ConfirmEvent event = new ConfirmEvent(dialog.confirm, false);
+    fireEvent(dialog.confirm, event);
     verify(presenter).delete(locale);
+  }
+
+  @Test
+  public void delete_Cancel() {
+    clickButton(dialog.delete);
+
+    assertTrue(dialog.confirm.isOpened());
+    CancelEvent event = new CancelEvent(dialog.confirm, false);
+    fireEvent(dialog.confirm, event);
+    verify(presenter, never()).delete(any());
   }
 }
