@@ -39,6 +39,7 @@ import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -332,6 +333,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     TestTransaction.flagForCommit();
     dialog.delete().click();
+    $(ConfirmDialogElement.class).waitForFirst().getConfirmButton().click();
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();

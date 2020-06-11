@@ -30,6 +30,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -69,6 +70,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String FILE_DELETE_ERROR = property("filename", "delete", "error");
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
+  public static final String DELETE_HEADER = property(DELETE, "header");
+  public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected TextField sampleId = new TextField();
@@ -87,6 +90,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected Button save = new Button();
   protected Button cancel = new Button();
   protected Button delete = new Button();
+  protected ConfirmDialog confirm = new ConfirmDialog();
   @Autowired
   private transient SampleDialogPresenter presenter;
 
@@ -159,7 +163,11 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     delete.setId(id(DELETE));
     delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
     delete.setIcon(VaadinIcon.TRASH.create());
-    delete.addClickListener(e -> presenter.delete(getLocale()));
+    delete.addClickListener(e -> confirm.open());
+    confirm.setCancelable(true);
+    confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
+        + ButtonVariant.LUMO_PRIMARY.getVariantName());
+    confirm.addConfirmListener(e -> presenter.delete(getLocale()));
     presenter.init(this);
   }
 
@@ -196,6 +204,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     delete.setText(webResources.message(DELETE));
+    confirm.setHeader(resources.message(DELETE_HEADER));
+    confirm.setConfirmText(webResources.message(DELETE));
+    confirm.setCancelText(webResources.message(CANCEL));
     updateHeader();
     presenter.localeChange(getLocale());
   }
@@ -205,6 +216,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     Sample sample = presenter.getSample();
     if (sample != null && sample.getName() != null) {
       header.setText(resources.message(HEADER, 1, sample.getName()));
+      confirm.setText(resources.message(DELETE_MESSAGE, sample.getName()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }
