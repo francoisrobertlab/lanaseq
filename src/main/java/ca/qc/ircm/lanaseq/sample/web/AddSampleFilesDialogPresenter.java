@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.CREATE_FOLDER_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -128,6 +129,18 @@ public class AddSampleFilesDialogPresenter {
     return sample != null ? configuration.upload(sample) : null;
   }
 
+  boolean validate(Collection<Path> files, Locale locale) {
+    dialog.error.setVisible(false);
+    boolean anyExists = files.stream()
+        .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
+    if (anyExists) {
+      final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
+      dialog.error.setVisible(true);
+      dialog.error.setText(resources.message(OVERWRITE_ERROR));
+    }
+    return !anyExists;
+  }
+
   void save(Locale locale) {
     Path folder = folder();
     Collection<Path> files;
@@ -137,12 +150,14 @@ public class AddSampleFilesDialogPresenter {
     } catch (IOException e) {
       files = Collections.emptyList();
     }
-    logger.debug("save new files {} for sample {}", files, sample);
-    service.saveFiles(sample, files);
-    final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
-    dialog.showNotification(resources.message(SAVED, files.size(), sample.getName()));
-    dialog.fireSavedEvent();
-    dialog.close();
+    if (validate(files, locale)) {
+      logger.debug("save new files {} for sample {}", files, sample);
+      service.saveFiles(sample, files);
+      final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
+      dialog.showNotification(resources.message(SAVED, files.size(), sample.getName()));
+      dialog.fireSavedEvent();
+      dialog.close();
+    }
   }
 
   Sample getSample() {

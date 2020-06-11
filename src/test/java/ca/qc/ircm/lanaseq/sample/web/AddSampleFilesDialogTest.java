@@ -25,15 +25,19 @@ import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SIZE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SIZE_VALUE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -47,11 +51,16 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -92,6 +101,10 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
   private ArgumentCaptor<ValueProvider<Path, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Span, Path>> spanRendererCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentRenderer<Checkbox, Path>> checkboxRendererCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<Path>> comparatorCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<AddSampleFilesDialog>> savedListener;
   @Autowired
@@ -151,6 +164,16 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
     when(dialog.size.setKey(any())).thenReturn(dialog.size);
     when(dialog.size.setComparator(any(Comparator.class))).thenReturn(dialog.size);
     when(dialog.size.setHeader(any(String.class))).thenReturn(dialog.size);
+    dialog.overwrite = mock(Column.class);
+    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(OVERWRITE)))
+        .thenReturn(dialog.overwrite);
+    when(dialog.overwrite.setKey(any())).thenReturn(dialog.overwrite);
+    when(dialog.overwrite.setSortable(anyBoolean())).thenReturn(dialog.overwrite);
+    when(dialog.overwrite.setHeader(any(String.class))).thenReturn(dialog.overwrite);
+    HeaderRow headerRow = mock(HeaderRow.class);
+    when(dialog.files.appendHeaderRow()).thenReturn(headerRow);
+    HeaderCell overwriteCell = mock(HeaderCell.class);
+    when(headerRow.getCell(dialog.overwrite)).thenReturn(overwriteCell);
   }
 
   @Test
@@ -180,6 +203,7 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
     assertEquals("", dialog.network.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));
     verify(dialog.size).setHeader(resources.message(SIZE));
+    verify(dialog.overwrite).setHeader(resources.message(OVERWRITE));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     verify(presenter, atLeastOnce()).localeChange(locale);
   }
@@ -199,27 +223,29 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
     assertEquals("", dialog.network.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));
     verify(dialog.size).setHeader(resources.message(SIZE));
+    verify(dialog.overwrite).setHeader(resources.message(OVERWRITE));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
   public void files() {
-    assertEquals(2, dialog.files.getColumns().size());
+    assertEquals(3, dialog.files.getColumns().size());
     assertNotNull(dialog.files.getColumnByKey(FILENAME));
     assertNotNull(dialog.files.getColumnByKey(SIZE));
+    assertNotNull(dialog.files.getColumnByKey(OVERWRITE));
   }
 
   @Test
   public void files_ColumnsValueProvider() throws Throwable {
-    mockColumns();
-    dialog.init();
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    verify(dialog.files).addColumn(spanRendererCaptor.capture(), eq(FILENAME));
     when(presenter.exists(any())).then(i -> {
       Path file = i.getArgument(0);
       return files.get(0).equals(file);
     });
+    mockColumns();
+    dialog.init();
+    dialog.localeChange(mock(LocaleChangeEvent.class));
+    verify(dialog.files).addColumn(spanRendererCaptor.capture(), eq(FILENAME));
     ComponentRenderer<Span, Path> spanRenderer = spanRendererCaptor.getValue();
     for (Path file : files) {
       Span span = spanRenderer.createComponent(file);
@@ -227,6 +253,13 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
       if (presenter.exists(file)) {
         assertTrue(span.hasClassName(ERROR_TEXT));
       }
+    }
+    verify(dialog.filename).setComparator(comparatorCaptor.capture());
+    Comparator<Path> comparator = comparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Path file : files) {
+      assertEquals(file.getFileName().toString(),
+          ((NormalizedComparator<Path>) comparator).getConverter().apply(file));
     }
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(SIZE));
     ValueProvider<Path, String> valueProvider = valueProviderCaptor.getValue();
@@ -236,6 +269,59 @@ public class AddSampleFilesDialogTest extends AbstractViewTestCase {
               Files.size(temporaryFolder.getRoot().toPath().resolve(file)) / 1048576),
           valueProvider.apply(file));
     }
+    verify(dialog.files).addColumn(checkboxRendererCaptor.capture(), eq(OVERWRITE));
+    ComponentRenderer<Checkbox, Path> checkboxRenderer = checkboxRendererCaptor.getValue();
+    for (Path file : files) {
+      Checkbox checkbox = checkboxRenderer.createComponent(file);
+      assertNotNull(checkbox);
+    }
+  }
+
+  @Test
+  public void overwriteAll_True() {
+    for (Path file : files) {
+      dialog.overwrite(file);
+    }
+    dialog.overwriteAll.setValue(true);
+    ComponentValueChangeEvent<Checkbox, Boolean> event =
+        new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
+    fireEvent(dialog.overwriteAll, event);
+    for (Path file : files) {
+      Checkbox checkbox = dialog.overwrite(file);
+      assertTrue(checkbox.getValue());
+    }
+  }
+
+  @Test
+  public void overwriteAll_False() {
+    for (Path file : files) {
+      Checkbox checkbox = dialog.overwrite(file);
+      checkbox.setValue(true);
+    }
+    dialog.overwriteAll.setValue(true);
+    ComponentValueChangeEvent<Checkbox, Boolean> event =
+        new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
+    fireEvent(dialog.overwriteAll, event);
+    dialog.overwriteAll.setValue(false);
+    event = new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, true, true);
+    fireEvent(dialog.overwriteAll, event);
+    for (Path file : files) {
+      Checkbox checkbox = dialog.overwrite(file);
+      assertFalse(checkbox.getValue());
+    }
+  }
+
+  @Test
+  public void overwriteAll_UncheckIfOneOverwiteUnchecked() {
+    for (Path file : files) {
+      dialog.overwrite(file);
+    }
+    dialog.overwriteAll.setValue(true);
+    ComponentValueChangeEvent<Checkbox, Boolean> event =
+        new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
+    fireEvent(dialog.overwriteAll, event);
+    dialog.overwrite(files.get(0)).setValue(false);
+    assertFalse(dialog.overwriteAll.getValue());
   }
 
   @Test

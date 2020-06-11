@@ -8,14 +8,17 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -30,6 +33,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -50,8 +55,10 @@ public class AddSampleFilesDialog extends Dialog
   public static final String FILENAME = "filename";
   public static final String SIZE = "size";
   public static final String SIZE_VALUE = property("size", "value");
+  public static final String OVERWRITE = "overwrite";
   public static final String SAVED = "saved";
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
+  public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
@@ -59,7 +66,11 @@ public class AddSampleFilesDialog extends Dialog
   protected Grid<Path> files = new Grid<>();
   protected Column<Path> filename;
   protected Column<Path> size;
+  protected Column<Path> overwrite;
+  protected Checkbox overwriteAll = new Checkbox();
+  protected Div error = new Div();
   protected Button save = new Button();
+  private Map<Path, Checkbox> overwriteFields = new HashMap<>();
   @Autowired
   private transient AddSampleFilesDialogPresenter presenter;
 
@@ -81,13 +92,24 @@ public class AddSampleFilesDialog extends Dialog
     add(layout);
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
-    layout.add(header, message, network, files, save);
+    layout.add(header, message, network, files, error, save);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     network.setId(id(NETWORK));
     files.setId(id(FILES));
     filename =
-        files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME);
+        files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME)
+            .setComparator(NormalizedComparator.of(file -> file.getFileName().toString()));
+    overwrite = files.addColumn(new ComponentRenderer<>(file -> overwrite(file)), OVERWRITE)
+        .setKey(OVERWRITE).setSortable(false);
+    files.appendHeaderRow(); // Headers.
+    HeaderRow headerRow = files.appendHeaderRow();
+    headerRow.getCell(overwrite).setComponent(overwriteAll);
+    overwriteAll.addValueChangeListener(e -> {
+      if (e.isFromClient()) {
+        overwriteFields.values().stream().forEach(c -> c.setValue(e.getValue()));
+      }
+    });
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -104,7 +126,22 @@ public class AddSampleFilesDialog extends Dialog
     return span;
   }
 
+  Checkbox overwrite(Path file) {
+    if (overwriteFields.containsKey(file)) {
+      return overwriteFields.get(file);
+    }
+    Checkbox checkbox = new Checkbox();
+    checkbox.addValueChangeListener(e -> {
+      if (!e.getValue()) {
+        overwriteAll.setValue(false);
+      }
+    });
+    overwriteFields.put(file, checkbox);
+    return checkbox;
+  }
+
   @Override
+  @SuppressWarnings("unchecked")
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
@@ -124,7 +161,9 @@ public class AddSampleFilesDialog extends Dialog
       }
       return "";
     }, SIZE).setKey(SIZE);
+    files.setColumnOrder(filename, size, overwrite);
     size.setHeader(resources.message(SIZE));
+    overwrite.setHeader(resources.message(OVERWRITE));
     save.setText(webResources.message(SAVE));
     presenter.localeChange(getLocale());
     updateHeader();

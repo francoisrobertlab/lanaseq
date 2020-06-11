@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +43,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.dialog.GeneratedVaadinDialog.OpenedChangeEvent;
 import com.vaadin.flow.component.grid.Grid;
@@ -111,6 +114,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     dialog.message = new Div();
     dialog.network = new Div();
     dialog.files = new Grid<>();
+    dialog.error = new Div();
     dialog.save = new Button();
     files.add(Paths.get("sample_R1.fastq"));
     files.add(Paths.get("sample_R2.fastq"));
@@ -118,6 +122,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     files.add(Paths.get("sample.png"));
     folder = temporaryFolder.getRoot().toPath().resolve("sample");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
+    when(dialog.overwrite(any())).thenReturn(new Checkbox("test", false));
     when(configuration.upload(any(Sample.class))).thenReturn(folder);
     when(configuration.uploadLabel(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
@@ -309,7 +314,46 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void save_OverwriteNotAllowed() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+
+    presenter.save(locale);
+
+    assertTrue(dialog.error.isVisible());
+    assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
+    verify(service, never()).saveFiles(any(), any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).fireSavedEvent();
+    verify(dialog, never()).close();
+  }
+
+  @Test
+  public void save_OverwriteAllowed() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    when(dialog.overwrite(any())).thenReturn(new Checkbox("test", true));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+
+    presenter.save(locale);
+
+    verify(service).saveFiles(eq(sample), filesCaptor.capture());
+    Collection<Path> files = filesCaptor.getValue();
+    assertEquals(2, files.size());
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+    assertFalse(dialog.error.isVisible());
+    verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
+    verify(dialog).fireSavedEvent();
+    verify(dialog).close();
+  }
+
+  @Test
   public void save() throws Throwable {
+    when(service.files(any())).thenReturn(new ArrayList<>());
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
