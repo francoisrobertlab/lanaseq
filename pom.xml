@@ -199,6 +199,10 @@
       <artifactId>vaadin-crud-flow</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-confirm-dialog-flow</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
