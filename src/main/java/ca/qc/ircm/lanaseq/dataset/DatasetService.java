@@ -175,9 +175,13 @@ public class DatasetService {
     dataset.generateName();
     repository.save(dataset);
     Path folder = configuration.folder(dataset);
+    move(oldFolder, folder);
+  }
+
+  private void move(Path oldFolder, Path folder) {
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
-        logger.debug("moving folder {} to {} for dataset {}", oldFolder, folder, dataset);
+        logger.debug("moving folder {} to {} for dataset {}", oldFolder, folder);
         Files.move(oldFolder, folder);
       } catch (IOException e) {
         throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);

@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
@@ -159,9 +160,25 @@ public class SampleService {
     sample.generateName();
     repository.save(sample);
     Path folder = configuration.folder(sample);
+    move(oldFolder, folder);
+    renameDatasets(sample);
+  }
+
+  private void renameDatasets(Sample sample) {
+    List<Dataset> datasets = datasetRepository.findBySamples(sample);
+    for (Dataset dataset : datasets) {
+      Path oldFolder = configuration.folder(dataset);
+      dataset.generateName();
+      datasetRepository.save(dataset);
+      Path folder = configuration.folder(dataset);
+      move(oldFolder, folder);
+    }
+  }
+
+  private void move(Path oldFolder, Path folder) {
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
-        logger.debug("moving folder {} to {} for sample {}", oldFolder, folder, sample);
+        logger.debug("moving folder {} to {} for dataset {}", oldFolder, folder);
         Files.move(oldFolder, folder);
       } catch (IOException e) {
         throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);

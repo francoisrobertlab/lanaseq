@@ -14,6 +14,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -53,7 +56,11 @@ public class SampleServiceTest {
   @Autowired
   private ProtocolRepository protocolRepository;
   @Autowired
+  private DatasetRepository datasetRepository;
+  @Autowired
   private UserRepository userRepository;
+  @MockBean
+  private DatasetService datasetService;
   @MockBean
   private AppConfiguration configuration;
   @MockBean
@@ -70,6 +77,12 @@ public class SampleServiceTest {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null
           ? temporaryFolder.getRoot().toPath().resolve(sample.getName())
+          : null;
+    });
+    when(configuration.folder(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
           : null;
     });
   }
@@ -589,6 +602,53 @@ public class SampleServiceTest {
     assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20181020",
         sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
+  }
+
+  @Test
+  @WithMockUser
+  public void save_RenameDatasets() throws Throwable {
+    Sample sample = repository.findById(4L).get();
+    sample.setSampleId("sample1");
+    sample.setReplicate("r1");
+    Dataset dataset1 = datasetRepository.findById(2L).get();
+    Path beforeFolder1 = configuration.folder(dataset1);
+    Files.createDirectories(beforeFolder1);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder1.resolve("dataset_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Dataset dataset2 = datasetRepository.findById(6L).get();
+    Path beforeFolder2 = configuration.folder(dataset2);
+    Files.createDirectories(beforeFolder2);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder2.resolve("dataset_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+
+    service.save(sample);
+
+    repository.flush();
+    Dataset dataset = datasetRepository.findById(2L).get();
+    assertEquals("ChIPSeq_Spt16_yFR101_G24D_sample1-JS2_20181022", dataset.getName());
+    assertEquals(2, dataset.getSamples().size());
+    assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    dataset = datasetRepository.findById(6L).get();
+    assertEquals("ChIPSeq_Spt16_yFR101_G24D_sample1_20181208", dataset.getName());
+    assertEquals(1, dataset.getSamples().size());
+    assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 12, 8, 10, 28, 23), dataset.getDate());
+    Path folder = configuration.folder(dataset1);
+    assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
+    assertFalse(Files.exists(beforeFolder1));
+    folder = configuration.folder(dataset2);
+    assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder2));
   }
 
   @Test(expected = IllegalArgumentException.class)

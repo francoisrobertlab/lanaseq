@@ -32,5 +32,7 @@ public interface DatasetRepository extends JpaRepository<Dataset, Long> {
 
   public Page<Dataset> findAllByOrderByIdDesc(Pageable pageable);
 
+  public List<Dataset> findBySamples(Sample sample);
+
   public List<Dataset> findByOwner(User owner);
 }

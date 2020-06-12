@@ -30,6 +30,8 @@ import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
@@ -73,6 +75,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private SampleRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private DatasetRepository datasetRepository;
   @Autowired
   private AppConfiguration configuration;
   private Protocol protocol;
@@ -291,6 +295,11 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    Dataset dataset = datasetRepository.findById(2L).get();
+    assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "-JS2_20181022",
+        dataset.getName());
+    dataset = datasetRepository.findById(6L).get();
+    assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
   }
 
   @Test

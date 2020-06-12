@@ -145,12 +145,13 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all();
 
-    assertEquals(5, datasets.size());
+    assertEquals(6, datasets.size());
     assertTrue(find(datasets, 1L).isPresent());
     assertTrue(find(datasets, 2L).isPresent());
     assertTrue(find(datasets, 3L).isPresent());
     assertTrue(find(datasets, 4L).isPresent());
     assertTrue(find(datasets, 5L).isPresent());
+    assertTrue(find(datasets, 6L).isPresent());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
