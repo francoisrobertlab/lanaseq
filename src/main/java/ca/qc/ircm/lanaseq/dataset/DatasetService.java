@@ -17,12 +17,18 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +43,7 @@ import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Services for {@link Dataset}.
@@ -48,6 +55,7 @@ public class DatasetService {
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
   private SampleRepository sampleRepository;
+  private AppConfiguration configuration;
   private AuthorizationService authorizationService;
 
   protected DatasetService() {
@@ -55,9 +63,10 @@ public class DatasetService {
 
   @Autowired
   protected DatasetService(DatasetRepository repository, SampleRepository sampleRepository,
-      AuthorizationService authorizationService) {
+      AppConfiguration configuration, AuthorizationService authorizationService) {
     this.repository = repository;
     this.sampleRepository = sampleRepository;
+    this.configuration = configuration;
     this.authorizationService = authorizationService;
   }
 
@@ -85,6 +94,24 @@ public class DatasetService {
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Dataset> all() {
     return repository.findAll();
+  }
+
+  /**
+   * Returns all dataset's files.
+   *
+   * @return all dataset's files
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public List<Path> files(Dataset dataset) {
+    if (dataset == null || dataset.getId() == null) {
+      return new ArrayList<>();
+    }
+    Path folder = configuration.folder(dataset);
+    try {
+      return Files.list(folder).collect(Collectors.toCollection(ArrayList::new));
+    } catch (IOException e) {
+      return new ArrayList<>();
+    }
   }
 
   /**
@@ -144,8 +171,49 @@ public class DatasetService {
         sampleRepository.save(sample);
       }
     }
+    Path oldFolder = null;
+    if (dataset.getName() != null) {
+      oldFolder = configuration.folder(dataset);
+    }
     dataset.generateName();
     repository.save(dataset);
+    Path folder = configuration.folder(dataset);
+    if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
+      try {
+        logger.debug("moving folder {} to {} for dataset {}", oldFolder, folder, dataset);
+        Files.move(oldFolder, folder);
+      } catch (IOException e) {
+        throw new IllegalArgumentException("could not move folder " + oldFolder + " to " + folder,
+            e);
+      }
+    }
+  }
+
+  /**
+   * Save files to dataset folder.
+   *
+   * @param dataset
+   *          dataset
+   * @param files
+   *          files to save
+   */
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public void saveFiles(Dataset dataset, Collection<Path> files) {
+    Path folder = configuration.folder(dataset);
+    try {
+      Files.createDirectories(folder);
+    } catch (IOException e) {
+      throw new IllegalStateException("could not create folder " + folder, e);
+    }
+    for (Path file : files) {
+      Path target = folder.resolve(file.getFileName());
+      try {
+        logger.debug("moving file {} to {} for dataset {}", file, target, dataset);
+        Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException e) {
+        throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
+      }
+    }
   }
 
   /**
@@ -160,5 +228,11 @@ public class DatasetService {
       throw new IllegalArgumentException("dataset cannot be deleted");
     }
     repository.delete(dataset);
+    Path folder = configuration.folder(dataset);
+    try {
+      FileSystemUtils.deleteRecursively(folder);
+    } catch (IOException e) {
+      logger.error("could not delete folder {}", folder);
+    }
   }
 }

@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -25,9 +26,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -36,6 +39,10 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -43,7 +50,9 @@ import java.util.HashSet;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -65,13 +74,23 @@ public class DatasetServiceTest {
   @Autowired
   private UserRepository userRepository;
   @MockBean
+  private AppConfiguration configuration;
+  @MockBean
   private AuthorizationService authorizationService;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
+    when(configuration.folder(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
+          : null;
+    });
   }
 
   @Test
@@ -117,6 +136,56 @@ public class DatasetServiceTest {
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
+  }
+
+  @Test
+  @WithMockUser
+  public void files() throws Throwable {
+    Dataset dataset = repository.findById(1L).orElse(null);
+    Path folder = configuration.folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("dataset_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("dataset_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    List<Path> files = service.files(dataset);
+
+    verify(configuration, times(2)).folder(dataset);
+    assertEquals(2, files.size());
+    assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("dataset_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void files_FolderNotExists() throws Throwable {
+    Dataset dataset = repository.findById(1L).orElse(null);
+
+    List<Path> files = service.files(dataset);
+
+    verify(configuration).folder(dataset);
+    assertTrue(files.isEmpty());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void files_NullId() throws Throwable {
+    List<Path> files = service.files(new Dataset());
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  @WithMockUser
+  public void files_Null() throws Throwable {
+    List<Path> files = service.files(null);
+
+    assertTrue(files.isEmpty());
   }
 
   @Test
@@ -333,11 +402,120 @@ public class DatasetServiceTest {
 
   @Test
   @WithMockUser
-  public void delete() {
+  public void save_UpdateMoveFiles() throws Throwable {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Dataset dataset = repository.findById(1L).orElse(null);
+    Sample sample1 = dataset.getSamples().get(0);
+    sample1.setSampleId("sample1");
+    sample1.setReplicate("r1");
+    sample1.setAssay(Assay.CHIP_SEQ);
+    sample1.setType(SampleType.INPUT);
+    sample1.setTarget("my target");
+    sample1.setStrain("yFR213");
+    sample1.setStrainDescription("F56G");
+    sample1.setTreatment("37C");
+    sample1.setProtocol(protocolRepository.findById(3L).get());
+    dataset.getSamples().remove(1);
+    Sample sample3 = new Sample();
+    sample3.setSampleId("sample4");
+    sample3.setReplicate("r4");
+    sample3.setAssay(Assay.CHIP_SEQ);
+    sample3.setType(SampleType.INPUT);
+    sample3.setTarget("my target");
+    sample3.setStrain("yFR213");
+    sample3.setStrainDescription("F56G");
+    sample3.setTreatment("37C");
+    sample3.setProtocol(protocolRepository.findById(3L).get());
+    dataset.getSamples().add(sample3);
+    Path beforeFolder = configuration.folder(dataset);
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("dataset_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("dataset_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+
+    service.save(dataset);
+
+    repository.flush();
+    dataset = repository.findById(1L).orElse(null);
+    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20181020",
+        dataset.getName());
+    assertEquals(2, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(3, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals((Long) 1L, sample.getId());
+    assertEquals("sample1", sample.getSampleId());
+    assertEquals("r1", sample.getReplicate());
+    sample = dataset.getSamples().get(1);
+    assertEquals((Long) 3L, sample.getId());
+    assertEquals("FR3", sample.getSampleId());
+    assertEquals("R3", sample.getReplicate());
+    sample = dataset.getSamples().get(2);
+    assertNotNull(sample.getId());
+    assertEquals("sample4", sample.getSampleId());
+    assertEquals("r4", sample.getReplicate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+    Path folder = configuration.folder(dataset);
+    assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  @WithMockUser
+  public void saveFiles() throws Throwable {
+    Dataset dataset = repository.findById(1L).orElse(null);
+    List<Path> files = new ArrayList<>();
+    Path file = temporaryFolder.newFile("dataset_R1.fastq").toPath();
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    files.add(file);
+    file = temporaryFolder.newFile("dataset_R2.fastq").toPath();
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    files.add(file);
+
+    service.saveFiles(dataset, files);
+
+    verify(configuration).folder(dataset);
+    Path folder = configuration.folder(dataset);
+    assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  @WithMockUser
+  public void delete() throws Throwable {
     Dataset dataset = repository.findById(5L).get();
+    Path folder = configuration.folder(dataset);
+    Path file = folder.resolve("R1.fastq");
+    Files.createDirectories(folder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
     service.delete(dataset);
+
     repository.flush();
     assertFalse(repository.findById(5L).isPresent());
+    assertFalse(Files.exists(folder));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
