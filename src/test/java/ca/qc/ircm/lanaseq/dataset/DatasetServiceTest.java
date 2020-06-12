@@ -26,6 +26,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +36,8 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -70,9 +74,13 @@ public class DatasetServiceTest {
   @Autowired
   private DatasetRepository repository;
   @Autowired
+  private SampleRepository sampleRepository;
+  @Autowired
   private ProtocolRepository protocolRepository;
   @Autowired
   private UserRepository userRepository;
+  @MockBean
+  private SampleService sampleService;
   @MockBean
   private AppConfiguration configuration;
   @MockBean
@@ -91,6 +99,16 @@ public class DatasetServiceTest {
           ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
           : null;
     });
+    doAnswer(i -> {
+      Sample sample = i.getArgument(0);
+      if (sample.getId() == null) {
+        sample.setDate(LocalDateTime.now());
+        sample.setOwner(authorizationService.getCurrentUser());
+      }
+      sample.generateName();
+      sampleRepository.save(sample);
+      return null;
+    }).when(sampleService).save(any());
   }
 
   @Test
@@ -276,38 +294,9 @@ public class DatasetServiceTest {
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getDate()));
     assertEquals(2, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertNotNull(sample.getId());
-    assertEquals("sample1", sample.getSampleId());
-    assertEquals("r1", sample.getReplicate());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
-    assertEquals("my target", sample.getTarget());
-    assertEquals("yFR213", sample.getStrain());
-    assertEquals("F56G", sample.getStrainDescription());
-    assertEquals("37C", sample.getTreatment());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
-    assertEquals("sample1_ChIPSeq_IP_mytarget_yFR213_F56G_37C_r1_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
-    assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals(user.getId(), sample.getOwner().getId());
-    sample = dataset.getSamples().get(1);
-    assertNotNull(sample.getId());
-    assertEquals("sample2", sample.getSampleId());
-    assertEquals("r2", sample.getReplicate());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
-    assertEquals("my target", sample.getTarget());
-    assertEquals("yFR213", sample.getStrain());
-    assertEquals("F56G", sample.getStrainDescription());
-    assertEquals("37C", sample.getTreatment());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
-    assertEquals("sample2_ChIPSeq_IP_mytarget_yFR213_F56G_37C_r2_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
-    assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals(user.getId(), sample.getOwner().getId());
+    for (Sample sample : dataset.getSamples()) {
+      verify(sampleService).save(sample);
+    }
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
@@ -356,50 +345,9 @@ public class DatasetServiceTest {
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     assertEquals(3, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertEquals((Long) 1L, sample.getId());
-    assertEquals("sample1", sample.getSampleId());
-    assertEquals("r1", sample.getReplicate());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(SampleType.INPUT, sample.getType());
-    assertEquals("my target", sample.getTarget());
-    assertEquals("yFR213", sample.getStrain());
-    assertEquals("F56G", sample.getStrainDescription());
-    assertEquals("37C", sample.getTreatment());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
-    assertEquals("sample1_ChIPSeq_Input_mytarget_yFR213_F56G_37C_r1_20181020", sample.getName());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals((Long) 2L, sample.getOwner().getId());
-    sample = dataset.getSamples().get(1);
-    assertEquals((Long) 3L, sample.getId());
-    assertEquals("FR3", sample.getSampleId());
-    assertEquals("R3", sample.getReplicate());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
-    assertEquals("polr2a", sample.getTarget());
-    assertEquals("yFR100", sample.getStrain());
-    assertEquals("WT", sample.getStrainDescription());
-    assertEquals("Rappa", sample.getTreatment());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 30, 23), sample.getDate());
-    assertEquals("FR3_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R3_20181020", sample.getName());
-    assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals((Long) 2L, sample.getOwner().getId());
-    sample = dataset.getSamples().get(2);
-    assertNotNull(sample.getId());
-    assertEquals("sample4", sample.getSampleId());
-    assertEquals("r4", sample.getReplicate());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
-    assertEquals(SampleType.INPUT, sample.getType());
-    assertEquals("my target", sample.getTarget());
-    assertEquals("yFR213", sample.getStrain());
-    assertEquals("F56G", sample.getStrainDescription());
-    assertEquals("37C", sample.getTreatment());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
-    assertEquals("sample4_ChIPSeq_Input_mytarget_yFR213_F56G_37C_r4_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals((Long) 2L, sample.getOwner().getId());
+    for (Sample sample : dataset.getSamples()) {
+      verify(sampleService).save(sample);
+    }
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
@@ -419,19 +367,6 @@ public class DatasetServiceTest {
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(3L).get());
-    dataset.getSamples().remove(1);
-    Sample sample3 = new Sample();
-    sample3.setSampleId("sample4");
-    sample3.setReplicate("r4");
-    sample3.setAssay(Assay.CHIP_SEQ);
-    sample3.setType(SampleType.INPUT);
-    sample3.setTarget("my target");
-    sample3.setStrain("yFR213");
-    sample3.setStrainDescription("F56G");
-    sample3.setTreatment("37C");
-    sample3.setEditable(true);
-    sample3.setProtocol(protocolRepository.findById(3L).get());
-    dataset.getSamples().add(sample3);
     Path beforeFolder = configuration.folder(dataset);
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -443,7 +378,7 @@ public class DatasetServiceTest {
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20181020",
+    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
@@ -451,18 +386,13 @@ public class DatasetServiceTest {
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     assertEquals(3, dataset.getSamples().size());
+    for (Sample sample : dataset.getSamples()) {
+      verify(sampleService).save(sample);
+    }
     Sample sample = dataset.getSamples().get(0);
     assertEquals((Long) 1L, sample.getId());
     assertEquals("sample1", sample.getSampleId());
     assertEquals("r1", sample.getReplicate());
-    sample = dataset.getSamples().get(1);
-    assertEquals((Long) 3L, sample.getId());
-    assertEquals("FR3", sample.getSampleId());
-    assertEquals("R3", sample.getReplicate());
-    sample = dataset.getSamples().get(2);
-    assertNotNull(sample.getId());
-    assertEquals("sample4", sample.getSampleId());
-    assertEquals("r4", sample.getReplicate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
     Path folder = configuration.folder(dataset);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
@@ -502,48 +432,9 @@ public class DatasetServiceTest {
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     assertEquals(3, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertEquals((Long) 1L, sample.getId());
-    assertEquals("FR1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
-    assertEquals("polr2a", sample.getTarget());
-    assertEquals("yFR100", sample.getStrain());
-    assertEquals("WT", sample.getStrainDescription());
-    assertEquals("Rappa", sample.getTreatment());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
-    assertEquals("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
-    assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals((Long) 2L, sample.getOwner().getId());
-    sample = dataset.getSamples().get(1);
-    assertEquals((Long) 2L, sample.getId());
-    assertEquals("sample2", sample.getSampleId());
-    assertEquals("r2", sample.getReplicate());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
-    assertEquals("polr2a", sample.getTarget());
-    assertEquals("yFR100", sample.getStrain());
-    assertEquals("WT", sample.getStrainDescription());
-    assertEquals("Rappa", sample.getTreatment());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 53), sample.getDate());
-    assertEquals("sample2_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_r2_20181020", sample.getName());
-    assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals((Long) 2L, sample.getOwner().getId());
-    sample = dataset.getSamples().get(2);
-    assertEquals((Long) 3L, sample.getId());
-    assertEquals("FR3", sample.getSampleId());
-    assertEquals("R3", sample.getReplicate());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
-    assertEquals("polr2a", sample.getTarget());
-    assertEquals("yFR100", sample.getStrain());
-    assertEquals("WT", sample.getStrainDescription());
-    assertEquals("Rappa", sample.getTreatment());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 30, 23), sample.getDate());
-    assertEquals("FR3_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R3_20181020", sample.getName());
-    assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals((Long) 2L, sample.getOwner().getId());
+    verify(sampleService, never()).save(dataset.getSamples().get(0));
+    verify(sampleService).save(dataset.getSamples().get(1));
+    verify(sampleService).save(dataset.getSamples().get(2));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 

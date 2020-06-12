@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class DatasetService {
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
-  private SampleRepository sampleRepository;
+  private SampleService sampleService;
   private AppConfiguration configuration;
   private AuthorizationService authorizationService;
 
@@ -62,10 +62,10 @@ public class DatasetService {
   }
 
   @Autowired
-  protected DatasetService(DatasetRepository repository, SampleRepository sampleRepository,
+  protected DatasetService(DatasetRepository repository, SampleService sampleService,
       AppConfiguration configuration, AuthorizationService authorizationService) {
     this.repository = repository;
-    this.sampleRepository = sampleRepository;
+    this.sampleService = sampleService;
     this.configuration = configuration;
     this.authorizationService = authorizationService;
   }
@@ -163,13 +163,8 @@ public class DatasetService {
     }
     if (dataset.getSamples() != null) {
       for (Sample sample : dataset.getSamples()) {
-        if (sample.getId() == null) {
-          sample.setOwner(user);
-          sample.setDate(now);
-        }
         if (sample.isEditable()) {
-          sample.generateName();
-          sampleRepository.save(sample);
+          sampleService.save(sample);
         }
       }
     }
