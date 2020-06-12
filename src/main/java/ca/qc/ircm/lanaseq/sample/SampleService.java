@@ -164,8 +164,7 @@ public class SampleService {
         logger.debug("moving folder {} to {} for sample {}", oldFolder, folder, sample);
         Files.move(oldFolder, folder);
       } catch (IOException e) {
-        throw new IllegalArgumentException("could not move folder " + oldFolder + " to " + folder,
-            e);
+        throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);
       }
     }
   }
