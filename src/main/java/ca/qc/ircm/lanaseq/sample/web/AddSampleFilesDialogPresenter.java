@@ -153,6 +153,11 @@ public class AddSampleFilesDialogPresenter {
     if (validate(files, locale)) {
       logger.debug("save new files {} for sample {}", files, sample);
       service.saveFiles(sample, files);
+      try {
+        Files.delete(folder);
+      } catch (IOException e) {
+        logger.warn("could not delete upload folder {}", folder);
+      }
       final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, files.size(), sample.getName()));
       dialog.fireSavedEvent();

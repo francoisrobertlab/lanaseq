@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -134,6 +135,13 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
       return (linux ? uploadNetworkLinux : uploadNetworkWindows);
     });
     when(service.files(any())).thenReturn(files.subList(0, 2));
+    doAnswer(i -> {
+      Collection<Path> files = i.getArgument(1);
+      for (Path file : files) {
+        Files.delete(file);
+      }
+      return null;
+    }).when(service).saveFiles(any(), any());
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -366,6 +374,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+    assertFalse(Files.exists(uploadFolder(sample)));
     verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
     verify(dialog).fireSavedEvent();
     verify(dialog).close();
@@ -381,6 +390,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(0, files.size());
+    assertFalse(Files.exists(uploadFolder(sample)));
     verify(dialog).showNotification(resources.message(SAVED, 0, sample.getName()));
     verify(dialog).fireSavedEvent();
     verify(dialog).close();
