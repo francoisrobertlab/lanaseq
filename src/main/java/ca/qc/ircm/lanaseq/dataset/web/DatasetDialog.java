@@ -60,7 +60,6 @@ import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -89,7 +88,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
-  public static final String SAMPLES_HEADER = "samplesHeader";
   public static final String ADD_SAMPLE = "addSample";
   public static final String SAMPLES = "samples";
   public static final String FILES = "files";
@@ -111,7 +109,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
   protected TextField treatment = new TextField();
-  protected H4 samplesHeader = new H4();
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> sampleId;
   protected Column<Sample> sampleReplicate;
@@ -161,7 +158,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, tags, form, samplesHeader, samples, files, buttons);
+    layout.add(header, tags, form, samples, files, buttons);
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));
@@ -177,7 +174,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
-    samplesHeader.setId(id(SAMPLES_HEADER));
     samples.setId(id(SAMPLES));
     samples.setHeight("14em");
     sampleId = samples
@@ -290,7 +286,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         .setPlaceholder(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
     treatment.setLabel(sampleResources.message(TREATMENT));
     treatment.setPlaceholder(sampleResources.message(property(TREATMENT, PLACEHOLDER)));
-    samplesHeader.setText(resources.message(SAMPLES_HEADER));
     sampleId.setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     sampleReplicate.setHeader(sampleResources.message(SampleProperties.REPLICATE));
     sampleName.setHeader(sampleResources.message(SampleProperties.NAME));

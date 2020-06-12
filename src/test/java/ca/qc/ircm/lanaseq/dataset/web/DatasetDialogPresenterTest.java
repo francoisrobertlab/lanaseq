@@ -64,7 +64,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -165,7 +164,6 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
-    dialog.samplesHeader = new H4();
     dialog.samples = new Grid<>();
     dialog.files = new Grid<>();
     dialog.deleteFile = dialog.files.addColumn(file -> file);

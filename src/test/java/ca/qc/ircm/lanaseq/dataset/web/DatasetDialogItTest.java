@@ -160,7 +160,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.samplesHeader()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
     assertTrue(optional(() -> dialog.addSample()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());

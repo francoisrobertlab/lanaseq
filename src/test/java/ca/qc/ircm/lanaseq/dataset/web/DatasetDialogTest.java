@@ -32,7 +32,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -251,7 +250,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
-    assertEquals(id(SAMPLES_HEADER), dialog.samplesHeader.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
@@ -294,7 +292,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
@@ -342,7 +339,6 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    assertEquals(resources.message(SAMPLES_HEADER), dialog.samplesHeader.getText());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
