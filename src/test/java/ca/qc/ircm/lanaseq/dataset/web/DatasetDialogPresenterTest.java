@@ -17,12 +17,15 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,6 +33,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -40,6 +44,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -57,6 +62,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.select.Select;
@@ -65,6 +71,9 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,10 +81,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -87,6 +99,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class DatasetDialogPresenterTest extends AbstractViewTestCase {
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
   private DatasetDialogPresenter presenter;
   @Mock
@@ -131,6 +145,8 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   private String sampleReplicate1 = "rep1";
   private String sampleId2 = "test sample 2";
   private String sampleReplicate2 = "rep2";
+  private List<Path> files = new ArrayList<>();
+  private Random random = new Random();
 
   /**
    * Before test.
@@ -151,6 +167,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     dialog.treatment = new TextField();
     dialog.samplesHeader = new H4();
     dialog.samples = new Grid<>();
+    dialog.files = new Grid<>();
+    dialog.deleteFile = dialog.files.addColumn(file -> file);
+    dialog.filenameEdit = new TextField();
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
@@ -179,6 +198,9 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     topTags.add("input");
     topTags.add("chip");
     when(service.topTags(anyInt())).thenReturn(topTags);
+    files.add(Paths.get("dataset.bw"));
+    files.add(Paths.get("dataset.png"));
+    when(service.files(any())).thenReturn(files);
     presenter.init(dialog);
   }
 
@@ -248,6 +270,14 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
     assertNull(samples.get(1).getReplicate());
     assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
+    assertTrue(dialog.deleteFile.isVisible());
+    assertFalse(dialog.filenameEdit.isReadOnly());
   }
 
   @Test
@@ -293,6 +323,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -339,6 +375,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -385,6 +427,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -431,6 +479,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -477,6 +531,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -526,6 +586,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -572,6 +638,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
     assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -607,6 +679,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
     assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -642,6 +720,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
     assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    verify(service).files(dataset);
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -675,6 +759,12 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
     assertNull(samples.get(1).getReplicate());
     assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
+    verify(service, atLeastOnce()).files(any());
+    List<DatasetFile> files = items(dialog.files);
+    assertEquals(this.files.size(), files.size());
+    for (DatasetFile file : files) {
+      assertTrue(this.files.contains(file.getPath()));
+    }
   }
 
   @Test
@@ -811,6 +901,109 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(1)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+  }
+
+  @Test
+  public void filenameEdit_Empty() throws Throwable {
+    dialog.filenameEdit.setValue("");
+
+    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void filenameEdit_Invalid() throws Throwable {
+    dialog.filenameEdit.setValue("abc?.txt");
+
+    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(resources.message(FILENAME_REGEX_ERROR)), error.getMessage());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void filenameEdit_Exists() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    temporaryFolder.newFile("abc.txt");
+    DatasetFile file = new DatasetFile(path);
+    dialog.files = mock(Grid.class);
+    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    when(dialog.files.getEditor().getItem()).thenReturn(file);
+
+    dialog.filenameEdit.setValue("abc.txt");
+
+    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void filenameEdit_ExistsSameFile() throws Throwable {
+    temporaryFolder.newFile("abc.txt");
+    dialog.files = mock(Grid.class);
+    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    when(dialog.files.getEditor().getItem()).thenReturn(null);
+
+    dialog.filenameEdit.setValue("abc.txt");
+
+    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    assertTrue(status.isOk());
+  }
+
+  @Test
+  public void filenameEdit_ItemNull() throws Throwable {
+    dialog.filenameEdit.setValue("");
+
+    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.filenameEdit);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void rename() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    DatasetFile file = new DatasetFile(path);
+    file.setFilename("target.txt");
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
+    Files.write(path, bytes);
+
+    presenter.rename(file, locale);
+
+    assertTrue(Files.exists(path.resolveSibling("target.txt")));
+    assertArrayEquals(bytes, Files.readAllBytes(path.resolveSibling("target.txt")));
+    assertFalse(Files.exists(path));
+  }
+
+  @Test
+  public void deleteFile() throws Throwable {
+    Path path = temporaryFolder.newFile("source.txt").toPath();
+    DatasetFile file = new DatasetFile(path);
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
+    Files.write(path, bytes);
+
+    presenter.deleteFile(file, locale);
+
+    assertFalse(Files.exists(path));
   }
 
   @Test

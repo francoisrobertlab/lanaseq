@@ -282,10 +282,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
       return path;
     }
 
-    public void setPath(Path path) {
-      this.path = path;
-    }
-
     public String getFilename() {
       return filename;
     }

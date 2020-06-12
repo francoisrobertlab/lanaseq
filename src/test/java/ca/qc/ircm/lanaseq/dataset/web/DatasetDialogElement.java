@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
@@ -33,6 +34,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILENAME;
 
 import ca.qc.ircm.lanaseq.web.TagsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
@@ -109,6 +111,14 @@ public class DatasetDialogElement extends DialogElement {
 
   public ButtonElement addSample() {
     return $(ButtonElement.class).id(id(ADD_SAMPLE));
+  }
+
+  public GridElement files() {
+    return $(GridElement.class).id(id(FILES));
+  }
+
+  public TextFieldElement filenameEdit() {
+    return $(TextFieldElement.class).id(id(FILENAME));
   }
 
   public ButtonElement save() {

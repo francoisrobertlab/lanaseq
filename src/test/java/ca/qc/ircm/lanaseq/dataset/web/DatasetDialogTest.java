@@ -25,6 +25,10 @@ import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_MESSAGE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
@@ -37,8 +41,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_HEADER;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -62,6 +64,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
@@ -83,6 +86,9 @@ import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.grid.editor.EditorCloseEvent;
+import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -90,6 +96,9 @@ import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -120,6 +129,14 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, Sample>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
+  @Captor
+  private ArgumentCaptor<ValueProvider<DatasetFile, String>> fileValueProviderCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentRenderer<Button, DatasetFile>> fileButtonRendererCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<DatasetFile>> fileComparatorCaptor;
+  @Captor
+  private ArgumentCaptor<EditorCloseListener<DatasetFile>> fileCloseListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Mock
@@ -136,6 +153,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Sample> samples;
+  private List<Path> files = new ArrayList<>();
 
   /**
    * Before test.
@@ -146,6 +164,11 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     dialog = new DatasetDialog(presenter);
     dialog.init();
     samples = sampleRepository.findAll();
+    files.add(Paths.get("dataset", "dataset.png"));
+    files.add(Paths.get("sample", "sample_R1.fastq"));
+    files.add(Paths.get("sample", "sample_R2.fastq"));
+    files.add(Paths.get("sample", "sample.bw"));
+    files.add(Paths.get("sample", "sample.png"));
   }
 
   @SuppressWarnings("unchecked")
@@ -191,6 +214,26 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     when(footerRow.getCell(dialog.sampleRemove)).thenReturn(removeFooterCell);
   }
 
+  @SuppressWarnings("unchecked")
+  private void mockFilesColumns() {
+    Element filesElement = dialog.files.getElement();
+    dialog.files = mock(Grid.class);
+    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    when(dialog.files.getElement()).thenReturn(filesElement);
+    dialog.filename = mock(Column.class);
+    when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
+        .thenReturn(dialog.filename);
+    when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
+    when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
+    when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
+    dialog.deleteFile = mock(Column.class);
+    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DELETE)))
+        .thenReturn(dialog.deleteFile);
+    when(dialog.deleteFile.setKey(any())).thenReturn(dialog.deleteFile);
+    when(dialog.deleteFile.setComparator(any(Comparator.class))).thenReturn(dialog.deleteFile);
+    when(dialog.deleteFile.setHeader(any(String.class))).thenReturn(dialog.deleteFile);
+  }
+
   @Test
   public void presenter_Init() {
     verify(presenter).init(dialog);
@@ -211,6 +254,8 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     assertEquals(id(SAMPLES_HEADER), dialog.samplesHeader.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
+    assertEquals(id(FILES), dialog.files.getId().orElse(""));
+    assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -229,6 +274,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   @Test
   public void labels() {
     mockSamplesColumns();
+    mockFilesColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
@@ -252,6 +298,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
+    verify(dialog.filename).setHeader(resources.message(FILENAME));
     assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -268,6 +315,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   @Test
   public void localeChange() {
     mockSamplesColumns();
+    mockFilesColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
@@ -298,6 +346,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
+    verify(dialog.filename).setHeader(resources.message(FILENAME));
     assertEquals(webResources.message(ADD), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -353,6 +402,7 @@ public class DatasetDialogTest extends AbstractViewTestCase {
   @Test
   public void samples_ColumnsValueProvider() {
     mockSamplesColumns();
+    mockFilesColumns();
     dialog.init();
     verify(dialog.samples).addColumn(textFieldRendererCaptor.capture(),
         eq(SampleProperties.SAMPLE_ID));
@@ -405,6 +455,59 @@ public class DatasetDialogTest extends AbstractViewTestCase {
       verify(presenter).removeSample(sample);
     }
     verify(dialog.sampleRemove, never()).setComparator(comparatorCaptor.capture());
+  }
+
+  @Test
+  public void files() {
+    assertEquals(2, dialog.files.getColumns().size());
+    assertNotNull(dialog.files.getColumnByKey(FILENAME));
+    assertNotNull(dialog.files.getColumnByKey(DELETE));
+  }
+
+  @Test
+  public void files_ColumnsValueProvider() {
+    mockSamplesColumns();
+    mockFilesColumns();
+    dialog.init();
+    verify(dialog.files).addColumn(fileValueProviderCaptor.capture(), eq(FILENAME));
+    ValueProvider<DatasetFile, String> valueProvider = fileValueProviderCaptor.getValue();
+    for (Path path : files) {
+      DatasetFile file = new DatasetFile(path);
+      assertEquals(file.getFilename(), valueProvider.apply(file));
+    }
+    verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
+    verify(dialog.filename).setComparator(fileComparatorCaptor.capture());
+    Comparator<DatasetFile> comparator = fileComparatorCaptor.getValue();
+    assertTrue(comparator instanceof NormalizedComparator);
+    for (Path path : files) {
+      DatasetFile file = new DatasetFile(path);
+      assertEquals(file.getFilename(),
+          ((NormalizedComparator<DatasetFile>) comparator).getConverter().apply(file));
+    }
+    verify(dialog.files).addColumn(fileButtonRendererCaptor.capture(), eq(DELETE));
+    ComponentRenderer<Button, DatasetFile> buttonRenderer = fileButtonRendererCaptor.getValue();
+    for (Path path : files) {
+      DatasetFile file = new DatasetFile(path);
+      Button button = buttonRenderer.createComponent(file);
+      assertTrue(button.hasClassName(DELETE));
+      assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
+      validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
+      assertEquals("", button.getText());
+      button.click();
+      verify(presenter).deleteFile(file, locale);
+    }
+  }
+
+  @Test
+  public void renameFile() {
+    mockSamplesColumns();
+    mockFilesColumns();
+    dialog.init();
+    DatasetFile file = new DatasetFile(files.get(0));
+    verify(dialog.files.getEditor()).addCloseListener(fileCloseListenerCaptor.capture());
+    EditorCloseListener<DatasetFile> listener = fileCloseListenerCaptor.getValue();
+    listener.onEditorClose(new EditorCloseEvent<>(dialog.files.getEditor(), file));
+    verify(presenter).rename(file, locale);
   }
 
   @Test

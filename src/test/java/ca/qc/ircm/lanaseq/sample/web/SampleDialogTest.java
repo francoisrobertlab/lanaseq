@@ -74,6 +74,8 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.grid.editor.EditorCloseEvent;
+import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
@@ -106,6 +108,8 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private ArgumentCaptor<ValueProvider<SampleFile, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, SampleFile>> buttonRendererCaptor;
+  @Captor
+  private ArgumentCaptor<EditorCloseListener<SampleFile>> closeListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
@@ -322,6 +326,17 @@ public class SampleDialogTest extends AbstractViewTestCase {
       button.click();
       verify(presenter).deleteFile(file, locale);
     }
+  }
+
+  @Test
+  public void renameFile() {
+    mockColumns();
+    dialog.init();
+    SampleFile file = new SampleFile(files.get(0));
+    verify(dialog.files.getEditor()).addCloseListener(closeListenerCaptor.capture());
+    EditorCloseListener<SampleFile> listener = closeListenerCaptor.getValue();
+    listener.onEditorClose(new EditorCloseEvent<>(dialog.files.getEditor(), file));
+    verify(presenter).rename(file, locale);
   }
 
   @Test

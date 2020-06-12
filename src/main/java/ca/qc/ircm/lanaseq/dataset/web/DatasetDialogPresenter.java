@@ -17,9 +17,14 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILENAME_REGEX;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILENAME_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILE_RENAME_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -33,10 +38,12 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -46,7 +53,11 @@ import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,6 +84,7 @@ public class DatasetDialogPresenter {
   private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
   private ListDataProvider<Sample> samplesDataProvider =
       DataProvider.ofCollection(new ArrayList<>());
+  private Binder<DatasetFile> fileBinder = new BeanValidationBinder<>(DatasetFile.class);
   private DatasetService service;
   private ProtocolService protocolService;
   private AuthorizationService authorizationService;
@@ -89,11 +101,13 @@ public class DatasetDialogPresenter {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
     dialog.tags.setTagSuggestions(service.topTags(50));
+    dialog.files.getEditor().setBinder(fileBinder);
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null, Constants.DEFAULT_LOCALE);
   }
 
   void localeChange(Locale locale) {
+    final AppResources resources = new AppResources(DatasetDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.tags).bind(TAGS);
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
@@ -106,6 +120,22 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.strainDescription).withNullRepresentation("")
         .bind(STRAIN_DESCRIPTION);
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
+    fileBinder.forField(dialog.filenameEdit).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("")
+        .withValidator(new RegexpValidator(resources.message(FILENAME_REGEX_ERROR), FILENAME_REGEX))
+        .withValidator(exists(locale)).bind(FILENAME);
+  }
+
+  private Validator<String> exists(Locale locale) {
+    return (value, context) -> {
+      DatasetFile item = dialog.files.getEditor().getItem();
+      if (value != null && item != null && !value.equals(item.getPath().getFileName().toString())
+          && Files.exists(item.getPath().resolveSibling(value))) {
+        final AppResources webResources = new AppResources(Constants.class, locale);
+        return ValidationResult.error(webResources.message(ALREADY_EXISTS));
+      }
+      return ValidationResult.ok();
+    };
   }
 
   void setReadOnly() {
@@ -116,6 +146,8 @@ public class DatasetDialogPresenter {
         .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE) && sa.isEditable())
         .filter(val -> val).findFirst().orElse(false);
     sampleBinder.setReadOnly(sampleReadOnly);
+    fileBinder.setReadOnly(readOnly);
+    dialog.deleteFile.setVisible(!readOnly);
   }
 
   void bindSampleFields(Sample sample, Locale locale) {
@@ -150,9 +182,46 @@ public class DatasetDialogPresenter {
     setReadOnly();
   }
 
+  private void updateFiles() {
+    dialog.files
+        .setItems(service.files(binder.getBean()).stream().map(file -> new DatasetFile(file)));
+  }
+
+  void rename(DatasetFile file, Locale locale) {
+    Path source = file.getPath();
+    Path target = source.resolveSibling(file.getFilename());
+    try {
+      logger.debug("rename file {} to {}", source, target);
+      Files.move(source, target);
+      updateFiles();
+    } catch (IOException e) {
+      logger.error("renaming of file {} to {} failed", source, target);
+      final AppResources resources = new AppResources(SampleDialog.class, locale);
+      dialog.showNotification(
+          resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
+    }
+  }
+
+  void deleteFile(DatasetFile file, Locale locale) {
+    Path path = file.getPath();
+    try {
+      logger.debug("delete file {}", path);
+      Files.delete(path);
+      updateFiles();
+    } catch (IOException e) {
+      logger.error("deleting file {} failed", path);
+      final AppResources resources = new AppResources(SampleDialog.class, locale);
+      dialog.showNotification(resources.message(FILE_RENAME_ERROR, path.getFileName()));
+    }
+  }
+
   private void refreshSamplesDataProvider() {
     samplesDataProvider = DataProvider.ofCollection(samplesDataProvider.getItems());
     dialog.samples.setDataProvider(samplesDataProvider);
+  }
+
+  BinderValidationStatus<DatasetFile> validateDatasetFile() {
+    return fileBinder.validate();
   }
 
   BinderValidationStatus<Dataset> validateDataset() {
@@ -241,6 +310,7 @@ public class DatasetDialogPresenter {
     samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
     dataset.getSamples().forEach(s -> bindSampleFields(s, locale));
+    updateFiles();
     setReadOnly();
   }
 
