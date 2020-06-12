@@ -167,8 +167,10 @@ public class DatasetService {
           sample.setOwner(user);
           sample.setDate(now);
         }
-        sample.generateName();
-        sampleRepository.save(sample);
+        if (sample.isEditable()) {
+          sample.generateName();
+          sampleRepository.save(sample);
+        }
       }
     }
     Path oldFolder = null;

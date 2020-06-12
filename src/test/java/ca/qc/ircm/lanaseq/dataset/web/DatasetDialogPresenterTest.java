@@ -434,6 +434,52 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void setDataset_NoEditableSamples() {
+    Dataset dataset = repository.findById(1L).get();
+    dataset.getSamples().forEach(sample -> sample.setEditable(false));
+
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertFalse(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("Rappa", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertTrue(find(samples, 2L).isPresent());
+    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
+    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+    assertTrue(find(samples, 3L).isPresent());
+    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
+    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+  }
+
+  @Test
   public void setDataset_CannotUpdateOneSample() {
     when(authorizationService.hasPermission(any(Sample.class), any())).then(i -> {
       Sample sample = i.getArgument(0);
@@ -483,8 +529,54 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void setDataset_OneSampleNotEditable() {
+    Dataset dataset = repository.findById(1L).get();
+    dataset.getSamples().get(1).setEditable(false);
+
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertFalse(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertFalse(dialog.protocol.isReadOnly());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
+    assertEquals("Rappa", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertTrue(find(samples, 2L).isPresent());
+    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
+    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+    assertTrue(find(samples, 3L).isPresent());
+    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
+    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
+  }
+
+  @Test
   public void setDataset_CannotUpdateOnlyOneSample() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
     Dataset dataset = repository.findById(5L).get();
 
     presenter.localeChange(locale);
@@ -492,7 +584,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
 
     assertEquals(1, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("chipseq"));
-    assertTrue(dialog.tags.isReadOnly());
+    assertFalse(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 2L, dialog.protocol.getValue().getId());
     assertTrue(dialog.protocol.isReadOnly());
@@ -509,16 +601,47 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
     List<Sample> samples = items(dialog.samples);
-    assertEquals(2, samples.size());
+    assertEquals(1, samples.size());
     assertTrue(find(samples, 8L).isPresent());
     assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
     assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
     assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+  }
+
+  @Test
+  public void setDataset_NotEditableOnlyOneSample() {
+    Dataset dataset = repository.findById(5L).get();
+    dataset.getSamples().get(0).setEditable(false);
+
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    assertEquals(1, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("chipseq"));
+    assertFalse(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2b", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yBC103", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(1, samples.size());
+    assertTrue(find(samples, 8L).isPresent());
+    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
   }
 
   @Test
@@ -591,8 +714,48 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void addSample_NotEditableSamples() {
+    Dataset dataset = repository.findById(5L).get();
+    dataset.getSamples().get(0).setEditable(false);
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    presenter.addSample(locale);
+
+    assertEquals(1, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("chipseq"));
+    assertFalse(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertFalse(dialog.protocol.isReadOnly());
+    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertFalse(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertFalse(dialog.type.isReadOnly());
+    assertEquals("polr2b", dialog.target.getValue());
+    assertFalse(dialog.target.isReadOnly());
+    assertEquals("yBC103", dialog.strain.getValue());
+    assertFalse(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertFalse(dialog.strainDescription.isReadOnly());
+    assertEquals("", dialog.treatment.getValue());
+    assertFalse(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(2, samples.size());
+    assertTrue(find(samples, 8L).isPresent());
+    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(1)).isReadOnly());
+    assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
-  public void deletedSample() {
+  public void removeSample() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
     dialog.samples = mock(Grid.class);
@@ -605,6 +768,49 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
     for (int i = 1; i < samples.size(); i++) {
       assertEquals(samples.get(i), items.get(i - 1));
     }
+  }
+
+  @Test
+  public void removeSample_NotEditable() {
+    Dataset dataset = repository.findById(1L).get();
+    dataset.getSamples().forEach(sample -> sample.setEditable(false));
+    dataset.getSamples().get(0).setEditable(true);
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    presenter.removeSample(dataset.getSamples().get(0));
+
+    assertEquals(2, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("mnase"));
+    assertTrue(dialog.tags.getValue().contains("ip"));
+    assertFalse(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("Rappa", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(2, samples.size());
+    assertTrue(find(samples, 2L).isPresent());
+    assertEquals("FR2", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R2", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertTrue(find(samples, 3L).isPresent());
+    assertEquals("FR3", sampleIdFields.get(samples.get(1)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
+    assertEquals("R3", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
   }
 
   @Test

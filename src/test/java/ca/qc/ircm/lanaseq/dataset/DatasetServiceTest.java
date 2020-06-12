@@ -246,6 +246,7 @@ public class DatasetServiceTest {
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
+    sample1.setEditable(true);
     sample1.setProtocol(protocolRepository.findById(1L).get());
     dataset.getSamples().add(sample1);
     Sample sample2 = new Sample();
@@ -257,6 +258,7 @@ public class DatasetServiceTest {
     sample2.setStrain("yFR213");
     sample2.setStrainDescription("F56G");
     sample2.setTreatment("37C");
+    sample2.setEditable(true);
     sample2.setProtocol(protocolRepository.findById(1L).get());
     dataset.getSamples().add(sample2);
 
@@ -337,6 +339,7 @@ public class DatasetServiceTest {
     sample3.setStrain("yFR213");
     sample3.setStrainDescription("F56G");
     sample3.setTreatment("37C");
+    sample3.setEditable(true);
     sample3.setProtocol(protocolRepository.findById(3L).get());
     dataset.getSamples().add(sample3);
 
@@ -426,6 +429,7 @@ public class DatasetServiceTest {
     sample3.setStrain("yFR213");
     sample3.setStrainDescription("F56G");
     sample3.setTreatment("37C");
+    sample3.setEditable(true);
     sample3.setProtocol(protocolRepository.findById(3L).get());
     dataset.getSamples().add(sample3);
     Path beforeFolder = configuration.folder(dataset);
@@ -470,6 +474,77 @@ public class DatasetServiceTest {
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  @WithMockUser
+  public void save_NotUpdatableSample() {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Dataset dataset = repository.findById(1L).orElse(null);
+    dataset.getTags().remove("rappa");
+    dataset.getTags().add("tag1");
+    Sample sample1 = dataset.getSamples().get(0);
+    sample1.setEditable(false);
+    Sample sample2 = dataset.getSamples().get(1);
+    sample2.setSampleId("sample2");
+    sample2.setReplicate("r2");
+
+    service.save(dataset);
+
+    repository.flush();
+    dataset = repository.findById(1L).orElse(null);
+    assertEquals("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-sample2-FR3_20181020", dataset.getName());
+    assertEquals(3, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("tag1"));
+    assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(3, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals((Long) 1L, sample.getId());
+    assertEquals("FR1", sample.getSampleId());
+    assertEquals("R1", sample.getReplicate());
+    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals("polr2a", sample.getTarget());
+    assertEquals("yFR100", sample.getStrain());
+    assertEquals("WT", sample.getStrainDescription());
+    assertEquals("Rappa", sample.getTreatment());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
+    assertEquals("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
+    assertEquals((Long) 1L, sample.getProtocol().getId());
+    assertEquals((Long) 2L, sample.getOwner().getId());
+    sample = dataset.getSamples().get(1);
+    assertEquals((Long) 2L, sample.getId());
+    assertEquals("sample2", sample.getSampleId());
+    assertEquals("r2", sample.getReplicate());
+    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals("polr2a", sample.getTarget());
+    assertEquals("yFR100", sample.getStrain());
+    assertEquals("WT", sample.getStrainDescription());
+    assertEquals("Rappa", sample.getTreatment());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 53), sample.getDate());
+    assertEquals("sample2_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_r2_20181020", sample.getName());
+    assertEquals((Long) 1L, sample.getProtocol().getId());
+    assertEquals((Long) 2L, sample.getOwner().getId());
+    sample = dataset.getSamples().get(2);
+    assertEquals((Long) 3L, sample.getId());
+    assertEquals("FR3", sample.getSampleId());
+    assertEquals("R3", sample.getReplicate());
+    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals("polr2a", sample.getTarget());
+    assertEquals("yFR100", sample.getStrain());
+    assertEquals("WT", sample.getStrainDescription());
+    assertEquals("Rappa", sample.getTreatment());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 30, 23), sample.getDate());
+    assertEquals("FR3_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R3_20181020", sample.getName());
+    assertEquals((Long) 1L, sample.getProtocol().getId());
+    assertEquals((Long) 2L, sample.getOwner().getId());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   @Test

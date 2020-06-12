@@ -113,13 +113,14 @@ public class DatasetDialogPresenter {
     boolean readOnly = !authorizationService.hasPermission(dataset, Permission.WRITE);
     binder.setReadOnly(readOnly);
     boolean sampleReadOnly = readOnly || !dataset.getSamples().stream()
-        .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE)).filter(val -> val)
-        .findFirst().orElse(false);
+        .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE) && sa.isEditable())
+        .filter(val -> val).findFirst().orElse(false);
     sampleBinder.setReadOnly(sampleReadOnly);
   }
 
   void bindSampleFields(Sample sample, Locale locale) {
-    boolean forceReadOnly = !authorizationService.hasPermission(binder.getBean(), Permission.WRITE);
+    boolean forceReadOnly = !authorizationService.hasPermission(binder.getBean(), Permission.WRITE)
+        || !sample.isEditable();
     final AppResources webResources = new AppResources(Constants.class, locale);
     Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
     binder.forField(dialog.sampleIdField(sample))
@@ -136,14 +137,17 @@ public class DatasetDialogPresenter {
 
   void addSample(Locale locale) {
     Sample sample = new Sample();
+    sample.setEditable(true);
     samplesDataProvider.getItems().add(sample);
     bindSampleFields(sample, locale);
     refreshSamplesDataProvider();
+    setReadOnly();
   }
 
   void removeSample(Sample sample) {
     samplesDataProvider.getItems().remove(sample);
     refreshSamplesDataProvider();
+    setReadOnly();
   }
 
   private void refreshSamplesDataProvider() {
@@ -223,8 +227,12 @@ public class DatasetDialogPresenter {
     if (dataset.getSamples() == null) {
       dataset.setSamples(new ArrayList<>());
     }
-    while (dataset.getSamples().size() < 2) {
-      dataset.getSamples().add(new Sample());
+    if (dataset.getId() == null) {
+      while (dataset.getSamples().size() < 2) {
+        Sample sample = new Sample();
+        sample.setEditable(true);
+        dataset.getSamples().add(sample);
+      }
     }
     Sample sample = new Sample();
     copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
