@@ -72,6 +72,8 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.merge()).isPresent());
+    assertTrue(optional(() -> view.addFiles()).isPresent());
   }
 
   @Test

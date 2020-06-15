@@ -196,7 +196,7 @@ public class DatasetDialogPresenter {
       updateFiles();
     } catch (IOException e) {
       logger.error("renaming of file {} to {} failed", source, target);
-      final AppResources resources = new AppResources(SampleDialog.class, locale);
+      final AppResources resources = new AppResources(DatasetDialog.class, locale);
       dialog.showNotification(
           resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
     }

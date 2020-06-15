@@ -1,15 +1,15 @@
-package ca.qc.ircm.lanaseq.sample.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.CREATE_FOLDER_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.CREATE_FOLDER_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.NETWORK;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
@@ -30,26 +30,27 @@ import org.springframework.security.concurrent.DelegatingSecurityContextRunnable
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Add sample files dialog presenter.
+ * Add dataset files dialog presenter.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AddSampleFilesDialogPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(AddSampleFilesDialogPresenter.class);
-  private AddSampleFilesDialog dialog;
-  private Sample sample;
+public class AddDatasetFilesDialogPresenter {
+  private static final Logger logger =
+      LoggerFactory.getLogger(AddDatasetFilesDialogPresenter.class);
+  private AddDatasetFilesDialog dialog;
+  private Dataset dataset;
   private Set<Path> existingFilenames = new HashSet<>();
   private Thread updateFilesThread;
-  private SampleService service;
+  private DatasetService service;
   private AppConfiguration configuration;
 
   @Autowired
-  protected AddSampleFilesDialogPresenter(SampleService service, AppConfiguration configuration) {
+  protected AddDatasetFilesDialogPresenter(DatasetService service, AppConfiguration configuration) {
     this.service = service;
     this.configuration = configuration;
   }
 
-  void init(AddSampleFilesDialog dialog) {
+  void init(AddDatasetFilesDialog dialog) {
     this.dialog = dialog;
     dialog.addOpenedChangeListener(event -> {
       if (event.isOpened()) {
@@ -67,12 +68,13 @@ public class AddSampleFilesDialogPresenter {
   }
 
   void localeChange(Locale locale) {
-    final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
+    final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     dialog.getUI().ifPresent(ui -> {
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
-      if (sample != null) {
-        dialog.message.setText(resources.message(MESSAGE, configuration.uploadLabel(sample, unix)));
+      if (dataset != null) {
+        dialog.message
+            .setText(resources.message(MESSAGE, configuration.uploadLabel(dataset, unix)));
       }
       String network = configuration.uploadNetwork(unix);
       dialog.network.setVisible(network != null && !network.isEmpty());
@@ -82,7 +84,7 @@ public class AddSampleFilesDialogPresenter {
 
   Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
-      logger.debug("stat checking files in sample {} upload folder", sample);
+      logger.debug("stat checking files in dataset {} upload folder", dataset);
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
@@ -91,7 +93,7 @@ public class AddSampleFilesDialogPresenter {
         try {
           Thread.sleep(2000);
         } catch (InterruptedException e) {
-          logger.debug("stop checking files in sample {} upload folder", sample);
+          logger.debug("stop checking files in dataset {} upload folder", dataset);
           return;
         }
       }
@@ -105,7 +107,7 @@ public class AddSampleFilesDialogPresenter {
 
   void updateFiles() {
     existingFilenames =
-        service.files(sample).stream().map(f -> f.getFileName()).collect(Collectors.toSet());
+        service.files(dataset).stream().map(f -> f.getFileName()).collect(Collectors.toSet());
     Path folder = folder();
     if (folder != null) {
       try {
@@ -126,7 +128,7 @@ public class AddSampleFilesDialogPresenter {
   }
 
   private Path folder() {
-    return sample != null ? configuration.upload(sample) : null;
+    return dataset != null ? configuration.upload(dataset) : null;
   }
 
   boolean validate(Collection<Path> files, Locale locale) {
@@ -134,7 +136,7 @@ public class AddSampleFilesDialogPresenter {
     boolean anyExists = files.stream()
         .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
     if (anyExists) {
-      final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
+      final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
       dialog.error.setVisible(true);
       dialog.error.setText(resources.message(OVERWRITE_ERROR));
     }
@@ -151,32 +153,32 @@ public class AddSampleFilesDialogPresenter {
       files = Collections.emptyList();
     }
     if (validate(files, locale)) {
-      logger.debug("save new files {} for sample {}", files, sample);
-      service.saveFiles(sample, files);
+      logger.debug("save new files {} for dataset {}", files, dataset);
+      service.saveFiles(dataset, files);
       try {
         Files.delete(folder);
       } catch (IOException e) {
         logger.warn("could not delete upload folder {}", folder);
       }
-      final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
-      dialog.showNotification(resources.message(SAVED, files.size(), sample.getName()));
+      final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
+      dialog.showNotification(resources.message(SAVED, files.size(), dataset.getName()));
       dialog.fireSavedEvent();
       dialog.close();
     }
   }
 
-  Sample getSample() {
-    return sample;
+  Dataset getDataset() {
+    return dataset;
   }
 
-  void setSample(Sample sample, Locale locale) {
-    if (sample == null) {
-      throw new NullPointerException("sample cannot be null");
+  void setDataset(Dataset dataset, Locale locale) {
+    if (dataset == null) {
+      throw new NullPointerException("dataset cannot be null");
     }
-    if (sample.getId() == null) {
-      throw new IllegalArgumentException("sample cannot be new");
+    if (dataset.getId() == null) {
+      throw new IllegalArgumentException("dataset cannot be new");
     }
-    this.sample = sample;
+    this.dataset = dataset;
     createFolder(locale);
     localeChange(locale);
     updateFiles();
@@ -186,10 +188,10 @@ public class AddSampleFilesDialogPresenter {
     Path folder = folder();
     if (folder != null) {
       try {
-        logger.debug("creating upload folder {} for sample {}", sample);
+        logger.debug("creating upload folder {} for dataset {}", dataset);
         Files.createDirectories(folder);
       } catch (IOException e) {
-        final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
+        final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
         dialog.showNotification(resources.message(CREATE_FOLDER_ERROR));
       }
     }

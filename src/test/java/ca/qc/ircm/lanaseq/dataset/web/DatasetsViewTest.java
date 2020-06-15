@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ADD_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
@@ -33,6 +34,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -182,6 +184,8 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
+    assertEquals(ADD_FILES, view.addFiles.getId().orElse(""));
+    validateIcon(VaadinIcon.FILE_ADD.create(), view.addFiles.getIcon());
   }
 
   @Test
@@ -205,6 +209,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
+    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
   }
 
   @Test
@@ -235,6 +240,7 @@ public class DatasetsViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
+    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
   }
 
   @Test
@@ -318,6 +324,22 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   }
 
   @Test
+  public void addFiles_Conrol() {
+    Dataset dataset = datasets.get(0);
+    clickItem(view.datasets, dataset, view.name, true, false, false, false);
+
+    verify(presenter).addFiles(dataset, locale);
+  }
+
+  @Test
+  public void addFiles_Meta() {
+    Dataset dataset = datasets.get(0);
+    clickItem(view.datasets, dataset, view.name, false, false, false, true);
+
+    verify(presenter).addFiles(dataset, locale);
+  }
+
+  @Test
   public void viewProtocol() {
     Dataset dataset = datasets.get(0);
     doubleClickItem(view.datasets, dataset, view.protocol);
@@ -380,5 +402,11 @@ public class DatasetsViewTest extends AbstractViewTestCase {
   public void merge() {
     clickButton(view.merge);
     verify(presenter).merge(locale);
+  }
+
+  @Test
+  public void addFiles() {
+    clickButton(view.addFiles);
+    verify(presenter).addFiles(locale);
   }
 }

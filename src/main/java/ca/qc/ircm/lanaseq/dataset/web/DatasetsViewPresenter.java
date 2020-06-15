@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_CANNOT_WRITE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
@@ -29,6 +31,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -36,6 +39,7 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -105,6 +109,35 @@ public class DatasetsViewPresenter {
     clearError();
     view.datasetDialog.setDataset(service.get(dataset.getId()));
     view.datasetDialog.open();
+  }
+
+  public void addFiles(Locale locale) {
+    List<Dataset> datasets = new ArrayList<>(view.datasets.getSelectedItems());
+    AppResources resources = new AppResources(DatasetsView.class, locale);
+    boolean error = false;
+    if (datasets.isEmpty()) {
+      view.error.setText(resources.message(DATASETS_REQUIRED));
+      error = true;
+    } else if (datasets.size() > 1) {
+      view.error.setText(resources.message(DATASETS_MORE_THAN_ONE));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      Dataset dataset = datasets.iterator().next();
+      addFiles(dataset, locale);
+    }
+  }
+
+  public void addFiles(Dataset dataset, Locale locale) {
+    if (authorizationService.hasPermission(dataset, Permission.WRITE)) {
+      view.addFilesDialog.setDataset(dataset);
+      view.addFilesDialog.open();
+    } else {
+      AppResources resources = new AppResources(DatasetsView.class, locale);
+      view.error.setText(resources.message(DATASETS_CANNOT_WRITE));
+      view.error.setVisible(true);
+    }
   }
 
   void view(Protocol protocol) {

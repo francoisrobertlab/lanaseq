@@ -76,9 +76,12 @@ public class DatasetsView extends VerticalLayout
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
-  public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
   public static final String MERGE = "merge";
+  public static final String ADD_FILES = "addFiles";
   public static final String MERGE_ERROR = property(MERGE, "error");
+  public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
+  public static final String DATASETS_MORE_THAN_ONE = property(DATASETS, "moreThanOne");
+  public static final String DATASETS_CANNOT_WRITE = property(DATASETS, "cannotWrite");
   public static final String MERGED = "merged";
   private static final long serialVersionUID = 2568742367790329628L;
   protected H2 header = new H2();
@@ -96,10 +99,13 @@ public class DatasetsView extends VerticalLayout
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button merge = new Button();
+  protected Button addFiles = new Button();
   @Autowired
   protected DatasetDialog datasetDialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
+  @Autowired
+  protected AddDatasetFilesDialog addFilesDialog;
   @Autowired
   private transient DatasetsViewPresenter presenter;
 
@@ -116,10 +122,15 @@ public class DatasetsView extends VerticalLayout
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, datasets, error, new HorizontalLayout(add, merge));
+    add(header, datasets, error, new HorizontalLayout(add, merge, addFiles));
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.setSelectionMode(SelectionMode.MULTI);
+    datasets.addItemClickListener(e -> {
+      if (e.isCtrlKey() || e.isMetaKey()) {
+        presenter.addFiles(e.getItem(), getLocale());
+      }
+    });
     datasets.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && protocol(e.getItem()).getId() != null) {
         presenter.view(protocol(e.getItem()));
@@ -168,6 +179,9 @@ public class DatasetsView extends VerticalLayout
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
     merge.addClickListener(e -> presenter.merge(getLocale()));
+    addFiles.setId(ADD_FILES);
+    addFiles.setIcon(VaadinIcon.FILE_ADD.create());
+    addFiles.addClickListener(e -> presenter.addFiles(getLocale()));
     presenter.init(this);
   }
 
@@ -200,6 +214,7 @@ public class DatasetsView extends VerticalLayout
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
     merge.setText(resources.message(MERGE));
+    addFiles.setText(resources.message(ADD_FILES));
   }
 
   @Override

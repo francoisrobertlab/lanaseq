@@ -19,8 +19,10 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ADD_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
@@ -29,6 +31,8 @@ import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.apache.commons.lang3.SystemUtils;
+import org.openqa.selenium.Keys;
 
 @Element("vaadin-vertical-layout")
 public class DatasetsViewElement extends VerticalLayoutElement {
@@ -56,6 +60,14 @@ public class DatasetsViewElement extends VerticalLayoutElement {
     return datasets().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
 
+  public void controlClick(int row) {
+    Keys key = Keys.CONTROL;
+    if (SystemUtils.IS_OS_MAC_OSX) {
+      key = Keys.COMMAND;
+    }
+    datasets().getCell(row, NAME_COLUMN).click(0, 0, key);
+  }
+
   public void doubleClick(int row) {
     datasets().getCell(row, NAME_COLUMN).doubleClick();
   }
@@ -70,5 +82,13 @@ public class DatasetsViewElement extends VerticalLayoutElement {
 
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
+  }
+
+  public ButtonElement merge() {
+    return $(ButtonElement.class).id(MERGE);
+  }
+
+  public ButtonElement addFiles() {
+    return $(ButtonElement.class).id(ADD_FILES);
   }
 }
