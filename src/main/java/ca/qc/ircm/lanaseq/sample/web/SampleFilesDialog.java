@@ -18,6 +18,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -42,6 +43,8 @@ public class SampleFilesDialog extends Dialog
     implements LocaleChangeObserver, NotificationComponent {
   public static final String ID = "sample-files-dialog";
   public static final String HEADER = "header";
+  public static final String MESSAGE = "message";
+  public static final String MESSAGE_TITLE = property(MESSAGE, "title");
   public static final String FILES = "files";
   public static final String FILENAME = "filename";
   public static final String FILENAME_REGEX = "[\\w-\\.]*";
@@ -50,6 +53,7 @@ public class SampleFilesDialog extends Dialog
   public static final String FILE_DELETE_ERROR = property("filename", "delete", "error");
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
+  protected Div message = new Div();
   protected Grid<SampleFile> files = new Grid<>();
   protected Column<SampleFile> filename;
   protected Column<SampleFile> delete;
@@ -81,8 +85,9 @@ public class SampleFilesDialog extends Dialog
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
     layout.setHeight("40em");
-    layout.add(header, files, add);
+    layout.add(header, message, files, add);
     header.setId(id(HEADER));
+    message.setId(id(MESSAGE));
     files.setId(id(FILES));
     files.setSizeFull();
     files.getEditor().addCloseListener(e -> presenter.rename(e.getItem(), getLocale()));
@@ -117,6 +122,8 @@ public class SampleFilesDialog extends Dialog
     final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
+    message.setText("");
+    message.setTitle("");
     filename.setHeader(resources.message(FILENAME));
     delete.setHeader(webResources.message(DELETE));
     add.setText(webResources.message(ADD));

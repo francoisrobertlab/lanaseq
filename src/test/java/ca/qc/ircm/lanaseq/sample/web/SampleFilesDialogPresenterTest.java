@@ -20,6 +20,8 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertArrayEquals;
@@ -27,12 +29,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -47,6 +51,7 @@ import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -84,6 +89,8 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   private ProtocolService protocolService;
   @MockBean
   private AuthorizationService authorizationService;
+  @MockBean
+  private AppConfiguration configuration;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Captor
@@ -96,6 +103,11 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   private AppResources resources = new AppResources(SampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Path> files = new ArrayList<>();
+  private Path folder;
+  private String folderLabelLinux = "lanaseq/upload";
+  private String folderLabelWindows = "lanaseq\\upload";
+  private String folderNetworkLinux = "smb://lanaseq01/lanaseq";
+  private String folderNetworkWindows = "\\\\lanaseq01\\lanaseq";
   private Random random = new Random();
 
   /**
@@ -105,6 +117,7 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     dialog.header = new H3();
+    dialog.message = new Div();
     dialog.files = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
@@ -113,10 +126,75 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
     files.add(Paths.get("sample_R2.fastq"));
     files.add(Paths.get("sample.bw"));
     files.add(Paths.get("sample.png"));
+    when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(service.files(any())).thenReturn(files);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(configuration.folder(any(Sample.class))).thenReturn(folder);
+    when(configuration.folderLabel(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean linux = i.getArgument(1);
+      return (linux ? folderLabelLinux : folderLabelWindows) + "/" + sample.getName();
+    });
+    when(configuration.folderNetwork(anyBoolean())).then(i -> {
+      boolean linux = i.getArgument(0);
+      return (linux ? folderNetworkLinux : folderNetworkWindows);
+    });
     presenter.init(dialog);
     presenter.localeChange(locale);
+  }
+
+  @Test
+  public void labels() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, false)),
+        dialog.message.getText());
+    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(false)),
+        dialog.message.getTitle().orElse(""));
+  }
+
+  @Test
+  public void labels_Linux() {
+    Sample sample = repository.findById(1L).get();
+    when(browser.isLinux()).thenReturn(true);
+    presenter.setSample(sample);
+    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
+        dialog.message.getText());
+    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(true)),
+        dialog.message.getTitle().orElse(""));
+  }
+
+  @Test
+  public void labels_Mac() {
+    Sample sample = repository.findById(1L).get();
+    when(browser.isMacOSX()).thenReturn(true);
+    presenter.setSample(sample);
+    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
+        dialog.message.getText());
+    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(true)),
+        dialog.message.getTitle().orElse(""));
+  }
+
+  @Test
+  public void network_Empty() {
+    Sample sample = repository.findById(1L).get();
+    when(browser.isLinux()).thenReturn(true);
+    when(configuration.folderNetwork(anyBoolean())).thenReturn("");
+    presenter.setSample(sample);
+    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
+        dialog.message.getText());
+    assertEquals("", dialog.message.getTitle().orElse(""));
+  }
+
+  @Test
+  public void network_Null() {
+    Sample sample = repository.findById(1L).get();
+    when(browser.isLinux()).thenReturn(true);
+    when(configuration.folderNetwork(anyBoolean())).thenReturn(null);
+    presenter.setSample(sample);
+    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
+        dialog.message.getText());
+    assertEquals("", dialog.message.getTitle().orElse(""));
   }
 
   @Test

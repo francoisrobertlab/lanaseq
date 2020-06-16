@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ID;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.Assert.assertEquals;
@@ -142,6 +143,7 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
+    assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(ADD), dialog.add.getId().orElse(""));

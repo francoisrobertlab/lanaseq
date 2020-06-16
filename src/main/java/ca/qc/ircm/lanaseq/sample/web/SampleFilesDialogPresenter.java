@@ -6,7 +6,10 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILE_RENAME_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -20,6 +23,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.RegexpValidator;
+import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,13 +47,15 @@ public class SampleFilesDialogPresenter {
   private Sample sample;
   private SampleService service;
   private AuthorizationService authorizationService;
+  private AppConfiguration configuration;
   private Binder<SampleFile> fileBinder = new BeanValidationBinder<>(SampleFile.class);
 
   @Autowired
   protected SampleFilesDialogPresenter(SampleService service,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService, AppConfiguration configuration) {
     this.service = service;
     this.authorizationService = authorizationService;
+    this.configuration = configuration;
   }
 
   void init(SampleFilesDialog dialog) {
@@ -66,6 +72,7 @@ public class SampleFilesDialogPresenter {
         .withNullRepresentation("")
         .withValidator(new RegexpValidator(resources.message(FILENAME_REGEX_ERROR), FILENAME_REGEX))
         .withValidator(exists(locale)).bind(FILENAME);
+    updateMessage();
   }
 
   private Validator<String> exists(Locale locale) {
@@ -78,6 +85,20 @@ public class SampleFilesDialogPresenter {
       }
       return ValidationResult.ok();
     };
+  }
+
+  private void updateMessage() {
+    dialog.getUI().ifPresent(ui -> {
+      final AppResources resources = new AppResources(SampleFilesDialog.class, ui.getLocale());
+      WebBrowser browser = ui.getSession().getBrowser();
+      boolean unix = browser.isMacOSX() || browser.isLinux();
+      if (sample != null) {
+        dialog.message.setText(resources.message(MESSAGE, configuration.folderLabel(sample, unix)));
+      }
+      String network = configuration.folderNetwork(unix);
+      dialog.message.setTitle(
+          network != null && !network.isEmpty() ? resources.message(MESSAGE_TITLE, network) : "");
+    });
   }
 
   private void updateFiles() {
@@ -136,6 +157,7 @@ public class SampleFilesDialogPresenter {
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
     dialog.addFilesDialog.setSample(sample);
+    updateMessage();
     updateFiles();
   }
 }
