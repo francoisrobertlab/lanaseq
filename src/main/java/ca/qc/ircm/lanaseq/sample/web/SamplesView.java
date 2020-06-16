@@ -79,6 +79,8 @@ public class SamplesView extends VerticalLayout
   @Autowired
   protected SampleDialog dialog;
   @Autowired
+  protected SampleFilesDialog filesDialog;
+  @Autowired
   protected AddSampleFilesDialog addFilesDialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
@@ -88,10 +90,11 @@ public class SamplesView extends VerticalLayout
   public SamplesView() {
   }
 
-  SamplesView(SamplesViewPresenter presenter, SampleDialog dialog,
+  SamplesView(SamplesViewPresenter presenter, SampleDialog dialog, SampleFilesDialog filesDialog,
       AddSampleFilesDialog addFilesDialog, ProtocolDialog protocolDialog) {
     this.presenter = presenter;
     this.dialog = dialog;
+    this.filesDialog = filesDialog;
     this.addFilesDialog = addFilesDialog;
     this.protocolDialog = protocolDialog;
   }
@@ -122,7 +125,9 @@ public class SamplesView extends VerticalLayout
       }
     });
     samples.addItemClickListener(e -> {
-      if (e.isCtrlKey() || e.isMetaKey()) {
+      if (e.isShiftKey()) {
+        presenter.viewFiles(e.getItem());
+      } else if (e.isCtrlKey() || e.isMetaKey()) {
         presenter.addFiles(e.getItem(), getLocale());
       }
     });

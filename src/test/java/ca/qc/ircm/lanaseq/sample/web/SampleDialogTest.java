@@ -32,8 +32,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILENAME;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
@@ -44,10 +42,8 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,20 +67,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.CancelEvent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.editor.Editor;
-import com.vaadin.flow.component.grid.editor.EditorCloseEvent;
 import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
@@ -122,7 +109,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
   private AppResources resources = new AppResources(SampleDialog.class, locale);
   private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Path> files = new ArrayList<>();
 
   /**
    * Before test.
@@ -132,30 +118,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
     when(ui.getLocale()).thenReturn(locale);
     dialog = new SampleDialog(presenter);
     dialog.init();
-    files.add(Paths.get("sample", "sample_R1.fastq"));
-    files.add(Paths.get("sample", "sample_R2.fastq"));
-    files.add(Paths.get("sample", "sample.bw"));
-    files.add(Paths.get("sample", "sample.png"));
-  }
-
-  @SuppressWarnings("unchecked")
-  private void mockColumns() {
-    Element filesElement = dialog.files.getElement();
-    dialog.files = mock(Grid.class);
-    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
-    when(dialog.files.getElement()).thenReturn(filesElement);
-    dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
-        .thenReturn(dialog.filename);
-    when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
-    when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
-    when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
-    dialog.deleteFile = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DELETE)))
-        .thenReturn(dialog.deleteFile);
-    when(dialog.deleteFile.setKey(any())).thenReturn(dialog.deleteFile);
-    when(dialog.deleteFile.setComparator(any(Comparator.class))).thenReturn(dialog.deleteFile);
-    when(dialog.deleteFile.setHeader(any(String.class))).thenReturn(dialog.deleteFile);
   }
 
   @Test
@@ -176,8 +138,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
-    assertEquals(id(FILES), dialog.files.getId().orElse(""));
-    assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -195,7 +155,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
 
   @Test
   public void labels() {
-    mockColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
@@ -216,7 +175,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    verify(dialog.filename).setHeader(resources.message(FILENAME));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -231,7 +189,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    mockColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
@@ -258,7 +215,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    verify(dialog.filename).setHeader(resources.message(FILENAME));
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -294,49 +250,6 @@ public class SampleDialogTest extends AbstractViewTestCase {
     for (SampleType type : types) {
       assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
     }
-  }
-
-  @Test
-  public void files() {
-    assertEquals(2, dialog.files.getColumns().size());
-    assertNotNull(dialog.files.getColumnByKey(FILENAME));
-    assertNotNull(dialog.files.getColumnByKey(DELETE));
-  }
-
-  @Test
-  public void files_ColumnsValueProvider() {
-    mockColumns();
-    dialog.init();
-    verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<SampleFile, String> valueProvider = valueProviderCaptor.getValue();
-    for (Path path : files) {
-      SampleFile file = new SampleFile(path);
-      assertEquals(file.getFilename(), valueProvider.apply(file));
-    }
-    verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
-    verify(dialog.files).addColumn(buttonRendererCaptor.capture(), eq(DELETE));
-    ComponentRenderer<Button, SampleFile> buttonRenderer = buttonRendererCaptor.getValue();
-    for (Path path : files) {
-      SampleFile file = new SampleFile(path);
-      Button button = buttonRenderer.createComponent(file);
-      assertTrue(button.hasClassName(DELETE));
-      assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
-      validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
-      assertEquals("", button.getText());
-      button.click();
-      verify(presenter).deleteFile(file, locale);
-    }
-  }
-
-  @Test
-  public void renameFile() {
-    mockColumns();
-    dialog.init();
-    SampleFile file = new SampleFile(files.get(0));
-    verify(dialog.files.getEditor()).addCloseListener(closeListenerCaptor.capture());
-    EditorCloseListener<SampleFile> listener = closeListenerCaptor.getValue();
-    listener.onEditorClose(new EditorCloseEvent<>(dialog.files.getEditor(), file));
-    verify(presenter).rename(file, locale);
   }
 
   @Test

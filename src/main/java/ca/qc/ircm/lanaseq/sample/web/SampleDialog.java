@@ -26,7 +26,6 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -34,8 +33,6 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -43,7 +40,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
@@ -62,12 +58,6 @@ import org.springframework.context.annotation.Scope;
 public class SampleDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
   public static final String ID = "sample-dialog";
   public static final String HEADER = "header";
-  public static final String FILES = "files";
-  public static final String FILENAME = "filename";
-  public static final String FILENAME_REGEX = "[\\w-\\.]*";
-  public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
-  public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
-  public static final String FILE_DELETE_ERROR = property("filename", "delete", "error");
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
@@ -83,10 +73,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
   protected TextField treatment = new TextField();
-  protected Grid<SampleFile> files = new Grid<>();
-  protected Column<SampleFile> filename;
-  protected Column<SampleFile> deleteFile;
-  protected TextField filenameEdit = new TextField();
   protected Button save = new Button();
   protected Button cancel = new Button();
   protected Button delete = new Button();
@@ -123,7 +109,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, form, files, buttons);
+    layout.add(header, form, buttons);
     header.setId(id(HEADER));
     sampleId.setId(id(SAMPLE_ID));
     replicate.setId(id(REPLICATE));
@@ -140,19 +126,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
-    files.setId(id(FILES));
-    files.setHeight("12em");
-    files.getEditor().addCloseListener(e -> presenter.rename(e.getItem(), getLocale()));
-    files.addItemDoubleClickListener(e -> {
-      files.getEditor().editItem(e.getItem());
-      filenameEdit.focus();
-    });
-    filename = files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME);
-    deleteFile =
-        files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE).setKey(DELETE);
-    filename.setEditorComponent(filenameEdit);
-    filenameEdit.setId(id(FILENAME));
-    filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -169,15 +142,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> presenter.delete(getLocale()));
     presenter.init(this);
-  }
-
-  private Button deleteButton(SampleFile file) {
-    Button button = new Button();
-    button.addClassName(DELETE);
-    button.setIcon(VaadinIcon.TRASH.create());
-    button.addThemeVariants(ButtonVariant.LUMO_ERROR);
-    button.addClickListener(e -> presenter.deleteFile(file, getLocale()));
-    return button;
   }
 
   @Override
@@ -200,7 +164,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
         .setPlaceholder(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
     treatment.setLabel(sampleResources.message(TREATMENT));
     treatment.setPlaceholder(sampleResources.message(property(TREATMENT, PLACEHOLDER)));
-    filename.setHeader(resources.message(FILENAME));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     delete.setText(webResources.message(DELETE));

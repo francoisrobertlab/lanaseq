@@ -60,6 +60,10 @@ public class SamplesViewElement extends VerticalLayoutElement {
     return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
 
+  public void shiftClick(int row) {
+    samples().getCell(row, NAME_COLUMN).click(0, 0, Keys.SHIFT);
+  }
+
   public void controlClick(int row) {
     Keys key = Keys.CONTROL;
     if (SystemUtils.IS_OS_MAC_OSX) {

@@ -87,7 +87,9 @@ public class SamplesViewTest extends AbstractViewTestCase {
   @Mock
   private SampleDialog dialog;
   @Mock
-  private AddSampleFilesDialog addFileDialog;
+  private SampleFilesDialog filesDialog;
+  @Mock
+  private AddSampleFilesDialog addFilesDialog;
   @Mock
   private ProtocolDialog protocolDialog;
   @Captor
@@ -110,7 +112,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new SamplesView(presenter, dialog, addFileDialog, protocolDialog);
+    view = new SamplesView(presenter, dialog, filesDialog, addFilesDialog, protocolDialog);
     view.init();
     samples = sampleRepository.findAll();
   }
@@ -288,6 +290,14 @@ public class SamplesViewTest extends AbstractViewTestCase {
     doubleClickItem(view.samples, sample);
 
     verify(presenter).view(sample);
+  }
+
+  @Test
+  public void viewFiles() {
+    Sample sample = samples.get(0);
+    clickItem(view.samples, sample, view.name, false, true, false, false);
+
+    verify(presenter).viewFiles(sample);
   }
 
   @Test

@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -38,12 +39,19 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -54,8 +62,38 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewItTest extends AbstractTestBenchTestCase {
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
   private DatasetRepository datasetRepository;
+  @Autowired
+  private AppConfiguration configuration;
+  private Path home;
+
+  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
+      IllegalArgumentException, InvocationTargetException {
+    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
+    getHome.setAccessible(true);
+    return (Path) getHome.invoke(configuration);
+  }
+
+  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
+    setHome.setAccessible(true);
+    setHome.invoke(configuration, path);
+  }
+
+  @Before
+  public void beforeTest() throws Throwable {
+    home = getHome();
+    setHome(temporaryFolder.newFolder("home").toPath());
+  }
+
+  @After
+  public void afterTest() throws Throwable {
+    setHome(home);
+  }
 
   private void open() {
     openView(VIEW_NAME);
@@ -99,6 +137,24 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  public void viewFiles() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    view.shiftClick(0);
+    assertTrue(
+        optional(() -> $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID)).isPresent());
+  }
+
+  @Test
+  public void addFiles_Grid() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    view.controlClick(0);
+    assertTrue(optional(() -> $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID))
+        .isPresent());
+  }
+
+  @Test
   public void view_Protocol() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
@@ -115,7 +171,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Ignore("Cannot select multiple samples")
+  @Ignore("Cannot select samples")
   public void merge() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
@@ -143,5 +199,16 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertEquals(2, dataset.getSamples().size());
     assertTrue(find(dataset.getSamples(), 4L).isPresent());
     assertTrue(find(dataset.getSamples(), 5L).isPresent());
+  }
+
+  @Test
+  @Ignore("Cannot select samples")
+  public void addFiles() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    view.samples().select(0);
+    view.addFiles().click();
+    assertTrue(optional(() -> $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID))
+        .isPresent());
   }
 }

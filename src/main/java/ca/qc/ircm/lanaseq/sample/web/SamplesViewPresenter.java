@@ -98,6 +98,11 @@ public class SamplesViewPresenter {
     view.dialog.open();
   }
 
+  public void viewFiles(Sample sample) {
+    view.filesDialog.setSample(sample);
+    view.filesDialog.open();
+  }
+
   public void addFiles(Locale locale) {
     List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
     AppResources resources = new AppResources(SamplesView.class, locale);

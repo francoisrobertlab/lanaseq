@@ -126,6 +126,7 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     view.add = new Button();
     view.merge = new Button();
     view.dialog = mock(SampleDialog.class);
+    view.filesDialog = mock(SampleFilesDialog.class);
     view.addFilesDialog = mock(AddSampleFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
@@ -254,6 +255,15 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     verify(service).get(2L);
     verify(view.dialog).setSample(databaseSample);
     verify(view.dialog).open();
+  }
+
+  @Test
+  public void viewFiles() {
+    Sample sample = new Sample();
+    sample.setId(2L);
+    presenter.viewFiles(sample);
+    verify(view.filesDialog).setSample(sample);
+    verify(view.filesDialog).open();
   }
 
   @Test
