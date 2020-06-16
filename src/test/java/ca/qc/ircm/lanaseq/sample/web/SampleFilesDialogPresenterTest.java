@@ -27,7 +27,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +43,8 @@ import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.H3;
@@ -82,6 +86,8 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   private AuthorizationService authorizationService;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<SavedEvent<AddSampleFilesDialog>>> savedListenerCaptor;
   @Autowired
   private SampleRepository repository;
   @Rule
@@ -102,6 +108,7 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
     dialog.files = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
+    dialog.addFilesDialog = mock(AddSampleFilesDialog.class);
     files.add(Paths.get("sample_R1.fastq"));
     files.add(Paths.get("sample_R2.fastq"));
     files.add(Paths.get("sample.bw"));
@@ -140,6 +147,7 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
     }
     assertTrue(dialog.delete.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
+    verify(dialog.addFilesDialog).setSample(sample);
   }
 
   @Test
@@ -252,6 +260,55 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void add() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+
+    presenter.add();
+
+    verify(dialog.addFilesDialog).open();
+  }
+
+  @Test
+  public void add_CannotWrite() {
+    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+
+    presenter.add();
+
+    verify(dialog.addFilesDialog, never()).open();
+  }
+
+  @Test
+  public void add_NotEditable() {
+    Sample sample = repository.findById(8L).get();
+    presenter.setSample(sample);
+
+    presenter.add();
+
+    verify(dialog.addFilesDialog, never()).open();
+  }
+
+  @Test
+  public void add_NoSample() {
+    presenter.add();
+
+    verify(dialog.addFilesDialog, never()).open();
+  }
+
+  @Test
+  public void add_Saved() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    verify(dialog.addFilesDialog).addSavedListener(savedListenerCaptor.capture());
+
+    savedListenerCaptor.getValue().onComponentEvent(new SavedEvent<>(dialog.addFilesDialog, false));
+
+    verify(service, atLeast(2)).files(sample);
   }
 
   @Test

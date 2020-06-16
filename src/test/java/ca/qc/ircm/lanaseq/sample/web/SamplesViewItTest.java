@@ -125,7 +125,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
-    assertTrue(optional(() -> view.addFiles()).isPresent());
+    assertTrue(optional(() -> view.files()).isPresent());
   }
 
   @Test
@@ -140,18 +140,9 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void viewFiles() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.shiftClick(0);
+    view.controlClick(0);
     assertTrue(
         optional(() -> $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID)).isPresent());
-  }
-
-  @Test
-  public void addFiles_Grid() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.controlClick(0);
-    assertTrue(optional(() -> $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID))
-        .isPresent());
   }
 
   @Test
@@ -203,11 +194,11 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @Ignore("Cannot select samples")
-  public void addFiles() throws Throwable {
+  public void files() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.samples().select(0);
-    view.addFiles().click();
+    view.files().click();
     assertTrue(optional(() -> $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID))
         .isPresent());
   }

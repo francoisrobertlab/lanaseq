@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.HEADER;
@@ -47,5 +48,9 @@ public class SampleFilesDialogElement extends DialogElement {
 
   public TextFieldElement filenameEdit() {
     return $(TextFieldElement.class).id(id(FILENAME));
+  }
+
+  public ButtonElement add() {
+    return $(ButtonElement.class).id(id(ADD));
   }
 }

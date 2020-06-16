@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES;
@@ -77,6 +78,8 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
   @Mock
   private SampleFilesDialogPresenter presenter;
   @Mock
+  private AddSampleFilesDialog addFilesDialog;
+  @Mock
   private Sample sample;
   @Captor
   private ArgumentCaptor<ValueProvider<SampleFile, String>> valueProviderCaptor;
@@ -101,7 +104,7 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    dialog = new SampleFilesDialog(presenter);
+    dialog = new SampleFilesDialog(addFilesDialog, presenter);
     dialog.init();
     files.add(Paths.get("sample", "sample_R1.fastq"));
     files.add(Paths.get("sample", "sample_R2.fastq"));
@@ -141,6 +144,8 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
+    assertEquals(id(ADD), dialog.add.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), dialog.add.getIcon());
   }
 
   @Test
@@ -276,5 +281,12 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
 
     verify(presenter).setSample(null);
     assertEquals(resources.message(HEADER), dialog.header.getText());
+  }
+
+  @Test
+  public void add() {
+    dialog.add.click();
+
+    verify(presenter).add();
   }
 }

@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_CANNOT_WRITE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -127,7 +126,6 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
     view.merge = new Button();
     view.dialog = mock(SampleDialog.class);
     view.filesDialog = mock(SampleFilesDialog.class);
-    view.addFilesDialog = mock(AddSampleFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
     when(service.all()).thenReturn(samples);
@@ -259,81 +257,40 @@ public class SamplesViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void viewFiles() {
-    Sample sample = new Sample();
-    sample.setId(2L);
-    presenter.viewFiles(sample);
+    Sample sample = samples.get(0);
+    view.samples.select(sample);
+    presenter.viewFiles(locale);
+    assertFalse(view.error.isVisible());
     verify(view.filesDialog).setSample(sample);
     verify(view.filesDialog).open();
   }
 
   @Test
-  public void addFiles() {
-    Sample sample = samples.get(0);
-    view.samples.select(sample);
-    presenter.addFiles(locale);
-    assertFalse(view.error.isVisible());
-    verify(view.addFilesDialog).setSample(sample);
-    verify(view.addFilesDialog).open();
-  }
-
-  @Test
-  public void addFiles_NoSelection() {
-    presenter.addFiles(locale);
+  public void viewFiles_NoSelection() {
+    presenter.viewFiles(locale);
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
-    verify(view.addFilesDialog, never()).setSample(any());
-    verify(view.addFilesDialog, never()).open();
+    verify(view.filesDialog, never()).setSample(any());
+    verify(view.filesDialog, never()).open();
   }
 
   @Test
-  public void addFiles_MoreThanOneSampleSelected() {
+  public void viewFiles_MoreThanOneSampleSelected() {
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
-    presenter.addFiles(locale);
+    presenter.viewFiles(locale);
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_MORE_THAN_ONE), view.error.getText());
-    verify(view.addFilesDialog, never()).setSample(any());
-    verify(view.addFilesDialog, never()).open();
+    verify(view.filesDialog, never()).setSample(any());
+    verify(view.filesDialog, never()).open();
   }
 
   @Test
-  public void addFiles_CannotWrite() {
-    when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
+  public void viewFiles_Sample() {
     Sample sample = samples.get(0);
-    view.samples.select(sample);
-    presenter.addFiles(locale);
-    assertTrue(view.error.isVisible());
-    assertEquals(resources.message(SAMPLES_CANNOT_WRITE), view.error.getText());
-    verify(view.addFilesDialog, never()).setSample(any());
-    verify(view.addFilesDialog, never()).open();
-  }
-
-  @Test
-  public void addFiles_Sample() {
-    Sample sample = samples.get(0);
-    presenter.addFiles(sample, locale);
-    verify(view.addFilesDialog).setSample(sample);
-    verify(view.addFilesDialog).open();
-  }
-
-  @Test
-  public void addFiles_SampleCannotWrite() {
-    when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
-    Sample sample = samples.get(0);
-    presenter.addFiles(sample, locale);
-    assertEquals(resources.message(SAMPLES_CANNOT_WRITE), view.error.getText());
-    verify(view.addFilesDialog, never()).setSample(any());
-    verify(view.addFilesDialog, never()).open();
-  }
-
-  @Test
-  public void addFiles_SampleNotEditable() {
-    Sample sample = samples.get(0);
-    sample.setEditable(false);
-    presenter.addFiles(sample, locale);
-    assertEquals(resources.message(SAMPLES_CANNOT_WRITE), view.error.getText());
-    verify(view.addFilesDialog, never()).setSample(any());
-    verify(view.addFilesDialog, never()).open();
+    presenter.viewFiles(sample);
+    verify(view.filesDialog).setSample(sample);
+    verify(view.filesDialog).open();
   }
 
   @Test

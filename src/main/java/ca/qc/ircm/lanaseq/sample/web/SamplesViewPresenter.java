@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_CANNOT_WRITE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 
@@ -31,7 +30,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -103,7 +101,7 @@ public class SamplesViewPresenter {
     view.filesDialog.open();
   }
 
-  public void addFiles(Locale locale) {
+  public void viewFiles(Locale locale) {
     List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
     AppResources resources = new AppResources(SamplesView.class, locale);
     boolean error = false;
@@ -117,18 +115,7 @@ public class SamplesViewPresenter {
     view.error.setVisible(error);
     if (!error) {
       Sample sample = samples.iterator().next();
-      addFiles(sample, locale);
-    }
-  }
-
-  public void addFiles(Sample sample, Locale locale) {
-    if (authorizationService.hasPermission(sample, Permission.WRITE) && sample.isEditable()) {
-      view.addFilesDialog.setSample(sample);
-      view.addFilesDialog.open();
-    } else {
-      AppResources resources = new AppResources(SamplesView.class, locale);
-      view.error.setText(resources.message(SAMPLES_CANNOT_WRITE));
-      view.error.setVisible(true);
+      viewFiles(sample);
     }
   }
 

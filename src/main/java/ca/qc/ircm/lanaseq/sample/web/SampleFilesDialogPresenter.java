@@ -55,6 +55,7 @@ public class SampleFilesDialogPresenter {
   void init(SampleFilesDialog dialog) {
     this.dialog = dialog;
     dialog.files.getEditor().setBinder(fileBinder);
+    dialog.addFilesDialog.addSavedListener(e -> updateFiles());
     localeChange(Constants.DEFAULT_LOCALE);
   }
 
@@ -81,6 +82,13 @@ public class SampleFilesDialogPresenter {
 
   private void updateFiles() {
     dialog.files.setItems(service.files(sample).stream().map(file -> new SampleFile(file)));
+  }
+
+  void add() {
+    if (sample != null && sample.isEditable()
+        && authorizationService.hasPermission(sample, Permission.WRITE)) {
+      dialog.addFilesDialog.open();
+    }
   }
 
   void rename(SampleFile file, Locale locale) {
@@ -127,6 +135,7 @@ public class SampleFilesDialogPresenter {
         || (sample.getId() != null && !sample.isEditable());
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
+    dialog.addFilesDialog.setSample(sample);
     updateFiles();
   }
 }

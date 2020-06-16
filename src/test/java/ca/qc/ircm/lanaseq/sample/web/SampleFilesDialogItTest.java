@@ -89,10 +89,11 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.shiftClick(0);
+    view.controlClick(0);
     SampleFilesDialogElement dialog = $(SampleFilesDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
+    assertTrue(optional(() -> dialog.add()).isPresent());
   }
 
   @Test
@@ -104,7 +105,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.shiftClick(0);
+    view.controlClick(0);
     SampleFilesDialogElement dialog = $(SampleFilesDialogElement.class).id(ID);
 
     dialog.files().getRow(0).doubleClick();
@@ -128,7 +129,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.shiftClick(0);
+    view.controlClick(0);
     SampleFilesDialogElement dialog = $(SampleFilesDialogElement.class).id(ID);
 
     dialog.delete(0).click();

@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
@@ -53,13 +54,18 @@ public class SampleFilesDialog extends Dialog
   protected Column<SampleFile> filename;
   protected Column<SampleFile> delete;
   protected TextField filenameEdit = new TextField();
+  protected Button add = new Button();
+  @Autowired
+  protected AddSampleFilesDialog addFilesDialog;
   @Autowired
   private transient SampleFilesDialogPresenter presenter;
 
   protected SampleFilesDialog() {
   }
 
-  protected SampleFilesDialog(SampleFilesDialogPresenter presenter) {
+  protected SampleFilesDialog(AddSampleFilesDialog addFilesDialog,
+      SampleFilesDialogPresenter presenter) {
+    this.addFilesDialog = addFilesDialog;
     this.presenter = presenter;
   }
 
@@ -75,7 +81,7 @@ public class SampleFilesDialog extends Dialog
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
     layout.setHeight("40em");
-    layout.add(header, files);
+    layout.add(header, files, add);
     header.setId(id(HEADER));
     files.setId(id(FILES));
     files.setSizeFull();
@@ -91,6 +97,9 @@ public class SampleFilesDialog extends Dialog
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
+    add.setId(id(ADD));
+    add.setIcon(VaadinIcon.PLUS.create());
+    add.addClickListener(e -> presenter.add());
     presenter.init(this);
   }
 
@@ -110,6 +119,7 @@ public class SampleFilesDialog extends Dialog
     header.setText(resources.message(HEADER, 0));
     filename.setHeader(resources.message(FILENAME));
     delete.setHeader(webResources.message(DELETE));
+    add.setText(webResources.message(ADD));
     updateHeader();
     presenter.localeChange(getLocale());
   }

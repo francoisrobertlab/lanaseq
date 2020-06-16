@@ -55,7 +55,7 @@ public class SamplesView extends VerticalLayout
   public static final String HEADER = "header";
   public static final String SAMPLES = "samples";
   public static final String MERGE = "merge";
-  public static final String ADD_FILES = "addFiles";
+  public static final String FILES = "files";
   public static final String MERGED = "merged";
   public static final String SAMPLES_REQUIRED = property(SAMPLES, "required");
   public static final String SAMPLES_MORE_THAN_ONE = property(SAMPLES, "moreThanOne");
@@ -75,13 +75,11 @@ public class SamplesView extends VerticalLayout
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button merge = new Button();
-  protected Button addFiles = new Button();
+  protected Button files = new Button();
   @Autowired
   protected SampleDialog dialog;
   @Autowired
   protected SampleFilesDialog filesDialog;
-  @Autowired
-  protected AddSampleFilesDialog addFilesDialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
   @Autowired
@@ -91,18 +89,17 @@ public class SamplesView extends VerticalLayout
   }
 
   SamplesView(SamplesViewPresenter presenter, SampleDialog dialog, SampleFilesDialog filesDialog,
-      AddSampleFilesDialog addFilesDialog, ProtocolDialog protocolDialog) {
+      ProtocolDialog protocolDialog) {
     this.presenter = presenter;
     this.dialog = dialog;
     this.filesDialog = filesDialog;
-    this.addFilesDialog = addFilesDialog;
     this.protocolDialog = protocolDialog;
   }
 
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, samples, error, new HorizontalLayout(add, merge, addFiles));
+    add(header, samples, error, new HorizontalLayout(add, merge, files));
     header.setId(HEADER);
     samples.setId(SAMPLES);
     samples.setSelectionMode(SelectionMode.MULTI);
@@ -125,10 +122,8 @@ public class SamplesView extends VerticalLayout
       }
     });
     samples.addItemClickListener(e -> {
-      if (e.isShiftKey()) {
+      if (e.isCtrlKey() || e.isMetaKey()) {
         presenter.viewFiles(e.getItem());
-      } else if (e.isCtrlKey() || e.isMetaKey()) {
-        presenter.addFiles(e.getItem(), getLocale());
       }
     });
     samples.appendHeaderRow(); // Headers.
@@ -156,9 +151,9 @@ public class SamplesView extends VerticalLayout
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
     merge.addClickListener(e -> presenter.merge(getLocale()));
-    addFiles.setId(ADD_FILES);
-    addFiles.setIcon(VaadinIcon.FILE_ADD.create());
-    addFiles.addClickListener(e -> presenter.addFiles(getLocale()));
+    files.setId(FILES);
+    files.setIcon(VaadinIcon.FILE_O.create());
+    files.addClickListener(e -> presenter.viewFiles(getLocale()));
     presenter.init(this);
   }
 
@@ -181,7 +176,7 @@ public class SamplesView extends VerticalLayout
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
     merge.setText(resources.message(MERGE));
-    addFiles.setText(resources.message(ADD_FILES));
+    files.setText(resources.message(FILES));
   }
 
   @Override

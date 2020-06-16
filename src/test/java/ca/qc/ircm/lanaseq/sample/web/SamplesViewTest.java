@@ -25,7 +25,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ADD_FILES;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
@@ -89,8 +89,6 @@ public class SamplesViewTest extends AbstractViewTestCase {
   @Mock
   private SampleFilesDialog filesDialog;
   @Mock
-  private AddSampleFilesDialog addFilesDialog;
-  @Mock
   private ProtocolDialog protocolDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
@@ -112,7 +110,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new SamplesView(presenter, dialog, filesDialog, addFilesDialog, protocolDialog);
+    view = new SamplesView(presenter, dialog, filesDialog, protocolDialog);
     view.init();
     samples = sampleRepository.findAll();
   }
@@ -167,8 +165,8 @@ public class SamplesViewTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
-    assertEquals(ADD_FILES, view.addFiles.getId().orElse(""));
-    validateIcon(VaadinIcon.FILE_ADD.create(), view.addFiles.getIcon());
+    assertEquals(FILES, view.files.getId().orElse(""));
+    validateIcon(VaadinIcon.FILE_O.create(), view.files.getIcon());
   }
 
   @Test
@@ -189,7 +187,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
+    assertEquals(resources.message(FILES), view.files.getText());
   }
 
   @Test
@@ -217,7 +215,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
+    assertEquals(resources.message(FILES), view.files.getText());
   }
 
   @Test
@@ -293,19 +291,11 @@ public class SamplesViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void viewFiles() {
-    Sample sample = samples.get(0);
-    clickItem(view.samples, sample, view.name, false, true, false, false);
-
-    verify(presenter).viewFiles(sample);
-  }
-
-  @Test
-  public void addFiles_Conrol() {
+  public void viewFiles_Control() {
     Sample sample = samples.get(0);
     clickItem(view.samples, sample, view.name, true, false, false, false);
 
-    verify(presenter).addFiles(sample, locale);
+    verify(presenter).viewFiles(sample);
   }
 
   @Test
@@ -313,7 +303,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     Sample sample = samples.get(0);
     clickItem(view.samples, sample, view.name, false, false, false, true);
 
-    verify(presenter).addFiles(sample, locale);
+    verify(presenter).viewFiles(sample);
   }
 
   @Test
@@ -366,8 +356,8 @@ public class SamplesViewTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void addFiles() {
-    clickButton(view.addFiles);
-    verify(presenter).addFiles(locale);
+  public void files() {
+    clickButton(view.files);
+    verify(presenter).viewFiles(locale);
   }
 }

@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ADD_FILES;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
@@ -60,10 +60,6 @@ public class SamplesViewElement extends VerticalLayoutElement {
     return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
 
-  public void shiftClick(int row) {
-    samples().getCell(row, NAME_COLUMN).click(0, 0, Keys.SHIFT);
-  }
-
   public void controlClick(int row) {
     Keys key = Keys.CONTROL;
     if (SystemUtils.IS_OS_MAC_OSX) {
@@ -92,7 +88,7 @@ public class SamplesViewElement extends VerticalLayoutElement {
     return $(ButtonElement.class).id(MERGE);
   }
 
-  public ButtonElement addFiles() {
-    return $(ButtonElement.class).id(ADD_FILES);
+  public ButtonElement files() {
+    return $(ButtonElement.class).id(FILES);
   }
 }
