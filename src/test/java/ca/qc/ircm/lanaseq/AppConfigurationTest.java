@@ -140,6 +140,40 @@ public class AppConfigurationTest {
   }
 
   @Test
+  public void folderLabel_Sample() {
+    Sample sample = sample();
+    assertEquals("lanaseq\\" + sample.getName(), appConfiguration.folderLabel(sample, false));
+  }
+
+  @Test
+  public void folderLabel_SampleUnix() {
+    Sample sample = sample();
+    assertEquals("lanaseq/" + sample.getName(), appConfiguration.folderLabel(sample, true));
+  }
+
+  @Test
+  public void folderLabel_Dataset() {
+    Dataset dataset = dataset();
+    assertEquals("lanaseq\\" + dataset.getName(), appConfiguration.folderLabel(dataset, false));
+  }
+
+  @Test
+  public void folderLabel_DatasetUnix() {
+    Dataset dataset = dataset();
+    assertEquals("lanaseq/" + dataset.getName(), appConfiguration.folderLabel(dataset, true));
+  }
+
+  @Test
+  public void folderNetwork() {
+    assertEquals("\\\\lanaseq01\\lanaseq", appConfiguration.folderNetwork(false));
+  }
+
+  @Test
+  public void folderNetwork_Unix() {
+    assertEquals("smb://lanaseq01/lanaseq", appConfiguration.folderNetwork(true));
+  }
+
+  @Test
   public void getUpload() {
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/upload"),
         appConfiguration.getUpload());
@@ -188,32 +222,12 @@ public class AppConfigurationTest {
 
   @Test
   public void uploadNetwork() {
-    assertEquals("\\\\lanaseq01\\lanaseq", appConfiguration.uploadNetwork(false));
+    assertEquals("\\\\lanaseq01\\lanaseq\\upload", appConfiguration.uploadNetwork(false));
   }
 
   @Test
   public void uploadNetwork_Unix() {
-    assertEquals("smb://lanaseq01/lanaseq", appConfiguration.uploadNetwork(true));
-  }
-
-  @Test
-  public void uploadWindowsLabel() {
-    assertEquals("lanaseq\\upload", appConfiguration.getUploadWindowsLabel());
-  }
-
-  @Test
-  public void uploadWindowsNetwork() {
-    assertEquals("\\\\lanaseq01\\lanaseq", appConfiguration.getUploadWindowsNetwork());
-  }
-
-  @Test
-  public void uploadUnixLabel() {
-    assertEquals("lanaseq/upload", appConfiguration.getUploadUnixLabel());
-  }
-
-  @Test
-  public void uploadUnitNetwork() {
-    assertEquals("smb://lanaseq01/lanaseq", appConfiguration.getUploadUnixNetwork());
+    assertEquals("smb://lanaseq01/lanaseq/upload", appConfiguration.uploadNetwork(true));
   }
 
   @Test

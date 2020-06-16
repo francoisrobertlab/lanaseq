@@ -41,10 +41,8 @@ public class AppConfiguration {
   private String logfile;
   private Path home;
   private Path upload;
-  private String uploadWindowsLabel;
-  private String uploadWindowsNetwork;
-  private String uploadUnixLabel;
-  private String uploadUnixNetwork;
+  private Folder userHome;
+  private Folder userUpload;
   private String serverUrl;
   private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
 
@@ -60,6 +58,26 @@ public class AppConfiguration {
     return getHome().resolve(year.format(dataset.getDate())).resolve(dataset.getName());
   }
 
+  public String folderLabel(Sample sample, boolean unix) {
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + sample.getName());
+    } else {
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + sample.getName());
+    }
+  }
+
+  public String folderLabel(Dataset dataset, boolean unix) {
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + dataset.getName());
+    } else {
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + dataset.getName());
+    }
+  }
+
+  public String folderNetwork(boolean unix) {
+    return unix ? userHome.network.unix : userHome.network.windows;
+  }
+
   public Path upload(Sample sample) {
     return getUpload().resolve(sample.getName());
   }
@@ -70,22 +88,22 @@ public class AppConfiguration {
 
   public String uploadLabel(Sample sample, boolean unix) {
     if (unix) {
-      return FilenameUtils.separatorsToUnix(getUploadUnixLabel() + "/" + sample.getName());
+      return FilenameUtils.separatorsToUnix(userUpload.unix + "/" + sample.getName());
     } else {
-      return FilenameUtils.separatorsToWindows(getUploadWindowsLabel() + "/" + sample.getName());
+      return FilenameUtils.separatorsToWindows(userUpload.windows + "/" + sample.getName());
     }
   }
 
   public String uploadLabel(Dataset dataset, boolean unix) {
     if (unix) {
-      return FilenameUtils.separatorsToUnix(getUploadUnixLabel() + "/" + dataset.getName());
+      return FilenameUtils.separatorsToUnix(userUpload.unix + "/" + dataset.getName());
     } else {
-      return FilenameUtils.separatorsToWindows(getUploadWindowsLabel() + "/" + dataset.getName());
+      return FilenameUtils.separatorsToWindows(userUpload.windows + "/" + dataset.getName());
     }
   }
 
   public String uploadNetwork(boolean unix) {
-    return unix ? getUploadUnixNetwork() : getUploadWindowsNetwork();
+    return unix ? userUpload.network.unix : userUpload.network.windows;
   }
 
   /**
@@ -127,35 +145,72 @@ public class AppConfiguration {
     this.serverUrl = serverUrl;
   }
 
-  String getUploadWindowsLabel() {
-    return uploadWindowsLabel;
+  public Folder getUserHome() {
+    return userHome;
   }
 
-  void setUploadWindowsLabel(String uploadWindowsLabel) {
-    this.uploadWindowsLabel = uploadWindowsLabel;
+  public void setUserHome(Folder userHome) {
+    this.userHome = userHome;
   }
 
-  String getUploadUnixLabel() {
-    return uploadUnixLabel;
+  public Folder getUserUpload() {
+    return userUpload;
   }
 
-  void setUploadUnixLabel(String uploadUnixLabel) {
-    this.uploadUnixLabel = uploadUnixLabel;
+  public void setUserUpload(Folder userUpload) {
+    this.userUpload = userUpload;
   }
 
-  String getUploadWindowsNetwork() {
-    return uploadWindowsNetwork;
+  @SuppressWarnings("unused")
+  private static class Folder {
+    private String windows;
+    private String unix;
+    private Network network;
+
+    String getWindows() {
+      return windows;
+    }
+
+    void setWindows(String windows) {
+      this.windows = windows;
+    }
+
+    String getUnix() {
+      return unix;
+    }
+
+    void setUnix(String unix) {
+      this.unix = unix;
+    }
+
+    Network getNetwork() {
+      return network;
+    }
+
+    void setNetwork(Network network) {
+      this.network = network;
+    }
   }
 
-  void setUploadWindowsNetwork(String uploadWindowsNetwork) {
-    this.uploadWindowsNetwork = uploadWindowsNetwork;
-  }
+  @SuppressWarnings("unused")
+  private static class Network {
+    private String windows;
+    private String unix;
 
-  String getUploadUnixNetwork() {
-    return uploadUnixNetwork;
-  }
+    String getWindows() {
+      return windows;
+    }
 
-  void setUploadUnixNetwork(String uploadUnixNetwork) {
-    this.uploadUnixNetwork = uploadUnixNetwork;
+    void setWindows(String windows) {
+      this.windows = windows;
+    }
+
+    String getUnix() {
+      return unix;
+    }
+
+    void setUnix(String unix) {
+      this.unix = unix;
+    }
   }
 }
