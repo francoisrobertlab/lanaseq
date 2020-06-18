@@ -74,6 +74,8 @@ public class SampleService {
   /**
    * Returns all sample's files.
    *
+   * @param sample
+   *          sample
    * @return all sample's files
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
@@ -92,6 +94,8 @@ public class SampleService {
   /**
    * Returns true if sample can be deleted, false otherwise.
    *
+   * @param sample
+   *          sample
    * @return true if sample can be deleted, false otherwise
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
@@ -105,6 +109,8 @@ public class SampleService {
   /**
    * Returns true if samples can be merged, false otherwise.
    *
+   * @param samples
+   *          samples
    * @return true if samples can be merged, false otherwise
    */
   @PreAuthorize("hasRole('USER')")

@@ -99,6 +99,8 @@ public class DatasetService {
   /**
    * Returns all dataset's files.
    *
+   * @param dataset
+   *          dataset
    * @return all dataset's files
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
@@ -137,6 +139,8 @@ public class DatasetService {
   /**
    * Returns true if dataset can be deleted, false otherwise.
    *
+   * @param dataset
+   *          dataset
    * @return true if dataset can be deleted, false otherwise
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
