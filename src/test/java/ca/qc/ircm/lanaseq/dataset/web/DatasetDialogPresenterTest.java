@@ -53,7 +53,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -97,7 +97,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class DatasetDialogPresenterTest extends AbstractViewTestCase {
+public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
@@ -152,7 +152,7 @@ public class DatasetDialogPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.header = new H3();
     dialog.tags = new TagsField();
     dialog.protocol = new ComboBox<>();

@@ -49,7 +49,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -91,7 +91,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class AddDatasetFilesDialogTest extends AbstractViewTestCase {
+public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   private AddDatasetFilesDialog dialog;
   @Mock
   private AddDatasetFilesDialogPresenter presenter;
@@ -122,7 +122,7 @@ public class AddDatasetFilesDialogTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() throws Throwable {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog = new AddDatasetFilesDialog(presenter);
     files.add(temporaryFolder.getRoot().toPath().resolve("dataset_R1.fastq"));
     files.add(temporaryFolder.getRoot().toPath().resolve("dataset_R2.fastq"));
@@ -216,7 +216,7 @@ public class AddDatasetFilesDialogTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), dialog.header.getText());
     assertEquals("", dialog.message.getText());

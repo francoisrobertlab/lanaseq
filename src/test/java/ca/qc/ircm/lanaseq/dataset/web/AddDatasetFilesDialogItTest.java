@@ -142,11 +142,13 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
     Dataset dataset = repository.findById(2L).get();
     assertEquals(0, dialog.files().getRowCount());
-
     copyFiles(dataset);
-    Thread.sleep(3000);
-
+    Thread.sleep(2500);
     assertEquals(2, dialog.files().getRowCount());
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        configuration.upload(dataset).resolve("other.fastq"));
+    Thread.sleep(2500);
+    assertEquals(3, dialog.files().getRowCount());
   }
 
   @Test
