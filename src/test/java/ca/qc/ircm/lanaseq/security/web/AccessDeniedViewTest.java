@@ -36,10 +36,12 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
+@WithMockUser
 public class AccessDeniedViewTest extends AbstractKaribuTestCase {
   private AccessDeniedView view;
   private Locale locale = Locale.ENGLISH;
