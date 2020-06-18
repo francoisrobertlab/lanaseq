@@ -42,7 +42,7 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -66,7 +66,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class SampleDialogPresenterTest extends AbstractViewTestCase {
+public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private SampleDialogPresenter presenter;
   @Mock
@@ -102,7 +102,7 @@ public class SampleDialogPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.header = new H3();
     dialog.sampleId = new TextField();
     dialog.replicate = new TextField();

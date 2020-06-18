@@ -45,8 +45,9 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
@@ -78,7 +79,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
+public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private SampleFilesDialogPresenter presenter;
   @Mock
@@ -115,7 +116,7 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
     dialog.files = new Grid<>();
@@ -144,6 +145,7 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void labels() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
@@ -154,9 +156,9 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels_Linux() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isLinux()).thenReturn(true);
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
         dialog.message.getText());
@@ -165,9 +167,9 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void labels_Mac() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isMacOSX()).thenReturn(true);
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
         dialog.message.getText());
@@ -176,9 +178,9 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void network_Empty() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isLinux()).thenReturn(true);
     when(configuration.folderNetwork(anyBoolean())).thenReturn("");
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
@@ -187,9 +189,9 @@ public class SampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void network_Null() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isLinux()).thenReturn(true);
     when(configuration.folderNetwork(anyBoolean())).thenReturn(null);
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),

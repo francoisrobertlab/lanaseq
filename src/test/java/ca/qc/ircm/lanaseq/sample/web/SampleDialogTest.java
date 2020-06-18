@@ -58,7 +58,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SampleDialog.SampleFile;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -85,7 +85,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class SampleDialogTest extends AbstractViewTestCase {
+public class SampleDialogTest extends AbstractKaribuTestCase {
   private SampleDialog dialog;
   @Mock
   private SampleDialogPresenter presenter;
@@ -115,7 +115,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog = new SampleDialog(presenter);
     dialog.init();
   }
@@ -195,7 +195,7 @@ public class SampleDialogTest extends AbstractViewTestCase {
     final AppResources resources = new AppResources(SampleDialog.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());

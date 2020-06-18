@@ -40,7 +40,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -70,16 +70,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class SampleFilesDialogTest extends AbstractViewTestCase {
+public class SampleFilesDialogTest extends AbstractKaribuTestCase {
+  @Autowired
   private SampleFilesDialog dialog;
-  @Mock
+  @MockBean
   private SampleFilesDialogPresenter presenter;
-  @Mock
-  private AddSampleFilesDialog addFilesDialog;
   @Mock
   private Sample sample;
   @Captor
@@ -104,9 +104,7 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
-    dialog = new SampleFilesDialog(addFilesDialog, presenter);
-    dialog.init();
+    ui.setLocale(locale);
     files.add(Paths.get("sample", "sample_R1.fastq"));
     files.add(Paths.get("sample", "sample_R2.fastq"));
     files.add(Paths.get("sample", "sample.bw"));
@@ -169,7 +167,7 @@ public class SampleFilesDialogTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), dialog.header.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));

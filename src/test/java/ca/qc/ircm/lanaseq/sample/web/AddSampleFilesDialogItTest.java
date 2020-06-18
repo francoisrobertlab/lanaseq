@@ -148,11 +148,13 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     AddSampleFilesDialogElement dialog = $(AddSampleFilesDialogElement.class).id(ID);
     Sample sample = repository.findById(4L).get();
     assertEquals(0, dialog.files().getRowCount());
-
     copyFiles(sample);
-    Thread.sleep(3000);
-
+    Thread.sleep(2500);
     assertEquals(2, dialog.files().getRowCount());
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        configuration.upload(sample).resolve("other.fastq"));
+    Thread.sleep(2500);
+    assertEquals(3, dialog.files().getRowCount());
   }
 
   @Test

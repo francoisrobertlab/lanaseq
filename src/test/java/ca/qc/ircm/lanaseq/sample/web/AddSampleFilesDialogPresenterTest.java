@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
@@ -40,8 +39,9 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -75,7 +75,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
+public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private AddSampleFilesDialogPresenter presenter;
   @Mock
@@ -110,7 +110,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
     dialog.network = new Div();
@@ -158,6 +158,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void labels() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
@@ -168,9 +169,9 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels_Linux() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isLinux()).thenReturn(true);
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
         dialog.message.getText());
@@ -179,9 +180,9 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void labels_Mac() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isMacOSX()).thenReturn(true);
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
         dialog.message.getText());
@@ -190,9 +191,9 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void network_Empty() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isLinux()).thenReturn(true);
     when(configuration.uploadNetwork(anyBoolean())).thenReturn("");
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
@@ -201,9 +202,9 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void network_Null() {
     Sample sample = repository.findById(1L).get();
-    when(browser.isLinux()).thenReturn(true);
     when(configuration.uploadNetwork(anyBoolean())).thenReturn(null);
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
@@ -274,32 +275,34 @@ public class AddSampleFilesDialogPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void updateFiles_Thread() throws Throwable {
+  public void updateFiles_StopThreadOnClose() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    when(openedChangeEvent.isOpened()).thenReturn(true);
     verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    when(openedChangeEvent.isOpened()).thenReturn(true);
     openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
     assertTrue(presenter.updateFilesThread().isDaemon());
     Thread.sleep(500);
     assertTrue(presenter.updateFilesThread().isAlive());
-    verify(ui, atLeastOnce()).access(commandCaptor.capture());
-    Thread.sleep(3000);
-    verify(ui, atLeast(2)).access(commandCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(false);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
     Thread.sleep(500);
     assertFalse(presenter.updateFilesThread().isAlive());
-    Command command = commandCaptor.getValue();
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
-    command.execute();
-    verify(ui).push();
-    List<Path> files = items(dialog.files);
-    assertEquals(2, files.size());
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+  }
+
+  @Test
+  public void updateFiles_StopThreadOnInterrupt() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    when(openedChangeEvent.isOpened()).thenReturn(true);
+    openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    assertTrue(presenter.updateFilesThread().isDaemon());
+    Thread.sleep(500);
+    assertTrue(presenter.updateFilesThread().isAlive());
+    presenter.updateFilesThread().interrupt();
+    Thread.sleep(500);
+    assertFalse(presenter.updateFilesThread().isAlive());
   }
 
   @Test

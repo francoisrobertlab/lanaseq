@@ -50,7 +50,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import com.google.common.collect.Range;
@@ -80,7 +80,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class SamplesViewTest extends AbstractViewTestCase {
+public class SamplesViewTest extends AbstractKaribuTestCase {
   private SamplesView view;
   @Mock
   private SamplesViewPresenter presenter;
@@ -109,7 +109,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view = new SamplesView(presenter, dialog, filesDialog, protocolDialog);
     view.init();
     samples = sampleRepository.findAll();
@@ -199,7 +199,7 @@ public class SamplesViewTest extends AbstractViewTestCase {
     final AppResources resources = new AppResources(SamplesView.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name, atLeastOnce()).setHeader(sampleResources.message(NAME));
