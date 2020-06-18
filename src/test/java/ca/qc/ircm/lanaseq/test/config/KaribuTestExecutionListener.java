@@ -26,8 +26,18 @@ import org.springframework.test.context.TestExecutionListener;
  * Configures Karibu-Testing.
  */
 public class KaribuTestExecutionListener implements TestExecutionListener {
+  private Routes routes;
+
   private boolean isKaribuTest(TestContext testContext) {
     return AbstractKaribuTestCase.class.isAssignableFrom(testContext.getTestClass());
+  }
+
+  @Override
+  public void beforeTestClass(TestContext testContext) throws Exception {
+    if (!isKaribuTest(testContext)) {
+      return;
+    }
+    routes = new Routes().autoDiscoverViews("ca.qc.ircm.lanaseq");
   }
 
   @Override
@@ -35,7 +45,6 @@ public class KaribuTestExecutionListener implements TestExecutionListener {
     if (!isKaribuTest(testContext)) {
       return;
     }
-    Routes routes = new Routes().autoDiscoverViews("ca.qc.ircm.lanaseq");
     AnnotationFinder
         .findAnnotation(testContext.getTestClass(), testContext.getTestMethod(), UserAgent.class)
         .ifPresent(ua -> MockVaadin.INSTANCE.setUserAgent(ua.value()));
