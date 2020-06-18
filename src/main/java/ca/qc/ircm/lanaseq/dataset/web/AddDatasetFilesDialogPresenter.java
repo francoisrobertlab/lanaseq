@@ -87,7 +87,6 @@ public class AddDatasetFilesDialogPresenter {
       logger.debug("stat checking files in dataset {} upload folder", dataset);
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
-          logger.debug("ui.access");
           updateFiles();
           ui.push();
         }));

@@ -83,8 +83,6 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   private ProtocolsView view;
   @Mock
   private ProtocolsViewPresenter presenter;
-  @Mock
-  private ProtocolDialog dialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Protocol, String>> valueProviderCaptor;
   @Captor
@@ -105,7 +103,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new ProtocolsView(presenter, dialog);
+    view = new ProtocolsView(presenter, new ProtocolDialog());
     view.init();
     protocols = protocolRepository.findAll();
   }
@@ -177,7 +175,6 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void localeChange() {
-    view = new ProtocolsView(presenter, dialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -217,7 +214,6 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void protocols_ColumnsValueProvider() {
-    view = new ProtocolsView(presenter, dialog);
     mockColumns();
     view.init();
     verify(view.protocols).addColumn(valueProviderCaptor.capture(), eq(NAME));

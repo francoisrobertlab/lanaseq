@@ -86,12 +86,6 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   private SamplesView view;
   @Mock
   private SamplesViewPresenter presenter;
-  @Mock
-  private SampleDialog dialog;
-  @Mock
-  private SampleFilesDialog filesDialog;
-  @Mock
-  private ProtocolDialog protocolDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
   @Captor
@@ -112,7 +106,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new SamplesView(presenter, dialog, filesDialog, protocolDialog);
+    view = new SamplesView(presenter, new SampleDialog(), new SampleFilesDialog(),
+        new ProtocolDialog());
     view.init();
     samples = sampleRepository.findAll();
   }

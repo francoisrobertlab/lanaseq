@@ -89,8 +89,6 @@ public class UsersViewTest extends AbstractViewTestCase {
   private UsersView view;
   @Mock
   private UsersViewPresenter presenter;
-  @Mock
-  private UserDialog userDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<User, String>> valueProviderCaptor;
   @Captor
@@ -111,7 +109,7 @@ public class UsersViewTest extends AbstractViewTestCase {
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
-    view = new UsersView(presenter, userDialog);
+    view = new UsersView(presenter, new UserDialog());
     view.init();
     users = userRepository.findAll();
   }
@@ -153,7 +151,7 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertTrue(view.getContent().getId().orElse("").equals(ID));
+    assertTrue(view.getId().orElse("").equals(ID));
     assertTrue(view.header.getId().orElse("").equals(HEADER));
     assertTrue(view.users.getId().orElse("").equals(USERS));
     assertTrue(view.error.getId().orElse("").equals(ERROR_TEXT));
@@ -189,7 +187,6 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     view.localeChange(mock(LocaleChangeEvent.class));
@@ -250,7 +247,6 @@ public class UsersViewTest extends AbstractViewTestCase {
       user.setActive(!user.isActive());
       return null;
     }).when(presenter).toggleActive(any());
-    view = new UsersView(presenter, userDialog);
     mockColumns();
     view.init();
     verify(view.users).addColumn(valueProviderCaptor.capture(), eq(EMAIL));

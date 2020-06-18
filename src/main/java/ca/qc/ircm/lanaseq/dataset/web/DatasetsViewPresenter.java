@@ -84,7 +84,7 @@ public class DatasetsViewPresenter {
     logger.debug("Datasets view");
     this.view = view;
     loadDatasets();
-    view.datasetDialog.addSavedListener(e -> loadDatasets());
+    view.dialog.addSavedListener(e -> loadDatasets());
     view.protocolDialog.addSavedListener(e -> loadDatasets());
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
@@ -107,8 +107,8 @@ public class DatasetsViewPresenter {
 
   void view(Dataset dataset) {
     clearError();
-    view.datasetDialog.setDataset(service.get(dataset.getId()));
-    view.datasetDialog.open();
+    view.dialog.setDataset(service.get(dataset.getId()));
+    view.dialog.open();
   }
 
   public void addFiles(Locale locale) {
@@ -148,8 +148,8 @@ public class DatasetsViewPresenter {
 
   void add() {
     clearError();
-    view.datasetDialog.setDataset(null);
-    view.datasetDialog.open();
+    view.dialog.setDataset(null);
+    view.dialog.open();
   }
 
   void merge(Locale locale) {

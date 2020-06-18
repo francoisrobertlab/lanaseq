@@ -92,10 +92,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   private DatasetsView view;
   @Mock
   private DatasetsViewPresenter presenter;
-  @Mock
-  private DatasetDialog datasetDialog;
-  @Mock
-  private ProtocolDialog protocolDialog;
   @Captor
   private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
   @Captor
@@ -117,7 +113,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog);
+    view = new DatasetsView(presenter, new DatasetDialog(), new AddDatasetFilesDialog(),
+        new ProtocolDialog());
     view.init();
     datasets = datasetRepository.findAll();
   }
@@ -264,7 +261,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void datasets_ColumnsValueProvider() {
-    view = new DatasetsView(presenter, datasetDialog, protocolDialog);
     mockColumns();
     view.init();
     verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(NAME));

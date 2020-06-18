@@ -121,7 +121,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.ownerFilter = new TextField();
     view.error = new Div();
     view.add = new Button();
-    view.datasetDialog = mock(DatasetDialog.class);
+    view.dialog = mock(DatasetDialog.class);
     view.addFilesDialog = mock(AddDatasetFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     datasets = repository.findAll();
@@ -274,8 +274,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(service.get(any())).thenReturn(databaseDataset);
     presenter.view(dataset);
     verify(service).get(2L);
-    verify(view.datasetDialog).setDataset(databaseDataset);
-    verify(view.datasetDialog).open();
+    verify(view.dialog).setDataset(databaseDataset);
+    verify(view.dialog).open();
   }
 
   @Test
@@ -364,8 +364,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void add() {
     presenter.add();
-    verify(view.datasetDialog).setDataset(null);
-    verify(view.datasetDialog).open();
+    verify(view.dialog).setDataset(null);
+    verify(view.dialog).open();
   }
 
   @Test
@@ -431,7 +431,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnSaved() {
-    verify(view.datasetDialog).addSavedListener(savedListenerCaptor.capture());
+    verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));

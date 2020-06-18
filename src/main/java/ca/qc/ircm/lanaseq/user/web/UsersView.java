@@ -38,7 +38,6 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -73,8 +72,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ MANAGER, ADMIN })
-public class UsersView extends Composite<VerticalLayout> implements LocaleChangeObserver,
-    HasDynamicTitle, AfterNavigationObserver, NotificationComponent {
+public class UsersView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
+    AfterNavigationObserver, NotificationComponent {
   public static final String VIEW_NAME = "users";
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
@@ -113,11 +112,8 @@ public class UsersView extends Composite<VerticalLayout> implements LocaleChange
   @SuppressWarnings("unchecked")
   @PostConstruct
   void init() {
-    VerticalLayout root = getContent();
-    root.setId(ID);
-    HorizontalLayout buttonsLayout = new HorizontalLayout();
-    root.add(header, users, error, buttonsLayout);
-    buttonsLayout.add(add, switchUser);
+    setId(ID);
+    add(header, users, error, new HorizontalLayout(add, switchUser), userDialog);
     header.setId(HEADER);
     users.setId(USERS);
     users.addItemDoubleClickListener(e -> presenter.view(e.getItem()));

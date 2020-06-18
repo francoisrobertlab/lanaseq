@@ -101,7 +101,7 @@ public class DatasetsView extends VerticalLayout
   protected Button merge = new Button();
   protected Button addFiles = new Button();
   @Autowired
-  protected DatasetDialog datasetDialog;
+  protected DatasetDialog dialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
   @Autowired
@@ -112,17 +112,19 @@ public class DatasetsView extends VerticalLayout
   public DatasetsView() {
   }
 
-  protected DatasetsView(DatasetsViewPresenter presenter, DatasetDialog datasetDialog,
-      ProtocolDialog protocolDialog) {
+  protected DatasetsView(DatasetsViewPresenter presenter, DatasetDialog dialog,
+      AddDatasetFilesDialog addFilesDialog, ProtocolDialog protocolDialog) {
     this.presenter = presenter;
-    this.datasetDialog = datasetDialog;
+    this.dialog = dialog;
+    this.addFilesDialog = addFilesDialog;
     this.protocolDialog = protocolDialog;
   }
 
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, datasets, error, new HorizontalLayout(add, merge, addFiles));
+    add(header, datasets, error, new HorizontalLayout(add, merge, addFiles), dialog, addFilesDialog,
+        addFilesDialog);
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.setSelectionMode(SelectionMode.MULTI);

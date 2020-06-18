@@ -99,7 +99,8 @@ public class SamplesView extends VerticalLayout
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, samples, error, new HorizontalLayout(add, merge, files));
+    add(header, samples, error, new HorizontalLayout(add, merge, files), dialog, filesDialog,
+        protocolDialog);
     header.setId(HEADER);
     samples.setId(SAMPLES);
     samples.setSelectionMode(SelectionMode.MULTI);
