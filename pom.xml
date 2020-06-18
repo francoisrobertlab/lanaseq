@@ -53,8 +53,8 @@
     <resource.delimiter>$[*]</resource.delimiter>
     <javac.version>1.8</javac.version>
     <main-class>ca.qc.ircm.lanaseq.Main</main-class>
-    <testbench.skip>true</testbench.skip>
-    <testbench.maxAttempts>true</testbench.maxAttempts>
+    <testbench.skip>false</testbench.skip>
+    <testbench.maxAttempts>3</testbench.maxAttempts>
     <!-- Dependencies -->
     <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
     <vaadin.version>14.1.24</vaadin.version>
@@ -260,13 +260,34 @@
           <configuration>
             <excludes>
               <exclude>ca/qc/ircm/lanaseq/test/**/*.java</exclude>
+              <exclude>ca/qc/ircm/lanaseq/**/*ItTest.java</exclude>
             </excludes>
             <systemPropertyVariables>
               <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>
-              <testbench.skip>${testbench.skip}</testbench.skip>
-              	<com.vaadin.testbench.Parameters.maxAttempts>${testbench.maxAttempts}</com.vaadin.testbench.Parameters.maxAttempts>
             </systemPropertyVariables>
           </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>ca/qc/ircm/lanaseq/**/*ItTest.java</include>
+            </includes>
+            <systemPropertyVariables>
+              <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>
+              <testbench.skip>${testbench.skip}</testbench.skip>
+              <com.vaadin.testbench.Parameters.maxAttempts>${testbench.maxAttempts}</com.vaadin.testbench.Parameters.maxAttempts>
+            </systemPropertyVariables>
+            <argLine>-Dvaadin.productionMode=true</argLine>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -338,7 +359,7 @@
           <artifactId>migrations-maven-plugin</artifactId>
           <version>${migrations-maven-plugin.version}</version>
           <configuration>
-              <repository>src/migration</repository>
+            <repository>src/migration</repository>
           </configuration>
           <dependencies>
             <dependency>
@@ -383,6 +404,16 @@
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
       <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
       </plugin>
@@ -404,6 +435,7 @@
         <configuration>
           <reportsDirectories>
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
           </reportsDirectories>
         </configuration>
       </plugin>
@@ -411,25 +443,6 @@
   </reporting>
 
   <profiles>
-    <profile>
-      <id>productionMode</id>
-      <activation>
-        <property>
-          <name>vaadin.productionMode</name>
-        </property>
-      </activation>
-      <properties>
-        <spring-boot.run.jvmArguments>-Dvaadin.productionMode</spring-boot.run.jvmArguments>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>vaadin-repository</id>
       <activation>
@@ -455,26 +468,6 @@
       <properties>
         <slow-tests.skip>true</slow-tests.skip>
       </properties>
-    </profile>
-    <profile>
-      <id>testbench</id>
-      <properties>
-        <testbench.skip>false</testbench.skip>
-        <testbench.maxAttempts>3</testbench.maxAttempts>
-        <argLine>-Dvaadin.productionMode=true</argLine>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-maven-plugin</artifactId>
-          </plugin>
-		      <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-antrun-plugin</artifactId>
-		      </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>
