@@ -48,6 +48,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Sign in view.
@@ -74,10 +75,15 @@ public class SigninView extends LoginOverlay
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;
   protected String error;
+  @Autowired
   private transient SecurityConfiguration configuration;
+  @Autowired
   private transient AuthorizationService authorizationService;
 
-  public SigninView(SecurityConfiguration configuration,
+  protected SigninView() {
+  }
+
+  protected SigninView(SecurityConfiguration configuration,
       AuthorizationService authorizationService) {
     this.configuration = configuration;
     this.authorizationService = authorizationService;
