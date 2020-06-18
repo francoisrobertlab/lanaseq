@@ -51,12 +51,14 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
   }
 
   protected MainView(AuthorizationService authorizationService) {
-    this();
     this.authorizationService = authorizationService;
   }
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
+    if (authorizationService == null) {
+      return; // Patch for Karibu Testing.
+    }
     if (authorizationService.hasRole(ADMIN)) {
       event.forwardTo(UsersView.class);
     } else if (authorizationService.hasRole(MANAGER)) {

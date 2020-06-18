@@ -80,7 +80,7 @@ public class ViewLayout extends VerticalLayout
   @Autowired
   private transient AuthorizationService authorizationService;
 
-  protected ViewLayout() {
+  public ViewLayout() {
   }
 
   protected ViewLayout(AuthorizationService authorizationService) {
