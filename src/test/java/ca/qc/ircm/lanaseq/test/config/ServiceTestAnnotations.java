@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(
-    value = { InitializeDatabaseExecutionListener.class },
+    value = { InitializeDatabaseExecutionListener.class, KaribuTestExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional
 @Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql" })
