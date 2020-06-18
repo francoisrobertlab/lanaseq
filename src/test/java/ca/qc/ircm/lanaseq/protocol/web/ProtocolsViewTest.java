@@ -45,9 +45,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import com.github.mvysny.kaributesting.v10.MockVaadin;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -64,6 +65,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,7 +77,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ProtocolsViewTest extends AbstractViewTestCase {
+public class ProtocolsViewTest extends AbstractKaribuTestCase {
   private ProtocolsView view;
   @Mock
   private ProtocolsViewPresenter presenter;
@@ -100,10 +102,15 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view = new ProtocolsView(presenter, dialog);
     view.init();
     protocols = protocolRepository.findAll();
+  }
+
+  @After
+  public void afterTest() {
+    MockVaadin.tearDown();
   }
 
   @SuppressWarnings("unchecked")
@@ -176,7 +183,7 @@ public class ProtocolsViewTest extends AbstractViewTestCase {
     final AppResources resources = new AppResources(ProtocolsView.class, locale);
     final AppResources protocolResources = new AppResources(Protocol.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name, atLeastOnce()).setHeader(protocolResources.message(NAME));

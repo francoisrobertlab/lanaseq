@@ -51,7 +51,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -84,7 +84,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ProtocolDialogTest extends AbstractViewTestCase {
+public class ProtocolDialogTest extends AbstractKaribuTestCase {
   private ProtocolDialog dialog;
   @Mock
   private ProtocolDialogPresenter presenter;
@@ -112,7 +112,7 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog = new ProtocolDialog(presenter);
     dialog.init();
     protocolFiles = protocolRepository.findAll().stream().flatMap(pr -> pr.getFiles().stream())
@@ -172,7 +172,6 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
 
   @Test
   public void localeChange() {
-    dialog = new ProtocolDialog(presenter);
     mockColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -181,7 +180,7 @@ public class ProtocolDialogTest extends AbstractViewTestCase {
     final AppResources protocolResources = new AppResources(Protocol.class, locale);
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());

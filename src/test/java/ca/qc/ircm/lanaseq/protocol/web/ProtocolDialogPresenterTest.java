@@ -49,7 +49,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -78,17 +78,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ProtocolDialogPresenterTest extends AbstractViewTestCase {
+public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
+  @Autowired
   private ProtocolDialogPresenter presenter;
   @Mock
   private ProtocolDialog dialog;
-  @Mock
+  @MockBean
   private ProtocolService service;
-  @Mock
+  @MockBean
   private AuthorizationService authorizationService;
   @Mock
   private ProtocolFile file;
@@ -112,7 +114,6 @@ public class ProtocolDialogPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new ProtocolDialogPresenter(service, authorizationService);
     dialog.header = new H3();
     dialog.name = new TextField();
     dialog.uploadBuffer = new MultiFileMemoryBuffer();

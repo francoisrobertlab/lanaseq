@@ -32,7 +32,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -54,17 +54,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-public class ProtocolsViewPresenterTest extends AbstractViewTestCase {
+public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
+  @Autowired
   private ProtocolsViewPresenter presenter;
   @Mock
   private ProtocolsView view;
-  @Mock
+  @MockBean
   private ProtocolService protocolService;
-  @Mock
+  @MockBean
   private AuthorizationService authorizationService;
   @Mock
   private DataProvider<Protocol, ?> dataProvider;
@@ -84,7 +86,6 @@ public class ProtocolsViewPresenterTest extends AbstractViewTestCase {
    */
   @Before
   public void beforeTest() {
-    presenter = new ProtocolsViewPresenter(protocolService, authorizationService);
     view.header = new H2();
     view.protocols = new Grid<>();
     view.protocols.setSelectionMode(SelectionMode.MULTI);
