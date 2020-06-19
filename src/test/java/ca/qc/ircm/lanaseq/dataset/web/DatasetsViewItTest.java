@@ -28,6 +28,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
+import ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -73,7 +74,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
-    assertTrue(optional(() -> view.addFiles()).isPresent());
+    assertTrue(optional(() -> view.files()).isPresent());
   }
 
   @Test
@@ -101,7 +102,18 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Ignore("Cannot select multiple datasets")
+  @Ignore("Cannot select datasets")
   public void merge() throws Throwable {
+  }
+
+  @Test
+  @Ignore("Cannot select samples")
+  public void files() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.datasets().select(0);
+    view.files().click();
+    assertTrue(
+        optional(() -> $(DatasetFilesDialogElement.class).id(AddSampleFilesDialog.ID)).isPresent());
   }
 }

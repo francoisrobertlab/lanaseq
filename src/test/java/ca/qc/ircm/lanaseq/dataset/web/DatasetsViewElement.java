@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ADD_FILES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
@@ -88,7 +88,7 @@ public class DatasetsViewElement extends VerticalLayoutElement {
     return $(ButtonElement.class).id(MERGE);
   }
 
-  public ButtonElement addFiles() {
-    return $(ButtonElement.class).id(ADD_FILES);
+  public ButtonElement files() {
+    return $(ButtonElement.class).id(FILES);
   }
 }

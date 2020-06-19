@@ -22,8 +22,6 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILENAME;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
@@ -105,14 +103,6 @@ public class DatasetDialogElement extends DialogElement {
 
   public ButtonElement addSample() {
     return $(ButtonElement.class).id(id(ADD_SAMPLE));
-  }
-
-  public GridElement files() {
-    return $(GridElement.class).id(id(FILES));
-  }
-
-  public TextFieldElement filenameEdit() {
-    return $(TextFieldElement.class).id(id(FILENAME));
   }
 
   public ButtonElement save() {

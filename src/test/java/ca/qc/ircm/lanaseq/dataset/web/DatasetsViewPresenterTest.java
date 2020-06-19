@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_CANNOT_WRITE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
@@ -122,7 +121,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.error = new Div();
     view.add = new Button();
     view.dialog = mock(DatasetDialog.class);
-    view.addFilesDialog = mock(AddDatasetFilesDialog.class);
+    view.filesDialog = mock(DatasetFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     datasets = repository.findAll();
     when(service.all()).thenReturn(datasets);
@@ -279,74 +278,71 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void addFiles() {
+  public void viewFiles() {
     Dataset dataset = datasets.get(0);
     view.datasets.select(dataset);
-    presenter.addFiles(locale);
+    presenter.viewFiles(locale);
     assertFalse(view.error.isVisible());
-    verify(view.addFilesDialog).setDataset(dataset);
-    verify(view.addFilesDialog).open();
+    verify(view.filesDialog).setDataset(dataset);
+    verify(view.filesDialog).open();
   }
 
   @Test
-  public void addFiles_NoSelection() {
-    presenter.addFiles(locale);
+  public void viewFiles_NoSelection() {
+    presenter.viewFiles(locale);
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
-    verify(view.addFilesDialog, never()).setDataset(any());
-    verify(view.addFilesDialog, never()).open();
+    verify(view.filesDialog, never()).setDataset(any());
+    verify(view.filesDialog, never()).open();
   }
 
   @Test
-  public void addFiles_MoreThanOneDatasetSelected() {
+  public void viewFiles_MoreThanOneDatasetSelected() {
     view.datasets.select(datasets.get(0));
     view.datasets.select(datasets.get(1));
-    presenter.addFiles(locale);
+    presenter.viewFiles(locale);
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_MORE_THAN_ONE), view.error.getText());
-    verify(view.addFilesDialog, never()).setDataset(any());
-    verify(view.addFilesDialog, never()).open();
+    verify(view.filesDialog, never()).setDataset(any());
+    verify(view.filesDialog, never()).open();
   }
 
   @Test
-  public void addFiles_CannotWrite() {
+  public void viewFiles_CannotWrite() {
     when(authorizationService.hasPermission(any(Dataset.class), any())).thenReturn(false);
     Dataset dataset = datasets.get(0);
     view.datasets.select(dataset);
-    presenter.addFiles(locale);
-    assertTrue(view.error.isVisible());
-    assertEquals(resources.message(DATASETS_CANNOT_WRITE), view.error.getText());
-    verify(view.addFilesDialog, never()).setDataset(any());
-    verify(view.addFilesDialog, never()).open();
+    presenter.viewFiles(locale);
+    assertFalse(view.error.isVisible());
+    verify(view.filesDialog).setDataset(any());
+    verify(view.filesDialog).open();
   }
 
   @Test
-  public void addFiles_Dataset() {
+  public void viewFiles_Dataset() {
     Dataset dataset = datasets.get(0);
-    presenter.addFiles(dataset, locale);
-    verify(view.addFilesDialog).setDataset(dataset);
-    verify(view.addFilesDialog).open();
+    presenter.viewFiles(dataset);
+    verify(view.filesDialog).setDataset(dataset);
+    verify(view.filesDialog).open();
   }
 
   @Test
-  public void addFiles_DatasetCannotWrite() {
+  public void viewFiles_DatasetCannotWrite() {
     when(authorizationService.hasPermission(any(Dataset.class), any())).thenReturn(false);
     Dataset dataset = datasets.get(0);
-    presenter.addFiles(dataset, locale);
-    assertEquals(resources.message(DATASETS_CANNOT_WRITE), view.error.getText());
-    verify(view.addFilesDialog, never()).setDataset(any());
-    verify(view.addFilesDialog, never()).open();
+    presenter.viewFiles(dataset);
+    verify(view.filesDialog).setDataset(any());
+    verify(view.filesDialog).open();
   }
 
   @Test
   @Ignore("dataset does not have editable property")
-  public void addFiles_DatasetNotEditable() {
+  public void viewFiles_DatasetNotEditable() {
     Dataset dataset = datasets.get(0);
     //dataset.setEditable(false);
-    presenter.addFiles(dataset, locale);
-    assertEquals(resources.message(DATASETS_CANNOT_WRITE), view.error.getText());
-    verify(view.addFilesDialog, never()).setDataset(any());
-    verify(view.addFilesDialog, never()).open();
+    presenter.viewFiles(dataset);
+    verify(view.filesDialog, never()).setDataset(any());
+    verify(view.filesDialog, never()).open();
   }
 
   @Test

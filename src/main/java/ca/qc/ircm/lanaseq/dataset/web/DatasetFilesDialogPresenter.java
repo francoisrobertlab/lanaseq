@@ -1,20 +1,20 @@
-package ca.qc.ircm.lanaseq.sample.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILE_RENAME_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_RENAME_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE_TITLE;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -37,28 +37,28 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
- * Sample files dialog presenter.
+ * Dataset dialog presenter.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SampleFilesDialogPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(SampleFilesDialogPresenter.class);
-  private SampleFilesDialog dialog;
-  private Sample sample;
-  private SampleService service;
+public class DatasetFilesDialogPresenter {
+  private static final Logger logger = LoggerFactory.getLogger(DatasetFilesDialogPresenter.class);
+  private DatasetFilesDialog dialog;
+  private Dataset dataset;
+  private DatasetService service;
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
-  private Binder<SampleFile> fileBinder = new BeanValidationBinder<>(SampleFile.class);
+  private Binder<DatasetFile> fileBinder = new BeanValidationBinder<>(DatasetFile.class);
 
   @Autowired
-  protected SampleFilesDialogPresenter(SampleService service,
+  protected DatasetFilesDialogPresenter(DatasetService service,
       AuthorizationService authorizationService, AppConfiguration configuration) {
     this.service = service;
     this.authorizationService = authorizationService;
     this.configuration = configuration;
   }
 
-  void init(SampleFilesDialog dialog) {
+  void init(DatasetFilesDialog dialog) {
     this.dialog = dialog;
     dialog.files.getEditor().setBinder(fileBinder);
     dialog.addFilesDialog.addSavedListener(e -> updateFiles());
@@ -66,7 +66,7 @@ public class SampleFilesDialogPresenter {
   }
 
   public void localeChange(Locale locale) {
-    final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
+    final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     fileBinder.forField(dialog.filenameEdit).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
@@ -77,7 +77,7 @@ public class SampleFilesDialogPresenter {
 
   private Validator<String> exists(Locale locale) {
     return (value, context) -> {
-      SampleFile item = dialog.files.getEditor().getItem();
+      DatasetFile item = dialog.files.getEditor().getItem();
       if (value != null && item != null && !value.equals(item.getPath().getFileName().toString())
           && Files.exists(item.getPath().resolveSibling(value))) {
         final AppResources webResources = new AppResources(Constants.class, locale);
@@ -89,11 +89,12 @@ public class SampleFilesDialogPresenter {
 
   private void updateMessage() {
     dialog.getUI().ifPresent(ui -> {
-      final AppResources resources = new AppResources(SampleFilesDialog.class, ui.getLocale());
+      final AppResources resources = new AppResources(DatasetFilesDialog.class, ui.getLocale());
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
-      if (sample != null) {
-        dialog.message.setText(resources.message(MESSAGE, configuration.folderLabel(sample, unix)));
+      if (dataset != null) {
+        dialog.message
+            .setText(resources.message(MESSAGE, configuration.folderLabel(dataset, unix)));
       }
       String network = configuration.folderNetwork(unix);
       dialog.message.setTitle(
@@ -102,17 +103,16 @@ public class SampleFilesDialogPresenter {
   }
 
   private void updateFiles() {
-    dialog.files.setItems(service.files(sample).stream().map(file -> new SampleFile(file)));
+    dialog.files.setItems(service.files(dataset).stream().map(file -> new DatasetFile(file)));
   }
 
   void add() {
-    if (sample != null && sample.isEditable()
-        && authorizationService.hasPermission(sample, Permission.WRITE)) {
+    if (dataset != null && authorizationService.hasPermission(dataset, Permission.WRITE)) {
       dialog.addFilesDialog.open();
     }
   }
 
-  void rename(SampleFile file, Locale locale) {
+  void rename(DatasetFile file, Locale locale) {
     Path source = file.getPath();
     Path target = source.resolveSibling(file.getFilename());
     try {
@@ -121,13 +121,13 @@ public class SampleFilesDialogPresenter {
       updateFiles();
     } catch (IOException e) {
       logger.error("renaming of file {} to {} failed", source, target);
-      final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
+      final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
       dialog.showNotification(
           resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
     }
   }
 
-  void deleteFile(SampleFile file, Locale locale) {
+  void deleteFile(DatasetFile file, Locale locale) {
     Path path = file.getPath();
     try {
       logger.debug("delete file {}", path);
@@ -135,28 +135,27 @@ public class SampleFilesDialogPresenter {
       updateFiles();
     } catch (IOException e) {
       logger.error("deleting file {} failed", path);
-      final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
+      final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
       dialog.showNotification(resources.message(FILE_RENAME_ERROR, path.getFileName()));
     }
   }
 
-  BinderValidationStatus<SampleFile> validateSampleFile() {
+  BinderValidationStatus<DatasetFile> validateDatasetFile() {
     return fileBinder.validate();
   }
 
-  Sample getSample() {
-    return sample;
+  Dataset getDataset() {
+    return dataset;
   }
 
-  void setSample(Sample sample) {
-    Objects.requireNonNull(sample);
-    Objects.requireNonNull(sample.getId());
-    this.sample = sample;
-    boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE)
-        || (sample.getId() != null && !sample.isEditable());
+  void setDataset(Dataset dataset) {
+    Objects.requireNonNull(dataset);
+    Objects.requireNonNull(dataset.getId());
+    this.dataset = dataset;
+    boolean readOnly = !authorizationService.hasPermission(dataset, Permission.WRITE);
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
-    dialog.addFilesDialog.setSample(sample);
+    dialog.addFilesDialog.setDataset(dataset);
     updateMessage();
     updateFiles();
   }

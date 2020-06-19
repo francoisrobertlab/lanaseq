@@ -127,6 +127,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.controlClick(0);
+    DatasetFilesDialogElement filesDialog =
+        $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    filesDialog.add().click();
     AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
@@ -139,6 +142,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.controlClick(0);
+    DatasetFilesDialogElement filesDialog =
+        $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    filesDialog.add().click();
     AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
     Dataset dataset = repository.findById(2L).get();
     assertEquals(0, dialog.files().getRowCount());
@@ -156,6 +162,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.controlClick(0);
+    DatasetFilesDialogElement filesDialog =
+        $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    filesDialog.add().click();
     AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
     Dataset dataset = repository.findById(2L).get();
     copyFiles(dataset);

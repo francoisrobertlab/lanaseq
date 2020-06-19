@@ -48,7 +48,6 @@ import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.TagsField;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -90,16 +89,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String HEADER = "header";
   public static final String ADD_SAMPLE = "addSample";
   public static final String SAMPLES = "samples";
-  public static final String FILES = "files";
-  public static final String FILENAME = "filename";
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
-  public static final String FILENAME_REGEX = "[\\w-\\.]*";
-  public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
-  public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
-  public static final String FILE_DELETE_ERROR = property("filename", "delete", "error");
   protected H3 header = new H3();
   protected TagsField tags = new TagsField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
@@ -115,11 +108,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleRemove;
   protected Button addSample = new Button();
-  protected Grid<DatasetFile> files = new Grid<>();
-  protected Column<DatasetFile> filename;
-  protected Column<DatasetFile> sample;
-  protected Column<DatasetFile> deleteFile;
-  protected TextField filenameEdit = new TextField();
   protected Button save = new Button();
   protected Button cancel = new Button();
   protected Button delete = new Button();
@@ -158,7 +146,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, tags, form, samples, files, buttons);
+    layout.add(header, tags, form, samples, buttons);
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));
@@ -197,20 +185,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> presenter.addSample(getLocale()));
-    files.setId(id(FILES));
-    files.setHeight("12em");
-    files.getEditor().addCloseListener(e -> presenter.rename(e.getItem(), getLocale()));
-    files.addItemDoubleClickListener(e -> {
-      files.getEditor().editItem(e.getItem());
-      filenameEdit.focus();
-    });
-    filename = files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME)
-        .setComparator(NormalizedComparator.of(file -> file.getFilename()));
-    deleteFile =
-        files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE).setKey(DELETE);
-    filename.setEditorComponent(filenameEdit);
-    filenameEdit.setId(id(FILENAME));
-    filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -257,15 +231,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     return button;
   }
 
-  private Button deleteButton(DatasetFile file) {
-    Button button = new Button();
-    button.addClassName(DELETE);
-    button.setIcon(VaadinIcon.TRASH.create());
-    button.addThemeVariants(ButtonVariant.LUMO_ERROR);
-    button.addClickListener(e -> presenter.deleteFile(file, getLocale()));
-    return button;
-  }
-
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
@@ -290,7 +255,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleReplicate.setHeader(sampleResources.message(SampleProperties.REPLICATE));
     sampleName.setHeader(sampleResources.message(SampleProperties.NAME));
     addSample.setText(webResources.message(ADD));
-    filename.setHeader(resources.message(FILENAME));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     delete.setText(webResources.message(DELETE));

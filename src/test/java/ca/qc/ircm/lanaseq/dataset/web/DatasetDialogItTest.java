@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -45,9 +44,7 @@ import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -165,30 +162,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());
-  }
-
-  @Test
-  public void rename() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
-    Path folder = configuration.folder(dataset);
-    Files.createDirectories(folder);
-    Path file = folder.resolve("R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
-
-    dialog.files().getRow(0).doubleClick();
-    dialog.filenameEdit().setValue(dataset.getName() + "_R1.fastq");
-    dialog.filenameEdit().sendKeys(Keys.ENTER);
-    dialog.cancel().click();
-
-    assertTrue(Files.exists(file.resolveSibling(dataset.getName() + "_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
-        Files.readAllBytes(file.resolveSibling(dataset.getName() + "_R1.fastq")));
-    assertFalse(Files.exists(file));
   }
 
   @Test

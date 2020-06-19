@@ -26,8 +26,8 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ADD_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
@@ -113,7 +113,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new DatasetsView(presenter, new DatasetDialog(), new AddDatasetFilesDialog(),
+    view = new DatasetsView(presenter, new DatasetDialog(), new DatasetFilesDialog(),
         new ProtocolDialog());
     view.init();
     datasets = datasetRepository.findAll();
@@ -183,8 +183,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
-    assertEquals(ADD_FILES, view.addFiles.getId().orElse(""));
-    validateIcon(VaadinIcon.FILE_ADD.create(), view.addFiles.getIcon());
+    assertEquals(FILES, view.files.getId().orElse(""));
+    validateIcon(VaadinIcon.FILE_O.create(), view.files.getIcon());
   }
 
   @Test
@@ -208,7 +208,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
+    assertEquals(resources.message(FILES), view.files.getText());
   }
 
   @Test
@@ -239,7 +239,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(ADD_FILES), view.addFiles.getText());
+    assertEquals(resources.message(FILES), view.files.getText());
   }
 
   @Test
@@ -326,7 +326,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     Dataset dataset = datasets.get(0);
     clickItem(view.datasets, dataset, view.name, true, false, false, false);
 
-    verify(presenter).addFiles(dataset, locale);
+    verify(presenter).viewFiles(dataset);
   }
 
   @Test
@@ -334,7 +334,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     Dataset dataset = datasets.get(0);
     clickItem(view.datasets, dataset, view.name, false, false, false, true);
 
-    verify(presenter).addFiles(dataset, locale);
+    verify(presenter).viewFiles(dataset);
   }
 
   @Test
@@ -403,8 +403,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void addFiles() {
-    clickButton(view.addFiles);
-    verify(presenter).addFiles(locale);
+  public void files() {
+    clickButton(view.files);
+    verify(presenter).viewFiles(locale);
   }
 }

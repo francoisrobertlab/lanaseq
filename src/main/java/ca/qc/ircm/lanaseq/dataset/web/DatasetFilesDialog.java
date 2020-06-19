@@ -1,4 +1,4 @@
-package ca.qc.ircm.lanaseq.sample.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
@@ -7,7 +7,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -35,13 +35,13 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
- * Sample files dialog.
+ * Dataset dialog.
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SampleFilesDialog extends Dialog
+public class DatasetFilesDialog extends Dialog
     implements LocaleChangeObserver, NotificationComponent {
-  public static final String ID = "sample-files-dialog";
+  public static final String ID = "dataset-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
   public static final String MESSAGE_TITLE = property(MESSAGE, "title");
@@ -54,21 +54,21 @@ public class SampleFilesDialog extends Dialog
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
-  protected Grid<SampleFile> files = new Grid<>();
-  protected Column<SampleFile> filename;
-  protected Column<SampleFile> delete;
+  protected Grid<DatasetFile> files = new Grid<>();
+  protected Column<DatasetFile> filename;
+  protected Column<DatasetFile> delete;
   protected TextField filenameEdit = new TextField();
   protected Button add = new Button();
   @Autowired
-  protected AddSampleFilesDialog addFilesDialog;
+  protected AddDatasetFilesDialog addFilesDialog;
   @Autowired
-  private transient SampleFilesDialogPresenter presenter;
+  private transient DatasetFilesDialogPresenter presenter;
 
-  protected SampleFilesDialog() {
+  protected DatasetFilesDialog() {
   }
 
-  protected SampleFilesDialog(AddSampleFilesDialog addFilesDialog,
-      SampleFilesDialogPresenter presenter) {
+  protected DatasetFilesDialog(AddDatasetFilesDialog addFilesDialog,
+      DatasetFilesDialogPresenter presenter) {
     this.addFilesDialog = addFilesDialog;
     this.presenter = presenter;
   }
@@ -108,7 +108,7 @@ public class SampleFilesDialog extends Dialog
     presenter.init(this);
   }
 
-  private Button deleteButton(SampleFile file) {
+  private Button deleteButton(DatasetFile file) {
     Button button = new Button();
     button.addClassName(DELETE);
     button.setIcon(VaadinIcon.TRASH.create());
@@ -119,7 +119,7 @@ public class SampleFilesDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
+    final AppResources resources = new AppResources(DatasetFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
     message.setText("");
@@ -132,17 +132,17 @@ public class SampleFilesDialog extends Dialog
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
-    Sample sample = presenter.getSample();
-    if (sample != null && sample.getName() != null) {
-      header.setText(resources.message(HEADER, sample.getName()));
+    final AppResources resources = new AppResources(DatasetFilesDialog.class, getLocale());
+    Dataset dataset = presenter.getDataset();
+    if (dataset != null && dataset.getName() != null) {
+      header.setText(resources.message(HEADER, dataset.getName()));
     } else {
       header.setText(resources.message(HEADER));
     }
   }
 
   /**
-   * Adds listener to be informed when a sample was saved.
+   * Adds listener to be informed when a dataset was saved.
    *
    * @param listener
    *          listener
@@ -150,7 +150,7 @@ public class SampleFilesDialog extends Dialog
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Registration
-      addSavedListener(ComponentEventListener<SavedEvent<SampleFilesDialog>> listener) {
+      addSavedListener(ComponentEventListener<SavedEvent<DatasetFilesDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 
@@ -159,7 +159,7 @@ public class SampleFilesDialog extends Dialog
   }
 
   /**
-   * Adds listener to be informed when a sample was saved.
+   * Adds listener to be informed when a dataset was saved.
    *
    * @param listener
    *          listener
@@ -167,7 +167,7 @@ public class SampleFilesDialog extends Dialog
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Registration
-      addDeletedListener(ComponentEventListener<DeletedEvent<SampleFilesDialog>> listener) {
+      addDeletedListener(ComponentEventListener<DeletedEvent<DatasetFilesDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 
@@ -175,27 +175,27 @@ public class SampleFilesDialog extends Dialog
     fireEvent(new DeletedEvent<>(this, true));
   }
 
-  public Sample getSample() {
-    return presenter.getSample();
+  public Dataset getDataset() {
+    return presenter.getDataset();
   }
 
-  public void setSample(Sample sample) {
-    presenter.setSample(sample);
+  public void setDataset(Dataset dataset) {
+    presenter.setDataset(dataset);
     updateHeader();
   }
 
-  public static class SampleFile {
+  public static class DatasetFile {
     private Path path;
     private String filename;
 
-    SampleFile(Path path) {
+    DatasetFile(Path path) {
       this.path = path;
       filename = path.getFileName().toString();
     }
 
     @Override
     public String toString() {
-      return "SampleFile [path=" + path + ", filename=" + filename + "]";
+      return "DatasetFile [path=" + path + ", filename=" + filename + "]";
     }
 
     public Path getPath() {

@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_CANNOT_WRITE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
@@ -31,7 +30,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -111,7 +109,7 @@ public class DatasetsViewPresenter {
     view.dialog.open();
   }
 
-  public void addFiles(Locale locale) {
+  public void viewFiles(Locale locale) {
     List<Dataset> datasets = new ArrayList<>(view.datasets.getSelectedItems());
     AppResources resources = new AppResources(DatasetsView.class, locale);
     boolean error = false;
@@ -125,19 +123,13 @@ public class DatasetsViewPresenter {
     view.error.setVisible(error);
     if (!error) {
       Dataset dataset = datasets.iterator().next();
-      addFiles(dataset, locale);
+      viewFiles(dataset);
     }
   }
 
-  public void addFiles(Dataset dataset, Locale locale) {
-    if (authorizationService.hasPermission(dataset, Permission.WRITE)) {
-      view.addFilesDialog.setDataset(dataset);
-      view.addFilesDialog.open();
-    } else {
-      AppResources resources = new AppResources(DatasetsView.class, locale);
-      view.error.setText(resources.message(DATASETS_CANNOT_WRITE));
-      view.error.setVisible(true);
-    }
+  public void viewFiles(Dataset dataset) {
+    view.filesDialog.setDataset(dataset);
+    view.filesDialog.open();
   }
 
   void view(Protocol protocol) {
