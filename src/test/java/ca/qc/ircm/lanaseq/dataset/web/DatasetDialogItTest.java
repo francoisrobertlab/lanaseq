@@ -305,9 +305,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClick(1);
+    view.doubleClick(0);
     DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
-    Dataset dataset = repository.findById(5L).get();
+    Dataset dataset = repository.findById(4L).get();
     String name = dataset.getName();
 
     TestTransaction.flagForCommit();
@@ -318,6 +318,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(DELETED, name), notification.getText());
-    assertFalse(repository.findById(5L).isPresent());
+    assertFalse(repository.findById(4L).isPresent());
   }
 }

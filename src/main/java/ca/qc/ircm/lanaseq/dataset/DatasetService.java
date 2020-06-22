@@ -148,7 +148,7 @@ public class DatasetService {
     if (dataset == null || dataset.getId() == null) {
       return false;
     }
-    return true;
+    return dataset.isEditable();
   }
 
   /**

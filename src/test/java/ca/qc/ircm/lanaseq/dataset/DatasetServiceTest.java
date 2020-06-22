@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -220,9 +219,8 @@ public class DatasetServiceTest {
 
   @Test
   @WithMockUser
-  @Ignore("Never false for a database instance")
   public void isDeletable_False() {
-    Dataset dataset = repository.findById(1L).get();
+    Dataset dataset = repository.findById(5L).get();
     assertFalse(service.isDeletable(dataset));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
@@ -230,7 +228,7 @@ public class DatasetServiceTest {
   @Test
   @WithMockUser
   public void isDeletable_True() {
-    Dataset dataset = repository.findById(5L).get();
+    Dataset dataset = repository.findById(1L).get();
     assertTrue(service.isDeletable(dataset));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
@@ -482,7 +480,7 @@ public class DatasetServiceTest {
   @Test
   @WithMockUser
   public void delete() throws Throwable {
-    Dataset dataset = repository.findById(5L).get();
+    Dataset dataset = repository.findById(1L).get();
     Path folder = configuration.folder(dataset);
     Path file = folder.resolve("R1.fastq");
     Files.createDirectories(folder);
@@ -492,16 +490,15 @@ public class DatasetServiceTest {
     service.delete(dataset);
 
     repository.flush();
-    assertFalse(repository.findById(5L).isPresent());
+    assertFalse(repository.findById(1L).isPresent());
     assertFalse(Files.exists(folder));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
   @Test(expected = IllegalArgumentException.class)
   @WithMockUser
-  @Ignore("Never false for a database instance")
-  public void delete_NotDeletable() {
-    Dataset dataset = repository.findById(1L).get();
+  public void delete_NotEditable() {
+    Dataset dataset = repository.findById(5L).get();
     service.delete(dataset);
   }
 }
