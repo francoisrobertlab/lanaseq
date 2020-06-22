@@ -45,13 +45,16 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
+import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.SelectedEvent;
 import ca.qc.ircm.lanaseq.web.TagsField;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -111,11 +114,15 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentEventListener<DeletedEvent<SampleDialog>>> deletedListenerCaptor;
   @Captor
+  private ArgumentCaptor<ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>>> selectListenerCaptor;
+  @Captor
   private ArgumentCaptor<ListDataProvider<Sample>> samplesDataProviderCaptor;
   @Autowired
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -155,9 +162,12 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
     dialog.samples = new Grid<>();
+    dialog.addNewSample = new Button();
+    dialog.addSample = new Button();
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
+    dialog.selectSampleDialog = mock(SelectSampleDialog.class);
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
@@ -184,6 +194,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     topTags.add("chip");
     when(service.topTags(anyInt())).thenReturn(topTags);
     presenter.init(dialog);
+    presenter.localeChange(locale);
   }
 
   private void fillForm() {
@@ -223,7 +234,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void setDataset_NewDataset() {
     Dataset dataset = new Dataset();
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertTrue(dialog.tags.getValue().isEmpty());
@@ -258,7 +268,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void setDataset_Dataset() {
     Dataset dataset = repository.findById(1L).get();
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(2, dialog.tags.getValue().size());
@@ -304,54 +313,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     when(authorizationService.hasPermission(any(), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
-
-    assertEquals(2, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("mnase"));
-    assertTrue(dialog.tags.getValue().contains("ip"));
-    assertTrue(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertTrue(dialog.type.isReadOnly());
-    assertEquals("polr2a", dialog.target.getValue());
-    assertTrue(dialog.target.isReadOnly());
-    assertEquals("yFR100", dialog.strain.getValue());
-    assertTrue(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertEquals("Rappa", dialog.treatment.getValue());
-    assertTrue(dialog.treatment.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(3, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
-    assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_CannotWriteBeforeLocaleChange() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
-    Dataset dataset = repository.findById(1L).get();
-
-    presenter.setDataset(dataset, locale);
-    presenter.localeChange(locale);
 
     assertEquals(2, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("mnase"));
@@ -395,7 +357,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void setDataset_NotEditable() {
     Dataset dataset = repository.findById(5L).get();
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(1, dialog.tags.getValue().size());
@@ -430,7 +391,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(5L).get();
     dataset.getSamples().get(0).setEditable(true);
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(1, dialog.tags.getValue().size());
@@ -465,7 +425,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(2, dialog.tags.getValue().size());
@@ -511,7 +470,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     dataset.getSamples().forEach(sample -> sample.setEditable(false));
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(2, dialog.tags.getValue().size());
@@ -560,7 +518,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     });
     Dataset dataset = repository.findById(1L).get();
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(2, dialog.tags.getValue().size());
@@ -606,7 +563,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     dataset.getSamples().get(1).setEditable(false);
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(2, dialog.tags.getValue().size());
@@ -653,7 +609,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(5L).get();
     dataset.setEditable(true);
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(1, dialog.tags.getValue().size());
@@ -689,7 +644,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dataset.setEditable(true);
     dataset.getSamples().get(0).setEditable(false);
 
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     assertEquals(1, dialog.tags.getValue().size());
@@ -721,7 +675,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void setDataset_Null() {
-    presenter.localeChange(locale);
     presenter.setDataset(null, locale);
 
     assertTrue(dialog.tags.getValue().isEmpty());
@@ -754,7 +707,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void requiredIndicator() {
-    presenter.localeChange(locale);
     assertFalse(dialog.tags.isRequiredIndicatorVisible());
     assertTrue(dialog.protocol.isRequiredIndicatorVisible());
     assertTrue(dialog.assay.isRequiredIndicatorVisible());
@@ -778,9 +730,9 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void addSample() {
+  public void addNewSample() {
     assertEquals(2, items(dialog.samples).size());
-    presenter.addSample(locale);
+    presenter.addNewSample(locale);
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     Sample sample = samples.get(samples.size() - 1);
@@ -789,14 +741,13 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void addSample_NotEditableSamples() {
+  public void addNewSample_NotEditableSamples() {
     Dataset dataset = repository.findById(5L).get();
     dataset.setEditable(true);
     dataset.getSamples().get(0).setEditable(false);
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
-    presenter.addSample(locale);
+    presenter.addNewSample(locale);
 
     assertEquals(1, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("chipseq"));
@@ -830,6 +781,96 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void addSample() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset, locale);
+    assertEquals(3, items(dialog.samples).size());
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(4, samples.size());
+    assertEquals(sample, samples.get(samples.size() - 1));
+  }
+
+  @Test
+  public void addSample_AlreadyInDataset() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset, locale);
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals(3, items(dialog.samples).size());
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+  }
+
+  @Test
+  public void addSample_NotEditableSamples() {
+    Dataset dataset = repository.findById(5L).get();
+    dataset.setEditable(true);
+    dataset.getSamples().get(0).setEditable(false);
+    presenter.setDataset(dataset, locale);
+    Sample sample = sampleRepository.findById(1L).get();
+
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(2, samples.size());
+    assertTrue(find(samples, 8L).isPresent());
+    assertTrue(find(samples, 1L).isPresent());
+    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertEquals("FR1", sampleIdFields.get(samples.get(1)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(1)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+  }
+
+  @Test
+  public void addSample_AddNotEditableSample() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset, locale);
+    Sample sample = sampleRepository.findById(8L).get();
+
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(4, samples.size());
+    assertTrue(find(samples, 1L).isPresent());
+    assertTrue(find(samples, 2L).isPresent());
+    assertTrue(find(samples, 3L).isPresent());
+    assertTrue(find(samples, 8L).isPresent());
+    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
+    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+    assertEquals("BC1", sampleIdFields.get(samples.get(3)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(3)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(3)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(3)).isReadOnly());
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void removeSample() {
     Dataset dataset = repository.findById(1L).get();
@@ -851,7 +892,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     dataset.getSamples().forEach(sample -> sample.setEditable(false));
     dataset.getSamples().get(0).setEditable(true);
-    presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
 
     presenter.removeSample(dataset.getSamples().get(0));
@@ -891,7 +931,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_TagsEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.tags.setValue(new HashSet<>());
 
@@ -909,7 +948,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_ProtocolEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.protocol.setItems();
 
@@ -930,7 +968,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_ProtocolEmptyNoSample() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.protocol.setItems();
 
@@ -951,7 +988,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_AssayEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.assay.clear();
 
@@ -972,7 +1008,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_TypeEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.type.setValue(SampleType.NULL);
 
@@ -990,7 +1025,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_TargetEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.target.setValue("");
 
@@ -1008,7 +1042,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_StrainEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.strain.setValue("");
 
@@ -1029,7 +1062,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_StrainDescriptionEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.strainDescription.setValue("");
 
@@ -1047,7 +1079,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_TreatmentEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     dialog.treatment.setValue("");
 
@@ -1065,7 +1096,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_FirstSampleIdEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     Sample sample = items(dialog.samples).get(0);
     sampleIdFields.get(sample).setValue("");
@@ -1088,7 +1118,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_FirstSampleReplicateEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     Sample sample = items(dialog.samples).get(0);
     sampleReplicateFields.get(sample).setValue("");
@@ -1111,7 +1140,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_FirstSampleIdAndReplicateEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     Sample sample = items(dialog.samples).get(0);
     sampleIdFields.get(sample).setValue("");
@@ -1134,7 +1162,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_SecondSampleIdEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     Sample sample = items(dialog.samples).get(1);
     sampleIdFields.get(sample).setValue("");
@@ -1157,7 +1184,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_SecondSampleReplicateEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     Sample sample = items(dialog.samples).get(1);
     sampleReplicateFields.get(sample).setValue("");
@@ -1180,7 +1206,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_SecondSampleIdAndReplicateEmpty() {
-    presenter.localeChange(locale);
     fillForm();
     Sample sample = items(dialog.samples).get(1);
     sampleIdFields.get(sample).setValue("");
@@ -1203,9 +1228,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_NewSampleIdEmpty() {
-    presenter.localeChange(locale);
     fillForm();
-    presenter.addSample(locale);
+    presenter.addNewSample(locale);
     List<Sample> samples = items(dialog.samples);
     Sample sample = samples.get(2);
     sampleReplicateFields.get(sample).setValue(sampleReplicate2 + "-new");
@@ -1229,9 +1253,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_NewSampleReplicateEmpty() {
-    presenter.localeChange(locale);
     fillForm();
-    presenter.addSample(locale);
+    presenter.addNewSample(locale);
     List<Sample> samples = items(dialog.samples);
     Sample sample = samples.get(2);
     sampleIdFields.get(sample).setValue(sampleId2 + "-new");
@@ -1255,7 +1278,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_NewDataset() {
-    presenter.localeChange(locale);
     fillForm();
 
     presenter.save(locale);
@@ -1295,7 +1317,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_UpdateDataset() {
     Dataset dataset = repository.findById(2L).get();
     presenter.setDataset(dataset, locale);
-    presenter.localeChange(locale);
     fillForm();
 
     presenter.save(locale);
@@ -1333,8 +1354,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void cancel_Close() {
-    presenter.localeChange(locale);
-
     presenter.cancel();
 
     verify(service, never()).save(any());

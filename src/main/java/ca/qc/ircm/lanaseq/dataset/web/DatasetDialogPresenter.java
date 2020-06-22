@@ -68,6 +68,7 @@ import org.springframework.context.annotation.Scope;
 public class DatasetDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogPresenter.class);
   private DatasetDialog dialog;
+  private Locale locale;
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
   private Binder<Sample> sampleBinder = new BeanValidationBinder<>(Sample.class);
   private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
@@ -89,11 +90,13 @@ public class DatasetDialogPresenter {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
     dialog.tags.setTagSuggestions(service.topTags(50));
+    dialog.selectSampleDialog.addSelectedListener(e -> addSample(e.getSelection()));
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null, Constants.DEFAULT_LOCALE);
   }
 
   void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.tags).bind(TAGS);
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
@@ -108,12 +111,12 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }
 
-  boolean isReadOnly(Dataset dataset) {
+  private boolean isReadOnly(Dataset dataset) {
     return !authorizationService.hasPermission(dataset, Permission.WRITE)
         || (dataset.getId() != null && !dataset.isEditable());
   }
 
-  void setReadOnly() {
+  private void setReadOnly() {
     Dataset dataset = binder.getBean();
     boolean readOnly = isReadOnly(dataset);
     binder.setReadOnly(readOnly);
@@ -123,7 +126,7 @@ public class DatasetDialogPresenter {
     sampleBinder.setReadOnly(sampleReadOnly);
   }
 
-  void bindSampleFields(Sample sample, Locale locale) {
+  private void bindSampleFields(Sample sample) {
     boolean forceReadOnly = isReadOnly(binder.getBean()) || !sample.isEditable();
     final AppResources webResources = new AppResources(Constants.class, locale);
     Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
@@ -139,13 +142,27 @@ public class DatasetDialogPresenter {
     sampleBinders.put(sample, binder);
   }
 
-  void addSample(Locale locale) {
+  void addNewSample(Locale locale) {
     Sample sample = new Sample();
     sample.setEditable(true);
     samplesDataProvider.getItems().add(sample);
-    bindSampleFields(sample, locale);
+    bindSampleFields(sample);
     refreshSamplesDataProvider();
     setReadOnly();
+  }
+
+  void addSample() {
+    dialog.selectSampleDialog.open();
+  }
+
+  private void addSample(Sample sample) {
+    if (!samplesDataProvider.getItems().stream().filter(sa -> sa.getId().equals(sample.getId()))
+        .findAny().isPresent()) {
+      samplesDataProvider.getItems().add(sample);
+      bindSampleFields(sample);
+      refreshSamplesDataProvider();
+      setReadOnly();
+    }
   }
 
   void removeSample(Sample sample) {
@@ -244,7 +261,7 @@ public class DatasetDialogPresenter {
     sampleBinder.setBean(sample);
     samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
     dialog.samples.setDataProvider(samplesDataProvider);
-    dataset.getSamples().forEach(s -> bindSampleFields(s, locale));
+    dataset.getSamples().forEach(s -> bindSampleFields(s));
     setReadOnly();
   }
 

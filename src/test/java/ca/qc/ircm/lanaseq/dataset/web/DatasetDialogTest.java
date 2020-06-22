@@ -17,13 +17,13 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_NEW_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_MESSAGE;
@@ -69,6 +69,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
@@ -158,7 +159,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog = new DatasetDialog(presenter);
+    dialog = new DatasetDialog(presenter, new SelectSampleDialog());
     dialog.init();
     samples = sampleRepository.findAll();
     files.add(Paths.get("dataset", "dataset.png"));
@@ -179,6 +180,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     when(dialog.sampleId.setKey(any())).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setComparator(any(Comparator.class))).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setHeader(any(String.class))).thenReturn(dialog.sampleId);
+    when(dialog.sampleId.setFooter(any(String.class))).thenReturn(dialog.sampleId);
     dialog.sampleReplicate = mock(Column.class);
     when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(SampleProperties.REPLICATE)))
         .thenReturn(dialog.sampleReplicate);
@@ -186,12 +188,14 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     when(dialog.sampleReplicate.setComparator(any(Comparator.class)))
         .thenReturn(dialog.sampleReplicate);
     when(dialog.sampleReplicate.setHeader(any(String.class))).thenReturn(dialog.sampleReplicate);
+    when(dialog.sampleReplicate.setFooter(any(String.class))).thenReturn(dialog.sampleReplicate);
     dialog.sampleName = mock(Column.class);
     when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.NAME)))
         .thenReturn(dialog.sampleName);
     when(dialog.sampleName.setKey(any())).thenReturn(dialog.sampleName);
     when(dialog.sampleName.setComparator(any(Comparator.class))).thenReturn(dialog.sampleName);
     when(dialog.sampleName.setHeader(any(String.class))).thenReturn(dialog.sampleName);
+    when(dialog.sampleName.setFooter(any(String.class))).thenReturn(dialog.sampleName);
     dialog.sampleRemove = mock(Column.class);
     when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(REMOVE)))
         .thenReturn(dialog.sampleRemove);
@@ -199,6 +203,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     when(dialog.sampleRemove.setSortable(anyBoolean())).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setComparator(any(Comparator.class))).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setHeader(any(String.class))).thenReturn(dialog.sampleRemove);
+    when(dialog.sampleRemove.setFooter(any(String.class))).thenReturn(dialog.sampleRemove);
     FooterRow footerRow = mock(FooterRow.class);
     when(dialog.samples.appendFooterRow()).thenReturn(footerRow);
     FooterCell sampleIdFooterCell = mock(FooterCell.class);
@@ -229,6 +234,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
+    assertEquals(id(ADD_NEW_SAMPLE), dialog.addNewSample.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
@@ -268,9 +274,13 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    verify(dialog.sampleId).setFooter(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
+    verify(dialog.sampleName).setFooter(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
-    assertEquals(webResources.message(ADD), dialog.addSample.getText());
+    verify(dialog.sampleReplicate).setFooter(sampleResources.message(SampleProperties.REPLICATE));
+    assertEquals(resources.message(ADD_NEW_SAMPLE), dialog.addNewSample.getText());
+    assertEquals(resources.message(ADD_SAMPLE), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -313,9 +323,13 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
+    verify(dialog.sampleId).setFooter(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
+    verify(dialog.sampleName).setFooter(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
-    assertEquals(webResources.message(ADD), dialog.addSample.getText());
+    verify(dialog.sampleReplicate).setFooter(sampleResources.message(SampleProperties.REPLICATE));
+    assertEquals(resources.message(ADD_NEW_SAMPLE), dialog.addNewSample.getText());
+    assertEquals(resources.message(ADD_SAMPLE), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -509,10 +523,17 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void addNewSample() {
+    clickButton(dialog.addNewSample);
+
+    verify(presenter).addNewSample(locale);
+  }
+
+  @Test
   public void addSample() {
     clickButton(dialog.addSample);
 
-    verify(presenter).addSample(locale);
+    verify(presenter).addSample();
   }
 
   @Test

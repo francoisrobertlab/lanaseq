@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
+import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.SAMPLES;
+import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
 
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
@@ -29,7 +29,7 @@ public class SelectSampleDialogElement extends DialogElement {
   private static final int NAME_COLUMN = 0;
 
   public GridElement samples() {
-    return $(GridElement.class).id(id(SAMPLE_ID));
+    return $(GridElement.class).id(id(SAMPLES));
   }
 
   public void doubleClick(int row) {

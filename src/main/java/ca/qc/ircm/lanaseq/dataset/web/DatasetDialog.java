@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
@@ -42,6 +41,7 @@ import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -87,6 +87,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
+  public static final String ADD_NEW_SAMPLE = "addNewSample";
   public static final String ADD_SAMPLE = "addSample";
   public static final String SAMPLES = "samples";
   public static final String SAVED = "saved";
@@ -107,11 +108,14 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Column<Sample> sampleReplicate;
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleRemove;
+  protected Button addNewSample = new Button();
   protected Button addSample = new Button();
   protected Button save = new Button();
   protected Button cancel = new Button();
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
+  @Autowired
+  protected transient SelectSampleDialog selectSampleDialog;
   @Autowired
   private transient DatasetDialogPresenter presenter;
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
@@ -120,8 +124,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected DatasetDialog() {
   }
 
-  protected DatasetDialog(DatasetDialogPresenter presenter) {
+  protected DatasetDialog(DatasetDialogPresenter presenter, SelectSampleDialog selectSampleDialog) {
     this.presenter = presenter;
+    this.selectSampleDialog = selectSampleDialog;
   }
 
   public static String id(String baseId) {
@@ -146,7 +151,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, tags, form, samples, buttons);
+    layout.add(header, tags, form, samples, buttons, confirm, selectSampleDialog);
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));
@@ -163,7 +168,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
     samples.setId(id(SAMPLES));
-    samples.setHeight("14em");
+    samples.setHeight("15em");
     sampleId = samples
         .addColumn(new ComponentRenderer<>(sample -> sampleIdField(sample)),
             SampleProperties.SAMPLE_ID)
@@ -180,11 +185,16 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleRemove =
         samples.addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)), REMOVE)
             .setKey(REMOVE).setSortable(false);
+    samples.appendFooterRow(); // Footers
     FooterRow footer = samples.appendFooterRow();
-    footer.getCell(sampleId).setComponent(addSample);
+    footer.join(footer.getCell(sampleId), footer.getCell(sampleReplicate));
+    footer.getCell(sampleId).setComponent(new HorizontalLayout(addNewSample, addSample));
+    addNewSample.setId(id(ADD_NEW_SAMPLE));
+    addNewSample.setIcon(VaadinIcon.PLUS.create());
+    addNewSample.addClickListener(e -> presenter.addNewSample(getLocale()));
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
-    addSample.addClickListener(e -> presenter.addSample(getLocale()));
+    addSample.addClickListener(e -> presenter.addSample());
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -251,10 +261,14 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         .setPlaceholder(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
     treatment.setLabel(sampleResources.message(TREATMENT));
     treatment.setPlaceholder(sampleResources.message(property(TREATMENT, PLACEHOLDER)));
-    sampleId.setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
-    sampleReplicate.setHeader(sampleResources.message(SampleProperties.REPLICATE));
-    sampleName.setHeader(sampleResources.message(SampleProperties.NAME));
-    addSample.setText(webResources.message(ADD));
+    String sampleIdHeader = sampleResources.message(SampleProperties.SAMPLE_ID);
+    sampleId.setHeader(sampleIdHeader).setFooter(sampleIdHeader);
+    String sampleReplicateHeader = sampleResources.message(SampleProperties.REPLICATE);
+    sampleReplicate.setHeader(sampleReplicateHeader).setFooter(sampleReplicateHeader);
+    String sampleNameHeader = sampleResources.message(SampleProperties.NAME);
+    sampleName.setHeader(sampleNameHeader).setFooter(sampleNameHeader);
+    addNewSample.setText(resources.message(ADD_NEW_SAMPLE));
+    addSample.setText(resources.message(ADD_SAMPLE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
     delete.setText(webResources.message(DELETE));

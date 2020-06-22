@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.SAMPLES;
+import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static org.junit.Assert.assertEquals;
@@ -136,7 +137,7 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
-    assertEquals(SAMPLES, dialog.samples.getId().orElse(""));
+    assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
   }
 
   @Test
