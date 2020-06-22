@@ -36,6 +36,8 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
+import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -158,6 +160,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
+    assertTrue(optional(() -> dialog.addNewSample()).isPresent());
     assertTrue(optional(() -> dialog.addSample()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -254,6 +257,68 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(treatment, sample.getTreatment());
     dataset = repository.findById(6L).get();
     assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+  }
+
+  @Test
+  public void addSample() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.doubleClick(0);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    dialog.addSample().click();
+    SelectSampleDialogElement selectSampleDialog =
+        $(SelectSampleDialogElement.class).id(SelectSampleDialog.ID);
+    selectSampleDialog.doubleClick(2);
+
+    TestTransaction.flagForCommit();
+    dialog.save().click();
+    TestTransaction.end();
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(DatasetDialog.class);
+    Dataset dataset = repository.findById(2L).get();
+    assertEquals(resources.message(SAVED, dataset.getName()), notification.getText());
+    assertEquals("ChIPSeq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
+    assertEquals(3, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(3, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals((Long) 4L, sample.getId());
+    assertEquals("JS1", sample.getSampleId());
+    assertEquals("R1", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
+    sample = dataset.getSamples().get(1);
+    assertEquals((Long) 5L, sample.getId());
+    assertEquals("JS2", sample.getSampleId());
+    assertEquals("R2", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
+    sample = dataset.getSamples().get(2);
+    assertEquals((Long) 10L, sample.getId());
+    assertEquals("JS1", sample.getSampleId());
+    assertEquals("R1", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
   }
 
   @Test

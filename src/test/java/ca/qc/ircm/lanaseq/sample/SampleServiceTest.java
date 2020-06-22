@@ -121,7 +121,7 @@ public class SampleServiceTest {
   public void all() {
     List<Sample> samples = service.all();
 
-    assertEquals(9, samples.size());
+    assertEquals(10, samples.size());
     assertTrue(find(samples, 1L).isPresent());
     assertTrue(find(samples, 2L).isPresent());
     assertTrue(find(samples, 3L).isPresent());
@@ -131,6 +131,7 @@ public class SampleServiceTest {
     assertTrue(find(samples, 7L).isPresent());
     assertTrue(find(samples, 8L).isPresent());
     assertTrue(find(samples, 9L).isPresent());
+    assertTrue(find(samples, 10L).isPresent());
     for (Sample sample : samples) {
       verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
     }
