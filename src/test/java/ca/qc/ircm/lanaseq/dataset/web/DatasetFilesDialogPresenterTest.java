@@ -66,7 +66,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -251,9 +250,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  @Ignore("Datasets don't have editable property")
   public void setDataset_NotEditable() {
-    Dataset dataset = repository.findById(8L).get();
+    Dataset dataset = repository.findById(5L).get();
 
     presenter.setDataset(dataset);
 
@@ -368,9 +366,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  @Ignore("Datasets don't have editable property")
   public void add_NotEditable() {
-    Dataset dataset = repository.findById(8L).get();
+    Dataset dataset = repository.findById(5L).get();
     presenter.setDataset(dataset);
 
     presenter.add();

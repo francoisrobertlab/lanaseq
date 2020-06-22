@@ -106,8 +106,13 @@ public class DatasetFilesDialogPresenter {
     dialog.files.setItems(service.files(dataset).stream().map(file -> new DatasetFile(file)));
   }
 
+  boolean isReadOnly() {
+    return dataset == null || !dataset.isEditable()
+        || !authorizationService.hasPermission(dataset, Permission.WRITE);
+  }
+
   void add() {
-    if (dataset != null && authorizationService.hasPermission(dataset, Permission.WRITE)) {
+    if (!isReadOnly()) {
       dialog.addFilesDialog.open();
     }
   }
@@ -152,7 +157,7 @@ public class DatasetFilesDialogPresenter {
     Objects.requireNonNull(dataset);
     Objects.requireNonNull(dataset.getId());
     this.dataset = dataset;
-    boolean readOnly = !authorizationService.hasPermission(dataset, Permission.WRITE);
+    boolean readOnly = isReadOnly();
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
     dialog.addFilesDialog.setDataset(dataset);

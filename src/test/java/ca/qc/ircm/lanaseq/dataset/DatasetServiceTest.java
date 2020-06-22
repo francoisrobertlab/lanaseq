@@ -122,6 +122,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertTrue(dataset.isEditable());
     assertEquals(3, dataset.getSamples().size());
     assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
@@ -265,7 +266,6 @@ public class DatasetServiceTest {
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
-    sample1.setEditable(true);
     sample1.setProtocol(protocolRepository.findById(1L).get());
     dataset.getSamples().add(sample1);
     Sample sample2 = new Sample();
@@ -277,7 +277,6 @@ public class DatasetServiceTest {
     sample2.setStrain("yFR213");
     sample2.setStrainDescription("F56G");
     sample2.setTreatment("37C");
-    sample2.setEditable(true);
     sample2.setProtocol(protocolRepository.findById(1L).get());
     dataset.getSamples().add(sample2);
 
@@ -292,6 +291,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("tag1"));
     assertTrue(dataset.getTags().contains("tag2"));
     assertEquals(user.getId(), dataset.getOwner().getId());
+    assertTrue(dataset.isEditable());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getDate()));
     assertEquals(2, dataset.getSamples().size());
@@ -319,7 +319,7 @@ public class DatasetServiceTest {
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(3L).get());
-    dataset.getSamples().remove(1);
+    Sample removed = dataset.getSamples().remove(1);
     Sample sample3 = new Sample();
     sample3.setSampleId("sample4");
     sample3.setReplicate("r4");
@@ -329,7 +329,6 @@ public class DatasetServiceTest {
     sample3.setStrain("yFR213");
     sample3.setStrainDescription("F56G");
     sample3.setTreatment("37C");
-    sample3.setEditable(true);
     sample3.setProtocol(protocolRepository.findById(3L).get());
     dataset.getSamples().add(sample3);
 
@@ -344,11 +343,13 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("tag1"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     assertEquals(3, dataset.getSamples().size());
     for (Sample sample : dataset.getSamples()) {
       verify(sampleService).save(sample);
     }
+    verify(sampleService, never()).save(removed);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
@@ -385,6 +386,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
     assertEquals(3, dataset.getSamples().size());
     for (Sample sample : dataset.getSamples()) {
@@ -407,9 +409,18 @@ public class DatasetServiceTest {
     assertFalse(Files.exists(beforeFolder));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  @WithMockUser
+  public void save_UpdateNotEditable() {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Dataset dataset = repository.findById(5L).orElse(null);
+    service.save(dataset);
+  }
+
   @Test
   @WithMockUser
-  public void save_NotUpdatableSample() {
+  public void save_NotEditableSample() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Dataset dataset = repository.findById(1L).orElse(null);

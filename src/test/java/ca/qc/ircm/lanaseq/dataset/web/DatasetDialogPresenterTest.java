@@ -300,7 +300,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void setDataset_CannotUpdate() {
+  public void setDataset_CannotWrite() {
     when(authorizationService.hasPermission(any(), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
@@ -346,7 +346,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void setDataset_CannotUpdateBeforeLocaleChange() {
+  public void setDataset_CannotWriteBeforeLocaleChange() {
     when(authorizationService.hasPermission(any(), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
@@ -392,7 +392,76 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void setDataset_CannotUpdateAnySample() {
+  public void setDataset_NotEditable() {
+    Dataset dataset = repository.findById(5L).get();
+
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    assertEquals(1, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("chipseq"));
+    assertTrue(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2b", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yBC103", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(1, samples.size());
+    assertTrue(find(samples, 8L).isPresent());
+    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+  }
+
+  @Test
+  public void setDataset_NotEditableWithEditableSamples() {
+    Dataset dataset = repository.findById(5L).get();
+    dataset.getSamples().get(0).setEditable(true);
+
+    presenter.localeChange(locale);
+    presenter.setDataset(dataset, locale);
+
+    assertEquals(1, dialog.tags.getValue().size());
+    assertTrue(dialog.tags.getValue().contains("chipseq"));
+    assertTrue(dialog.tags.isReadOnly());
+    assertNotNull(dialog.protocol.getValue());
+    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertTrue(dialog.protocol.isReadOnly());
+    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertTrue(dialog.assay.isReadOnly());
+    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertTrue(dialog.type.isReadOnly());
+    assertEquals("polr2b", dialog.target.getValue());
+    assertTrue(dialog.target.isReadOnly());
+    assertEquals("yBC103", dialog.strain.getValue());
+    assertTrue(dialog.strain.isReadOnly());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertTrue(dialog.strainDescription.isReadOnly());
+    assertEquals("", dialog.treatment.getValue());
+    assertTrue(dialog.treatment.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(1, samples.size());
+    assertTrue(find(samples, 8L).isPresent());
+    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
+    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
+    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
+    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
+  }
+
+  @Test
+  public void setDataset_CannotWriteAnySample() {
     when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
@@ -484,7 +553,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void setDataset_CannotUpdateOneSample() {
+  public void setDataset_CannotWriteOneSample() {
     when(authorizationService.hasPermission(any(Sample.class), any())).then(i -> {
       Sample sample = i.getArgument(0);
       return sample.getId() == null || sample.getId() != 2;
@@ -579,9 +648,10 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void setDataset_CannotUpdateOnlyOneSample() {
+  public void setDataset_CannotWriteOnlyOneSample() {
     when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
     Dataset dataset = repository.findById(5L).get();
+    dataset.setEditable(true);
 
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);
@@ -616,6 +686,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void setDataset_NotEditableOnlyOneSample() {
     Dataset dataset = repository.findById(5L).get();
+    dataset.setEditable(true);
     dataset.getSamples().get(0).setEditable(false);
 
     presenter.localeChange(locale);
@@ -720,6 +791,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void addSample_NotEditableSamples() {
     Dataset dataset = repository.findById(5L).get();
+    dataset.setEditable(true);
     dataset.getSamples().get(0).setEditable(false);
     presenter.localeChange(locale);
     presenter.setDataset(dataset, locale);

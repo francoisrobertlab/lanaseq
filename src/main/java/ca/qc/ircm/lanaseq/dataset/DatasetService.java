@@ -159,15 +159,19 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void save(Dataset dataset) {
+    if (dataset.getId() != null && !dataset.isEditable()) {
+      throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
+    }
     LocalDateTime now = LocalDateTime.now();
     User user = authorizationService.getCurrentUser();
     if (dataset.getId() == null) {
       dataset.setOwner(user);
       dataset.setDate(now);
+      dataset.setEditable(true);
     }
     if (dataset.getSamples() != null) {
       for (Sample sample : dataset.getSamples()) {
-        if (sample.isEditable()) {
+        if (sample.getId() == null || sample.isEditable()) {
           sampleService.save(sample);
         }
       }

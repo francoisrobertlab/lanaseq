@@ -105,9 +105,13 @@ public class SampleFilesDialogPresenter {
     dialog.files.setItems(service.files(sample).stream().map(file -> new SampleFile(file)));
   }
 
+  boolean isReadOnly() {
+    return sample == null || !sample.isEditable()
+        || !authorizationService.hasPermission(sample, Permission.WRITE);
+  }
+
   void add() {
-    if (sample != null && sample.isEditable()
-        && authorizationService.hasPermission(sample, Permission.WRITE)) {
+    if (!isReadOnly()) {
       dialog.addFilesDialog.open();
     }
   }
@@ -152,8 +156,7 @@ public class SampleFilesDialogPresenter {
     Objects.requireNonNull(sample);
     Objects.requireNonNull(sample.getId());
     this.sample = sample;
-    boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE)
-        || (sample.getId() != null && !sample.isEditable());
+    boolean readOnly = isReadOnly();
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
     dialog.addFilesDialog.setSample(sample);

@@ -91,7 +91,7 @@ public class Sample implements Data, Owned, Serializable {
   @Size(max = 255)
   private String treatment;
   /**
-   * Creation date.
+   * True if sample can be edited.
    */
   @Column
   private boolean editable;

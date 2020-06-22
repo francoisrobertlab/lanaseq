@@ -68,6 +68,11 @@ public class Dataset implements Data, Owned, Serializable {
   @ElementCollection
   private Set<String> tags;
   /**
+   * True if dataset can be edited.
+   */
+  @Column
+  private boolean editable;
+  /**
    * Creation date.
    */
   @Column
@@ -176,5 +181,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setTags(Set<String> tags) {
     this.tags = tags;
+  }
+
+  public boolean isEditable() {
+    return editable;
+  }
+
+  public void setEditable(boolean editable) {
+    this.editable = editable;
   }
 }

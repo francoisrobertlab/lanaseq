@@ -108,9 +108,14 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
   }
 
+  boolean isReadOnly(Dataset dataset) {
+    return !authorizationService.hasPermission(dataset, Permission.WRITE)
+        || (dataset.getId() != null && !dataset.isEditable());
+  }
+
   void setReadOnly() {
     Dataset dataset = binder.getBean();
-    boolean readOnly = !authorizationService.hasPermission(dataset, Permission.WRITE);
+    boolean readOnly = isReadOnly(dataset);
     binder.setReadOnly(readOnly);
     boolean sampleReadOnly = readOnly || !dataset.getSamples().stream()
         .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE) && sa.isEditable())
@@ -119,8 +124,7 @@ public class DatasetDialogPresenter {
   }
 
   void bindSampleFields(Sample sample, Locale locale) {
-    boolean forceReadOnly = !authorizationService.hasPermission(binder.getBean(), Permission.WRITE)
-        || !sample.isEditable();
+    boolean forceReadOnly = isReadOnly(binder.getBean()) || !sample.isEditable();
     final AppResources webResources = new AppResources(Constants.class, locale);
     Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
     binder.forField(dialog.sampleIdField(sample))
