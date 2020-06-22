@@ -188,7 +188,16 @@ public class SampleServiceTest {
 
   @Test
   @WithMockUser
-  public void isDeletable_False() {
+  public void isDeletable_FalseNotEditable() {
+    Sample sample = repository.findById(9L).get();
+    sample.setEditable(false);
+    assertFalse(service.isDeletable(sample));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_FalseLinkedToDataset() {
     Sample sample = repository.findById(1L).get();
     assertFalse(service.isDeletable(sample));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
@@ -742,8 +751,16 @@ public class SampleServiceTest {
 
   @Test(expected = IllegalArgumentException.class)
   @WithMockUser
-  public void delete_NotDeletable() {
+  public void delete_LinkedToDataset() {
     Sample sample = repository.findById(1L).get();
+    service.delete(sample);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  @WithMockUser
+  public void delete_NotEditable() {
+    Sample sample = repository.findById(9L).get();
+    sample.setEditable(false);
     service.delete(sample);
   }
 }

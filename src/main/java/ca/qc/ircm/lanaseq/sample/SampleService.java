@@ -103,7 +103,7 @@ public class SampleService {
     if (sample == null || sample.getId() == null) {
       return false;
     }
-    return !datasetRepository.existsBySamples(sample);
+    return sample.isEditable() && !datasetRepository.existsBySamples(sample);
   }
 
   /**
