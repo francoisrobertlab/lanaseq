@@ -92,7 +92,7 @@ public class DatasetDialogPresenter {
     dialog.tags.setTagSuggestions(service.topTags(50));
     dialog.selectSampleDialog.addSelectedListener(e -> addSample(e.getSelection()));
     localeChange(Constants.DEFAULT_LOCALE);
-    setDataset(null, Constants.DEFAULT_LOCALE);
+    setDataset(null);
   }
 
   void localeChange(Locale locale) {
@@ -142,7 +142,7 @@ public class DatasetDialogPresenter {
     sampleBinders.put(sample, binder);
   }
 
-  void addNewSample(Locale locale) {
+  void addNewSample() {
     Sample sample = new Sample();
     sample.setEditable(true);
     samplesDataProvider.getItems().add(sample);
@@ -194,7 +194,7 @@ public class DatasetDialogPresenter {
         && !validateSamples().stream().filter(status -> !status.isOk()).findAny().isPresent();
   }
 
-  void save(Locale locale) {
+  void save() {
     if (validate()) {
       Dataset dataset = binder.getBean();
       logger.debug("Save dataset {}", dataset);
@@ -220,7 +220,7 @@ public class DatasetDialogPresenter {
     return sample.getSampleId() == null && sample.getReplicate() == null;
   }
 
-  void delete(Locale locale) {
+  void delete() {
     Dataset dataset = binder.getBean();
     logger.debug("delete dataset {}", dataset);
     service.delete(dataset);
@@ -238,7 +238,7 @@ public class DatasetDialogPresenter {
     return binder.getBean();
   }
 
-  void setDataset(Dataset dataset, Locale locale) {
+  void setDataset(Dataset dataset) {
     if (dataset == null) {
       dataset = new Dataset();
     }

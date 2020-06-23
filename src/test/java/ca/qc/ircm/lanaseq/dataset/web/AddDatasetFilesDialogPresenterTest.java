@@ -163,7 +163,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void creatUploadFolderOnOpen() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertFalse(Files.exists(uploadFolder(dataset)));
     when(openedChangeEvent.isOpened()).thenReturn(true);
     verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
@@ -175,7 +175,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void deleteUploadFolderOnClose() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertFalse(Files.exists(uploadFolder(dataset)));
     when(openedChangeEvent.isOpened()).thenReturn(true);
     verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
@@ -193,7 +193,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void labels() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, false)),
         dialog.message.getText());
     assertEquals(resources.message(NETWORK, configuration.uploadNetwork(false)),
@@ -204,7 +204,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels_Linux() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
         dialog.message.getText());
     assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
@@ -215,7 +215,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void labels_Mac() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
         dialog.message.getText());
     assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
@@ -227,7 +227,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void network_Empty() {
     when(configuration.uploadNetwork(anyBoolean())).thenReturn("");
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
         dialog.message.getText());
     assertFalse(dialog.network.isVisible());
@@ -238,7 +238,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void network_Null() {
     when(configuration.uploadNetwork(anyBoolean())).thenReturn(null);
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
         dialog.message.getText());
     assertFalse(dialog.network.isVisible());
@@ -247,20 +247,20 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void getDataset() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertEquals(dataset, presenter.getDataset());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void setDataset_NewDataset() {
-    presenter.setDataset(new Dataset(), locale);
+    presenter.setDataset(new Dataset());
   }
 
   @Test
   public void setDataset_Dataset() {
     Dataset dataset = repository.findById(1L).get();
 
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
 
     verify(configuration, atLeastOnce()).upload(dataset);
     List<Path> files = items(dialog.files);
@@ -269,13 +269,13 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test(expected = NullPointerException.class)
   public void setDataset_Null() {
-    presenter.setDataset(null, locale);
+    presenter.setDataset(null);
   }
 
   @Test
   public void updateFiles() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
@@ -309,7 +309,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void updateFiles_StopThreadOnClose() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(true);
     openedChangeListenerCaptor.getAllValues()
@@ -327,7 +327,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void updateFiles_StopThreadOnInterrupt() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(true);
     openedChangeListenerCaptor.getAllValues()
@@ -343,14 +343,14 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void exists_False() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertFalse(presenter.exists(files.get(2)));
   }
 
   @Test
   public void exists_True() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     assertTrue(presenter.exists(files.get(1)));
   }
 
@@ -362,12 +362,12 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void save_OverwriteNotAllowed() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
 
-    presenter.save(locale);
+    presenter.save();
 
     assertTrue(dialog.error.isVisible());
     assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
@@ -380,13 +380,13 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void save_OverwriteAllowed() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", true));
     Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
@@ -403,12 +403,12 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void save() throws Throwable {
     when(service.files(any())).thenReturn(new ArrayList<>());
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
     Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
@@ -423,9 +423,9 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void save_NoFiles() {
     Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset, locale);
+    presenter.setDataset(dataset);
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();

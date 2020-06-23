@@ -355,7 +355,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER), dialog.header.getText());
   }
 
@@ -368,7 +368,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
   }
 
@@ -380,7 +380,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
   }
 
@@ -392,7 +392,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.setDataset(dataset);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
   }
 
@@ -401,7 +401,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(null);
 
-    verify(presenter).setDataset(null, locale);
+    verify(presenter).setDataset(null);
     assertEquals(resources.message(HEADER), dialog.header.getText());
   }
 
@@ -409,6 +409,6 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 }

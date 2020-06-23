@@ -45,6 +45,7 @@ public class DatasetFilesDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(DatasetFilesDialogPresenter.class);
   private DatasetFilesDialog dialog;
   private Dataset dataset;
+  private Locale locale;
   private DatasetService service;
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
@@ -65,17 +66,18 @@ public class DatasetFilesDialogPresenter {
     localeChange(Constants.DEFAULT_LOCALE);
   }
 
-  public void localeChange(Locale locale) {
+  void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     fileBinder.forField(dialog.filenameEdit).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
         .withValidator(new RegexpValidator(resources.message(FILENAME_REGEX_ERROR), FILENAME_REGEX))
-        .withValidator(exists(locale)).bind(FILENAME);
+        .withValidator(exists()).bind(FILENAME);
     updateMessage();
   }
 
-  private Validator<String> exists(Locale locale) {
+  private Validator<String> exists() {
     return (value, context) -> {
       DatasetFile item = dialog.files.getEditor().getItem();
       if (value != null && item != null && !value.equals(item.getPath().getFileName().toString())
@@ -89,7 +91,7 @@ public class DatasetFilesDialogPresenter {
 
   private void updateMessage() {
     dialog.getUI().ifPresent(ui -> {
-      final AppResources resources = new AppResources(DatasetFilesDialog.class, ui.getLocale());
+      final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (dataset != null) {
@@ -117,7 +119,7 @@ public class DatasetFilesDialogPresenter {
     }
   }
 
-  void rename(DatasetFile file, Locale locale) {
+  void rename(DatasetFile file) {
     Path source = file.getPath();
     Path target = source.resolveSibling(file.getFilename());
     try {
@@ -132,7 +134,7 @@ public class DatasetFilesDialogPresenter {
     }
   }
 
-  void deleteFile(DatasetFile file, Locale locale) {
+  void deleteFile(DatasetFile file) {
     Path path = file.getPath();
     try {
       logger.debug("delete file {}", path);

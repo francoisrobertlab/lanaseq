@@ -113,7 +113,7 @@ public class AddDatasetFilesDialog extends Dialog
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     presenter.init(this);
   }
 
@@ -201,7 +201,7 @@ public class AddDatasetFilesDialog extends Dialog
   }
 
   public void setDataset(Dataset dataset) {
-    presenter.setDataset(dataset, getLocale());
+    presenter.setDataset(dataset);
     updateHeader();
   }
 }

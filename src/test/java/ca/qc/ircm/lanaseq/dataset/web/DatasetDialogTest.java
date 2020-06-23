@@ -481,7 +481,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
@@ -493,7 +493,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(dataset);
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
     assertEquals(resources.message(DELETE_MESSAGE, dataset.getName()),
         dialog.confirm.getElement().getProperty("message"));
@@ -507,7 +507,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     dialog.setDataset(dataset);
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setDataset(dataset, locale);
+    verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
     assertEquals(resources.message(DELETE_MESSAGE, dataset.getName()),
         dialog.confirm.getElement().getProperty("message"));
@@ -518,7 +518,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setDataset(null);
 
-    verify(presenter).setDataset(null, locale);
+    verify(presenter).setDataset(null);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
   }
 
@@ -526,7 +526,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   public void addNewSample() {
     clickButton(dialog.addNewSample);
 
-    verify(presenter).addNewSample(locale);
+    verify(presenter).addNewSample();
   }
 
   @Test
@@ -540,7 +540,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test
@@ -557,7 +557,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.confirm.isOpened());
     ConfirmEvent event = new ConfirmEvent(dialog.confirm, false);
     fireEvent(dialog.confirm, event);
-    verify(presenter).delete(locale);
+    verify(presenter).delete();
   }
 
   @Test
@@ -567,6 +567,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.confirm.isOpened());
     CancelEvent event = new CancelEvent(dialog.confirm, false);
     fireEvent(dialog.confirm, event);
-    verify(presenter, never()).delete(any());
+    verify(presenter, never()).delete();
   }
 }

@@ -141,7 +141,7 @@ public class AddDatasetFilesDialogPresenter {
     return dataset != null ? configuration.upload(dataset) : null;
   }
 
-  private boolean validate(Collection<Path> files, Locale locale) {
+  private boolean validate(Collection<Path> files) {
     dialog.error.setVisible(false);
     boolean anyExists = files.stream()
         .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
@@ -153,7 +153,7 @@ public class AddDatasetFilesDialogPresenter {
     return !anyExists;
   }
 
-  void save(Locale locale) {
+  void save() {
     Path folder = folder();
     Collection<Path> files;
     try {
@@ -162,7 +162,7 @@ public class AddDatasetFilesDialogPresenter {
     } catch (IOException e) {
       files = Collections.emptyList();
     }
-    if (validate(files, locale)) {
+    if (validate(files)) {
       logger.debug("save new files {} for dataset {}", files, dataset);
       service.saveFiles(dataset, files);
       final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
@@ -176,7 +176,7 @@ public class AddDatasetFilesDialogPresenter {
     return dataset;
   }
 
-  void setDataset(Dataset dataset, Locale locale) {
+  void setDataset(Dataset dataset) {
     if (dataset == null) {
       throw new NullPointerException("dataset cannot be null");
     }

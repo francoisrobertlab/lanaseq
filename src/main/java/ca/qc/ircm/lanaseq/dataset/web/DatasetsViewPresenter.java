@@ -109,7 +109,7 @@ public class DatasetsViewPresenter {
     view.dialog.open();
   }
 
-  public void viewFiles(Locale locale) {
+  void viewFiles(Locale locale) {
     List<Dataset> datasets = new ArrayList<>(view.datasets.getSelectedItems());
     AppResources resources = new AppResources(DatasetsView.class, locale);
     boolean error = false;
@@ -127,7 +127,7 @@ public class DatasetsViewPresenter {
     }
   }
 
-  public void viewFiles(Dataset dataset) {
+  void viewFiles(Dataset dataset) {
     view.filesDialog.setDataset(dataset);
     view.filesDialog.open();
   }

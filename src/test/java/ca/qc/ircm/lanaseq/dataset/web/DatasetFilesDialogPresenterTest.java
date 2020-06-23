@@ -402,7 +402,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     random.nextBytes(bytes);
     Files.write(path, bytes);
 
-    presenter.rename(file, locale);
+    presenter.rename(file);
 
     assertTrue(Files.exists(path.resolveSibling("target.txt")));
     assertArrayEquals(bytes, Files.readAllBytes(path.resolveSibling("target.txt")));
@@ -417,7 +417,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     random.nextBytes(bytes);
     Files.write(path, bytes);
 
-    presenter.deleteFile(file, locale);
+    presenter.deleteFile(file);
 
     assertFalse(Files.exists(path));
   }

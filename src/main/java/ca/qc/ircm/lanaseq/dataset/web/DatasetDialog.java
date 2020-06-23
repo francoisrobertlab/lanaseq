@@ -191,14 +191,14 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     footer.getCell(sampleId).setComponent(new HorizontalLayout(addNewSample, addSample));
     addNewSample.setId(id(ADD_NEW_SAMPLE));
     addNewSample.setIcon(VaadinIcon.PLUS.create());
-    addNewSample.addClickListener(e -> presenter.addNewSample(getLocale()));
+    addNewSample.addClickListener(e -> presenter.addNewSample());
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> presenter.addSample());
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
@@ -209,7 +209,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     confirm.setCancelable(true);
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
-    confirm.addConfirmListener(e -> presenter.delete(getLocale()));
+    confirm.addConfirmListener(e -> presenter.delete());
     presenter.init(this);
   }
 
@@ -333,7 +333,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
    *          dataset
    */
   public void setDataset(Dataset dataset) {
-    presenter.setDataset(dataset, getLocale());
+    presenter.setDataset(dataset);
     updateHeader();
   }
 
