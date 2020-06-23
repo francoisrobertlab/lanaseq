@@ -28,6 +28,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Add sample files dialog presenter.
@@ -38,6 +39,7 @@ public class AddSampleFilesDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(AddSampleFilesDialogPresenter.class);
   private AddSampleFilesDialog dialog;
   private Sample sample;
+  private Locale locale;
   private Set<Path> existingFilenames = new HashSet<>();
   private Thread updateFilesThread;
   private SampleService service;
@@ -51,6 +53,13 @@ public class AddSampleFilesDialogPresenter {
 
   void init(AddSampleFilesDialog dialog) {
     this.dialog = dialog;
+    dialog.addOpenedChangeListener(event -> {
+      if (event.isOpened()) {
+        createFolder();
+      } else {
+        deleteFolder();
+      }
+    });
     dialog.addOpenedChangeListener(event -> {
       if (event.isOpened()) {
         if (updateFilesThread != null) {
@@ -67,6 +76,7 @@ public class AddSampleFilesDialogPresenter {
   }
 
   void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
     dialog.getUI().ifPresent(ui -> {
       WebBrowser browser = ui.getSession().getBrowser();
@@ -80,7 +90,7 @@ public class AddSampleFilesDialogPresenter {
     });
   }
 
-  Thread createUpdateFilesThread() {
+  private Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
       logger.debug("stat checking files in sample {} upload folder", sample);
       while (true) {
@@ -129,7 +139,7 @@ public class AddSampleFilesDialogPresenter {
     return sample != null ? configuration.upload(sample) : null;
   }
 
-  boolean validate(Collection<Path> files, Locale locale) {
+  private boolean validate(Collection<Path> files) {
     dialog.error.setVisible(false);
     boolean anyExists = files.stream()
         .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
@@ -150,14 +160,9 @@ public class AddSampleFilesDialogPresenter {
     } catch (IOException e) {
       files = Collections.emptyList();
     }
-    if (validate(files, locale)) {
+    if (validate(files)) {
       logger.debug("save new files {} for sample {}", files, sample);
       service.saveFiles(sample, files);
-      try {
-        Files.delete(folder);
-      } catch (IOException e) {
-        logger.warn("could not delete upload folder {}", folder);
-      }
       final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, files.size(), sample.getName()));
       dialog.fireSavedEvent();
@@ -177,12 +182,11 @@ public class AddSampleFilesDialogPresenter {
       throw new IllegalArgumentException("sample cannot be new");
     }
     this.sample = sample;
-    createFolder(locale);
     localeChange(locale);
     updateFiles();
   }
 
-  private void createFolder(Locale locale) {
+  private void createFolder() {
     Path folder = folder();
     if (folder != null) {
       try {
@@ -191,6 +195,18 @@ public class AddSampleFilesDialogPresenter {
       } catch (IOException e) {
         final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
         dialog.showNotification(resources.message(CREATE_FOLDER_ERROR));
+      }
+    }
+  }
+
+  private void deleteFolder() {
+    Path folder = folder();
+    if (folder != null) {
+      try {
+        logger.debug("deleting upload folder {} for sample {}", sample);
+        FileSystemUtils.deleteRecursively(folder);
+      } catch (IOException e) {
+        logger.warn("could not delete folder {}", folder);
       }
     }
   }

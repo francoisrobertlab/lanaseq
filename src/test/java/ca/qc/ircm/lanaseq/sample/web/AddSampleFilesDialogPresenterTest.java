@@ -150,13 +150,43 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @After
   public void afterTest() {
-    when(openedChangeEvent.isOpened()).thenReturn(false);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
-    openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    Thread thread = presenter.updateFilesThread();
+    if (thread != null) {
+      thread.interrupt();
+    }
   }
 
   private Path uploadFolder(Sample sample) {
     return configuration.upload(sample);
+  }
+
+  @Test
+  public void creatUploadFolderOnOpen() {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    assertFalse(Files.exists(uploadFolder(sample)));
+    when(openedChangeEvent.isOpened()).thenReturn(true);
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
+    assertTrue(Files.isDirectory(uploadFolder(sample)));
+  }
+
+  @Test
+  public void deleteUploadFolderOnClose() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample, locale);
+    assertFalse(Files.exists(uploadFolder(sample)));
+    when(openedChangeEvent.isOpened()).thenReturn(true);
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
+    assertTrue(Files.isDirectory(uploadFolder(sample)));
+    Files.createFile(uploadFolder(sample).resolve("test.txt"));
+    when(openedChangeEvent.isOpened()).thenReturn(false);
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
+    assertFalse(Files.exists(uploadFolder(sample)));
   }
 
   @Test
@@ -233,7 +263,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample, locale);
 
     verify(configuration, atLeastOnce()).upload(sample);
-    assertTrue(Files.isDirectory(uploadFolder(sample)));
     List<Path> files = items(dialog.files);
     assertTrue(files.isEmpty());
   }
@@ -247,6 +276,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
+    Files.createDirectories(uploadFolder(sample));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
     Files.createDirectory(uploadFolder(sample).resolve("dir"));
@@ -280,7 +310,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles_StopThreadOnClose() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(true);
     openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
     assertTrue(presenter.updateFilesThread().isDaemon());
@@ -296,7 +326,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles_StopThreadOnInterrupt() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(true);
     openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
     assertTrue(presenter.updateFilesThread().isDaemon());
@@ -330,6 +360,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_OverwriteNotAllowed() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
+    Files.createDirectories(uploadFolder(sample));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
 
@@ -348,6 +379,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", true));
+    Files.createDirectories(uploadFolder(sample));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
 
@@ -369,6 +401,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.files(any())).thenReturn(new ArrayList<>());
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
+    Files.createDirectories(uploadFolder(sample));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
 
@@ -379,7 +412,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
-    assertFalse(Files.exists(uploadFolder(sample)));
     verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
     verify(dialog).fireSavedEvent();
     verify(dialog).close();

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Add dataset files dialog presenter.
@@ -39,6 +40,7 @@ public class AddDatasetFilesDialogPresenter {
       LoggerFactory.getLogger(AddDatasetFilesDialogPresenter.class);
   private AddDatasetFilesDialog dialog;
   private Dataset dataset;
+  private Locale locale;
   private Set<Path> existingFilenames = new HashSet<>();
   private Thread updateFilesThread;
   private DatasetService service;
@@ -52,6 +54,13 @@ public class AddDatasetFilesDialogPresenter {
 
   void init(AddDatasetFilesDialog dialog) {
     this.dialog = dialog;
+    dialog.addOpenedChangeListener(event -> {
+      if (event.isOpened()) {
+        createFolder();
+      } else {
+        deleteFolder();
+      }
+    });
     dialog.addOpenedChangeListener(event -> {
       if (event.isOpened()) {
         if (updateFilesThread != null) {
@@ -68,6 +77,7 @@ public class AddDatasetFilesDialogPresenter {
   }
 
   void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     dialog.getUI().ifPresent(ui -> {
       WebBrowser browser = ui.getSession().getBrowser();
@@ -82,7 +92,7 @@ public class AddDatasetFilesDialogPresenter {
     });
   }
 
-  Thread createUpdateFilesThread() {
+  private Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
       logger.debug("stat checking files in dataset {} upload folder", dataset);
       while (true) {
@@ -131,7 +141,7 @@ public class AddDatasetFilesDialogPresenter {
     return dataset != null ? configuration.upload(dataset) : null;
   }
 
-  boolean validate(Collection<Path> files, Locale locale) {
+  private boolean validate(Collection<Path> files, Locale locale) {
     dialog.error.setVisible(false);
     boolean anyExists = files.stream()
         .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
@@ -155,11 +165,6 @@ public class AddDatasetFilesDialogPresenter {
     if (validate(files, locale)) {
       logger.debug("save new files {} for dataset {}", files, dataset);
       service.saveFiles(dataset, files);
-      try {
-        Files.delete(folder);
-      } catch (IOException e) {
-        logger.warn("could not delete upload folder {}", folder);
-      }
       final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, files.size(), dataset.getName()));
       dialog.fireSavedEvent();
@@ -179,12 +184,11 @@ public class AddDatasetFilesDialogPresenter {
       throw new IllegalArgumentException("dataset cannot be new");
     }
     this.dataset = dataset;
-    createFolder(locale);
     localeChange(locale);
     updateFiles();
   }
 
-  private void createFolder(Locale locale) {
+  private void createFolder() {
     Path folder = folder();
     if (folder != null) {
       try {
@@ -193,6 +197,18 @@ public class AddDatasetFilesDialogPresenter {
       } catch (IOException e) {
         final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
         dialog.showNotification(resources.message(CREATE_FOLDER_ERROR));
+      }
+    }
+  }
+
+  private void deleteFolder() {
+    Path folder = folder();
+    if (folder != null) {
+      try {
+        logger.debug("deleting upload folder {} for dataset {}", dataset);
+        FileSystemUtils.deleteRecursively(folder);
+      } catch (IOException e) {
+        logger.warn("could not delete folder {}", folder);
       }
     }
   }

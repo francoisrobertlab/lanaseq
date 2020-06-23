@@ -150,13 +150,43 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @After
   public void afterTest() {
-    when(openedChangeEvent.isOpened()).thenReturn(false);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
-    openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    Thread thread = presenter.updateFilesThread();
+    if (thread != null) {
+      thread.interrupt();
+    }
   }
 
   private Path uploadFolder(Dataset dataset) {
     return configuration.upload(dataset);
+  }
+
+  @Test
+  public void creatUploadFolderOnOpen() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset, locale);
+    assertFalse(Files.exists(uploadFolder(dataset)));
+    when(openedChangeEvent.isOpened()).thenReturn(true);
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
+    assertTrue(Files.isDirectory(uploadFolder(dataset)));
+  }
+
+  @Test
+  public void deleteUploadFolderOnClose() throws Throwable {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset, locale);
+    assertFalse(Files.exists(uploadFolder(dataset)));
+    when(openedChangeEvent.isOpened()).thenReturn(true);
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
+    assertTrue(Files.isDirectory(uploadFolder(dataset)));
+    Files.createFile(uploadFolder(dataset).resolve("test.txt"));
+    when(openedChangeEvent.isOpened()).thenReturn(false);
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
+    assertFalse(Files.exists(uploadFolder(dataset)));
   }
 
   @Test
@@ -233,7 +263,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset, locale);
 
     verify(configuration, atLeastOnce()).upload(dataset);
-    assertTrue(Files.isDirectory(uploadFolder(dataset)));
     List<Path> files = items(dialog.files);
     assertTrue(files.isEmpty());
   }
@@ -247,6 +276,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
+    Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
     Files.createDirectory(uploadFolder(dataset).resolve("dir"));
@@ -280,14 +310,16 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles_StopThreadOnClose() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(true);
-    openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
     assertTrue(presenter.updateFilesThread().isDaemon());
     Thread.sleep(500);
     assertTrue(presenter.updateFilesThread().isAlive());
     when(openedChangeEvent.isOpened()).thenReturn(false);
-    openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
     Thread.sleep(500);
     assertFalse(presenter.updateFilesThread().isAlive());
   }
@@ -296,9 +328,10 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles_StopThreadOnInterrupt() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
-    verify(dialog).addOpenedChangeListener(openedChangeListenerCaptor.capture());
+    verify(dialog, atLeastOnce()).addOpenedChangeListener(openedChangeListenerCaptor.capture());
     when(openedChangeEvent.isOpened()).thenReturn(true);
-    openedChangeListenerCaptor.getValue().onComponentEvent(openedChangeEvent);
+    openedChangeListenerCaptor.getAllValues()
+        .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
     assertTrue(presenter.updateFilesThread().isDaemon());
     Thread.sleep(500);
     assertTrue(presenter.updateFilesThread().isAlive());
@@ -330,6 +363,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_OverwriteNotAllowed() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
+    Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
 
@@ -348,6 +382,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", true));
+    Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
 
@@ -369,6 +404,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.files(any())).thenReturn(new ArrayList<>());
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset, locale);
+    Files.createDirectories(uploadFolder(dataset));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(0)));
     Files.createFile(uploadFolder(dataset).resolve(this.files.get(1)));
 
@@ -379,7 +415,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0))));
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1))));
-    assertFalse(Files.exists(uploadFolder(dataset)));
     verify(dialog).showNotification(resources.message(SAVED, 2, dataset.getName()));
     verify(dialog).fireSavedEvent();
     verify(dialog).close();
