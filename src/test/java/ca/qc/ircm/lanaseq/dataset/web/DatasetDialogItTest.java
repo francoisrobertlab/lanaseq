@@ -27,7 +27,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -44,15 +43,11 @@ import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,8 +69,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
-  @Autowired
-  private AppConfiguration configuration;
   private String tag1 = "mnase";
   private String tag2 = "ip";
   private Protocol protocol;
@@ -87,32 +80,11 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String treatment = "37C";
   private String sampleId = "FR3";
   private String sampleReplicate = "R3";
-  private Path home;
-
-  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-      IllegalArgumentException, InvocationTargetException {
-    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
-    getHome.setAccessible(true);
-    return (Path) getHome.invoke(configuration);
-  }
-
-  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
-    setHome.setAccessible(true);
-    setHome.invoke(configuration, path);
-  }
 
   @Before
   public void beforeTest() throws Throwable {
     protocol = protocolRepository.findById(1L).get();
-    home = getHome();
     setHome(temporaryFolder.newFolder("home").toPath());
-  }
-
-  @After
-  public void afterTest() throws Throwable {
-    setHome(home);
   }
 
   private void open() {

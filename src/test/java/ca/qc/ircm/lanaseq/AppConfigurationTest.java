@@ -86,10 +86,22 @@ public class AppConfigurationTest {
   }
 
   @Test
+  public void getSampleHome() {
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq", "sample"),
+        appConfiguration.getSampleHome());
+  }
+
+  @Test
+  public void getDatasetHome() {
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq", "dataset"),
+        appConfiguration.getDatasetHome());
+  }
+
+  @Test
   public void folder_Sample2019() {
     Sample sample = sample();
     String name = sample.getName();
-    assertEquals(appConfiguration.getHome().resolve("2019/" + name),
+    assertEquals(appConfiguration.getSampleHome().resolve("2019/" + name),
         appConfiguration.folder(sample));
   }
 
@@ -105,7 +117,7 @@ public class AppConfigurationTest {
     sample.setDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
     sample.generateName();
     String name = sample.getName();
-    assertEquals(appConfiguration.getHome().resolve("2020/" + name),
+    assertEquals(appConfiguration.getSampleHome().resolve("2020/" + name),
         appConfiguration.folder(sample));
   }
 
@@ -113,7 +125,7 @@ public class AppConfigurationTest {
   public void folder_Dataset2019() {
     Dataset dataset = dataset();
     String name = dataset.getName();
-    assertEquals(appConfiguration.getHome().resolve("2019/" + name),
+    assertEquals(appConfiguration.getDatasetHome().resolve("2019/" + name),
         appConfiguration.folder(dataset));
   }
 
@@ -135,32 +147,36 @@ public class AppConfigurationTest {
     dataset.getSamples().add(sample);
     dataset.generateName();
     String name = dataset.getName();
-    assertEquals(appConfiguration.getHome().resolve("2020/" + name),
+    assertEquals(appConfiguration.getDatasetHome().resolve("2020/" + name),
         appConfiguration.folder(dataset));
   }
 
   @Test
   public void folderLabel_Sample() {
     Sample sample = sample();
-    assertEquals("lanaseq\\" + sample.getName(), appConfiguration.folderLabel(sample, false));
+    assertEquals("lanaseq\\sample\\2019\\" + sample.getName(),
+        appConfiguration.folderLabel(sample, false));
   }
 
   @Test
   public void folderLabel_SampleUnix() {
     Sample sample = sample();
-    assertEquals("lanaseq/" + sample.getName(), appConfiguration.folderLabel(sample, true));
+    assertEquals("lanaseq/sample/2019/" + sample.getName(),
+        appConfiguration.folderLabel(sample, true));
   }
 
   @Test
   public void folderLabel_Dataset() {
     Dataset dataset = dataset();
-    assertEquals("lanaseq\\" + dataset.getName(), appConfiguration.folderLabel(dataset, false));
+    assertEquals("lanaseq\\dataset\\2019\\" + dataset.getName(),
+        appConfiguration.folderLabel(dataset, false));
   }
 
   @Test
   public void folderLabel_DatasetUnix() {
     Dataset dataset = dataset();
-    assertEquals("lanaseq/" + dataset.getName(), appConfiguration.folderLabel(dataset, true));
+    assertEquals("lanaseq/dataset/2019/" + dataset.getName(),
+        appConfiguration.folderLabel(dataset, true));
   }
 
   @Test

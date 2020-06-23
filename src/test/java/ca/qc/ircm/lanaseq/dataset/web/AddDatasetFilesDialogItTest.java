@@ -34,12 +34,10 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,49 +60,11 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   private AppConfiguration configuration;
   private Path file1;
   private Path file2;
-  private Path home;
-  private Path upload;
-
-  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-      IllegalArgumentException, InvocationTargetException {
-    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
-    getHome.setAccessible(true);
-    return (Path) getHome.invoke(configuration);
-  }
-
-  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
-    setHome.setAccessible(true);
-    setHome.invoke(configuration, path);
-  }
-
-  private Path getUpload() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-      IllegalArgumentException, InvocationTargetException {
-    Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
-    getUpload.setAccessible(true);
-    return (Path) getUpload.invoke(configuration);
-  }
-
-  private void setUpload(Path path) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setUpload = AppConfiguration.class.getDeclaredMethod("setUpload", Path.class);
-    setUpload.setAccessible(true);
-    setUpload.invoke(configuration, path);
-  }
 
   @Before
   public void beforeTest() throws Throwable {
-    home = getHome();
-    upload = getUpload();
     setHome(temporaryFolder.newFolder("home").toPath());
     setUpload(temporaryFolder.newFolder("upload").toPath());
-  }
-
-  @After
-  public void afterTest() throws Throwable {
-    setHome(home);
-    setUpload(upload);
   }
 
   private void open() {

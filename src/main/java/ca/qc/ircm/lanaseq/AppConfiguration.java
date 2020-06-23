@@ -40,6 +40,8 @@ public class AppConfiguration {
   @Value("${logging.path:${user.dir}}/${logging.file:" + APPLICATION_NAME + "log}")
   private String logfile;
   private Path home;
+  private Path sampleHome;
+  private Path datasetHome;
   private Path upload;
   private Folder userHome;
   private Folder userUpload;
@@ -51,26 +53,28 @@ public class AppConfiguration {
   }
 
   public Path folder(Sample sample) {
-    return getHome().resolve(year.format(sample.getDate())).resolve(sample.getName());
+    return sampleHome.resolve(year.format(sample.getDate())).resolve(sample.getName());
   }
 
   public Path folder(Dataset dataset) {
-    return getHome().resolve(year.format(dataset.getDate())).resolve(dataset.getName());
+    return datasetHome.resolve(year.format(dataset.getDate())).resolve(dataset.getName());
   }
 
   public String folderLabel(Sample sample, boolean unix) {
+    Path relative = home.relativize(folder(sample));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + sample.getName());
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + sample.getName());
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
     }
   }
 
   public String folderLabel(Dataset dataset, boolean unix) {
+    Path relative = home.relativize(folder(dataset));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + dataset.getName());
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + dataset.getName());
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
     }
   }
 
@@ -127,6 +131,22 @@ public class AppConfiguration {
 
   void setHome(Path home) {
     this.home = home;
+  }
+
+  Path getSampleHome() {
+    return sampleHome;
+  }
+
+  void setSampleHome(Path sampleHome) {
+    this.sampleHome = sampleHome;
+  }
+
+  Path getDatasetHome() {
+    return datasetHome;
+  }
+
+  void setDatasetHome(Path datasetHome) {
+    this.datasetHome = datasetHome;
   }
 
   public Path getUpload() {

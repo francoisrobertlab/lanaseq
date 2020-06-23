@@ -28,12 +28,9 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,31 +51,10 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   private DatasetRepository repository;
   @Autowired
   private AppConfiguration configuration;
-  private Path home;
-
-  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-      IllegalArgumentException, InvocationTargetException {
-    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
-    getHome.setAccessible(true);
-    return (Path) getHome.invoke(configuration);
-  }
-
-  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
-    setHome.setAccessible(true);
-    setHome.invoke(configuration, path);
-  }
 
   @Before
   public void beforeTest() throws Throwable {
-    home = getHome();
     setHome(temporaryFolder.newFolder("home").toPath());
-  }
-
-  @After
-  public void afterTest() throws Throwable {
-    setHome(home);
   }
 
   private void open() {

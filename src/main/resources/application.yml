@@ -34,6 +34,8 @@ spring:
 
 app:
   home: ${user.home}/lanaseq
+  sample-home: ${app.home}/sample
+  dataset-home: ${app.home}/dataset
   user-home:
     windows: 'lanaseq'
     unix: 'lanaseq'

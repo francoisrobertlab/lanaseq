@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
@@ -30,14 +31,19 @@ import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.tabs.testbench.TabElement;
 import com.vaadin.flow.component.tabs.testbench.TabsElement;
 import com.vaadin.testbench.TestBenchTestCase;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -47,6 +53,34 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchTestCase.class);
   @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
+  private Path home;
+  private Path upload;
+  @Autowired
+  private AppConfiguration configuration;
+
+  @Before
+  public void saveHomeFolder() throws Throwable {
+    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
+    getHome.setAccessible(true);
+    home = (Path) getHome.invoke(configuration);
+  }
+
+  @Before
+  public void saveUploadFolder() throws Throwable {
+    Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
+    getUpload.setAccessible(true);
+    upload = (Path) getUpload.invoke(configuration);
+  }
+
+  @After
+  public void restoreHomeFolder() throws Throwable {
+    setHome(home);
+  }
+
+  @After
+  public void restoreUploadFolder() throws Throwable {
+    setUpload(upload);
+  }
 
   protected String homeUrl() {
     return baseUrl + "/";
@@ -124,5 +158,33 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
         uploader.getAttribute("id"), uploader.getAttribute("class"));
     logger.error("Not updated for Vaadin 10+");
     throw new UnsupportedOperationException("Not updated for Vaadin 10+");
+  }
+
+  protected Path getHome() {
+    return home;
+  }
+
+  protected void setHome(Path home) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
+    setHome.setAccessible(true);
+    setHome.invoke(configuration, home);
+    Method setSampleHome = AppConfiguration.class.getDeclaredMethod("setSampleHome", Path.class);
+    setSampleHome.setAccessible(true);
+    setSampleHome.invoke(configuration, home.resolve("sample"));
+    Method setDatasetHome = AppConfiguration.class.getDeclaredMethod("setDatasetHome", Path.class);
+    setDatasetHome.setAccessible(true);
+    setDatasetHome.invoke(configuration, home.resolve("dataset"));
+  }
+
+  protected Path getUpload() {
+    return upload;
+  }
+
+  protected void setUpload(Path upload) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setUpload = AppConfiguration.class.getDeclaredMethod("setUpload", Path.class);
+    setUpload.setAccessible(true);
+    setUpload.invoke(configuration, upload);
   }
 }

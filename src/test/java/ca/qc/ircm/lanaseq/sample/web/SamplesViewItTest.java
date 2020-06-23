@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -39,14 +38,10 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -66,33 +61,10 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
   private DatasetRepository datasetRepository;
-  @Autowired
-  private AppConfiguration configuration;
-  private Path home;
-
-  private Path getHome() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-      IllegalArgumentException, InvocationTargetException {
-    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
-    getHome.setAccessible(true);
-    return (Path) getHome.invoke(configuration);
-  }
-
-  private void setHome(Path path) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
-    setHome.setAccessible(true);
-    setHome.invoke(configuration, path);
-  }
 
   @Before
   public void beforeTest() throws Throwable {
-    home = getHome();
     setHome(temporaryFolder.newFolder("home").toPath());
-  }
-
-  @After
-  public void afterTest() throws Throwable {
-    setHome(home);
   }
 
   private void open() {
