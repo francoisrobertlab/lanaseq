@@ -36,7 +36,7 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import org.junit.Before;
@@ -59,6 +59,8 @@ public class ProtocolServiceTest {
   private ProtocolService service;
   @Autowired
   private ProtocolRepository repository;
+  @Autowired
+  private ProtocolFileRepository fileRepository;
   @Autowired
   private UserRepository userRepository;
   @MockBean
@@ -84,14 +86,6 @@ public class ProtocolServiceTest {
     assertEquals("FLAG", protocol.getName());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
-    assertEquals(1, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
-    assertEquals((Long) 1L, file.getId());
-    assertEquals("FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(
-        Files.readAllBytes(
-            Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
-        file.getContent());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
   }
 
@@ -142,6 +136,39 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
+  public void files() throws Throwable {
+    Protocol protocol = repository.findById(1L).get();
+    List<ProtocolFile> files = service.files(protocol);
+
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
+    assertEquals((Long) 1L, file.getId());
+    assertEquals("FLAG Protocol.docx", file.getFilename());
+    assertArrayEquals(
+        Files.readAllBytes(
+            Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
+        file.getContent());
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void files_NoId() throws Throwable {
+    List<ProtocolFile> files = service.files(new Protocol());
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  @WithMockUser
+  public void files_Null() throws Throwable {
+    List<ProtocolFile> files = service.files(null);
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  @WithMockUser
   public void save_New() {
     Protocol protocol = new Protocol();
     protocol.setName("New protocol");
@@ -150,9 +177,8 @@ public class ProtocolServiceTest {
     ProtocolFile file = new ProtocolFile();
     file.setFilename("New protocol file.docx");
     file.setContent(content);
-    protocol.setFiles(Arrays.asList(file));
 
-    service.save(protocol);
+    service.save(protocol, Collections.nCopies(1, file));
 
     repository.flush();
     assertNotNull(protocol.getId());
@@ -161,8 +187,9 @@ public class ProtocolServiceTest {
     assertEquals(currentUser.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(protocol.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(protocol.getDate()));
-    assertEquals(1, database.getFiles().size());
-    file = database.getFiles().get(0);
+    List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
+    assertEquals(1, files.size());
+    file = files.get(0);
     assertNotNull(file.getId());
     assertEquals("New protocol file.docx", file.getFilename());
     assertArrayEquals(content, file.getContent());
@@ -175,7 +202,7 @@ public class ProtocolServiceTest {
     Protocol protocol = new Protocol();
     protocol.setName("New protocol");
 
-    service.save(protocol);
+    service.save(protocol, Collections.emptyList());
   }
 
   @Test
@@ -188,18 +215,17 @@ public class ProtocolServiceTest {
     ProtocolFile file = new ProtocolFile();
     file.setFilename("New protocol file.docx");
     file.setContent(content);
-    protocol.getFiles().remove(0);
-    protocol.getFiles().add(file);
 
-    service.save(protocol);
+    service.save(protocol, Collections.nCopies(1, file));
 
     repository.flush();
     protocol = repository.findById(1L).orElse(null);
     assertEquals("New name", protocol.getName());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
-    assertEquals(1, protocol.getFiles().size());
-    file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
+    assertEquals(1, files.size());
+    file = files.get(0);
     assertNotNull(file.getId());
     assertEquals("New protocol file.docx", file.getFilename());
     assertArrayEquals(content, file.getContent());

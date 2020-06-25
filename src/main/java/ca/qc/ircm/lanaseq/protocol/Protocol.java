@@ -25,15 +25,12 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 /**
@@ -67,12 +64,6 @@ public class Protocol implements Data, Owned, Serializable {
   @ManyToOne(optional = false)
   @JoinColumn
   private User owner;
-  /**
-   * Files.
-   */
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn
-  private List<ProtocolFile> files;
 
   public Protocol() {
   }
@@ -127,13 +118,5 @@ public class Protocol implements Data, Owned, Serializable {
 
   public void setDate(LocalDateTime date) {
     this.date = date;
-  }
-
-  public List<ProtocolFile> getFiles() {
-    return files;
-  }
-
-  public void setFiles(List<ProtocolFile> files) {
-    this.files = files;
   }
 }

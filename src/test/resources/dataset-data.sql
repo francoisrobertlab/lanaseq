@@ -21,11 +21,11 @@ INSERT INTO protocol (id,name,owner_id,date)
 VALUES ('2', 'BioID', '5', '2018-11-18 9:31:14');
 INSERT INTO protocol (id,name,owner_id,date)
 VALUES ('3', 'Histone FLAG', '2', '2018-10-20 9:58:12');
-INSERT INTO protocol_file (id,files_id,filename,content)
+INSERT INTO protocol_file (id,protocol_id,filename,content)
 VALUES (1,1,'FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/FLAG_Protocol.docx'));
-INSERT INTO protocol_file (id,files_id,filename,content)
+INSERT INTO protocol_file (id,protocol_id,filename,content)
 VALUES (2,2,'BioID Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/BioID_Protocol.docx'));
-INSERT INTO protocol_file (id,files_id,filename,content)
+INSERT INTO protocol_file (id,protocol_id,filename,content)
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'));
 INSERT INTO dataset (id,name,owner_id,editable,date)
 VALUES ('1', 'MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020', '2', 1, '2018-10-20 13:28:12');

@@ -46,6 +46,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -67,6 +68,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -100,11 +103,15 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   private DataProviderListener<ProtocolFile> filesDataProviderListener;
   @Captor
   private ArgumentCaptor<Protocol> protocolCaptor;
+  @Captor
+  private ArgumentCaptor<Collection<ProtocolFile>> filesCaptor;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(ProtocolDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   @Autowired
-  private ProtocolRepository protocolRepository;
+  private ProtocolRepository repository;
+  @Autowired
+  private ProtocolFileRepository fileRepository;
   private Protocol protocol;
   private String name = "test protocol";
   private String filename = "test file";
@@ -128,9 +135,17 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.cancel = new Button();
     presenter.init(dialog);
     presenter.localeChange(locale);
-    protocol = protocolRepository.findById(1L).get();
+    protocol = repository.findById(1L).get();
     random.nextBytes(fileContent);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(service.files(any())).then(i -> {
+      Protocol protocol = i.getArgument(0);
+      if (protocol != null && protocol.getId() != null) {
+        return fileRepository.findByProtocol(protocol);
+      } else {
+        return new ArrayList<>();
+      }
+    });
   }
 
   private void fillFields() {
@@ -207,7 +222,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
+    verify(service, never()).save(any(), any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -227,7 +242,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
-    verify(service, never()).save(any());
+    verify(service, never()).save(any(), any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -242,7 +257,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
     dialog.filesError.setVisible(true);
     assertEquals(resources.message(FILES_REQUIRED), dialog.filesError.getText());
-    verify(service, never()).save(any());
+    verify(service, never()).save(any(), any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
@@ -265,14 +280,15 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.save(locale);
 
-    verify(service).save(protocolCaptor.capture());
+    verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
     assertNull(protocol.getId());
     assertEquals(name, protocol.getName());
     assertNull(protocol.getDate());
     assertNull(protocol.getOwner());
-    assertEquals(1, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
     assertNull(file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(fileContent, file.getContent());
@@ -288,20 +304,21 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.save(locale);
 
-    verify(service).save(protocolCaptor.capture());
+    verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
     assertEquals((Long) 1L, protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(2, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
+    assertEquals(2, files.size());
+    ProtocolFile file = files.get(0);
     assertEquals((Long) 1L, file.getId());
     assertEquals("FLAG Protocol.docx", file.getFilename());
     byte[] fileContent = Files
         .readAllBytes(Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI()));
     assertArrayEquals(fileContent, file.getContent());
-    file = protocol.getFiles().get(1);
+    file = files.get(1);
     assertNull(file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
@@ -318,14 +335,15 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.save(locale);
 
-    verify(service).save(protocolCaptor.capture());
+    verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
     assertEquals((Long) 1L, protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(1, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
     assertNull(file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
@@ -337,7 +355,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void cancel() {
     presenter.cancel();
-    verify(service, never()).save(any());
+    verify(service, never()).save(any(), any());
     verify(dialog, never()).showNotification(any());
     verify(dialog).close();
     verify(dialog, never()).fireSavedEvent();
@@ -345,12 +363,12 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void getProtocol_New() {
+    when(service.files(any())).thenReturn(new ArrayList<>());
     Protocol protocol = presenter.getProtocol();
     assertNotNull(protocol);
     assertNull(protocol.getId());
     assertNull(protocol.getName());
-    assertNotNull(protocol.getFiles());
-    assertTrue(protocol.getFiles().isEmpty());
+    assertTrue(items(dialog.files).isEmpty());
   }
 
   @Test
@@ -364,10 +382,11 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   public void setProtocol() {
     presenter.setProtocol(protocol);
     assertEquals(protocol.getName(), dialog.name.getValue());
+    List<ProtocolFile> expectedFiles = fileRepository.findByProtocol(protocol);
     List<ProtocolFile> files = items(dialog.files);
-    assertEquals(this.protocol.getFiles().size(), files.size());
-    for (int i = 0; i < this.protocol.getFiles().size(); i++) {
-      assertEquals(this.protocol.getFiles().get(i), files.get(i));
+    assertEquals(expectedFiles.size(), files.size());
+    for (int i = 0; i < expectedFiles.size(); i++) {
+      assertEquals(expectedFiles.get(i), files.get(i));
     }
     assertFalse(dialog.name.isReadOnly());
     assertTrue(dialog.upload.isVisible());
@@ -382,9 +401,10 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setProtocol(protocol);
     assertEquals(protocol.getName(), dialog.name.getValue());
     List<ProtocolFile> files = items(dialog.files);
-    assertEquals(this.protocol.getFiles().size(), files.size());
-    for (int i = 0; i < this.protocol.getFiles().size(); i++) {
-      assertEquals(this.protocol.getFiles().get(i), files.get(i));
+    List<ProtocolFile> expectedFiles = fileRepository.findByProtocol(protocol);
+    assertEquals(expectedFiles.size(), files.size());
+    for (int i = 0; i < expectedFiles.size(); i++) {
+      assertEquals(expectedFiles.get(i), files.get(i));
     }
     assertTrue(dialog.name.isReadOnly());
     assertFalse(dialog.upload.isVisible());
@@ -400,9 +420,10 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.localeChange(locale);
     assertEquals(protocol.getName(), dialog.name.getValue());
     List<ProtocolFile> files = items(dialog.files);
-    assertEquals(this.protocol.getFiles().size(), files.size());
-    for (int i = 0; i < this.protocol.getFiles().size(); i++) {
-      assertEquals(this.protocol.getFiles().get(i), files.get(i));
+    List<ProtocolFile> expectedFiles = fileRepository.findByProtocol(protocol);
+    assertEquals(expectedFiles.size(), files.size());
+    for (int i = 0; i < expectedFiles.size(); i++) {
+      assertEquals(expectedFiles.get(i), files.get(i));
     }
     assertTrue(dialog.name.isReadOnly());
     assertFalse(dialog.upload.isVisible());
@@ -424,7 +445,8 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void setProtocol_NullFiles() {
+  public void setProtocol_NoFiles() {
+    when(service.files(any())).thenReturn(new ArrayList<>());
     presenter.setProtocol(new Protocol());
     assertEquals("", dialog.name.getValue());
     assertTrue(items(dialog.files).isEmpty());

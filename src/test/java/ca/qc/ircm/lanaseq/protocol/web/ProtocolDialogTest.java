@@ -23,8 +23,8 @@ import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
-import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.FILES;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_ERROR;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.ID;
@@ -50,6 +50,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -72,7 +73,6 @@ import java.io.ByteArrayInputStream;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,7 +99,9 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Comparator<ProtocolFile>> comparatorCaptor;
   @Autowired
-  private ProtocolRepository protocolRepository;
+  private ProtocolRepository repository;
+  @Autowired
+  private ProtocolFileRepository fileRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(ProtocolDialog.class, locale);
   private AppResources protocolResources = new AppResources(Protocol.class, locale);
@@ -117,8 +119,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog = new ProtocolDialog(presenter);
     dialog.init();
-    protocolFiles = protocolRepository.findAll().stream().flatMap(pr -> pr.getFiles().stream())
-        .collect(Collectors.toList());
+    protocolFiles = fileRepository.findAll();
   }
 
   @SuppressWarnings("unchecked")
@@ -287,7 +288,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void setProtocol_Protocol() {
-    Protocol protocol = protocolRepository.findById(2L).get();
+    Protocol protocol = repository.findById(2L).get();
     when(presenter.getProtocol()).thenReturn(protocol);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -299,7 +300,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void setProtocol_BeforeLocaleChange() {
-    Protocol protocol = protocolRepository.findById(2L).get();
+    Protocol protocol = repository.findById(2L).get();
     when(presenter.getProtocol()).thenReturn(protocol);
 
     dialog.setProtocol(protocol);

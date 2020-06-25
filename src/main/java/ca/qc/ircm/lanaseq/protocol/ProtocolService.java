@@ -22,6 +22,8 @@ import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -39,14 +41,17 @@ public class ProtocolService {
   @Autowired
   private ProtocolRepository repository;
   @Autowired
+  private ProtocolFileRepository fileRepository;
+  @Autowired
   private AuthorizationService authorizationService;
 
   protected ProtocolService() {
   }
 
-  protected ProtocolService(ProtocolRepository repository,
+  protected ProtocolService(ProtocolRepository repository, ProtocolFileRepository fileRepository,
       AuthorizationService authorizationService) {
     this.repository = repository;
+    this.fileRepository = fileRepository;
     this.authorizationService = authorizationService;
   }
 
@@ -93,21 +98,49 @@ public class ProtocolService {
   }
 
   /**
+   * Returns all files linked to protocol.
+   *
+   * @param protocol
+   *          protocol
+   * @return all files linked to protocol
+   */
+  @PreAuthorize("hasPermission(#protocol, 'read')")
+  public List<ProtocolFile> files(Protocol protocol) {
+    if (protocol == null || protocol.getId() == null) {
+      return new ArrayList<>();
+    }
+    return fileRepository.findByProtocol(protocol);
+  }
+
+  /**
    * Saves protocol into database.
    *
    * @param protocol
    *          protocol
+   * @param protocol's
+   *          files protocol's files
    */
   @PreAuthorize("hasPermission(#protocol, 'write')")
-  public void save(Protocol protocol) {
-    if (protocol.getFiles() == null || protocol.getFiles().isEmpty()) {
+  public void save(Protocol protocol, Collection<ProtocolFile> files) {
+    if (files == null || files.isEmpty()) {
       throw new IllegalArgumentException("at least one file is required for protocols");
     }
     if (protocol.getId() == null) {
       User user = authorizationService.getCurrentUser();
       protocol.setOwner(user);
       protocol.setDate(LocalDateTime.now());
+    } else {
+      List<ProtocolFile> oldFiles = fileRepository.findByProtocol(protocol);
+      for (ProtocolFile file : oldFiles) {
+        if (!files.stream().filter(f -> file.getId().equals(f.getId())).findAny().isPresent()) {
+          fileRepository.delete(file);
+        }
+      }
     }
     repository.save(protocol);
+    for (ProtocolFile file : files) {
+      file.setProtocol(protocol);
+      fileRepository.save(file);
+    }
   }
 }

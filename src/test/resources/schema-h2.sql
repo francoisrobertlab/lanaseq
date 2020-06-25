@@ -50,11 +50,11 @@ CREATE TABLE IF NOT EXISTS protocol (
 );
 CREATE TABLE IF NOT EXISTS protocol_file (
   id bigint(20) NOT NULL AUTO_INCREMENT,
-  files_id bigint(20) DEFAULT NULL,
+  protocol_id bigint(20) DEFAULT NULL,
   filename varchar(255) NOT NULL,
   content blob,
   PRIMARY KEY (id),
-  CONSTRAINT protocolfileProtocol_ibfk FOREIGN KEY (files_id) REFERENCES protocol (id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT protocolfileProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS dataset (
   id bigint(20) NOT NULL AUTO_INCREMENT,

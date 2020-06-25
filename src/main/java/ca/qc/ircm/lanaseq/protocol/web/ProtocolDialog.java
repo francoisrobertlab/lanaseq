@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
-import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.FILES;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
@@ -74,6 +73,7 @@ import org.springframework.context.annotation.Scope;
 public class ProtocolDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
   public static final String ID = "protocols-dialog";
   public static final String HEADER = "header";
+  public static final String FILES = "files";
   public static final String FILES_ERROR = property(FILES, "error");
   public static final String FILES_REQUIRED = property(FILES, REQUIRED);
   public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");

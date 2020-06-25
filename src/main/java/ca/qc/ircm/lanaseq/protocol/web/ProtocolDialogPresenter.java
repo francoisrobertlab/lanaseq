@@ -155,8 +155,7 @@ public class ProtocolDialogPresenter {
   void save(Locale locale) {
     if (isValid(locale)) {
       Protocol protocol = binder.getBean();
-      protocol.setFiles(new ArrayList<>(filesDataProvider.getItems()));
-      service.save(protocol);
+      service.save(protocol, new ArrayList<>(filesDataProvider.getItems()));
       final AppResources resources = new AppResources(ProtocolDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, protocol.getName()));
       dialog.close();
@@ -176,12 +175,9 @@ public class ProtocolDialogPresenter {
     if (protocol == null) {
       protocol = new Protocol();
     }
-    if (protocol.getFiles() == null) {
-      protocol.setFiles(new ArrayList<>());
-    }
     binder.setBean(protocol);
     filesDataProvider.getItems().clear();
-    filesDataProvider.getItems().addAll(protocol.getFiles());
+    filesDataProvider.getItems().addAll(service.files(protocol));
     filesDataProvider.refreshAll();
     setReadOnly();
   }

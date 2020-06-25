@@ -26,6 +26,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 /**
@@ -53,6 +54,11 @@ public class ProtocolFile implements Data, Serializable {
    */
   @Column(nullable = false)
   private byte[] content;
+  /**
+   * Protocol.
+   */
+  @ManyToOne
+  private Protocol protocol;
 
   public ProtocolFile() {
   }
@@ -84,5 +90,13 @@ public class ProtocolFile implements Data, Serializable {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public Protocol getProtocol() {
+    return protocol;
+  }
+
+  public void setProtocol(Protocol protocol) {
+    this.protocol = protocol;
   }
 }

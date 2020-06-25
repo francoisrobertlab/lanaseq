@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
@@ -39,6 +40,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,6 +56,8 @@ import org.springframework.test.context.transaction.TestTransaction;
 public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private ProtocolRepository repository;
+  @Autowired
+  private ProtocolFileRepository fileRepository;
   @Value("${download-home}")
   protected Path downloadHome;
   private String name = "test protocol";
@@ -112,11 +116,12 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(protocol.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(protocol.getDate()));
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(2, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
+    assertEquals(2, files.size());
+    ProtocolFile file = files.get(0);
     assertEquals("FLAG_Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(file1), file.getContent());
-    file = protocol.getFiles().get(1);
+    file = files.get(1);
     assertEquals("Histone_FLAG_Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(file2), file.getContent());
   }
@@ -140,17 +145,18 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(name, protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(3, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
+    assertEquals(3, files.size());
+    ProtocolFile file = files.get(0);
     assertEquals("FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(
         Files.readAllBytes(
             Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
         file.getContent());
-    file = protocol.getFiles().get(1);
+    file = files.get(1);
     assertEquals("FLAG_Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(file1), file.getContent());
-    file = protocol.getFiles().get(2);
+    file = files.get(2);
     assertEquals("Histone_FLAG_Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(file2), file.getContent());
   }
@@ -172,8 +178,9 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("FLAG", protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(1, protocol.getFiles().size());
-    ProtocolFile file = protocol.getFiles().get(0);
+    List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
     assertEquals("FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(
         Files.readAllBytes(
