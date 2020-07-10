@@ -148,6 +148,8 @@ public class ProtocolServiceTest {
         Files.readAllBytes(
             Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
         file.getContent());
+    assertFalse(file.isDeleted());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), file.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
   }
 
@@ -193,6 +195,9 @@ public class ProtocolServiceTest {
     assertNotNull(file.getId());
     assertEquals("New protocol file.docx", file.getFilename());
     assertArrayEquals(content, file.getContent());
+    assertFalse(file.isDeleted());
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(file.getDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(file.getDate()));
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
   }
 
@@ -224,11 +229,24 @@ public class ProtocolServiceTest {
     assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
-    assertEquals(1, files.size());
+    assertEquals(2, files.size());
     file = files.get(0);
+    assertEquals((Long) 1L, file.getId());
+    assertEquals("FLAG Protocol.docx", file.getFilename());
+    assertArrayEquals(
+        Files.readAllBytes(
+            Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
+        file.getContent());
+    assertTrue(file.isDeleted());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), file.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
+    file = files.get(1);
     assertNotNull(file.getId());
     assertEquals("New protocol file.docx", file.getFilename());
     assertArrayEquals(content, file.getContent());
+    assertFalse(file.isDeleted());
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(file.getDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(file.getDate()));
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
   }
 }

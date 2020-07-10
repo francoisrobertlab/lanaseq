@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -450,6 +451,25 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setProtocol(new Protocol());
     assertEquals("", dialog.name.getValue());
     assertTrue(items(dialog.files).isEmpty());
+    assertFalse(dialog.name.isReadOnly());
+    assertTrue(dialog.upload.isVisible());
+    assertTrue(dialog.remove.isVisible());
+    assertTrue(dialog.save.isVisible());
+    assertTrue(dialog.cancel.isVisible());
+  }
+
+  @Test
+  public void setProtocol_DeletedFiles() {
+    Protocol protocol = repository.findById(3L).get();
+    presenter.setProtocol(protocol);
+    assertEquals(protocol.getName(), dialog.name.getValue());
+    List<ProtocolFile> expectedFiles = fileRepository.findByProtocol(protocol).stream()
+        .filter(file -> !file.isDeleted()).collect(Collectors.toList());
+    List<ProtocolFile> files = items(dialog.files);
+    assertEquals(expectedFiles.size(), files.size());
+    for (int i = 0; i < expectedFiles.size(); i++) {
+      assertEquals(expectedFiles.get(i), files.get(i));
+    }
     assertFalse(dialog.name.isReadOnly());
     assertTrue(dialog.upload.isVisible());
     assertTrue(dialog.remove.isVisible());

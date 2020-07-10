@@ -22,6 +22,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -54,6 +55,16 @@ public class ProtocolFile implements Data, Serializable {
    */
   @Column(nullable = false)
   private byte[] content;
+  /**
+   * True if file was deleted.
+   */
+  @Column(nullable = false)
+  private boolean deleted;
+  /**
+   * Creation date.
+   */
+  @Column
+  private LocalDateTime date;
   /**
    * Protocol.
    */
@@ -98,5 +109,21 @@ public class ProtocolFile implements Data, Serializable {
 
   public void setProtocol(Protocol protocol) {
     this.protocol = protocol;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
+  }
+
+  public LocalDateTime getDate() {
+    return date;
+  }
+
+  public void setDate(LocalDateTime date) {
+    this.date = date;
   }
 }

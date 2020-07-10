@@ -117,7 +117,7 @@ public class ProtocolService {
    *
    * @param protocol
    *          protocol
-   * @param protocol's
+   * @param files
    *          files protocol's files
    */
   @PreAuthorize("hasPermission(#protocol, 'write')")
@@ -125,21 +125,26 @@ public class ProtocolService {
     if (files == null || files.isEmpty()) {
       throw new IllegalArgumentException("at least one file is required for protocols");
     }
+    LocalDateTime now = LocalDateTime.now();
     if (protocol.getId() == null) {
       User user = authorizationService.getCurrentUser();
       protocol.setOwner(user);
-      protocol.setDate(LocalDateTime.now());
+      protocol.setDate(now);
     } else {
       List<ProtocolFile> oldFiles = fileRepository.findByProtocol(protocol);
       for (ProtocolFile file : oldFiles) {
         if (!files.stream().filter(f -> file.getId().equals(f.getId())).findAny().isPresent()) {
-          fileRepository.delete(file);
+          file.setDeleted(true);
+          fileRepository.save(file);
         }
       }
     }
     repository.save(protocol);
     for (ProtocolFile file : files) {
-      file.setProtocol(protocol);
+      if (file.getId() == null) {
+        file.setProtocol(protocol);
+        file.setDate(now);
+      }
       fileRepository.save(file);
     }
   }
