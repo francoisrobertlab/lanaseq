@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -155,6 +156,25 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
+  public void files_WithDeleted() throws Throwable {
+    Protocol protocol = repository.findById(3L).get();
+    List<ProtocolFile> files = service.files(protocol);
+
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
+    assertEquals((Long) 4L, file.getId());
+    assertEquals("Histone Protocol.docx", file.getFilename());
+    assertArrayEquals(
+        Files.readAllBytes(
+            Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI())),
+        file.getContent());
+    assertFalse(file.isDeleted());
+    assertEquals(LocalDateTime.of(2018, 10, 21, 9, 58, 12), file.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
   public void files_NoId() throws Throwable {
     List<ProtocolFile> files = service.files(new Protocol());
 
@@ -166,6 +186,58 @@ public class ProtocolServiceTest {
   public void files_Null() throws Throwable {
     List<ProtocolFile> files = service.files(null);
 
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  @WithMockUser(authorities = { UserRole.USER, UserRole.ADMIN })
+  public void deletedFiles_Admin() throws Throwable {
+    Protocol protocol = repository.findById(3L).get();
+    List<ProtocolFile> files = service.deletedFiles(protocol);
+
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
+    assertEquals((Long) 3L, file.getId());
+    assertEquals("Histone FLAG Protocol.docx", file.getFilename());
+    assertArrayEquals(
+        Files.readAllBytes(
+            Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI())),
+        file.getContent());
+    assertTrue(file.isDeleted());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
+  }
+
+  @Test
+  @WithMockUser(authorities = { UserRole.USER, UserRole.MANAGER })
+  public void deletedFiles_Manager() throws Throwable {
+    Protocol protocol = repository.findById(3L).get();
+    List<ProtocolFile> files = service.deletedFiles(protocol);
+
+    assertEquals(1, files.size());
+    ProtocolFile file = files.get(0);
+    assertEquals((Long) 3L, file.getId());
+    assertEquals("Histone FLAG Protocol.docx", file.getFilename());
+    assertArrayEquals(
+        Files.readAllBytes(
+            Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI())),
+        file.getContent());
+    assertTrue(file.isDeleted());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  @WithMockUser
+  public void deletedFiles_User() throws Throwable {
+    Protocol protocol = repository.findById(3L).get();
+    service.deletedFiles(protocol);
+  }
+
+  @Test
+  @WithMockUser(authorities = { UserRole.USER, UserRole.MANAGER })
+  public void deletedFiles_Null() throws Throwable {
+    List<ProtocolFile> files = service.deletedFiles(null);
     assertTrue(files.isEmpty());
   }
 

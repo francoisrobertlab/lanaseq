@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.protocol;
 
+import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
+import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -109,7 +111,23 @@ public class ProtocolService {
     if (protocol == null || protocol.getId() == null) {
       return new ArrayList<>();
     }
-    return fileRepository.findByProtocol(protocol);
+    return fileRepository.findByProtocolAndDeletedFalse(protocol);
+  }
+
+  /**
+   * Returns all deleted files linked to protocol.
+   *
+   * @param protocol
+   *          protocol
+   * @return all deleted files linked to protocol
+   */
+  @PreAuthorize("hasPermission(#protocol, 'read') && hasAnyRole('" + MANAGER + "', '" + ADMIN
+      + "')")
+  public List<ProtocolFile> deletedFiles(Protocol protocol) {
+    if (protocol == null || protocol.getId() == null) {
+      return new ArrayList<>();
+    }
+    return fileRepository.findByProtocolAndDeletedTrue(protocol);
   }
 
   /**
@@ -131,7 +149,7 @@ public class ProtocolService {
       protocol.setOwner(user);
       protocol.setDate(now);
     } else {
-      List<ProtocolFile> oldFiles = fileRepository.findByProtocol(protocol);
+      List<ProtocolFile> oldFiles = fileRepository.findByProtocolAndDeletedFalse(protocol);
       for (ProtocolFile file : oldFiles) {
         if (!files.stream().filter(f -> file.getId().equals(f.getId())).findAny().isPresent()) {
           file.setDeleted(true);

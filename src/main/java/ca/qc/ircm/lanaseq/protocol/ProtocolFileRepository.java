@@ -25,4 +25,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ProtocolFileRepository extends JpaRepository<ProtocolFile, Long> {
   public List<ProtocolFile> findByProtocol(Protocol protocol);
+
+  public List<ProtocolFile> findByProtocolAndDeletedFalse(Protocol protocol);
+
+  public List<ProtocolFile> findByProtocolAndDeletedTrue(Protocol protocol);
 }
