@@ -46,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,8 +177,7 @@ public class ProtocolDialogPresenter {
     }
     binder.setBean(protocol);
     filesDataProvider.getItems().clear();
-    filesDataProvider.getItems().addAll(service.files(protocol).stream()
-        .filter(file -> !file.isDeleted()).collect(Collectors.toList()));
+    filesDataProvider.getItems().addAll(service.files(protocol));
     filesDataProvider.refreshAll();
     setReadOnly();
   }

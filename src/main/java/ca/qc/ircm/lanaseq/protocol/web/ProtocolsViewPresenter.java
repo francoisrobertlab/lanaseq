@@ -76,6 +76,13 @@ public class ProtocolsViewPresenter {
     view.dialog.open();
   }
 
+  public void history(Protocol protocol) {
+    if (authorizationService.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
+      view.historyDialog.setProtocol(service.get(protocol.getId()));
+      view.historyDialog.open();
+    }
+  }
+
   public void add() {
     view.dialog.setProtocol(new Protocol());
     view.dialog.open();

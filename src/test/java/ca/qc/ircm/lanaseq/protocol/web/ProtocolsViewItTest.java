@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -80,7 +81,29 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.doubleClickProtocol(0);
 
-    assertTrue(optional(() -> $(ProtocolDialogElement.class).first()).isPresent());
+    assertTrue($(ProtocolDialogElement.class).id(ProtocolDialog.ID).isOpen());
+  }
+
+  @Test
+  public void history_User() throws Throwable {
+    open();
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+    view.ownerFilter().setValue("");
+
+    view.altClickProtocol(2);
+
+    assertFalse($(ProtocolHistoryDialogElement.class).id(ProtocolHistoryDialog.ID).isOpen());
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void history_Manager() throws Throwable {
+    open();
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+
+    view.altClickProtocol(2);
+
+    assertTrue($(ProtocolHistoryDialogElement.class).id(ProtocolHistoryDialog.ID).isOpen());
   }
 
   @Test
@@ -90,6 +113,6 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.add().click();
 
-    assertTrue(optional(() -> $(ProtocolDialogElement.class).first()).isPresent());
+    assertTrue($(ProtocolDialogElement.class).id(ProtocolDialog.ID).isOpen());
   }
 }

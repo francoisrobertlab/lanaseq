@@ -28,6 +28,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -103,7 +104,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new ProtocolsView(presenter, new ProtocolDialog());
+    view = new ProtocolsView(presenter, new ProtocolDialog(), new ProtocolHistoryDialog());
     view.init();
     protocols = protocolRepository.findAll();
   }
@@ -254,6 +255,14 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     doubleClickItem(view.protocols, protocol);
 
     verify(presenter).view(protocol);
+  }
+
+  @Test
+  public void history() {
+    Protocol protocol = protocols.get(0);
+    clickItem(view.protocols, protocol, view.name, false, false, true, false);
+
+    verify(presenter).history(protocol);
   }
 
   @Test

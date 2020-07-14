@@ -17,37 +17,24 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.Constants.CANCEL;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.Constants.REMOVE;
-import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
-import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_ERROR;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.ID;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.MAXIMUM_FILES_COUNT;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.MAXIMUM_FILES_SIZE;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.REMOVE_BUTTON;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.id;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.FILES;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.HEADER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.ID;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVER_BUTTON;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
@@ -57,19 +44,14 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.upload.SucceededEvent;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import java.io.ByteArrayInputStream;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -86,10 +68,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
-public class ProtocolDialogTest extends AbstractKaribuTestCase {
-  private ProtocolDialog dialog;
+public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
+  private ProtocolHistoryDialog dialog;
   @Mock
-  private ProtocolDialogPresenter presenter;
+  private ProtocolHistoryDialogPresenter presenter;
   @Mock
   private ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener;
   @Captor
@@ -103,10 +85,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   @Autowired
   private ProtocolFileRepository fileRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ProtocolDialog.class, locale);
-  private AppResources protocolResources = new AppResources(Protocol.class, locale);
+  private AppResources resources = new AppResources(ProtocolHistoryDialog.class, locale);
   private AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   @Mock
   private Protocol protocol;
   private List<ProtocolFile> protocolFiles;
@@ -117,7 +97,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog = new ProtocolDialog(presenter);
+    dialog = new ProtocolHistoryDialog(presenter);
     dialog.init();
     protocolFiles = fileRepository.findAll();
   }
@@ -133,10 +113,11 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
-    dialog.remove = mock(Column.class);
-    when(dialog.files.addColumn(any(TemplateRenderer.class), eq(REMOVE))).thenReturn(dialog.remove);
-    when(dialog.remove.setKey(any())).thenReturn(dialog.remove);
-    when(dialog.remove.setHeader(any(String.class))).thenReturn(dialog.remove);
+    dialog.recover = mock(Column.class);
+    when(dialog.files.addColumn(any(TemplateRenderer.class), eq(RECOVER)))
+        .thenReturn(dialog.recover);
+    when(dialog.recover.setKey(any())).thenReturn(dialog.recover);
+    when(dialog.recover.setHeader(any(String.class))).thenReturn(dialog.recover);
   }
 
   @Test
@@ -148,28 +129,16 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
-    assertEquals(id(NAME), dialog.name.getId().orElse(""));
-    assertEquals(id(UPLOAD), dialog.upload.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
-    assertEquals(id(FILES_ERROR), dialog.filesError.getId().orElse(""));
-    assertTrue(dialog.filesError.hasClassName(ERROR_TEXT));
-    assertEquals(id(SAVE), dialog.save.getId().orElse(""));
-    assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
-    validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
-    assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
-    validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
   }
 
   @Test
   public void labels() {
     mockColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
-    verify(dialog.remove).setHeader(webResources.message(REMOVE));
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
-    assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    verify(dialog.recover).setHeader(resources.message(RECOVER));
     verify(presenter).localeChange(locale);
   }
 
@@ -179,52 +148,26 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ProtocolDialog.class, locale);
-    final AppResources protocolResources = new AppResources(Protocol.class, locale);
+    final AppResources resources = new AppResources(ProtocolHistoryDialog.class, locale);
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
-    verify(dialog.remove).setHeader(webResources.message(REMOVE));
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
-    assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    verify(dialog.recover).setHeader(resources.message(RECOVER));
     verify(presenter).localeChange(locale);
-  }
-
-  @Test
-  public void upload() {
-    assertEquals(MAXIMUM_FILES_COUNT, dialog.upload.getMaxFiles());
-    assertEquals(MAXIMUM_FILES_SIZE, dialog.upload.getMaxFileSize());
-  }
-
-  @Test
-  public void upload_File() {
-    dialog.uploadBuffer = mock(MultiFileMemoryBuffer.class);
-    ByteArrayInputStream input = new ByteArrayInputStream(new byte[0]);
-    when(dialog.uploadBuffer.getInputStream(any())).thenReturn(input);
-    String filename = "test_file.txt";
-    String mimeType = "text/plain";
-    long filesize = 84325;
-    SucceededEvent event = new SucceededEvent(dialog.upload, filename, mimeType, filesize);
-    fireEvent(dialog.upload, event);
-    verify(presenter).addFile(filename, input, locale);
-    verify(dialog.uploadBuffer).getInputStream(filename);
   }
 
   @Test
   public void files() {
     assertEquals(2, dialog.files.getColumns().size());
     assertNotNull(dialog.files.getColumnByKey(FILENAME));
-    assertNotNull(dialog.files.getColumnByKey(REMOVE));
+    assertNotNull(dialog.files.getColumnByKey(RECOVER));
     assertTrue(dialog.files.getSelectionModel() instanceof SelectionModel.Single);
   }
 
   @Test
   public void files_ColumnsValueProvider() {
-    dialog = new ProtocolDialog(presenter);
     mockColumns();
     dialog.init();
     verify(dialog.files).addColumn(anchorComponentRendererCaptor.capture(), eq(FILENAME));
@@ -243,28 +186,14 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
       assertEquals(file.getFilename(),
           ((NormalizedComparator<ProtocolFile>) comparator).getConverter().apply(file));
     }
-    verify(dialog.files).addColumn(templateRendererCaptor.capture(), eq(REMOVE));
+    verify(dialog.files).addColumn(templateRendererCaptor.capture(), eq(RECOVER));
     TemplateRenderer<ProtocolFile> templateRenderer = templateRendererCaptor.getValue();
     for (ProtocolFile file : protocolFiles) {
-      assertEquals(REMOVE_BUTTON, rendererTemplate(templateRenderer));
-      assertTrue(templateRenderer.getEventHandlers().containsKey("removeFile"));
-      templateRenderer.getEventHandlers().get("removeFile").accept(file);
-      verify(presenter).removeFile(file);
+      assertEquals(RECOVER_BUTTON, rendererTemplate(templateRenderer));
+      assertTrue(templateRenderer.getEventHandlers().containsKey("recoverFile"));
+      templateRenderer.getEventHandlers().get("recoverFile").accept(file);
+      verify(presenter).recoverFile(file);
     }
-  }
-
-  @Test
-  public void savedListener() {
-    dialog.addSavedListener(savedListener);
-    dialog.fireSavedEvent();
-    verify(savedListener).onComponentEvent(any());
-  }
-
-  @Test
-  public void savedListener_Remove() {
-    dialog.addSavedListener(savedListener).remove();
-    dialog.fireSavedEvent();
-    verify(savedListener, never()).onComponentEvent(any());
   }
 
   @Test
@@ -283,7 +212,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.setProtocol(protocol);
 
     verify(presenter).setProtocol(protocol);
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
   }
 
   @Test
@@ -295,7 +224,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.setProtocol(protocol);
 
     verify(presenter).setProtocol(protocol);
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, protocol.getName()), dialog.header.getText());
   }
 
   @Test
@@ -307,7 +236,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setProtocol(protocol);
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, protocol.getName()), dialog.header.getText());
   }
 
   @Test
@@ -316,18 +245,6 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.setProtocol(null);
 
     verify(presenter).setProtocol(null);
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-  }
-
-  @Test
-  public void save() {
-    dialog.save.click();
-    verify(presenter).save(locale);
-  }
-
-  @Test
-  public void cancel() {
-    clickButton(dialog.cancel);
-    verify(presenter).cancel();
+    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
   }
 }

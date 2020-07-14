@@ -166,4 +166,16 @@ public class ProtocolService {
       fileRepository.save(file);
     }
   }
+
+  /**
+   * Recovers protocol file.
+   *
+   * @param file
+   *          protocol file
+   */
+  @PreAuthorize("hasPermission(#file.protocol, 'write')")
+  public void recover(ProtocolFile file) {
+    file.setDeleted(false);
+    fileRepository.save(file);
+  }
 }

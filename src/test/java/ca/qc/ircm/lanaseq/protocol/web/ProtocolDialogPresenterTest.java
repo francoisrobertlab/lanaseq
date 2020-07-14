@@ -142,7 +142,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.files(any())).then(i -> {
       Protocol protocol = i.getArgument(0);
       if (protocol != null && protocol.getId() != null) {
-        return fileRepository.findByProtocol(protocol);
+        return fileRepository.findByProtocolAndDeletedFalse(protocol);
       } else {
         return new ArrayList<>();
       }

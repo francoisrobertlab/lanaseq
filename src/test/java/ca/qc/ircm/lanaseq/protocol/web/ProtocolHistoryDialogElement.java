@@ -17,49 +17,40 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.FILES;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.HEADER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.id;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
-import com.vaadin.flow.component.html.testbench.H2Element;
-import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
-import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.flow.component.html.testbench.AnchorElement;
+import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.Keys;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
-@Element("vaadin-vertical-layout")
-public class ProtocolsViewElement extends VerticalLayoutElement {
-  private static final int NAME_COLUMN = 0;
-  private static final int OWNER_COLUMN = 2;
+@Element("vaadin-dialog")
+public class ProtocolHistoryDialogElement extends DialogElement {
+  private static final int FILENAME_COLUMN = 0;
+  private static final int RECOVER_COLUMN = 1;
 
-  public H2Element header() {
-    return $(H2Element.class).id(HEADER);
+  public H3Element header() {
+    return $(H3Element.class).id(id(HEADER));
   }
 
-  public GridElement protocols() {
-    return $(GridElement.class).id(PROTOCOLS);
+  public GridElement files() {
+    return $(GridElement.class).id(id(FILES));
   }
 
-  public TextFieldElement ownerFilter() {
-    return protocols().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
+  public AnchorElement filename(int row) {
+    return files().getCell(row, FILENAME_COLUMN).$(AnchorElement.class).first();
   }
 
-  public void doubleClickProtocol(int row) {
-    protocols().getCell(row, NAME_COLUMN).doubleClick();
-  }
-
-  public void altClickProtocol(int row) {
-    protocols().getCell(row, NAME_COLUMN).click(0, 0, Keys.ALT);
-  }
-
-  public ButtonElement add() {
-    return $(ButtonElement.class).id(ADD);
+  public ButtonElement recover(int row) {
+    return files().getCell(row, RECOVER_COLUMN).$(ButtonElement.class).first();
   }
 }

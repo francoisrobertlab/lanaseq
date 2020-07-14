@@ -321,4 +321,23 @@ public class ProtocolServiceTest {
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(file.getDate()));
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
   }
+
+  @Test
+  @WithMockUser
+  public void recover() throws Throwable {
+    Protocol protocol = repository.findById(3L).get();
+    ProtocolFile file = fileRepository.findById(3L).get();
+
+    service.recover(file);
+
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
+    assertEquals((Long) 3L, file.getId());
+    assertEquals("Histone FLAG Protocol.docx", file.getFilename());
+    assertArrayEquals(
+        Files.readAllBytes(
+            Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI())),
+        file.getContent());
+    assertFalse(file.isDeleted());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getDate());
+  }
 }

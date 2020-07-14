@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,6 +96,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     view.ownerFilter = new TextField();
     view.add = new Button();
     view.dialog = mock(ProtocolDialog.class);
+    view.historyDialog = mock(ProtocolHistoryDialog.class);
     protocols = protocolRepository.findAll();
     when(protocolService.all()).thenReturn(protocols);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -211,6 +213,31 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     verify(protocolService).get(2L);
     verify(view.dialog).setProtocol(databaseProtocol);
     verify(view.dialog).open();
+  }
+
+  @Test
+  public void history_NoRole() {
+    presenter.init(view);
+    Protocol protocol = new Protocol();
+    protocol.setId(2L);
+    presenter.history(protocol);
+    verify(view.historyDialog, never()).setProtocol(any());
+    verify(view.historyDialog, never()).open();
+  }
+
+  @Test
+  public void history_WithRole() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    presenter.init(view);
+    Protocol protocol = new Protocol();
+    protocol.setId(2L);
+    Protocol databaseProtocol = new Protocol();
+    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    presenter.history(protocol);
+    verify(authorizationService).hasAnyRole(UserRole.MANAGER, UserRole.ADMIN);
+    verify(protocolService).get(2L);
+    verify(view.historyDialog).setProtocol(databaseProtocol);
+    verify(view.historyDialog).open();
   }
 
   @Test

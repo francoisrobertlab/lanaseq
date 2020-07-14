@@ -75,20 +75,24 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   @Autowired
   protected ProtocolDialog dialog;
   @Autowired
+  protected ProtocolHistoryDialog historyDialog;
+  @Autowired
   private transient ProtocolsViewPresenter presenter;
 
   public ProtocolsView() {
   }
 
-  ProtocolsView(ProtocolsViewPresenter presenter, ProtocolDialog dialog) {
+  ProtocolsView(ProtocolsViewPresenter presenter, ProtocolDialog dialog,
+      ProtocolHistoryDialog historyDialog) {
     this.presenter = presenter;
     this.dialog = dialog;
+    this.historyDialog = historyDialog;
   }
 
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, protocols, add, dialog);
+    add(header, protocols, add, dialog, historyDialog);
     header.setId(HEADER);
     protocols.setId(PROTOCOLS);
     name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
@@ -100,6 +104,11 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     protocols.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    protocols.addItemClickListener(e -> {
+      if (e.isAltKey()) {
+        presenter.history(e.getItem());
+      }
+    });
     protocols.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = protocols.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
