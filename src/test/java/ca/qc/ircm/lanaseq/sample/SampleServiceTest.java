@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,7 +28,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
+@WithMockUser
 public class SampleServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
@@ -88,7 +92,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void get() {
     Sample sample = service.get(1L);
 
@@ -110,14 +113,12 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void get_Null() {
     Sample sample = service.get(null);
     assertNull(sample);
   }
 
   @Test
-  @WithMockUser
   public void all() {
     List<Sample> samples = service.all();
 
@@ -138,7 +139,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
     Path folder = configuration.folder(sample);
@@ -160,7 +160,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files_FolderNotExists() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
 
@@ -172,7 +171,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files_NullId() throws Throwable {
     List<Path> files = service.files(new Sample());
 
@@ -180,7 +178,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files_Null() throws Throwable {
     List<Path> files = service.files(null);
 
@@ -188,7 +185,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_FalseNotEditable() {
     Sample sample = repository.findById(9L).get();
     sample.setEditable(false);
@@ -197,7 +193,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_FalseLinkedToDataset() {
     Sample sample = repository.findById(1L).get();
     assertFalse(service.isDeletable(sample));
@@ -205,7 +200,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_True() {
     Sample sample = repository.findById(9L).get();
     assertTrue(service.isDeletable(sample));
@@ -213,19 +207,16 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_Null() {
     assertFalse(service.isDeletable(null));
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_NullId() {
     assertFalse(service.isDeletable(new Sample()));
   }
 
   @Test
-  @WithMockUser
   public void isMergable_False() {
     List<Sample> samples = new ArrayList<>();
     samples.add(repository.findById(1L).get());
@@ -234,7 +225,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_True() {
     List<Sample> samples = new ArrayList<>();
     samples.add(repository.findById(1L).get());
@@ -243,7 +233,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_AllNull() {
     List<Sample> samples = new ArrayList<>();
     samples.add(new Sample());
@@ -252,7 +241,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_ProtocolTrue() {
     List<Sample> samples = new ArrayList<>();
     Protocol protocol = new Protocol(1L);
@@ -266,7 +254,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_ProtocolFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -279,7 +266,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_ProtocolOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -290,7 +276,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_AssayTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -303,7 +288,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_AssayFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -316,7 +300,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_AssayOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -327,7 +310,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TypeTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -340,7 +322,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TypeFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -353,7 +334,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TypeOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -364,7 +344,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TargetTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -377,7 +356,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TargetFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -390,7 +368,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TargetOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -401,7 +378,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_StrainTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -414,7 +390,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_StrainFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -427,7 +402,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_StrainOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -438,7 +412,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_StrainDescriptionTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -451,7 +424,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_StrainDescriptionFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -464,7 +436,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_StrainDescriptionOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -475,7 +446,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TreatmentTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -488,7 +458,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TreatmentFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -501,7 +470,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TreatmentOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -512,7 +480,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_TargetTrueTreatmentFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
@@ -527,7 +494,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isMergable_Empty() {
     assertFalse(service.isMergable(new ArrayList<>()));
   }
@@ -539,7 +505,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -578,7 +543,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_Update() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -615,7 +579,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_RenameDatasets() throws Throwable {
     Sample sample = repository.findById(4L).get();
     sample.setSampleId("sample1");
@@ -662,7 +625,6 @@ public class SampleServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @WithMockUser
   public void save_UpdateNotEditable() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -671,7 +633,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_UpdateMoveFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -704,7 +665,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void saveFiles() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
     List<Path> files = new ArrayList<>();
@@ -733,7 +693,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void delete() throws Throwable {
     Sample sample = repository.findById(9L).get();
     Path folder = configuration.folder(sample);
@@ -751,17 +710,95 @@ public class SampleServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @WithMockUser
   public void delete_LinkedToDataset() {
     Sample sample = repository.findById(1L).get();
     service.delete(sample);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @WithMockUser
   public void delete_NotEditable() {
     Sample sample = repository.findById(9L).get();
     sample.setEditable(false);
     service.delete(sample);
+  }
+
+  @Test
+  public void deleteFile_FullPath() throws Throwable {
+    Sample sample = repository.findById(9L).get();
+    Path folder = configuration.folder(sample);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
+
+    service.deleteFile(sample, file);
+
+    verify(configuration, times(2)).folder(sample);
+    assertFalse(Files.exists(file));
+    Path deleted = folder.resolve(".deleted");
+    List<String> deletedLines = Files.readAllLines(deleted);
+    String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
+    assertEquals(3, deletedFileColumns.length);
+    assertEquals("test.txt", deletedFileColumns[0]);
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test
+  public void deleteFile_RelativePath() throws Throwable {
+    Sample sample = repository.findById(9L).get();
+    Path folder = configuration.folder(sample);
+    Files.createDirectories(folder);
+    Path file = Paths.get("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
+        StandardCopyOption.REPLACE_EXISTING);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(folder.resolve(file), FileTime.from(toInstant(modifiedTime)));
+
+    service.deleteFile(sample, file);
+
+    verify(configuration, times(2)).folder(sample);
+    assertFalse(Files.exists(file));
+    Path deleted = folder.resolve(".deleted");
+    List<String> deletedLines = Files.readAllLines(deleted);
+    String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
+    assertEquals(3, deletedFileColumns.length);
+    assertEquals("test.txt", deletedFileColumns[0]);
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void deleteFile_FullPathNotInSampleFolder() throws Throwable {
+    Sample sample = repository.findById(9L).get();
+    Path file = temporaryFolder.getRoot().toPath().resolve("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.setLastModifiedTime(file,
+        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+
+    service.deleteFile(sample, file);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
+    Sample sample = repository.findById(9L).get();
+    Path folder = configuration.folder(sample);
+    Files.createDirectories(folder);
+    Path file = Paths.get("../test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.setLastModifiedTime(file,
+        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+
+    service.deleteFile(sample, file);
   }
 }

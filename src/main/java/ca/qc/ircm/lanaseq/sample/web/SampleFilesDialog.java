@@ -50,7 +50,6 @@ public class SampleFilesDialog extends Dialog
   public static final String FILENAME_REGEX = "[\\w-\\.]*";
   public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
   public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
-  public static final String FILE_DELETE_ERROR = property("filename", "delete", "error");
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();

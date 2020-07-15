@@ -17,9 +17,12 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -31,6 +34,10 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,6 +110,8 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
@@ -112,5 +121,15 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Thread.sleep(1000);
 
     assertFalse(Files.exists(file));
+    Path deleted = folder.resolve(DELETED_FILENAME);
+    List<String> deletedLines = Files.readAllLines(deleted);
+    String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
+    assertEquals(3, deletedFileColumns.length);
+    assertEquals("R1.fastq", deletedFileColumns[0]);
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
   }
 }

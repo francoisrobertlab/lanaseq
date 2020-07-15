@@ -133,15 +133,9 @@ public class SampleFilesDialogPresenter {
 
   void deleteFile(SampleFile file, Locale locale) {
     Path path = file.getPath();
-    try {
-      logger.debug("delete file {}", path);
-      Files.delete(path);
-      updateFiles();
-    } catch (IOException e) {
-      logger.error("deleting file {} failed", path);
-      final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
-      dialog.showNotification(resources.message(FILE_RENAME_ERROR, path.getFileName()));
-    }
+    logger.debug("delete file {}", path);
+    service.deleteFile(sample, path);
+    updateFiles();
   }
 
   BinderValidationStatus<SampleFile> validateSampleFile() {

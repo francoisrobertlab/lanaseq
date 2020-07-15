@@ -411,6 +411,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void deleteFile() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
     Path path = temporaryFolder.newFile("source.txt").toPath();
     SampleFile file = new SampleFile(path);
     byte[] bytes = new byte[1024];
@@ -419,6 +421,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.deleteFile(file, locale);
 
-    assertFalse(Files.exists(path));
+    verify(service).deleteFile(sample, file.getPath());
   }
 }
