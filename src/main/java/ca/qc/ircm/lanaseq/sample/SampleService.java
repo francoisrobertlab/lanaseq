@@ -254,15 +254,20 @@ public class SampleService {
    *          file to delete
    */
   public void deleteFile(Sample sample, Path file) {
+    Path filename = file.getFileName();
+    if (filename == null) {
+      throw new IllegalArgumentException("file " + file + " is empty");
+    }
     Path folder = configuration.folder(sample);
     Path toDelete = folder.resolve(file);
-    if (!toDelete.getParent().equals(folder)) {
+    Path toDeleteParent = toDelete.getParent();
+    if (toDeleteParent == null || !toDeleteParent.equals(folder)) {
       throw new IllegalArgumentException("file " + file + " not in folder " + folder);
     }
     Path deleted = folder.resolve(DELETED_FILENAME);
     try (Writer writer =
         Files.newBufferedWriter(deleted, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
-      writer.write(file.getFileName().toString());
+      writer.write(filename.toString());
       writer.write("\t");
       DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
       writer.write(
