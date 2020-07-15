@@ -63,7 +63,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -308,41 +307,11 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void viewFiles_CannotWrite() {
-    when(authorizationService.hasPermission(any(Dataset.class), any())).thenReturn(false);
-    Dataset dataset = datasets.get(0);
-    view.datasets.select(dataset);
-    presenter.viewFiles(locale);
-    assertFalse(view.error.isVisible());
-    verify(view.filesDialog).setDataset(any());
-    verify(view.filesDialog).open();
-  }
-
-  @Test
   public void viewFiles_Dataset() {
     Dataset dataset = datasets.get(0);
     presenter.viewFiles(dataset);
     verify(view.filesDialog).setDataset(dataset);
     verify(view.filesDialog).open();
-  }
-
-  @Test
-  public void viewFiles_DatasetCannotWrite() {
-    when(authorizationService.hasPermission(any(Dataset.class), any())).thenReturn(false);
-    Dataset dataset = datasets.get(0);
-    presenter.viewFiles(dataset);
-    verify(view.filesDialog).setDataset(any());
-    verify(view.filesDialog).open();
-  }
-
-  @Test
-  @Ignore("dataset does not have editable property")
-  public void viewFiles_DatasetNotEditable() {
-    Dataset dataset = datasets.get(0);
-    //dataset.setEditable(false);
-    presenter.viewFiles(dataset);
-    verify(view.filesDialog, never()).setDataset(any());
-    verify(view.filesDialog, never()).open();
   }
 
   @Test
