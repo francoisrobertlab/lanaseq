@@ -136,15 +136,9 @@ public class DatasetFilesDialogPresenter {
 
   void deleteFile(DatasetFile file) {
     Path path = file.getPath();
-    try {
-      logger.debug("delete file {}", path);
-      Files.delete(path);
-      updateFiles();
-    } catch (IOException e) {
-      logger.error("deleting file {} failed", path);
-      final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
-      dialog.showNotification(resources.message(FILE_RENAME_ERROR, path.getFileName()));
-    }
+    logger.debug("delete file {}", path);
+    service.deleteFile(dataset, path);
+    updateFiles();
   }
 
   BinderValidationStatus<DatasetFile> validateDatasetFile() {

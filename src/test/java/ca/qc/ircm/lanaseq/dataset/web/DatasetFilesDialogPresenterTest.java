@@ -411,6 +411,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void deleteFile() throws Throwable {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
     Path path = temporaryFolder.newFile("source.txt").toPath();
     DatasetFile file = new DatasetFile(path);
     byte[] bytes = new byte[1024];
@@ -419,6 +421,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.deleteFile(file);
 
-    assertFalse(Files.exists(path));
+    verify(service).deleteFile(dataset, file.getPath());
   }
 }

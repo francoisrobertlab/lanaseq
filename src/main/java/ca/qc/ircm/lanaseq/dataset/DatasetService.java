@@ -17,16 +17,22 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
+import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
+import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
+
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -241,6 +247,38 @@ public class DatasetService {
       FileSystemUtils.deleteRecursively(folder);
     } catch (IOException e) {
       logger.error("could not delete folder {}", folder);
+    }
+  }
+
+  /**
+   * Deletes dataset file.
+   *
+   * @param dataset
+   *          dataset
+   * @param file
+   *          file to delete
+   */
+  public void deleteFile(Dataset dataset, Path file) {
+    Path folder = configuration.folder(dataset);
+    Path toDelete = folder.resolve(file);
+    if (!toDelete.getParent().equals(folder)) {
+      throw new IllegalArgumentException("file " + file + " not in folder " + folder);
+    }
+    Path deleted = folder.resolve(DELETED_FILENAME);
+    try (Writer writer =
+        Files.newBufferedWriter(deleted, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+      writer.write(file.getFileName().toString());
+      writer.write("\t");
+      DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+      writer.write(
+          formatter.format(toLocalDateTime(Files.getLastModifiedTime(toDelete).toInstant())));
+      writer.write("\t");
+      writer.write(formatter.format(LocalDateTime.now()));
+      writer.write("\n");
+      Files.delete(toDelete);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("could not delete file " + file + " from folder " + folder,
+          e);
     }
   }
 }

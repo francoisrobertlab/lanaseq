@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +48,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -500,5 +503,85 @@ public class DatasetServiceTest {
   public void delete_NotEditable() {
     Dataset dataset = repository.findById(5L).get();
     service.delete(dataset);
+  }
+
+  @Test
+  public void deleteFile_FullPath() throws Throwable {
+    Dataset dataset = repository.findById(4L).get();
+    Path folder = configuration.folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
+
+    service.deleteFile(dataset, file);
+
+    verify(configuration, times(2)).folder(dataset);
+    assertFalse(Files.exists(file));
+    Path deleted = folder.resolve(".deleted");
+    List<String> deletedLines = Files.readAllLines(deleted);
+    String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
+    assertEquals(3, deletedFileColumns.length);
+    assertEquals("test.txt", deletedFileColumns[0]);
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test
+  public void deleteFile_RelativePath() throws Throwable {
+    Dataset dataset = repository.findById(4L).get();
+    Path folder = configuration.folder(dataset);
+    Files.createDirectories(folder);
+    Path file = Paths.get("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
+        StandardCopyOption.REPLACE_EXISTING);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(folder.resolve(file), FileTime.from(toInstant(modifiedTime)));
+
+    service.deleteFile(dataset, file);
+
+    verify(configuration, times(2)).folder(dataset);
+    assertFalse(Files.exists(file));
+    Path deleted = folder.resolve(".deleted");
+    List<String> deletedLines = Files.readAllLines(deleted);
+    String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
+    assertEquals(3, deletedFileColumns.length);
+    assertEquals("test.txt", deletedFileColumns[0]);
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void deleteFile_FullPathNotInSampleFolder() throws Throwable {
+    Dataset dataset = repository.findById(4L).get();
+    Path file = temporaryFolder.getRoot().toPath().resolve("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.setLastModifiedTime(file,
+        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+
+    service.deleteFile(dataset, file);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
+    Dataset dataset = repository.findById(4L).get();
+    Path folder = configuration.folder(dataset);
+    Files.createDirectories(folder);
+    Path file = Paths.get("../test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.setLastModifiedTime(file,
+        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+
+    service.deleteFile(dataset, file);
   }
 }
