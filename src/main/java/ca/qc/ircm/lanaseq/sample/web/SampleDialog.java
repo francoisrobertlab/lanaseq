@@ -44,7 +44,6 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.nio.file.Path;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -225,32 +224,5 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public void setSample(Sample sample) {
     presenter.setSample(sample);
     updateHeader();
-  }
-
-  public static class SampleFile {
-    private Path path;
-    private String filename;
-
-    SampleFile(Path path) {
-      this.path = path;
-      filename = path.getFileName().toString();
-    }
-
-    @Override
-    public String toString() {
-      return "SampleFile [path=" + path + ", filename=" + filename + "]";
-    }
-
-    public Path getPath() {
-      return path;
-    }
-
-    public String getFilename() {
-      return filename;
-    }
-
-    public void setFilename(String filename) {
-      this.filename = filename;
-    }
   }
 }

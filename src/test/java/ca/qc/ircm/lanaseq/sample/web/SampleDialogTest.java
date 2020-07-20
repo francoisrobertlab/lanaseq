@@ -57,28 +57,21 @@ import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import ca.qc.ircm.lanaseq.sample.web.SampleDialog.SampleFile;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.CancelEvent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
-import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -93,12 +86,6 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
   private SampleDialogPresenter presenter;
   @Mock
   private Sample sample;
-  @Captor
-  private ArgumentCaptor<ValueProvider<SampleFile, String>> valueProviderCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentRenderer<Button, SampleFile>> buttonRendererCaptor;
-  @Captor
-  private ArgumentCaptor<EditorCloseListener<SampleFile>> closeListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
