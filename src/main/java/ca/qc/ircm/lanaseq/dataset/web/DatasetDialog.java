@@ -70,7 +70,6 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -335,27 +334,5 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public void setDataset(Dataset dataset) {
     presenter.setDataset(dataset);
     updateHeader();
-  }
-
-  public static class DatasetFile {
-    private Path path;
-    private String filename;
-
-    DatasetFile(Path path) {
-      this.path = path;
-      filename = path.getFileName().toString();
-    }
-
-    public Path getPath() {
-      return path;
-    }
-
-    public String getFilename() {
-      return filename;
-    }
-
-    public void setFilename(String filename) {
-      this.filename = filename;
-    }
   }
 }

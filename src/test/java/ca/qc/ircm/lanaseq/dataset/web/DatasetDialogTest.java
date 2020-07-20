@@ -61,7 +61,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
@@ -84,7 +83,6 @@ import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -127,14 +125,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, Sample>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
-  @Captor
-  private ArgumentCaptor<ValueProvider<DatasetFile, String>> fileValueProviderCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentRenderer<Button, DatasetFile>> fileButtonRendererCaptor;
-  @Captor
-  private ArgumentCaptor<Comparator<DatasetFile>> fileComparatorCaptor;
-  @Captor
-  private ArgumentCaptor<EditorCloseListener<DatasetFile>> fileCloseListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Mock
