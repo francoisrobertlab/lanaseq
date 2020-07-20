@@ -2,21 +2,21 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILE_RENAME_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
+import static ca.qc.ircm.lanaseq.web.EditableFileProperties.FILENAME;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -25,6 +25,7 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +49,7 @@ public class SampleFilesDialogPresenter {
   private SampleService service;
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
-  private Binder<SampleFile> fileBinder = new BeanValidationBinder<>(SampleFile.class);
+  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
 
   @Autowired
   protected SampleFilesDialogPresenter(SampleService service,
@@ -77,9 +78,9 @@ public class SampleFilesDialogPresenter {
 
   private Validator<String> exists(Locale locale) {
     return (value, context) -> {
-      SampleFile item = dialog.files.getEditor().getItem();
-      if (value != null && item != null && !value.equals(item.getPath().getFileName().toString())
-          && Files.exists(item.getPath().resolveSibling(value))) {
+      EditableFile item = dialog.files.getEditor().getItem();
+      if (value != null && item != null && !value.equals(item.getFile().getName())
+          && Files.exists(item.getFile().toPath().resolveSibling(value))) {
         final AppResources webResources = new AppResources(Constants.class, locale);
         return ValidationResult.error(webResources.message(ALREADY_EXISTS));
       }
@@ -102,7 +103,8 @@ public class SampleFilesDialogPresenter {
   }
 
   private void updateFiles() {
-    dialog.files.setItems(service.files(sample).stream().map(file -> new SampleFile(file)));
+    dialog.files
+        .setItems(service.files(sample).stream().map(file -> new EditableFile(file.toFile())));
   }
 
   boolean isReadOnly() {
@@ -116,8 +118,8 @@ public class SampleFilesDialogPresenter {
     }
   }
 
-  void rename(SampleFile file, Locale locale) {
-    Path source = file.getPath();
+  void rename(EditableFile file, Locale locale) {
+    Path source = file.getFile().toPath();
     Path target = source.resolveSibling(file.getFilename());
     try {
       logger.debug("rename file {} to {}", source, target);
@@ -131,14 +133,14 @@ public class SampleFilesDialogPresenter {
     }
   }
 
-  void deleteFile(SampleFile file, Locale locale) {
-    Path path = file.getPath();
+  void deleteFile(EditableFile file, Locale locale) {
+    File path = file.getFile();
     logger.debug("delete file {}", path);
-    service.deleteFile(sample, path);
+    service.deleteFile(sample, path.toPath());
     updateFiles();
   }
 
-  BinderValidationStatus<SampleFile> validateSampleFile() {
+  BinderValidationStatus<EditableFile> validateSampleFile() {
     return fileBinder.validate();
   }
 

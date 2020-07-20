@@ -39,10 +39,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -57,8 +57,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -85,11 +84,11 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   @Mock
   private Sample sample;
   @Captor
-  private ArgumentCaptor<ValueProvider<SampleFile, String>> valueProviderCaptor;
+  private ArgumentCaptor<ValueProvider<EditableFile, String>> valueProviderCaptor;
   @Captor
-  private ArgumentCaptor<ComponentRenderer<Button, SampleFile>> buttonRendererCaptor;
+  private ArgumentCaptor<ComponentRenderer<Button, EditableFile>> buttonRendererCaptor;
   @Captor
-  private ArgumentCaptor<EditorCloseListener<SampleFile>> closeListenerCaptor;
+  private ArgumentCaptor<EditorCloseListener<EditableFile>> closeListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
@@ -99,7 +98,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Path> files = new ArrayList<>();
+  private List<File> files = new ArrayList<>();
 
   /**
    * Before test.
@@ -107,10 +106,10 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    files.add(Paths.get("sample", "sample_R1.fastq"));
-    files.add(Paths.get("sample", "sample_R2.fastq"));
-    files.add(Paths.get("sample", "sample.bw"));
-    files.add(Paths.get("sample", "sample.png"));
+    files.add(new File("sample", "sample_R1.fastq"));
+    files.add(new File("sample", "sample_R2.fastq"));
+    files.add(new File("sample", "sample.bw"));
+    files.add(new File("sample", "sample.png"));
   }
 
   @SuppressWarnings("unchecked")
@@ -189,16 +188,16 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
     mockColumns();
     dialog.init();
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<SampleFile, String> valueProvider = valueProviderCaptor.getValue();
-    for (Path path : files) {
-      SampleFile file = new SampleFile(path);
+    ValueProvider<EditableFile, String> valueProvider = valueProviderCaptor.getValue();
+    for (File path : files) {
+      EditableFile file = new EditableFile(path);
       assertEquals(file.getFilename(), valueProvider.apply(file));
     }
     verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
     verify(dialog.files).addColumn(buttonRendererCaptor.capture(), eq(DELETE));
-    ComponentRenderer<Button, SampleFile> buttonRenderer = buttonRendererCaptor.getValue();
-    for (Path path : files) {
-      SampleFile file = new SampleFile(path);
+    ComponentRenderer<Button, EditableFile> buttonRenderer = buttonRendererCaptor.getValue();
+    for (File path : files) {
+      EditableFile file = new EditableFile(path);
       Button button = buttonRenderer.createComponent(file);
       assertTrue(button.hasClassName(DELETE));
       assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
@@ -213,9 +212,9 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   public void renameFile() {
     mockColumns();
     dialog.init();
-    SampleFile file = new SampleFile(files.get(0));
+    EditableFile file = new EditableFile(files.get(0));
     verify(dialog.files.getEditor()).addCloseListener(closeListenerCaptor.capture());
-    EditorCloseListener<SampleFile> listener = closeListenerCaptor.getValue();
+    EditorCloseListener<EditableFile> listener = closeListenerCaptor.getValue();
     listener.onEditorClose(new EditorCloseEvent<>(dialog.files.getEditor(), file));
     verify(presenter).rename(file, locale);
   }

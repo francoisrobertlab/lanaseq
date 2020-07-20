@@ -43,11 +43,11 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.SampleFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
@@ -57,14 +57,15 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Path> files = new ArrayList<>();
+  private List<File> files = new ArrayList<>();
   private Path folder;
   private String folderLabelLinux = "lanaseq/upload";
   private String folderLabelWindows = "lanaseq\\upload";
@@ -125,12 +126,13 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
     dialog.addFilesDialog = mock(AddSampleFilesDialog.class);
-    files.add(Paths.get("sample_R1.fastq"));
-    files.add(Paths.get("sample_R2.fastq"));
-    files.add(Paths.get("sample.bw"));
-    files.add(Paths.get("sample.png"));
+    files.add(new File("sample_R1.fastq"));
+    files.add(new File("sample_R2.fastq"));
+    files.add(new File("sample.bw"));
+    files.add(new File("sample.png"));
     when(dialog.getUI()).thenReturn(Optional.of(ui));
-    when(service.files(any())).thenReturn(files);
+    when(service.files(any()))
+        .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     when(configuration.folder(any(Sample.class))).thenReturn(folder);
     when(configuration.folderLabel(any(Sample.class), anyBoolean())).then(i -> {
@@ -222,10 +224,10 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
 
     verify(service).files(sample);
-    List<SampleFile> files = items(dialog.files);
+    List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (SampleFile file : files) {
-      assertTrue(this.files.contains(file.getPath()));
+    for (EditableFile file : files) {
+      assertTrue(this.files.contains(file.getFile()));
     }
     assertTrue(dialog.delete.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
@@ -240,10 +242,10 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
 
     verify(service).files(sample);
-    List<SampleFile> files = items(dialog.files);
+    List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (SampleFile file : files) {
-      assertTrue(this.files.contains(file.getPath()));
+    for (EditableFile file : files) {
+      assertTrue(this.files.contains(file.getFile()));
     }
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
@@ -256,10 +258,10 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
 
     verify(service).files(sample);
-    List<SampleFile> files = items(dialog.files);
+    List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (SampleFile file : files) {
-      assertTrue(this.files.contains(file.getPath()));
+    for (EditableFile file : files) {
+      assertTrue(this.files.contains(file.getFile()));
     }
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
@@ -274,7 +276,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void filenameEdit_Empty() throws Throwable {
     dialog.filenameEdit.setValue("");
 
-    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateSampleFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -287,7 +289,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void filenameEdit_Invalid() throws Throwable {
     dialog.filenameEdit.setValue("abc?.txt");
 
-    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateSampleFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -299,16 +301,16 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_Exists() throws Throwable {
-    Path path = temporaryFolder.newFile("source.txt").toPath();
+    File path = temporaryFolder.newFile("source.txt");
     temporaryFolder.newFile("abc.txt");
-    SampleFile file = new SampleFile(path);
+    EditableFile file = new EditableFile(path);
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
     when(dialog.files.getEditor().getItem()).thenReturn(file);
 
     dialog.filenameEdit.setValue("abc.txt");
 
-    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateSampleFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -327,7 +329,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     dialog.filenameEdit.setValue("abc.txt");
 
-    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateSampleFile();
     assertTrue(status.isOk());
   }
 
@@ -335,7 +337,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void filenameEdit_ItemNull() throws Throwable {
     dialog.filenameEdit.setValue("");
 
-    BinderValidationStatus<SampleFile> status = presenter.validateSampleFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateSampleFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -395,32 +397,32 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void rename() throws Throwable {
-    Path path = temporaryFolder.newFile("source.txt").toPath();
-    SampleFile file = new SampleFile(path);
+    File path = temporaryFolder.newFile("source.txt");
+    EditableFile file = new EditableFile(path);
     file.setFilename("target.txt");
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
-    Files.write(path, bytes);
+    Files.write(path.toPath(), bytes);
 
     presenter.rename(file, locale);
 
-    assertTrue(Files.exists(path.resolveSibling("target.txt")));
-    assertArrayEquals(bytes, Files.readAllBytes(path.resolveSibling("target.txt")));
-    assertFalse(Files.exists(path));
+    assertTrue(Files.exists(path.toPath().resolveSibling("target.txt")));
+    assertArrayEquals(bytes, Files.readAllBytes(path.toPath().resolveSibling("target.txt")));
+    assertFalse(Files.exists(path.toPath()));
   }
 
   @Test
   public void deleteFile() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    Path path = temporaryFolder.newFile("source.txt").toPath();
-    SampleFile file = new SampleFile(path);
+    File path = temporaryFolder.newFile("source.txt");
+    EditableFile file = new EditableFile(path);
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
-    Files.write(path, bytes);
+    Files.write(path.toPath(), bytes);
 
     presenter.deleteFile(file, locale);
 
-    verify(service).deleteFile(sample, file.getPath());
+    verify(service).deleteFile(sample, file.getFile().toPath());
   }
 }
