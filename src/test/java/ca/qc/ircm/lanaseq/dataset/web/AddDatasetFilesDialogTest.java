@@ -68,6 +68,7 @@ import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -100,13 +101,13 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   @Mock
   private Dataset dataset;
   @Captor
-  private ArgumentCaptor<ValueProvider<Path, String>> valueProviderCaptor;
+  private ArgumentCaptor<ValueProvider<File, String>> valueProviderCaptor;
   @Captor
-  private ArgumentCaptor<ComponentRenderer<Span, Path>> spanRendererCaptor;
+  private ArgumentCaptor<ComponentRenderer<Span, File>> spanRendererCaptor;
   @Captor
-  private ArgumentCaptor<ComponentRenderer<Checkbox, Path>> checkboxRendererCaptor;
+  private ArgumentCaptor<ComponentRenderer<Checkbox, File>> checkboxRendererCaptor;
   @Captor
-  private ArgumentCaptor<Comparator<Path>> comparatorCaptor;
+  private ArgumentCaptor<Comparator<File>> comparatorCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<AddDatasetFilesDialog>> savedListener;
   @Autowired
@@ -116,7 +117,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Path> files = new ArrayList<>();
+  private List<File> files = new ArrayList<>();
   private Random random = new Random();
 
   /**
@@ -126,12 +127,12 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   public void beforeTest() throws Throwable {
     ui.setLocale(locale);
     dialog = new AddDatasetFilesDialog(presenter);
-    files.add(temporaryFolder.getRoot().toPath().resolve("dataset_R1.fastq"));
-    files.add(temporaryFolder.getRoot().toPath().resolve("dataset_R2.fastq"));
-    files.add(temporaryFolder.getRoot().toPath().resolve("dataset.bw"));
-    files.add(temporaryFolder.getRoot().toPath().resolve("dataset.png"));
-    for (Path file : files) {
-      writeFile(temporaryFolder.getRoot().toPath().resolve(file), random.nextInt(10) * 1024 ^ 2);
+    files.add(temporaryFolder.newFile("dataset_R1.fastq"));
+    files.add(temporaryFolder.newFile("dataset_R2.fastq"));
+    files.add(temporaryFolder.newFile("dataset.bw"));
+    files.add(temporaryFolder.newFile("dataset.png"));
+    for (File file : files) {
+      writeFile(file.toPath(), random.nextInt(10) * 1024 ^ 2);
     }
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -241,39 +242,37 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   @Test
   public void files_ColumnsValueProvider() throws Throwable {
     when(presenter.exists(any())).then(i -> {
-      Path file = i.getArgument(0);
+      File file = i.getArgument(0);
       return files.get(0).equals(file);
     });
     mockColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     verify(dialog.files).addColumn(spanRendererCaptor.capture(), eq(FILENAME));
-    ComponentRenderer<Span, Path> spanRenderer = spanRendererCaptor.getValue();
-    for (Path file : files) {
+    ComponentRenderer<Span, File> spanRenderer = spanRendererCaptor.getValue();
+    for (File file : files) {
       Span span = spanRenderer.createComponent(file);
-      assertEquals(file.getFileName().toString(), span.getText());
+      assertEquals(file.getName(), span.getText());
       if (presenter.exists(file)) {
         assertTrue(span.hasClassName(ERROR_TEXT));
       }
     }
     verify(dialog.filename).setComparator(comparatorCaptor.capture());
-    Comparator<Path> comparator = comparatorCaptor.getValue();
+    Comparator<File> comparator = comparatorCaptor.getValue();
     assertTrue(comparator instanceof NormalizedComparator);
-    for (Path file : files) {
-      assertEquals(file.getFileName().toString(),
-          ((NormalizedComparator<Path>) comparator).getConverter().apply(file));
+    for (File file : files) {
+      assertEquals(file.getName(),
+          ((NormalizedComparator<File>) comparator).getConverter().apply(file));
     }
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(SIZE));
-    ValueProvider<Path, String> valueProvider = valueProviderCaptor.getValue();
-    for (Path file : files) {
-      assertEquals(
-          resources.message(SIZE_VALUE,
-              Files.size(temporaryFolder.getRoot().toPath().resolve(file)) / 1048576),
+    ValueProvider<File, String> valueProvider = valueProviderCaptor.getValue();
+    for (File file : files) {
+      assertEquals(resources.message(SIZE_VALUE, file.length() / 1048576),
           valueProvider.apply(file));
     }
     verify(dialog.files).addColumn(checkboxRendererCaptor.capture(), eq(OVERWRITE));
-    ComponentRenderer<Checkbox, Path> checkboxRenderer = checkboxRendererCaptor.getValue();
-    for (Path file : files) {
+    ComponentRenderer<Checkbox, File> checkboxRenderer = checkboxRendererCaptor.getValue();
+    for (File file : files) {
       Checkbox checkbox = checkboxRenderer.createComponent(file);
       assertNotNull(checkbox);
     }
@@ -281,14 +280,14 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void overwriteAll_True() {
-    for (Path file : files) {
+    for (File file : files) {
       dialog.overwrite(file);
     }
     dialog.overwriteAll.setValue(true);
     ComponentValueChangeEvent<Checkbox, Boolean> event =
         new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
     fireEvent(dialog.overwriteAll, event);
-    for (Path file : files) {
+    for (File file : files) {
       Checkbox checkbox = dialog.overwrite(file);
       assertTrue(checkbox.getValue());
     }
@@ -296,7 +295,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void overwriteAll_False() {
-    for (Path file : files) {
+    for (File file : files) {
       Checkbox checkbox = dialog.overwrite(file);
       checkbox.setValue(true);
     }
@@ -307,7 +306,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.overwriteAll.setValue(false);
     event = new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, true, true);
     fireEvent(dialog.overwriteAll, event);
-    for (Path file : files) {
+    for (File file : files) {
       Checkbox checkbox = dialog.overwrite(file);
       assertFalse(checkbox.getValue());
     }
@@ -315,7 +314,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void overwriteAll_UncheckIfOneOverwiteUnchecked() {
-    for (Path file : files) {
+    for (File file : files) {
       dialog.overwrite(file);
     }
     dialog.overwriteAll.setValue(true);

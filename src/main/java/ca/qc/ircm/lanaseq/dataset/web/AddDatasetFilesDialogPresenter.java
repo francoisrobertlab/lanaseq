@@ -12,6 +12,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class AddDatasetFilesDialogPresenter {
   private AddDatasetFilesDialog dialog;
   private Dataset dataset;
   private Locale locale;
-  private Set<Path> existingFilenames = new HashSet<>();
+  private Set<String> existingFilenames = new HashSet<>();
   private Thread updateFilesThread;
   private DatasetService service;
   private AppConfiguration configuration;
@@ -116,8 +118,8 @@ public class AddDatasetFilesDialogPresenter {
   }
 
   void updateFiles() {
-    existingFilenames =
-        service.files(dataset).stream().map(f -> f.getFileName()).collect(Collectors.toSet());
+    existingFilenames = service.files(dataset).stream()
+        .map(file -> FilenameUtils.getName(file.toString())).collect(Collectors.toSet());
     Path folder = folder();
     if (folder != null) {
       try {
@@ -127,14 +129,14 @@ public class AddDatasetFilesDialogPresenter {
           } catch (IOException e) {
             return false;
           }
-        }));
+        }).map(file -> file.toFile()));
       } catch (IOException e) {
       }
     }
   }
 
-  boolean exists(Path file) {
-    return existingFilenames.contains(file.getFileName());
+  boolean exists(File file) {
+    return existingFilenames.contains(file.getName());
   }
 
   private Path folder() {
@@ -144,7 +146,8 @@ public class AddDatasetFilesDialogPresenter {
   private boolean validate(Collection<Path> files) {
     dialog.error.setVisible(false);
     boolean anyExists = files.stream()
-        .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
+        .filter(file -> exists(file.toFile()) && !dialog.overwrite(file.toFile()).getValue())
+        .findAny().isPresent();
     if (anyExists) {
       final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
       dialog.error.setVisible(true);
