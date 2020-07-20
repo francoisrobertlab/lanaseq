@@ -9,6 +9,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -28,7 +29,6 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.nio.file.Path;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -53,9 +53,9 @@ public class DatasetFilesDialog extends Dialog
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
-  protected Grid<DatasetFile> files = new Grid<>();
-  protected Column<DatasetFile> filename;
-  protected Column<DatasetFile> delete;
+  protected Grid<EditableFile> files = new Grid<>();
+  protected Column<EditableFile> filename;
+  protected Column<EditableFile> delete;
   protected TextField filenameEdit = new TextField();
   protected Button add = new Button();
   @Autowired
@@ -107,7 +107,7 @@ public class DatasetFilesDialog extends Dialog
     presenter.init(this);
   }
 
-  private Button deleteButton(DatasetFile file) {
+  private Button deleteButton(EditableFile file) {
     Button button = new Button();
     button.addClassName(DELETE);
     button.setIcon(VaadinIcon.TRASH.create());
@@ -181,32 +181,5 @@ public class DatasetFilesDialog extends Dialog
   public void setDataset(Dataset dataset) {
     presenter.setDataset(dataset);
     updateHeader();
-  }
-
-  public static class DatasetFile {
-    private Path path;
-    private String filename;
-
-    DatasetFile(Path path) {
-      this.path = path;
-      filename = path.getFileName().toString();
-    }
-
-    @Override
-    public String toString() {
-      return "DatasetFile [path=" + path + ", filename=" + filename + "]";
-    }
-
-    public Path getPath() {
-      return path;
-    }
-
-    public String getFilename() {
-      return filename;
-    }
-
-    public void setFilename(String filename) {
-      this.filename = filename;
-    }
   }
 }

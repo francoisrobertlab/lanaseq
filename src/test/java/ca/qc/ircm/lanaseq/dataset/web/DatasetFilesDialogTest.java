@@ -39,10 +39,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -57,8 +57,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -85,11 +84,11 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   @Mock
   private Dataset dataset;
   @Captor
-  private ArgumentCaptor<ValueProvider<DatasetFile, String>> valueProviderCaptor;
+  private ArgumentCaptor<ValueProvider<EditableFile, String>> valueProviderCaptor;
   @Captor
-  private ArgumentCaptor<ComponentRenderer<Button, DatasetFile>> buttonRendererCaptor;
+  private ArgumentCaptor<ComponentRenderer<Button, EditableFile>> buttonRendererCaptor;
   @Captor
-  private ArgumentCaptor<EditorCloseListener<DatasetFile>> closeListenerCaptor;
+  private ArgumentCaptor<EditorCloseListener<EditableFile>> closeListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Mock
@@ -99,7 +98,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Path> files = new ArrayList<>();
+  private List<File> files = new ArrayList<>();
 
   /**
    * Before test.
@@ -107,10 +106,10 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     ui.setLocale(locale);
-    files.add(Paths.get("dataset", "dataset_R1.fastq"));
-    files.add(Paths.get("dataset", "dataset_R2.fastq"));
-    files.add(Paths.get("dataset", "dataset.bw"));
-    files.add(Paths.get("dataset", "dataset.png"));
+    files.add(new File("dataset", "dataset_R1.fastq"));
+    files.add(new File("dataset", "dataset_R2.fastq"));
+    files.add(new File("dataset", "dataset.bw"));
+    files.add(new File("dataset", "dataset.png"));
   }
 
   @SuppressWarnings("unchecked")
@@ -189,23 +188,23 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     mockColumns();
     dialog.init();
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<DatasetFile, String> valueProvider = valueProviderCaptor.getValue();
-    for (Path path : files) {
-      DatasetFile file = new DatasetFile(path);
-      assertEquals(file.getFilename(), valueProvider.apply(file));
+    ValueProvider<EditableFile, String> valueProvider = valueProviderCaptor.getValue();
+    for (File file : files) {
+      EditableFile efile = new EditableFile(file);
+      assertEquals(efile.getFilename(), valueProvider.apply(efile));
     }
     verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
     verify(dialog.files).addColumn(buttonRendererCaptor.capture(), eq(DELETE));
-    ComponentRenderer<Button, DatasetFile> buttonRenderer = buttonRendererCaptor.getValue();
-    for (Path path : files) {
-      DatasetFile file = new DatasetFile(path);
-      Button button = buttonRenderer.createComponent(file);
+    ComponentRenderer<Button, EditableFile> buttonRenderer = buttonRendererCaptor.getValue();
+    for (File file : files) {
+      EditableFile efile = new EditableFile(file);
+      Button button = buttonRenderer.createComponent(efile);
       assertTrue(button.hasClassName(DELETE));
       assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
       validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
       assertEquals("", button.getText());
       button.click();
-      verify(presenter).deleteFile(file);
+      verify(presenter).deleteFile(efile);
     }
   }
 
@@ -213,9 +212,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   public void renameFile() {
     mockColumns();
     dialog.init();
-    DatasetFile file = new DatasetFile(files.get(0));
+    EditableFile file = new EditableFile(files.get(0));
     verify(dialog.files.getEditor()).addCloseListener(closeListenerCaptor.capture());
-    EditorCloseListener<DatasetFile> listener = closeListenerCaptor.getValue();
+    EditorCloseListener<EditableFile> listener = closeListenerCaptor.getValue();
     listener.onEditorClose(new EditorCloseEvent<>(dialog.files.getEditor(), file));
     verify(presenter).rename(file);
   }

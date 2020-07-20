@@ -42,12 +42,12 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
@@ -57,14 +57,15 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private List<Path> files = new ArrayList<>();
+  private List<File> files = new ArrayList<>();
   private Path folder;
   private String folderLabelLinux = "lanaseq/upload";
   private String folderLabelWindows = "lanaseq\\upload";
@@ -125,12 +126,13 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
     dialog.addFilesDialog = mock(AddDatasetFilesDialog.class);
-    files.add(Paths.get("dataset_R1.fastq"));
-    files.add(Paths.get("dataset_R2.fastq"));
-    files.add(Paths.get("dataset.bw"));
-    files.add(Paths.get("dataset.png"));
+    files.add(new File("dataset_R1.fastq"));
+    files.add(new File("dataset_R2.fastq"));
+    files.add(new File("dataset.bw"));
+    files.add(new File("dataset.png"));
     when(dialog.getUI()).thenReturn(Optional.of(ui));
-    when(service.files(any())).thenReturn(files);
+    when(service.files(any()))
+        .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     when(configuration.folder(any(Dataset.class))).thenReturn(folder);
     when(configuration.folderLabel(any(Dataset.class), anyBoolean())).then(i -> {
@@ -222,10 +224,10 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
 
     verify(service).files(dataset);
-    List<DatasetFile> files = items(dialog.files);
+    List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (DatasetFile file : files) {
-      assertTrue(this.files.contains(file.getPath()));
+    for (EditableFile file : files) {
+      assertTrue(this.files.contains(file.getFile()));
     }
     assertTrue(dialog.delete.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
@@ -240,10 +242,10 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
 
     verify(service).files(dataset);
-    List<DatasetFile> files = items(dialog.files);
+    List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (DatasetFile file : files) {
-      assertTrue(this.files.contains(file.getPath()));
+    for (EditableFile file : files) {
+      assertTrue(this.files.contains(file.getFile()));
     }
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
@@ -256,10 +258,10 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
 
     verify(service).files(dataset);
-    List<DatasetFile> files = items(dialog.files);
+    List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
-    for (DatasetFile file : files) {
-      assertTrue(this.files.contains(file.getPath()));
+    for (EditableFile file : files) {
+      assertTrue(this.files.contains(file.getFile()));
     }
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
@@ -274,7 +276,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void filenameEdit_Empty() throws Throwable {
     dialog.filenameEdit.setValue("");
 
-    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -287,7 +289,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void filenameEdit_Invalid() throws Throwable {
     dialog.filenameEdit.setValue("abc?.txt");
 
-    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -299,16 +301,16 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_Exists() throws Throwable {
-    Path path = temporaryFolder.newFile("source.txt").toPath();
+    File file = temporaryFolder.newFile("source.txt");
     temporaryFolder.newFile("abc.txt");
-    DatasetFile file = new DatasetFile(path);
+    EditableFile efile = new EditableFile(file);
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
-    when(dialog.files.getEditor().getItem()).thenReturn(file);
+    when(dialog.files.getEditor().getItem()).thenReturn(efile);
 
     dialog.filenameEdit.setValue("abc.txt");
 
-    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -327,7 +329,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     dialog.filenameEdit.setValue("abc.txt");
 
-    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateDatasetFile();
     assertTrue(status.isOk());
   }
 
@@ -335,7 +337,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void filenameEdit_ItemNull() throws Throwable {
     dialog.filenameEdit.setValue("");
 
-    BinderValidationStatus<DatasetFile> status = presenter.validateDatasetFile();
+    BinderValidationStatus<EditableFile> status = presenter.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dialog.filenameEdit);
@@ -395,32 +397,32 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void rename() throws Throwable {
-    Path path = temporaryFolder.newFile("source.txt").toPath();
-    DatasetFile file = new DatasetFile(path);
-    file.setFilename("target.txt");
+    File file = temporaryFolder.newFile("source.txt");
+    EditableFile efile = new EditableFile(file);
+    efile.setFilename("target.txt");
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
-    Files.write(path, bytes);
+    Files.write(file.toPath(), bytes);
 
-    presenter.rename(file);
+    presenter.rename(efile);
 
-    assertTrue(Files.exists(path.resolveSibling("target.txt")));
-    assertArrayEquals(bytes, Files.readAllBytes(path.resolveSibling("target.txt")));
-    assertFalse(Files.exists(path));
+    assertTrue(Files.exists(file.toPath().resolveSibling("target.txt")));
+    assertArrayEquals(bytes, Files.readAllBytes(file.toPath().resolveSibling("target.txt")));
+    assertFalse(Files.exists(file.toPath()));
   }
 
   @Test
   public void deleteFile() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    Path path = temporaryFolder.newFile("source.txt").toPath();
-    DatasetFile file = new DatasetFile(path);
+    File file = temporaryFolder.newFile("source.txt");
+    EditableFile efile = new EditableFile(file);
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
-    Files.write(path, bytes);
+    Files.write(file.toPath(), bytes);
 
-    presenter.deleteFile(file);
+    presenter.deleteFile(efile);
 
-    verify(service).deleteFile(dataset, file.getPath());
+    verify(service).deleteFile(dataset, efile.getFile().toPath());
   }
 }

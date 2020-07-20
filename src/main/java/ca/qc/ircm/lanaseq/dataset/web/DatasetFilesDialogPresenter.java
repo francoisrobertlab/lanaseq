@@ -2,21 +2,21 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_RENAME_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE_TITLE;
+import static ca.qc.ircm.lanaseq.web.EditableFileProperties.FILENAME;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.DatasetFile;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
+import ca.qc.ircm.lanaseq.web.EditableFile;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -49,7 +49,7 @@ public class DatasetFilesDialogPresenter {
   private DatasetService service;
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
-  private Binder<DatasetFile> fileBinder = new BeanValidationBinder<>(DatasetFile.class);
+  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
 
   @Autowired
   protected DatasetFilesDialogPresenter(DatasetService service,
@@ -79,9 +79,9 @@ public class DatasetFilesDialogPresenter {
 
   private Validator<String> exists() {
     return (value, context) -> {
-      DatasetFile item = dialog.files.getEditor().getItem();
-      if (value != null && item != null && !value.equals(item.getPath().getFileName().toString())
-          && Files.exists(item.getPath().resolveSibling(value))) {
+      EditableFile item = dialog.files.getEditor().getItem();
+      if (value != null && item != null && !value.equals(item.getFile().getName())
+          && Files.exists(item.getFile().toPath().resolveSibling(value))) {
         final AppResources webResources = new AppResources(Constants.class, locale);
         return ValidationResult.error(webResources.message(ALREADY_EXISTS));
       }
@@ -105,7 +105,8 @@ public class DatasetFilesDialogPresenter {
   }
 
   private void updateFiles() {
-    dialog.files.setItems(service.files(dataset).stream().map(file -> new DatasetFile(file)));
+    dialog.files
+        .setItems(service.files(dataset).stream().map(file -> new EditableFile(file.toFile())));
   }
 
   boolean isReadOnly() {
@@ -119,8 +120,8 @@ public class DatasetFilesDialogPresenter {
     }
   }
 
-  void rename(DatasetFile file) {
-    Path source = file.getPath();
+  void rename(EditableFile file) {
+    Path source = file.getFile().toPath();
     Path target = source.resolveSibling(file.getFilename());
     try {
       logger.debug("rename file {} to {}", source, target);
@@ -134,14 +135,14 @@ public class DatasetFilesDialogPresenter {
     }
   }
 
-  void deleteFile(DatasetFile file) {
-    Path path = file.getPath();
+  void deleteFile(EditableFile file) {
+    Path path = file.getFile().toPath();
     logger.debug("delete file {}", path);
     service.deleteFile(dataset, path);
     updateFiles();
   }
 
-  BinderValidationStatus<DatasetFile> validateDatasetFile() {
+  BinderValidationStatus<EditableFile> validateDatasetFile() {
     return fileBinder.validate();
   }
 
