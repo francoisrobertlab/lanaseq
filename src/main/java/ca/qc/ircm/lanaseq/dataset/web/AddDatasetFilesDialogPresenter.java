@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,8 +117,8 @@ public class AddDatasetFilesDialogPresenter {
   }
 
   void updateFiles() {
-    existingFilenames = service.files(dataset).stream()
-        .map(file -> FilenameUtils.getName(file.toString())).collect(Collectors.toSet());
+    existingFilenames = service.files(dataset).stream().map(file -> file.toFile().getName())
+        .collect(Collectors.toSet());
     Path folder = folder();
     if (folder != null) {
       try {
