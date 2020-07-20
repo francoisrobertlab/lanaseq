@@ -48,7 +48,7 @@ public class PasswordView extends VerticalLayout implements LocaleChangeObserver
   protected PasswordsForm passwords = new PasswordsForm();
   protected Button save = new Button();
   @Autowired
-  private PasswordViewPresenter presenter;
+  private transient PasswordViewPresenter presenter;
 
   protected PasswordView() {
   }
