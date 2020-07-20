@@ -51,14 +51,15 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.server.Command;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -101,7 +102,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
   private Path folder;
-  private List<Path> files = new ArrayList<>();
+  private List<File> files = new ArrayList<>();
   private String uploadLabelLinux = "lanaseq/upload";
   private String uploadLabelWindows = "lanaseq\\upload";
   private String uploadNetworkLinux = "smb://lanaseq01/lanaseq";
@@ -119,10 +120,10 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.files = new Grid<>();
     dialog.error = new Div();
     dialog.save = new Button();
-    files.add(Paths.get("sample_R1.fastq"));
-    files.add(Paths.get("sample_R2.fastq"));
-    files.add(Paths.get("sample.bw"));
-    files.add(Paths.get("sample.png"));
+    files.add(new File("sample_R1.fastq"));
+    files.add(new File("sample_R2.fastq"));
+    files.add(new File("sample.bw"));
+    files.add(new File("sample.png"));
     folder = temporaryFolder.getRoot().toPath().resolve("sample");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", false));
@@ -136,7 +137,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       boolean linux = i.getArgument(0);
       return (linux ? uploadNetworkLinux : uploadNetworkWindows);
     });
-    when(service.files(any())).thenReturn(files.subList(0, 2));
+    when(service.files(any())).thenReturn(
+        files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
     doAnswer(i -> {
       Collection<Path> files = i.getArgument(1);
       for (Path file : files) {
@@ -263,7 +265,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample, locale);
 
     verify(configuration, atLeastOnce()).upload(sample);
-    List<Path> files = items(dialog.files);
+    List<File> files = items(dialog.files);
     assertTrue(files.isEmpty());
   }
 
@@ -277,8 +279,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
     Files.createDirectory(uploadFolder(sample).resolve("dir"));
     Files.createFile(uploadFolder(sample).resolve("dir").resolve("test.txt"));
     Path hiddenFile = uploadFolder(sample).resolve(".hidden.txt");
@@ -289,21 +291,21 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.updateFiles();
 
-    List<Path> files = items(dialog.files);
+    List<File> files = items(dialog.files);
     assertEquals(2, files.size());
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(2)));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(3)));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath()).toFile()));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(2).toPath()));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(3).toPath()));
 
     presenter.updateFiles();
 
     files = items(dialog.files);
     assertEquals(4, files.size());
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(2))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(3))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(2).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(3).toPath()).toFile()));
   }
 
   @Test
@@ -361,8 +363,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
 
     presenter.save(locale);
 
@@ -380,16 +382,16 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample, locale);
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", true));
     Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
 
     presenter.save(locale);
 
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(2, files.size());
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath())));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath())));
     assertFalse(dialog.error.isVisible());
     verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
     verify(dialog).fireSavedEvent();
@@ -402,16 +404,16 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0)));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1)));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
+    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
 
     presenter.save(locale);
 
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(2, files.size());
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0))));
-    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1))));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath())));
+    assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath())));
     verify(dialog).showNotification(resources.message(SAVED, 2, sample.getName()));
     verify(dialog).fireSavedEvent();
     verify(dialog).close();

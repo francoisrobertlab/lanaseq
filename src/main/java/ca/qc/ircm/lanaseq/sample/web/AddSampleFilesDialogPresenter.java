@@ -12,6 +12,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +41,7 @@ public class AddSampleFilesDialogPresenter {
   private AddSampleFilesDialog dialog;
   private Sample sample;
   private Locale locale;
-  private Set<Path> existingFilenames = new HashSet<>();
+  private Set<String> existingFilenames = new HashSet<>();
   private Thread updateFilesThread;
   private SampleService service;
   private AppConfiguration configuration;
@@ -115,7 +116,7 @@ public class AddSampleFilesDialogPresenter {
 
   void updateFiles() {
     existingFilenames =
-        service.files(sample).stream().map(f -> f.getFileName()).collect(Collectors.toSet());
+        service.files(sample).stream().map(f -> f.toFile().getName()).collect(Collectors.toSet());
     Path folder = folder();
     if (folder != null) {
       try {
@@ -125,14 +126,14 @@ public class AddSampleFilesDialogPresenter {
           } catch (IOException e) {
             return false;
           }
-        }));
+        }).map(file -> file.toFile()));
       } catch (IOException e) {
       }
     }
   }
 
-  boolean exists(Path file) {
-    return existingFilenames.contains(file.getFileName());
+  boolean exists(File file) {
+    return existingFilenames.contains(file.getName());
   }
 
   private Path folder() {
@@ -142,7 +143,8 @@ public class AddSampleFilesDialogPresenter {
   private boolean validate(Collection<Path> files) {
     dialog.error.setVisible(false);
     boolean anyExists = files.stream()
-        .filter(file -> exists(file) && !dialog.overwrite(file).getValue()).findAny().isPresent();
+        .filter(file -> exists(file.toFile()) && !dialog.overwrite(file.toFile()).getValue())
+        .findAny().isPresent();
     if (anyExists) {
       final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
       dialog.error.setVisible(true);

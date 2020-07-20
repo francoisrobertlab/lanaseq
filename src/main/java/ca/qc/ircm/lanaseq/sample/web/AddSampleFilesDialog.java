@@ -29,9 +29,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,14 +61,14 @@ public class AddSampleFilesDialog extends Dialog
   protected H3 header = new H3();
   protected Div message = new Div();
   protected Div network = new Div();
-  protected Grid<Path> files = new Grid<>();
-  protected Column<Path> filename;
-  protected Column<Path> size;
-  protected Column<Path> overwrite;
+  protected Grid<File> files = new Grid<>();
+  protected Column<File> filename;
+  protected Column<File> size;
+  protected Column<File> overwrite;
   protected Checkbox overwriteAll = new Checkbox();
   protected Div error = new Div();
   protected Button save = new Button();
-  private Map<Path, Checkbox> overwriteFields = new HashMap<>();
+  private Map<File, Checkbox> overwriteFields = new HashMap<>();
   @Autowired
   private transient AddSampleFilesDialogPresenter presenter;
 
@@ -97,9 +95,8 @@ public class AddSampleFilesDialog extends Dialog
     message.setId(id(MESSAGE));
     network.setId(id(NETWORK));
     files.setId(id(FILES));
-    filename =
-        files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME)
-            .setComparator(NormalizedComparator.of(file -> file.getFileName().toString()));
+    filename = files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME)
+        .setKey(FILENAME).setComparator(NormalizedComparator.of(file -> file.getName()));
     overwrite = files.addColumn(new ComponentRenderer<>(file -> overwrite(file)), OVERWRITE)
         .setKey(OVERWRITE).setSortable(false);
     files.appendHeaderRow(); // Headers.
@@ -117,16 +114,16 @@ public class AddSampleFilesDialog extends Dialog
     presenter.init(this);
   }
 
-  private Span filename(Path file) {
+  private Span filename(File file) {
     Span span = new Span();
-    span.setText(file.getFileName().toString());
+    span.setText(file.getName());
     if (presenter.exists(file)) {
       span.addClassName(ERROR_TEXT);
     }
     return span;
   }
 
-  Checkbox overwrite(Path file) {
+  Checkbox overwrite(File file) {
     if (overwriteFields.containsKey(file)) {
       return overwriteFields.get(file);
     }
@@ -154,12 +151,7 @@ public class AddSampleFilesDialog extends Dialog
     }
     NumberFormat sizeFormat = NumberFormat.getIntegerInstance(getLocale());
     size = files.addColumn(file -> {
-      try {
-        return resources.message(SIZE_VALUE,
-            sizeFormat.format(Files.size(file) / Math.pow(1024, 2)));
-      } catch (IOException e1) {
-      }
-      return "";
+      return resources.message(SIZE_VALUE, sizeFormat.format(file.length() / Math.pow(1024, 2)));
     }, SIZE).setKey(SIZE);
     files.setColumnOrder(filename, size, overwrite);
     size.setHeader(resources.message(SIZE));
