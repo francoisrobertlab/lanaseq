@@ -114,7 +114,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
   @Autowired
-  protected transient SelectSampleDialog selectSampleDialog;
+  protected SelectSampleDialog selectSampleDialog;
   @Autowired
   private transient DatasetDialogPresenter presenter;
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
