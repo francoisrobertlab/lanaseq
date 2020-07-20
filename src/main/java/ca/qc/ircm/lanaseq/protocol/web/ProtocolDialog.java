@@ -96,7 +96,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   protected Button save = new Button();
   protected Button cancel = new Button();
   @Autowired
-  private ProtocolDialogPresenter presenter;
+  private transient ProtocolDialogPresenter presenter;
 
   public ProtocolDialog() {
   }

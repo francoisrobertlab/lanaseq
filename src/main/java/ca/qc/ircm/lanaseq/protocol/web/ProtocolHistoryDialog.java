@@ -65,7 +65,7 @@ public class ProtocolHistoryDialog extends Dialog
   protected Column<ProtocolFile> filename;
   protected Column<ProtocolFile> recover;
   @Autowired
-  private ProtocolHistoryDialogPresenter presenter;
+  private transient ProtocolHistoryDialogPresenter presenter;
 
   public ProtocolHistoryDialog() {
   }
