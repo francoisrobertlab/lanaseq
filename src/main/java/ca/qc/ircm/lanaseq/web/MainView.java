@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
-import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
@@ -58,8 +57,6 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
   public void beforeEnter(BeforeEnterEvent event) {
     if (authorizationService.hasRole(ADMIN)) {
       event.forwardTo(UsersView.class);
-    } else if (authorizationService.hasRole(MANAGER)) {
-      event.forwardTo(DatasetsView.class);
     } else {
       event.forwardTo(DatasetsView.class);
     }
