@@ -31,7 +31,7 @@ public class ByteArrayStreamResourceWriter implements StreamResourceWriter {
   private final byte[] content;
 
   public ByteArrayStreamResourceWriter(byte[] content) {
-    this.content = content;
+    this.content = content.clone();
   }
 
   @Override
