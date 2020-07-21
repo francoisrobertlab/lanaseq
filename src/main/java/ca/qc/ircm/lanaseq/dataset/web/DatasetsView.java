@@ -147,7 +147,7 @@ public class DatasetsView extends VerticalLayout
     protocol = datasets.addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()));
     date = datasets
-        .addColumn(new LocalDateTimeRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        .addColumn(new LocalDateTimeRenderer<>(Dataset::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
             DATE)
         .setKey(DATE);
     owner = datasets.addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)

@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_NEW_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
@@ -37,6 +38,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import ca.qc.ircm.lanaseq.web.TagsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
+import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
@@ -84,6 +86,10 @@ public class DatasetDialogElement extends DialogElement {
 
   public TextFieldElement treatment() {
     return $(TextFieldElement.class).id(id(TREATMENT));
+  }
+
+  public DatePickerElement date() {
+    return $(DatePickerElement.class).id(id(DATE));
   }
 
   public GridElement samples() {

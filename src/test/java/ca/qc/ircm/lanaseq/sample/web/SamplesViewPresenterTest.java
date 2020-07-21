@@ -332,6 +332,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     assertEquals(2, dataset.getSamples().size());
     assertTrue(dataset.getSamples().contains(samples.get(0)));
     assertTrue(dataset.getSamples().contains(samples.get(1)));
+    assertEquals(samples.get(0).getDate(), dataset.getDate());
     verify(view).showNotification(resources.message(MERGED, dataset.getName()));
   }
 

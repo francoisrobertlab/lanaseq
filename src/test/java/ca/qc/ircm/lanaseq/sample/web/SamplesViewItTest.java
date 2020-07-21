@@ -155,8 +155,8 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertNotNull(dataset.getId());
     assertEquals(name, dataset.getName());
     assertTrue(dataset.getTags().isEmpty());
-    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
-    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));
     assertTrue(dataset.getTags().isEmpty());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());

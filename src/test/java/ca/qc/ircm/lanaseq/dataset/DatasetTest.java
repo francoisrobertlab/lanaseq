@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -61,7 +61,7 @@ public class DatasetTest {
     copy(sample, sample2);
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_20200508", dataset.getName());
   }
@@ -85,7 +85,7 @@ public class DatasetTest {
     sample2.setSampleId("FR 2)");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -109,7 +109,7 @@ public class DatasetTest {
     sample2.setSampleId("FRê2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FRi1-FRe2_20200508", dataset.getName());
   }
@@ -132,7 +132,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -155,7 +155,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -178,7 +178,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -202,7 +202,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -226,7 +226,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spta16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -248,7 +248,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -272,7 +272,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -296,7 +296,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yaFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -319,7 +319,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -342,7 +342,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -366,7 +366,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -390,7 +390,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24DE_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -413,7 +413,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_FR1-FR2_20200508", dataset.getName());
   }
@@ -437,7 +437,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_FR1-FR2_20200508", dataset.getName());
   }
@@ -461,7 +461,7 @@ public class DatasetTest {
     sample2.setSampleId("FR2");
     sample2.setReplicate("R2");
     dataset.getSamples().add(sample2);
-    dataset.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    dataset.setDate(LocalDate.of(2020, 5, 8));
     dataset.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IcAA_FR1-FR2_20200508", dataset.getName());
   }

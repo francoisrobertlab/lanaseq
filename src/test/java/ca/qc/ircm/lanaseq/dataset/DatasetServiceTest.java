@@ -49,6 +49,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -129,7 +130,8 @@ public class DatasetServiceTest {
     assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
     assertEquals((Long) 3L, dataset.getSamples().get(2).getId());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(LocalDate.of(2018, 10, 20), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
@@ -257,6 +259,7 @@ public class DatasetServiceTest {
     dataset.setTags(new HashSet<>());
     dataset.getTags().add("tag1");
     dataset.getTags().add("tag2");
+    dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     Sample sample1 = new Sample();
     sample1.setSampleId("sample1");
@@ -268,6 +271,7 @@ public class DatasetServiceTest {
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(1L).get());
+    sample1.setDate(LocalDate.of(2020, 7, 21));
     dataset.getSamples().add(sample1);
     Sample sample2 = new Sample();
     sample2.setSampleId("sample2");
@@ -279,6 +283,7 @@ public class DatasetServiceTest {
     sample2.setStrainDescription("F56G");
     sample2.setTreatment("37C");
     sample2.setProtocol(protocolRepository.findById(1L).get());
+    sample2.setDate(LocalDate.of(2020, 7, 21));
     dataset.getSamples().add(sample2);
 
     service.save(dataset);
@@ -286,15 +291,15 @@ public class DatasetServiceTest {
     repository.flush();
     assertNotNull(dataset.getId());
     dataset = repository.findById(dataset.getId()).orElse(null);
-    assertEquals("ChIPSeq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(dataset.getDate()), dataset.getName());
+    assertEquals("ChIPSeq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_20200721", dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("tag1"));
     assertTrue(dataset.getTags().contains("tag2"));
     assertEquals(user.getId(), dataset.getOwner().getId());
+    assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
     assertTrue(dataset.isEditable());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getDate()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getCreationDate()));
     assertEquals(2, dataset.getSamples().size());
     for (Sample sample : dataset.getSamples()) {
       verify(sampleService).save(sample);
@@ -310,6 +315,7 @@ public class DatasetServiceTest {
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.getTags().remove("rappa");
     dataset.getTags().add("tag1");
+    dataset.setDate(LocalDate.of(2020, 7, 21));
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
@@ -320,6 +326,7 @@ public class DatasetServiceTest {
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(3L).get());
+    sample1.setDate(LocalDate.of(2020, 7, 21));
     Sample removed = dataset.getSamples().remove(1);
     Sample sample3 = new Sample();
     sample3.setSampleId("sample4");
@@ -331,21 +338,23 @@ public class DatasetServiceTest {
     sample3.setStrainDescription("F56G");
     sample3.setTreatment("37C");
     sample3.setProtocol(protocolRepository.findById(3L).get());
+    sample3.setDate(LocalDate.of(2020, 7, 21));
     dataset.getSamples().add(sample3);
 
     service.save(dataset);
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20181020",
+    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20200721",
         dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("tag1"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
+    assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
     assertTrue(dataset.isEditable());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
     for (Sample sample : dataset.getSamples()) {
       verify(sampleService).save(sample);
@@ -388,7 +397,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("ip"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertTrue(dataset.isEditable());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
     for (Sample sample : dataset.getSamples()) {
       verify(sampleService).save(sample);
@@ -443,7 +452,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("tag1"));
     assertEquals((Long) 2L, dataset.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
     verify(sampleService, never()).save(dataset.getSamples().get(0));
     verify(sampleService).save(dataset.getSamples().get(1));

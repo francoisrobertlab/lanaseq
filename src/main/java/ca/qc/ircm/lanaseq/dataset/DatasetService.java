@@ -172,16 +172,12 @@ public class DatasetService {
     User user = authorizationService.getCurrentUser();
     if (dataset.getId() == null) {
       dataset.setOwner(user);
-      dataset.setDate(now);
+      dataset.setCreationDate(now);
       dataset.setEditable(true);
     }
     if (dataset.getSamples() != null) {
       for (Sample sample : dataset.getSamples()) {
         if (sample.getId() == null || sample.isEditable()) {
-          // TODO Remove next block when dataset's date becomes editable.
-          if (sample.getId() == null) {
-            sample.setDate(now.toLocalDate());
-          }
           sampleService.save(sample);
         }
       }

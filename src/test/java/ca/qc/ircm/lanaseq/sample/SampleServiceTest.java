@@ -609,13 +609,13 @@ public class SampleServiceTest {
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
     assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     dataset = datasetRepository.findById(6L).get();
     assertEquals("ChIPSeq_Spt16_yFR101_G24D_sample1_20181208", dataset.getName());
     assertEquals(1, dataset.getSamples().size());
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 12, 8, 10, 28, 23), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 12, 8, 10, 28, 23), dataset.getCreationDate());
     Path folder = configuration.folder(dataset1);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(

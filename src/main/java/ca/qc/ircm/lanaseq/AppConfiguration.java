@@ -58,7 +58,7 @@ public class AppConfiguration {
   }
 
   public Path folder(Dataset dataset) {
-    return datasetHome.resolve(year.format(dataset.getDate())).resolve(dataset.getName());
+    return datasetHome.resolve(year.format(dataset.getCreationDate())).resolve(dataset.getName());
   }
 
   public String folderLabel(Sample sample, boolean unix) {

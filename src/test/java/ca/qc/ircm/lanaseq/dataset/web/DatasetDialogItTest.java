@@ -45,7 +45,6 @@ import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
@@ -78,6 +77,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
+  private LocalDate date = LocalDate.of(2020, 07, 20);
   private String sampleId = "FR3";
   private String sampleReplicate = "R3";
 
@@ -107,6 +107,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
+    dialog.date().setDate(date);
     dialog.sampleId(0).setValue(sampleId);
     dialog.replicate(0).setValue(sampleReplicate);
   }
@@ -131,6 +132,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
+    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
     assertTrue(optional(() -> dialog.addNewSample()).isPresent());
     assertTrue(optional(() -> dialog.addSample()).isPresent());
@@ -151,8 +153,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name =
-        name() + "_" + sampleId + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDate.now());
+    String name = name() + "_" + sampleId + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -165,8 +166,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
-    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getDate()));
-    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getDate()));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(1, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -193,8 +194,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name = name() + "_" + sampleId + "-JS2_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDate.of(2018, 10, 22));
+    String name = name() + "_" + sampleId + "-JS2_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -204,7 +204,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals(date, dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -217,6 +218,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
@@ -227,6 +229,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     dataset = repository.findById(6L).get();
     assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
   }
@@ -255,7 +258,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("G24D"));
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(3, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -269,6 +273,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals((Long) 5L, sample.getId());
     assertEquals("JS2", sample.getSampleId());
@@ -280,6 +285,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(2);
     assertEquals((Long) 10L, sample.getId());
     assertEquals("JS1", sample.getSampleId());
@@ -291,6 +297,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 12, 10), sample.getDate());
   }
 
   @Test
@@ -311,7 +318,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("G24D"));
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getDate());
+    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -324,6 +332,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
@@ -333,6 +342,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertNull(sample.getTreatment());
   }
 

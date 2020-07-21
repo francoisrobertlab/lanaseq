@@ -165,6 +165,7 @@ public class DatasetsViewPresenter {
       Dataset dataset = new Dataset();
       dataset.setTags(tags);
       dataset.setSamples(samples);
+      dataset.setDate(datasets.iterator().next().getDate());
       service.save(dataset);
       view.showNotification(resources.message(MERGED, dataset.getName()));
     }

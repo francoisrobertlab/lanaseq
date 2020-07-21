@@ -256,7 +256,7 @@ public class DatasetFilterTest {
 
   private Dataset date(LocalDateTime date) {
     Dataset dataset = new Dataset();
-    dataset.setDate(date);
+    dataset.setCreationDate(date);
     return dataset;
   }
 

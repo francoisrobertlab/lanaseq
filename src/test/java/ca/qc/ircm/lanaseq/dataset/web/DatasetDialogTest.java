@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_NEW_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
@@ -41,8 +42,11 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDatePickerI18n;
+import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -263,6 +267,9 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    assertEquals(datasetResources.message(DATE), dialog.date.getLabel());
+    validateEquals(englishDatePickerI18n(), dialog.date.getI18n());
+    assertEquals(Locale.CANADA, dialog.date.getLocale());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleId).setFooter(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));
@@ -312,6 +319,9 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    assertEquals(datasetResources.message(DATE), dialog.date.getLabel());
+    validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
+    assertEquals(Locale.CANADA, dialog.date.getLocale());
     verify(dialog.sampleId).setHeader(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleId).setFooter(sampleResources.message(SampleProperties.SAMPLE_ID));
     verify(dialog.sampleName).setHeader(sampleResources.message(SampleProperties.NAME));

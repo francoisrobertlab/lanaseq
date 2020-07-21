@@ -61,9 +61,10 @@ CREATE TABLE IF NOT EXISTS protocol_file (
 CREATE TABLE IF NOT EXISTS dataset (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
+  date DATE NOT NULL,
   owner_id bigint(20) NOT NULL,
   editable tinyint NOT NULL DEFAULT 0,
-  date DATETIME NOT NULL,
+  creation_date DATETIME NOT NULL,
   PRIMARY KEY (id),
   UNIQUE (name),
   CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE

@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
@@ -47,6 +48,7 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -109,6 +111,7 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.strainDescription).withNullRepresentation("")
         .bind(STRAIN_DESCRIPTION);
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
+    binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
   }
 
   private boolean isReadOnly(Dataset dataset) {
@@ -207,6 +210,10 @@ public class DatasetDialogPresenter {
       Sample from = sampleBinder.getBean();
       for (Sample sample : dataset.getSamples()) {
         copy(from, sample);
+        if (sample.getId() == null) {
+          logger.debug("updating date for sample with name: {}", sample.getName());
+          sample.setDate(dataset.getDate());
+        }
       }
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
@@ -244,6 +251,9 @@ public class DatasetDialogPresenter {
     }
     if (dataset.getTags() == null) {
       dataset.setTags(new HashSet<>());
+    }
+    if (dataset.getDate() == null) {
+      dataset.setDate(LocalDate.now());
     }
     if (dataset.getSamples() == null) {
       dataset.setSamples(new ArrayList<>());

@@ -361,6 +361,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     assertTrue(find(dataset.getSamples(), 3L).isPresent());
     assertTrue(find(dataset.getSamples(), 4L).isPresent());
     assertTrue(find(dataset.getSamples(), 5L).isPresent());
+    assertEquals(datasets.get(0).getDate(), dataset.getDate());
     verify(view).showNotification(resources.message(MERGED, dataset.getName()));
   }
 

@@ -56,7 +56,7 @@ public class AppConfigurationTest {
   private Dataset dataset() {
     Dataset dataset = new Dataset();
     dataset.setSamples(new ArrayList<>());
-    dataset.setDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    dataset.setCreationDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -133,7 +133,7 @@ public class AppConfigurationTest {
   public void folder_Dataset2020() {
     Dataset dataset = new Dataset();
     dataset.setSamples(new ArrayList<>());
-    dataset.setDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
+    dataset.setCreationDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");

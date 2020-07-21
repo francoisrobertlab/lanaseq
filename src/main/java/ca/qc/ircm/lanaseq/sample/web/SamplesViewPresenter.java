@@ -145,6 +145,7 @@ public class SamplesViewPresenter {
       Dataset dataset = new Dataset();
       dataset.setSamples(samples);
       dataset.setTags(new HashSet<>());
+      dataset.setDate(samples.get(0).getDate());
       datasetService.save(dataset);
       view.showNotification(resources.message(MERGED, dataset.getName()));
     }

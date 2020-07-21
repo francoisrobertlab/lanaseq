@@ -296,7 +296,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     verify(view.datasets).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Dataset> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
     for (Dataset dataset : datasets) {
-      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
+      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getCreationDate()),
           getFormattedValue(localDateTimeRenderer, dataset));
     }
     verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(OWNER));
