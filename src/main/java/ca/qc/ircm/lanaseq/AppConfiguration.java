@@ -54,7 +54,7 @@ public class AppConfiguration {
   }
 
   public Path folder(Sample sample) {
-    return sampleHome.resolve(year.format(sample.getDate())).resolve(sample.getName());
+    return sampleHome.resolve(year.format(sample.getCreationDate())).resolve(sample.getName());
   }
 
   public Path folder(Dataset dataset) {

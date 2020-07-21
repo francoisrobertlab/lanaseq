@@ -10,6 +10,7 @@ import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -96,10 +97,15 @@ public class Sample implements Data, Owned, Serializable {
   @Column
   private boolean editable;
   /**
-   * Creation date.
+   * Date.
    */
-  @Column
-  private LocalDateTime date;
+  @Column(nullable = false)
+  private LocalDate date;
+  /**
+   * Time when sample was created.
+   */
+  @Column(nullable = false)
+  private LocalDateTime creationDate;
   /**
    * Protocol.
    */
@@ -184,12 +190,12 @@ public class Sample implements Data, Owned, Serializable {
     this.replicate = replicate;
   }
 
-  public LocalDateTime getDate() {
-    return date;
+  public LocalDateTime getCreationDate() {
+    return creationDate;
   }
 
-  public void setDate(LocalDateTime date) {
-    this.date = date;
+  public void setCreationDate(LocalDateTime creationDate) {
+    this.creationDate = creationDate;
   }
 
   @Override
@@ -271,5 +277,13 @@ public class Sample implements Data, Owned, Serializable {
 
   public void setEditable(boolean editable) {
     this.editable = editable;
+  }
+
+  public LocalDate getDate() {
+    return date;
+  }
+
+  public void setDate(LocalDate date) {
+    this.date = date;
   }
 }

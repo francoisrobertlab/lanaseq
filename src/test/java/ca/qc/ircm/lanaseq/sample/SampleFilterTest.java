@@ -196,7 +196,7 @@ public class SampleFilterTest {
 
   private Sample date(LocalDateTime date) {
     Sample sample = new Sample();
-    sample.setDate(date);
+    sample.setCreationDate(date);
     return sample;
   }
 

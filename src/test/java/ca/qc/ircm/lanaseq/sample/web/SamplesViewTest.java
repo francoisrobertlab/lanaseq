@@ -262,7 +262,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     verify(view.samples).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
     LocalDateTimeRenderer<Sample> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
+      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getCreationDate()),
           getFormattedValue(localDateTimeRenderer, sample));
     }
     verify(view.samples).addColumn(valueProviderCaptor.capture(), eq(OWNER));

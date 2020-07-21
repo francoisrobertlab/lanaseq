@@ -73,7 +73,7 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName));
     date = samples
-        .addColumn(new LocalDateTimeRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        .addColumn(new LocalDateTimeRenderer<>(Sample::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
             DATE)
         .setKey(DATE);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)

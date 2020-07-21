@@ -46,11 +46,13 @@ import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -98,6 +100,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
+  private LocalDate date = LocalDate.of(2020, 7, 20);
 
   /**
    * Before test.
@@ -117,6 +120,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
+    dialog.date = new DatePicker();
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
@@ -138,6 +142,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strain.setValue(strain);
     dialog.strainDescription.setValue(strainDescription);
     dialog.treatment.setValue(treatment);
+    dialog.date.setValue(date);
   }
 
   @Test
@@ -171,6 +176,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals(LocalDate.now(), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -200,6 +207,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -230,6 +239,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
+    assertTrue(dialog.date.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -259,6 +270,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals(LocalDate.of(2018, 12, 5), dialog.date.getValue());
+    assertTrue(dialog.date.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -289,6 +302,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertTrue(dialog.delete.isVisible());
@@ -316,6 +331,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals(LocalDate.now(), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
     assertFalse(dialog.delete.isVisible());
@@ -332,6 +349,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strain.isRequiredIndicatorVisible());
     assertFalse(dialog.strainDescription.isRequiredIndicatorVisible());
     assertFalse(dialog.treatment.isRequiredIndicatorVisible());
+    assertTrue(dialog.date.isRequiredIndicatorVisible());
   }
 
   @Test
@@ -521,6 +539,27 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void save_DateEmpty() {
+    fillForm();
+    dialog.date.setValue(null);
+
+    presenter.save(locale);
+
+    BinderValidationStatus<Sample> status = presenter.validateSample();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.date);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(service, never()).delete(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
   public void save_NewSample() {
     fillForm();
 
@@ -537,6 +576,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertEquals(date, sample.getDate());
     verify(service, never()).delete(any());
     verify(dialog).showNotification(resources.message(SAVED, sample.getName()));
     verify(dialog).close();
@@ -563,6 +603,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertEquals(date, sample.getDate());
     verify(service, never()).delete(any());
     verify(dialog).showNotification(resources.message(SAVED, sample.getName()));
     verify(dialog).close();
@@ -586,6 +627,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 20), sample.getDate());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     verify(dialog).close();
@@ -612,6 +654,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 20), sample.getDate());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     verify(dialog).close();

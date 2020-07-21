@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
@@ -38,8 +39,11 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDatePickerI18n;
+import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -127,6 +131,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
+    assertEquals(id(DATE), dialog.date.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -164,6 +169,9 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
+    validateEquals(englishDatePickerI18n(), dialog.date.getI18n());
+    assertEquals(Locale.CANADA, dialog.date.getLocale());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());
@@ -204,6 +212,9 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
     assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
+    assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
+    validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
+    assertEquals(Locale.CANADA, dialog.date.getLocale());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     assertEquals(webResources.message(DELETE), dialog.delete.getText());

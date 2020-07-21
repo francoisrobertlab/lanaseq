@@ -104,7 +104,7 @@ public class DatasetServiceTest {
     doAnswer(i -> {
       Sample sample = i.getArgument(0);
       if (sample.getId() == null) {
-        sample.setDate(LocalDateTime.now());
+        sample.setCreationDate(LocalDateTime.now());
         sample.setOwner(authorizationService.getCurrentUser());
       }
       sample.generateName();

@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -106,7 +107,8 @@ public class SampleServiceTest {
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
     assertTrue(sample.isEditable());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getCreationDate());
+    assertEquals(LocalDate.of(2018, 10, 20), sample.getDate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
@@ -518,6 +520,7 @@ public class SampleServiceTest {
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
     sample.setProtocol(protocolRepository.findById(1L).get());
+    sample.setDate(LocalDate.of(2020, 7, 21));
 
     service.save(sample);
 
@@ -535,10 +538,11 @@ public class SampleServiceTest {
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
     assertTrue(sample.isEditable());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getDate()));
-    assertEquals("mysample_ChIPSeq_IP_mytarget_yFR213_F56G_37C_myreplicate_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(sample.getDate()), sample.getName());
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getCreationDate()));
+    assertEquals(LocalDate.of(2020, 7, 21), sample.getDate());
+    assertEquals("mysample_ChIPSeq_IP_mytarget_yFR213_F56G_37C_myreplicate_20200721",
+        sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 
@@ -556,6 +560,7 @@ public class SampleServiceTest {
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
     sample.setProtocol(protocolRepository.findById(3L).get());
+    sample.setDate(LocalDate.of(2020, 7, 21));
 
     service.save(sample);
 
@@ -572,8 +577,9 @@ public class SampleServiceTest {
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     assertTrue(sample.isEditable());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getDate());
-    assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20181020",
+    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getCreationDate());
+    assertEquals(LocalDate.of(2020, 7, 21), sample.getDate());
+    assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20200721",
         sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }

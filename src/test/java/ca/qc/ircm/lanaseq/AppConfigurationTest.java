@@ -48,7 +48,7 @@ public class AppConfigurationTest {
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
-    sample.setDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    sample.setCreationDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
     sample.generateName();
     return sample;
   }
@@ -114,7 +114,7 @@ public class AppConfigurationTest {
     sample.setType(SampleType.INPUT);
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
-    sample.setDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
+    sample.setCreationDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
     sample.generateName();
     String name = sample.getName();
     assertEquals(appConfiguration.getSampleHome().resolve("2020/" + name),

@@ -162,7 +162,7 @@ public class SampleService {
     User user = authorizationService.getCurrentUser();
     if (sample.getId() == null) {
       sample.setOwner(user);
-      sample.setDate(now);
+      sample.setCreationDate(now);
       sample.setEditable(true);
     }
     Path oldFolder = null;

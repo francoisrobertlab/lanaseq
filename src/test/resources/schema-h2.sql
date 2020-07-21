@@ -79,10 +79,11 @@ CREATE TABLE IF NOT EXISTS sample (
   strain varchar(255) NOT NULL,
   strain_description varchar(255),
   treatment varchar(255),
+  date DATE NOT NULL,
   protocol_id bigint(20) NOT NULL,
   owner_id bigint(20) NOT NULL,
   editable tinyint NOT NULL DEFAULT 0,
-  date DATETIME NOT NULL,
+  creation_date DATETIME NOT NULL,
   PRIMARY KEY (id),
   UNIQUE (name),
   CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE

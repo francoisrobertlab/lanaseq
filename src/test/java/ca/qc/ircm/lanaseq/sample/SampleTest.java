@@ -2,7 +2,7 @@ package ca.qc.ircm.lanaseq.sample;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import org.junit.Test;
 
 public class SampleTest {
@@ -17,7 +17,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -32,7 +32,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -48,7 +48,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -64,7 +64,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FUR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -79,7 +79,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_20200508", sample.getName());
   }
@@ -95,7 +95,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -111,7 +111,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1i_20200508", sample.getName());
   }
@@ -126,7 +126,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -141,7 +141,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -156,7 +156,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -172,7 +172,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -188,7 +188,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spta16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -202,7 +202,7 @@ public class SampleTest {
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_IAA_R1_20200508", sample.getName());
   }
@@ -218,7 +218,7 @@ public class SampleTest {
     sample.setStrain("yFR 101$");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -234,7 +234,7 @@ public class SampleTest {
     sample.setStrain("yâFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yaFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -249,7 +249,7 @@ public class SampleTest {
     sample.setTarget("Spt16");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -264,7 +264,7 @@ public class SampleTest {
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_IAA_R1_20200508", sample.getName());
   }
@@ -280,7 +280,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G 24D@");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -296,7 +296,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24DÉ");
     sample.setTreatment("IAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24DE_IAA_R1_20200508", sample.getName());
   }
@@ -311,7 +311,7 @@ public class SampleTest {
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_R1_20200508", sample.getName());
   }
@@ -327,7 +327,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("I AA!");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1_20200508", sample.getName());
   }
@@ -343,7 +343,7 @@ public class SampleTest {
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
     sample.setTreatment("IçAA");
-    sample.setDate(LocalDateTime.of(2020, 5, 8, 15, 36, 21));
+    sample.setDate(LocalDate.of(2020, 5, 8));
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IcAA_R1_20200508", sample.getName());
   }

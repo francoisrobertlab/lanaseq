@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
@@ -25,6 +26,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.time.LocalDate;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,7 @@ public class SampleDialogPresenter {
         .withNullRepresentation("").bind(STRAIN);
     binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
     binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
+    binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
   }
 
   BinderValidationStatus<Sample> validateSample() {
@@ -117,6 +120,9 @@ public class SampleDialogPresenter {
   void setSample(Sample sample) {
     if (sample == null) {
       sample = new Sample();
+    }
+    if (sample.getDate() == null) {
+      sample.setDate(LocalDate.now());
     }
     binder.setBean(sample);
     boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE)
