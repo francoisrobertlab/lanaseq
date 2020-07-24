@@ -95,7 +95,7 @@ public class AddDatasetFilesDialogPresenter {
 
   private Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
-      logger.debug("stat checking files in dataset {} upload folder", dataset);
+      logger.debug("start checking files in dataset {} upload folder", dataset);
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
@@ -194,7 +194,7 @@ public class AddDatasetFilesDialogPresenter {
     Path folder = folder();
     if (folder != null) {
       try {
-        logger.debug("creating upload folder {} for dataset {}", dataset);
+        logger.debug("creating upload folder {} for dataset {}", folder, dataset);
         Files.createDirectories(folder);
       } catch (IOException e) {
         final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
@@ -207,7 +207,7 @@ public class AddDatasetFilesDialogPresenter {
     Path folder = folder();
     if (folder != null) {
       try {
-        logger.debug("deleting upload folder {} for dataset {}", dataset);
+        logger.debug("deleting upload folder {} for dataset {}", folder, dataset);
         FileSystemUtils.deleteRecursively(folder);
       } catch (IOException e) {
         logger.warn("could not delete folder {}", folder);

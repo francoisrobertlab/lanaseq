@@ -93,7 +93,7 @@ public class AddSampleFilesDialogPresenter {
 
   private Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
-      logger.debug("stat checking files in sample {} upload folder", sample);
+      logger.debug("start checking files in sample {} upload folder", sample);
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
@@ -192,7 +192,7 @@ public class AddSampleFilesDialogPresenter {
     Path folder = folder();
     if (folder != null) {
       try {
-        logger.debug("creating upload folder {} for sample {}", sample);
+        logger.debug("creating upload folder {} for sample {}", folder, sample);
         Files.createDirectories(folder);
       } catch (IOException e) {
         final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
@@ -205,7 +205,7 @@ public class AddSampleFilesDialogPresenter {
     Path folder = folder();
     if (folder != null) {
       try {
-        logger.debug("deleting upload folder {} for sample {}", sample);
+        logger.debug("deleting upload folder {} for sample {}", folder, sample);
         FileSystemUtils.deleteRecursively(folder);
       } catch (IOException e) {
         logger.warn("could not delete folder {}", folder);
