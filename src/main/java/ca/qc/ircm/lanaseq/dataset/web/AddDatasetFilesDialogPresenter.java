@@ -95,7 +95,7 @@ public class AddDatasetFilesDialogPresenter {
 
   private Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
-      logger.debug("start checking files in dataset {} upload folder", dataset);
+      logger.debug("start checking files in dataset upload folder {}", folder());
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
@@ -104,7 +104,7 @@ public class AddDatasetFilesDialogPresenter {
         try {
           Thread.sleep(2000);
         } catch (InterruptedException e) {
-          logger.debug("stop checking files in dataset {} upload folder", dataset);
+          logger.debug("stop checking files in dataset upload folder {}", folder());
           return;
         }
       }

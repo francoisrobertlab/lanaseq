@@ -93,7 +93,7 @@ public class AddSampleFilesDialogPresenter {
 
   private Thread createUpdateFilesThread() {
     Runnable updateFilesRunnable = () -> {
-      logger.debug("start checking files in sample {} upload folder", sample);
+      logger.debug("start checking files in sample upload folder {}", folder());
       while (true) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
@@ -102,7 +102,7 @@ public class AddSampleFilesDialogPresenter {
         try {
           Thread.sleep(2000);
         } catch (InterruptedException e) {
-          logger.debug("stop checking files in sample {} upload folder", sample);
+          logger.debug("stop checking files in sample upload folder {}", folder());
           return;
         }
       }
