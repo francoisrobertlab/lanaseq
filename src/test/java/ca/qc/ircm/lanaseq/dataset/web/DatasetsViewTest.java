@@ -64,7 +64,7 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -95,7 +95,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
   @Captor
-  private ArgumentCaptor<LocalDateTimeRenderer<Dataset>> localDateTimeRendererCaptor;
+  private ArgumentCaptor<LocalDateRenderer<Dataset>> localDateRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Dataset>> comparatorCaptor;
   @Autowired
@@ -146,7 +146,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     view.date = mock(Column.class);
-    when(view.datasets.addColumn(any(LocalDateTimeRenderer.class), eq(DATE))).thenReturn(view.date);
+    when(view.datasets.addColumn(any(LocalDateRenderer.class), eq(DATE))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
     view.owner = mock(Column.class);
@@ -293,11 +293,11 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
       assertEquals(protocol(dataset).getName(),
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
-    verify(view.datasets).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
-    LocalDateTimeRenderer<Dataset> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
+    verify(view.datasets).addColumn(localDateRendererCaptor.capture(), eq(DATE));
+    LocalDateRenderer<Dataset> localDateRenderer = localDateRendererCaptor.getValue();
     for (Dataset dataset : datasets) {
-      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getCreationDate()),
-          getFormattedValue(localDateTimeRenderer, dataset));
+      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
+          getFormattedValue(localDateRenderer, dataset));
     }
     verify(view.datasets).addColumn(valueProviderCaptor.capture(), eq(OWNER));
     valueProvider = valueProviderCaptor.getValue();

@@ -26,7 +26,6 @@ import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -142,29 +141,29 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void test_dateRange() {
+  public void test_DateRange() {
     LocalDate from = LocalDate.of(2011, 1, 2);
     LocalDate to = LocalDate.of(2011, 10, 9);
     filter.dateRange = Range.closed(from, to);
 
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+    assertFalse(filter.test(date(LocalDate.of(2011, 1, 1))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 2))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 8))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 9))));
+    assertFalse(filter.test(date(LocalDate.of(2011, 12, 1))));
+    assertFalse(filter.test(date(LocalDate.of(2011, 1, 1))));
   }
 
   @Test
-  public void test_dateRange_Null() {
+  public void test_DateRange_Null() {
     filter.dateRange = null;
 
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 1))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 2))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 8))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 9))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 12, 1))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 1))));
   }
 
   @Test
@@ -254,9 +253,9 @@ public class DatasetFilterTest {
     return dataset;
   }
 
-  private Dataset date(LocalDateTime date) {
+  private Dataset date(LocalDate date) {
     Dataset dataset = new Dataset();
-    dataset.setCreationDate(date);
+    dataset.setDate(date);
     return dataset;
   }
 

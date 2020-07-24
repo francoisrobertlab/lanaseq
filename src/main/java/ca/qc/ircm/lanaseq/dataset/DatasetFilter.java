@@ -53,7 +53,7 @@ public class DatasetFilter implements Predicate<Dataset> {
           .contains(comparable(protocolContains));
     }
     if (dateRange != null) {
-      test &= dateRange.contains(dataset.getCreationDate().toLocalDate());
+      test &= dateRange.contains(dataset.getDate());
     }
     if (ownerContains != null) {
       test &=

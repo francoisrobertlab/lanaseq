@@ -25,7 +25,6 @@ import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -88,29 +87,29 @@ public class SampleFilterTest {
   }
 
   @Test
-  public void test_dateRange() {
+  public void test_DateRange() {
     LocalDate from = LocalDate.of(2011, 1, 2);
     LocalDate to = LocalDate.of(2011, 10, 9);
     filter.dateRange = Range.closed(from, to);
 
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
-    assertFalse(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+    assertFalse(filter.test(date(LocalDate.of(2011, 1, 1))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 2))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 8))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 9))));
+    assertFalse(filter.test(date(LocalDate.of(2011, 12, 1))));
+    assertFalse(filter.test(date(LocalDate.of(2011, 1, 1))));
   }
 
   @Test
-  public void test_dateRange_Null() {
+  public void test_DateRange_Null() {
     filter.dateRange = null;
 
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 2, 9, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 8, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 10, 9, 23, 40))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 12, 1, 0, 0))));
-    assertTrue(filter.test(date(LocalDateTime.of(2011, 1, 1, 0, 0))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 1))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 2))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 8))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 10, 9))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 12, 1))));
+    assertTrue(filter.test(date(LocalDate.of(2011, 1, 1))));
   }
 
   @Test
@@ -194,9 +193,9 @@ public class SampleFilterTest {
     return sample;
   }
 
-  private Sample date(LocalDateTime date) {
+  private Sample date(LocalDate date) {
     Sample sample = new Sample();
-    sample.setCreationDate(date);
+    sample.setDate(date);
     return sample;
   }
 

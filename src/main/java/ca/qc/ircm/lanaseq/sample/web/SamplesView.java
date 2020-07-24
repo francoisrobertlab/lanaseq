@@ -32,7 +32,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -110,8 +110,7 @@ public class SamplesView extends VerticalLayout
         samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
             .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()));
     date = samples
-        .addColumn(new LocalDateTimeRenderer<>(Sample::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
-            DATE)
+        .addColumn(new LocalDateRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
         .setKey(DATE);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));

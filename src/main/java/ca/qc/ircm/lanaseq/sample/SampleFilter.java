@@ -44,7 +44,7 @@ public class SampleFilter implements Predicate<Sample> {
           .contains(comparable(protocolContains));
     }
     if (dateRange != null) {
-      test &= dateRange.contains(sample.getCreationDate().toLocalDate());
+      test &= dateRange.contains(sample.getDate());
     }
     if (ownerContains != null) {
       test &=
