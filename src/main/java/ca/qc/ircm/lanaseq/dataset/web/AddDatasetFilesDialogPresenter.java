@@ -16,12 +16,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,22 +59,22 @@ public class AddDatasetFilesDialogPresenter {
     this.dialog = dialog;
     dialog.addOpenedChangeListener(event -> {
       if (event.isOpened()) {
-        createFolder();
-      } else {
-        deleteFolder();
-      }
-    });
-    dialog.addOpenedChangeListener(event -> {
-      if (event.isOpened()) {
         if (updateFilesThread != null) {
           updateFilesThread.interrupt();
         }
+        createFolder();
         updateFilesThread = createUpdateFilesThread();
         updateFilesThread.start();
       } else {
         if (updateFilesThread != null) {
           updateFilesThread.interrupt();
+          try {
+            updateFilesThread.join(5000);
+          } catch (InterruptedException e) {
+          }
         }
+        dialog.files.setItems(new ArrayList<>());
+        deleteFolder();
       }
     });
   }
@@ -120,17 +122,11 @@ public class AddDatasetFilesDialogPresenter {
     existingFilenames = service.files(dataset).stream().map(file -> file.toFile().getName())
         .collect(Collectors.toSet());
     Path folder = folder();
-    if (folder != null) {
-      try {
-        dialog.files.setItems(Files.list(folder).filter(file -> {
-          try {
-            return Files.isRegularFile(file) && !Files.isHidden(file);
-          } catch (IOException e) {
-            return false;
-          }
-        }).map(file -> file.toFile()));
-      } catch (IOException e) {
-      }
+    if (folder != null && Files.isDirectory(folder)) {
+      dialog.files.setItems(
+          Stream.of(folder.toFile().listFiles()).filter(file -> file.isFile() && !file.isHidden()));
+    } else {
+      dialog.files.setItems(new ArrayList<>());
     }
   }
 
