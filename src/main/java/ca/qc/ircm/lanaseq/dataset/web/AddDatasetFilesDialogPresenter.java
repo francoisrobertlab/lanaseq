@@ -198,7 +198,7 @@ public class AddDatasetFilesDialogPresenter {
         Files.createDirectories(folder);
       } catch (IOException e) {
         final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
-        dialog.showNotification(resources.message(CREATE_FOLDER_ERROR));
+        dialog.showNotification(resources.message(CREATE_FOLDER_ERROR, folder));
       }
     }
   }
@@ -208,7 +208,9 @@ public class AddDatasetFilesDialogPresenter {
     if (folder != null) {
       try {
         logger.debug("deleting upload folder {} for dataset {}", folder, dataset);
-        FileSystemUtils.deleteRecursively(folder);
+        if (!FileSystemUtils.deleteRecursively(folder)) {
+          logger.warn("could not delete folder {}", folder);
+        }
       } catch (IOException e) {
         logger.warn("could not delete folder {}", folder);
       }
