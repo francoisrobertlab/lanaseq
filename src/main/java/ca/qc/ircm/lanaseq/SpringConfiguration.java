@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.messageresolver.StandardMessageResolver;
@@ -38,6 +39,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
  */
 @Configuration
 @EnableTransactionManagement
+@EnableScheduling
 public class SpringConfiguration {
   @Autowired
   private MailConfiguration mailConfiguration;

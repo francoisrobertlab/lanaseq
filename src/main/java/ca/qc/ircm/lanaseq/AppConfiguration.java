@@ -21,6 +21,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,13 +41,41 @@ public class AppConfiguration {
   public static final String DELETED_FILENAME = ".deleted";
   @Value("${logging.path:${user.dir}}/${logging.file:" + APPLICATION_NAME + "log}")
   private String logfile;
+  /**
+   * Application home folder.
+   */
   private Path home;
+  /**
+   * Where sample files are stored.
+   */
   private Path sampleHome;
+  /**
+   * Where dataset files are stored.
+   */
   private Path datasetHome;
+  /**
+   * Upload folder.
+   */
   private Path upload;
+  /**
+   * Time that must elapse before a folder get deleted.
+   */
+  private Duration uploadDeleteAge;
+  /**
+   * Application home folder as shown to users.
+   */
   private Folder userHome;
+  /**
+   * Application upload folder as shown to users.
+   */
   private Folder userUpload;
+  /**
+   * Server's actual URL, used in emails.
+   */
   private String serverUrl;
+  /**
+   * Year formatter.
+   */
   private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
 
   public Path getLogFile() {
@@ -166,20 +195,28 @@ public class AppConfiguration {
     this.serverUrl = serverUrl;
   }
 
-  public Folder getUserHome() {
+  Folder getUserHome() {
     return userHome;
   }
 
-  public void setUserHome(Folder userHome) {
+  void setUserHome(Folder userHome) {
     this.userHome = userHome;
   }
 
-  public Folder getUserUpload() {
+  Folder getUserUpload() {
     return userUpload;
   }
 
-  public void setUserUpload(Folder userUpload) {
+  void setUserUpload(Folder userUpload) {
     this.userUpload = userUpload;
+  }
+
+  public Duration getUploadDeleteAge() {
+    return uploadDeleteAge;
+  }
+
+  void setUploadDeleteAge(Duration uploadDeleteAge) {
+    this.uploadDeleteAge = uploadDeleteAge;
   }
 
   @SuppressWarnings("unused")

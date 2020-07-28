@@ -25,6 +25,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import org.junit.Test;
@@ -250,5 +251,10 @@ public class AppConfigurationTest {
   public void getUrl() {
     assertEquals("http://localhost:8080/myurl/subpath?param1=abc",
         appConfiguration.getUrl("/myurl/subpath?param1=abc"));
+  }
+
+  @Test
+  public void getUploadDeleteAge() {
+    assertEquals(Duration.ofHours(6), appConfiguration.getUploadDeleteAge());
   }
 }

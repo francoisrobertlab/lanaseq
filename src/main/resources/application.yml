@@ -43,6 +43,7 @@ app:
       windows: '\\lanaseq01\lanaseq'
       unix: 'smb://lanaseq01/lanaseq'
   upload: ${app.home}/upload
+  upload-delete-age: PT6H
   user-upload:
     windows: 'lanaseq\upload'
     unix: 'lanaseq/upload'
