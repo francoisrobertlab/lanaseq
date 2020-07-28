@@ -163,7 +163,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void creatUploadFolderOnOpen() {
+  public void createUploadFolderOnOpen() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     assertFalse(Files.exists(uploadFolder(sample)));

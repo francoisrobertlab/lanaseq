@@ -163,7 +163,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void creatUploadFolderOnOpen() {
+  public void createUploadFolderOnOpen() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
     assertFalse(Files.exists(uploadFolder(dataset)));
