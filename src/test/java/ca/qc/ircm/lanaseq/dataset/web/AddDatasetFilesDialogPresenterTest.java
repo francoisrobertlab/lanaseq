@@ -175,7 +175,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void deleteUploadFolderOnClose() throws Throwable {
+  public void keepUploadFolderOnClose() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
     assertFalse(Files.exists(uploadFolder(dataset)));
@@ -188,7 +188,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(openedChangeEvent.isOpened()).thenReturn(false);
     openedChangeListenerCaptor.getAllValues()
         .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
-    assertFalse(Files.exists(uploadFolder(dataset)));
+    assertTrue(Files.exists(uploadFolder(dataset)));
   }
 
   @Test

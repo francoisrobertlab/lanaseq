@@ -175,7 +175,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void deleteUploadFolderOnClose() throws Throwable {
+  public void keepUploadFolderOnClose() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     assertFalse(Files.exists(uploadFolder(sample)));
@@ -188,7 +188,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(openedChangeEvent.isOpened()).thenReturn(false);
     openedChangeListenerCaptor.getAllValues()
         .forEach(listener -> listener.onComponentEvent(openedChangeEvent));
-    assertFalse(Files.exists(uploadFolder(sample)));
+    assertTrue(Files.exists(uploadFolder(sample)));
   }
 
   @Test

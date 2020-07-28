@@ -31,7 +31,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.FileSystemUtils;
 
 /**
  * Add sample files dialog presenter.
@@ -73,7 +72,6 @@ public class AddSampleFilesDialogPresenter {
           }
         }
         dialog.files.setItems(new ArrayList<>());
-        deleteFolder();
       }
     });
   }
@@ -193,20 +191,6 @@ public class AddSampleFilesDialogPresenter {
       } catch (IOException e) {
         final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
         dialog.showNotification(resources.message(CREATE_FOLDER_ERROR, folder));
-      }
-    }
-  }
-
-  private void deleteFolder() {
-    Path folder = folder();
-    if (folder != null) {
-      try {
-        logger.debug("deleting upload folder {} for sample {}", folder, sample);
-        if (!FileSystemUtils.deleteRecursively(folder)) {
-          logger.warn("could not delete folder {}", folder);
-        }
-      } catch (IOException e) {
-        logger.warn("could not delete folder {}", folder);
       }
     }
   }
