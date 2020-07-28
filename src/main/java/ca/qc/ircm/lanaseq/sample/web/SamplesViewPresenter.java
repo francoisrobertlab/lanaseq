@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +131,8 @@ public class SamplesViewPresenter {
   }
 
   public void merge(Locale locale) {
-    List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
+    List<Sample> samples = view.samples.getSelectedItems().stream()
+        .sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).collect(Collectors.toList());
     AppResources resources = new AppResources(SamplesView.class, locale);
     boolean error = false;
     if (samples.isEmpty()) {

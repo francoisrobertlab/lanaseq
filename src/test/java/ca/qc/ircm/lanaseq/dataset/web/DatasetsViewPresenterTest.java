@@ -356,11 +356,43 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("G24D"));
     assertEquals(5, dataset.getSamples().size());
-    assertTrue(find(dataset.getSamples(), 1L).isPresent());
-    assertTrue(find(dataset.getSamples(), 2L).isPresent());
-    assertTrue(find(dataset.getSamples(), 3L).isPresent());
-    assertTrue(find(dataset.getSamples(), 4L).isPresent());
-    assertTrue(find(dataset.getSamples(), 5L).isPresent());
+    assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
+    assertEquals((Long) 3L, dataset.getSamples().get(2).getId());
+    assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
+    assertEquals(datasets.get(0).getDate(), dataset.getDate());
+    verify(view).showNotification(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_SortById() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    view.datasets.select(datasets.get(1));
+    view.datasets.select(datasets.get(0));
+    presenter.merge(locale);
+    assertFalse(view.error.isVisible());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(5, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertEquals(4, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(5, dataset.getSamples().size());
+    assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
+    assertEquals((Long) 3L, dataset.getSamples().get(2).getId());
+    assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
     verify(view).showNotification(resources.message(MERGED, dataset.getName()));
   }

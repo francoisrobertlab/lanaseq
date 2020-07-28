@@ -146,11 +146,12 @@ public class DatasetsViewPresenter {
 
   void merge(Locale locale) {
     clearError();
-    Set<Dataset> datasets = view.datasets.getSelectedItems();
+    List<Dataset> datasets = view.datasets.getSelectedItems().stream()
+        .sorted((d1, d2) -> d1.getId().compareTo(d2.getId())).collect(Collectors.toList());
     Set<String> tags = datasets.stream().flatMap(dataset -> dataset.getTags().stream())
         .collect(Collectors.toSet());
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
-        .collect(Collectors.toList());
+        .sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).collect(Collectors.toList());
     AppResources resources = new AppResources(DatasetsView.class, locale);
     boolean error = false;
     if (samples.isEmpty()) {
@@ -165,7 +166,7 @@ public class DatasetsViewPresenter {
       Dataset dataset = new Dataset();
       dataset.setTags(tags);
       dataset.setSamples(samples);
-      dataset.setDate(datasets.iterator().next().getDate());
+      dataset.setDate(datasets.get(0).getDate());
       service.save(dataset);
       view.showNotification(resources.message(MERGED, dataset.getName()));
     }

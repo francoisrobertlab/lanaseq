@@ -330,8 +330,30 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     assertNull(dataset.getId());
     assertTrue(dataset.getTags().isEmpty());
     assertEquals(2, dataset.getSamples().size());
-    assertTrue(dataset.getSamples().contains(samples.get(0)));
-    assertTrue(dataset.getSamples().contains(samples.get(1)));
+    assertEquals(samples.get(0), dataset.getSamples().get(0));
+    assertEquals(samples.get(1), dataset.getSamples().get(1));
+    assertEquals(samples.get(0).getDate(), dataset.getDate());
+    verify(view).showNotification(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_SortById() {
+    when(service.isMergable(any())).thenReturn(true);
+    view.samples.select(samples.get(1));
+    view.samples.select(samples.get(0));
+    presenter.merge(locale);
+    assertFalse(view.error.isVisible());
+    verify(service).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
+    assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
+    verify(datasetService).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertTrue(dataset.getTags().isEmpty());
+    assertEquals(2, dataset.getSamples().size());
+    assertEquals(samples.get(0), dataset.getSamples().get(0));
+    assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
     verify(view).showNotification(resources.message(MERGED, dataset.getName()));
   }
