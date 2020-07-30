@@ -74,6 +74,7 @@ public class ProfileView extends VerticalLayout
   @PostConstruct
   protected void init() {
     setId(ID);
+    setMaxWidth("40em");
     add(header, form, save);
     header.setId(HEADER);
     save.setId(SAVE);

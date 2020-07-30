@@ -69,7 +69,6 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   @PostConstruct
   protected void init() {
     setId(ID);
-    setResponsiveSteps(new ResponsiveStep("30em", 1));
     add(new FormLayout(email, name, admin, manager, passwords));
     email.setId(id(EMAIL));
     name.setId(id(NAME));
