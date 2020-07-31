@@ -104,7 +104,7 @@ public class DatasetPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_ReadDataset_Admin() throws Throwable {
     Dataset dataset = datasetRepository.findById(2L).orElse(null);
     assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, READ));
@@ -180,7 +180,7 @@ public class DatasetPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_WriteDataset_Admin() throws Throwable {
     Dataset dataset = datasetRepository.findById(2L).orElse(null);
     assertTrue(permissionEvaluator.hasPermission(authentication(), dataset, WRITE));
@@ -221,7 +221,7 @@ public class DatasetPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_Null() throws Throwable {
     assertFalse(permissionEvaluator.hasPermission(authentication(), null, READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), null, WRITE));
@@ -236,7 +236,7 @@ public class DatasetPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_NotDataset() throws Throwable {
     assertFalse(permissionEvaluator.hasPermission(authentication(), new User(1L), READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), new User(1L), WRITE));
@@ -253,7 +253,7 @@ public class DatasetPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_NotLongId() throws Throwable {
     assertFalse(
         permissionEvaluator.hasPermission(authentication(), "Informatics", DATASET_CLASS, READ));

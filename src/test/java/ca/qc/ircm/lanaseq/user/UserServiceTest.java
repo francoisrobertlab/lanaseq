@@ -81,8 +81,8 @@ public class UserServiceTest {
 
     assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
-    assertEquals("Lana Administrator", user.getName());
-    assertEquals("lana@ircm.qc.ca", user.getEmail());
+    assertEquals("LANAseq Administrator", user.getName());
+    assertEquals("lanaseq@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
     assertEquals(1, user.getSignAttempts());
     assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)

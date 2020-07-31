@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
-@WithUserDetails("lana@ircm.qc.ca")
+@WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewItTest extends AbstractTestBenchTestCase {
   private void open() {
     openView(VIEW_NAME);

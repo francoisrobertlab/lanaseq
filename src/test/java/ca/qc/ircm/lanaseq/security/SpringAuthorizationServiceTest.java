@@ -114,7 +114,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void currentUser() throws Throwable {
     User user = authorizationService.getCurrentUser();
     assertNotNull(authorizationService.getCurrentUser());
@@ -146,7 +146,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasRole_SwitchedUser() throws Throwable {
     switchToUser("francois.robert@ircm.qc.ca");
     assertTrue(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
@@ -171,7 +171,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasAnyRole_SwitchedUser() throws Throwable {
     switchToUser("francois.robert@ircm.qc.ca");
     assertTrue(authorizationService.hasAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
@@ -237,7 +237,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void removeForceChangePasswordRole_NoForceChangePasswordRole() throws Throwable {
     Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -245,7 +245,7 @@ public class SpringAuthorizationServiceTest {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertSame(oldAuthentication, authentication);
-    assertEquals("lana@ircm.qc.ca", authentication.getName());
+    assertEquals("lanaseq@ircm.qc.ca", authentication.getName());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2,
         authentication.getCredentials());
     assertTrue(authentication.isAuthenticated());
@@ -257,7 +257,7 @@ public class SpringAuthorizationServiceTest {
         .isPresent());
     assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
     AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
-    assertEquals("lana@ircm.qc.ca", user.getUsername());
+    assertEquals("lanaseq@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getPassword());
     assertEquals((Long) 1L, user.getId());
     assertEquals(3, user.getAuthorities().size());
@@ -333,7 +333,7 @@ public class SpringAuthorizationServiceTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void isAuthorized_SwitchedUser() throws Throwable {
     switchToUser("francois.robert@ircm.qc.ca");
     assertTrue(authorizationService.isAuthorized(UserRoleTest.class));

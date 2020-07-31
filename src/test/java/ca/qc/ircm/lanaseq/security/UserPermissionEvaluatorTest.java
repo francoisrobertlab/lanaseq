@@ -96,7 +96,7 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_ReadUser_Admin() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, READ));
@@ -149,7 +149,7 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_WriteNewUser_Admin() throws Throwable {
     User user = new User("new user");
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, WRITE));
@@ -157,7 +157,7 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_WriteNewAdmin_Admin() throws Throwable {
     User user = new User("new user");
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, WRITE));
@@ -213,7 +213,7 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_WriteUser_Admin() throws Throwable {
     User user = userRepository.findById(3L).orElse(null);
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, WRITE));
@@ -251,7 +251,7 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_Null() throws Throwable {
     assertFalse(permissionEvaluator.hasPermission(authentication(), null, READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), null, WRITE));
@@ -264,7 +264,7 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_NotUser() throws Throwable {
     assertFalse(permissionEvaluator.hasPermission(authentication(), new Protocol(1L), READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), new Protocol(1L), WRITE));
@@ -281,15 +281,15 @@ public class UserPermissionEvaluatorTest {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_NotLongId() throws Throwable {
     assertFalse(
-        permissionEvaluator.hasPermission(authentication(), "lana@ircm.qc.ca", USER_CLASS, READ));
+        permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS, READ));
     assertFalse(
-        permissionEvaluator.hasPermission(authentication(), "lana@ircm.qc.ca", USER_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), "lana@ircm.qc.ca", USER_CLASS,
+        permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS, WRITE));
+    assertFalse(permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS,
         BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), "lana@ircm.qc.ca", USER_CLASS,
+    assertFalse(permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS,
         BASE_WRITE));
   }
 }

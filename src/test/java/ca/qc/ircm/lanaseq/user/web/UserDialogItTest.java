@@ -40,7 +40,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
-@WithUserDetails("lana@ircm.qc.ca")
+@WithUserDetails("lanaseq@ircm.qc.ca")
 public class UserDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private UserRepository repository;

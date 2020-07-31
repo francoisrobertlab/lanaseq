@@ -61,7 +61,7 @@ public class SpringDataUserDetailsServiceTest {
     userDetailsService = new SpringDataUserDetailsService(userRepository);
     user = new User();
     user.setId(2L);
-    user.setEmail("lana@ircm.qc.ca");
+    user.setEmail("lanaseq@ircm.qc.ca");
     user.setName("A User");
     user.setHashedPassword(InitializeDatabaseExecutionListener.PASSWORD_PASS1);
     user.setActive(true);
@@ -75,10 +75,10 @@ public class SpringDataUserDetailsServiceTest {
 
   @Test
   public void loadUserByUsername() {
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
+    UserDetails userDetails = userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
 
-    verify(userRepository).findByEmail("lana@ircm.qc.ca");
-    assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
+    verify(userRepository).findByEmail("lanaseq@ircm.qc.ca");
+    assertEquals("lanaseq@ircm.qc.ca", userDetails.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(1, authorities.size());
@@ -99,7 +99,7 @@ public class SpringDataUserDetailsServiceTest {
   public void loadUserByUsername_Admin() {
     user.setAdmin(true);
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
+    UserDetails userDetails = userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
 
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(2, authorities.size());
@@ -114,7 +114,7 @@ public class SpringDataUserDetailsServiceTest {
   public void loadUserByUsername_Manager() {
     user.setManager(true);
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
+    UserDetails userDetails = userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
 
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(2, authorities.size());
@@ -130,7 +130,7 @@ public class SpringDataUserDetailsServiceTest {
     user.setAdmin(true);
     user.setManager(true);
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
+    UserDetails userDetails = userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
 
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(3, authorities.size());
@@ -146,16 +146,16 @@ public class SpringDataUserDetailsServiceTest {
   public void loadUserByUsername_NotExists() {
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
 
-    userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
+    userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
   }
 
   @Test
   public void loadUserByUsername_ExpiredPassword() {
     user.setExpiredPassword(true);
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername("lana@ircm.qc.ca");
+    UserDetails userDetails = userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
 
-    assertEquals("lana@ircm.qc.ca", userDetails.getUsername());
+    assertEquals("lanaseq@ircm.qc.ca", userDetails.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, userDetails.getPassword());
     List<? extends GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
     assertEquals(2, authorities.size());

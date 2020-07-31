@@ -62,7 +62,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void adminRedirected() throws Throwable {
     open();
 

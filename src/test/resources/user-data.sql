@@ -16,7 +16,7 @@
 --
 
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,locale,date)
-VALUES ('1', 'lana@ircm.qc.ca', 'Lana Administrator', '$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu', 1, '2018-12-13 17:40:12', 1, 1, 1, 0, null, '2018-11-20 09:30:00');
+VALUES ('1', 'lanaseq@ircm.qc.ca', 'LANAseq Administrator', '$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu', 1, '2018-12-13 17:40:12', 1, 1, 1, 0, null, '2018-11-20 09:30:00');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,locale,date)
 VALUES ('2', 'francois.robert@ircm.qc.ca', 'Francois Robert', '$2a$10$nGJQSCEj1xlQR/C.nEO8G.GQ4/wUCuGrRKNd0AV3oQp3FwzjtfyAq', 0, '2018-12-17 15:40:12', 1, 1, 0, 0, 'en', '2018-11-20 09:45:21');
 INSERT INTO user (id,email,name,hashed_password,sign_attempts,last_sign_attempt,active,manager,admin,expired_password,locale,date)

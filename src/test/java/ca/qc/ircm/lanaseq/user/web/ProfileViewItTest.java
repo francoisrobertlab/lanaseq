@@ -116,7 +116,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Admin() throws Throwable {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).id(ID);

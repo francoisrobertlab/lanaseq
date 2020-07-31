@@ -75,7 +75,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Admin() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
@@ -89,7 +89,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Runas() throws Throwable {
     openView(UsersView.VIEW_NAME);
     SigninViewElement signinView = $(SigninViewElement.class).id(SigninView.ID);
-    signinView.getUsernameField().setValue("lana@ircm.qc.ca");
+    signinView.getUsernameField().setValue("lanaseq@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass2");
     signinView.getSubmitButton().click();
     UsersViewElement usersView = $(UsersViewElement.class).id(UsersView.ID);
@@ -139,7 +139,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("lana@ircm.qc.ca")
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void users() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
@@ -151,7 +151,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   public void exitSwitchUser() throws Throwable {
     openView(UsersView.VIEW_NAME);
     SigninViewElement signinView = $(SigninViewElement.class).id(SigninView.ID);
-    signinView.getUsernameField().setValue("lana@ircm.qc.ca");
+    signinView.getUsernameField().setValue("lanaseq@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass2");
     signinView.getSubmitButton().click();
     UsersViewElement usersView = $(UsersViewElement.class).id(UsersView.ID);
