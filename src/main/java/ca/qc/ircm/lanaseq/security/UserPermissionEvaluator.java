@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
+  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(UserPermissionEvaluator.class);
   @Autowired
   private UserRepository repository;
@@ -53,10 +54,6 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     User user = (User) targetDomainObject;
     User currentUser = getUser(authentication);
     Permission realPermission = resolvePermission(permission);
-    if (realPermission.equals(WRITE)) {
-      logger.debug("hasPermission={} for user {} and current user {}",
-          hasPermission(user, currentUser, realPermission), user, currentUser);
-    }
     return hasPermission(user, currentUser, realPermission);
   }
 
