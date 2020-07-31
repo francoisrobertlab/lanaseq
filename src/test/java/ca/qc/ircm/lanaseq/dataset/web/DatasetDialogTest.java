@@ -87,10 +87,15 @@ import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.GridNoneSelectionModel;
+import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
+import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
+import com.vaadin.flow.component.grid.dnd.GridDropEvent;
+import com.vaadin.flow.component.grid.dnd.GridDropLocation;
+import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -100,6 +105,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -129,6 +137,12 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, Sample>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<GridDragStartEvent<Sample>>> dragStartListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<GridDragEndEvent<Sample>>> dragEndListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<GridDropEvent<Sample>>> dropListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Mock
@@ -378,7 +392,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.sampleName.isSortable());
     assertNotNull(dialog.samples.getColumnByKey(REMOVE));
     assertFalse(dialog.sampleRemove.isSortable());
-    assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
+    assertTrue(dialog.samples.getSelectionModel() instanceof GridNoneSelectionModel);
+    assertTrue(dialog.samples.isRowsDraggable());
   }
 
   @Test
@@ -436,6 +451,56 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
       verify(presenter).removeSample(sample);
     }
     verify(dialog.sampleRemove, never()).setComparator(comparatorCaptor.capture());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void samples_DragAndDrop_Above() {
+    mockSamplesColumns();
+    dialog.init();
+    Sample sample = samples.get(0);
+    Sample droppedSample = samples.get(2);
+    verify(dialog.samples).addDragStartListener(dragStartListenerCaptor.capture());
+    GridDragStartEvent<Sample> dragStartEvent = mock(GridDragStartEvent.class);
+    when(dragStartEvent.getDraggedItems())
+        .thenReturn(Stream.of(sample).collect(Collectors.toList()));
+    dragStartListenerCaptor.getValue().onComponentEvent(dragStartEvent);
+    verify(dialog.samples).setDropMode(GridDropMode.BETWEEN);
+    verify(dialog.samples).addDropListener(dropListenerCaptor.capture());
+    GridDropEvent<Sample> dropEvent = mock(GridDropEvent.class);
+    when(dropEvent.getDropTargetItem()).thenReturn(Optional.of(droppedSample));
+    when(dropEvent.getDropLocation()).thenReturn(GridDropLocation.ABOVE);
+    dropListenerCaptor.getValue().onComponentEvent(dropEvent);
+    verify(presenter).dropSample(sample, droppedSample, GridDropLocation.ABOVE);
+    verify(dialog.samples).addDragEndListener(dragEndListenerCaptor.capture());
+    GridDragEndEvent<Sample> dragEndEvent = mock(GridDragEndEvent.class);
+    dragEndListenerCaptor.getValue().onComponentEvent(dragEndEvent);
+    verify(dialog.samples).setDropMode(null);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void samples_DragAndDrop_Below() {
+    mockSamplesColumns();
+    dialog.init();
+    Sample sample = samples.get(0);
+    Sample droppedSample = samples.get(2);
+    verify(dialog.samples).addDragStartListener(dragStartListenerCaptor.capture());
+    GridDragStartEvent<Sample> dragStartEvent = mock(GridDragStartEvent.class);
+    when(dragStartEvent.getDraggedItems())
+        .thenReturn(Stream.of(sample).collect(Collectors.toList()));
+    dragStartListenerCaptor.getValue().onComponentEvent(dragStartEvent);
+    verify(dialog.samples).setDropMode(GridDropMode.BETWEEN);
+    verify(dialog.samples).addDropListener(dropListenerCaptor.capture());
+    GridDropEvent<Sample> dropEvent = mock(GridDropEvent.class);
+    when(dropEvent.getDropTargetItem()).thenReturn(Optional.of(droppedSample));
+    when(dropEvent.getDropLocation()).thenReturn(GridDropLocation.BELOW);
+    dropListenerCaptor.getValue().onComponentEvent(dropEvent);
+    verify(presenter).dropSample(sample, droppedSample, GridDropLocation.BELOW);
+    verify(dialog.samples).addDragEndListener(dragEndListenerCaptor.capture());
+    GridDragEndEvent<Sample> dragEndEvent = mock(GridDragEndEvent.class);
+    dragEndListenerCaptor.getValue().onComponentEvent(dragEndEvent);
+    verify(dialog.samples).setDropMode(null);
   }
 
   @Test

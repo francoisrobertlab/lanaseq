@@ -61,6 +61,8 @@ import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -124,6 +126,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private transient DatasetDialogPresenter presenter;
   private Map<Sample, TextField> sampleIdFields = new HashMap<>();
   private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
+  private Sample draggedSample;
 
   protected DatasetDialog() {
   }
@@ -177,6 +180,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     date.setId(id(DATE));
     samples.setId(id(SAMPLES));
     samples.setHeight("15em");
+    samples.setSelectionMode(SelectionMode.NONE);
     sampleId = samples
         .addColumn(new ComponentRenderer<>(sample -> sampleIdField(sample)),
             SampleProperties.SAMPLE_ID)
@@ -193,6 +197,21 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleRemove =
         samples.addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)), REMOVE)
             .setKey(REMOVE).setSortable(false);
+    samples.setRowsDraggable(true);
+    samples.addDragStartListener(e -> {
+      draggedSample = e.getDraggedItems().get(0);
+      samples.setDropMode(GridDropMode.BETWEEN);
+    });
+    samples.addDragEndListener(e -> {
+      draggedSample = null;
+      samples.setDropMode(null);
+    });
+    samples.addDropListener(e -> {
+      Sample dropped = e.getDropTargetItem().orElse(null);
+      if (dropped != null && draggedSample != null) {
+        presenter.dropSample(draggedSample, dropped, e.getDropLocation());
+      }
+    });
     samples.appendFooterRow(); // Footers
     FooterRow footer = samples.appendFooterRow();
     footer.join(footer.getCell(sampleId), footer.getCell(sampleReplicate));

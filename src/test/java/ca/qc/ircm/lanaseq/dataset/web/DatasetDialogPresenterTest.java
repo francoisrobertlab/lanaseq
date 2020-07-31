@@ -61,6 +61,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -908,11 +909,12 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
     dialog.samples = mock(Grid.class);
+    when(dialog.samples.getDataProvider()).thenReturn(mock(ListDataProvider.class));
     List<Sample> samples = new ArrayList<Sample>(dataset.getSamples());
     Sample sample = samples.get(0);
     presenter.removeSample(sample);
-    verify(dialog.samples).setDataProvider(samplesDataProviderCaptor.capture());
-    List<Sample> items = new ArrayList<>(samplesDataProviderCaptor.getValue().getItems());
+    verify(dialog.samples.getDataProvider()).refreshAll();
+    List<Sample> items = presenter.getSamples();
     assertEquals(samples.size() - 1, items.size());
     for (int i = 1; i < samples.size(); i++) {
       assertEquals(samples.get(i), items.get(i - 1));
@@ -959,6 +961,81 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
     assertEquals("R3", sampleReplicateFields.get(samples.get(1)).getValue());
     assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
+  }
+
+  @Test
+  public void dropSample_AboveMoveFarther() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    presenter.dropSample(dataset.getSamples().get(0), dataset.getSamples().get(2),
+        GridDropLocation.ABOVE);
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertEquals((Long) 2L, samples.get(0).getId());
+    assertEquals((Long) 1L, samples.get(1).getId());
+    assertEquals((Long) 3L, samples.get(2).getId());
+  }
+
+  @Test
+  public void dropSample_BelowMoveFarther() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    presenter.dropSample(dataset.getSamples().get(0), dataset.getSamples().get(2),
+        GridDropLocation.BELOW);
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertEquals((Long) 2L, samples.get(0).getId());
+    assertEquals((Long) 3L, samples.get(1).getId());
+    assertEquals((Long) 1L, samples.get(2).getId());
+  }
+
+  @Test
+  public void dropSample_AboveMoveNearer() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    presenter.dropSample(dataset.getSamples().get(2), dataset.getSamples().get(0),
+        GridDropLocation.ABOVE);
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertEquals((Long) 3L, samples.get(0).getId());
+    assertEquals((Long) 1L, samples.get(1).getId());
+    assertEquals((Long) 2L, samples.get(2).getId());
+  }
+
+  @Test
+  public void dropSample_BelowMoveNearer() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    presenter.dropSample(dataset.getSamples().get(2), dataset.getSamples().get(0),
+        GridDropLocation.BELOW);
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertEquals((Long) 1L, samples.get(0).getId());
+    assertEquals((Long) 3L, samples.get(1).getId());
+    assertEquals((Long) 2L, samples.get(2).getId());
+  }
+
+  @Test
+  public void dropSample_Save() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    presenter.dropSample(dataset.getSamples().get(0), dataset.getSamples().get(2),
+        GridDropLocation.ABOVE);
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(3, samples.size());
+    assertEquals((Long) 2L, samples.get(0).getId());
+    assertEquals((Long) 1L, samples.get(1).getId());
+    assertEquals((Long) 3L, samples.get(2).getId());
+
+    presenter.save();
+
+    verify(service).save(datasetCaptor.capture());
+    dataset = datasetCaptor.getValue();
+    samples = dataset.getSamples();
+    assertEquals(3, samples.size());
+    assertEquals((Long) 2L, samples.get(0).getId());
+    assertEquals((Long) 1L, samples.get(1).getId());
+    assertEquals((Long) 3L, samples.get(2).getId());
   }
 
   @Test

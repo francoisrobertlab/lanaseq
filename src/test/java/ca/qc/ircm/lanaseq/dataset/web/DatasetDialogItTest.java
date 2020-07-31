@@ -48,11 +48,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -232,6 +235,63 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     dataset = repository.findById(6L).get();
     assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+  }
+
+  @Test
+  @Ignore("Drag and drop function moves to random element instead of the right location")
+  public void save_ReorderSamples() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.doubleClick(0);
+    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    Actions dragAndDrop = new Actions(dialog.getDriver());
+    WebElement drag = dialog.samples().getCell(0, 2);
+    WebElement drop = dialog.samples().getCell(1, 2);
+    int yoffset = drop.getLocation().y - drag.getLocation().y;
+    dragAndDrop.dragAndDropBy(drop, 0, yoffset).perform();
+
+    TestTransaction.flagForCommit();
+    dialog.save().click();
+    TestTransaction.end();
+
+    String name = "ChIPSeq_Spt16_yFR101_G24D_JS2-JS1_20181022";
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(DatasetDialog.class);
+    assertEquals(resources.message(SAVED, name), notification.getText());
+    Dataset dataset = repository.findById(2L).get();
+    assertEquals(name, dataset.getName());
+    assertEquals(3, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(2, dataset.getSamples().size());
+    Sample sample = dataset.getSamples().get(0);
+    assertEquals((Long) 5L, sample.getId());
+    assertEquals("JS2", sample.getSampleId());
+    assertEquals("R2", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    sample = dataset.getSamples().get(1);
+    assertEquals((Long) 4L, sample.getId());
+    assertEquals("JS1", sample.getSampleId());
+    assertEquals("R1", sample.getReplicate());
+    assertEquals((Long) 3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
   }
 
   @Test

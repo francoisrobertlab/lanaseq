@@ -40,13 +40,12 @@ import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
+import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
-import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -74,8 +73,7 @@ public class DatasetDialogPresenter {
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
   private Binder<Sample> sampleBinder = new BeanValidationBinder<>(Sample.class);
   private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
-  private ListDataProvider<Sample> samplesDataProvider =
-      DataProvider.ofCollection(new ArrayList<>());
+  private List<Sample> samples = new ArrayList<>();
   private DatasetService service;
   private ProtocolService protocolService;
   private AuthorizationService authorizationService;
@@ -123,7 +121,7 @@ public class DatasetDialogPresenter {
     Dataset dataset = binder.getBean();
     boolean readOnly = isReadOnly(dataset);
     binder.setReadOnly(readOnly);
-    boolean sampleReadOnly = readOnly || !dataset.getSamples().stream()
+    boolean sampleReadOnly = readOnly || !samples.stream()
         .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE) && sa.isEditable())
         .filter(val -> val).findFirst().orElse(false);
     sampleBinder.setReadOnly(sampleReadOnly);
@@ -148,7 +146,7 @@ public class DatasetDialogPresenter {
   void addNewSample() {
     Sample sample = new Sample();
     sample.setEditable(true);
-    samplesDataProvider.getItems().add(sample);
+    samples.add(sample);
     bindSampleFields(sample);
     refreshSamplesDataProvider();
     setReadOnly();
@@ -159,9 +157,8 @@ public class DatasetDialogPresenter {
   }
 
   private void addSample(Sample sample) {
-    if (!samplesDataProvider.getItems().stream().filter(sa -> sa.getId().equals(sample.getId()))
-        .findAny().isPresent()) {
-      samplesDataProvider.getItems().add(sample);
+    if (!samples.stream().filter(sa -> sa.getId().equals(sample.getId())).findAny().isPresent()) {
+      samples.add(sample);
       bindSampleFields(sample);
       refreshSamplesDataProvider();
       setReadOnly();
@@ -169,14 +166,22 @@ public class DatasetDialogPresenter {
   }
 
   void removeSample(Sample sample) {
-    samplesDataProvider.getItems().remove(sample);
+    samples.remove(sample);
     refreshSamplesDataProvider();
     setReadOnly();
   }
 
+  void dropSample(Sample dragged, Sample drop, GridDropLocation dropLocation) {
+    if (!dragged.equals(drop)) {
+      samples.remove(dragged);
+      int dropIndex = samples.indexOf(drop) + (dropLocation == GridDropLocation.BELOW ? 1 : 0);
+      samples.add(dropIndex, dragged);
+      refreshSamplesDataProvider();
+    }
+  }
+
   private void refreshSamplesDataProvider() {
-    samplesDataProvider = DataProvider.ofCollection(samplesDataProvider.getItems());
-    dialog.samples.setDataProvider(samplesDataProvider);
+    dialog.samples.getDataProvider().refreshAll();
   }
 
   BinderValidationStatus<Dataset> validateDataset() {
@@ -188,8 +193,8 @@ public class DatasetDialogPresenter {
   }
 
   List<BinderValidationStatus<Sample>> validateSamples() {
-    return samplesDataProvider.getItems().stream()
-        .map(sample -> sampleBinders.get(sample).validate()).collect(Collectors.toList());
+    return samples.stream().map(sample -> sampleBinders.get(sample).validate())
+        .collect(Collectors.toList());
   }
 
   private boolean validate() {
@@ -201,7 +206,7 @@ public class DatasetDialogPresenter {
     if (validate()) {
       Dataset dataset = binder.getBean();
       logger.debug("Save dataset {}", dataset);
-      dataset.setSamples(new ArrayList<>(samplesDataProvider.getItems()));
+      dataset.setSamples(new ArrayList<>(samples));
       for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
         if (empty(dataset.getSamples().get(i))) {
           dataset.getSamples().remove(i);
@@ -269,8 +274,8 @@ public class DatasetDialogPresenter {
     copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
     binder.setBean(dataset);
     sampleBinder.setBean(sample);
-    samplesDataProvider = DataProvider.ofCollection(dataset.getSamples());
-    dialog.samples.setDataProvider(samplesDataProvider);
+    samples = new ArrayList<>(dataset.getSamples());
+    dialog.samples.setItems(samples);
     dataset.getSamples().forEach(s -> bindSampleFields(s));
     setReadOnly();
   }
@@ -291,5 +296,9 @@ public class DatasetDialogPresenter {
             || !dialog.sampleReplicateField(sample).isEmpty()) && value.isEmpty()
                 ? ValidationResult.error(errorMessage)
                 : ValidationResult.ok();
+  }
+
+  List<Sample> getSamples() {
+    return samples;
   }
 }
