@@ -24,6 +24,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
@@ -49,6 +50,7 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
     event.getSource().addUIInitListener(uiEvent -> {
       UI ui = uiEvent.getUI();
       ui.addBeforeEnterListener(this::beforeEnter);
+      ui.addAfterNavigationListener(this::afterNavigation);
     });
   }
 
@@ -56,15 +58,9 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
    * Reroutes the user if she is not authorized to access the view.
    *
    * @param event
-   *          before navigation event with event details
+   *          event
    */
   private void beforeEnter(BeforeEnterEvent event) {
-    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)
-        && !event.getLocation().getPath().equals(PasswordView.VIEW_NAME)) {
-      logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
-          PasswordView.class.getSimpleName());
-      UI.getCurrent().navigate(PasswordView.class);
-    }
     if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
       if (authorizationService.isAnonymous()) {
         logger.debug("user is anonymous, redirect to {}", SigninView.class.getSimpleName());
@@ -80,6 +76,21 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
         logger.info(message);
         event.rerouteToError(new AccessDeniedException(message), message);
       }
+    }
+  }
+
+  /**
+   * Reroutes the user to change password, if they are forced to.
+   *
+   * @param event
+   *          event
+   */
+  private void afterNavigation(AfterNavigationEvent event) {
+    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)
+        && !event.getLocation().getPath().equals(PasswordView.VIEW_NAME)) {
+      logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
+          PasswordView.class.getSimpleName());
+      UI.getCurrent().navigate(PasswordView.class);
     }
   }
 }

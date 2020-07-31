@@ -17,26 +17,25 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.user.web.PasswordView.SAVED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
-import ca.qc.ircm.lanaseq.user.web.PasswordView;
-import ca.qc.ircm.lanaseq.user.web.PasswordViewPresenter;
-import ca.qc.ircm.lanaseq.user.web.Passwords;
-import ca.qc.ircm.lanaseq.user.web.PasswordsForm;
 import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +63,8 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
   private ArgumentCaptor<Boolean> booleanCaptor;
   @Autowired
   private UserRepository userRepository;
+  private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(PasswordView.class, locale);
   private String password = "test_password";
   private User currentUser;
 
@@ -81,6 +82,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
     presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   @Test
@@ -108,5 +110,6 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
 
     verify(service).save(password);
     verify(ui).navigate(MainView.class);
+    verify(view).showNotification(resources.message(SAVED));
   }
 }

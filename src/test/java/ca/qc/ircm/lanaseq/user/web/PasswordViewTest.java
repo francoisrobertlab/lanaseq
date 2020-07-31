@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.HEADER;
-import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.user.web.PasswordView.ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -71,7 +71,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
 
   @Test
   public void styles() {
-    assertEquals(VIEW_NAME, view.getId().orElse(""));
+    assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAVE, view.save.getId().orElse(""));
     assertTrue(view.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
@@ -88,6 +88,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
   @Test
   public void localeChange() {
     view.localeChange(mock(LocaleChangeEvent.class));
+    verify(presenter).localeChange(locale);
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(PasswordView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
@@ -95,6 +96,7 @@ public class PasswordViewTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test

@@ -17,12 +17,16 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
+
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,7 @@ public class PasswordViewPresenter {
   private UserService service;
   @Autowired
   private AuthorizationService authorizationService;
+  private Locale locale;
 
   protected PasswordViewPresenter() {
   }
@@ -56,6 +61,10 @@ public class PasswordViewPresenter {
     view.passwords.setRequired(true);
   }
 
+  public void localeChange(Locale locale) {
+    this.locale = locale;
+  }
+
   private boolean validate() {
     return view.passwords.validate().isOk();
   }
@@ -66,6 +75,8 @@ public class PasswordViewPresenter {
       String password = view.passwords.getPassword();
       logger.debug("save new password for user {}", user);
       service.save(password);
+      final AppResources resources = new AppResources(PasswordView.class, locale);
+      view.showNotification(resources.message(SAVED));
       UI.getCurrent().navigate(MainView.class);
     }
   }

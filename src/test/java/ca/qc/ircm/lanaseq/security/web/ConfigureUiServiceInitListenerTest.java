@@ -31,6 +31,8 @@ import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
 import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterListener;
 import com.vaadin.flow.router.Location;
@@ -69,9 +71,13 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   @Mock
   private BeforeEnterEvent beforeEnterEvent;
   @Mock
+  private AfterNavigationEvent afterNavigationEvent;
+  @Mock
   private Location location;
   @Captor
   private ArgumentCaptor<BeforeEnterListener> beforeEnterListenerCaptor;
+  @Captor
+  private ArgumentCaptor<AfterNavigationListener> afterNavigationListenerCaptor;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(ConfigureUiServiceInitListener.class, locale);
   private User user = new User(1L, "myuser");
@@ -93,6 +99,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
     when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
     when(beforeEnterEvent.getUI()).thenReturn(ui);
     when(beforeEnterEvent.getLocation()).thenReturn(location);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
     when(location.getPath()).thenReturn("");
   }
 
@@ -102,6 +109,14 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
     verify(ui).addBeforeEnterListener(beforeEnterListenerCaptor.capture());
     BeforeEnterListener beforeEnterListener = beforeEnterListenerCaptor.getValue();
     beforeEnterListener.beforeEnter(beforeEnterEvent);
+  }
+
+  private void doAfterNavigation() {
+    configurer.serviceInit(serviceInitEvent);
+    verify(vaadinService).addUIInitListener(any());
+    verify(ui).addAfterNavigationListener(afterNavigationListenerCaptor.capture());
+    AfterNavigationListener afterNavigationListener = afterNavigationListenerCaptor.getValue();
+    afterNavigationListener.afterNavigation(afterNavigationEvent);
   }
 
   @Test
@@ -136,36 +151,32 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void beforeEnter_AuthorizedForceChangePassword() {
+  public void afterNavigation_ForceChangePassword() {
     when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
 
-    doBeforeEnter();
+    doAfterNavigation();
 
     verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(ui).navigate(PasswordView.class);
   }
 
   @Test
-  public void beforeEnter_AuthorizedForceChangePasswordAlreadyOnView() {
+  public void afterNavigation_ForceChangePasswordAlreadyOnView() {
     when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
     when(location.getPath()).thenReturn(PasswordView.VIEW_NAME);
 
-    doBeforeEnter();
+    doAfterNavigation();
 
     verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(ui, never()).navigate(PasswordView.class);
   }
 
   @Test
-  public void beforeEnter_NotAuthorizedForceChangePassword() {
-    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
-
-    doBeforeEnter();
+  public void afterNavigation_NotForceChangePassword() {
+    doAfterNavigation();
 
     verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(ui).navigate(PasswordView.class);
+    verify(ui, never()).navigate(PasswordView.class);
   }
 
   public static class ViewTest {

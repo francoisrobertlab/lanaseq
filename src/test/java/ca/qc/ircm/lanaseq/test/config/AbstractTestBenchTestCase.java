@@ -25,6 +25,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
+import ca.qc.ircm.lanaseq.user.web.PasswordView;
 import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
@@ -127,6 +128,13 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
           .filter(locale -> new AppResources(UseForgotPasswordView.class, locale)
+              .message(TITLE, new AppResources(Constants.class, locale).message(APPLICATION_NAME))
+              .equals(getDriver().getTitle()))
+          .findAny();
+    }
+    if (!optlocale.isPresent()) {
+      optlocale = locales.stream()
+          .filter(locale -> new AppResources(PasswordView.class, locale)
               .message(TITLE, new AppResources(Constants.class, locale).message(APPLICATION_NAME))
               .equals(getDriver().getTitle()))
           .findAny();

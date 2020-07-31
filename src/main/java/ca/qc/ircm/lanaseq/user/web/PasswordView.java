@@ -20,9 +20,11 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -40,9 +42,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Change password view.
  */
 @Route(value = PasswordView.VIEW_NAME)
-public class PasswordView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
+public class PasswordView extends VerticalLayout
+    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "password";
+  public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
+  public static final String SAVED = "saved";
   private static final long serialVersionUID = -8554355390432590290L;
   protected H2 header = new H2();
   protected PasswordsForm passwords = new PasswordsForm();
@@ -59,7 +64,7 @@ public class PasswordView extends VerticalLayout implements LocaleChangeObserver
 
   @PostConstruct
   void init() {
-    setId(VIEW_NAME);
+    setId(ID);
     add(header, passwords, save);
     header.setId(HEADER);
     passwords.setResponsiveSteps(new ResponsiveStep("30em", 1));
@@ -77,6 +82,7 @@ public class PasswordView extends VerticalLayout implements LocaleChangeObserver
     AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     save.setText(webResources.message(SAVE));
+    presenter.localeChange(getLocale());
   }
 
   @Override
