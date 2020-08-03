@@ -31,8 +31,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -98,6 +96,9 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
     assertTrue(optional(() -> view.files()).isPresent());
+    assertTrue(optional(() -> view.dialog()).isPresent());
+    assertTrue(optional(() -> view.filesDialog()).isPresent());
+    assertTrue(optional(() -> view.protocolDialog()).isPresent());
   }
 
   @Test
@@ -105,7 +106,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.doubleClick(0);
-    assertTrue(optional(() -> $(SampleDialogElement.class).id(SampleDialog.ID)).isPresent());
+    assertTrue(view.dialog().isOpen());
   }
 
   @Test
@@ -113,8 +114,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.controlClick(0);
-    assertTrue(
-        optional(() -> $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID)).isPresent());
+    assertTrue(view.filesDialog().isOpen());
   }
 
   @Test
@@ -122,7 +122,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.doubleClickProtocol(0);
-    assertTrue(optional(() -> $(ProtocolDialogElement.class).id(ProtocolDialog.ID)).isPresent());
+    assertTrue(view.protocolDialog().isOpen());
   }
 
   @Test
@@ -130,7 +130,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.add().click();
-    assertTrue(optional(() -> $(SampleDialogElement.class).id(SampleDialog.ID)).isPresent());
+    assertTrue(view.dialog().isOpen());
   }
 
   @Test
@@ -173,5 +173,6 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     view.files().click();
     assertTrue(optional(() -> $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID))
         .isPresent());
+    assertTrue(view.filesDialog().isOpen());
   }
 }

@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.Assert.assertArrayEquals;
@@ -87,10 +86,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.controlClick(0);
-    DatasetFilesDialogElement filesDialog =
-        $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
+    AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
@@ -102,10 +100,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.controlClick(0);
-    DatasetFilesDialogElement filesDialog =
-        $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
+    AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
     Dataset dataset = repository.findById(2L).get();
     assertEquals(0, dialog.files().getRowCount());
     copyFiles(dataset);
@@ -122,10 +119,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.controlClick(0);
-    DatasetFilesDialogElement filesDialog =
-        $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddDatasetFilesDialogElement dialog = $(AddDatasetFilesDialogElement.class).id(ID);
+    AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
     Dataset dataset = repository.findById(2L).get();
     copyFiles(dataset);
 

@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.Assert.assertArrayEquals;
@@ -73,10 +72,11 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
-    SampleFilesDialogElement dialog = $(SampleFilesDialogElement.class).id(ID);
+    SampleFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.add()).isPresent());
+    assertTrue(optional(() -> dialog.addFilesDialog()).isPresent());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
-    SampleFilesDialogElement dialog = $(SampleFilesDialogElement.class).id(ID);
+    SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.files().getRow(0).doubleClick();
     dialog.filenameEdit().setValue(sample.getName() + "_R1.fastq");
@@ -115,7 +115,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
-    SampleFilesDialogElement dialog = $(SampleFilesDialogElement.class).id(ID);
+    SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.delete(0).click();
     Thread.sleep(1000);
@@ -131,5 +131,17 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test
+  public void add() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    view.controlClick(0);
+    SampleFilesDialogElement dialog = view.filesDialog();
+
+    dialog.add().click();
+
+    assertTrue(dialog.addFilesDialog().isOpen());
   }
 }

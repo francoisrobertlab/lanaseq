@@ -69,8 +69,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
 
     view.doubleClick(1);
 
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-    UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
+    UserDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.form()).isPresent());
     assertTrue(optional(() -> dialog.form().email()).isPresent());
@@ -91,8 +90,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
 
     view.doubleClick(2);
 
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-    UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
+    UserDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.form()).isPresent());
     assertTrue(optional(() -> dialog.form().email()).isPresent());
@@ -111,8 +109,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
     view.doubleClick(2);
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-    UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
+    UserDialogElement dialog = view.dialog();
     setFields(dialog);
 
     TestTransaction.flagForCommit();
@@ -135,8 +132,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
     view.doubleClick(2);
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-    UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
+    UserDialogElement dialog = view.dialog();
     setFields(dialog);
     dialog.form().email().setValue("test");
 
@@ -144,7 +140,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
+    assertTrue(optional(() -> view.dialog()).isPresent());
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     User user = repository.findById(3L).get();
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
@@ -159,8 +155,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
     view.doubleClick(2);
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-    UserDialogElement dialog = $(UserDialogElement.class).id(UserDialog.ID);
+    UserDialogElement dialog = view.dialog();
     setFields(dialog);
 
     TestTransaction.flagForCommit();

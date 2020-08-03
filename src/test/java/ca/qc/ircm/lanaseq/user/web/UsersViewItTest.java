@@ -104,8 +104,19 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.switchFailed()).isPresent());
-    assertTrue(optional(() -> view.addButton()).isPresent());
-    assertTrue(optional(() -> view.switchUserButton()).isPresent());
+    assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.switchUser()).isPresent());
+    assertTrue(optional(() -> view.dialog()).isPresent());
+  }
+
+  @Test
+  public void view() throws Throwable {
+    open();
+    UsersViewElement view = $(UsersViewElement.class).id(ID);
+
+    view.doubleClick(0);
+
+    assertTrue(view.dialog().isOpen());
   }
 
   @Test
@@ -113,28 +124,18 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.clickAdd();
+    view.add().click();
 
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
-  }
-
-  @Test
-  public void update() throws Throwable {
-    open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
-
-    view.doubleClick(0);
-
-    assertTrue(optional(() -> $(UserDialogElement.class).id(UserDialog.ID)).isPresent());
+    assertTrue(view.dialog().isOpen());
   }
 
   @Test
   public void switchUser() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.clickUser(1);
+    view.users().select(1);
 
-    view.clickSwitchUser();
+    view.switchUser().click();
 
     Locale locale = currentLocale();
     assertEquals(
@@ -148,9 +149,9 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   public void switchUser_Fail() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
-    view.clickUser(0);
+    view.users().select(0);
 
-    view.clickSwitchUser();
+    view.switchUser().click();
 
     assertTrue(optional(() -> view.switchFailed()).isPresent());
   }

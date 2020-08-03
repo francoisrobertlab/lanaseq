@@ -72,6 +72,8 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.dialog()).isPresent());
+    assertTrue(optional(() -> view.historyDialog()).isPresent());
   }
 
   @Test
@@ -81,7 +83,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.doubleClickProtocol(0);
 
-    assertTrue($(ProtocolDialogElement.class).id(ProtocolDialog.ID).isOpen());
+    assertTrue(view.dialog().isOpen());
   }
 
   @Test
@@ -92,7 +94,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.altClickProtocol(2);
 
-    assertFalse($(ProtocolHistoryDialogElement.class).id(ProtocolHistoryDialog.ID).isOpen());
+    assertFalse(view.historyDialog().isOpen());
   }
 
   @Test
@@ -103,7 +105,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.altClickProtocol(2);
 
-    assertTrue($(ProtocolHistoryDialogElement.class).id(ProtocolHistoryDialog.ID).isOpen());
+    assertTrue(view.historyDialog().isOpen());
   }
 
   @Test
@@ -113,6 +115,6 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.add().click();
 
-    assertTrue($(ProtocolDialogElement.class).id(ProtocolDialog.ID).isOpen());
+    assertTrue(view.dialog().isOpen());
   }
 }

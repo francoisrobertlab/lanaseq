@@ -53,4 +53,8 @@ public class SampleFilesDialogElement extends DialogElement {
   public ButtonElement add() {
     return $(ButtonElement.class).id(id(ADD));
   }
+
+  public AddSampleFilesDialogElement addFilesDialog() {
+    return $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID);
+  }
 }

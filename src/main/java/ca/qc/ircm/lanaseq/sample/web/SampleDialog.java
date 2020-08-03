@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
@@ -130,7 +131,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, form, buttons);
+    layout.add(header, form, buttons, confirm);
     header.setId(id(HEADER));
     sampleId.setId(id(SAMPLE_ID));
     replicate.setId(id(REPLICATE));
@@ -159,6 +160,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
     delete.setIcon(VaadinIcon.TRASH.create());
     delete.addClickListener(e -> confirm.open());
+    confirm.setId(id(CONFIRM));
     confirm.setCancelable(true);
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());

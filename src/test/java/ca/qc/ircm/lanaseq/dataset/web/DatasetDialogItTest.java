@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
@@ -35,13 +34,11 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
-import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -125,7 +122,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.tags()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
@@ -142,6 +139,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(() -> dialog.confirm()).isPresent());
+    assertTrue(optional(() -> dialog.selectSampleDialog()).isPresent());
   }
 
   @Test
@@ -149,7 +148,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.add().click();
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -190,7 +189,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -243,7 +242,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     Actions dragAndDrop = new Actions(dialog.getDriver());
     WebElement drag = dialog.samples().getCell(0, 2);
     WebElement drop = dialog.samples().getCell(1, 2);
@@ -299,10 +298,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     dialog.addSample().click();
-    SelectSampleDialogElement selectSampleDialog =
-        $(SelectSampleDialogElement.class).id(SelectSampleDialog.ID);
+    SelectSampleDialogElement selectSampleDialog = dialog.selectSampleDialog();
     selectSampleDialog.doubleClick(2);
 
     TestTransaction.flagForCommit();
@@ -365,7 +363,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -413,13 +411,13 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
     view.doubleClick(0);
-    DatasetDialogElement dialog = $(DatasetDialogElement.class).id(ID);
+    DatasetDialogElement dialog = view.dialog();
     Dataset dataset = repository.findById(4L).get();
     String name = dataset.getName();
 
     TestTransaction.flagForCommit();
     dialog.delete().click();
-    $(ConfirmDialogElement.class).waitForFirst().getConfirmButton().click();
+    dialog.confirm().getConfirmButton().click();
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();

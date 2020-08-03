@@ -19,11 +19,13 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
@@ -90,5 +92,17 @@ public class DatasetsViewElement extends VerticalLayoutElement {
 
   public ButtonElement files() {
     return $(ButtonElement.class).id(FILES);
+  }
+
+  public DatasetDialogElement dialog() {
+    return $(DatasetDialogElement.class).id(DatasetDialog.ID);
+  }
+
+  public DatasetFilesDialogElement filesDialog() {
+    return $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+  }
+
+  public ProtocolDialogElement protocolDialog() {
+    return $(ProtocolDialogElement.class).id(ProtocolDialog.ID);
   }
 }

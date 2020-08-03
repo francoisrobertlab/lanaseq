@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
@@ -39,7 +38,6 @@ import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -110,7 +108,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.add().click();
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
     assertTrue(optional(() -> dialog.replicate()).isPresent());
@@ -125,6 +123,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertFalse(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(() -> dialog.confirm()).isPresent());
   }
 
   @Test
@@ -132,7 +131,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.doubleClick(0);
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
     assertTrue(optional(() -> dialog.replicate()).isPresent());
@@ -147,6 +146,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertFalse(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(() -> dialog.confirm()).isPresent());
   }
 
   @Test
@@ -156,7 +156,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
     view.doubleClick(3);
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
     assertTrue(optional(() -> dialog.replicate()).isPresent());
@@ -171,6 +171,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(() -> dialog.confirm()).isPresent());
   }
 
   @Test
@@ -178,7 +179,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.add().click();
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -215,7 +216,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.doubleClick(0);
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -252,7 +253,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.doubleClick(0);
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
     TestTransaction.flagForCommit();
@@ -282,13 +283,13 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
     view.doubleClick(3);
-    SampleDialogElement dialog = $(SampleDialogElement.class).id(ID);
+    SampleDialogElement dialog = view.dialog();
     Sample sample = repository.findById(9L).get();
     String name = sample.getName();
 
     TestTransaction.flagForCommit();
     dialog.delete().click();
-    $(ConfirmDialogElement.class).waitForFirst().getConfirmButton().click();
+    dialog.confirm().getConfirmButton().click();
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();

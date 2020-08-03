@@ -41,10 +41,6 @@ public class UsersViewElement extends VerticalLayoutElement {
     return $(GridElement.class).first();
   }
 
-  public void clickUser(int row) {
-    users().getCell(row, EMAIL_COLUMN).click();
-  }
-
   public void doubleClick(int row) {
     users().getCell(row, EMAIL_COLUMN).doubleClick();
   }
@@ -57,19 +53,15 @@ public class UsersViewElement extends VerticalLayoutElement {
     return $(DivElement.class).id(SWITCH_FAILED);
   }
 
-  public ButtonElement addButton() {
+  public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
   }
 
-  public void clickAdd() {
-    addButton().click();
-  }
-
-  public ButtonElement switchUserButton() {
+  public ButtonElement switchUser() {
     return $(ButtonElement.class).id(SWITCH_USER);
   }
 
-  public void clickSwitchUser() {
-    switchUserButton().click();
+  public UserDialogElement dialog() {
+    return $(UserDialogElement.class).id(UserDialog.ID);
   }
 }

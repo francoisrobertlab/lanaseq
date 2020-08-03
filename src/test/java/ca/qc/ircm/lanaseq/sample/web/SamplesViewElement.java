@@ -24,6 +24,8 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
@@ -90,5 +92,17 @@ public class SamplesViewElement extends VerticalLayoutElement {
 
   public ButtonElement files() {
     return $(ButtonElement.class).id(FILES);
+  }
+
+  public SampleDialogElement dialog() {
+    return $(SampleDialogElement.class).id(SampleDialog.ID);
+  }
+
+  public SampleFilesDialogElement filesDialog() {
+    return $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID);
+  }
+
+  public ProtocolDialogElement protocolDialog() {
+    return $(ProtocolDialogElement.class).id(ProtocolDialog.ID);
   }
 }

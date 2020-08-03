@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.Assert.assertArrayEquals;
@@ -87,10 +86,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
-    SampleFilesDialogElement filesDialog =
-        $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID);
+    SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddSampleFilesDialogElement dialog = $(AddSampleFilesDialogElement.class).id(ID);
+    AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
@@ -102,10 +100,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
-    SampleFilesDialogElement filesDialog =
-        $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID);
+    SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddSampleFilesDialogElement dialog = $(AddSampleFilesDialogElement.class).id(ID);
+    AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     Sample sample = repository.findById(4L).get();
     assertEquals(0, dialog.files().getRowCount());
     copyFiles(sample);
@@ -122,10 +119,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.controlClick(0);
-    SampleFilesDialogElement filesDialog =
-        $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID);
+    SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddSampleFilesDialogElement dialog = $(AddSampleFilesDialogElement.class).id(ID);
+    AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     Sample sample = repository.findById(4L).get();
     copyFiles(sample);
 

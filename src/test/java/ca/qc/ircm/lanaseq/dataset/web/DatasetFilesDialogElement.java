@@ -53,4 +53,8 @@ public class DatasetFilesDialogElement extends DialogElement {
   public ButtonElement add() {
     return $(ButtonElement.class).id(id(ADD));
   }
+
+  public AddDatasetFilesDialogElement addFilesDialog() {
+    return $(AddDatasetFilesDialogElement.class).id(AddDatasetFilesDialog.ID);
+  }
 }

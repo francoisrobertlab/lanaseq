@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.SAVED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.Assert.assertArrayEquals;
@@ -85,7 +84,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.doubleClickProtocol(0);
-    ProtocolDialogElement dialog = $(ProtocolDialogElement.class).id(ID);
+    ProtocolDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.name()).isPresent());
     assertTrue(optional(() -> dialog.upload()).isPresent());
@@ -99,7 +98,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.add().click();
-    ProtocolDialogElement dialog = $(ProtocolDialogElement.class).id(ID);
+    ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
 
     TestTransaction.flagForCommit();
@@ -131,7 +130,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.doubleClickProtocol(0);
-    ProtocolDialogElement dialog = $(ProtocolDialogElement.class).id(ID);
+    ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
 
     TestTransaction.flagForCommit();
@@ -166,7 +165,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.doubleClickProtocol(0);
-    ProtocolDialogElement dialog = $(ProtocolDialogElement.class).id(ID);
+    ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
 
     TestTransaction.flagForCommit();
@@ -198,7 +197,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.doubleClickProtocol(0);
-    ProtocolDialogElement dialog = $(ProtocolDialogElement.class).id(ID);
+    ProtocolDialogElement dialog = view.dialog();
     AnchorElement filename = dialog.filename(0);
     filename.click();
 

@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVERED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.Assert.assertArrayEquals;
@@ -63,7 +62,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.altClickProtocol(2);
-    ProtocolHistoryDialogElement dialog = $(ProtocolHistoryDialogElement.class).id(ID);
+    ProtocolHistoryDialogElement dialog = view.historyDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
   }
@@ -73,7 +72,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.altClickProtocol(2);
-    ProtocolHistoryDialogElement dialog = $(ProtocolHistoryDialogElement.class).id(ID);
+    ProtocolHistoryDialogElement dialog = view.historyDialog();
 
     TestTransaction.flagForCommit();
     dialog.recover(0).click();
@@ -103,7 +102,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.altClickProtocol(2);
-    ProtocolHistoryDialogElement dialog = $(ProtocolHistoryDialogElement.class).id(ID);
+    ProtocolHistoryDialogElement dialog = view.historyDialog();
     AnchorElement filename = dialog.filename(0);
     filename.click();
 

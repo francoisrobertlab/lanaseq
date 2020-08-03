@@ -93,8 +93,8 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     signinView.getPasswordField().setValue("pass2");
     signinView.getSubmitButton().click();
     UsersViewElement usersView = $(UsersViewElement.class).id(UsersView.ID);
-    usersView.clickUser(1);
-    usersView.clickSwitchUser();
+    usersView.users().select(1);
+    usersView.switchUser().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
@@ -155,8 +155,8 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     signinView.getPasswordField().setValue("pass2");
     signinView.getSubmitButton().click();
     UsersViewElement usersView = $(UsersViewElement.class).id(UsersView.ID);
-    usersView.clickUser(1);
-    usersView.clickSwitchUser();
+    usersView.users().select(1);
+    usersView.switchUser().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     view.exitSwitchUser().click();
     assertEquals(viewUrl(UsersView.VIEW_NAME), getDriver().getCurrentUrl());

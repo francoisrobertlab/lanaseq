@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
@@ -233,6 +234,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
     delete.setIcon(VaadinIcon.TRASH.create());
     delete.addClickListener(e -> confirm.open());
+    confirm.setId(id(CONFIRM));
     confirm.setCancelable(true);
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());

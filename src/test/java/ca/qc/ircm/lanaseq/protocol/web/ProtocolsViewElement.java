@@ -62,4 +62,12 @@ public class ProtocolsViewElement extends VerticalLayoutElement {
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
   }
+
+  public ProtocolDialogElement dialog() {
+    return $(ProtocolDialogElement.class).id(ProtocolDialog.ID);
+  }
+
+  public ProtocolHistoryDialogElement historyDialog() {
+    return $(ProtocolHistoryDialogElement.class).id(ProtocolHistoryDialog.ID);
+  }
 }
