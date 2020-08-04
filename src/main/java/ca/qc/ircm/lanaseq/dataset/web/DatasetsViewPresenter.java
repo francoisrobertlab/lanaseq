@@ -40,7 +40,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,6 +148,11 @@ public class DatasetsViewPresenter {
     view.dialog.open();
   }
 
+  private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+  }
+
   void merge(Locale locale) {
     clearError();
     List<Dataset> datasets = view.datasets.getSelectedItems().stream()
@@ -151,7 +160,8 @@ public class DatasetsViewPresenter {
     Set<String> tags = datasets.stream().flatMap(dataset -> dataset.getTags().stream())
         .collect(Collectors.toSet());
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
-        .sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).collect(Collectors.toList());
+        .filter(distinctByKey(Sample::getId)).sorted((s1, s2) -> s1.getId().compareTo(s2.getId()))
+        .collect(Collectors.toList());
     AppResources resources = new AppResources(DatasetsView.class, locale);
     boolean error = false;
     if (samples.isEmpty()) {
@@ -163,7 +173,6 @@ public class DatasetsViewPresenter {
     }
     view.error.setVisible(error);
     if (!error) {
-      logger.debug("samples to merge: {}", samples);
       Dataset dataset = new Dataset();
       dataset.setTags(tags);
       dataset.setSamples(samples);

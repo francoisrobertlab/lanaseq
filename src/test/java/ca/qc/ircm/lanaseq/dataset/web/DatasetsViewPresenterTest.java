@@ -62,6 +62,7 @@ import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -103,6 +104,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   private DatasetRepository repository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private EntityManager entityManager;
   private List<Dataset> datasets;
   private User currentUser;
   private Locale locale = Locale.ENGLISH;
@@ -405,6 +408,37 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     verify(sampleService, never()).isMergable(any());
     verify(service, never()).save(any());
     verify(view, never()).showNotification(any());
+  }
+
+  @Test
+  public void merge_DuplicatedSample() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    Dataset dataset1 = find(datasets, 2L).get();
+    Dataset dataset2 = find(datasets, 6L).get();
+    dataset1.getSamples();
+    dataset1.getSamples().forEach(sample -> entityManager.detach(sample));
+    dataset2.getSamples();
+    dataset2.getSamples().forEach(sample -> entityManager.detach(sample));
+    view.datasets.select(dataset1);
+    view.datasets.select(dataset2);
+    presenter.merge(locale);
+    assertFalse(view.error.isVisible());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertEquals(3, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(2, dataset.getSamples().size());
+    assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
+    assertEquals(dataset1.getDate(), dataset.getDate());
+    verify(view).showNotification(resources.message(MERGED, dataset.getName()));
   }
 
   @Test
