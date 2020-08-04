@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
@@ -110,6 +111,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   private User currentUser;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetsView.class, locale);
+  private AppResources datasetResources = new AppResources(Dataset.class, locale);
 
   /**
    * Before test.
@@ -456,6 +458,23 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
     assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
     assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service, never()).save(any());
+    verify(view, never()).showNotification(any());
+  }
+
+  @Test
+  public void merge_NameExists() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    when(service.exists(any())).thenReturn(true);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+    presenter.merge(locale);
+    assertTrue(view.error.isVisible());
+    assertEquals(
+        datasetResources.message(NAME_ALREADY_EXISTS,
+            "MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
+        view.error.getText());
+    verify(service).exists("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
     verify(service, never()).save(any());
     verify(view, never()).showNotification(any());
   }

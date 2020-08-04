@@ -69,6 +69,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
+@WithMockUser
 public class DatasetServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
@@ -115,7 +116,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void get() {
     Dataset dataset = service.get(1L);
 
@@ -136,14 +136,27 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void get_Null() {
     Dataset dataset = service.get(null);
     assertNull(dataset);
   }
 
   @Test
-  @WithMockUser
+  public void exists_True() {
+    assertTrue(service.exists("ChIPSeq_Spt16_yFR101_G24D_JS3_20181211"));
+  }
+
+  @Test
+  public void exists_False() {
+    assertFalse(service.exists("ChIPSeq_Spt16_yFR101_G24D"));
+  }
+
+  @Test
+  public void exists_Null() {
+    assertFalse(service.exists(null));
+  }
+
+  @Test
   public void all() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -164,7 +177,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
     Path folder = configuration.folder(dataset);
@@ -186,7 +198,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files_FolderNotExists() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
 
@@ -198,7 +209,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files_NullId() throws Throwable {
     List<Path> files = service.files(new Dataset());
 
@@ -206,7 +216,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void files_Null() throws Throwable {
     List<Path> files = service.files(null);
 
@@ -214,7 +223,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void topTags() {
     List<String> tags = service.topTags(4);
     assertEquals(4, tags.size());
@@ -225,7 +233,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_False() {
     Dataset dataset = repository.findById(5L).get();
     assertFalse(service.isDeletable(dataset));
@@ -233,7 +240,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_True() {
     Dataset dataset = repository.findById(1L).get();
     assertTrue(service.isDeletable(dataset));
@@ -241,19 +247,16 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_Null() {
     assertFalse(service.isDeletable(null));
   }
 
   @Test
-  @WithMockUser
   public void isDeletable_NullId() {
     assertFalse(service.isDeletable(new Dataset()));
   }
 
   @Test
-  @WithMockUser
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -310,7 +313,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_Update() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -366,7 +368,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_UpdateMoveFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -422,7 +423,6 @@ public class DatasetServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @WithMockUser
   public void save_UpdateNotEditable() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -431,7 +431,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void save_NotEditableSample() {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -463,7 +462,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void saveFiles() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
     List<Path> files = new ArrayList<>();
@@ -492,7 +490,6 @@ public class DatasetServiceTest {
   }
 
   @Test
-  @WithMockUser
   public void delete() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     Path folder = configuration.folder(dataset);
@@ -510,7 +507,6 @@ public class DatasetServiceTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  @WithMockUser
   public void delete_NotEditable() {
     Dataset dataset = repository.findById(5L).get();
     service.delete(dataset);

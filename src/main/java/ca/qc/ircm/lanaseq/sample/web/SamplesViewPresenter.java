@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
@@ -148,8 +149,15 @@ public class SamplesViewPresenter {
       dataset.setSamples(samples);
       dataset.setTags(new HashSet<>());
       dataset.setDate(samples.get(0).getDate());
-      datasetService.save(dataset);
-      view.showNotification(resources.message(MERGED, dataset.getName()));
+      dataset.generateName();
+      if (datasetService.exists(dataset.getName())) {
+        AppResources datasetResources = new AppResources(Dataset.class, locale);
+        view.error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));
+        view.error.setVisible(true);
+      } else {
+        datasetService.save(dataset);
+        view.showNotification(resources.message(MERGED, dataset.getName()));
+      }
     }
   }
 
