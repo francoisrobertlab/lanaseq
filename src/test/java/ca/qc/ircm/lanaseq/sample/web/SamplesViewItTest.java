@@ -19,8 +19,8 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
@@ -36,15 +36,11 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -55,15 +51,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewItTest extends AbstractTestBenchTestCase {
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
   private DatasetRepository datasetRepository;
-
-  @Before
-  public void beforeTest() throws Throwable {
-    setHome(temporaryFolder.newFolder("home").toPath());
-  }
 
   private void open() {
     openView(VIEW_NAME);
@@ -134,20 +123,18 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Ignore("Cannot select samples")
   public void merge() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.samples().select(0);
     view.samples().select(1);
+    view.samples().select(2);
 
     view.merge().click();
 
-    String name = "ChIPSeq_Spt16_yFR101_G24D_JS1-JS2_"
-        + DateTimeFormatter.BASIC_ISO_DATE.format(LocalDateTime.now());
+    String name = "ChIPSeq_Spt16_yFR101_G24D_JS2-JS1_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(SampleDialog.class);
-    assertEquals(resources.message(DELETED, name), notification.getText());
+    AppResources resources = this.resources(SamplesView.class);
+    assertEquals(resources.message(MERGED, name), notification.getText());
     List<Dataset> datasets = datasetRepository.findByOwner(new User(3L));
     Dataset dataset =
         datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
@@ -155,24 +142,22 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertNotNull(dataset.getId());
     assertEquals(name, dataset.getName());
     assertTrue(dataset.getTags().isEmpty());
+    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));
-    assertTrue(dataset.getTags().isEmpty());
+    assertTrue(dataset.isEditable());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
-    assertTrue(find(dataset.getSamples(), 4L).isPresent());
     assertTrue(find(dataset.getSamples(), 5L).isPresent());
+    assertTrue(find(dataset.getSamples(), 10L).isPresent());
   }
 
   @Test
-  @Ignore("Cannot select samples")
   public void files() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.samples().select(0);
     view.files().click();
-    assertTrue(optional(() -> $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID))
-        .isPresent());
     assertTrue(view.filesDialog().isOpen());
   }
 }

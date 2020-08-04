@@ -150,13 +150,14 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all();
 
-    assertEquals(6, datasets.size());
+    assertEquals(7, datasets.size());
     assertTrue(find(datasets, 1L).isPresent());
     assertTrue(find(datasets, 2L).isPresent());
     assertTrue(find(datasets, 3L).isPresent());
     assertTrue(find(datasets, 4L).isPresent());
     assertTrue(find(datasets, 5L).isPresent());
     assertTrue(find(datasets, 6L).isPresent());
+    assertTrue(find(datasets, 7L).isPresent());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -215,11 +216,12 @@ public class DatasetServiceTest {
   @Test
   @WithMockUser
   public void topTags() {
-    List<String> tags = service.topTags(3);
-    assertEquals(3, tags.size());
+    List<String> tags = service.topTags(4);
+    assertEquals(4, tags.size());
     assertTrue(tags.contains("ip"));
     assertTrue(tags.contains("chipseq"));
     assertTrue(tags.contains("G24D"));
+    assertTrue(tags.contains("Spt16"));
   }
 
   @Test

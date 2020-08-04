@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
+import ca.qc.ircm.lanaseq.test.config.MultiSelectGridElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
@@ -47,7 +48,7 @@ public class DatasetsViewElement extends VerticalLayoutElement {
   }
 
   public GridElement datasets() {
-    return $(GridElement.class).id(DATASETS);
+    return $(MultiSelectGridElement.class).id(DATASETS);
   }
 
   public TextFieldElement nameFilter() {

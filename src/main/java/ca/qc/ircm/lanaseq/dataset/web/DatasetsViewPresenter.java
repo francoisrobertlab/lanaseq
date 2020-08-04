@@ -163,6 +163,7 @@ public class DatasetsViewPresenter {
     }
     view.error.setVisible(error);
     if (!error) {
+      logger.debug("samples to merge: {}", samples);
       Dataset dataset = new Dataset();
       dataset.setTags(tags);
       dataset.setSamples(samples);

@@ -41,6 +41,8 @@ INSERT INTO dataset (id,name,date,owner_id,editable,creation_date)
 VALUES ('5', 'ChIPSeq_IP_polr2b_yBC103_WT_BC1_20181118', '2018-12-05', '5', 0, '2018-12-05 9:28:23');
 INSERT INTO dataset (id,name,date,owner_id,editable,creation_date)
 VALUES ('6', 'ChIPSeq_Spt16_yFR101_G24D_JS1_20181208', '2018-12-08', '3', 1, '2018-12-08 10:28:23');
+INSERT INTO dataset (id,name,date,owner_id,editable,creation_date)
+VALUES ('7', 'ChIPSeq_Spt16_yFR101_G24D_JS3_20181211', '2018-12-11', '3', 1, '2018-12-11 10:28:23');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date)
 VALUES (1, 'FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:23');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date)
@@ -61,6 +63,8 @@ INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_
 VALUES (9, 'BC1_ChIPSeq_Input_polr2c_yBC201_WT_R1_20181208', 'BC1', 'R1', 'CHIP_SEQ', 'INPUT', 'polr2c', 'yBC201', 'WT', null, '2018-12-08', '2', 5, 1, '2018-12-08 9:29:23');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date)
 VALUES (10, 'JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181210', 'JS1', 'R1', 'CHIP_SEQ', null, 'Spt16', 'yFR101', 'G24D', null, '2018-12-10', '3', 3, 1, '2018-12-10 9:29:23');
+INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date)
+VALUES (11, 'JS3_ChIPSeq_Spt16_yFR101_G24D_R1_20181211', 'JS3', 'R1', 'CHIP_SEQ', null, 'Spt16', 'yFR101', 'G24D', null, '2018-12-11', '3', 3, 1, '2018-12-11 9:50:20');
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (1,1,0,1);
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
@@ -79,6 +83,8 @@ INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (8,5,0,8);
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (9,6,0,4);
+INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
+VALUES (10,7,0,11);
 INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (1,1,'mnase');
 INSERT INTO dataset_tags (id,dataset_id,tags)
@@ -93,3 +99,5 @@ INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (6,5,'chipseq');
 INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (7,2,'G24D');
+INSERT INTO dataset_tags (id,dataset_id,tags)
+VALUES (8,7,'Spt16');

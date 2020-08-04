@@ -21,18 +21,28 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +51,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsViewItTest extends AbstractTestBenchTestCase {
+  @Autowired
+  private DatasetRepository repository;
+
   private void open() {
     openView(VIEW_NAME);
   }
@@ -110,12 +123,41 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Ignore("Cannot select datasets")
   public void merge() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.datasets().select(0);
+    view.datasets().select(3);
+
+    view.merge().click();
+
+    String name = "ChIPSeq_Spt16_yFR101_G24D_JS1-JS2-JS3_20181022";
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(DatasetsView.class);
+    assertEquals(resources.message(MERGED, name), notification.getText());
+    List<Dataset> datasets = repository.findByOwner(new User(3L));
+    Dataset dataset =
+        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
+    assertNotNull(dataset);
+    assertNotNull(dataset.getId());
+    assertEquals(name, dataset.getName());
+    assertEquals(4, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertTrue(dataset.getTags().contains("Spt16"));
+    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));
+    assertTrue(dataset.isEditable());
+    assertEquals((Long) 3L, dataset.getOwner().getId());
+    assertEquals(3, dataset.getSamples().size());
+    assertTrue(find(dataset.getSamples(), 4L).isPresent());
+    assertTrue(find(dataset.getSamples(), 5L).isPresent());
+    assertTrue(find(dataset.getSamples(), 11L).isPresent());
   }
 
   @Test
-  @Ignore("Cannot select samples")
   public void files() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
