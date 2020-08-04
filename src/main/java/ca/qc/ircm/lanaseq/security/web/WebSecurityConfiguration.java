@@ -30,7 +30,7 @@ import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.vaadin.flow.server.ServletHelper.RequestType;
+import com.vaadin.flow.server.HandlerHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
 import java.util.HashMap;
 import java.util.Map;
