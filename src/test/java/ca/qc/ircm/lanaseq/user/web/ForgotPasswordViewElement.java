@@ -18,9 +18,9 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.MESSAGE;
-import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.DivElement;

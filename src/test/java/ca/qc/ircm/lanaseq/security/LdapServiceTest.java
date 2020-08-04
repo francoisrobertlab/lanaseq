@@ -21,8 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.security.LdapConfiguration;
-import ca.qc.ircm.lanaseq.security.LdapService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import org.junit.Before;
 import org.junit.Test;

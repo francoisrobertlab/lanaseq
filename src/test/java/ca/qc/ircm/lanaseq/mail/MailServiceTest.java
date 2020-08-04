@@ -25,8 +25,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.mail.MailConfiguration;
-import ca.qc.ircm.lanaseq.mail.MailService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;

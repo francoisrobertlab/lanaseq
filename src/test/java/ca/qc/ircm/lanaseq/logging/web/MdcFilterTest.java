@@ -25,7 +25,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.logging.web.MdcFilter;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;

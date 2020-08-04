@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.security.LdapConfiguration;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.Test;
 import org.junit.runner.RunWith;

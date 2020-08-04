@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.text;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.lanaseq.text.Strings;
 import org.junit.Test;
 
 public class StringsTest {

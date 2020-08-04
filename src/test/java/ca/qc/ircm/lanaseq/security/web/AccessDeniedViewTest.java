@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.i18n.LocaleChangeEvent;

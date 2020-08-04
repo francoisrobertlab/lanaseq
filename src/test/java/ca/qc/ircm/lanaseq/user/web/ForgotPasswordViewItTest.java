@@ -31,7 +31,6 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
-import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.util.List;

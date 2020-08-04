@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
