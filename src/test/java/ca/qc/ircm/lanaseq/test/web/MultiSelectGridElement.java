@@ -1,4 +1,4 @@
-package ca.qc.ircm.lanaseq.test.config;
+package ca.qc.ircm.lanaseq.test.web;
 
 import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
