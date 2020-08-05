@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
@@ -91,6 +92,7 @@ public class DatasetDialogPresenter {
     dialog.protocol.setItems(protocolService.all());
     dialog.tags.setTagSuggestions(service.topTags(50));
     dialog.selectSampleDialog.addSelectedListener(e -> addSample(e.getSelection()));
+    dialog.error.setVisible(false);
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null);
   }
@@ -198,12 +200,10 @@ public class DatasetDialogPresenter {
   }
 
   private boolean validate() {
-    return validateDataset().isOk() && validateSample().isOk()
+    dialog.error.setVisible(false);
+    boolean valid = validateDataset().isOk() && validateSample().isOk()
         && !validateSamples().stream().filter(status -> !status.isOk()).findAny().isPresent();
-  }
-
-  void save() {
-    if (validate()) {
+    if (valid) {
       Dataset dataset = binder.getBean();
       logger.debug("Save dataset {}", dataset);
       dataset.setSamples(new ArrayList<>(samples));
@@ -220,6 +220,22 @@ public class DatasetDialogPresenter {
           sample.setDate(dataset.getDate());
         }
       }
+      dataset.generateName();
+      if (service.exists(dataset.getName()) && (dataset.getId() == null
+          || !dataset.getName().equalsIgnoreCase(service.get(dataset.getId()).getName()))) {
+        valid = false;
+        AppResources datasetResources = new AppResources(Dataset.class, locale);
+        dialog.error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));
+        dialog.error.setVisible(true);
+      }
+    }
+    return valid;
+  }
+
+  void save() {
+    if (validate()) {
+      Dataset dataset = binder.getBean();
+      logger.debug("Save dataset {}", dataset);
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, dataset.getName()));

@@ -62,6 +62,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -70,6 +71,7 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -169,6 +171,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.samples = new Grid<>();
     dialog.addNewSample = new Button();
     dialog.addSample = new Button();
+    dialog.error = new Div();
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
@@ -227,6 +230,11 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     ComboBox<String> newTag = (ComboBox<String>) newTagField.get(dialog.tags);
     List<String> items = items(newTag);
     assertEquals(topTags, items);
+  }
+
+  @Test
+  public void error() {
+    assertFalse(dialog.error.isVisible());
   }
 
   @Test
@@ -1403,6 +1411,40 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NameExists() {
+    when(service.exists(any())).thenReturn(true);
+    fillForm();
+
+    presenter.save();
+
+    verify(service).exists(
+        ("ChIPSeq_IP_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_"
+            + sampleId1 + "-" + sampleId2 + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
+                .replaceAll("[^\\w-]", ""));
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NameExistsSameDataset() {
+    Dataset dataset = repository.findById(2L).get();
+    when(service.exists(any())).thenReturn(true);
+    when(service.get(any())).thenReturn(dataset);
+    presenter.setDataset(dataset);
+
+    presenter.save();
+
+    verify(service).exists("ChIPSeq_Spt16_yFR101_G24D_JS1-JS2_20181022");
+    verify(service).get(2L);
+    verify(service).save(any());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
