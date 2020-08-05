@@ -25,5 +25,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Repository for {@link Sample}.
  */
 public interface SampleRepository extends JpaRepository<Sample, Long> {
+  public boolean existsByName(String name);
+
   public List<Sample> findByOwner(User owner);
 }

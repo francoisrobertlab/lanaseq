@@ -47,12 +47,14 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -121,6 +123,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
     dialog.date = new DatePicker();
+    dialog.error = new Div();
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
@@ -143,6 +146,11 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strainDescription.setValue(strainDescription);
     dialog.treatment.setValue(treatment);
     dialog.date.setValue(date);
+  }
+
+  @Test
+  public void error() {
+    assertFalse(dialog.error.isVisible());
   }
 
   @Test
@@ -557,6 +565,40 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NameExists() {
+    when(service.exists(any())).thenReturn(true);
+    fillForm();
+
+    presenter.save(locale);
+
+    verify(service).exists(
+        (sampleId + "_" + "ChIPSeq_IP_" + target + "_" + strain + "_" + strainDescription + "_"
+            + treatment + "_" + replicate + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
+                .replaceAll("[^\\w-]", ""));
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NameExistsSameSample() {
+    Sample sample = repository.findById(2L).get();
+    when(service.exists(any())).thenReturn(true);
+    when(service.get(any())).thenReturn(sample);
+    presenter.setSample(sample);
+
+    presenter.save(locale);
+
+    verify(service).exists("FR2_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
+    verify(service).get(2L);
+    verify(service).save(any());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test

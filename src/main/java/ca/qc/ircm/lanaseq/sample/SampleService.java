@@ -85,6 +85,20 @@ public class SampleService {
   }
 
   /**
+   * Returns true if a dataset with specified name exists, false otherwise.
+   *
+   * @param name
+   *          name
+   * @return true if a dataset with specified name exists, false otherwise
+   */
+  public boolean exists(String name) {
+    if (name == null) {
+      return false;
+    }
+    return repository.existsByName(name);
+  }
+
+  /**
    * Returns all samples.
    *
    * @return all samples

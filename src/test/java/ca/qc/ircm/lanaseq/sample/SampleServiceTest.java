@@ -138,6 +138,21 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void exists_True() {
+    assertTrue(service.exists("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020"));
+  }
+
+  @Test
+  public void exists_False() {
+    assertFalse(service.exists("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa"));
+  }
+
+  @Test
+  public void exists_Null() {
+    assertFalse(service.exists(null));
+  }
+
+  @Test
   public void all() {
     List<Sample> samples = service.all();
 

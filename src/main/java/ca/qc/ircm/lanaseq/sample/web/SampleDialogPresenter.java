@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.sample.Sample.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -75,6 +76,7 @@ public class SampleDialogPresenter {
   void init(SampleDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
+    dialog.error.setVisible(false);
     localeChange(Constants.DEFAULT_LOCALE);
     setSample(null);
   }
@@ -100,12 +102,25 @@ public class SampleDialogPresenter {
     return binder.validate();
   }
 
-  boolean validate() {
-    return validateSample().isOk();
+  boolean validate(Locale locale) {
+    dialog.error.setVisible(false);
+    boolean valid = validateSample().isOk();
+    if (valid) {
+      Sample sample = binder.getBean();
+      sample.generateName();
+      if (service.exists(sample.getName()) && (sample.getId() == null
+          || !sample.getName().equalsIgnoreCase(service.get(sample.getId()).getName()))) {
+        valid = false;
+        AppResources sampleResources = new AppResources(Sample.class, locale);
+        dialog.error.setText(sampleResources.message(NAME_ALREADY_EXISTS, sample.getName()));
+        dialog.error.setVisible(true);
+      }
+    }
+    return valid;
   }
 
   void save(Locale locale) {
-    if (validate()) {
+    if (validate(locale)) {
       Sample sample = binder.getBean();
       logger.debug("save sample {}", sample);
       service.save(sample);

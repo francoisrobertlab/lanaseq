@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
@@ -133,6 +134,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(DATE), dialog.date.getId().orElse(""));
+    assertEquals(id(ERROR_TEXT), dialog.error.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
