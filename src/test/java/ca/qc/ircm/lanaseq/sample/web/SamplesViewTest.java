@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
@@ -158,6 +159,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAMPLES, view.samples.getId().orElse(""));
+    assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
+    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(ADD, view.add.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));

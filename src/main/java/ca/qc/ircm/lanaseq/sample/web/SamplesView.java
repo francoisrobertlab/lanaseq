@@ -161,6 +161,7 @@ public class SamplesView extends VerticalLayout
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
     error.setId(ERROR_TEXT);
+    error.addClassName(ERROR_TEXT);
     error.setVisible(false);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());

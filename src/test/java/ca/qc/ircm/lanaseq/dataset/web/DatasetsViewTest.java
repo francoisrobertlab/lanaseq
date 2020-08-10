@@ -179,6 +179,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(DATASETS, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
+    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(ADD, view.add.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));

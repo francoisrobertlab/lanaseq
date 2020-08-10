@@ -174,6 +174,7 @@ public class DatasetsView extends VerticalLayout
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
     error.setId(ERROR_TEXT);
+    error.addClassName(ERROR_TEXT);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> presenter.add());
