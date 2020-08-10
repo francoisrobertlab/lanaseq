@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.analysis.web.ConfigureAnalysisView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -58,6 +59,10 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     assertTrue(optional(() -> view.datasets()).isPresent());
+    assertTrue(optional(() -> view.samples()).isPresent());
+    assertTrue(optional(() -> view.protocols()).isPresent());
+    assertTrue(optional(() -> view.analyse()).isPresent());
+    assertTrue(optional(() -> view.profile()).isPresent());
     assertFalse(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -69,6 +74,10 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     assertTrue(optional(() -> view.datasets()).isPresent());
+    assertTrue(optional(() -> view.samples()).isPresent());
+    assertTrue(optional(() -> view.protocols()).isPresent());
+    assertTrue(optional(() -> view.analyse()).isPresent());
+    assertTrue(optional(() -> view.profile()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -80,6 +89,10 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     assertTrue(optional(() -> view.datasets()).isPresent());
+    assertTrue(optional(() -> view.samples()).isPresent());
+    assertTrue(optional(() -> view.protocols()).isPresent());
+    assertTrue(optional(() -> view.analyse()).isPresent());
+    assertTrue(optional(() -> view.profile()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -97,6 +110,10 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     usersView.switchUser().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     assertTrue(optional(() -> view.datasets()).isPresent());
+    assertTrue(optional(() -> view.samples()).isPresent());
+    assertTrue(optional(() -> view.protocols()).isPresent());
+    assertTrue(optional(() -> view.analyse()).isPresent());
+    assertTrue(optional(() -> view.profile()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertTrue(optional(() -> view.exitSwitchUser()).isPresent());
     assertTrue(optional(() -> view.signout()).isPresent());
@@ -127,6 +144,15 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     view.protocols().click();
     assertEquals(viewUrl(ProtocolsView.VIEW_NAME), getDriver().getCurrentUrl());
+  }
+
+  @Test
+  @WithUserDetails("jonh.smith@ircm.qc.ca")
+  public void analyse() throws Throwable {
+    open();
+    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    view.analyse().click();
+    assertEquals(viewUrl(ConfigureAnalysisView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test

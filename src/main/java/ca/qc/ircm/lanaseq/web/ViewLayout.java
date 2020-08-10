@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.analysis.web.ConfigureAnalysisView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -60,6 +61,7 @@ public class ViewLayout extends VerticalLayout
   public static final String DATASETS = "datasets";
   public static final String SAMPLES = "samples";
   public static final String PROTOCOLS = "protocols";
+  public static final String ANALYSE = "analyse";
   public static final String PROFILE = "profile";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
@@ -71,6 +73,7 @@ public class ViewLayout extends VerticalLayout
   protected Tab datasets = new Tab();
   protected Tab samples = new Tab();
   protected Tab protocols = new Tab();
+  protected Tab analyse = new Tab();
   protected Tab profile = new Tab();
   protected Tab users = new Tab();
   protected Tab exitSwitchUser = new Tab();
@@ -95,12 +98,13 @@ public class ViewLayout extends VerticalLayout
     setSpacing(false);
     add(tabs);
     tabs.setId(TABS);
-    tabs.add(datasets, samples, protocols, profile, users, exitSwitchUser, signout);
+    tabs.add(datasets, samples, protocols, analyse, profile, users, exitSwitchUser, signout);
     exitSwitchUser
         .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     datasets.setId(styleName(DATASETS, TAB));
     samples.setId(styleName(SAMPLES, TAB));
     protocols.setId(styleName(PROTOCOLS, TAB));
+    analyse.setId(styleName(ANALYSE, TAB));
     profile.setId(styleName(PROFILE, TAB));
     users.setId(styleName(USERS, TAB));
     users.setVisible(authorizationService.isAuthorized(UsersView.class));
@@ -109,6 +113,7 @@ public class ViewLayout extends VerticalLayout
     tabsHref.put(datasets, DatasetsView.VIEW_NAME);
     tabsHref.put(samples, SamplesView.VIEW_NAME);
     tabsHref.put(protocols, ProtocolsView.VIEW_NAME);
+    tabsHref.put(analyse, ConfigureAnalysisView.VIEW_NAME);
     tabsHref.put(profile, ProfileView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
     tabs.addSelectedChangeListener(e -> selectTab());
@@ -120,6 +125,7 @@ public class ViewLayout extends VerticalLayout
     datasets.setLabel(resources.message(DATASETS));
     samples.setLabel(resources.message(SAMPLES));
     protocols.setLabel(resources.message(PROTOCOLS));
+    analyse.setLabel(resources.message(ANALYSE));
     profile.setLabel(resources.message(PROFILE));
     users.setLabel(resources.message(USERS));
     exitSwitchUser.setLabel(resources.message(EXIT_SWITCH_USER));
