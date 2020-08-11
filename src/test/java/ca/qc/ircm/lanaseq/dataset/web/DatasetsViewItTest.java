@@ -94,7 +94,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void view() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
-    view.doubleClick(0);
+    view.datasets().doubleClick(0);
     assertTrue(view.dialog().isOpen());
   }
 
@@ -102,7 +102,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void view_Protocol() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
-    view.doubleClickProtocol(0);
+    view.datasets().doubleClickProtocol(0);
     assertTrue(view.protocolDialog().isOpen());
   }
 
@@ -110,7 +110,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void view_Files() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
-    view.controlClick(0);
+    view.datasets().controlClick(0);
     assertTrue(view.filesDialog().isOpen());
   }
 

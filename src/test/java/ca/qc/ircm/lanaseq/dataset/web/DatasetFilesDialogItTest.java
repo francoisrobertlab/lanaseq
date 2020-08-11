@@ -71,7 +71,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.controlClick(0);
+    view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
@@ -88,7 +88,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.controlClick(0);
+    view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
     dialog.files().getRow(0).doubleClick();
@@ -114,7 +114,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.controlClick(0);
+    view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
     dialog.delete(0).click();
@@ -137,7 +137,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   public void add() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.controlClick(0);
+    view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
     dialog.add().click();
