@@ -54,6 +54,14 @@ public class AppConfiguration {
    */
   private Path datasetHome;
   /**
+   * Analysis folder.
+   */
+  private Path analysis;
+  /**
+   * Use symbolic links for analysis instead of copying files.
+   */
+  private boolean analysisSymlinks;
+  /**
    * Upload folder.
    */
   private Path upload;
@@ -110,6 +118,19 @@ public class AppConfiguration {
 
   public String folderNetwork(boolean unix) {
     return unix ? userHome.network.unix : userHome.network.windows;
+  }
+
+  public Path analysis(Dataset dataset) {
+    return getAnalysis().resolve(dataset.getName());
+  }
+
+  public String analysisLabel(Dataset dataset, boolean unix) {
+    Path relative = home.relativize(analysis(dataset));
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+    } else {
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+    }
   }
 
   public Path upload(Sample sample) {
@@ -217,6 +238,22 @@ public class AppConfiguration {
 
   void setUploadDeleteAge(Duration uploadDeleteAge) {
     this.uploadDeleteAge = uploadDeleteAge;
+  }
+
+  Path getAnalysis() {
+    return analysis;
+  }
+
+  void setAnalysis(Path analysis) {
+    this.analysis = analysis;
+  }
+
+  public boolean isAnalysisSymlinks() {
+    return analysisSymlinks;
+  }
+
+  void setAnalysisSymlinks(boolean analysisSymlinks) {
+    this.analysisSymlinks = analysisSymlinks;
   }
 
   @SuppressWarnings("unused")

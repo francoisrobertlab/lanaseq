@@ -191,6 +191,30 @@ public class AppConfigurationTest {
   }
 
   @Test
+  public void analysis_Dataset() {
+    Dataset dataset = dataset();
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq", dataset.getName()),
+        appConfiguration.analysis(dataset));
+  }
+
+  @Test
+  public void analysisLabel_Dataset() {
+    Dataset dataset = dataset();
+    assertEquals("lanaseq\\" + dataset.getName(), appConfiguration.analysisLabel(dataset, false));
+  }
+
+  @Test
+  public void analysisLabel_DatasetUnix() {
+    Dataset dataset = dataset();
+    assertEquals("lanaseq/" + dataset.getName(), appConfiguration.analysisLabel(dataset, true));
+  }
+
+  @Test
+  public void analysisSymlinks() {
+    assertEquals(true, appConfiguration.isAnalysisSymlinks());
+  }
+
+  @Test
   public void getUpload() {
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/upload"),
         appConfiguration.getUpload());
