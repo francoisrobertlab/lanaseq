@@ -30,14 +30,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.security.UserRole;
-import com.google.common.collect.Range;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -67,41 +60,23 @@ public class DatasetsViewPresenter {
   private ProtocolService protocolService;
   @Autowired
   private SampleService sampleService;
-  @Autowired
-  private AuthorizationService authorizationService;
-  private ListDataProvider<Dataset> datasetsDataProvider;
-  private WebDatasetFilter filter = new WebDatasetFilter();
 
   protected DatasetsViewPresenter() {
   }
 
   protected DatasetsViewPresenter(DatasetService service, ProtocolService protocolService,
-      SampleService sampleService, AuthorizationService authorizationService) {
+      SampleService sampleService) {
     this.service = service;
     this.protocolService = protocolService;
     this.sampleService = sampleService;
-    this.authorizationService = authorizationService;
   }
 
   void init(DatasetsView view) {
     logger.debug("Datasets view");
     this.view = view;
-    loadDatasets();
-    view.dialog.addSavedListener(e -> loadDatasets());
-    view.protocolDialog.addSavedListener(e -> loadDatasets());
-    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
-    }
+    view.dialog.addSavedListener(e -> view.datasets.refreshDatasets());
+    view.protocolDialog.addSavedListener(e -> view.datasets.refreshDatasets());
     clearError();
-  }
-
-  @SuppressWarnings("checkstyle:linelength")
-  private void loadDatasets() {
-    datasetsDataProvider = new ListDataProvider<>(service.all());
-    ConfigurableFilterDataProvider<Dataset, Void, SerializablePredicate<Dataset>> dataProvider =
-        datasetsDataProvider.withConfigurableFilter();
-    dataProvider.setFilter(filter);
-    view.datasets.setDataProvider(dataProvider);
   }
 
   private void clearError() {
@@ -188,39 +163,5 @@ public class DatasetsViewPresenter {
         view.showNotification(resources.message(MERGED, dataset.getName()));
       }
     }
-  }
-
-  void filterName(String value) {
-    clearError();
-    filter.nameContains = value.isEmpty() ? null : value;
-    view.datasets.getDataProvider().refreshAll();
-  }
-
-  void filterTags(String value) {
-    clearError();
-    filter.tagsContains = value.isEmpty() ? null : value;
-    view.datasets.getDataProvider().refreshAll();
-  }
-
-  void filterProtocol(String value) {
-    clearError();
-    filter.protocolContains = value.isEmpty() ? null : value;
-    view.datasets.getDataProvider().refreshAll();
-  }
-
-  void filterDate(Range<LocalDate> value) {
-    clearError();
-    filter.dateRange = value;
-    view.datasets.getDataProvider().refreshAll();
-  }
-
-  void filterOwner(String value) {
-    clearError();
-    filter.ownerContains = value.isEmpty() ? null : value;
-    view.datasets.getDataProvider().refreshAll();
-  }
-
-  WebDatasetFilter filter() {
-    return filter;
   }
 }

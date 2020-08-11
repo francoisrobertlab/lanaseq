@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -31,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,22 +43,17 @@ import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import javax.persistence.EntityManager;
@@ -119,16 +112,15 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Before
   public void beforeTest() {
     view.header = new H2();
-    view.datasets = new Grid<>();
+    view.datasets = new DatasetGrid();
     view.datasets.setSelectionMode(SelectionMode.MULTI);
-    view.ownerFilter = new TextField();
     view.error = new Div();
     view.add = new Button();
     view.dialog = mock(DatasetDialog.class);
     view.filesDialog = mock(DatasetFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     datasets = repository.findAll();
-    when(service.all()).thenReturn(datasets);
+    view.datasets.setItems(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
@@ -137,131 +129,9 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void datasets() {
-    List<Dataset> datasets = items(view.datasets);
-    assertEquals(this.datasets.size(), datasets.size());
-    for (Dataset dataset : this.datasets) {
-      assertTrue(dataset.toString(), datasets.contains(dataset));
-    }
     assertEquals(0, view.datasets.getSelectedItems().size());
     datasets.forEach(dataset -> view.datasets.select(dataset));
     assertEquals(datasets.size(), view.datasets.getSelectedItems().size());
-  }
-
-  @Test
-  public void ownerFilter_User() {
-    assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
-    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
-  }
-
-  @Test
-  public void ownerFilter_ManagerOrAdmin() {
-    view.ownerFilter.setValue("");
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
-    presenter.init(view);
-    assertEquals("", view.ownerFilter.getValue());
-    verify(authorizationService, times(2)).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
-  }
-
-  @Test
-  public void filterName() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterName("test");
-
-    assertEquals("test", presenter.filter().nameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterName_Empty() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterName("");
-
-    assertEquals(null, presenter.filter().nameContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterTags() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterTags("test");
-
-    assertEquals("test", presenter.filter().tagsContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterTags_Empty() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterTags("");
-
-    assertEquals(null, presenter.filter().tagsContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterProtocol() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterProtocol("test");
-
-    assertEquals("test", presenter.filter().protocolContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterProtocol_Empty() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterProtocol("");
-
-    assertEquals(null, presenter.filter().protocolContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterDate() {
-    view.datasets.setDataProvider(dataProvider);
-    Range<LocalDate> range =
-        Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(2));
-
-    presenter.filterDate(range);
-
-    assertEquals(range, presenter.filter().dateRange);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterDate_Null() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterDate(null);
-
-    assertEquals(null, presenter.filter().dateRange);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterOwner() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterOwner("test");
-
-    assertEquals("test", presenter.filter().ownerContains);
-    verify(dataProvider).refreshAll();
-  }
-
-  @Test
-  public void filterOwner_Empty() {
-    view.datasets.setDataProvider(dataProvider);
-
-    presenter.filterOwner("");
-
-    assertEquals(null, presenter.filter().ownerContains);
-    verify(dataProvider).refreshAll();
   }
 
   @Test
@@ -482,20 +352,22 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnSaved() {
+    view.datasets = mock(DatasetGrid.class);
     verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(service, times(2)).all();
+    verify(view.datasets).refreshDatasets();
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnProtocolSaved() {
+    view.datasets = mock(DatasetGrid.class);
     verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         protocolSavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(service, times(2)).all();
+    verify(view.datasets).refreshDatasets();
   }
 }
