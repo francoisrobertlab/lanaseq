@@ -678,10 +678,11 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyResources_DatasetZip() throws Throwable {
-    datasetAnalysis.samples.get(0).fastq1 = pairedZip1;
-    datasetAnalysis.samples.get(0).fastq2 = pairedZip2;
-    datasetAnalysis.samples.get(1).fastq1 = secondPairedZip1;
-    datasetAnalysis.samples.get(1).fastq2 = secondPairedZip2;
+    Path temp = temporaryFolder.getRoot().toPath();
+    datasetAnalysis.samples.get(0).fastq1 = temp.resolve(pairedZip1);
+    datasetAnalysis.samples.get(0).fastq2 = temp.resolve(pairedZip2);
+    datasetAnalysis.samples.get(1).fastq1 = temp.resolve(secondPairedZip1);
+    datasetAnalysis.samples.get(1).fastq2 = temp.resolve(secondPairedZip2);
     byte[] fastq1Content = writeRandom(datasetAnalysis.samples.get(0).fastq1);
     byte[] fastq2Content = writeRandom(datasetAnalysis.samples.get(0).fastq2);
     byte[] fastq3Content = writeRandom(datasetAnalysis.samples.get(1).fastq1);
