@@ -38,9 +38,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetGridPresenter {
   private DatasetGrid grid;
-  @Autowired
   private DatasetService service;
-  @Autowired
   private AuthorizationService authorizationService;
   private ListDataProvider<Dataset> datasetsDataProvider;
   private WebDatasetFilter filter = new WebDatasetFilter();
@@ -48,6 +46,7 @@ public class DatasetGridPresenter {
   protected DatasetGridPresenter() {
   }
 
+  @Autowired
   protected DatasetGridPresenter(DatasetService service,
       AuthorizationService authorizationService) {
     this.service = service;
