@@ -1,16 +1,19 @@
 package ca.qc.ircm.lanaseq.analysis;
 
+import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -21,16 +24,18 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
@@ -56,6 +61,8 @@ public class AnalysisServiceTest {
   private SampleRepository sampleRepository;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
+  @Mock
+  private Consumer<String> errorHandler;
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
   private Dataset dataset;
@@ -83,6 +90,8 @@ public class AnalysisServiceTest {
   private List<Path> secondUnpairedZipPaths = new ArrayList<>();
   private DatasetAnalysis datasetAnalysis = new DatasetAnalysis();
   private Random random = new Random();
+  private Locale locale = ENGLISH;
+  private AppResources resources = new AppResources(AnalysisService.class, locale);
 
   @Before
   public void beforeTest() {
@@ -90,37 +99,38 @@ public class AnalysisServiceTest {
     dataset = datasetRepository.findById(2L).get();
     sample = sampleRepository.findById(4L).get();
     sample2 = sampleRepository.findById(5L).get();
-    paired1 = Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
-    paired2 = Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
-    pairedPaths.add(Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    Path folder = temporaryFolder.getRoot().toPath();
+    paired1 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
+    paired2 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
+    pairedPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);
-    pairedZip1 = Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq.gz");
-    pairedZip2 = Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq.gz");
-    pairedZipPaths.add(Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    pairedZip1 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq.gz");
+    pairedZip2 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq.gz");
+    pairedZipPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     pairedZipPaths.add(pairedZip1);
     pairedZipPaths.add(pairedZip2);
-    unpaired = Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq");
-    unpairedPaths.add(Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    unpaired = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq");
+    unpairedPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     unpairedPaths.add(unpaired);
-    unpairedZip = Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq.gz");
-    unpairedZipPaths.add(Paths.get("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    unpairedZip = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq.gz");
+    unpairedZipPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     unpairedZipPaths.add(unpairedZip);
-    secondPaired1 = Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq");
-    secondPaired2 = Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq");
-    secondPairedPaths.add(Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondPaired1 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq");
+    secondPaired2 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq");
+    secondPairedPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedPaths.add(secondPaired1);
     secondPairedPaths.add(secondPaired2);
-    secondPairedZip1 = Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
-    secondPairedZip2 = Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
-    secondPairedZipPaths.add(Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondPairedZip1 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
+    secondPairedZip2 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
+    secondPairedZipPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedZipPaths.add(secondPairedZip1);
     secondPairedZipPaths.add(secondPairedZip2);
-    secondUnpaired = Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq");
-    secondUnpairedPaths.add(Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondUnpaired = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq");
+    secondUnpairedPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondUnpairedPaths.add(secondUnpaired);
-    secondUnpairedZip = Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq.gz");
-    secondUnpairedZipPaths.add(Paths.get("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondUnpairedZip = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq.gz");
+    secondUnpairedZipPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondUnpairedZipPaths.add(secondUnpairedZip);
     when(configuration.analysis(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
@@ -128,7 +138,6 @@ public class AnalysisServiceTest {
           ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
           : null;
     });
-    Path folder = temporaryFolder.getRoot().toPath();
     datasetAnalysis.dataset = dataset;
     datasetAnalysis.samples = new ArrayList<>();
     SampleAnalysis sampleAnalysis = new SampleAnalysis();
@@ -154,454 +163,222 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPaired() {
+  public void validate_DatasetPaired() {
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(paired1, sampleAnalysis.fastq1);
-    assertEquals(paired2, sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPaired1, sampleAnalysis.fastq1);
-    assertEquals(secondPaired2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedFirstMissing() {
+  public void validate_DatasetPairedFirstMissing() {
     pairedPaths.remove(paired1);
     secondPairedPaths.remove(secondPaired1);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(paired2, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondPaired2, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedFirstMissingFirstSample() {
+  public void validate_DatasetPairedFirstMissingFirstSample() {
     pairedPaths.remove(paired1);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(paired2, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPaired1, sampleAnalysis.fastq1);
-    assertEquals(secondPaired2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedSecondMissing() {
+  public void validate_DatasetPairedSecondMissing() {
     pairedPaths.remove(paired2);
     secondPairedPaths.remove(secondPaired2);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(paired1, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondPaired1, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedSecondMissingFirstSample() {
+  public void validate_DatasetPairedSecondMissingFirstSample() {
     pairedPaths.remove(paired2);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(paired1, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPaired1, sampleAnalysis.fastq1);
-    assertEquals(secondPaired2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedZip() {
+  public void validate_DatasetPairedZip() {
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(pairedZip1, sampleAnalysis.fastq1);
-    assertEquals(pairedZip2, sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPairedZip1, sampleAnalysis.fastq1);
-    assertEquals(secondPairedZip2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedZipFirstMissing() {
+  public void validate_DatasetPairedZipFirstMissing() {
     pairedZipPaths.remove(pairedZip1);
     secondPairedZipPaths.remove(secondPairedZip1);
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(pairedZip2, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondPairedZip2, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedZipFirstMissingFirstSample() {
+  public void validate_DatasetPairedZipFirstMissingFirstSample() {
     pairedZipPaths.remove(pairedZip1);
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(pairedZip2, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPairedZip1, sampleAnalysis.fastq1);
-    assertEquals(secondPairedZip2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedZipSecondMissing() {
+  public void validate_DatasetPairedZipSecondMissing() {
     pairedZipPaths.remove(pairedZip2);
     secondPairedZipPaths.remove(secondPairedZip2);
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(pairedZip1, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondPairedZip1, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedZipSecondMissingFirstSample() {
+  public void validate_DatasetPairedZipSecondMissingFirstSample() {
     pairedZipPaths.remove(pairedZip2);
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(pairedZip1, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPairedZip1, sampleAnalysis.fastq1);
-    assertEquals(secondPairedZip2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedSecondSampleZip() {
+  public void validate_DatasetPairedSecondSampleZip() {
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(paired1, sampleAnalysis.fastq1);
-    assertEquals(paired2, sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(secondPairedZip1, sampleAnalysis.fastq1);
-    assertEquals(secondPairedZip2, sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetUnpaired() {
+  public void validate_DatasetUnpaired() {
     when(sampleService.files(any())).thenReturn(unpairedPaths, secondUnpairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(unpaired, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondUnpaired, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedSecondSampleUnpaired() {
+  public void validate_DatasetPairedSecondSampleUnpaired() {
     when(sampleService.files(any())).thenReturn(pairedPaths, secondUnpairedPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(paired1, sampleAnalysis.fastq1);
-    assertEquals(paired2, sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondUnpaired, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetUnpairedZip() {
+  public void validate_DatasetUnpairedZip() {
     when(sampleService.files(any())).thenReturn(unpairedZipPaths, secondUnpairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(unpairedZip, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondUnpairedZip, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetPairedZipSecondSampleUnpaired() {
+  public void validate_DatasetPairedZipSecondSampleUnpaired() {
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondUnpairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertTrue(sampleAnalysis.paired);
-    assertEquals(pairedZip1, sampleAnalysis.fastq1);
-    assertEquals(pairedZip2, sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondUnpairedZip, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetUnpairedSecondSampleZip() {
+  public void validate_DatasetUnpairedSecondSampleZip() {
     when(sampleService.files(any())).thenReturn(unpairedPaths, secondUnpairedZipPaths);
-    DatasetAnalysis analysis = service.metadata(dataset);
-    assertEquals(dataset, analysis.dataset);
-    assertEquals(2, analysis.samples.size());
-    SampleAnalysis sampleAnalysis = analysis.samples.get(0);
-    assertEquals(sample, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(unpaired, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
-    sampleAnalysis = analysis.samples.get(1);
-    assertEquals(sample2, sampleAnalysis.sample);
-    assertFalse(sampleAnalysis.paired);
-    assertEquals(secondUnpairedZip, sampleAnalysis.fastq1);
-    assertNull(sampleAnalysis.fastq2);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void metadata_DatasetNoFastq() {
+  @Test
+  public void validate_DatasetNoFastq() {
     when(sampleService.files(any())).thenReturn(new ArrayList<>());
-    service.metadata(dataset);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler)
+        .accept(resources.message("sample.noFastq", dataset.getSamples().get(0).getName()));
+    verify(errorHandler)
+        .accept(resources.message("sample.noFastq", dataset.getSamples().get(1).getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   @SuppressWarnings("unchecked")
-  public void metadata_DatasetSecondSampleNoFastq() {
+  public void validate_DatasetNoFastqFistSample() {
+    when(sampleService.files(any())).thenReturn(new ArrayList<>(), secondPairedPaths);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler)
+        .accept(resources.message("sample.noFastq", dataset.getSamples().get(0).getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validate_DatasetNoFastqSecondSample() {
     when(sampleService.files(any())).thenReturn(pairedPaths, new ArrayList<>());
-    service.metadata(dataset);
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler)
+        .accept(resources.message("sample.noFastq", dataset.getSamples().get(1).getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
-  public void metadata_SamplePaired() {
-    when(sampleService.files(any())).thenReturn(pairedPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertTrue(analysis.paired);
-    assertEquals(paired1, analysis.fastq1);
-    assertEquals(paired2, analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  @SuppressWarnings("unchecked")
+  public void validate_DatasetFirstPairedSecondUnpairedThirdNoFastq() {
+    Sample sample = sampleRepository.findById(1L).get();
+    dataset.getSamples().add(sample);
+    when(sampleService.files(any())).thenReturn(pairedPaths, secondUnpairedPaths,
+        new ArrayList<>());
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("sample.noFastq", sample.getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
-  public void metadata_SamplePairedFirstMissing() {
-    pairedPaths.remove(paired1);
-    when(sampleService.files(any())).thenReturn(pairedPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertFalse(analysis.paired);
-    assertEquals(paired2, analysis.fastq1);
-    assertNull(analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test
-  public void metadata_SamplePairedSecondMissing() {
-    pairedPaths.remove(paired2);
-    when(sampleService.files(any())).thenReturn(pairedPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertFalse(analysis.paired);
-    assertEquals(paired1, analysis.fastq1);
-    assertNull(analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test
-  public void metadata_SamplePairedZip() {
-    when(sampleService.files(any())).thenReturn(pairedZipPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertTrue(analysis.paired);
-    assertEquals(pairedZip1, analysis.fastq1);
-    assertEquals(pairedZip2, analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test
-  public void metadata_SamplePairedZipFirstMissing() {
-    pairedZipPaths.remove(pairedZip1);
-    when(sampleService.files(any())).thenReturn(pairedZipPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertFalse(analysis.paired);
-    assertEquals(pairedZip2, analysis.fastq1);
-    assertNull(analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test
-  public void metadata_SamplePairedZipSecondMissing() {
-    pairedZipPaths.remove(pairedZip2);
-    when(sampleService.files(any())).thenReturn(pairedZipPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertFalse(analysis.paired);
-    assertEquals(pairedZip1, analysis.fastq1);
-    assertNull(analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test
-  public void metadata_SampleUnpaired() {
-    when(sampleService.files(any())).thenReturn(unpairedPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertFalse(analysis.paired);
-    assertEquals(unpaired, analysis.fastq1);
-    assertNull(analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test
-  public void metadata_SampleUnpairedZip() {
-    when(sampleService.files(any())).thenReturn(unpairedZipPaths);
-    SampleAnalysis analysis = service.metadata(sample);
-    assertEquals(sample, analysis.sample);
-    assertFalse(analysis.paired);
-    assertEquals(unpairedZip, analysis.fastq1);
-    assertNull(analysis.fastq2);
-    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void metadata_SampleNoFastq() {
-    when(sampleService.files(any())).thenReturn(new ArrayList<>());
-    service.metadata(sample);
-  }
-
-  @Test
+  @SuppressWarnings("unchecked")
   public void copyResources_Dataset() throws Throwable {
-    byte[] fastq1Content = writeRandom(datasetAnalysis.samples.get(0).fastq1);
-    byte[] fastq2Content = writeRandom(datasetAnalysis.samples.get(0).fastq2);
-    byte[] fastq3Content = writeRandom(datasetAnalysis.samples.get(1).fastq1);
-    byte[] fastq4Content = writeRandom(datasetAnalysis.samples.get(1).fastq2);
-    Path folder = service.copyResources(datasetAnalysis);
+    when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
+    byte[] fastq1Content = writeRandom(paired1);
+    byte[] fastq2Content = writeRandom(paired2);
+    byte[] fastq3Content = writeRandom(secondPaired1);
+    byte[] fastq4Content = writeRandom(secondPaired2);
+    Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
@@ -636,13 +413,15 @@ public class AnalysisServiceTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void copyResources_DatasetSymlinks() throws Throwable {
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
-    byte[] fastq1Content = writeRandom(datasetAnalysis.samples.get(0).fastq1);
-    byte[] fastq2Content = writeRandom(datasetAnalysis.samples.get(0).fastq2);
-    byte[] fastq3Content = writeRandom(datasetAnalysis.samples.get(1).fastq1);
-    byte[] fastq4Content = writeRandom(datasetAnalysis.samples.get(1).fastq2);
-    Path folder = service.copyResources(datasetAnalysis);
+    when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
+    byte[] fastq1Content = writeRandom(paired1);
+    byte[] fastq2Content = writeRandom(paired2);
+    byte[] fastq3Content = writeRandom(secondPaired1);
+    byte[] fastq4Content = writeRandom(secondPaired2);
+    Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
@@ -677,17 +456,14 @@ public class AnalysisServiceTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void copyResources_DatasetZip() throws Throwable {
-    Path temp = temporaryFolder.getRoot().toPath();
-    datasetAnalysis.samples.get(0).fastq1 = temp.resolve(pairedZip1);
-    datasetAnalysis.samples.get(0).fastq2 = temp.resolve(pairedZip2);
-    datasetAnalysis.samples.get(1).fastq1 = temp.resolve(secondPairedZip1);
-    datasetAnalysis.samples.get(1).fastq2 = temp.resolve(secondPairedZip2);
-    byte[] fastq1Content = writeRandom(datasetAnalysis.samples.get(0).fastq1);
-    byte[] fastq2Content = writeRandom(datasetAnalysis.samples.get(0).fastq2);
-    byte[] fastq3Content = writeRandom(datasetAnalysis.samples.get(1).fastq1);
-    byte[] fastq4Content = writeRandom(datasetAnalysis.samples.get(1).fastq2);
-    Path folder = service.copyResources(datasetAnalysis);
+    when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
+    byte[] fastq1Content = writeRandom(pairedZip1);
+    byte[] fastq2Content = writeRandom(pairedZip2);
+    byte[] fastq3Content = writeRandom(secondPairedZip1);
+    byte[] fastq4Content = writeRandom(secondPairedZip2);
+    Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
@@ -722,14 +498,12 @@ public class AnalysisServiceTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void copyResources_DatasetUnpaired() throws Throwable {
-    datasetAnalysis.samples.get(0).paired = false;
-    datasetAnalysis.samples.get(0).fastq2 = null;
-    datasetAnalysis.samples.get(1).paired = false;
-    datasetAnalysis.samples.get(1).fastq2 = null;
-    byte[] fastq1Content = writeRandom(datasetAnalysis.samples.get(0).fastq1);
-    byte[] fastq3Content = writeRandom(datasetAnalysis.samples.get(1).fastq1);
-    Path folder = service.copyResources(datasetAnalysis);
+    when(sampleService.files(any())).thenReturn(unpairedPaths, secondUnpairedPaths);
+    byte[] fastq1Content = writeRandom(unpaired);
+    byte[] fastq3Content = writeRandom(secondUnpaired);
+    Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
