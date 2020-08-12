@@ -116,6 +116,8 @@ public class AnalysisService {
    * @return folder the folder containing analysis files
    * @throws IOException
    *           could not copy analysis files to folder
+   * @throws IllegalArgumentException
+   *           dataset analysis validation failed
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public Path copyResources(Dataset dataset) throws IOException {
