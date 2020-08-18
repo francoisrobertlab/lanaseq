@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service;
 public class AnalysisService {
   private static final String FASTQ = "\\.fastq(?:\\.gz)?";
   private static final String FASTQ_PATTERN = ".*" + FASTQ;
-  private static final String FASTQ1_PATTERN = ".*_R1" + FASTQ;
-  private static final String FASTQ2_PATTERN = ".*_R2" + FASTQ;
+  private static final String FASTQ1_PATTERN = "(?:.*_)?R1" + FASTQ;
+  private static final String FASTQ2_PATTERN = "(?:.*_)?R2" + FASTQ;
   private SampleService sampleService;
   private AppConfiguration configuration;
 
@@ -84,10 +84,12 @@ public class AnalysisService {
     List<Path> fastqs = sampleService.files(sample).stream()
         .filter(file -> fastqPattern.matcher(file.toString()).matches())
         .collect(Collectors.toList());
-    Path fastq1 = fastqs.stream().filter(file -> fastq1Pattern.matcher(file.toString()).matches())
-        .findAny().orElse(fastqs.isEmpty() ? null : fastqs.get(0));
-    Path fastq2 = fastqs.stream().filter(file -> fastq2Pattern.matcher(file.toString()).matches())
-        .findAny().orElse(null);
+    Path fastq1 = fastqs.stream()
+        .filter(file -> fastq1Pattern.matcher(file.getFileName().toString()).matches()).findAny()
+        .orElse(fastqs.isEmpty() ? null : fastqs.get(0));
+    Path fastq2 = fastqs.stream()
+        .filter(file -> fastq2Pattern.matcher(file.getFileName().toString()).matches()).findAny()
+        .orElse(null);
     if (fastq1 == null) {
       String message = resources.message("sample.noFastq", sample.getName());
       errorHandler.accept(message);
