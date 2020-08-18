@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -43,10 +44,14 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.dialog.GeneratedVaadinDialog.OpenedChangeEvent;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.io.IOException;
 import java.util.Locale;
@@ -81,6 +86,8 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<Component> componentCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<OpenedChangeEvent<Dialog>>> openListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<ConfirmEvent>> confirmListenerCaptor;
   @Autowired
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
@@ -94,6 +101,9 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     dataset = datasetRepository.findById(2L).get();
+    dialog.header = new H3();
+    dialog.message = new Div();
+    dialog.createFolder = new Button();
     dialog.confirm = mock(ConfirmDialog.class);
     dialog.confirmLayout = new VerticalLayout();
     dialog.errors = mock(ConfirmDialog.class);
@@ -109,6 +119,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(service).validate(eq(dataset), eq(locale), any());
     assertEquals(0, dialog.errorsLayout.getComponentCount());
     verify(dialog.errors, never()).open();
+    assertTrue(dialog.createFolder.isEnabled());
   }
 
   @Test
@@ -122,11 +133,12 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.validate();
     verify(service).validate(eq(dataset), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Text);
-    assertEquals("error1", ((Text) dialog.errorsLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.errorsLayout.getComponentAt(1) instanceof Text);
-    assertEquals("error2", ((Text) dialog.errorsLayout.getComponentAt(1)).getText());
+    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
+    assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.errorsLayout.getComponentAt(1) instanceof Span);
+    assertEquals("error2", ((Span) dialog.errorsLayout.getComponentAt(1)).getText());
     verify(dialog.errors).open();
+    assertFalse(dialog.createFolder.isEnabled());
   }
 
   @Test
@@ -141,11 +153,12 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.validate();
     verify(service, times(2)).validate(eq(dataset), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Text);
-    assertEquals("error1", ((Text) dialog.errorsLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.errorsLayout.getComponentAt(1) instanceof Text);
-    assertEquals("error2", ((Text) dialog.errorsLayout.getComponentAt(1)).getText());
+    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
+    assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.errorsLayout.getComponentAt(1) instanceof Span);
+    assertEquals("error2", ((Span) dialog.errorsLayout.getComponentAt(1)).getText());
     verify(dialog.errors, times(2)).open();
+    assertFalse(dialog.createFolder.isEnabled());
   }
 
   @Test
@@ -171,15 +184,15 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(configuration).analysisLabel(dataset, false);
     verify(configuration).folderNetwork(false);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Text);
+    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Text) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Text);
+        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Text) dialog.confirmLayout.getComponentAt(1)).getText());
+        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
-    verify(dialog).close();
+    verify(dialog, never()).close();
   }
 
   @Test
@@ -193,12 +206,12 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(configuration).analysisLabel(dataset, false);
     verify(configuration).folderNetwork(false);
     assertEquals(1, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Text);
+    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Text) dialog.confirmLayout.getComponentAt(0)).getText());
+        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
-    verify(dialog).close();
+    verify(dialog, never()).close();
   }
 
   @Test
@@ -214,15 +227,15 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(configuration).analysisLabel(dataset, true);
     verify(configuration).folderNetwork(true);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Text);
+    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Text) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Text);
+        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Text) dialog.confirmLayout.getComponentAt(1)).getText());
+        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
-    verify(dialog).close();
+    verify(dialog, never()).close();
   }
 
   @Test
@@ -238,15 +251,15 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(configuration).analysisLabel(dataset, true);
     verify(configuration).folderNetwork(true);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Text);
+    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Text) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Text);
+        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
     assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Text) dialog.confirmLayout.getComponentAt(1)).getText());
+        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
-    verify(dialog).close();
+    verify(dialog, never()).close();
   }
 
   @Test
@@ -257,9 +270,9 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(service).copyResources(dataset);
     verify(dialog.confirm, never()).open();
     assertEquals(1, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Text);
+    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
     assertEquals(resources.message(CREATE_FOLDER_EXCEPTION, dataset.getName()),
-        ((Text) dialog.errorsLayout.getComponentAt(0)).getText());
+        ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
     verify(dialog.errors).open();
     verify(dialog, never()).close();
   }
@@ -285,10 +298,17 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     verify(service).copyResources(dataset);
     verify(dialog.confirm, never()).open();
     assertEquals(1, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Text);
-    assertEquals("error1", ((Text) dialog.errorsLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
+    assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
     verify(dialog.errors).open();
     verify(dialog, never()).close();
+  }
+
+  @Test
+  public void createFolder_CloseOnConfirm() throws Throwable {
+    verify(dialog.confirm).addConfirmListener(confirmListenerCaptor.capture());
+    confirmListenerCaptor.getValue().onComponentEvent(new ConfirmEvent(dialog.confirm, false));
+    verify(dialog).close();
   }
 
   @Test

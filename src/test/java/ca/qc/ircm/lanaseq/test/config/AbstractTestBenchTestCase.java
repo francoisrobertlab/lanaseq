@@ -183,6 +183,9 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     Method setDatasetHome = AppConfiguration.class.getDeclaredMethod("setDatasetHome", Path.class);
     setDatasetHome.setAccessible(true);
     setDatasetHome.invoke(configuration, home.resolve("dataset"));
+    Method setAnalysis = AppConfiguration.class.getDeclaredMethod("setAnalysis", Path.class);
+    setAnalysis.setAccessible(true);
+    setAnalysis.invoke(configuration, home);
   }
 
   protected Path getUpload() {

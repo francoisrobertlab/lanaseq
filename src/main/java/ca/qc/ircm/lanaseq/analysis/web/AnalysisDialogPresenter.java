@@ -8,6 +8,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class AnalysisDialogPresenter {
         validate();
       }
     });
+    dialog.confirm.addConfirmListener(e -> dialog.close());
   }
 
   void localChange(Locale locale) {
@@ -54,9 +56,10 @@ public class AnalysisDialogPresenter {
     service.validate(dataset, locale, error -> errors.add(error));
     if (!errors.isEmpty()) {
       dialog.errorsLayout.removeAll();
-      errors.forEach(error -> dialog.errorsLayout.add(error));
+      errors.forEach(error -> dialog.errorsLayout.add(new Span(error)));
       dialog.errors.open();
     }
+    dialog.createFolder.setEnabled(errors.isEmpty());
     return errors.isEmpty();
   }
 
@@ -71,15 +74,16 @@ public class AnalysisDialogPresenter {
         }).orElse(false);
         String folder = configuration.analysisLabel(dataset, unix);
         String network = configuration.folderNetwork(unix);
-        dialog.confirmLayout.add(resources.message(property(CONFIRM, "message"), folder));
+        dialog.confirmLayout.add(new Span(resources.message(property(CONFIRM, "message"), folder)));
         if (network != null) {
-          dialog.confirmLayout.add(resources.message(property(CONFIRM, "network"), network));
+          dialog.confirmLayout
+              .add(new Span(resources.message(property(CONFIRM, "network"), network)));
         }
         dialog.confirm.open();
-        dialog.close();
       } catch (IOException e) {
         dialog.errorsLayout.removeAll();
-        dialog.errorsLayout.add(resources.message(CREATE_FOLDER_EXCEPTION, dataset.getName()));
+        dialog.errorsLayout
+            .add(new Span(resources.message(CREATE_FOLDER_EXCEPTION, dataset.getName())));
         dialog.errors.open();
       } catch (IllegalArgumentException e) {
         // re-validate, something changed.
