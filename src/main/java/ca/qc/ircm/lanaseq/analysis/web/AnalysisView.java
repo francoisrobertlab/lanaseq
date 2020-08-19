@@ -9,6 +9,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetGrid;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -30,7 +31,11 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
+  public static final String SEQTOOLS = "seqtools";
+  public static final String SEQTOOLS_LINK =
+      "https://github.com/francoisrobertlab/seqtools/blob/master/ComputeCanada.md";
   protected H2 header = new H2();
+  protected Anchor seqtools = new Anchor();
   @Autowired
   protected DatasetGrid datasets;
   @Autowired
@@ -50,10 +55,13 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   @PostConstruct
   void init() {
     setId(ID);
-    add(header, datasets, dialog);
+    add(header, datasets, seqtools, dialog);
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    seqtools.setId(SEQTOOLS);
+    seqtools.setHref(SEQTOOLS_LINK);
+    seqtools.setTarget("_blank");
     presenter.init(this);
   }
 
@@ -61,6 +69,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(AnalysisView.class, getLocale());
     header.setText(resources.message(HEADER));
+    seqtools.setText(resources.message(SEQTOOLS));
     presenter.localChange(getLocale());
   }
 

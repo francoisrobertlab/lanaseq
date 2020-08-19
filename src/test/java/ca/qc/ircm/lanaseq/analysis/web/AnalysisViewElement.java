@@ -18,9 +18,10 @@
 package ca.qc.ircm.lanaseq.analysis.web;
 
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.DATASETS;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.HEADER;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.*;
 
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.testbench.elementsbase.Element;
@@ -33,6 +34,10 @@ public class AnalysisViewElement extends VerticalLayoutElement {
 
   public GridElement datasets() {
     return $(GridElement.class).id(DATASETS);
+  }
+
+  public AnchorElement seqtools() {
+    return $(AnchorElement.class).id(SEQTOOLS);
   }
 
   public AnalysisDialogElement dialog() {

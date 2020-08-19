@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.analysis.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ID;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.SEQTOOLS_LINK;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.VIEW_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -72,5 +73,15 @@ public class AnalysisViewItTest extends AbstractTestBenchTestCase {
     AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
     view.datasets().getCell(0, 0).doubleClick();
     assertTrue(view.dialog().isOpen());
+  }
+
+  @Test
+  public void seqtools() throws Throwable {
+    open();
+    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
+    assertEquals(SEQTOOLS_LINK, view.seqtools().getAttribute("href"));
+    assertEquals("_blank", view.seqtools().getAttribute("target"));
+    view.seqtools().click();
+    assertEquals(2, view.getDriver().getWindowHandles().size());
   }
 }
