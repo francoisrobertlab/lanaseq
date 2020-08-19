@@ -41,7 +41,7 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   @Autowired
-  private AnalysisDialogPresenter presenter;
+  private transient AnalysisDialogPresenter presenter;
 
   public AnalysisDialog() {
   }

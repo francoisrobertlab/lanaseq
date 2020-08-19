@@ -36,7 +36,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   @Autowired
   protected AnalysisDialog dialog;
   @Autowired
-  private AnalysisViewPresenter presenter;
+  private transient AnalysisViewPresenter presenter;
 
   public AnalysisView() {
   }
