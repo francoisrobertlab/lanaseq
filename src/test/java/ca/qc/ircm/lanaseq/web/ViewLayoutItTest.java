@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ca.qc.ircm.lanaseq.analysis.web.ConfigureAnalysisView;
+import ca.qc.ircm.lanaseq.analysis.web.AnalysisView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -152,7 +152,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
     view.analyse().click();
-    assertEquals(viewUrl(ConfigureAnalysisView.VIEW_NAME), getDriver().getCurrentUrl());
+    assertEquals(viewUrl(AnalysisView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 
   @Test

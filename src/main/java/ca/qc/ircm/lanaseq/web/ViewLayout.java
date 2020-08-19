@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.analysis.web.ConfigureAnalysisView;
+import ca.qc.ircm.lanaseq.analysis.web.AnalysisView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -113,7 +113,7 @@ public class ViewLayout extends VerticalLayout
     tabsHref.put(datasets, DatasetsView.VIEW_NAME);
     tabsHref.put(samples, SamplesView.VIEW_NAME);
     tabsHref.put(protocols, ProtocolsView.VIEW_NAME);
-    tabsHref.put(analyse, ConfigureAnalysisView.VIEW_NAME);
+    tabsHref.put(analyse, AnalysisView.VIEW_NAME);
     tabsHref.put(profile, ProfileView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
     tabs.addSelectedChangeListener(e -> selectTab());

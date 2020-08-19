@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.analysis.web.ConfigureAnalysisView;
+import ca.qc.ircm.lanaseq.analysis.web.AnalysisView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -250,13 +250,13 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.analyse);
 
-    verify(ui).navigate(ConfigureAnalysisView.VIEW_NAME);
+    verify(ui).navigate(AnalysisView.VIEW_NAME);
     verify(page, never()).executeJs(any());
   }
 
   @Test
   public void tabs_SelectAnalyseNoChange() {
-    Location location = new Location(ConfigureAnalysisView.VIEW_NAME);
+    Location location = new Location(AnalysisView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
@@ -371,7 +371,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
   @Test
   public void afterNavigation_Analyse() {
-    Location location = new Location(ConfigureAnalysisView.VIEW_NAME);
+    Location location = new Location(AnalysisView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
 
     view.afterNavigation(afterNavigationEvent);
