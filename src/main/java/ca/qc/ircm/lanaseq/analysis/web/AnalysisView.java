@@ -33,7 +33,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public static final String DATASETS = "datasets";
   public static final String SEQTOOLS = "seqtools";
   public static final String SEQTOOLS_LINK =
-      "https://github.com/francoisrobertlab/seqtools/blob/master/ComputeCanada.md";
+      "https://github.com/francoisrobertlab/seqtools/tree/master/computecanada";
   protected H2 header = new H2();
   protected Anchor seqtools = new Anchor();
   @Autowired
