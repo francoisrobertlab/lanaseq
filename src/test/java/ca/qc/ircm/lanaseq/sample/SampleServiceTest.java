@@ -184,6 +184,8 @@ public class SampleServiceTest {
     file = folder.resolve("sample_R2.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve(".deleted");
+    Files.createFile(file);
 
     List<Path> files = service.files(sample);
 

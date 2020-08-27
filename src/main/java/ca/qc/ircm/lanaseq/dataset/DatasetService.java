@@ -130,7 +130,9 @@ public class DatasetService {
     }
     Path folder = configuration.folder(dataset);
     try {
-      return Files.list(folder).collect(Collectors.toCollection(ArrayList::new));
+      return Files.list(folder)
+          .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+          .collect(Collectors.toCollection(ArrayList::new));
     } catch (IOException e) {
       return new ArrayList<>();
     }
