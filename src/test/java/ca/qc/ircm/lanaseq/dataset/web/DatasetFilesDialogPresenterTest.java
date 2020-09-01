@@ -42,7 +42,9 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -60,7 +62,9 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -90,7 +94,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetService service;
   @MockBean
-  private ProtocolService protocolService;
+  private SampleService sampleService;
   @MockBean
   private AuthorizationService authorizationService;
   @MockBean
@@ -103,6 +107,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private DatasetRepository repository;
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Mock
+  private Sample sample;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -123,9 +129,11 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.header = new H3();
     dialog.message = new Div();
     dialog.files = new Grid<>();
+    dialog.samples = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
     dialog.addFilesDialog = mock(AddDatasetFilesDialog.class);
+    dialog.sampleFilesDialog = mock(SampleFilesDialog.class);
     files.add(new File("dataset_R1.fastq"));
     files.add(new File("dataset_R2.fastq"));
     files.add(new File("dataset.bw"));
@@ -231,6 +239,11 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     }
     assertTrue(dialog.delete.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(dataset.getSamples().size(), samples.size());
+    for (Sample sample : dataset.getSamples()) {
+      assertTrue(samples.contains(sample));
+    }
     verify(dialog.addFilesDialog).setDataset(dataset);
   }
 
@@ -249,6 +262,11 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     }
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(dataset.getSamples().size(), samples.size());
+    for (Sample sample : dataset.getSamples()) {
+      assertTrue(samples.contains(sample));
+    }
   }
 
   @Test
@@ -265,6 +283,11 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     }
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(dataset.getSamples().size(), samples.size());
+    for (Sample sample : dataset.getSamples()) {
+      assertTrue(samples.contains(sample));
+    }
   }
 
   @Test(expected = NullPointerException.class)
@@ -344,6 +367,21 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void fileCount() {
+    when(sampleService.files(any())).thenReturn(
+        Arrays.asList(Paths.get("test1.txt"), Paths.get("test2.txt"), Paths.get("test3.txt")));
+    assertEquals(3, presenter.fileCount(sample));
+    verify(sampleService).files(sample);
+  }
+
+  @Test
+  public void viewFiles() {
+    presenter.viewFiles(sample);
+    verify(dialog.sampleFilesDialog).setSample(sample);
+    verify(dialog.sampleFilesDialog).open();
   }
 
   @Test

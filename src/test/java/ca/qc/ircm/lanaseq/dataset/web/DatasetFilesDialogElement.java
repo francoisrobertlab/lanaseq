@@ -18,11 +18,14 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
 
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
@@ -46,6 +49,10 @@ public class DatasetFilesDialogElement extends DialogElement {
     return files().getCell(row, DELETE_COLUMN).$(ButtonElement.class).first();
   }
 
+  public GridElement samples() {
+    return $(GridElement.class).id(id(SAMPLES));
+  }
+
   public TextFieldElement filenameEdit() {
     return $(TextFieldElement.class).id(id(FILENAME));
   }
@@ -56,5 +63,9 @@ public class DatasetFilesDialogElement extends DialogElement {
 
   public AddDatasetFilesDialogElement addFilesDialog() {
     return $(AddDatasetFilesDialogElement.class).id(AddDatasetFilesDialog.ID);
+  }
+
+  public SampleFilesDialogElement sampleFilesDialog() {
+    return $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID);
   }
 }

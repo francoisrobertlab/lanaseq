@@ -75,8 +75,10 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     DatasetFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
+    assertTrue(optional(() -> dialog.samples()).isPresent());
     assertTrue(optional(() -> dialog.add()).isPresent());
     assertTrue(optional(() -> dialog.addFilesDialog()).isPresent());
+    assertTrue(optional(() -> dialog.sampleFilesDialog()).isPresent());
   }
 
   @Test
@@ -131,6 +133,17 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test
+  public void viewFiles_Sample() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.datasets().controlClick(0);
+    DatasetFilesDialogElement dialog = view.filesDialog();
+    dialog.samples().getCell(0, 0).doubleClick();
+
+    assertTrue(dialog.sampleFilesDialog().isOpen());
   }
 
   @Test

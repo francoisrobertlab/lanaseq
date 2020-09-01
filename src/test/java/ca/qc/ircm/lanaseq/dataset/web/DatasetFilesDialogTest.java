@@ -19,12 +19,16 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_COUNT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,6 +43,8 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -68,6 +74,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -89,16 +97,24 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<ComponentRenderer<Button, EditableFile>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<EditorCloseListener<EditableFile>> closeListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ValueProvider<Sample, String>> sampleNameProviderCaptor;
+  @Captor
+  private ArgumentCaptor<ValueProvider<Sample, Integer>> sampleFileCountProviderCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Mock
   private ComponentEventListener<DeletedEvent<DatasetDialog>> deletedListener;
   @Autowired
-  private DatasetRepository datasetRepository;
+  private DatasetRepository repository;
+  @Autowired
+  private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
+  private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<File> files = new ArrayList<>();
+  private List<Sample> samples = new ArrayList<>();
 
   /**
    * Before test.
@@ -110,6 +126,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     files.add(new File("dataset", "dataset_R2.fastq"));
     files.add(new File("dataset", "dataset.bw"));
     files.add(new File("dataset", "dataset.png"));
+    samples = sampleRepository.findAll();
   }
 
   @SuppressWarnings("unchecked")
@@ -131,6 +148,19 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.delete.setKey(any())).thenReturn(dialog.delete);
     when(dialog.delete.setComparator(any(Comparator.class))).thenReturn(dialog.delete);
     when(dialog.delete.setHeader(any(String.class))).thenReturn(dialog.delete);
+    Element samplesElement = dialog.samples.getElement();
+    dialog.samples = mock(Grid.class);
+    when(dialog.samples.getElement()).thenReturn(samplesElement);
+    dialog.name = mock(Column.class);
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(dialog.name);
+    when(dialog.name.setKey(any())).thenReturn(dialog.name);
+    when(dialog.name.setWidth(any())).thenReturn(dialog.name);
+    when(dialog.name.setHeader(any(String.class))).thenReturn(dialog.name);
+    dialog.fileCount = mock(Column.class);
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(FILE_COUNT)))
+        .thenReturn(dialog.fileCount);
+    when(dialog.fileCount.setKey(any())).thenReturn(dialog.fileCount);
+    when(dialog.fileCount.setHeader(any(String.class))).thenReturn(dialog.fileCount);
   }
 
   @Test
@@ -145,6 +175,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
+    assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(ADD), dialog.add.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), dialog.add.getIcon());
   }
@@ -157,6 +188,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), dialog.header.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));
     verify(dialog.delete).setHeader(webResources.message(DELETE));
+    verify(dialog.name).setHeader(sampleResources.message(NAME));
+    verify(dialog.fileCount).setHeader(resources.message(FILE_COUNT));
     verify(presenter).localeChange(locale);
   }
 
@@ -173,6 +206,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), dialog.header.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));
     verify(dialog.delete).setHeader(webResources.message(DELETE));
+    verify(dialog.name).setHeader(sampleResources.message(NAME));
+    verify(dialog.fileCount).setHeader(resources.message(FILE_COUNT));
     verify(presenter).localeChange(locale);
   }
 
@@ -220,6 +255,45 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void samples() {
+    assertEquals(2, dialog.samples.getColumns().size());
+    assertNotNull(dialog.samples.getColumnByKey(NAME));
+    assertNotNull(dialog.samples.getColumnByKey(FILE_COUNT));
+  }
+
+  @Test
+  public void samples_ColumnsValueProvider() {
+    mockColumns();
+    dialog.init();
+    verify(dialog.samples).addColumn(sampleNameProviderCaptor.capture(), eq(NAME));
+    ValueProvider<Sample, String> valueProvider = sampleNameProviderCaptor.getValue();
+    for (Sample sample : samples) {
+      assertEquals(sample.getName(), valueProvider.apply(sample));
+    }
+    verify(dialog.samples).addColumn(sampleFileCountProviderCaptor.capture(), eq(FILE_COUNT));
+    ValueProvider<Sample, Integer> fileCountProvider = sampleFileCountProviderCaptor.getValue();
+    when(presenter.fileCount(any())).then(new Answer<Integer>() {
+      int count = 0;
+
+      @Override
+      public Integer answer(InvocationOnMock invocation) throws Throwable {
+        return count++;
+      }
+    });
+    for (Sample sample : samples) {
+      assertEquals((Integer) samples.indexOf(sample), fileCountProvider.apply(sample));
+      verify(presenter).fileCount(sample);
+    }
+  }
+
+  @Test
+  public void samples_ViewFiles() {
+    Sample sample = samples.get(0);
+    doubleClickItem(dialog.samples, sample);
+    verify(presenter).viewFiles(sample);
+  }
+
+  @Test
   public void getDataset() {
     when(presenter.getDataset()).thenReturn(dataset);
     assertEquals(dataset, dialog.getDataset());
@@ -253,7 +327,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void setDataset_Dataset() {
-    Dataset dataset = datasetRepository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).get();
     when(presenter.getDataset()).thenReturn(dataset);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
@@ -265,7 +339,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void setDataset_BeforeLocaleChange() {
-    Dataset dataset = datasetRepository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).get();
     when(presenter.getDataset()).thenReturn(dataset);
 
     dialog.setDataset(dataset);

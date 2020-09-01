@@ -31,6 +31,8 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
@@ -64,14 +66,16 @@ public class DatasetFilesDialogPresenter {
   private Dataset dataset;
   private Locale locale;
   private DatasetService service;
+  private SampleService sampleService;
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
 
   @Autowired
-  protected DatasetFilesDialogPresenter(DatasetService service,
+  protected DatasetFilesDialogPresenter(DatasetService service, SampleService sampleService,
       AuthorizationService authorizationService, AppConfiguration configuration) {
     this.service = service;
+    this.sampleService = sampleService;
     this.authorizationService = authorizationService;
     this.configuration = configuration;
   }
@@ -131,6 +135,15 @@ public class DatasetFilesDialogPresenter {
         || !authorizationService.hasPermission(dataset, Permission.WRITE);
   }
 
+  int fileCount(Sample sample) {
+    return sampleService.files(sample).size();
+  }
+
+  void viewFiles(Sample sample) {
+    dialog.sampleFilesDialog.setSample(sample);
+    dialog.sampleFilesDialog.open();
+  }
+
   void add() {
     if (!isReadOnly()) {
       dialog.addFilesDialog.open();
@@ -174,6 +187,7 @@ public class DatasetFilesDialogPresenter {
     boolean readOnly = isReadOnly();
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
+    dialog.samples.setItems(dataset.getSamples());
     dialog.addFilesDialog.setDataset(dataset);
     updateMessage();
     updateFiles();

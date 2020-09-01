@@ -19,12 +19,16 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -67,6 +71,7 @@ public class DatasetFilesDialog extends Dialog
   public static final String FILENAME_REGEX = "[\\w-\\.]*";
   public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
   public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
+  public static final String FILE_COUNT = "fileCount";
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
@@ -74,18 +79,24 @@ public class DatasetFilesDialog extends Dialog
   protected Column<EditableFile> filename;
   protected Column<EditableFile> delete;
   protected TextField filenameEdit = new TextField();
+  protected Grid<Sample> samples = new Grid<>();
+  protected Column<Sample> name;
+  protected Column<Sample> fileCount;
   protected Button add = new Button();
   @Autowired
   protected AddDatasetFilesDialog addFilesDialog;
+  @Autowired
+  protected SampleFilesDialog sampleFilesDialog;
   @Autowired
   private transient DatasetFilesDialogPresenter presenter;
 
   protected DatasetFilesDialog() {
   }
 
-  protected DatasetFilesDialog(AddDatasetFilesDialog addFilesDialog,
-      DatasetFilesDialogPresenter presenter) {
+  protected DatasetFilesDialog(DatasetFilesDialogPresenter presenter,
+      AddDatasetFilesDialog addFilesDialog, SampleFilesDialog sampleFilesDialog) {
     this.addFilesDialog = addFilesDialog;
+    this.sampleFilesDialog = sampleFilesDialog;
     this.presenter = presenter;
   }
 
@@ -101,7 +112,7 @@ public class DatasetFilesDialog extends Dialog
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
     layout.setHeight("40em");
-    layout.add(header, message, files, add, addFilesDialog);
+    layout.add(header, message, files, samples, add, addFilesDialog, sampleFilesDialog);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
@@ -118,6 +129,10 @@ public class DatasetFilesDialog extends Dialog
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
+    samples.setId(id(SAMPLES));
+    samples.addItemDoubleClickListener(e -> presenter.viewFiles(e.getItem()));
+    name = samples.addColumn(sa -> sa.getName(), NAME).setKey(NAME).setWidth("35em");
+    fileCount = samples.addColumn(sa -> presenter.fileCount(sa), FILE_COUNT).setKey(FILE_COUNT);
     add.setId(id(ADD));
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> presenter.add());
@@ -136,12 +151,15 @@ public class DatasetFilesDialog extends Dialog
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(DatasetFilesDialog.class, getLocale());
+    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
     message.setText("");
     message.setTitle("");
     filename.setHeader(resources.message(FILENAME));
     delete.setHeader(webResources.message(DELETE));
+    name.setHeader(sampleResources.message(NAME));
+    fileCount.setHeader(resources.message(FILE_COUNT));
     add.setText(webResources.message(ADD));
     updateHeader();
     presenter.localeChange(getLocale());
