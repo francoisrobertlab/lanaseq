@@ -54,7 +54,6 @@ public class SelectSampleDialogPresenter {
   }
 
   void init(SelectSampleDialog dialog) {
-    logger.debug("select sample dialog");
     this.dialog = dialog;
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       dialog.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
@@ -71,6 +70,7 @@ public class SelectSampleDialogPresenter {
   }
 
   public void select(Sample sample) {
+    logger.debug("selected sample {}", sample);
     dialog.fireSelectedEvent(sample);
     dialog.close();
   }

@@ -44,8 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -56,7 +54,6 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SamplesViewPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(SamplesViewPresenter.class);
   private SamplesView view;
   private ListDataProvider<Sample> samplesDataProvider;
   private WebSampleFilter filter = new WebSampleFilter();
@@ -75,7 +72,6 @@ public class SamplesViewPresenter {
   }
 
   void init(SamplesView view) {
-    logger.debug("samples view");
     this.view = view;
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
