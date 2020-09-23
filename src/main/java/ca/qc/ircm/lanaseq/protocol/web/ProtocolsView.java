@@ -50,6 +50,8 @@ import com.vaadin.flow.router.Route;
 import java.time.format.DateTimeFormatter;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,6 +65,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public static final String HEADER = "header";
   public static final String PROTOCOLS = "protocols";
   private static final long serialVersionUID = -2370599174391239721L;
+  private static final Logger logger = LoggerFactory.getLogger(ProtocolsView.class);
   protected H2 header = new H2();
   protected Grid<Protocol> protocols = new Grid<>();
   protected Column<Protocol> name;
@@ -91,6 +94,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
 
   @PostConstruct
   void init() {
+    logger.debug("protocols view");
     setId(ID);
     add(header, protocols, add, dialog, historyDialog);
     header.setId(HEADER);
