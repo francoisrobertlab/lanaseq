@@ -39,6 +39,8 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,6 +55,7 @@ public class ProfileView extends VerticalLayout
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = 1252966315920684518L;
+  private static final Logger logger = LoggerFactory.getLogger(ProfileView.class);
   protected H2 header = new H2();
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
@@ -73,6 +76,7 @@ public class ProfileView extends VerticalLayout
    */
   @PostConstruct
   protected void init() {
+    logger.debug("profile view");
     setId(ID);
     setMaxWidth("40em");
     add(header, form, save);

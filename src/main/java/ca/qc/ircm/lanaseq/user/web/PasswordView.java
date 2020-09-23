@@ -36,6 +36,8 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,6 +51,7 @@ public class PasswordView extends VerticalLayout
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = -8554355390432590290L;
+  private Logger logger = LoggerFactory.getLogger(PasswordView.class);
   protected H2 header = new H2();
   protected PasswordsForm passwords = new PasswordsForm();
   protected Button save = new Button();
@@ -64,6 +67,7 @@ public class PasswordView extends VerticalLayout
 
   @PostConstruct
   void init() {
+    logger.debug("force change password view");
     setId(ID);
     add(header, passwords, save);
     header.setId(HEADER);

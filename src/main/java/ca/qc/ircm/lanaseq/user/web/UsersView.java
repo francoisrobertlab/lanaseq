@@ -112,6 +112,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   @SuppressWarnings("unchecked")
   @PostConstruct
   void init() {
+    logger.debug("users view");
     setId(ID);
     add(header, users, error, new HorizontalLayout(add, switchUser), userDialog);
     header.setId(HEADER);
