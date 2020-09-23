@@ -71,7 +71,6 @@ public class SigninView extends LoginOverlay
   public static final String DISABLED = "disabled";
   public static final String LOCKED = "locked";
   private static final long serialVersionUID = 638443368018456019L;
-  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;
   protected String error;
@@ -91,6 +90,7 @@ public class SigninView extends LoginOverlay
 
   @PostConstruct
   void init() {
+    logger.debug("signin view");
     setId(ID);
     addLoginListener(e -> setError(false));
     setForgotPasswordButtonVisible(true);
@@ -102,6 +102,7 @@ public class SigninView extends LoginOverlay
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
     // Redirect to main view if user is known.
+    logger.debug("user is known, redirecting to main view");
     if (!authorizationService.isAnonymous()) {
       event.forwardTo(MainView.class);
     }
