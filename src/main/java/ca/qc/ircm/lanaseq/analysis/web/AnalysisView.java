@@ -18,6 +18,8 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = AnalysisView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ USER })
 public class AnalysisView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
-  private static final long serialVersionUID = 6718796782451862327L;
   public static final String VIEW_NAME = "analysis";
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
@@ -34,6 +35,8 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public static final String SEQTOOLS = "seqtools";
   public static final String SEQTOOLS_LINK =
       "https://github.com/francoisrobertlab/seqtools/tree/master/computecanada";
+  private static final long serialVersionUID = 6718796782451862327L;
+  private static final Logger logger = LoggerFactory.getLogger(AnalysisView.class);
   protected H2 header = new H2();
   protected Anchor seqtools = new Anchor();
   @Autowired
@@ -54,6 +57,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
 
   @PostConstruct
   void init() {
+    logger.debug("analysis view");
     setId(ID);
     add(header, datasets, seqtools, dialog);
     header.setId(HEADER);
