@@ -40,8 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -52,7 +50,6 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetsViewPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(DatasetsViewPresenter.class);
   private DatasetsView view;
   @Autowired
   private DatasetService service;
@@ -72,7 +69,6 @@ public class DatasetsViewPresenter {
   }
 
   void init(DatasetsView view) {
-    logger.debug("Datasets view");
     this.view = view;
     view.dialog.addSavedListener(e -> view.datasets.refreshDatasets());
     view.protocolDialog.addSavedListener(e -> view.datasets.refreshDatasets());
