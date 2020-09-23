@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AnalysisDialogPresenter {
+  private static final Logger logger = LoggerFactory.getLogger(AnalysisDialogPresenter.class);
   private AnalysisDialog dialog;
   private Dataset dataset;
   private Locale locale;
@@ -65,6 +68,7 @@ public class AnalysisDialogPresenter {
 
   void createFolder() {
     if (validate()) {
+      logger.debug("creating analysis folder for dataset {}", dataset);
       AppResources resources = new AppResources(AnalysisDialog.class, locale);
       try {
         service.copyResources(dataset);

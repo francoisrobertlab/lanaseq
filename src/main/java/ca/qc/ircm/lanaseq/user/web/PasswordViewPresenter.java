@@ -56,7 +56,6 @@ public class PasswordViewPresenter {
   }
 
   void init(PasswordView view) {
-    logger.debug("force change password view");
     this.view = view;
     view.passwords.setRequired(true);
   }

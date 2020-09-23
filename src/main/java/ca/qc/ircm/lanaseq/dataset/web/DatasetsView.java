@@ -46,6 +46,8 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -66,6 +68,7 @@ public class DatasetsView extends VerticalLayout
   public static final String DATASETS_MORE_THAN_ONE = property(DATASETS, "moreThanOne");
   public static final String MERGED = "merged";
   private static final long serialVersionUID = 2568742367790329628L;
+  private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
   protected H2 header = new H2();
   protected Div error = new Div();
   protected Button add = new Button();
@@ -96,6 +99,7 @@ public class DatasetsView extends VerticalLayout
 
   @PostConstruct
   void init() {
+    logger.debug("datasets view");
     setId(ID);
     add(header, datasets, error, new HorizontalLayout(add, merge, files), dialog, filesDialog,
         protocolDialog);

@@ -58,6 +58,8 @@ import com.vaadin.flow.router.Route;
 import java.time.format.DateTimeFormatter;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -79,6 +81,7 @@ public class SamplesView extends VerticalLayout
   public static final String SAMPLES_CANNOT_WRITE = property(SAMPLES, "cannotWrite");
   public static final String MERGE_ERROR = property(MERGE, "error");
   private static final long serialVersionUID = -6945706067250351889L;
+  private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
   protected H2 header = new H2();
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
@@ -115,6 +118,7 @@ public class SamplesView extends VerticalLayout
 
   @PostConstruct
   void init() {
+    logger.debug("samples view");
     setId(ID);
     add(header, samples, error, new HorizontalLayout(add, merge, files), dialog, filesDialog,
         protocolDialog);

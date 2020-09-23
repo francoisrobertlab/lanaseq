@@ -109,7 +109,7 @@ public class ProtocolDialogPresenter {
   }
 
   void addFile(String filename, InputStream input, Locale locale) {
-    logger.debug("received file {}", filename);
+    logger.trace("received file {}", filename);
     ProtocolFile file = new ProtocolFile();
     file.setFilename(filename);
     ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -155,6 +155,7 @@ public class ProtocolDialogPresenter {
   void save(Locale locale) {
     if (isValid(locale)) {
       Protocol protocol = binder.getBean();
+      logger.debug("save protocol {}", protocol);
       service.save(protocol, new ArrayList<>(filesDataProvider.getItems()));
       final AppResources resources = new AppResources(ProtocolDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, protocol.getName()));

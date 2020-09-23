@@ -205,7 +205,6 @@ public class DatasetDialogPresenter {
         && !validateSamples().stream().filter(status -> !status.isOk()).findAny().isPresent();
     if (valid) {
       Dataset dataset = binder.getBean();
-      logger.debug("Save dataset {}", dataset);
       dataset.setSamples(new ArrayList<>(samples));
       for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
         if (empty(dataset.getSamples().get(i))) {
@@ -216,7 +215,6 @@ public class DatasetDialogPresenter {
       for (Sample sample : dataset.getSamples()) {
         copy(from, sample);
         if (sample.getId() == null) {
-          logger.debug("updating date for sample with name: {}", sample.getName());
           sample.setDate(dataset.getDate());
         }
       }
@@ -235,7 +233,7 @@ public class DatasetDialogPresenter {
   void save() {
     if (validate()) {
       Dataset dataset = binder.getBean();
-      logger.debug("Save dataset {}", dataset);
+      logger.debug("save dataset {}", dataset);
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
       dialog.showNotification(resources.message(SAVED, dataset.getName()));
