@@ -89,7 +89,7 @@ public class ForgotPasswordView extends VerticalLayout
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     presenter.init(this);
   }
 

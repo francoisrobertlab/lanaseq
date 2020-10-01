@@ -19,8 +19,8 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
+import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -50,6 +50,7 @@ public class ForgotPasswordViewPresenter {
   private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordViewPresenter.class);
   private ForgotPasswordView view;
   private Binder<User> binder = new BeanValidationBinder<User>(User.class);
+  private Locale locale;
   private ForgotPasswordService service;
   private UserService userService;
 
@@ -65,6 +66,7 @@ public class ForgotPasswordViewPresenter {
   }
 
   void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(view.email).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
@@ -79,7 +81,7 @@ public class ForgotPasswordViewPresenter {
     return validateUser().isOk();
   }
 
-  void save(Locale locale) {
+  void save() {
     if (validate()) {
       String email = view.email.getValue();
       logger.debug("create new forgot password for user {}", view.email.getValue());

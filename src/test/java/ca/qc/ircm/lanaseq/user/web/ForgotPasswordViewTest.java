@@ -120,7 +120,7 @@ public class ForgotPasswordViewTest extends AbstractViewTestCase {
   public void save() {
     clickButton(view.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test

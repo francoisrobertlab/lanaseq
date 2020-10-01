@@ -93,6 +93,8 @@ public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
     forgotPassword.setId(id);
     forgotPassword.setConfirmNumber(confirmNumber);
     when(service.insert(any(), any())).thenReturn(forgotPassword);
+    presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   private void setFields() {
@@ -100,18 +102,11 @@ public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
   }
 
   @Test
-  public void init() {
-    presenter.init(view);
-  }
-
-  @Test
   @SuppressWarnings("unchecked")
   public void save_EmailEmtpy() {
-    presenter.init(view);
-    presenter.localeChange(locale);
     view.email.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<User> status = presenter.validateUser();
     assertFalse(status.isOk());
@@ -128,11 +123,9 @@ public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void save_EmailInvalid() {
-    presenter.init(view);
-    presenter.localeChange(locale);
     view.email.setValue("test");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<User> status = presenter.validateUser();
     assertFalse(status.isOk());
@@ -148,11 +141,9 @@ public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_EmailNotExists() {
-    presenter.init(view);
-    presenter.localeChange(locale);
     setFields();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(userService).exists(email);
     verify(service, never()).insert(any(), any());
@@ -165,11 +156,9 @@ public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
     String viewUrl = "/usefp";
     when(userService.exists(any())).thenReturn(true);
     when(view.getUrl(any())).thenReturn(viewUrl);
-    presenter.init(view);
-    presenter.localeChange(locale);
     setFields();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(userService).exists(email);
     verify(service).insert(eq(email), webContextCaptor.capture());
