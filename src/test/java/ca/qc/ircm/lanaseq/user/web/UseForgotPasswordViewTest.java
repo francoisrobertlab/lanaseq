@@ -125,6 +125,6 @@ public class UseForgotPasswordViewTest extends AbstractViewTestCase {
   public void setParameter() {
     String parameter = "test";
     view.setParameter(beforeEvent, parameter);
-    verify(presenter).setParameter(parameter);
+    verify(presenter).setParameter(parameter, locale);
   }
 }

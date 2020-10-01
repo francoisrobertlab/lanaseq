@@ -71,7 +71,7 @@ public class UseForgotPasswordViewPresenter {
     }
   }
 
-  private boolean validateParameter(String parameter) {
+  private boolean validateParameter(String parameter, Locale locale) {
     final AppResources resources = new AppResources(UseForgotPasswordView.class, locale);
     if (parameter == null) {
       view.showNotification(resources.message(INVALID));
@@ -99,8 +99,8 @@ public class UseForgotPasswordViewPresenter {
     return valid;
   }
 
-  void setParameter(String parameter) {
-    if (validateParameter(parameter)) {
+  void setParameter(String parameter, Locale locale) {
+    if (validateParameter(parameter, locale)) {
       String[] parameters = parameter.split(SEPARATOR, -1);
       long id = Long.parseLong(parameters[0]);
       String confirmNumber = parameters[1];

@@ -82,7 +82,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void save_Invalid() {
-    presenter.setParameter(parameter);
+    presenter.setParameter(parameter, locale);
 
     presenter.save();
 
@@ -95,7 +95,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
     String password = "test_password";
     when(view.form.isValid()).thenReturn(true);
     when(view.form.getPassword()).thenReturn(password);
-    presenter.setParameter(parameter);
+    presenter.setParameter(parameter, locale);
 
     presenter.save();
 
@@ -107,7 +107,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setParameter() {
-    presenter.setParameter(parameter);
+    presenter.setParameter(parameter, locale);
     verify(service, atLeastOnce()).get(id, confirmNumber);
     assertTrue(view.save.isEnabled());
     verify(view.form, never()).setEnabled(false);
@@ -115,7 +115,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setParameter_IdNotNumber() {
-    presenter.setParameter("A434GS");
+    presenter.setParameter("A434GS", locale);
     verify(service, never()).get(id, confirmNumber);
     verify(view).showNotification(resources.message(INVALID));
     assertFalse(view.save.isEnabled());
@@ -124,7 +124,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setParameter_MissingConfirm() {
-    presenter.setParameter(String.valueOf(id));
+    presenter.setParameter(String.valueOf(id), locale);
     verify(service, never()).get(id, confirmNumber);
     verify(view).showNotification(resources.message(INVALID));
     assertFalse(view.save.isEnabled());
@@ -134,7 +134,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
   @Test
   public void setParameter_NullForgotPassword() {
     when(service.get(any(Long.class), any())).thenReturn(null);
-    presenter.setParameter(parameter);
+    presenter.setParameter(parameter, locale);
     verify(service).get(id, confirmNumber);
     verify(view).showNotification(resources.message(INVALID));
     assertFalse(view.save.isEnabled());
@@ -143,7 +143,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setParameter_Null() {
-    presenter.setParameter(null);
+    presenter.setParameter(null, locale);
     verify(service, never()).get(id, confirmNumber);
     verify(view).showNotification(resources.message(INVALID));
     assertFalse(view.save.isEnabled());

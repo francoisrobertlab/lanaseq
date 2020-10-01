@@ -108,6 +108,6 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
 
   @Override
   public void setParameter(BeforeEvent event, @WildcardParameter String parameter) {
-    presenter.setParameter(parameter);
+    presenter.setParameter(parameter, getLocale());
   }
 }
