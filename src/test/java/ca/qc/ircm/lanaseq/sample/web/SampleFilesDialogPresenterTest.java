@@ -404,7 +404,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     random.nextBytes(bytes);
     Files.write(path.toPath(), bytes);
 
-    presenter.rename(file, locale);
+    presenter.rename(file);
 
     assertTrue(Files.exists(path.toPath().resolveSibling("target.txt")));
     assertArrayEquals(bytes, Files.readAllBytes(path.toPath().resolveSibling("target.txt")));
@@ -421,7 +421,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     random.nextBytes(bytes);
     Files.write(path.toPath(), bytes);
 
-    presenter.deleteFile(file, locale);
+    presenter.deleteFile(file);
 
     verify(service).deleteFile(sample, file.getFile().toPath());
   }

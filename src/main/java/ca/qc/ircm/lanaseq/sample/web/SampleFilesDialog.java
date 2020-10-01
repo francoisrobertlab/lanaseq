@@ -106,7 +106,7 @@ public class SampleFilesDialog extends Dialog
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
     files.setSizeFull();
-    files.getEditor().addCloseListener(e -> presenter.rename(e.getItem(), getLocale()));
+    files.getEditor().addCloseListener(e -> presenter.rename(e.getItem()));
     files.addItemDoubleClickListener(e -> {
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
@@ -129,7 +129,7 @@ public class SampleFilesDialog extends Dialog
     button.addClassName(DELETE);
     button.setIcon(VaadinIcon.TRASH.create());
     button.addThemeVariants(ButtonVariant.LUMO_ERROR);
-    button.addClickListener(e -> presenter.deleteFile(file, getLocale()));
+    button.addClickListener(e -> presenter.deleteFile(file));
     return button;
   }
 

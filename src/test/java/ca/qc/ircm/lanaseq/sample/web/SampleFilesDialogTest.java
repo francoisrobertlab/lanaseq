@@ -204,7 +204,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
       validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
       assertEquals("", button.getText());
       button.click();
-      verify(presenter).deleteFile(file, locale);
+      verify(presenter).deleteFile(file);
     }
   }
 
@@ -216,7 +216,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
     verify(dialog.files.getEditor()).addCloseListener(closeListenerCaptor.capture());
     EditorCloseListener<EditableFile> listener = closeListenerCaptor.getValue();
     listener.onEditorClose(new EditorCloseEvent<>(dialog.files.getEditor(), file));
-    verify(presenter).rename(file, locale);
+    verify(presenter).rename(file);
   }
 
   @Test

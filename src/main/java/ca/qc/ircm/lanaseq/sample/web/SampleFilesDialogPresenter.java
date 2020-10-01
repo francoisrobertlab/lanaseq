@@ -63,10 +63,11 @@ public class SampleFilesDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(SampleFilesDialogPresenter.class);
   private SampleFilesDialog dialog;
   private Sample sample;
+  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
+  private Locale locale;
   private SampleService service;
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
-  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
 
   @Autowired
   protected SampleFilesDialogPresenter(SampleService service,
@@ -84,16 +85,17 @@ public class SampleFilesDialogPresenter {
   }
 
   public void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     fileBinder.forField(dialog.filenameEdit).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
         .withValidator(new RegexpValidator(resources.message(FILENAME_REGEX_ERROR), FILENAME_REGEX))
-        .withValidator(exists(locale)).bind(FILENAME);
+        .withValidator(exists()).bind(FILENAME);
     updateMessage();
   }
 
-  private Validator<String> exists(Locale locale) {
+  private Validator<String> exists() {
     return (value, context) -> {
       EditableFile item = dialog.files.getEditor().getItem();
       if (value != null && item != null && !value.equals(item.getFile().getName())
@@ -107,7 +109,7 @@ public class SampleFilesDialogPresenter {
 
   private void updateMessage() {
     dialog.getUI().ifPresent(ui -> {
-      final AppResources resources = new AppResources(SampleFilesDialog.class, ui.getLocale());
+      final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (sample != null) {
@@ -135,7 +137,7 @@ public class SampleFilesDialogPresenter {
     }
   }
 
-  void rename(EditableFile file, Locale locale) {
+  void rename(EditableFile file) {
     Path source = file.getFile().toPath();
     Path target = source.resolveSibling(file.getFilename());
     try {
@@ -150,7 +152,7 @@ public class SampleFilesDialogPresenter {
     }
   }
 
-  void deleteFile(EditableFile file, Locale locale) {
+  void deleteFile(EditableFile file) {
     File path = file.getFile();
     logger.debug("delete file {}", path);
     service.deleteFile(sample, path.toPath());
