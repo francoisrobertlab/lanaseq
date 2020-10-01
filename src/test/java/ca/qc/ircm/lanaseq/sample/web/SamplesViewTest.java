@@ -188,6 +188,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -216,6 +217,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -352,12 +354,12 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   @Test
   public void merge() {
     clickButton(view.merge);
-    verify(presenter).merge(locale);
+    verify(presenter).merge();
   }
 
   @Test
   public void files() {
     clickButton(view.files);
-    verify(presenter).viewFiles(locale);
+    verify(presenter).viewFiles();
   }
 }

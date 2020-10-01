@@ -137,6 +137,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   @Test
@@ -263,7 +264,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   public void viewFiles() {
     Sample sample = samples.get(0);
     view.samples.select(sample);
-    presenter.viewFiles(locale);
+    presenter.viewFiles();
     assertFalse(view.error.isVisible());
     verify(view.filesDialog).setSample(sample);
     verify(view.filesDialog).open();
@@ -271,7 +272,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void viewFiles_NoSelection() {
-    presenter.viewFiles(locale);
+    presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
     verify(view.filesDialog, never()).setSample(any());
@@ -282,7 +283,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   public void viewFiles_MoreThanOneSampleSelected() {
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
-    presenter.viewFiles(locale);
+    presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_MORE_THAN_ONE), view.error.getText());
     verify(view.filesDialog, never()).setSample(any());
@@ -321,7 +322,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.isMergable(any())).thenReturn(true);
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
-    presenter.merge(locale);
+    presenter.merge();
     assertFalse(view.error.isVisible());
     verify(service).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
@@ -343,7 +344,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.isMergable(any())).thenReturn(true);
     view.samples.select(samples.get(1));
     view.samples.select(samples.get(0));
-    presenter.merge(locale);
+    presenter.merge();
     assertFalse(view.error.isVisible());
     verify(service).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
@@ -362,7 +363,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void merge_NoSamples() {
-    presenter.merge(locale);
+    presenter.merge();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
     verify(service, never()).isMergable(any());
@@ -375,7 +376,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.isMergable(any())).thenReturn(false);
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
-    presenter.merge(locale);
+    presenter.merge();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(MERGE_ERROR), view.error.getText());
     verify(service).isMergable(samplesCaptor.capture());
@@ -392,7 +393,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(datasetService.exists(any())).thenReturn(true);
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
-    presenter.merge(locale);
+    presenter.merge();
     assertTrue(view.error.isVisible());
     assertEquals(datasetResources.message(NAME_ALREADY_EXISTS,
         "MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"), view.error.getText());

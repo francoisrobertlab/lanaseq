@@ -57,6 +57,7 @@ public class SamplesViewPresenter {
   private SamplesView view;
   private ListDataProvider<Sample> samplesDataProvider;
   private WebSampleFilter filter = new WebSampleFilter();
+  private Locale locale;
   private SampleService service;
   private ProtocolService protocolService;
   private DatasetService datasetService;
@@ -81,6 +82,10 @@ public class SamplesViewPresenter {
     view.protocolDialog.addSavedListener(e -> loadSamples());
   }
 
+  public void localeChange(Locale locale) {
+    this.locale = locale;
+  }
+
   private void loadSamples() {
     samplesDataProvider = DataProvider.ofCollection(service.all());
     ConfigurableFilterDataProvider<Sample, Void, SerializablePredicate<Sample>> dataProvider =
@@ -99,7 +104,7 @@ public class SamplesViewPresenter {
     view.filesDialog.open();
   }
 
-  public void viewFiles(Locale locale) {
+  public void viewFiles() {
     List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
     AppResources resources = new AppResources(SamplesView.class, locale);
     boolean error = false;
@@ -127,7 +132,7 @@ public class SamplesViewPresenter {
     view.dialog.open();
   }
 
-  public void merge(Locale locale) {
+  public void merge() {
     List<Sample> samples = view.samples.getSelectedItems().stream()
         .sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).collect(Collectors.toList());
     AppResources resources = new AppResources(SamplesView.class, locale);
