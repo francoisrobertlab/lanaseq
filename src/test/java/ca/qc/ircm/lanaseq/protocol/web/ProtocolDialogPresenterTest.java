@@ -151,13 +151,13 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
   private void fillFields() {
     dialog.name.setValue(name);
-    presenter.addFile(filename, new ByteArrayInputStream(fileContent), locale);
+    presenter.addFile(filename, new ByteArrayInputStream(fileContent));
   }
 
   @Test
   public void addFile() {
     dialog.files.getDataProvider().addDataProviderListener(filesDataProviderListener);
-    presenter.addFile(filename, new ByteArrayInputStream(fileContent), locale);
+    presenter.addFile(filename, new ByteArrayInputStream(fileContent));
     List<ProtocolFile> files = items(dialog.files);
     assertEquals(1, files.size());
     ProtocolFile file = files.get(0);
@@ -173,7 +173,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     when(input.read()).thenThrow(new IOException());
     when(input.read(any())).thenThrow(new IOException());
     when(input.read(any(), anyInt(), anyInt())).thenThrow(new IOException());
-    presenter.addFile(filename, input, locale);
+    presenter.addFile(filename, input);
     verify(dialog).showNotification(resources.message(FILES_IOEXCEPTION, filename));
     assertTrue(items(dialog.files).isEmpty());
     verify(filesDataProviderListener, never()).onDataChange(any());
@@ -181,14 +181,14 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void addFile_OverMaximum() throws Throwable {
-    presenter.addFile(filename, new ByteArrayInputStream(fileContent), locale);
-    presenter.addFile(filename + "1", new ByteArrayInputStream(fileContent), locale);
-    presenter.addFile(filename + "2", new ByteArrayInputStream(fileContent), locale);
-    presenter.addFile(filename + "3", new ByteArrayInputStream(fileContent), locale);
-    presenter.addFile(filename + "4", new ByteArrayInputStream(fileContent), locale);
-    presenter.addFile(filename + "5", new ByteArrayInputStream(fileContent), locale);
+    presenter.addFile(filename, new ByteArrayInputStream(fileContent));
+    presenter.addFile(filename + "1", new ByteArrayInputStream(fileContent));
+    presenter.addFile(filename + "2", new ByteArrayInputStream(fileContent));
+    presenter.addFile(filename + "3", new ByteArrayInputStream(fileContent));
+    presenter.addFile(filename + "4", new ByteArrayInputStream(fileContent));
+    presenter.addFile(filename + "5", new ByteArrayInputStream(fileContent));
     dialog.files.getDataProvider().addDataProviderListener(filesDataProviderListener);
-    presenter.addFile(filename + "6", new ByteArrayInputStream(fileContent), locale);
+    presenter.addFile(filename + "6", new ByteArrayInputStream(fileContent));
     verify(dialog).showNotification(resources.message(FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT));
     assertEquals(MAXIMUM_FILES_COUNT, items(dialog.files).size());
     assertEquals(filename, items(dialog.files).get(0).getFilename());
@@ -214,7 +214,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     fillFields();
     dialog.name.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Protocol> status = presenter.validateProtocol();
     assertFalse(status.isOk());
@@ -234,7 +234,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.nameExists(any())).thenReturn(true);
     fillFields();
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Protocol> status = presenter.validateProtocol();
     assertFalse(status.isOk());
@@ -254,7 +254,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     fillFields();
     presenter.removeFile(items(dialog.files).get(0));
 
-    presenter.save(locale);
+    presenter.save();
 
     dialog.filesError.setVisible(true);
     assertEquals(resources.message(FILES_REQUIRED), dialog.filesError.getText());
@@ -268,9 +268,9 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_NoFileErrorClear() {
     fillFields();
     presenter.removeFile(items(dialog.files).get(0));
-    presenter.save(locale);
+    presenter.save();
     fillFields();
-    presenter.save(locale);
+    presenter.save();
 
     dialog.filesError.setVisible(false);
   }
@@ -279,7 +279,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_NewProtocol() {
     fillFields();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
@@ -303,7 +303,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setProtocol(protocol);
     fillFields();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
@@ -334,7 +334,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     fillFields();
     presenter.removeFile(items(dialog.files).get(0));
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();

@@ -64,6 +64,7 @@ public class ProtocolDialogPresenter {
   private Binder<Protocol> binder = new BeanValidationBinder<Protocol>(Protocol.class);
   private ListDataProvider<ProtocolFile> filesDataProvider =
       DataProvider.ofCollection(new ArrayList<>());
+  private Locale locale;
   private ProtocolService service;
   private AuthorizationService authorizationService;
 
@@ -81,12 +82,13 @@ public class ProtocolDialogPresenter {
   }
 
   void localeChange(Locale locale) {
+    this.locale = locale;
     AppResources resources = new AppResources(Constants.class, locale);
     binder.forField(dialog.name).asRequired(resources.message(REQUIRED)).withNullRepresentation("")
-        .withValidator(nameExists(locale)).bind(NAME);
+        .withValidator(nameExists()).bind(NAME);
   }
 
-  private Validator<String> nameExists(Locale locale) {
+  private Validator<String> nameExists() {
     return (value, context) -> {
       if (service.nameExists(value)) {
         final AppResources resources = new AppResources(Constants.class, locale);
@@ -108,7 +110,7 @@ public class ProtocolDialogPresenter {
     dialog.cancel.setVisible(!readOnly);
   }
 
-  void addFile(String filename, InputStream input, Locale locale) {
+  void addFile(String filename, InputStream input) {
     logger.trace("received file {}", filename);
     ProtocolFile file = new ProtocolFile();
     file.setFilename(filename);
@@ -139,7 +141,7 @@ public class ProtocolDialogPresenter {
     return binder.validate();
   }
 
-  boolean isValid(Locale locale) {
+  boolean isValid() {
     dialog.filesError.setVisible(false);
     boolean valid = true;
     valid = validateProtocol().isOk() && valid;
@@ -152,8 +154,8 @@ public class ProtocolDialogPresenter {
     return valid;
   }
 
-  void save(Locale locale) {
-    if (isValid(locale)) {
+  void save() {
+    if (isValid()) {
       Protocol protocol = binder.getBean();
       logger.debug("save protocol {}", protocol);
       service.save(protocol, new ArrayList<>(filesDataProvider.getItems()));

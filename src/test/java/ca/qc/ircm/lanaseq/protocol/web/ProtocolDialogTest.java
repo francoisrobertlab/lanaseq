@@ -210,7 +210,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     long filesize = 84325;
     SucceededEvent event = new SucceededEvent(dialog.upload, filename, mimeType, filesize);
     fireEvent(dialog.upload, event);
-    verify(presenter).addFile(filename, input, locale);
+    verify(presenter).addFile(filename, input);
     verify(dialog.uploadBuffer).getInputStream(filename);
   }
 
@@ -322,7 +322,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   @Test
   public void save() {
     dialog.save.click();
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test

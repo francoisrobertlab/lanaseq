@@ -126,7 +126,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     upload.setMaxFiles(MAXIMUM_FILES_COUNT);
     upload.setMinHeight("2.5em");
     upload.addSucceededListener(event -> presenter.addFile(event.getFileName(),
-        uploadBuffer.getInputStream(event.getFileName()), getLocale()));
+        uploadBuffer.getInputStream(event.getFileName())));
     files.setId(id(FILES));
     files.setHeight("15em");
     files.setMinHeight("15em");
@@ -144,7 +144,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
