@@ -386,6 +386,6 @@ public class UsersViewTest extends AbstractViewTestCase {
 
     view.afterNavigation(event);
 
-    verify(presenter).showError(location.getQueryParameters().getParameters(), locale);
+    verify(presenter).showError(location.getQueryParameters().getParameters());
   }
 }

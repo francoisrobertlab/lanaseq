@@ -107,11 +107,12 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     when(userService.all()).thenReturn(users);
     currentUser = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   @Test
   public void users_User() {
-    presenter.init(view);
     verify(userService).all();
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
@@ -130,7 +131,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   public void users_Manager() {
     when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
     presenter.init(view);
-    verify(userService).all();
+    verify(userService, times(2)).all();
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -149,7 +150,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
     when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(true);
     presenter.init(view);
-    verify(userService).all();
+    verify(userService, times(2)).all();
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
@@ -165,7 +166,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterEmail() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterEmail("test");
@@ -176,7 +176,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterEmail_Empty() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterEmail("");
@@ -187,7 +186,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterName() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterName("test");
@@ -198,7 +196,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterName_Empty() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterName("");
@@ -209,7 +206,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterActive_False() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterActive(false);
@@ -220,7 +216,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterActive_True() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterActive(true);
@@ -231,7 +226,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void filterActive_Null() {
-    presenter.init(view);
     view.users.setDataProvider(dataProvider);
 
     presenter.filterActive(null);
@@ -242,14 +236,11 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void error() {
-    presenter.init(view);
-    presenter.localeChange(locale);
     assertFalse(view.error.isVisible());
   }
 
   @Test
   public void view() {
-    presenter.init(view);
     User user = new User();
     user.setId(2L);
     User databaseUser = userRepository.findById(2L).orElse(null);
@@ -263,7 +254,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnUserSaved() {
-    presenter.init(view);
     verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<UserDialog>> savedListener =
         userSavedListenerCaptor.getValue();
@@ -273,7 +263,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void toggleActive_Active() {
-    presenter.init(view);
     User user = userRepository.findById(3L).orElse(null);
     presenter.toggleActive(user);
     verify(userService).save(user, null);
@@ -282,7 +271,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void toggleActive_Inactive() {
-    presenter.init(view);
     User user = userRepository.findById(7L).orElse(null);
     presenter.toggleActive(user);
     verify(userService).save(user, null);
@@ -291,7 +279,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void switchUser() throws Throwable {
-    presenter.init(view);
     User user = userRepository.findById(3L).orElse(null);
     view.users.select(user);
     presenter.switchUser();
@@ -303,8 +290,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void switchUser_EmptySelection() throws Throwable {
-    presenter.init(view);
-    presenter.localeChange(locale);
     presenter.switchUser();
     assertEquals(resources.message(USERS_REQUIRED), view.error.getText());
     assertTrue(view.error.isVisible());
@@ -313,8 +298,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void permissions_ErrorThenView() {
-    presenter.init(view);
-    presenter.localeChange(locale);
     presenter.switchUser();
     presenter.view(users.get(1));
     assertFalse(view.error.isVisible());
@@ -322,7 +305,6 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void add() {
-    presenter.init(view);
     presenter.add();
     verify(view.userDialog).setUser(userCaptor.capture());
     User user = userCaptor.getValue();
@@ -334,18 +316,16 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void showError_NoError() {
-    presenter.init(view);
     Map<String, List<String>> parameters = new HashMap<>();
-    presenter.showError(parameters, locale);
+    presenter.showError(parameters);
     verify(view, never()).showNotification(any());
   }
 
   @Test
   public void showError_SwitchFailed() {
-    presenter.init(view);
     Map<String, List<String>> parameters = new HashMap<>();
     parameters.put(SWITCH_FAILED, Collections.emptyList());
-    presenter.showError(parameters, locale);
+    presenter.showError(parameters);
     verify(view).showNotification(resources.message(SWITCH_FAILED));
   }
 }

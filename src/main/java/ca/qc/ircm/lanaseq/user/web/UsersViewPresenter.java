@@ -150,7 +150,7 @@ public class UsersViewPresenter {
     view.userDialog.open();
   }
 
-  void showError(Map<String, List<String>> parameters, Locale locale) {
+  void showError(Map<String, List<String>> parameters) {
     AppResources resources = new AppResources(UsersView.class, locale);
     if (parameters.containsKey(SWITCH_FAILED)) {
       view.showNotification(resources.message(SWITCH_FAILED));

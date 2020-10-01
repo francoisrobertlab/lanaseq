@@ -206,6 +206,6 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
 
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
-    presenter.showError(event.getLocation().getQueryParameters().getParameters(), getLocale());
+    presenter.showError(event.getLocation().getQueryParameters().getParameters());
   }
 }
