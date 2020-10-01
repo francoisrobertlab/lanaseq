@@ -91,6 +91,7 @@ public class UseForgotPasswordViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(MESSAGE), view.message.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -104,13 +105,14 @@ public class UseForgotPasswordViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MESSAGE), view.message.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void save() {
     clickButton(view.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test
@@ -123,6 +125,6 @@ public class UseForgotPasswordViewTest extends AbstractViewTestCase {
   public void setParameter() {
     String parameter = "test";
     view.setParameter(beforeEvent, parameter);
-    verify(presenter).setParameter(parameter, locale);
+    verify(presenter).setParameter(parameter);
   }
 }

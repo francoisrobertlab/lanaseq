@@ -44,6 +44,7 @@ public class UseForgotPasswordViewPresenter {
       LoggerFactory.getLogger(UseForgotPasswordViewPresenter.class);
   private UseForgotPasswordView view;
   private ForgotPassword forgotPassword;
+  private Locale locale;
   private ForgotPasswordService service;
 
   @Autowired
@@ -55,7 +56,11 @@ public class UseForgotPasswordViewPresenter {
     this.view = view;
   }
 
-  void save(Locale locale) {
+  void localeChange(Locale locale) {
+    this.locale = locale;
+  }
+
+  void save() {
     if (view.form.isValid()) {
       String password = view.form.getPassword();
       logger.debug("save new password for user {}", forgotPassword.getUser());
@@ -66,7 +71,7 @@ public class UseForgotPasswordViewPresenter {
     }
   }
 
-  private boolean validateParameter(String parameter, Locale locale) {
+  private boolean validateParameter(String parameter) {
     final AppResources resources = new AppResources(UseForgotPasswordView.class, locale);
     if (parameter == null) {
       view.showNotification(resources.message(INVALID));
@@ -94,8 +99,8 @@ public class UseForgotPasswordViewPresenter {
     return valid;
   }
 
-  void setParameter(String parameter, Locale locale) {
-    if (validateParameter(parameter, locale)) {
+  void setParameter(String parameter) {
+    if (validateParameter(parameter)) {
       String[] parameters = parameter.split(SEPARATOR, -1);
       long id = Long.parseLong(parameters[0]);
       String confirmNumber = parameters[1];

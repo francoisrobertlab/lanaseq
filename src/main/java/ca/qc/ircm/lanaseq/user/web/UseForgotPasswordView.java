@@ -85,7 +85,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     presenter.init(this);
   }
 
@@ -96,6 +96,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     header.setText(resources.message(HEADER));
     message.setText(resources.message(MESSAGE));
     save.setText(webResources.message(SAVE));
+    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -107,6 +108,6 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
 
   @Override
   public void setParameter(BeforeEvent event, @WildcardParameter String parameter) {
-    presenter.setParameter(parameter, getLocale());
+    presenter.setParameter(parameter);
   }
 }
