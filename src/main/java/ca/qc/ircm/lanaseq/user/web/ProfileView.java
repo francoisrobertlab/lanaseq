@@ -84,7 +84,7 @@ public class ProfileView extends VerticalLayout
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     presenter.init(this);
   }
 
@@ -94,6 +94,7 @@ public class ProfileView extends VerticalLayout
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     save.setText(webResources.message(SAVE));
     header.setText(resources.message(HEADER));
+    presenter.localeChange(getLocale());
   }
 
   @Override

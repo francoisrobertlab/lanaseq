@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Scope;
 public class ProfileViewPresenter {
   private static final Logger logger = LoggerFactory.getLogger(ProfileViewPresenter.class);
   private ProfileView view;
+  private Locale locale;
   private UserService service;
   private AuthorizationService authorizationService;
 
@@ -56,7 +57,11 @@ public class ProfileViewPresenter {
     view.form.setUser(authorizationService.getCurrentUser());
   }
 
-  void save(Locale locale) {
+  void localeChange(Locale locale) {
+    this.locale = locale;
+  }
+
+  void save() {
     if (view.form.isValid()) {
       User user = view.form.getUser();
       String password = view.form.getPassword();

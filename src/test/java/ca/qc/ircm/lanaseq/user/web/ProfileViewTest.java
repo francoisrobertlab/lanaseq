@@ -92,6 +92,7 @@ public class ProfileViewTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -104,13 +105,14 @@ public class ProfileViewTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void save() {
     clickButton(view.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test

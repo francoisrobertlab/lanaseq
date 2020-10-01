@@ -75,19 +75,18 @@ public class ProfileViewPresenterTest extends AbstractViewTestCase {
     view.save = new Button();
     when(service.get(any(Long.class))).thenReturn(user);
     when(authorizationService.getCurrentUser()).thenReturn(user);
+    presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   @Test
   public void init() {
-    presenter.init(view);
     verify(view.form).setUser(user);
   }
 
   @Test
   public void save_Invalid() {
-    presenter.init(view);
-
-    presenter.save(locale);
+    presenter.save();
 
     verify(view.form).isValid();
     verify(service, never()).save(any(), any());
@@ -100,9 +99,8 @@ public class ProfileViewPresenterTest extends AbstractViewTestCase {
     when(view.form.isValid()).thenReturn(true);
     when(view.form.getPassword()).thenReturn(password);
     when(view.form.getUser()).thenReturn(user);
-    presenter.init(view);
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(view.form).isValid();
     verify(service).save(eq(user), eq(password));
