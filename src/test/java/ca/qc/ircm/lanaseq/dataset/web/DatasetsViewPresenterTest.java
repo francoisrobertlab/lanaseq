@@ -125,6 +125,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   @Test
@@ -155,7 +156,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   public void viewFiles() {
     Dataset dataset = datasets.get(0);
     view.datasets.select(dataset);
-    presenter.viewFiles(locale);
+    presenter.viewFiles();
     assertFalse(view.error.isVisible());
     verify(view.filesDialog).setDataset(dataset);
     verify(view.filesDialog).open();
@@ -163,7 +164,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void viewFiles_NoSelection() {
-    presenter.viewFiles(locale);
+    presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
     verify(view.filesDialog, never()).setDataset(any());
@@ -174,7 +175,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   public void viewFiles_MoreThanOneDatasetSelected() {
     view.datasets.select(datasets.get(0));
     view.datasets.select(datasets.get(1));
-    presenter.viewFiles(locale);
+    presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_MORE_THAN_ONE), view.error.getText());
     verify(view.filesDialog, never()).setDataset(any());
@@ -213,7 +214,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(sampleService.isMergable(any())).thenReturn(true);
     view.datasets.select(datasets.get(0));
     view.datasets.select(datasets.get(1));
-    presenter.merge(locale);
+    presenter.merge();
     assertFalse(view.error.isVisible());
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
@@ -245,7 +246,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(sampleService.isMergable(any())).thenReturn(true);
     view.datasets.select(datasets.get(1));
     view.datasets.select(datasets.get(0));
-    presenter.merge(locale);
+    presenter.merge();
     assertFalse(view.error.isVisible());
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
@@ -274,7 +275,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void merge_NoSamples() {
-    presenter.merge(locale);
+    presenter.merge();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
     verify(sampleService, never()).isMergable(any());
@@ -293,7 +294,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     dataset2.getSamples().forEach(sample -> entityManager.detach(sample));
     view.datasets.select(dataset1);
     view.datasets.select(dataset2);
-    presenter.merge(locale);
+    presenter.merge();
     assertFalse(view.error.isVisible());
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
@@ -318,7 +319,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(sampleService.isMergable(any())).thenReturn(false);
     view.datasets.select(datasets.get(0));
     view.datasets.select(datasets.get(1));
-    presenter.merge(locale);
+    presenter.merge();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(MERGE_ERROR), view.error.getText());
     verify(sampleService).isMergable(samplesCaptor.capture());
@@ -338,7 +339,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(service.exists(any())).thenReturn(true);
     view.datasets.select(datasets.get(0));
     view.datasets.select(datasets.get(1));
-    presenter.merge(locale);
+    presenter.merge();
     assertTrue(view.error.isVisible());
     assertEquals(
         datasetResources.message(NAME_ALREADY_EXISTS,

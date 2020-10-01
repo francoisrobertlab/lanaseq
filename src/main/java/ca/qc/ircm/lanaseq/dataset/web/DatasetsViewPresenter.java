@@ -51,6 +51,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetsViewPresenter {
   private DatasetsView view;
+  private Locale locale;
   @Autowired
   private DatasetService service;
   @Autowired
@@ -75,6 +76,10 @@ public class DatasetsViewPresenter {
     clearError();
   }
 
+  void localeChange(Locale locale) {
+    this.locale = locale;
+  }
+
   private void clearError() {
     view.error.setVisible(false);
   }
@@ -85,7 +90,7 @@ public class DatasetsViewPresenter {
     view.dialog.open();
   }
 
-  void viewFiles(Locale locale) {
+  void viewFiles() {
     List<Dataset> datasets = new ArrayList<>(view.datasets.getSelectedItems());
     AppResources resources = new AppResources(DatasetsView.class, locale);
     boolean error = false;
@@ -125,7 +130,7 @@ public class DatasetsViewPresenter {
     return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 
-  void merge(Locale locale) {
+  void merge() {
     clearError();
     List<Dataset> datasets = view.datasets.getSelectedItems().stream()
         .sorted((d1, d2) -> d1.getId().compareTo(d2.getId())).collect(Collectors.toList());

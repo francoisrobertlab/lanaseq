@@ -125,10 +125,10 @@ public class DatasetsView extends VerticalLayout
     add.addClickListener(e -> presenter.add());
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
-    merge.addClickListener(e -> presenter.merge(getLocale()));
+    merge.addClickListener(e -> presenter.merge());
     files.setId(FILES);
     files.setIcon(VaadinIcon.FILE_O.create());
-    files.addClickListener(e -> presenter.viewFiles(getLocale()));
+    files.addClickListener(e -> presenter.viewFiles());
     presenter.init(this);
   }
 
@@ -146,6 +146,7 @@ public class DatasetsView extends VerticalLayout
     add.setText(webResources.message(ADD));
     merge.setText(resources.message(MERGE));
     files.setText(resources.message(FILES));
+    presenter.localeChange(getLocale());
   }
 
   @Override
