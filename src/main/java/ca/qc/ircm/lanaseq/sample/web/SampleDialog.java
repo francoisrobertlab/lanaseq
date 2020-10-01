@@ -156,7 +156,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
@@ -168,7 +168,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     confirm.setCancelable(true);
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
-    confirm.addConfirmListener(e -> presenter.delete(getLocale()));
+    confirm.addConfirmListener(e -> presenter.delete());
     presenter.init(this);
   }
 

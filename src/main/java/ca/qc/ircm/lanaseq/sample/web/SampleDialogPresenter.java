@@ -61,6 +61,7 @@ public class SampleDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(SampleDialogPresenter.class);
   private SampleDialog dialog;
   private Binder<Sample> binder = new BeanValidationBinder<>(Sample.class);
+  private Locale locale;
   private SampleService service;
   private ProtocolService protocolService;
   private AuthorizationService authorizationService;
@@ -82,6 +83,7 @@ public class SampleDialogPresenter {
   }
 
   public void localeChange(Locale locale) {
+    this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.sampleId).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(SAMPLE_ID);
@@ -102,7 +104,7 @@ public class SampleDialogPresenter {
     return binder.validate();
   }
 
-  boolean validate(Locale locale) {
+  boolean validate() {
     dialog.error.setVisible(false);
     boolean valid = validateSample().isOk();
     if (valid) {
@@ -119,8 +121,8 @@ public class SampleDialogPresenter {
     return valid;
   }
 
-  void save(Locale locale) {
-    if (validate(locale)) {
+  void save() {
+    if (validate()) {
       Sample sample = binder.getBean();
       logger.debug("save sample {}", sample);
       service.save(sample);
@@ -135,7 +137,7 @@ public class SampleDialogPresenter {
     dialog.close();
   }
 
-  void delete(Locale locale) {
+  void delete() {
     Sample sample = binder.getBean();
     logger.debug("delete sample {}", sample);
     service.delete(sample);

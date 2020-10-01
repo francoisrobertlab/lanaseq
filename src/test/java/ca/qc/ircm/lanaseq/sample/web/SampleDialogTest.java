@@ -359,7 +359,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test
@@ -376,7 +376,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.confirm.isOpened());
     ConfirmEvent event = new ConfirmEvent(dialog.confirm, false);
     fireEvent(dialog.confirm, event);
-    verify(presenter).delete(locale);
+    verify(presenter).delete();
   }
 
   @Test
@@ -386,6 +386,6 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.confirm.isOpened());
     CancelEvent event = new CancelEvent(dialog.confirm, false);
     fireEvent(dialog.confirm, event);
-    verify(presenter, never()).delete(any());
+    verify(presenter, never()).delete();
   }
 }

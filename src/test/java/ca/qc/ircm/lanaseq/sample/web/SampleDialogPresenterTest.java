@@ -374,7 +374,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.sampleId.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
@@ -395,7 +395,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.replicate.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
@@ -416,7 +416,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.protocol.setItems();
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
@@ -437,7 +437,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.assay.clear();
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
@@ -458,7 +458,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.type.setValue(SampleType.NULL);
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
@@ -476,7 +476,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.target.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
@@ -494,7 +494,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.strain.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
@@ -515,7 +515,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.strainDescription.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
@@ -533,7 +533,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.treatment.setValue("");
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
@@ -551,7 +551,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     fillForm();
     dialog.date.setValue(null);
 
-    presenter.save(locale);
+    presenter.save();
 
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertFalse(status.isOk());
@@ -572,7 +572,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.exists(any())).thenReturn(true);
     fillForm();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).exists(
         (sampleId + "_" + "ChIPSeq_IP_" + target + "_" + strain + "_" + strainDescription + "_"
@@ -591,7 +591,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.get(any())).thenReturn(sample);
     presenter.setSample(sample);
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).exists("FR2_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
     verify(service).get(2L);
@@ -605,7 +605,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_NewSample() {
     fillForm();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
@@ -632,7 +632,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
     fillForm();
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(service).save(sampleCaptor.capture());
     sample = sampleCaptor.getValue();
@@ -683,7 +683,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(2L).get();
     fillForm();
     dialog.replicate.setValue("");
-    presenter.save(locale);
+    presenter.save();
 
     presenter.cancel();
 
@@ -722,7 +722,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
 
-    presenter.delete(locale);
+    presenter.delete();
 
     verify(service, never()).save(any());
     verify(service).delete(sample);
