@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Scope;
 public class UserDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(UserDialogPresenter.class);
   private UserDialog dialog;
+  private Locale locale;
   private UserService userService;
 
   protected UserDialogPresenter() {
@@ -52,7 +53,11 @@ public class UserDialogPresenter {
     this.dialog = dialog;
   }
 
-  void save(Locale locale) {
+  void localeChange(Locale locale) {
+    this.locale = locale;
+  }
+
+  void save() {
     if (dialog.form.isValid()) {
       User user = dialog.form.getUser();
       String password = dialog.form.getPassword();

@@ -89,7 +89,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
+    save.addClickListener(e -> presenter.save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
@@ -102,6 +102,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     updateHeader();
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
+    presenter.localeChange(getLocale());
   }
 
   private void updateHeader() {

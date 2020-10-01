@@ -81,13 +81,13 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     dialog.cancel = new Button();
     currentUser = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    presenter.init(dialog);
+    presenter.localeChange(locale);
   }
 
   @Test
   public void save_ValidationFalse() {
-    presenter.init(dialog);
-
-    presenter.save(locale);
+    presenter.save();
 
     verify(userService, never()).save(any(), any());
     verify(dialog, never()).close();
@@ -100,9 +100,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(dialog.form.getUser()).thenReturn(user);
     when(dialog.form.getPassword()).thenReturn(password);
     when(user.getEmail()).thenReturn(email);
-    presenter.init(dialog);
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(userService).save(user, password);
     verify(dialog).showNotification(resources.message(SAVED, email));
@@ -115,9 +114,8 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
     when(dialog.form.isValid()).thenReturn(true);
     when(dialog.form.getUser()).thenReturn(user);
     when(user.getEmail()).thenReturn(email);
-    presenter.init(dialog);
 
-    presenter.save(locale);
+    presenter.save();
 
     verify(userService).save(user, null);
     verify(dialog).showNotification(resources.message(SAVED, email));
@@ -127,8 +125,6 @@ public class UserDialogPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void cancel_Close() {
-    presenter.init(dialog);
-
     presenter.cancel();
 
     verify(dialog).close();

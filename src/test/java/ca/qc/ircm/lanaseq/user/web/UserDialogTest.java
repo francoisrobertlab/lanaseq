@@ -103,6 +103,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -116,6 +117,7 @@ public class UserDialogTest extends AbstractViewTestCase {
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -188,7 +190,7 @@ public class UserDialogTest extends AbstractViewTestCase {
   public void save() {
     clickButton(dialog.save);
 
-    verify(presenter).save(locale);
+    verify(presenter).save();
   }
 
   @Test
