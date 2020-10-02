@@ -52,7 +52,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -221,10 +220,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and().logout().logoutUrl(SIGNOUT_URL).logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
 
         // Remember me
-        .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey())
-
-        // Switch user.
-        .and().addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
+        .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());
 
     // Used for TestBench.
     try {
