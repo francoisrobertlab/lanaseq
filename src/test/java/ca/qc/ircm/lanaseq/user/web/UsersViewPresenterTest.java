@@ -19,6 +19,8 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USERNAME;
+import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS_REQUIRED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,7 +36,6 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -42,6 +43,7 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -49,8 +51,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +102,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.error = new Div();
     view.add = new Button();
     view.switchUser = new Button();
+    view.switchUserForm = new Html("<form></form>");
     view.userDialog = mock(UserDialog.class);
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
@@ -125,6 +126,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     verify(view.active).setVisible(false);
     assertFalse(view.add.isVisible());
     assertFalse(view.switchUser.isVisible());
+    assertFalse(view.switchUserForm.isVisible());
   }
 
   @Test
@@ -143,6 +145,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     verify(view.active).setVisible(true);
     assertTrue(view.add.isVisible());
     assertFalse(view.switchUser.isVisible());
+    assertFalse(view.switchUserForm.isVisible());
   }
 
   @Test
@@ -162,6 +165,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     verify(view.active).setVisible(true);
     assertTrue(view.add.isVisible());
     assertTrue(view.switchUser.isVisible());
+    assertTrue(view.switchUserForm.isVisible());
   }
 
   @Test
@@ -283,9 +287,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.users.select(user);
     presenter.switchUser();
     assertFalse(view.error.isVisible());
-    verify(page).executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_URL + "?"
-        + WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER + "="
-        + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8.name()) + "')");
+    verify(page).executeJs("document.getElementById(\"" + SWITCH_USERNAME + "\").value = \""
+        + user.getEmail() + "\"; document.getElementById(\"" + SWITCH_USER_FORM + "\").submit()");
   }
 
   @Test

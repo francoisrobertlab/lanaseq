@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -28,6 +29,7 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -65,6 +67,7 @@ public class ViewLayout extends VerticalLayout
   public static final String PROFILE = "profile";
   public static final String USERS = "users";
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
+  public static final String EXIT_SWITCH_USER_FORM = "exitSwitchUserform";
   public static final String SIGNOUT = "signout";
   public static final String TAB = "tab";
   private static final long serialVersionUID = 710800815636494374L;
@@ -78,6 +81,8 @@ public class ViewLayout extends VerticalLayout
   protected Tab users = new Tab();
   protected Tab exitSwitchUser = new Tab();
   protected Tab signout = new Tab();
+  protected Html exitSwitchUserForm = new Html("<form action=\"" + SWITCH_USER_EXIT_URL
+      + "\" method=\"post\" style=\"display:none;\"></form>");
   private Map<Tab, String> tabsHref = new HashMap<>();
   private String currentHref;
   @Autowired
@@ -98,8 +103,11 @@ public class ViewLayout extends VerticalLayout
     setSpacing(false);
     add(tabs);
     tabs.setId(TABS);
-    tabs.add(datasets, samples, protocols, analyse, profile, users, exitSwitchUser, signout);
+    tabs.add(datasets, samples, protocols, analyse, profile, users, exitSwitchUser, signout,
+        exitSwitchUserForm);
     exitSwitchUser
+        .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+    exitSwitchUserForm
         .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     datasets.setId(styleName(DATASETS, TAB));
     samples.setId(styleName(SAMPLES, TAB));
@@ -109,6 +117,7 @@ public class ViewLayout extends VerticalLayout
     users.setId(styleName(USERS, TAB));
     users.setVisible(authorizationService.isAuthorized(UsersView.class));
     exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
+    exitSwitchUserForm.setId(styleName(EXIT_SWITCH_USER_FORM, TAB));
     signout.setId(styleName(SIGNOUT, TAB));
     tabsHref.put(datasets, DatasetsView.VIEW_NAME);
     tabsHref.put(samples, SamplesView.VIEW_NAME);
@@ -141,8 +150,8 @@ public class ViewLayout extends VerticalLayout
     } else if (tabs.getSelectedTab() == exitSwitchUser) {
       // Exit switch user requires a request to be made outside of Vaadin.
       logger.debug("redirect to exit switch user");
-      UI.getCurrent().getPage()
-          .executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
+      UI.getCurrent().getPage().executeJs(
+          "document.getElementById(\"" + styleName(EXIT_SWITCH_USER_FORM, TAB) + "\").submit()");
     } else {
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("navigate to {}", tabsHref.get(tabs.getSelectedTab()));

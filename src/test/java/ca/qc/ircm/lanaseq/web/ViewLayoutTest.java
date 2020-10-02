@@ -17,10 +17,12 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ANALYSE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
@@ -95,6 +97,10 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertEquals(styleName(PROFILE, TAB), view.profile.getId().orElse(""));
     assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
+    assertEquals(styleName(EXIT_SWITCH_USER_FORM, TAB), view.exitSwitchUserForm.getId().orElse(""));
+    assertEquals(SWITCH_USER_EXIT_URL, view.exitSwitchUserForm.getElement().getAttribute("action"));
+    assertEquals("post", view.exitSwitchUserForm.getElement().getAttribute("method"));
+    assertEquals("none", view.exitSwitchUserForm.getElement().getStyle().get("display"));
     assertEquals(styleName(SIGNOUT, TAB), view.signout.getId().orElse(""));
   }
 
@@ -138,6 +144,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
+    assertFalse(view.exitSwitchUserForm.isVisible());
     assertTrue(view.signout.isVisible());
   }
 
@@ -152,6 +159,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertTrue(view.profile.isVisible());
     assertTrue(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
+    assertFalse(view.exitSwitchUserForm.isVisible());
     assertTrue(view.signout.isVisible());
   }
 
@@ -167,6 +175,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
+    assertTrue(view.exitSwitchUserForm.isVisible());
     assertTrue(view.signout.isVisible());
   }
 
@@ -323,8 +332,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.tabs.setSelectedTab(view.exitSwitchUser);
 
     verify(ui, never()).navigate(any(String.class));
-    verify(page)
-        .executeJs("location.assign('" + WebSecurityConfiguration.SWITCH_USER_EXIT_URL + "')");
+    verify(page).executeJs(
+        "document.getElementById(\"" + styleName(EXIT_SWITCH_USER_FORM, TAB) + "\").submit()");
   }
 
   @Test
