@@ -39,7 +39,7 @@ public class AppConfiguration {
   public static final String APPLICATION_NAME = "lanaseq";
   public static final String PREFIX = "app";
   public static final String DELETED_FILENAME = ".deleted";
-  @Value("${logging.path:${user.dir}}/${logging.file:" + APPLICATION_NAME + "log}")
+  @Value("${logging.path:${user.dir}}/${logging.file.name:" + APPLICATION_NAME + "log}")
   private String logfile;
   /**
    * Application home folder.
