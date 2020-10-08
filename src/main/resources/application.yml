@@ -84,7 +84,8 @@ mail:
   to: christian.poitras@ircm.qc.ca
 
 logging:
-  file: ${spring.application.name}.log
+  file:
+    name: ${spring.application.name}.log
 
 ---
 spring:
@@ -111,7 +112,8 @@ vaadin:
   productionMode: false
 
 logging:
-  file: test.log
+  file:
+    name: test.log
 
 ---
 spring:
