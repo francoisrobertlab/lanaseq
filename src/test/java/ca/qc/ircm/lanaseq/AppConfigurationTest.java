@@ -191,22 +191,30 @@ public class AppConfigurationTest {
   }
 
   @Test
+  public void getAnalysis() {
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis"),
+        appConfiguration.getAnalysis());
+  }
+
+  @Test
   public void analysis_Dataset() {
     Dataset dataset = dataset();
-    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq", dataset.getName()),
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis", dataset.getName()),
         appConfiguration.analysis(dataset));
   }
 
   @Test
   public void analysisLabel_Dataset() {
     Dataset dataset = dataset();
-    assertEquals("lanaseq\\" + dataset.getName(), appConfiguration.analysisLabel(dataset, false));
+    assertEquals("lanaseq\\analysis\\" + dataset.getName(),
+        appConfiguration.analysisLabel(dataset, false));
   }
 
   @Test
   public void analysisLabel_DatasetUnix() {
     Dataset dataset = dataset();
-    assertEquals("lanaseq/" + dataset.getName(), appConfiguration.analysisLabel(dataset, true));
+    assertEquals("lanaseq/analysis/" + dataset.getName(),
+        appConfiguration.analysisLabel(dataset, true));
   }
 
   @Test
