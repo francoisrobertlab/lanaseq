@@ -223,6 +223,11 @@ public class AppConfigurationTest {
   }
 
   @Test
+  public void getAnalysisDeleteAge() {
+    assertEquals(Duration.ofHours(48), appConfiguration.getAnalysisDeleteAge());
+  }
+
+  @Test
   public void getUpload() {
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/upload"),
         appConfiguration.getUpload());
@@ -280,13 +285,13 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void getUrl() {
-    assertEquals("http://localhost:8080/myurl/subpath?param1=abc",
-        appConfiguration.getUrl("/myurl/subpath?param1=abc"));
+  public void getUploadDeleteAge() {
+    assertEquals(Duration.ofHours(6), appConfiguration.getUploadDeleteAge());
   }
 
   @Test
-  public void getUploadDeleteAge() {
-    assertEquals(Duration.ofHours(6), appConfiguration.getUploadDeleteAge());
+  public void getUrl() {
+    assertEquals("http://localhost:8080/myurl/subpath?param1=abc",
+        appConfiguration.getUrl("/myurl/subpath?param1=abc"));
   }
 }

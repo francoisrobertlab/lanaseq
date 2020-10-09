@@ -62,11 +62,15 @@ public class AppConfiguration {
    */
   private boolean analysisSymlinks;
   /**
+   * Time that must elapse before an analysis folder get deleted.
+   */
+  private Duration analysisDeleteAge;
+  /**
    * Upload folder.
    */
   private Path upload;
   /**
-   * Time that must elapse before a folder get deleted.
+   * Time that must elapse before an upload folder get deleted.
    */
   private Duration uploadDeleteAge;
   /**
@@ -240,7 +244,7 @@ public class AppConfiguration {
     this.uploadDeleteAge = uploadDeleteAge;
   }
 
-  Path getAnalysis() {
+  public Path getAnalysis() {
     return analysis;
   }
 
@@ -254,6 +258,14 @@ public class AppConfiguration {
 
   void setAnalysisSymlinks(boolean analysisSymlinks) {
     this.analysisSymlinks = analysisSymlinks;
+  }
+
+  public Duration getAnalysisDeleteAge() {
+    return analysisDeleteAge;
+  }
+
+  void setAnalysisDeleteAge(Duration analysisDeleteAge) {
+    this.analysisDeleteAge = analysisDeleteAge;
   }
 
   @SuppressWarnings("unused")

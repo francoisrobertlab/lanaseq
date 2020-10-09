@@ -43,6 +43,7 @@ app:
       windows: '\\lanaseq01\lanaseq'
       unix: 'smb://lanaseq01/lanaseq'
   analysis: ${app.home}/analysis
+  analysis-delete-age: PT48H
   analysis-symlinks: true
   upload: ${app.home}/upload
   upload-delete-age: PT6H
