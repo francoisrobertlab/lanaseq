@@ -20,10 +20,13 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.DEFAULT_LOCALE;
 
 import ca.qc.ircm.lanaseq.logging.web.MdcFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -36,6 +39,19 @@ import org.springframework.web.util.IntrospectorCleanupListener;
  */
 @Configuration
 public class SpringWebConfiguration implements WebMvcConfigurer {
+  @Bean
+  public FilterRegistrationBean<CommonsRequestLoggingFilter> requestLoggingFilter() {
+    CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
+    loggingFilter.setIncludeClientInfo(true);
+    loggingFilter.setIncludeQueryString(true);
+    loggingFilter.setIncludePayload(false);
+    loggingFilter.setIncludeHeaders(true);
+    FilterRegistrationBean<CommonsRequestLoggingFilter> registration =
+        new FilterRegistrationBean<>(loggingFilter);
+    registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    return registration;
+  }
+
   @Bean(name = MdcFilter.BEAN_NAME)
   public MdcFilter mdcFilter() {
     return new MdcFilter();
