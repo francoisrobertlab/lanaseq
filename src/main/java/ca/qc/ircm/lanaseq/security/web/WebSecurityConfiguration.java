@@ -23,7 +23,6 @@ import ca.qc.ircm.lanaseq.security.DaoAuthenticationProviderWithLdap;
 import ca.qc.ircm.lanaseq.security.LdapConfiguration;
 import ca.qc.ircm.lanaseq.security.LdapService;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
-import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
@@ -206,7 +205,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .permitAll()
 
         // Allow all requests by logged in users.
-        .anyRequest().hasAnyAuthority(UserRole.roles())
+        .anyRequest().authenticated()
 
         // Configure the login page.
         .and().formLogin().loginPage(SIGNIN_URL).permitAll()
