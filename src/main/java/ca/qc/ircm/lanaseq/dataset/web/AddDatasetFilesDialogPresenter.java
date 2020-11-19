@@ -218,10 +218,4 @@ public class AddDatasetFilesDialogPresenter {
   Thread updateFilesThread() {
     return updateFilesThread;
   }
-
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    updateFilesThread.interrupt();
-  }
 }
