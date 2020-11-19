@@ -59,6 +59,9 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   @Autowired
   private AppConfiguration configuration;
 
+  /**
+   * Saves home folder to reset it's value upon test completion.
+   */
   @Before
   public void saveHomeFolder() throws Throwable {
     Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
@@ -66,6 +69,9 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     home = (Path) getHome.invoke(configuration);
   }
 
+  /**
+   * Saves upload folder to reset it's value upon test completion.
+   */
   @Before
   public void saveUploadFolder() throws Throwable {
     Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
@@ -73,11 +79,17 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     upload = (Path) getUpload.invoke(configuration);
   }
 
+  /**
+   * Restores home folder's value.
+   */
   @After
   public void restoreHomeFolder() throws Throwable {
     setHome(home);
   }
 
+  /**
+   * Restores upload folder's value.
+   */
   @After
   public void restoreUploadFolder() throws Throwable {
     setUpload(upload);

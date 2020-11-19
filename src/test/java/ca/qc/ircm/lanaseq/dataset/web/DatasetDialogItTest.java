@@ -414,7 +414,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().doubleClick(0);
     DatasetDialogElement dialog = view.dialog();
     Dataset dataset = repository.findById(4L).get();
-    String name = dataset.getName();
+    final String name = dataset.getName();
 
     TestTransaction.flagForCommit();
     dialog.delete().click();

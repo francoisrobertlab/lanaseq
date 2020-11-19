@@ -102,7 +102,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<SampleDialog>>> savedListenerCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
   @Autowired
   private SampleRepository repository;
   @Autowired
@@ -299,12 +300,12 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void view_Protocol() {
+  public void viewProtocol() {
     Protocol protocol = new Protocol();
     protocol.setId(1L);
     Protocol databaseProtocol = mock(Protocol.class);
     when(protocolService.get(any())).thenReturn(databaseProtocol);
-    presenter.view(protocol);
+    presenter.viewProtocol(protocol);
     verify(protocolService).get(1L);
     verify(view.protocolDialog).setProtocol(databaseProtocol);
     verify(view.protocolDialog).open();

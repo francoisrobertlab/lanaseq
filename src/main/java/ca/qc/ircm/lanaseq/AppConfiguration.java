@@ -102,6 +102,15 @@ public class AppConfiguration {
     return datasetHome.resolve(year.format(dataset.getCreationDate())).resolve(dataset.getName());
   }
 
+  /**
+   * Returns label to be shown to user so he can find the sample's folder on the network.
+   *
+   * @param sample
+   *          sample
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user so he can find the sample's folder on the network
+   */
   public String folderLabel(Sample sample, boolean unix) {
     Path relative = home.relativize(folder(sample));
     if (unix) {
@@ -111,6 +120,15 @@ public class AppConfiguration {
     }
   }
 
+  /**
+   * Returns label to be shown to user so he can find the dataset's folder on the network.
+   *
+   * @param dataset
+   *          dataset
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user so he can find the dataset's folder on the network
+   */
   public String folderLabel(Dataset dataset, boolean unix) {
     Path relative = home.relativize(folder(dataset));
     if (unix) {
@@ -128,6 +146,15 @@ public class AppConfiguration {
     return getAnalysis().resolve(dataset.getName());
   }
 
+  /**
+   * Returns label to be shown to user so he can find the dataset's analysis folder on the network.
+   *
+   * @param dataset
+   *          dataset
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user so he can find the dataset's analysis folder on the network
+   */
   public String analysisLabel(Dataset dataset, boolean unix) {
     Path relative = home.relativize(analysis(dataset));
     if (unix) {
@@ -145,6 +172,15 @@ public class AppConfiguration {
     return getUpload().resolve(dataset.getName());
   }
 
+  /**
+   * Returns label to be shown to user so he can find the sample's upload folder on the network.
+   *
+   * @param sample
+   *          sample
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user so he can find the sample's upload folder on the network
+   */
   public String uploadLabel(Sample sample, boolean unix) {
     if (unix) {
       return FilenameUtils.separatorsToUnix(userUpload.unix + "/" + sample.getName());
@@ -153,6 +189,15 @@ public class AppConfiguration {
     }
   }
 
+  /**
+   * Returns label to be shown to user so he can find the dataset's upload folder on the network.
+   *
+   * @param dataset
+   *          dataset
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user so he can find the dataset's upload folder on the network
+   */
   public String uploadLabel(Dataset dataset, boolean unix) {
     if (unix) {
       return FilenameUtils.separatorsToUnix(userUpload.unix + "/" + dataset.getName());

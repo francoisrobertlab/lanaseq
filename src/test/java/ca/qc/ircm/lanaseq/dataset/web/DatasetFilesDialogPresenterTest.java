@@ -102,7 +102,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<AddDatasetFilesDialog>>> savedListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<SavedEvent<AddDatasetFilesDialog>>> savedListenerCaptor;
   @Autowired
   private DatasetRepository repository;
   @Rule

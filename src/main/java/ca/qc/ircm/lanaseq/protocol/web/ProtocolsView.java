@@ -134,9 +134,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(ProtocolsView.class, getLocale());
-    AppResources protocolResources = new AppResources(Protocol.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
+    final AppResources resources = new AppResources(ProtocolsView.class, getLocale());
+    final AppResources protocolResources = new AppResources(Protocol.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     String nameHeader = protocolResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);

@@ -285,7 +285,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     view.doubleClick(3);
     SampleDialogElement dialog = view.dialog();
     Sample sample = repository.findById(9L).get();
-    String name = sample.getName();
+    final String name = sample.getName();
 
     TestTransaction.flagForCommit();
     dialog.delete().click();

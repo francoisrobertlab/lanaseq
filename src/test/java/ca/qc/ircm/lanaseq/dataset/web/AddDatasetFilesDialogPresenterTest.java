@@ -92,7 +92,8 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Mock
   private OpenedChangeEvent<Dialog> openedChangeEvent;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<OpenedChangeEvent<Dialog>>> openedChangeListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<OpenedChangeEvent<Dialog>>> openedChangeListenerCaptor;
   @Captor
   private ArgumentCaptor<Command> commandCaptor;
   @Captor
@@ -150,6 +151,9 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.localeChange(locale);
   }
 
+  /**
+   * After test.
+   */
   @After
   public void afterTest() {
     Thread thread = presenter.updateFilesThread();

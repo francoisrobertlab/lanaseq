@@ -98,7 +98,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<AddSampleFilesDialog>>> savedListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<SavedEvent<AddSampleFilesDialog>>> savedListenerCaptor;
   @Autowired
   private SampleRepository repository;
   @Rule

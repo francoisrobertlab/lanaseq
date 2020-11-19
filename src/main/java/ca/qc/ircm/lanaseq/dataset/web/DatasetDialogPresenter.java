@@ -130,7 +130,7 @@ public class DatasetDialogPresenter {
   }
 
   private void bindSampleFields(Sample sample) {
-    boolean forceReadOnly = isReadOnly(binder.getBean()) || !sample.isEditable();
+    final boolean forceReadOnly = isReadOnly(binder.getBean()) || !sample.isEditable();
     final AppResources webResources = new AppResources(Constants.class, locale);
     Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
     binder.forField(dialog.sampleIdField(sample))

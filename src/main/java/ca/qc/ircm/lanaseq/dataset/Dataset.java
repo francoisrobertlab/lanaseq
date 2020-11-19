@@ -111,6 +111,9 @@ public class Dataset implements Data, Owned, Serializable {
     return "Dataset [id=" + id + ", name=" + name + "]";
   }
 
+  /**
+   * Updates dataset's name with a new generated name.
+   */
   public void generateName() {
     StringBuilder builder = new StringBuilder();
     Sample first =

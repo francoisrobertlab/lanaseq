@@ -92,6 +92,9 @@ public class SampleServiceTest {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
@@ -707,17 +710,17 @@ public class SampleServiceTest {
 
   @Test
   public void saveFiles() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    final Sample sample = repository.findById(1L).orElse(null);
     List<Path> files = new ArrayList<>();
     Path file = temporaryFolder.newFile("sample_R1.fastq").toPath();
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
-    FileTime filetime1 = Files.getLastModifiedTime(file);
+    final FileTime filetime1 = Files.getLastModifiedTime(file);
     files.add(file);
     file = temporaryFolder.newFile("sample_R2.fastq").toPath();
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
-    FileTime filetime2 = Files.getLastModifiedTime(file);
+    final FileTime filetime2 = Files.getLastModifiedTime(file);
     files.add(file);
     Thread.sleep(1000); // Allows to test file modification time.
 

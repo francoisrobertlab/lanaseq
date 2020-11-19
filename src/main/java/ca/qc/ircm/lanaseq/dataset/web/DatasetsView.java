@@ -113,7 +113,7 @@ public class DatasetsView extends VerticalLayout
     });
     datasets.addItemDoubleClickListener(e -> {
       if (e.getColumn() == datasets.protocol && protocol(e.getItem()).getId() != null) {
-        presenter.view(protocol(e.getItem()));
+        presenter.viewProtocol(protocol(e.getItem()));
       } else {
         presenter.view(e.getItem());
       }

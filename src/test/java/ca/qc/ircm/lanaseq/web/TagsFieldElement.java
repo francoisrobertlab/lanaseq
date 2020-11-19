@@ -29,6 +29,13 @@ public class TagsFieldElement extends CustomFieldElement {
     return $(ButtonElement.class).all();
   }
 
+  /**
+   * Returns tag element.
+   *
+   * @param tag
+   *          tag
+   * @return tag element
+   */
   public ButtonElement tag(String tag) {
     for (ButtonElement button : tags()) {
       if (button.getText().equals(tag)) {

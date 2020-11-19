@@ -680,7 +680,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void cancel_SamplePropertiesAfterValidationFail() {
-    Sample sample = repository.findById(2L).get();
+    final Sample sample = repository.findById(2L).get();
     fillForm();
     dialog.replicate.setValue("");
     presenter.save();

@@ -71,6 +71,9 @@ public class ProtocolServiceTest {
   private Random random = new Random();
   private User currentUser;
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);

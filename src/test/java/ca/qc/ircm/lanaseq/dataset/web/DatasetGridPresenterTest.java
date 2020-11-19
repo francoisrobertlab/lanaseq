@@ -73,7 +73,8 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<DatasetDialog>>> savedListenerCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
   @Autowired
   private DatasetRepository repository;
   @Autowired

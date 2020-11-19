@@ -63,6 +63,12 @@ public class SamplesViewElement extends VerticalLayoutElement {
     return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
 
+  /**
+   * Control click sample.
+   *
+   * @param row
+   *          row index
+   */
   public void controlClick(int row) {
     Keys key = Keys.CONTROL;
     if (SystemUtils.IS_OS_MAC_OSX) {

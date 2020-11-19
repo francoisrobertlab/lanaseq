@@ -137,7 +137,7 @@ public class SamplesView extends VerticalLayout
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     samples.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && e.getItem().getProtocol() != null) {
-        presenter.view(e.getItem().getProtocol());
+        presenter.viewProtocol(e.getItem().getProtocol());
       } else {
         presenter.view(e.getItem());
       }
@@ -181,9 +181,9 @@ public class SamplesView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(SamplesView.class, getLocale());
-    AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
+    final AppResources resources = new AppResources(SamplesView.class, getLocale());
+    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     String nameHeader = sampleResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);

@@ -119,7 +119,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentEventListener<DeletedEvent<SampleDialog>>> deletedListenerCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>>> selectListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>>> selectListenerCaptor;
   @Captor
   private ArgumentCaptor<ListDataProvider<Sample>> samplesDataProviderCaptor;
   @Autowired
@@ -841,7 +842,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void addSample_AlreadyInDataset() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    Sample sample = dataset.getSamples().get(0);
+    final Sample sample = dataset.getSamples().get(0);
     assertEquals(3, items(dialog.samples).size());
     verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
@@ -859,7 +860,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dataset.setEditable(true);
     dataset.getSamples().get(0).setEditable(false);
     presenter.setDataset(dataset);
-    Sample sample = sampleRepository.findById(1L).get();
+    final Sample sample = sampleRepository.findById(1L).get();
 
     verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
@@ -886,7 +887,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void addSample_AddNotEditableSample() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    Sample sample = sampleRepository.findById(8L).get();
+    final Sample sample = sampleRepository.findById(8L).get();
 
     verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();

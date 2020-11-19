@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 
 /**
- * Ignores scheduled tasks
+ * Ignores scheduled tasks.
  */
 @Configuration
 public class UnregisterScheduledProcessor implements BeanFactoryPostProcessor {

@@ -162,9 +162,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources protocolResources = new AppResources(Protocol.class, getLocale());
-    AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
+    final AppResources protocolResources = new AppResources(Protocol.class, getLocale());
+    final AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
     name.setLabel(protocolResources.message(NAME));
     upload.setI18n(uploadI18N(getLocale()));

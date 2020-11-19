@@ -92,6 +92,9 @@ public class AnalysisServiceTest {
   private Locale locale = ENGLISH;
   private AppResources resources = new AppResources(AnalysisService.class, locale);
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
@@ -374,10 +377,10 @@ public class AnalysisServiceTest {
   @SuppressWarnings("unchecked")
   public void copyResources_Dataset() throws Throwable {
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    byte[] fastq1Content = writeRandom(paired1);
-    byte[] fastq2Content = writeRandom(paired2);
-    byte[] fastq3Content = writeRandom(secondPaired1);
-    byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
     Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
@@ -422,10 +425,10 @@ public class AnalysisServiceTest {
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    byte[] fastq1Content = writeRandom(paired1);
-    byte[] fastq2Content = writeRandom(paired2);
-    byte[] fastq3Content = writeRandom(secondPaired1);
-    byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
     Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
@@ -465,10 +468,10 @@ public class AnalysisServiceTest {
   public void copyResources_DatasetSymlinks() throws Throwable {
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
-    byte[] fastq1Content = writeRandom(paired1);
-    byte[] fastq2Content = writeRandom(paired2);
-    byte[] fastq3Content = writeRandom(secondPaired1);
-    byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
     Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
@@ -507,10 +510,10 @@ public class AnalysisServiceTest {
   @SuppressWarnings("unchecked")
   public void copyResources_DatasetZip() throws Throwable {
     when(sampleService.files(any())).thenReturn(pairedZipPaths, secondPairedZipPaths);
-    byte[] fastq1Content = writeRandom(pairedZip1);
-    byte[] fastq2Content = writeRandom(pairedZip2);
-    byte[] fastq3Content = writeRandom(secondPairedZip1);
-    byte[] fastq4Content = writeRandom(secondPairedZip2);
+    final byte[] fastq1Content = writeRandom(pairedZip1);
+    final byte[] fastq2Content = writeRandom(pairedZip2);
+    final byte[] fastq3Content = writeRandom(secondPairedZip1);
+    final byte[] fastq4Content = writeRandom(secondPairedZip2);
     Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));
@@ -549,8 +552,8 @@ public class AnalysisServiceTest {
   @SuppressWarnings("unchecked")
   public void copyResources_DatasetUnpaired() throws Throwable {
     when(sampleService.files(any())).thenReturn(unpairedPaths, secondUnpairedPaths);
-    byte[] fastq1Content = writeRandom(unpaired);
-    byte[] fastq3Content = writeRandom(secondUnpaired);
+    final byte[] fastq1Content = writeRandom(unpaired);
+    final byte[] fastq3Content = writeRandom(secondUnpaired);
     Path folder = service.copyResources(dataset);
     assertEquals(configuration.analysis(dataset), folder);
     assertTrue(Files.exists(folder));

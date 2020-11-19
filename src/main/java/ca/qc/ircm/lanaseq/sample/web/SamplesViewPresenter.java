@@ -82,7 +82,7 @@ public class SamplesViewPresenter {
     view.protocolDialog.addSavedListener(e -> loadSamples());
   }
 
-  public void localeChange(Locale locale) {
+  void localeChange(Locale locale) {
     this.locale = locale;
   }
 
@@ -94,17 +94,17 @@ public class SamplesViewPresenter {
     view.samples.setDataProvider(dataProvider);
   }
 
-  public void view(Sample sample) {
+  void view(Sample sample) {
     view.dialog.setSample(service.get(sample.getId()));
     view.dialog.open();
   }
 
-  public void viewFiles(Sample sample) {
+  void viewFiles(Sample sample) {
     view.filesDialog.setSample(sample);
     view.filesDialog.open();
   }
 
-  public void viewFiles() {
+  void viewFiles() {
     List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
     AppResources resources = new AppResources(SamplesView.class, locale);
     boolean error = false;
@@ -122,17 +122,17 @@ public class SamplesViewPresenter {
     }
   }
 
-  public void view(Protocol protocol) {
+  void viewProtocol(Protocol protocol) {
     view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
     view.protocolDialog.open();
   }
 
-  public void add() {
+  void add() {
     view.dialog.setSample(null);
     view.dialog.open();
   }
 
-  public void merge() {
+  void merge() {
     List<Sample> samples = view.samples.getSelectedItems().stream()
         .sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).collect(Collectors.toList());
     AppResources resources = new AppResources(SamplesView.class, locale);
@@ -162,22 +162,22 @@ public class SamplesViewPresenter {
     }
   }
 
-  public void filterName(String value) {
+  void filterName(String value) {
     filter.nameContains = value.isEmpty() ? null : value;
     view.samples.getDataProvider().refreshAll();
   }
 
-  public void filterProtocol(String value) {
+  void filterProtocol(String value) {
     filter.protocolContains = value.isEmpty() ? null : value;
     view.samples.getDataProvider().refreshAll();
   }
 
-  public void filterDate(Range<LocalDate> value) {
+  void filterDate(Range<LocalDate> value) {
     filter.dateRange = value;
     view.samples.getDataProvider().refreshAll();
   }
 
-  public void filterOwner(String value) {
+  void filterOwner(String value) {
     filter.ownerContains = value.isEmpty() ? null : value;
     view.samples.getDataProvider().refreshAll();
   }

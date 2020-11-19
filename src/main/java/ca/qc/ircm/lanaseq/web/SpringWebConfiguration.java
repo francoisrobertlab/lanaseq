@@ -39,6 +39,11 @@ import org.springframework.web.util.IntrospectorCleanupListener;
  */
 @Configuration
 public class SpringWebConfiguration implements WebMvcConfigurer {
+  /**
+   * Returns filter that logs request information like headers.
+   *
+   * @return requestLoggingFilter
+   */
   @Bean
   public FilterRegistrationBean<CommonsRequestLoggingFilter> requestLoggingFilter() {
     CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();

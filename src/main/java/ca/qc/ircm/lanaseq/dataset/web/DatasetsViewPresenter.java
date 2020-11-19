@@ -113,7 +113,7 @@ public class DatasetsViewPresenter {
     view.filesDialog.open();
   }
 
-  void view(Protocol protocol) {
+  void viewProtocol(Protocol protocol) {
     clearError();
     view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
     view.protocolDialog.open();

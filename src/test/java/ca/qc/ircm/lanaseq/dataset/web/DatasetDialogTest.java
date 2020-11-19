@@ -140,7 +140,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<GridDragStartEvent<Sample>>> dragStartListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<GridDragStartEvent<Sample>>> dragStartListenerCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<GridDragEndEvent<Sample>>> dragEndListenerCaptor;
   @Captor

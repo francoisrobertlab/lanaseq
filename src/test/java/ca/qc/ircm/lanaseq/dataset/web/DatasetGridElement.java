@@ -46,6 +46,12 @@ public class DatasetGridElement extends GridElement {
     return getHeaderCell(column(OWNER_COLUMN)).$(TextFieldElement.class).first();
   }
 
+  /**
+   * Control click dataset.
+   *
+   * @param row
+   *          row index
+   */
   public void controlClick(int row) {
     Keys key = Keys.CONTROL;
     if (SystemUtils.IS_OS_MAC_OSX) {

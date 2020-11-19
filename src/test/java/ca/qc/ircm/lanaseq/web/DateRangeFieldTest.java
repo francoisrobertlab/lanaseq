@@ -61,6 +61,9 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
   private Locale locale = ENGLISH;
   private AppResources resources = new AppResources(DateRangeField.class, locale);
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);

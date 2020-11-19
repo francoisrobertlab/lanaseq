@@ -67,34 +67,34 @@ public class ProtocolsViewPresenter {
     view.protocols.setDataProvider(dataProvider);
   }
 
-  public void view(Protocol protocol) {
+  void view(Protocol protocol) {
     view.dialog.setProtocol(service.get(protocol.getId()));
     view.dialog.open();
   }
 
-  public void history(Protocol protocol) {
+  void history(Protocol protocol) {
     if (authorizationService.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
       view.historyDialog.setProtocol(service.get(protocol.getId()));
       view.historyDialog.open();
     }
   }
 
-  public void add() {
+  void add() {
     view.dialog.setProtocol(new Protocol());
     view.dialog.open();
   }
 
-  public void filterName(String value) {
+  void filterName(String value) {
     filter.nameContains = value.isEmpty() ? null : value;
     view.protocols.getDataProvider().refreshAll();
   }
 
-  public void filterDate(Range<LocalDate> value) {
+  void filterDate(Range<LocalDate> value) {
     filter.dateRange = value;
     view.protocols.getDataProvider().refreshAll();
   }
 
-  public void filterOwner(String value) {
+  void filterOwner(String value) {
     filter.ownerContains = value.isEmpty() ? null : value;
     view.protocols.getDataProvider().refreshAll();
   }

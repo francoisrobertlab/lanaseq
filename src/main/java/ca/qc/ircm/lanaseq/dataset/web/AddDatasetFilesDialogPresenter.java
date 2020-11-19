@@ -87,6 +87,7 @@ public class AddDatasetFilesDialogPresenter {
           try {
             updateFilesThread.join(5000);
           } catch (InterruptedException e) {
+            // Assume interrupted.
           }
         }
         dialog.files.setItems(new ArrayList<>());

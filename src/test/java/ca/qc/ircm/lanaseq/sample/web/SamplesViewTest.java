@@ -313,7 +313,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     Sample sample = samples.get(0);
     doubleClickItem(view.samples, sample, view.protocol);
 
-    verify(presenter).view(sample.getProtocol());
+    verify(presenter).viewProtocol(sample.getProtocol());
   }
 
   @Test

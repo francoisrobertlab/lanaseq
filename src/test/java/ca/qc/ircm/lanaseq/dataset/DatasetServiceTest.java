@@ -94,6 +94,9 @@ public class DatasetServiceTest {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
@@ -333,7 +336,7 @@ public class DatasetServiceTest {
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(3L).get());
     sample1.setDate(LocalDate.of(2020, 7, 21));
-    Sample removed = dataset.getSamples().remove(1);
+    final Sample removed = dataset.getSamples().remove(1);
     Sample sample3 = new Sample();
     sample3.setSampleId("sample4");
     sample3.setReplicate("r4");
@@ -465,17 +468,17 @@ public class DatasetServiceTest {
 
   @Test
   public void saveFiles() throws Throwable {
-    Dataset dataset = repository.findById(1L).orElse(null);
+    final Dataset dataset = repository.findById(1L).orElse(null);
     List<Path> files = new ArrayList<>();
     Path file = temporaryFolder.newFile("dataset_R1.fastq").toPath();
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
-    FileTime filetime1 = Files.getLastModifiedTime(file);
+    final FileTime filetime1 = Files.getLastModifiedTime(file);
     files.add(file);
     file = temporaryFolder.newFile("dataset_R2.fastq").toPath();
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
-    FileTime filetime2 = Files.getLastModifiedTime(file);
+    final FileTime filetime2 = Files.getLastModifiedTime(file);
     files.add(file);
     Thread.sleep(1000); // Allows to test file modification time.
 

@@ -57,6 +57,9 @@ public class TagsFieldTest extends AbstractViewTestCase {
   private Locale locale = ENGLISH;
   private AppResources resources = new AppResources(TagsField.class, locale);
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);

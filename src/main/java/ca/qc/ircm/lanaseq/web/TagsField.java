@@ -54,6 +54,9 @@ public class TagsField extends CustomField<Set<String>> implements LocaleChangeO
   protected ComboBox<String> newTag = new ComboBox<>();
   private Validator<String> validator;
 
+  /**
+   * Creates a tags field.
+   */
   public TagsField() {
     HorizontalLayout layout = new HorizontalLayout(tagsLayout, newTag);
     layout.addClassName(CLASS_NAME);

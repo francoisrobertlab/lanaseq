@@ -69,23 +69,23 @@ public class SelectSampleDialogPresenter {
     dialog.samples.setDataProvider(dataProvider);
   }
 
-  public void select(Sample sample) {
+  void select(Sample sample) {
     logger.debug("selected sample {}", sample);
     dialog.fireSelectedEvent(sample);
     dialog.close();
   }
 
-  public void filterName(String value) {
+  void filterName(String value) {
     filter.nameContains = value.isEmpty() ? null : value;
     dialog.samples.getDataProvider().refreshAll();
   }
 
-  public void filterDate(Range<LocalDate> value) {
+  void filterDate(Range<LocalDate> value) {
     filter.dateRange = value;
     dialog.samples.getDataProvider().refreshAll();
   }
 
-  public void filterOwner(String value) {
+  void filterOwner(String value) {
     filter.ownerContains = value.isEmpty() ? null : value;
     dialog.samples.getDataProvider().refreshAll();
   }

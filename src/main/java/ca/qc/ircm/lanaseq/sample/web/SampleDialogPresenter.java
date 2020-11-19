@@ -82,7 +82,7 @@ public class SampleDialogPresenter {
     setSample(null);
   }
 
-  public void localeChange(Locale locale) {
+  void localeChange(Locale locale) {
     this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
     binder.forField(dialog.sampleId).asRequired(webResources.message(REQUIRED))

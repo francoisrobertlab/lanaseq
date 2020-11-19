@@ -89,10 +89,9 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
     samples.setId(id(SAMPLES));
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName));
-    date = samples
-        .addColumn(new LocalDateTimeRenderer<>(Sample::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
-            DATE)
-        .setKey(DATE);
+    date = samples.addColumn(
+        new LocalDateTimeRenderer<>(Sample::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        DATE).setKey(DATE);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     samples.addItemDoubleClickListener(e -> {
@@ -116,8 +115,8 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
+    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     String nameHeader = sampleResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
     String dateHeader = sampleResources.message(DATE);

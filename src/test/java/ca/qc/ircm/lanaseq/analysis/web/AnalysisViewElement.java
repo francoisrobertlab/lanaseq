@@ -18,7 +18,8 @@
 package ca.qc.ircm.lanaseq.analysis.web;
 
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.DATASETS;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.*;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.HEADER;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.SEQTOOLS;
 
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.AnchorElement;

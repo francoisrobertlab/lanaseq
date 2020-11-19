@@ -186,7 +186,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     Dataset dataset = datasets.get(0);
     doubleClickItem(view.datasets, dataset, view.datasets.protocol);
 
-    verify(presenter).view(protocol(dataset));
+    verify(presenter).viewProtocol(protocol(dataset));
   }
 
   @Test

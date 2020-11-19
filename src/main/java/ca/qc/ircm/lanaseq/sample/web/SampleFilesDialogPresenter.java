@@ -84,7 +84,7 @@ public class SampleFilesDialogPresenter {
     localeChange(Constants.DEFAULT_LOCALE);
   }
 
-  public void localeChange(Locale locale) {
+  void localeChange(Locale locale) {
     this.locale = locale;
     final AppResources resources = new AppResources(SampleFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);

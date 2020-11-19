@@ -81,7 +81,8 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<SampleDialog>>> savedListenerCaptor;
   @Captor
-  private ArgumentCaptor<ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
   @Autowired
   private SampleRepository repository;
   @Autowired

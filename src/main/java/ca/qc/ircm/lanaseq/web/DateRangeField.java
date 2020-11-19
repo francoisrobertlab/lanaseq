@@ -51,6 +51,9 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
   protected DatePicker to = new DatePicker();
   private Binder<Dates> binder = new BeanValidationBinder<>(Dates.class);
 
+  /**
+   * Creates a new date range field.
+   */
   public DateRangeField() {
     layout.setResponsiveSteps(new ResponsiveStep("20em", 1), new ResponsiveStep("20em", 2));
     layout.add(from, to);
