@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -43,6 +42,8 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 public class SpringConfiguration {
   @Autowired
   private MailConfiguration mailConfiguration;
+  @Autowired
+  private JavaMailSender mailSender;
 
   /**
    * Creates Thymeleaf's template engine.
@@ -58,18 +59,6 @@ public class SpringConfiguration {
   }
 
   /**
-   * Mail sender.
-   *
-   * @return mail sender
-   */
-  @Bean
-  public JavaMailSender mailSender() {
-    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-    mailSender.setHost(mailConfiguration.getHost());
-    return mailSender;
-  }
-
-  /**
    * Template message.
    *
    * @return template message
@@ -78,7 +67,7 @@ public class SpringConfiguration {
    */
   @Bean
   public MimeMessage templateMessage() throws MessagingException {
-    MimeMessage message = mailSender().createMimeMessage();
+    MimeMessage message = mailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message);
     helper.setFrom(mailConfiguration.getFrom());
     helper.setSubject(mailConfiguration.getSubject());

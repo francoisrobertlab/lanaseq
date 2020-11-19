@@ -29,6 +29,10 @@
   <logger name="org.springframework.security" level="INFO"/>
   <logger name="org.springframework.jdbc.datasource.init.ScriptUtils" level="WARN"/>
   <logger name="org.springframework.test.context.transaction.TransactionContext" level="WARN"/>
+  <logger name="org.springframework.test.context.support.AbstractDirtiesContextTestExecutionListener" level="DEBUG"/>
+  <logger name="com.icegreen.greenmail" level="DEBUG"/>
+  <!--
+  -->
   <!-- Show SQL and parameters.
   <logger name="org.hibernate.SQL" level="DEBUG"/>
   <logger name="org.hibernate.type.descriptor.sql" level="TRACE"/>

@@ -37,10 +37,9 @@ public class MailConfigurationTest {
   @Test
   public void defaultValues() {
     assertEquals(true, mailConfiguration.isEnabled());
-    assertEquals("myemailserver.com", mailConfiguration.getHost());
     assertEquals("proview@ircm.qc.ca", mailConfiguration.getFrom());
     assertEquals("christian.poitras@ircm.qc.ca", mailConfiguration.getTo());
     assertEquals("lanaseq", mailConfiguration.getSubject());
-    assertEquals("myemailserver.com", mailSender.getHost());
+    assertEquals("localhost", mailSender.getHost());
   }
 }

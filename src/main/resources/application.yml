@@ -31,6 +31,8 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans : true
+  mail:
+    host: myemailserver.com
 
 app:
   home: ${user.home}/lanaseq
@@ -80,7 +82,6 @@ vaadin:
 
 mail:
   enabled: true
-  host: myemailserver.com
   from: proview@ircm.qc.ca
   to: christian.poitras@ircm.qc.ca
 
@@ -101,6 +102,9 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: none
+  mail:
+    port: 30025
+    host: localhost
 
 security:
   rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'

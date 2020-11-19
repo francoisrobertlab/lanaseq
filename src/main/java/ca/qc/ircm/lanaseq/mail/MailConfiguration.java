@@ -30,7 +30,6 @@ public class MailConfiguration {
   @Value("${spring.application.name}")
   private String applicationName;
   private boolean enabled;
-  private String host;
   private String from;
   private String to;
 
@@ -44,14 +43,6 @@ public class MailConfiguration {
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
   }
 
   public String getFrom() {
