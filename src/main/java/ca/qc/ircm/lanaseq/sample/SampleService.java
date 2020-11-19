@@ -251,7 +251,8 @@ public class SampleService {
       Path target = folder.resolve(file.getFileName());
       try {
         logger.debug("moving file {} to {} for sample {}", file, target, sample);
-        Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
+        Files.delete(file);
       } catch (IOException e) {
         throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
       }
