@@ -29,11 +29,8 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
-import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
-import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -48,7 +45,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,40 +169,6 @@ public class DatasetFilesDialog extends Dialog
     } else {
       header.setText(resources.message(HEADER));
     }
-  }
-
-  /**
-   * Adds listener to be informed when a dataset was saved.
-   *
-   * @param listener
-   *          listener
-   * @return listener registration
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Registration
-      addSavedListener(ComponentEventListener<SavedEvent<DatasetFilesDialog>> listener) {
-    return addListener((Class) SavedEvent.class, listener);
-  }
-
-  void fireSavedEvent() {
-    fireEvent(new SavedEvent<>(this, true));
-  }
-
-  /**
-   * Adds listener to be informed when a dataset was saved.
-   *
-   * @param listener
-   *          listener
-   * @return listener registration
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Registration
-      addDeletedListener(ComponentEventListener<DeletedEvent<DatasetFilesDialog>> listener) {
-    return addListener((Class) DeletedEvent.class, listener);
-  }
-
-  void fireDeletedEvent() {
-    fireEvent(new DeletedEvent<>(this, true));
   }
 
   public Dataset getDataset() {
