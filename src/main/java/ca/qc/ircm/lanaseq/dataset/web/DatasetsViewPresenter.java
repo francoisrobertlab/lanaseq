@@ -72,6 +72,7 @@ public class DatasetsViewPresenter {
   void init(DatasetsView view) {
     this.view = view;
     view.dialog.addSavedListener(e -> view.datasets.refreshDatasets());
+    view.dialog.addDeletedListener(e -> view.datasets.refreshDatasets());
     view.protocolDialog.addSavedListener(e -> view.datasets.refreshDatasets());
     clearError();
   }

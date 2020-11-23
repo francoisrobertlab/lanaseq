@@ -47,6 +47,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -92,6 +93,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<List<Sample>> samplesCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<DatasetDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<DeletedEvent<DatasetDialog>>> deletedListenerCaptor;
   @Captor
   private ArgumentCaptor<
       ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
@@ -359,6 +362,17 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(view.datasets).refreshDatasets();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshDatasetsOnDeleted() {
+    view.datasets = mock(DatasetGrid.class);
+    verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
+    ComponentEventListener<DeletedEvent<DatasetDialog>> deletedListener =
+        deletedListenerCaptor.getValue();
+    deletedListener.onComponentEvent(mock(DeletedEvent.class));
     verify(view.datasets).refreshDatasets();
   }
 
