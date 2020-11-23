@@ -76,16 +76,17 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   @PostConstruct
   void init() {
     name = addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Dataset::getName));
+        .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
     tags = addColumn(dataset -> dataset.getTags().stream().collect(Collectors.joining(", ")), TAGS)
-        .setKey(TAGS);
+        .setKey(TAGS).setFlexGrow(1);
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
-        .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()));
+        .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()))
+        .setFlexGrow(1);
     date =
         addColumn(new LocalDateRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
-            .setKey(DATE);
+            .setKey(DATE).setFlexGrow(1);
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
-        .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail()));
+        .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
     appendHeaderRow(); // Headers.
     HeaderRow filtersRow = appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
