@@ -52,6 +52,8 @@ import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.dialog.GeneratedVaadinDialog.OpenedChangeEvent;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
@@ -59,6 +61,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.provider.DataProvider;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,6 +107,9 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<
       ComponentEventListener<SavedEvent<AddDatasetFilesDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<
+      ComponentEventListener<OpenedChangeEvent<Dialog>>> openedSampleFilesListenerCaptor;
   @Autowired
   private DatasetRepository repository;
   @Rule
@@ -463,5 +469,23 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.deleteFile(efile);
 
     verify(service).deleteFile(dataset, efile.getFile().toPath());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshSamplesOnSampleFilesDialogClose() {
+    Dataset dataset = repository.findById(1L).get();
+
+    presenter.setDataset(dataset);
+
+    dialog.samples.setDataProvider(mock(DataProvider.class));
+    verify(dialog.sampleFilesDialog)
+        .addOpenedChangeListener(openedSampleFilesListenerCaptor.capture());
+    ComponentEventListener<OpenedChangeEvent<Dialog>> openedSampleFilesListener =
+        openedSampleFilesListenerCaptor.getValue();
+    OpenedChangeEvent<Dialog> event = mock(OpenedChangeEvent.class);
+    when(event.isOpened()).thenReturn(false);
+    openedSampleFilesListener.onComponentEvent(event);
+    verify(dialog.samples.getDataProvider()).refreshAll();
   }
 }

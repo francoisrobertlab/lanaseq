@@ -84,6 +84,11 @@ public class DatasetFilesDialogPresenter {
     this.dialog = dialog;
     dialog.files.getEditor().setBinder(fileBinder);
     dialog.addFilesDialog.addSavedListener(e -> updateFiles());
+    dialog.sampleFilesDialog.addOpenedChangeListener(e -> {
+      if (!e.isOpened()) {
+        dialog.samples.getDataProvider().refreshAll();
+      }
+    });
     localeChange(Constants.DEFAULT_LOCALE);
   }
 
