@@ -79,6 +79,7 @@ public class SamplesViewPresenter {
     }
     loadSamples();
     view.dialog.addSavedListener(e -> loadSamples());
+    view.dialog.addDeletedListener(e -> loadSamples());
     view.protocolDialog.addSavedListener(e -> loadSamples());
   }
 

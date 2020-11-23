@@ -50,6 +50,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -101,6 +102,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<Dataset> datasetCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<SampleDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<ComponentEventListener<DeletedEvent<SampleDialog>>> deletedListenerCaptor;
   @Captor
   private ArgumentCaptor<
       ComponentEventListener<SavedEvent<ProtocolDialog>>> protocolSavedListenerCaptor;
@@ -409,6 +412,16 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<SampleDialog>> savedListener = savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(service, times(2)).all();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshSamplesOnDeleted() {
+    verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
+    ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener =
+        deletedListenerCaptor.getValue();
+    deletedListener.onComponentEvent(mock(DeletedEvent.class));
     verify(service, times(2)).all();
   }
 
