@@ -126,15 +126,16 @@ public class SamplesView extends VerticalLayout
     samples.setId(SAMPLES);
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Sample::getName));
+        .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
     protocol =
         samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
-            .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()));
+            .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
+            .setFlexGrow(1);
     date = samples
         .addColumn(new LocalDateRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
-        .setKey(DATE);
+        .setKey(DATE).setFlexGrow(1);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
-        .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
+        .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
     samples.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && e.getItem().getProtocol() != null) {
         presenter.viewProtocol(e.getItem().getProtocol());
