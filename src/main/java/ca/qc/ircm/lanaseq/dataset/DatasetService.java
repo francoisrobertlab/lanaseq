@@ -132,6 +132,7 @@ public class DatasetService {
     try {
       return Files.list(folder)
           .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+          .filter(file -> !file.toFile().isHidden())
           .collect(Collectors.toCollection(ArrayList::new));
     } catch (IOException e) {
       return new ArrayList<>();

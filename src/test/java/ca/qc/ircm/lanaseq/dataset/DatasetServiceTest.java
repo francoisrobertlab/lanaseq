@@ -56,6 +56,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -192,6 +193,11 @@ public class DatasetServiceTest {
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve(".deleted");
     Files.createFile(file);
+    file = folder.resolve(".hiddenFile");
+    Files.createFile(file);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(file, "dos:hidden", Boolean.TRUE);
+    }
 
     List<Path> files = service.files(dataset);
 
