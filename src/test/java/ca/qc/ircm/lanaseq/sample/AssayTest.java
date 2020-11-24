@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample;
 
+import static ca.qc.ircm.lanaseq.sample.Assay.CHEC_SEQ;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_EXO;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_SEQ;
 import static ca.qc.ircm.lanaseq.sample.Assay.MNASE_SEQ;
@@ -44,9 +45,10 @@ public class AssayTest {
   @Test
   public void getLabel_English() {
     Locale locale = Locale.ENGLISH;
-    assertEquals("MNaseSeq", MNASE_SEQ.getLabel(locale));
+    assertEquals("ChECSeq", CHEC_SEQ.getLabel(locale));
     assertEquals("ChIPSeq", CHIP_SEQ.getLabel(locale));
     assertEquals("ChIPexo", CHIP_EXO.getLabel(locale));
+    assertEquals("MNaseSeq", MNASE_SEQ.getLabel(locale));
     assertEquals("NETseq", NET_SEQ.getLabel(locale));
     assertEquals("RNAseq", RNA_SEQ.getLabel(locale));
   }
@@ -54,9 +56,10 @@ public class AssayTest {
   @Test
   public void getLabel_French() {
     Locale locale = Locale.FRENCH;
-    assertEquals("MNaseSeq", MNASE_SEQ.getLabel(locale));
+    assertEquals("ChECSeq", CHEC_SEQ.getLabel(locale));
     assertEquals("ChIPSeq", CHIP_SEQ.getLabel(locale));
     assertEquals("ChIPexo", CHIP_EXO.getLabel(locale));
+    assertEquals("MNaseSeq", MNASE_SEQ.getLabel(locale));
     assertEquals("NETseq", NET_SEQ.getLabel(locale));
     assertEquals("RNAseq", RNA_SEQ.getLabel(locale));
   }

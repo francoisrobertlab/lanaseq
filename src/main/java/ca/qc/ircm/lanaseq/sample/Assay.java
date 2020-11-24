@@ -24,7 +24,7 @@ import java.util.Locale;
  * Assay type.
  */
 public enum Assay {
-  MNASE_SEQ, CHIP_SEQ, CHIP_EXO, NET_SEQ, RNA_SEQ;
+  CHEC_SEQ, CHIP_SEQ, CHIP_EXO, MNASE_SEQ, NET_SEQ, RNA_SEQ;
 
   /**
    * Returns assay's label to show in user interface.
