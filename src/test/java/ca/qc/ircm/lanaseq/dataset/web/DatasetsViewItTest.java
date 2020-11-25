@@ -131,7 +131,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
 
     view.merge().click();
 
-    String name = "ChIPSeq_Spt16_yFR101_G24D_JS1-JS2-JS3_20181022";
+    String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS3_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetsView.class);
     assertEquals(resources.message(MERGED, name), notification.getText());

@@ -575,7 +575,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.save();
 
     verify(service).exists(
-        (sampleId + "_" + "ChIPSeq_IP_" + target + "_" + strain + "_" + strainDescription + "_"
+        (sampleId + "_" + "ChIPseq_IP_" + target + "_" + strain + "_" + strainDescription + "_"
             + treatment + "_" + replicate + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
                 .replaceAll("[^\\w-]", ""));
     verify(service, never()).save(any());
@@ -593,7 +593,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.save();
 
-    verify(service).exists("FR2_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
+    verify(service).exists("FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
     verify(service).get(2L);
     verify(service).save(any());
     verify(dialog).showNotification(any());

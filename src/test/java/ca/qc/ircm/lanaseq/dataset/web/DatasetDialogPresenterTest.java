@@ -1422,7 +1422,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.save();
 
     verify(service).exists(
-        ("ChIPSeq_IP_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_"
+        ("ChIPseq_IP_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_"
             + sampleId1 + "-" + sampleId2 + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
                 .replaceAll("[^\\w-]", ""));
     verify(service, never()).save(any());
@@ -1440,7 +1440,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.save();
 
-    verify(service).exists("ChIPSeq_Spt16_yFR101_G24D_JS1-JS2_20181022");
+    verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service).get(2L);
     verify(service).save(any());
     verify(dialog).showNotification(any());

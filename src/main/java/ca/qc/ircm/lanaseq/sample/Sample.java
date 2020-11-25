@@ -167,7 +167,8 @@ public class Sample implements Data, Owned, Serializable {
   public void generateName() {
     StringBuilder builder = new StringBuilder();
     builder.append(sampleId != null ? sampleId + "_" : "");
-    builder.append(assay != null ? assay.getLabel(Locale.ENGLISH) + "_" : "");
+    builder
+        .append(assay != null ? assay.getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_" : "");
     builder.append(type != null ? type.getLabel(Locale.ENGLISH) + "_" : "");
     builder.append(target != null ? target + "_" : "");
     builder.append(strain != null ? strain + "_" : "");

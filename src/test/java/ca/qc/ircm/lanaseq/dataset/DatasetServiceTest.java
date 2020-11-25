@@ -124,7 +124,7 @@ public class DatasetServiceTest {
     Dataset dataset = service.get(1L);
 
     assertEquals((Long) 1L, dataset.getId());
-    assertEquals("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
+    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
@@ -307,7 +307,7 @@ public class DatasetServiceTest {
     repository.flush();
     assertNotNull(dataset.getId());
     dataset = repository.findById(dataset.getId()).orElse(null);
-    assertEquals("ChIPSeq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_20200721", dataset.getName());
+    assertEquals("ChIPseq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_20200721", dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("tag1"));
     assertTrue(dataset.getTags().contains("tag2"));
@@ -360,7 +360,7 @@ public class DatasetServiceTest {
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20200721",
+    assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20200721",
         dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
@@ -404,7 +404,7 @@ public class DatasetServiceTest {
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("ChIPSeq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
+    assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
@@ -458,7 +458,7 @@ public class DatasetServiceTest {
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-sample2-FR3_20181020", dataset.getName());
+    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-sample2-FR3_20181020", dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));

@@ -347,9 +347,9 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     assertTrue(view.error.isVisible());
     assertEquals(
         datasetResources.message(NAME_ALREADY_EXISTS,
-            "MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
         view.error.getText());
-    verify(service).exists("MNaseSeq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
+    verify(service).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
     verify(service, never()).save(any());
     verify(view, never()).showNotification(any());
   }

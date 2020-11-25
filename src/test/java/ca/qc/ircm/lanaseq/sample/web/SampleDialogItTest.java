@@ -85,12 +85,16 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  private void fill(SampleDialogElement dialog) {
+  private void fill(SampleDialogElement dialog) throws InterruptedException {
     dialog.sampleId().setValue(sampleId);
     dialog.replicate().setValue(replicate);
     dialog.protocol().selectByText(protocol.getName());
+    dialog.assay().openPopup(); // Causes delay to make unit test work.
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
+    dialog.assay().closePopup(); // Causes delay to make unit test work.
+    dialog.type().openPopup(); // Causes delay to make unit test work.
     dialog.type().selectByText(type.getLabel(currentLocale()));
+    dialog.type().closePopup(); // Causes delay to make unit test work.
     dialog.target().setValue(target);
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
@@ -99,8 +103,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private String name() {
-    return sampleId + "_" + assay.getLabel(Locale.ENGLISH) + "_" + type.getLabel(Locale.ENGLISH)
-        + "_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_" + replicate;
+    return sampleId + "_" + assay.getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_"
+        + type.getLabel(Locale.ENGLISH) + "_" + target + "_" + strain + "_" + strainDescription
+        + "_" + treatment + "_" + replicate;
   }
 
   @Test
@@ -242,10 +247,10 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(treatment, sample.getTreatment());
     assertEquals(date, sample.getDate());
     Dataset dataset = datasetRepository.findById(2L).get();
-    assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "-JS2_20181022",
+    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "-JS2_20181022",
         dataset.getName());
     dataset = datasetRepository.findById(6L).get();
-    assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
   }
 
   @Test

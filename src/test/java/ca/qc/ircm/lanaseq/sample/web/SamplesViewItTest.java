@@ -131,7 +131,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
 
     view.merge().click();
 
-    String name = "ChIPSeq_Spt16_yFR101_G24D_JS2-JS1_20181022";
+    String name = "ChIPseq_Spt16_yFR101_G24D_JS2-JS1_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(SamplesView.class);
     assertEquals(resources.message(MERGED, name), notification.getText());

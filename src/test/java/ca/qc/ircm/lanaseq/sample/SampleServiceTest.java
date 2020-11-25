@@ -118,7 +118,7 @@ public class SampleServiceTest {
     Sample sample = service.get(1L);
 
     assertEquals((Long) 1L, sample.getId());
-    assertEquals("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
+    assertEquals("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
     assertEquals("FR1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals(Assay.MNASE_SEQ, sample.getAssay());
@@ -585,7 +585,7 @@ public class SampleServiceTest {
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getCreationDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getCreationDate()));
     assertEquals(LocalDate.of(2020, 7, 21), sample.getDate());
-    assertEquals("mysample_ChIPSeq_IP_mytarget_yFR213_F56G_37C_myreplicate_20200721",
+    assertEquals("mysample_ChIPseq_IP_mytarget_yFR213_F56G_37C_myreplicate_20200721",
         sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
@@ -623,7 +623,7 @@ public class SampleServiceTest {
     assertTrue(sample.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getCreationDate());
     assertEquals(LocalDate.of(2020, 7, 21), sample.getDate());
-    assertEquals("mysample_ChIPSeq_Input_mytarget_yFR213_F56G_37C_myreplicate_20200721",
+    assertEquals("mysample_ChIPseq_Input_mytarget_yFR213_F56G_37C_myreplicate_20200721",
         sample.getName());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
@@ -648,14 +648,14 @@ public class SampleServiceTest {
 
     repository.flush();
     Dataset dataset = datasetRepository.findById(2L).get();
-    assertEquals("ChIPSeq_Spt16_yFR101_G24D_sample1-JS2_20181022", dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_sample1-JS2_20181022", dataset.getName());
     assertEquals(2, dataset.getSamples().size());
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     dataset = datasetRepository.findById(6L).get();
-    assertEquals("ChIPSeq_Spt16_yFR101_G24D_sample1_20181208", dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_sample1_20181208", dataset.getName());
     assertEquals(1, dataset.getSamples().size());
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 3L, dataset.getOwner().getId());

@@ -101,8 +101,12 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.tags().newTag().setFilter(tag2);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.protocol().selectByText(protocol.getName());
+    dialog.assay().openPopup(); // Causes delay to make unit test work.
     dialog.assay().selectByText(assay.getLabel(currentLocale()));
+    dialog.assay().closePopup(); // Causes delay to make unit test work.
+    dialog.type().openPopup(); // Causes delay to make unit test work.
     dialog.type().selectByText(type.getLabel(currentLocale()));
+    dialog.type().closePopup(); // Causes delay to make unit test work.
     dialog.target().setValue(target);
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
@@ -113,8 +117,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private String name() {
-    return assay.getLabel(Locale.ENGLISH) + "_" + type.getLabel(Locale.ENGLISH) + "_" + target + "_"
-        + strain + "_" + strainDescription + "_" + treatment;
+    return assay.getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_"
+        + type.getLabel(Locale.ENGLISH) + "_" + target + "_" + strain + "_" + strainDescription
+        + "_" + treatment;
   }
 
   @Test
@@ -234,7 +239,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(treatment, sample.getTreatment());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     dataset = repository.findById(6L).get();
-    assertEquals("MNaseSeq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
   }
 
   @Test
@@ -254,7 +259,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name = "ChIPSeq_Spt16_yFR101_G24D_JS2-JS1_20181022";
+    String name = "ChIPseq_Spt16_yFR101_G24D_JS2-JS1_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -312,7 +317,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     AppResources resources = this.resources(DatasetDialog.class);
     Dataset dataset = repository.findById(2L).get();
     assertEquals(resources.message(SAVED, dataset.getName()), notification.getText());
-    assertEquals("ChIPSeq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));
