@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -40,6 +41,8 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,6 +56,8 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -62,12 +67,15 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetDialogItTest extends AbstractTestBenchTestCase {
+  private static final Logger logger = LoggerFactory.getLogger(DatasetDialogItTest.class);
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Autowired
   private DatasetRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private AppConfiguration configuration;
   private String tag1 = "mnase";
   private String tag2 = "ip";
   private Protocol protocol;
@@ -193,6 +201,11 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_Update() throws Throwable {
     open();
+    Dataset dataset = repository.findById(2L).get();
+    Path oldFolder = configuration.folder(dataset);
+    Files.createDirectories(oldFolder);
+    Path oldSampleFolder = configuration.folder(dataset.getSamples().get(0));
+    Files.createDirectories(oldSampleFolder);
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().doubleClick(0);
     DatasetDialogElement dialog = view.dialog();
@@ -206,7 +219,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
-    Dataset dataset = repository.findById(2L).get();
+    dataset = repository.findById(2L).get();
     assertEquals(name, dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("chipseq"));
@@ -238,8 +251,19 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
-    dataset = repository.findById(6L).get();
-    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208",
+        repository.findById(6L).get().getName());
+    Thread.sleep(1000); // Allow time to apply changes to files.
+    Path folder = configuration.folder(dataset);
+    Path sampleFolder = configuration.folder(dataset.getSamples().get(0));
+    logger.debug("dataset folder {} exists {}", folder, Files.exists(folder));
+    logger.debug("dataset old folder {} exists {}", oldFolder, Files.exists(oldFolder));
+    logger.debug("sample folder {} exists {}", sampleFolder, Files.exists(sampleFolder));
+    logger.debug("sample old folder {} exists {}", oldSampleFolder, Files.exists(oldSampleFolder));
+    assertTrue(Files.exists(folder));
+    assertFalse(Files.exists(oldFolder));
+    assertTrue(Files.exists(sampleFolder));
+    assertFalse(Files.exists(oldSampleFolder));
   }
 
   @Test
@@ -302,6 +326,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void addSample() throws Throwable {
     open();
+    Dataset dataset = repository.findById(2L).get();
+    Path oldFolder = configuration.folder(dataset);
+    Files.createDirectories(oldFolder);
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().doubleClick(0);
     DatasetDialogElement dialog = view.dialog();
@@ -315,7 +342,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
-    Dataset dataset = repository.findById(2L).get();
+    dataset = repository.findById(2L).get();
     assertEquals(resources.message(SAVED, dataset.getName()), notification.getText());
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
     assertEquals(3, dataset.getTags().size());
@@ -362,6 +389,12 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertEquals(LocalDate.of(2018, 12, 10), sample.getDate());
+    Thread.sleep(1000); // Allow time to apply changes to files.
+    Path folder = configuration.folder(dataset);
+    logger.debug("dataset folder {} exists {}", folder, Files.exists(folder));
+    logger.debug("dataset old folder {} exists {}", oldFolder, Files.exists(oldFolder));
+    assertTrue(Files.exists(folder));
+    assertFalse(Files.exists(oldFolder));
   }
 
   @Test
@@ -414,11 +447,13 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void delete() throws Throwable {
     open();
+    Dataset dataset = repository.findById(4L).get();
+    Path folder = configuration.folder(dataset);
+    Files.createDirectories(folder);
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
     view.datasets().doubleClick(0);
     DatasetDialogElement dialog = view.dialog();
-    Dataset dataset = repository.findById(4L).get();
     final String name = dataset.getName();
 
     TestTransaction.flagForCommit();
@@ -430,5 +465,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(DELETED, name), notification.getText());
     assertFalse(repository.findById(4L).isPresent());
+    Thread.sleep(1000); // Allow time to apply changes to files.
+    assertFalse(Files.exists(folder));
   }
 }

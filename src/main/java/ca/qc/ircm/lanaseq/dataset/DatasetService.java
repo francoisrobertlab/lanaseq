@@ -199,20 +199,27 @@ public class DatasetService {
         }
       }
     }
-    Path oldFolder = null;
-    if (dataset.getName() != null) {
-      oldFolder = configuration.folder(dataset);
-    }
+    Path oldFolder = oldFolder(dataset);
     dataset.generateName();
     repository.save(dataset);
     Path folder = configuration.folder(dataset);
     move(oldFolder, folder);
   }
 
+  private Path oldFolder(Dataset dataset) {
+    if (dataset.getId() != null) {
+      // Reset name to value in database to allow renaming folder.
+      dataset.setName(repository.findNameById(dataset.getId()).getName());
+      return configuration.folder(dataset);
+    } else {
+      return null;
+    }
+  }
+
   private void move(Path oldFolder, Path folder) {
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
-        logger.debug("moving folder {} to {} for dataset {}", oldFolder, folder);
+        logger.debug("moving folder {} to {}", oldFolder, folder);
         Files.move(oldFolder, folder);
       } catch (IOException e) {
         throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);
