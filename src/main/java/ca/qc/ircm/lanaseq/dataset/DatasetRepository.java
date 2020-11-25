@@ -28,12 +28,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Repository for {@link Dataset}.
  */
 public interface DatasetRepository extends JpaRepository<Dataset, Long> {
-  static interface DatasetName {
-    String getName();
-  }
-
-  public DatasetName findNameById(Long id);
-
   public boolean existsByName(String name);
 
   public boolean existsBySamples(Sample sample);

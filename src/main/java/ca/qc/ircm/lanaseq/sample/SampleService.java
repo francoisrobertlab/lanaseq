@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,19 +199,23 @@ public class SampleService {
       sample.setOwner(user);
       sample.setCreationDate(now);
       sample.setEditable(true);
-    } else {
-      // Reset name to value in database to allow renaming folder.
-      sample.setName(repository.findNameById(sample.getId()).getName());
-    }
-    Path oldFolder = null;
-    if (sample.getName() != null) {
-      oldFolder = configuration.folder(sample);
     }
     sample.generateName();
+    Path oldFolder = oldFolder(sample);
     repository.save(sample);
     Path folder = configuration.folder(sample);
     move(oldFolder, folder);
     renameDatasets(sample);
+  }
+
+  @Transactional(TxType.REQUIRES_NEW)
+  protected Path oldFolder(Sample sample) {
+    if (sample.getId() != null) {
+      Sample old = repository.findById(sample.getId()).get();
+      return configuration.folder(old);
+    } else {
+      return null;
+    }
   }
 
   private void renameDatasets(Sample sample) {
@@ -228,6 +233,10 @@ public class SampleService {
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
         logger.debug("moving folder {} to {}", oldFolder, folder);
+        Path parent = folder.getParent();
+        if (parent != null) {
+          Files.createDirectories(parent);
+        }
         Files.move(oldFolder, folder);
       } catch (IOException e) {
         throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);

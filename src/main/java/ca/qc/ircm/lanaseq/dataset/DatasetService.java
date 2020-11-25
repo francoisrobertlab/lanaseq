@@ -39,6 +39,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,6 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 
 /**
@@ -206,11 +207,11 @@ public class DatasetService {
     move(oldFolder, folder);
   }
 
-  private Path oldFolder(Dataset dataset) {
+  @Transactional(TxType.REQUIRES_NEW)
+  protected Path oldFolder(Dataset dataset) {
     if (dataset.getId() != null) {
-      // Reset name to value in database to allow renaming folder.
-      dataset.setName(repository.findNameById(dataset.getId()).getName());
-      return configuration.folder(dataset);
+      Dataset old = repository.findById(dataset.getId()).get();
+      return configuration.folder(old);
     } else {
       return null;
     }
@@ -220,6 +221,10 @@ public class DatasetService {
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
         logger.debug("moving folder {} to {}", oldFolder, folder);
+        Path parent = folder.getParent();
+        if (parent != null) {
+          Files.createDirectories(parent);
+        }
         Files.move(oldFolder, folder);
       } catch (IOException e) {
         throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);

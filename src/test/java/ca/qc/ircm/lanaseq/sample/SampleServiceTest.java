@@ -694,6 +694,7 @@ public class SampleServiceTest {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
     Sample sample = repository.findById(1L).orElse(null);
+    detach(sample);
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     Path beforeFolder = configuration.folder(sample);
@@ -743,6 +744,48 @@ public class SampleServiceTest {
     sample = repository.findById(1L).orElse(null);
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
+    Path folder = configuration.folder(sample);
+    assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  public void save_UpdateMoveFilesParentNotExists() throws Throwable {
+    when(configuration.folder(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.getRoot().toPath().resolve(String.valueOf(sample.getDate().getYear()))
+              .resolve(sample.getName())
+          : null;
+    });
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Sample sample = repository.findById(1L).orElse(null);
+    detach(sample);
+    Path beforeFolder = configuration.folder(sample);
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    sample.setDate(LocalDate.of(2020, 01, 12));
+
+    service.save(sample);
+
+    repository.flush();
+    sample = repository.findById(1L).orElse(null);
+    assertEquals("my sample", sample.getSampleId());
+    assertEquals("my replicate", sample.getReplicate());
+    assertEquals(LocalDate.of(2020, 01, 12), sample.getDate());
     Path folder = configuration.folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(

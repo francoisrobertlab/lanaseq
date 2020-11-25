@@ -501,6 +501,54 @@ public class DatasetServiceTest {
     assertFalse(Files.exists(beforeFolder));
   }
 
+  @Test
+  public void save_UpdateMoveFilesParentNotExists() throws Throwable {
+    when(configuration.folder(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.getRoot().toPath().resolve(String.valueOf(dataset.getDate().getYear()))
+              .resolve(dataset.getName())
+          : null;
+    });
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Dataset dataset = repository.findById(1L).orElse(null);
+    detach(dataset);
+    Path beforeFolder = configuration.folder(dataset);
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("dataset_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("dataset_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    dataset.setDate(LocalDate.of(2020, 01, 12));
+    Sample sample1 = dataset.getSamples().get(0);
+    sample1.setSampleId("sample1");
+    sample1.setReplicate("r1");
+    sample1.setAssay(Assay.CHIP_SEQ);
+    sample1.setType(SampleType.INPUT);
+    sample1.setTarget("my target");
+    sample1.setStrain("yFR213");
+    sample1.setStrainDescription("F56G");
+    sample1.setTreatment("37C");
+    sample1.setProtocol(protocolRepository.findById(3L).get());
+
+    service.save(dataset);
+
+    repository.flush();
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+    dataset = repository.findById(1L).orElse(null);
+    Path folder = configuration.folder(dataset);
+    assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder));
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void save_UpdateNotEditable() {
     User user = userRepository.findById(2L).orElse(null);
