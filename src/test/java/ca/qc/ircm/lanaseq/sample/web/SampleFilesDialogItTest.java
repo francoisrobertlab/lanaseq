@@ -94,7 +94,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     dialog.files().getRow(0).doubleClick();
     dialog.filenameEdit().setValue(sample.getName() + "_R1.fastq");
     dialog.filenameEdit().sendKeys(Keys.ENTER);
-    Thread.sleep(1000);
+    Thread.sleep(1000); // Allow time to apply changes to files.
 
     assertTrue(Files.exists(file.resolveSibling(sample.getName() + "_R1.fastq")));
     assertArrayEquals(
@@ -118,7 +118,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.delete(0).click();
-    Thread.sleep(1000);
+    Thread.sleep(1000); // Allow time to apply changes to files.
 
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(DELETED_FILENAME);

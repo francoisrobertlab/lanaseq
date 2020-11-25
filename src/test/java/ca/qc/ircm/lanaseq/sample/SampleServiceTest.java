@@ -52,6 +52,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -82,6 +83,8 @@ public class SampleServiceTest {
   private DatasetRepository datasetRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private EntityManager entityManager;
   @MockBean
   private DatasetService datasetService;
   @MockBean
@@ -111,6 +114,10 @@ public class SampleServiceTest {
           ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
           : null;
     });
+  }
+
+  private void detach(Sample sample) {
+    entityManager.detach(sample);
   }
 
   @Test
@@ -695,6 +702,40 @@ public class SampleServiceTest {
         beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
         beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+
+    service.save(sample);
+
+    repository.flush();
+    sample = repository.findById(1L).orElse(null);
+    assertEquals("my sample", sample.getSampleId());
+    assertEquals("my replicate", sample.getReplicate());
+    Path folder = configuration.folder(sample);
+    assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("sample_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  public void save_UpdateMoveFilesAlreadyRenamed() throws Throwable {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Sample sample = repository.findById(1L).orElse(null);
+    detach(sample);
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    Path beforeFolder = configuration.folder(sample);
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    sample.generateName();
 
     service.save(sample);
 

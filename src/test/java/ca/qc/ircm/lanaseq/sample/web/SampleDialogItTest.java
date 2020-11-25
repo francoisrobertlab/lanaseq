@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -39,6 +40,8 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,6 +68,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolRepository protocolRepository;
   @Autowired
   private DatasetRepository datasetRepository;
+  @Autowired
+  private AppConfiguration configuration;
   private Protocol protocol;
   private Assay assay = Assay.MNASE_SEQ;
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
@@ -76,9 +81,13 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private String replicate = "R3";
   private LocalDate date = LocalDate.of(2020, 07, 20);
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() throws Throwable {
     protocol = protocolRepository.findById(1L).get();
+    setHome(temporaryFolder.newFolder("home").toPath());
   }
 
   private void open() {
@@ -219,6 +228,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_Update() throws Throwable {
     open();
+    Sample sample = repository.findById(4L).get();
+    Path oldFolder = configuration.folder(sample);
+    Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.doubleClick(0);
     SampleDialogElement dialog = view.dialog();
@@ -232,7 +244,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(SampleDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
-    Sample sample = repository.findById(4L).get();
+    sample = repository.findById(4L).get();
     assertEquals(name, sample.getName());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
     assertEquals((Long) 3L, sample.getOwner().getId());
@@ -251,6 +263,10 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
         dataset.getName());
     dataset = datasetRepository.findById(6L).get();
     assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+    Thread.sleep(1000); // Allow time to apply changes to files.
+    Path folder = configuration.folder(sample);
+    assertTrue(Files.exists(folder));
+    assertFalse(Files.exists(oldFolder));
   }
 
   @Test
@@ -285,11 +301,13 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void delete() throws Throwable {
     open();
+    Sample sample = repository.findById(9L).get();
+    Path folder = configuration.folder(sample);
+    Files.createDirectories(folder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
     view.doubleClick(3);
     SampleDialogElement dialog = view.dialog();
-    Sample sample = repository.findById(9L).get();
     final String name = sample.getName();
 
     TestTransaction.flagForCommit();
@@ -301,5 +319,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     AppResources resources = this.resources(SampleDialog.class);
     assertEquals(resources.message(DELETED, name), notification.getText());
     assertFalse(repository.findById(9L).isPresent());
+    Thread.sleep(1000); // Allow time to apply changes to files.
+    assertFalse(Files.exists(folder));
   }
 }

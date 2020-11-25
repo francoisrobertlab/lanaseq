@@ -198,6 +198,9 @@ public class SampleService {
       sample.setOwner(user);
       sample.setCreationDate(now);
       sample.setEditable(true);
+    } else {
+      // Reset name to value in database to allow renaming folder.
+      sample.setName(repository.findNameById(sample.getId()).getName());
     }
     Path oldFolder = null;
     if (sample.getName() != null) {
@@ -224,7 +227,7 @@ public class SampleService {
   private void move(Path oldFolder, Path folder) {
     if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
       try {
-        logger.debug("moving folder {} to {} for dataset {}", oldFolder, folder);
+        logger.debug("moving folder {} to {}", oldFolder, folder);
         Files.move(oldFolder, folder);
       } catch (IOException e) {
         throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);
