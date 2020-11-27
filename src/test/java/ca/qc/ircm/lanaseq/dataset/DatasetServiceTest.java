@@ -44,6 +44,7 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -478,17 +479,6 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertEquals((Long) 2L, dataset.getOwner().getId());
-    assertTrue(dataset.isEditable());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
-    assertEquals(3, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertEquals((Long) 1L, sample.getId());
-    assertEquals("sample1", sample.getSampleId());
-    assertEquals("r1", sample.getReplicate());
     Path folder = configuration.folder(dataset);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(
@@ -546,6 +536,86 @@ public class DatasetServiceTest {
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  public void save_RenameFiles() throws Throwable {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Dataset dataset = repository.findById(1L).orElse(null);
+    Sample sample1 = dataset.getSamples().get(0);
+    sample1.setSampleId("sample1");
+    sample1.setReplicate("r1");
+    sample1.setAssay(Assay.CHIP_SEQ);
+    sample1.setType(SampleType.INPUT);
+    sample1.setTarget("my target");
+    sample1.setStrain("yFR213");
+    sample1.setStrainDescription("F56G");
+    sample1.setTreatment("37C");
+    sample1.setProtocol(protocolRepository.findById(3L).get());
+    Path beforeFolder = configuration.folder(dataset);
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeFolder
+            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
+        ("e254a11d5102c5555232c3d7d0a53a0b  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeFolder
+            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq.md5"),
+        ("c0f5c3b76104640e306fce3c669f300e  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+
+    service.save(dataset);
+
+    repository.flush();
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+    for (Sample sample : dataset.getSamples()) {
+      verify(sampleService).save(sample);
+    }
+    dataset = repository.findById(1L).orElse(null);
+    assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
+        dataset.getName());
+    Path folder = configuration.folder(dataset);
+    assertTrue(Files.exists(folder
+        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder
+            .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertTrue(Files.exists(folder
+        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
+    List<String> md5Lines = Files.readAllLines(folder
+        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq",
+        md5Lines.get(0));
+    assertTrue(Files.exists(folder
+        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder
+            .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq")));
+    assertTrue(Files.exists(folder
+        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq.md5")));
+    md5Lines = Files.readAllLines(folder
+        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "c0f5c3b76104640e306fce3c669f300e  "
+            + "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq",
+        md5Lines.get(0));
     assertFalse(Files.exists(beforeFolder));
   }
 

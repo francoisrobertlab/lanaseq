@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.file.Renamer;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
@@ -200,35 +202,22 @@ public class DatasetService {
         }
       }
     }
-    Path oldFolder = oldFolder(dataset);
+    Dataset old = old(dataset).orElse(null);
+    final String oldName = old != null ? old.getName() : null;
+    Path oldFolder = old != null ? configuration.folder(old) : null;
     dataset.generateName();
     repository.save(dataset);
     Path folder = configuration.folder(dataset);
-    move(oldFolder, folder);
+    Renamer.moveFolder(oldFolder, folder);
+    Renamer.renameFiles(oldName, dataset.getName(), folder);
   }
 
   @Transactional(TxType.REQUIRES_NEW)
-  protected Path oldFolder(Dataset dataset) {
+  protected Optional<Dataset> old(Dataset dataset) {
     if (dataset.getId() != null) {
-      Dataset old = repository.findById(dataset.getId()).get();
-      return configuration.folder(old);
+      return repository.findById(dataset.getId());
     } else {
-      return null;
-    }
-  }
-
-  private void move(Path oldFolder, Path folder) {
-    if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
-      try {
-        logger.debug("moving folder {} to {}", oldFolder, folder);
-        Path parent = folder.getParent();
-        if (parent != null) {
-          Files.createDirectories(parent);
-        }
-        Files.move(oldFolder, folder);
-      } catch (IOException e) {
-        throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);
-      }
+      return Optional.empty();
     }
   }
 

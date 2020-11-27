@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.file.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -201,46 +203,35 @@ public class SampleService {
       sample.setEditable(true);
     }
     sample.generateName();
-    Path oldFolder = oldFolder(sample);
+    Sample old = old(sample).orElse(null);
+    final String oldName = old != null ? old.getName() : null;
+    final Path oldFolder = old != null ? configuration.folder(old) : null;
     repository.save(sample);
     Path folder = configuration.folder(sample);
-    move(oldFolder, folder);
+    Renamer.moveFolder(oldFolder, folder);
+    Renamer.renameFiles(oldName, sample.getName(), folder);
     renameDatasets(sample);
   }
 
   @Transactional(TxType.REQUIRES_NEW)
-  protected Path oldFolder(Sample sample) {
+  protected Optional<Sample> old(Sample sample) {
     if (sample.getId() != null) {
-      Sample old = repository.findById(sample.getId()).get();
-      return configuration.folder(old);
+      return repository.findById(sample.getId());
     } else {
-      return null;
+      return Optional.empty();
     }
   }
 
   private void renameDatasets(Sample sample) {
     List<Dataset> datasets = datasetRepository.findBySamples(sample);
     for (Dataset dataset : datasets) {
+      final String oldName = dataset.getName();
       Path oldFolder = configuration.folder(dataset);
       dataset.generateName();
       datasetRepository.save(dataset);
       Path folder = configuration.folder(dataset);
-      move(oldFolder, folder);
-    }
-  }
-
-  private void move(Path oldFolder, Path folder) {
-    if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(folder)) {
-      try {
-        logger.debug("moving folder {} to {}", oldFolder, folder);
-        Path parent = folder.getParent();
-        if (parent != null) {
-          Files.createDirectories(parent);
-        }
-        Files.move(oldFolder, folder);
-      } catch (IOException e) {
-        throw new IllegalStateException("could not move folder " + oldFolder + " to " + folder, e);
-      }
+      Renamer.moveFolder(oldFolder, folder);
+      Renamer.renameFiles(oldName, dataset.getName(), folder);
     }
   }
 

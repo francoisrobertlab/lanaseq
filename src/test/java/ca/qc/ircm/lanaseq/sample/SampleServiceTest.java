@@ -41,6 +41,7 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -796,6 +797,104 @@ public class SampleServiceTest {
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
+  }
+
+  @Test
+  public void save_RenameFiles() throws Throwable {
+    User user = userRepository.findById(2L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
+    Sample sample = repository.findById(1L).orElse(null);
+    detach(sample);
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    Path beforeFolder = configuration.folder(sample);
+    Files.createDirectories(beforeFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq.md5"),
+        ("e254a11d5102c5555232c3d7d0a53a0b  "
+            + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq.md5"),
+        ("c0f5c3b76104640e306fce3c669f300e  "
+            + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+    Dataset dataset = datasetRepository.findById(1L).get();
+    Path beforeDatasetFolder = configuration.folder(dataset);
+    Files.createDirectories(beforeDatasetFolder);
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        beforeDatasetFolder
+            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeDatasetFolder
+            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq.md5"),
+        ("c0f5c3b76104640e306fce3c669f300e  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+
+    service.save(sample);
+
+    repository.flush();
+    sample = repository.findById(1L).orElse(null);
+    assertEquals("my sample", sample.getSampleId());
+    assertEquals("my replicate", sample.getReplicate());
+    Path folder = configuration.folder(sample);
+    assertTrue(Files.exists(folder
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder
+            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertTrue(Files.exists(folder
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
+    List<String> md5Lines = Files.readAllLines(folder
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq",
+        md5Lines.get(0));
+    assertTrue(Files.exists(folder
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder
+            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
+    assertTrue(Files.exists(folder
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq.md5")));
+    md5Lines = Files.readAllLines(folder
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "c0f5c3b76104640e306fce3c669f300e  "
+            + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq",
+        md5Lines.get(0));
+    assertFalse(Files.exists(beforeFolder));
+    dataset = datasetRepository.findById(1L).get();
+    Path datasetFolder = configuration.folder(dataset);
+    assertTrue(Files.exists(datasetFolder
+        .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_mysample-FR2-FR3_20181020_R2.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(datasetFolder
+            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_mysample-FR2-FR3_20181020_R2.fastq")));
+    assertTrue(Files.exists(datasetFolder
+        .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_mysample-FR2-FR3_20181020_R2.fastq.md5")));
+    md5Lines = Files.readAllLines(datasetFolder
+        .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_mysample-FR2-FR3_20181020_R2.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "c0f5c3b76104640e306fce3c669f300e  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_mysample-FR2-FR3_20181020_R2.fastq",
+        md5Lines.get(0));
+    assertFalse(Files.exists(beforeDatasetFolder));
   }
 
   @Test
