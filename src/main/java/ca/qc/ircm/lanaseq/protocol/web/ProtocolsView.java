@@ -96,7 +96,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   void init() {
     logger.debug("protocols view");
     setId(ID);
+    setHeightFull();
     add(header, protocols, add, dialog, historyDialog);
+    expand(protocols);
     header.setId(HEADER);
     protocols.setId(PROTOCOLS);
     name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)

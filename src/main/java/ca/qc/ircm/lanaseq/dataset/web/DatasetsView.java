@@ -101,8 +101,10 @@ public class DatasetsView extends VerticalLayout
   void init() {
     logger.debug("datasets view");
     setId(ID);
+    setHeightFull();
     add(header, datasets, error, new HorizontalLayout(add, merge, files), dialog, filesDialog,
         protocolDialog);
+    expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.setSelectionMode(SelectionMode.MULTI);

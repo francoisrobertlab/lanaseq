@@ -59,7 +59,9 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   void init() {
     logger.debug("analysis view");
     setId(ID);
+    setHeightFull();
     add(header, datasets, seqtools, dialog);
+    expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
