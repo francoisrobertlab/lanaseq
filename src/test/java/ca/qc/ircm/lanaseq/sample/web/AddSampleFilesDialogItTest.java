@@ -99,7 +99,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   public void refresh_Files() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.controlClick(0);
+    view.controlClick(2);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
@@ -118,7 +118,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   public void save() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.controlClick(0);
+    view.controlClick(2);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();

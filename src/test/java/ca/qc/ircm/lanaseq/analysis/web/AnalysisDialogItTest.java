@@ -105,7 +105,7 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
     final byte[] fastq4Content = writeFile(fastq4);
     open();
     AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
-    view.datasets().getCell(0, 0).doubleClick();
+    view.datasets().getCell(3, 0).doubleClick();
     AnalysisDialogElement dialog = view.dialog();
 
     dialog.create().click();

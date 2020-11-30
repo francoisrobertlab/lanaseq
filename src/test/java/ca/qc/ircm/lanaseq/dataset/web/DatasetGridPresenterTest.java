@@ -42,6 +42,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +91,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     grid = new DatasetGrid();
     grid.ownerFilter = new TextField();
     datasets = repository.findAll();
-    when(service.all()).thenReturn(datasets);
+    when(service.all()).thenReturn(new ArrayList<>(datasets));
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
@@ -103,6 +104,11 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
       assertTrue(dataset.toString(), datasets.contains(dataset));
+    }
+    LocalDate date = datasets.get(0).getDate();
+    for (Dataset dataset : datasets) {
+      assertTrue(date.compareTo(dataset.getDate()) >= 0);
+      date = dataset.getDate();
     }
   }
 

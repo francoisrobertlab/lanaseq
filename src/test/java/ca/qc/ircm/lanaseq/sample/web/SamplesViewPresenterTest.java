@@ -62,6 +62,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -136,7 +137,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.filesDialog = mock(SampleFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
-    when(service.all()).thenReturn(samples);
+    when(service.all()).thenReturn(new ArrayList<>(samples));
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
@@ -150,6 +151,12 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
       assertTrue(sample.toString(), samples.contains(sample));
+    }
+    LocalDate date = samples.get(0).getDate();
+    for (Sample sample : samples) {
+      assertTrue(sample + " with date " + sample.getDate() + " <= " + date,
+          date.compareTo(sample.getDate()) >= 0);
+      date = sample.getDate();
     }
     assertEquals(0, view.samples.getSelectedItems().size());
     samples.forEach(dataset -> view.samples.select(dataset));

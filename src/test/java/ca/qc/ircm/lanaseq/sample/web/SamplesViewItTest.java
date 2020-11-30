@@ -127,7 +127,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.samples().select(1);
-    view.samples().select(2);
+    view.samples().select(3);
 
     view.merge().click();
 

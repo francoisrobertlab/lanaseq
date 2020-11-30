@@ -17,6 +17,9 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static java.util.Collections.sort;
+import static java.util.Comparator.comparing;
+
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -27,6 +30,7 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -63,7 +67,9 @@ public class DatasetGridPresenter {
 
   @SuppressWarnings("checkstyle:linelength")
   void refreshDatasets() {
-    datasetsDataProvider = new ListDataProvider<>(service.all());
+    List<Dataset> datasets = service.all();
+    sort(datasets, comparing(Dataset::getDate).reversed());
+    datasetsDataProvider = new ListDataProvider<>(datasets);
     ConfigurableFilterDataProvider<Dataset, Void, SerializablePredicate<Dataset>> dataProvider =
         datasetsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);

@@ -169,7 +169,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClick(3);
+    view.doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
@@ -232,7 +232,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Path oldFolder = configuration.folder(sample);
     Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClick(0);
+    view.doubleClick(2);
     SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
@@ -306,7 +306,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(folder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClick(3);
+    view.doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     final String name = sample.getName();
 

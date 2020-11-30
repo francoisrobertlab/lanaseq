@@ -22,6 +22,8 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
+import static java.util.Collections.sort;
+import static java.util.Comparator.comparing;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -88,7 +90,9 @@ public class SamplesViewPresenter {
   }
 
   private void loadSamples() {
-    samplesDataProvider = DataProvider.ofCollection(service.all());
+    List<Sample> samples = service.all();
+    sort(samples, comparing(Sample::getDate).reversed());
+    samplesDataProvider = DataProvider.ofCollection(samples);
     ConfigurableFilterDataProvider<Sample, Void, SerializablePredicate<Sample>> dataProvider =
         samplesDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);

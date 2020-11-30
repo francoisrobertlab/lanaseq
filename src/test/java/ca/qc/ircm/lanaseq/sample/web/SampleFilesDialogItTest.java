@@ -88,7 +88,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.controlClick(0);
+    view.controlClick(2);
     SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.files().getRow(0).doubleClick();
@@ -114,7 +114,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.controlClick(0);
+    view.controlClick(2);
     SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.delete(0).click();
