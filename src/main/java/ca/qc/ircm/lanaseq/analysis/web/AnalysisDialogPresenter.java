@@ -78,6 +78,7 @@ public class AnalysisDialogPresenter {
         }).orElse(false);
         String folder = configuration.analysisLabel(dataset, unix);
         String network = configuration.folderNetwork(unix);
+        dialog.confirmLayout.removeAll();
         dialog.confirmLayout.add(new Span(resources.message(property(CONFIRM, "message"), folder)));
         if (network != null) {
           dialog.confirmLayout

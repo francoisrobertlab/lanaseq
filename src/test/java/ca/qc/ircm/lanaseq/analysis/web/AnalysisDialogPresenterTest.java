@@ -263,6 +263,31 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
+  public void createFolder_MultipleCalls() throws Throwable {
+    String folder = "test/dataset";
+    String network = "smb://test";
+    when(configuration.analysisLabel(any(), anyBoolean())).thenReturn(folder);
+    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
+    presenter.createFolder();
+    presenter.createFolder();
+    verify(service, times(2)).validate(eq(dataset), eq(locale), any());
+    verify(service, times(2)).copyResources(dataset);
+    verify(configuration, times(2)).analysisLabel(dataset, false);
+    verify(configuration, times(2)).folderNetwork(false);
+    assertEquals(2, dialog.confirmLayout.getComponentCount());
+    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
+    assertEquals(resources.message(property(CONFIRM, "message"), folder),
+        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
+    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
+    assertEquals(resources.message(property(CONFIRM, "network"), network),
+        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm, times(2)).open();
+    verify(dialog.errors, never()).open();
+    verify(dialog, never()).close();
+  }
+
+  @Test
   public void createFolder_IoException() throws Throwable {
     doThrow(new IOException("test")).when(service).copyResources(any());
     presenter.createFolder();
