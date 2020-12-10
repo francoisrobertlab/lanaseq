@@ -32,13 +32,13 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
-  public static final String SEQTOOLS = "seqtools";
-  public static final String SEQTOOLS_LINK =
-      "https://github.com/francoisrobertlab/seqtools/tree/master/computecanada";
+  public static final String ROBTOOLS = "robtools";
+  public static final String ROBTOOLS_LINK =
+      "https://github.com/francoisrobertlab/robtools/tree/master/computecanada";
   private static final long serialVersionUID = 6718796782451862327L;
   private static final Logger logger = LoggerFactory.getLogger(AnalysisView.class);
   protected H2 header = new H2();
-  protected Anchor seqtools = new Anchor();
+  protected Anchor robtools = new Anchor();
   @Autowired
   protected DatasetGrid datasets;
   @Autowired
@@ -60,14 +60,14 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
     logger.debug("analysis view");
     setId(ID);
     setHeightFull();
-    add(header, datasets, seqtools, dialog);
+    add(header, datasets, robtools, dialog);
     expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
     datasets.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
-    seqtools.setId(SEQTOOLS);
-    seqtools.setHref(SEQTOOLS_LINK);
-    seqtools.setTarget("_blank");
+    robtools.setId(ROBTOOLS);
+    robtools.setHref(ROBTOOLS_LINK);
+    robtools.setTarget("_blank");
     presenter.init(this);
   }
 
@@ -75,7 +75,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(AnalysisView.class, getLocale());
     header.setText(resources.message(HEADER));
-    seqtools.setText(resources.message(SEQTOOLS));
+    robtools.setText(resources.message(ROBTOOLS));
     presenter.localChange(getLocale());
   }
 

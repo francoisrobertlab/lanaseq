@@ -22,8 +22,8 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.DATASETS;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.HEADER;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ID;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.SEQTOOLS;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.SEQTOOLS_LINK;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ROBTOOLS;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ROBTOOLS_LINK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -73,14 +73,14 @@ public class AnalysisViewTest extends AbstractKaribuTestCase {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(DATASETS, view.datasets.getId().orElse(""));
-    assertEquals(SEQTOOLS, view.seqtools.getId().orElse(""));
+    assertEquals(ROBTOOLS, view.robtools.getId().orElse(""));
   }
 
   @Test
   public void labels() {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(resources.message(SEQTOOLS), view.seqtools.getText());
+    assertEquals(resources.message(ROBTOOLS), view.robtools.getText());
     verify(presenter).localChange(locale);
   }
 
@@ -92,14 +92,14 @@ public class AnalysisViewTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(resources.message(SEQTOOLS), view.seqtools.getText());
+    assertEquals(resources.message(ROBTOOLS), view.robtools.getText());
     verify(presenter).localChange(locale);
   }
 
   @Test
-  public void seqtools() {
-    assertEquals(SEQTOOLS_LINK, view.seqtools.getHref());
-    assertEquals("_blank", view.seqtools.getTarget().orElse(""));
+  public void robtools() {
+    assertEquals(ROBTOOLS_LINK, view.robtools.getHref());
+    assertEquals("_blank", view.robtools.getTarget().orElse(""));
   }
 
   @Test
