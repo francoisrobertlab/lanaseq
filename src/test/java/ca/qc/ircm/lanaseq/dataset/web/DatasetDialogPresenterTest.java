@@ -913,6 +913,24 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void addSample_AfterAddNewSample() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    assertEquals(3, items(dialog.samples).size());
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addNewSample();
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(5, samples.size());
+    assertEquals(sample, samples.get(samples.size() - 1));
+    assertNull(samples.get(samples.size() - 2).getId());
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void removeSample() {
     Dataset dataset = repository.findById(1L).get();

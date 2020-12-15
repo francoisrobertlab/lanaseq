@@ -159,7 +159,8 @@ public class DatasetDialogPresenter {
   }
 
   private void addSample(Sample sample) {
-    if (!samples.stream().filter(sa -> sa.getId().equals(sample.getId())).findAny().isPresent()) {
+    if (!samples.stream().filter(sa -> sa.getId() != null && sa.getId().equals(sample.getId()))
+        .findAny().isPresent()) {
       samples.add(sample);
       bindSampleFields(sample);
       refreshSamplesDataProvider();
