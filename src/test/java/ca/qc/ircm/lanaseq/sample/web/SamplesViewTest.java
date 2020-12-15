@@ -134,6 +134,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     view.date = mock(Column.class);
     when(view.samples.addColumn(any(LocalDateRenderer.class), eq(DATE))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
+    when(view.date.setComparator(any(Comparator.class))).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
     when(view.date.setFlexGrow(anyInt())).thenReturn(view.date);
     view.owner = mock(Column.class);
@@ -274,6 +275,13 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     for (Sample sample : samples) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
           getFormattedValue(localDateRenderer, sample));
+    }
+    verify(view.date).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    LocalDate firstDate = samples.get(0).getDate();
+    for (Sample sample : samples) {
+      assertEquals(firstDate.compareTo(sample.getDate()),
+          comparator.compare(samples.get(0), sample));
     }
     verify(view.samples).addColumn(valueProviderCaptor.capture(), eq(OWNER));
     valueProvider = valueProviderCaptor.getValue();

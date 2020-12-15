@@ -56,6 +56,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
@@ -135,7 +136,7 @@ public class SamplesView extends VerticalLayout
             .setFlexGrow(1);
     date = samples
         .addColumn(new LocalDateRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
-        .setKey(DATE).setFlexGrow(1);
+        .setKey(DATE).setComparator(Comparator.comparing(Sample::getDate)).setFlexGrow(1);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
     samples.addItemDoubleClickListener(e -> {
