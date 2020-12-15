@@ -48,7 +48,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.renderer.BasicRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -78,7 +79,7 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
   @Captor
-  private ArgumentCaptor<LocalDateTimeRenderer<Sample>> localDateTimeRendererCaptor;
+  private ArgumentCaptor<LocalDateRenderer<Sample>> localDateRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Autowired
@@ -110,9 +111,9 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
     when(dialog.name.setComparator(any(Comparator.class))).thenReturn(dialog.name);
     when(dialog.name.setHeader(any(String.class))).thenReturn(dialog.name);
     dialog.date = mock(Column.class);
-    when(dialog.samples.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
-        .thenReturn(dialog.date);
+    when(dialog.samples.addColumn(any(BasicRenderer.class), eq(DATE))).thenReturn(dialog.date);
     when(dialog.date.setKey(any())).thenReturn(dialog.date);
+    when(dialog.date.setComparator(any(Comparator.class))).thenReturn(dialog.date);
     when(dialog.date.setHeader(any(String.class))).thenReturn(dialog.date);
     dialog.owner = mock(Column.class);
     when(dialog.samples.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(dialog.owner);
@@ -199,11 +200,18 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
       assertEquals(sample.getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(dialog.samples).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
-    LocalDateTimeRenderer<Sample> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
+    verify(dialog.samples).addColumn(localDateRendererCaptor.capture(), eq(DATE));
+    LocalDateRenderer<Sample> localDateTimeRenderer = localDateRendererCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getCreationDate()),
+      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
           getFormattedValue(localDateTimeRenderer, sample));
+    }
+    verify(dialog.date).setComparator(comparatorCaptor.capture());
+    comparator = comparatorCaptor.getValue();
+    LocalDate firstDate = samples.get(0).getDate();
+    for (Sample sample : samples) {
+      assertEquals(firstDate.compareTo(sample.getDate()),
+          comparator.compare(samples.get(0), sample));
     }
     verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(OWNER));
     valueProvider = valueProviderCaptor.getValue();

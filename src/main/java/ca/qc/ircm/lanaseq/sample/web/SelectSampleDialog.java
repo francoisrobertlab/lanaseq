@@ -36,13 +36,14 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -89,9 +90,9 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
     samples.setId(id(SAMPLES));
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName));
-    date = samples.addColumn(
-        new LocalDateTimeRenderer<>(Sample::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
-        DATE).setKey(DATE);
+    date = samples
+        .addColumn(new LocalDateRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
+        .setKey(DATE).setComparator(Comparator.comparing(Sample::getDate));
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     samples.addItemDoubleClickListener(e -> {
