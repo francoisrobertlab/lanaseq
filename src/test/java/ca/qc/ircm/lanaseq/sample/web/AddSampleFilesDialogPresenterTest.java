@@ -29,8 +29,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +60,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -113,6 +112,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
    * Before test.
    */
   @Before
+  @SuppressWarnings("unchecked")
   public void beforeTest() {
     ui.setLocale(locale);
     dialog.header = new H3();
@@ -138,15 +138,12 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       boolean linux = i.getArgument(0);
       return (linux ? uploadNetworkLinux : uploadNetworkWindows);
     });
+    when(service.uploadFiles(any())).thenReturn(new ArrayList<>(),
+        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList()),
+        files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     when(service.files(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
-    doAnswer(i -> {
-      Collection<Path> files = i.getArgument(1);
-      for (Path file : files) {
-        Files.delete(file);
-      }
-      return null;
-    }).when(service).saveFiles(any(), any());
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -268,7 +265,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.setSample(sample, locale);
 
-    verify(configuration, atLeastOnce()).upload(sample);
+    verify(service, atLeastOnce()).uploadFiles(sample);
     List<File> files = items(dialog.files);
     assertTrue(files.isEmpty());
   }
@@ -282,28 +279,18 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void updateFiles() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
-    Files.createDirectory(uploadFolder(sample).resolve("dir"));
-    Files.createFile(uploadFolder(sample).resolve("dir").resolve("test.txt"));
-    Path hiddenFile = uploadFolder(sample).resolve(".hidden.txt");
-    Files.createFile(hiddenFile);
-    if (SystemUtils.IS_OS_WINDOWS) {
-      Files.setAttribute(hiddenFile, "dos:hidden", true);
-    }
 
     presenter.updateFiles();
 
+    verify(service, times(2)).uploadFiles(sample);
     List<File> files = items(dialog.files);
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath()).toFile()));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(2).toPath()));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(3).toPath()));
 
     presenter.updateFiles();
 
+    verify(service, times(3)).uploadFiles(sample);
     files = items(dialog.files);
     assertEquals(4, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath()).toFile()));
@@ -366,9 +353,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_OverwriteNotAllowed() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
 
     presenter.save(locale);
 
@@ -385,9 +369,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", true));
-    Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
 
     presenter.save(locale);
 
@@ -407,9 +388,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.files(any())).thenReturn(new ArrayList<>());
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    Files.createDirectories(uploadFolder(sample));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(0).toPath()));
-    Files.createFile(uploadFolder(sample).resolve(this.files.get(1).toPath()));
 
     presenter.save(locale);
 
@@ -425,6 +403,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void save_NoFiles() {
+    when(service.uploadFiles(any())).thenReturn(new ArrayList<>());
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
 

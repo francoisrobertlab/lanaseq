@@ -111,6 +111,15 @@ public class DatasetServiceTest {
           ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
           : null;
     });
+    when(configuration.upload(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
+          : null;
+    });
+    when(configuration.getUpload()).then(i -> {
+      return temporaryFolder.getRoot().toPath().resolve("upload");
+    });
     doAnswer(i -> {
       Sample sample = i.getArgument(0);
       if (sample.getId() == null) {
@@ -239,6 +248,126 @@ public class DatasetServiceTest {
   @Test
   public void files_Null() throws Throwable {
     List<Path> files = service.files(null);
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  public void uploadFiles() throws Throwable {
+    Dataset dataset = repository.findById(1L).orElse(null);
+    Path upload = configuration.getUpload();
+    Files.createDirectories(upload);
+    Path uploadFile = upload.resolve(dataset.getName() + ".fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("." + dataset.getName() + ".bed");
+    Files.createFile(uploadFile);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(uploadFile, "dos:hidden", Boolean.TRUE);
+    }
+    uploadFile = upload.resolve(dataset.getName());
+    Files.createDirectory(uploadFile);
+    Path folder = configuration.upload(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("dataset_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("dataset_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve(".deleted");
+    Files.createFile(file);
+    file = folder.resolve(".hiddenFile");
+    Files.createFile(file);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(file, "dos:hidden", Boolean.TRUE);
+    }
+    file = folder.resolve("folder");
+    Files.createDirectory(file);
+
+    List<Path> files = service.uploadFiles(dataset);
+
+    verify(configuration, times(2)).getUpload();
+    verify(configuration, times(2)).upload(dataset);
+    assertEquals(3, files.size());
+    assertTrue(files.contains(upload.resolve(dataset.getName() + ".fastq")));
+    assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("dataset_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void uploadFiles_DatasetFolderNotExists() throws Throwable {
+    Dataset dataset = repository.findById(1L).orElse(null);
+    Path upload = configuration.getUpload();
+    Files.createDirectories(upload);
+    Path uploadFile = upload.resolve(dataset.getName() + ".fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("." + dataset.getName() + ".bed");
+    Files.createFile(uploadFile);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(uploadFile, "dos:hidden", Boolean.TRUE);
+    }
+    uploadFile = upload.resolve(dataset.getName());
+    Files.createDirectory(uploadFile);
+
+    List<Path> files = service.uploadFiles(dataset);
+
+    verify(configuration, times(2)).getUpload();
+    verify(configuration).upload(dataset);
+    assertEquals(1, files.size());
+    assertTrue(files.contains(upload.resolve(dataset.getName() + ".fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void uploadFiles_UploadFolderNotExists() throws Throwable {
+    Dataset dataset = repository.findById(1L).orElse(null);
+    Path folder = configuration.upload(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("dataset_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("dataset_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve(".deleted");
+    Files.createFile(file);
+    file = folder.resolve(".hiddenFile");
+    Files.createFile(file);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(file, "dos:hidden", Boolean.TRUE);
+    }
+    file = folder.resolve("folder");
+    Files.createDirectory(file);
+
+    List<Path> files = service.uploadFiles(dataset);
+
+    verify(configuration).getUpload();
+    verify(configuration, times(2)).upload(dataset);
+    assertEquals(2, files.size());
+    assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("dataset_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void uploadFiles_NullId() throws Throwable {
+    List<Path> files = service.uploadFiles(new Dataset());
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  public void uploadFiles_Null() throws Throwable {
+    List<Path> files = service.uploadFiles(null);
 
     assertTrue(files.isEmpty());
   }

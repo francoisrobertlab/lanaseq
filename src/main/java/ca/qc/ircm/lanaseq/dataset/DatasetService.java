@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import org.slf4j.Logger;
@@ -137,6 +138,39 @@ public class DatasetService {
           .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
           .filter(file -> !file.toFile().isHidden())
           .collect(Collectors.toCollection(ArrayList::new));
+    } catch (IOException e) {
+      return new ArrayList<>();
+    }
+  }
+
+  /**
+   * Returns all dataset's upload files.
+   *
+   * @param dataset
+   *          dataset
+   * @return all dataset's upload files
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public List<Path> uploadFiles(Dataset dataset) {
+    if (dataset == null || dataset.getId() == null) {
+      return new ArrayList<>();
+    }
+    Path upload = configuration.getUpload();
+    Path sampleUpload = configuration.upload(dataset);
+    try {
+      Stream<Path> files = Stream.empty();
+      if (Files.exists(upload)) {
+        files =
+            Stream.concat(Files.list(upload).filter(file -> file.toFile().isFile()).filter(file -> {
+              String filename = Optional.ofNullable(file.getFileName().toString()).orElse("");
+              return filename.contains(dataset.getName());
+            }).filter(file -> !file.toFile().isHidden()), files);
+      }
+      if (Files.exists(sampleUpload)) {
+        files = Stream.concat(Files.list(sampleUpload).filter(file -> file.toFile().isFile())
+            .filter(file -> !file.toFile().isHidden()), files);
+      }
+      return files.collect(Collectors.toList());
     } catch (IOException e) {
       return new ArrayList<>();
     }

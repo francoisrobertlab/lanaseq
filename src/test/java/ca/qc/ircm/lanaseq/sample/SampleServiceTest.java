@@ -109,6 +109,15 @@ public class SampleServiceTest {
           ? temporaryFolder.getRoot().toPath().resolve(sample.getName())
           : null;
     });
+    when(configuration.upload(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.getRoot().toPath().resolve(sample.getName())
+          : null;
+    });
+    when(configuration.getUpload()).then(i -> {
+      return temporaryFolder.getRoot().toPath().resolve("upload");
+    });
     when(configuration.folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
@@ -234,6 +243,122 @@ public class SampleServiceTest {
   @Test
   public void files_Null() throws Throwable {
     List<Path> files = service.files(null);
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  public void uploadFiles() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path upload = configuration.getUpload();
+    Files.createDirectories(upload);
+    Path uploadFile = upload.resolve(sample.getName() + ".fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("." + sample.getName() + ".bed");
+    Files.createFile(uploadFile);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(uploadFile, "dos:hidden", Boolean.TRUE);
+    }
+    uploadFile = upload.resolve(sample.getName());
+    Files.createDirectory(uploadFile);
+    Path folder = configuration.upload(sample);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("sample_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("sample_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve(".hiddenFile");
+    Files.createFile(file);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(file, "dos:hidden", Boolean.TRUE);
+    }
+    file = folder.resolve("folder");
+    Files.createDirectory(file);
+
+    List<Path> files = service.uploadFiles(sample);
+
+    verify(configuration, times(2)).getUpload();
+    verify(configuration, times(2)).upload(sample);
+    assertEquals(3, files.size());
+    assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  public void uploadFiles_SampleFolderNotExists() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path upload = configuration.getUpload();
+    Files.createDirectories(upload);
+    Path uploadFile = upload.resolve(sample.getName() + ".fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), uploadFile,
+        StandardCopyOption.REPLACE_EXISTING);
+    uploadFile = upload.resolve("." + sample.getName() + ".bed");
+    Files.createFile(uploadFile);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(uploadFile, "dos:hidden", Boolean.TRUE);
+    }
+    uploadFile = upload.resolve(sample.getName());
+    Files.createDirectory(uploadFile);
+
+    List<Path> files = service.uploadFiles(sample);
+
+    verify(configuration, times(2)).getUpload();
+    verify(configuration).upload(sample);
+    assertEquals(1, files.size());
+    assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  public void uploadFiles_UploadFolderNotExists() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.upload(sample);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("sample_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("sample_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve(".hiddenFile");
+    Files.createFile(file);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(file, "dos:hidden", Boolean.TRUE);
+    }
+    file = folder.resolve("folder");
+    Files.createDirectory(file);
+
+    List<Path> files = service.uploadFiles(sample);
+
+    verify(configuration).getUpload();
+    verify(configuration, times(2)).upload(sample);
+    assertEquals(2, files.size());
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  public void uploadFiles_NullId() throws Throwable {
+    List<Path> files = service.uploadFiles(new Sample());
+
+    assertTrue(files.isEmpty());
+  }
+
+  @Test
+  public void uploadFiles_Null() throws Throwable {
+    List<Path> files = service.uploadFiles(null);
 
     assertTrue(files.isEmpty());
   }

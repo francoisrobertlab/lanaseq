@@ -110,8 +110,10 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(2, dialog.files().getRowCount());
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         configuration.upload(dataset).resolve("other.fastq"));
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        configuration.getUpload().resolve("prefix_" + dataset.getName() + "_R1"));
     Thread.sleep(2500);
-    assertEquals(3, dialog.files().getRowCount());
+    assertEquals(4, dialog.files().getRowCount());
   }
 
   @Test
@@ -121,9 +123,12 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().controlClick(3);
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
-    AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
+    final AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
     Dataset dataset = repository.findById(2L).get();
     copyFiles(dataset);
+    String filenameInRoot = "prefix_" + dataset.getName() + "_R1";
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+        configuration.getUpload().resolve(filenameInRoot));
 
     TestTransaction.flagForCommit();
     dialog.save().click();
@@ -131,11 +136,12 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(AddDatasetFilesDialog.class);
-    assertEquals(resources.message(SAVED, 2, dataset.getName()), notification.getText());
+    assertEquals(resources.message(SAVED, 3, dataset.getName()), notification.getText());
     Path folder = configuration.folder(dataset);
     Path upload = configuration.upload(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertTrue(Files.exists(folder.resolve(file2.getFileName())));
+    assertFalse(Files.exists(upload.getParent().resolve(filenameInRoot)));
     assertFalse(Files.exists(upload.resolve(file1.getFileName())));
     assertFalse(Files.exists(upload.resolve(file2.getFileName())));
     assertArrayEquals(
@@ -144,5 +150,8 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve(file2.getFileName())));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve(filenameInRoot)));
   }
 }

@@ -35,12 +35,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,13 +135,7 @@ public class AddDatasetFilesDialogPresenter {
   void updateFiles() {
     existingFilenames = service.files(dataset).stream().map(file -> file.toFile().getName())
         .collect(Collectors.toSet());
-    Path folder = folder();
-    if (folder != null && Files.isDirectory(folder)) {
-      dialog.files.setItems(
-          Stream.of(folder.toFile().listFiles()).filter(file -> file.isFile() && !file.isHidden()));
-    } else {
-      dialog.files.setItems(new ArrayList<>());
-    }
+    dialog.files.setItems(service.uploadFiles(dataset).stream().map(file -> file.toFile()));
   }
 
   boolean exists(File file) {
@@ -168,14 +160,7 @@ public class AddDatasetFilesDialogPresenter {
   }
 
   void save() {
-    Path folder = folder();
-    Collection<Path> files;
-    try {
-      files = folder != null ? Files.list(folder).collect(Collectors.toList())
-          : Collections.emptyList();
-    } catch (IOException e) {
-      files = Collections.emptyList();
-    }
+    Collection<Path> files = service.uploadFiles(dataset);
     if (validate(files)) {
       logger.debug("save new files {} for dataset {}", files, dataset);
       service.saveFiles(dataset, files);
