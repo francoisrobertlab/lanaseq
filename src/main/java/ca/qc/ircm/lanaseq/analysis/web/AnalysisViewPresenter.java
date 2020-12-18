@@ -13,15 +13,12 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AnalysisViewPresenter {
   private AnalysisView view;
-  @SuppressWarnings("unused")
-  private Locale locale;
 
   void init(AnalysisView view) {
     this.view = view;
   }
 
   void localChange(Locale locale) {
-    this.locale = locale;
   }
 
   void view(Dataset dataset) {

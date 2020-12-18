@@ -51,7 +51,7 @@ public class PasswordView extends VerticalLayout
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = -8554355390432590290L;
-  private Logger logger = LoggerFactory.getLogger(PasswordView.class);
+  private static final Logger logger = LoggerFactory.getLogger(PasswordView.class);
   protected H2 header = new H2();
   protected PasswordsForm passwords = new PasswordsForm();
   protected Button save = new Button();
