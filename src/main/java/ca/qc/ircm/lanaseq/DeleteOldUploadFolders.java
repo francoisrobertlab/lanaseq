@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +61,8 @@ public class DeleteOldUploadFolders {
     logger.debug("deleting old folders in upload {}", upload);
     Duration deleteAge = configuration.getUploadDeleteAge();
     Instant now = Instant.now();
-    try {
-      Files.list(upload).filter(file -> {
+    try (Stream<Path> files = Files.list(upload)) {
+      files.filter(file -> {
         try {
           FileTime modifiedTime = Files.getLastModifiedTime(file);
           Duration age = Duration.between(modifiedTime.toInstant(), now);

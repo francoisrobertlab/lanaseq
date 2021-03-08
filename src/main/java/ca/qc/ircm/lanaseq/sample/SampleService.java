@@ -125,9 +125,8 @@ public class SampleService {
       return new ArrayList<>();
     }
     Path folder = configuration.folder(sample);
-    try {
-      return Files.list(folder)
-          .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+    try (Stream<Path> files = Files.list(folder)) {
+      return files.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
           .filter(file -> !file.toFile().isHidden())
           .collect(Collectors.toCollection(ArrayList::new));
     } catch (IOException e) {
@@ -150,19 +149,22 @@ public class SampleService {
     Path upload = configuration.getUpload();
     Path sampleUpload = configuration.upload(sample);
     try {
-      Stream<Path> files = Stream.empty();
+      List<Path> files = new ArrayList<>();
       if (Files.exists(upload)) {
-        files =
-            Stream.concat(Files.list(upload).filter(file -> file.toFile().isFile()).filter(file -> {
-              String filename = Optional.ofNullable(file.getFileName().toString()).orElse("");
-              return filename.contains(sample.getName());
-            }).filter(file -> !file.toFile().isHidden()), files);
+        try (Stream<Path> uploadFiles = Files.list(upload)) {
+          uploadFiles.filter(file -> file.toFile().isFile()).filter(file -> {
+            String filename = Optional.ofNullable(file.getFileName().toString()).orElse("");
+            return filename.contains(sample.getName());
+          }).filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+        }
       }
       if (Files.exists(sampleUpload)) {
-        files = Stream.concat(Files.list(sampleUpload).filter(file -> file.toFile().isFile())
-            .filter(file -> !file.toFile().isHidden()), files);
+        try (Stream<Path> uploadFiles = Files.list(sampleUpload)) {
+          uploadFiles.filter(file -> file.toFile().isFile())
+              .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+        }
       }
-      return files.collect(Collectors.toList());
+      return files;
     } catch (IOException e) {
       return new ArrayList<>();
     }

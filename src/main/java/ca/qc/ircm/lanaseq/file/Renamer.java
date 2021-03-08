@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +55,8 @@ public class Renamer {
    */
   public static void renameFiles(String oldName, String newName, Path folder) {
     List<Path> files;
-    try {
-      files = Files.list(folder).collect(Collectors.toList());
+    try (Stream<Path> stream = Files.list(folder)) {
+      files = stream.collect(Collectors.toList());
     } catch (IOException e) {
       files = new ArrayList<>();
     }
