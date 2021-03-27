@@ -17,6 +17,11 @@
 
 package ca.qc.ircm.lanaseq.sample;
 
+import static ca.qc.ircm.lanaseq.sample.QSample.sample;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -24,9 +29,16 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 import java.time.LocalDate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -223,5 +235,176 @@ public class SampleFilterTest {
     user.setEmail(email);
     sample.setOwner(user);
     return sample;
+  }
+
+  @Test
+  public void predicate_Default() throws Exception {
+    Predicate predicate = filter.predicate();
+
+    assertEquals(Expressions.asBoolean(true).isTrue(), predicate);
+  }
+
+  @Test
+  public void predicate_NameContains() throws Exception {
+    filter.nameContains = "test";
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.name.contains("test"), predicate);
+  }
+
+  @Test
+  public void predicate_ProtocolContains() throws Exception {
+    filter.protocolContains = "test";
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.protocol.name.contains("test"), predicate);
+  }
+
+  @Test
+  public void predicate_Date_OpenRange() throws Exception {
+    LocalDate start = LocalDate.now().minusDays(10);
+    LocalDate end = LocalDate.now();
+    filter.dateRange = Range.open(start, end);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.goe(start.plusDays(1)).and(sample.date.before(end)), predicate);
+  }
+
+  @Test
+  public void predicate_Date_ClosedRange() throws Exception {
+    LocalDate start = LocalDate.now().minusDays(10);
+    LocalDate end = LocalDate.now();
+    filter.dateRange = Range.closed(start, end);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.goe(start).and(sample.date.before(end.plusDays(1))), predicate);
+  }
+
+  @Test
+  public void predicate_Date_OpenClosedRange() throws Exception {
+    LocalDate start = LocalDate.now().minusDays(10);
+    LocalDate end = LocalDate.now();
+    filter.dateRange = Range.openClosed(start, end);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.goe(start.plusDays(1)).and(sample.date.before(end.plusDays(1))),
+        predicate);
+  }
+
+  @Test
+  public void predicate_Date_ClosedOpenRange() throws Exception {
+    LocalDate start = LocalDate.now().minusDays(10);
+    LocalDate end = LocalDate.now();
+    filter.dateRange = Range.closedOpen(start, end);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.goe(start).and(sample.date.before(end)), predicate);
+  }
+
+  @Test
+  public void predicate_Date_AtLeast() throws Exception {
+    LocalDate start = LocalDate.now().minusDays(10);
+    filter.dateRange = Range.atLeast(start);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.goe(start), predicate);
+  }
+
+  @Test
+  public void predicate_Date_GreaterThan() throws Exception {
+    LocalDate start = LocalDate.now().minusDays(10);
+    filter.dateRange = Range.greaterThan(start);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.goe(start.plusDays(1)), predicate);
+  }
+
+  @Test
+  public void predicate_Date_AtMost() throws Exception {
+    LocalDate end = LocalDate.now();
+    filter.dateRange = Range.atMost(end);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.before(end.plusDays(1)), predicate);
+  }
+
+  @Test
+  public void predicate_Date_LessThan() throws Exception {
+    LocalDate end = LocalDate.now();
+    filter.dateRange = Range.lessThan(end);
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.date.before(end), predicate);
+  }
+
+  @Test
+  public void predicate_OwnerContains() throws Exception {
+    filter.ownerContains = "test";
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.owner.email.contains("test").or(sample.owner.name.contains("test")),
+        predicate);
+  }
+
+  @Test
+  public void predicate_NameAndOwnerContains() throws Exception {
+    filter.nameContains = "test1";
+    filter.ownerContains = "test2";
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(
+        sample.name.contains("test1")
+            .and(sample.owner.email.contains("test2").or(sample.owner.name.contains("test2"))),
+        predicate);
+  }
+
+  @Test
+  public void pageable_Default() throws Exception {
+    Pageable pageable = filter.pageable();
+
+    assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Direction.ASC, ID)), pageable);
+  }
+
+  @Test
+  public void pageable_Page() throws Exception {
+    filter.page = 2;
+    filter.size = 5;
+
+    Pageable pageable = filter.pageable();
+
+    assertEquals(PageRequest.of(2, 5, Sort.by(Direction.ASC, ID)), pageable);
+  }
+
+  @Test
+  public void pageable_Sort() throws Exception {
+    filter.sort = Sort.by(Order.asc(NAME), Order.desc(DATE));
+
+    Pageable pageable = filter.pageable();
+
+    assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Order.asc(NAME), Order.desc(DATE))),
+        pageable);
+  }
+
+  @Test
+  public void pageable_PageAndSort() throws Exception {
+    filter.page = 2;
+    filter.size = 5;
+    filter.sort = Sort.by(Order.asc(NAME), Order.desc(DATE));
+
+    Pageable pageable = filter.pageable();
+
+    assertEquals(PageRequest.of(2, 5, Sort.by(Order.asc(NAME), Order.desc(DATE))), pageable);
   }
 }

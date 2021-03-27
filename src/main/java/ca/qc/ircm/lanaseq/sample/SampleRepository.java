@@ -20,11 +20,13 @@ package ca.qc.ircm.lanaseq.sample;
 import ca.qc.ircm.lanaseq.user.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 /**
  * Repository for {@link Sample}.
  */
-public interface SampleRepository extends JpaRepository<Sample, Long> {
+public interface SampleRepository
+    extends JpaRepository<Sample, Long>, QuerydslPredicateExecutor<Sample> {
   public boolean existsByName(String name);
 
   public List<Sample> findByOwner(User owner);

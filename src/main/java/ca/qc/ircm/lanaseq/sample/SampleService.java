@@ -113,6 +113,37 @@ public class SampleService {
   }
 
   /**
+   * Returns all samples passing filter.
+   *
+   * @param filter
+   *          filter
+   * @return all samples passing filter
+   */
+  @PostFilter("hasPermission(filterObject, 'read')")
+  public List<Sample> all(SampleFilter filter) {
+    if (filter == null) {
+      filter = new SampleFilter();
+    }
+
+    return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
+  }
+
+  /**
+   * Returns number of samples passing filter.
+   *
+   * @param filter
+   *          filter
+   * @return number of samples passing filter
+   */
+  public long count(SampleFilter filter) {
+    if (filter == null) {
+      filter = new SampleFilter();
+    }
+
+    return repository.count(filter.predicate());
+  }
+
+  /**
    * Returns all sample's files.
    *
    * @param sample

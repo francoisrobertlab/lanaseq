@@ -17,8 +17,14 @@
 
 package ca.qc.ircm.lanaseq.sample;
 
+import static ca.qc.ircm.lanaseq.sample.QSample.sample;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +33,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,6 +69,10 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -192,6 +203,158 @@ public class SampleServiceTest {
     for (Sample sample : samples) {
       verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
     }
+  }
+
+  @Test
+  public void all_Filter() {
+    SampleFilter filter = mock(SampleFilter.class);
+    when(filter.predicate()).thenReturn(sample.isNotNull());
+    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+
+    List<Sample> samples = service.all(filter);
+
+    assertEquals(11, samples.size());
+    assertEquals((Long) 1L, samples.get(0).getId());
+    assertEquals((Long) 2L, samples.get(1).getId());
+    assertEquals((Long) 3L, samples.get(2).getId());
+    assertEquals((Long) 4L, samples.get(3).getId());
+    assertEquals((Long) 5L, samples.get(4).getId());
+    assertEquals((Long) 6L, samples.get(5).getId());
+    assertEquals((Long) 7L, samples.get(6).getId());
+    assertEquals((Long) 8L, samples.get(7).getId());
+    assertEquals((Long) 9L, samples.get(8).getId());
+    assertEquals((Long) 10L, samples.get(9).getId());
+    assertEquals((Long) 11L, samples.get(10).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterName() {
+    SampleFilter filter = new SampleFilter();
+    filter.nameContains = "BC";
+
+    List<Sample> samples = service.all(filter);
+
+    assertEquals(4, samples.size());
+    assertEquals((Long) 6L, samples.get(0).getId());
+    assertEquals((Long) 7L, samples.get(1).getId());
+    assertEquals((Long) 8L, samples.get(2).getId());
+    assertEquals((Long) 9L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterPage() {
+    SampleFilter filter = new SampleFilter();
+    filter.page = 1;
+    filter.size = 5;
+
+    List<Sample> samples = service.all(filter);
+
+    assertEquals(5, samples.size());
+    assertEquals((Long) 6L, samples.get(0).getId());
+    assertEquals((Long) 7L, samples.get(1).getId());
+    assertEquals((Long) 8L, samples.get(2).getId());
+    assertEquals((Long) 9L, samples.get(3).getId());
+    assertEquals((Long) 10L, samples.get(4).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterSortName() {
+    SampleFilter filter = new SampleFilter();
+    filter.nameContains = "BC";
+    filter.sort = Sort.by(Direction.ASC, NAME);
+
+    List<Sample> samples = service.all(filter);
+
+    assertEquals(4, samples.size());
+    assertEquals((Long) 9L, samples.get(0).getId());
+    assertEquals((Long) 8L, samples.get(1).getId());
+    assertEquals((Long) 6L, samples.get(2).getId());
+    assertEquals((Long) 7L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterSortOwnerAndDate() {
+    SampleFilter filter = new SampleFilter();
+    filter.sort = Sort.by(Order.asc(OWNER + "." + EMAIL), Order.desc(DATE), Order.asc(ID));
+
+    List<Sample> samples = service.all(filter);
+
+    assertEquals(11, samples.size());
+    assertEquals((Long) 9L, samples.get(0).getId());
+    assertEquals((Long) 8L, samples.get(1).getId());
+    assertEquals((Long) 6L, samples.get(2).getId());
+    assertEquals((Long) 7L, samples.get(3).getId());
+    assertEquals((Long) 1L, samples.get(4).getId());
+    assertEquals((Long) 2L, samples.get(5).getId());
+    assertEquals((Long) 3L, samples.get(6).getId());
+    assertEquals((Long) 11L, samples.get(7).getId());
+    assertEquals((Long) 10L, samples.get(8).getId());
+    assertEquals((Long) 4L, samples.get(9).getId());
+    assertEquals((Long) 5L, samples.get(10).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_NullFilter() {
+    List<Sample> samples = service.all(null);
+
+    assertEquals(11, samples.size());
+    assertEquals((Long) 1L, samples.get(0).getId());
+    assertEquals((Long) 2L, samples.get(1).getId());
+    assertEquals((Long) 3L, samples.get(2).getId());
+    assertEquals((Long) 4L, samples.get(3).getId());
+    assertEquals((Long) 5L, samples.get(4).getId());
+    assertEquals((Long) 6L, samples.get(5).getId());
+    assertEquals((Long) 7L, samples.get(6).getId());
+    assertEquals((Long) 8L, samples.get(7).getId());
+    assertEquals((Long) 9L, samples.get(8).getId());
+    assertEquals((Long) 10L, samples.get(9).getId());
+    assertEquals((Long) 11L, samples.get(10).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void count_Filter() {
+    SampleFilter filter = mock(SampleFilter.class);
+    when(filter.predicate()).thenReturn(sample.isNotNull());
+    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+
+    long count = service.count(filter);
+
+    assertEquals(11, count);
+  }
+
+  @Test
+  public void count_FilterName() {
+    SampleFilter filter = new SampleFilter();
+    filter.nameContains = "BC";
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_NullFilter() {
+    long count = service.count(null);
+
+    assertEquals(11, count);
   }
 
   @Test
