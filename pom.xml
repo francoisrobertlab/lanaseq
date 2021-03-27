@@ -59,6 +59,7 @@
     <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
     <vaadin.version>14.4.7</vaadin.version>
     <generate-property-names.version>0.5</generate-property-names.version>
+    <querydsl.version>4.2.1</querydsl.version>
     <guava.version>27.0.1-jre</guava.version>
     <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
     <commons-email.version>1.5</commons-email.version>
@@ -66,6 +67,7 @@
     <karibu-testing.version>1.1.26</karibu-testing.version>
     <greenmail.version>1.6.1</greenmail.version>
     <mariadb-java-client.version>2.6.0</mariadb-java-client.version>
+    <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
     <migrations-maven-plugin.version>1.1.3</migrations-maven-plugin.version>
   </properties>
 
@@ -221,6 +223,14 @@
       <artifactId>vaadin-confirm-dialog-flow</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
@@ -338,6 +348,31 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>com.mysema.maven</groupId>
+          <artifactId>apt-maven-plugin</artifactId>
+          <version>${apt-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>querydsl-metamodel</id>
+              <goals>
+                <goal>process</goal>
+              </goals>
+              <phase>generate-sources</phase>
+              <configuration>
+                <outputDirectory>target/generated-sources/querydsl</outputDirectory>
+                <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>com.querydsl</groupId>
+              <artifactId>querydsl-apt</artifactId>
+              <version>${querydsl.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
           <groupId>com.vaadin</groupId>
           <artifactId>vaadin-maven-plugin</artifactId>
           <version>${vaadin.version}</version>
@@ -432,6 +467,10 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.mysema.maven</groupId>
+        <artifactId>apt-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
