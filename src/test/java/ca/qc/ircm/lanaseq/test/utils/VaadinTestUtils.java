@@ -44,6 +44,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -195,7 +196,8 @@ public class VaadinTestUtils {
     if (grid.getDataProvider() instanceof ListDataProvider) {
       return new ArrayList<>(((ListDataProvider<V>) grid.getDataProvider()).getItems());
     } else {
-      return grid.getDataProvider().fetch(new Query<>(0, Integer.MAX_VALUE, null, null, null))
+      return grid.getDataProvider()
+          .fetch(new Query<>(0, Integer.MAX_VALUE, Collections.emptyList(), null, null))
           .collect(Collectors.toList());
     }
   }
