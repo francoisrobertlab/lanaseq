@@ -334,7 +334,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     DatasetDialogElement dialog = view.dialog();
     dialog.addSample().click();
     SelectSampleDialogElement selectSampleDialog = dialog.selectSampleDialog();
-    selectSampleDialog.doubleClick(2);
+    selectSampleDialog.samples().doubleClick(2);
 
     TestTransaction.flagForCommit();
     dialog.save().click();
