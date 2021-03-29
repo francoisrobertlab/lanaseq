@@ -26,67 +26,20 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
-import ca.qc.ircm.lanaseq.test.web.MultiSelectGridElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
-import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
-import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
-import org.apache.commons.lang3.SystemUtils;
-import org.openqa.selenium.Keys;
 
 @Element("vaadin-vertical-layout")
 public class SamplesViewElement extends VerticalLayoutElement {
-  private static final int NAME_COLUMN = 1;
-  private static final int PROTOCOL_COLUMN = 2;
-  private static final int OWNER_COLUMN = 4;
-
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }
 
-  public GridElement samples() {
-    return $(MultiSelectGridElement.class).id(SAMPLES);
-  }
-
-  public TextFieldElement nameFilter() {
-    return samples().getHeaderCell(NAME_COLUMN).$(TextFieldElement.class).first();
-  }
-
-  public TextFieldElement protocolFilter() {
-    return samples().getHeaderCell(PROTOCOL_COLUMN).$(TextFieldElement.class).first();
-  }
-
-  public TextFieldElement ownerFilter() {
-    return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
-  }
-  
-  public String name(int row) {
-    return samples().getCell(row, NAME_COLUMN).getText();
-  }
-
-  /**
-   * Control click sample.
-   *
-   * @param row
-   *          row index
-   */
-  public void controlClick(int row) {
-    Keys key = Keys.CONTROL;
-    if (SystemUtils.IS_OS_MAC_OSX) {
-      key = Keys.COMMAND;
-    }
-    samples().getCell(row, NAME_COLUMN).click(0, 0, key);
-  }
-
-  public void doubleClick(int row) {
-    samples().getCell(row, NAME_COLUMN).doubleClick();
-  }
-
-  public void doubleClickProtocol(int row) {
-    samples().getCell(row, PROTOCOL_COLUMN).doubleClick();
+  public SamplesGridElement samples() {
+    return $(SamplesGridElement.class).id(SAMPLES);
   }
 
   public DivElement error() {

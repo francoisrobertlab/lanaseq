@@ -32,6 +32,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -94,7 +95,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void view() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.doubleClick(0);
+    view.samples().doubleClick(0);
     assertTrue(view.dialog().isOpen());
   }
 
@@ -102,7 +103,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void viewFiles() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.controlClick(0);
+    view.samples().controlClick(0);
     assertTrue(view.filesDialog().isOpen());
   }
 
@@ -110,7 +111,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void view_Protocol() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.doubleClickProtocol(0);
+    view.samples().doubleClickProtocol(0);
     assertTrue(view.protocolDialog().isOpen());
   }
 
@@ -123,6 +124,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  @Headless(false)
   public void merge() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);

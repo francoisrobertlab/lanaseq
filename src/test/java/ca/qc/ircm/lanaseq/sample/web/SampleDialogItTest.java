@@ -144,7 +144,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Update() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClick(0);
+    view.samples().doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
@@ -168,8 +168,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Deletable() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClick(0);
+    view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
+    view.samples().doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
@@ -233,7 +233,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Path oldFolder = configuration.folder(sample);
     Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClick(2);
+    view.samples().doubleClick(2);
     SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
@@ -269,14 +269,14 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
     assertEquals(4, view.samples().getRowCount());
-    assertEquals(name, view.name(0));
+    assertEquals(name, view.samples().name(0));
   }
 
   @Test
   public void cancel() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.doubleClick(0);
+    view.samples().doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
@@ -309,8 +309,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Path folder = configuration.folder(sample);
     Files.createDirectories(folder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.doubleClick(0);
+    view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
+    view.samples().doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     final String name = sample.getName();
 
