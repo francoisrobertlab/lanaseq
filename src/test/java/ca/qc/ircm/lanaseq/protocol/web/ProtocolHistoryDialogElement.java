@@ -22,10 +22,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.id;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
-import com.vaadin.flow.component.grid.testbench.GridElement;
-import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 import org.junit.runner.RunWith;
@@ -35,22 +32,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ServiceTestAnnotations
 @Element("vaadin-dialog")
 public class ProtocolHistoryDialogElement extends DialogElement {
-  private static final int FILENAME_COLUMN = 0;
-  private static final int RECOVER_COLUMN = 1;
-
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }
 
-  public GridElement files() {
-    return $(GridElement.class).id(id(FILES));
-  }
-
-  public AnchorElement filename(int row) {
-    return files().getCell(row, FILENAME_COLUMN).$(AnchorElement.class).first();
-  }
-
-  public ButtonElement recover(int row) {
-    return files().getCell(row, RECOVER_COLUMN).$(ButtonElement.class).first();
+  public ProtocolHistoryFilesGridElement files() {
+    return $(ProtocolHistoryFilesGridElement.class).id(id(FILES));
   }
 }

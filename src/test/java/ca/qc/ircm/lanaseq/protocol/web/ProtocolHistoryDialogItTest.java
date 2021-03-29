@@ -75,7 +75,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     ProtocolHistoryDialogElement dialog = view.historyDialog();
 
     TestTransaction.flagForCommit();
-    dialog.recover(0).click();
+    dialog.files().recover(0).click();
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
@@ -103,7 +103,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.altClickProtocol(2);
     ProtocolHistoryDialogElement dialog = view.historyDialog();
-    AnchorElement filename = dialog.filename(0);
+    AnchorElement filename = dialog.files().filename(0);
     filename.click();
 
     // Wait for file to download.
