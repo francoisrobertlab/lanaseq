@@ -35,18 +35,12 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class DatasetFilesDialogElement extends DialogElement {
-  private static int DELETE_COLUMN = 1;
-
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }
 
-  public GridElement files() {
-    return $(GridElement.class).id(id(FILES));
-  }
-
-  public ButtonElement delete(int row) {
-    return files().getCell(row, DELETE_COLUMN).$(ButtonElement.class).first();
+  public DatasetFilesGridElement files() {
+    return $(DatasetFilesGridElement.class).id(id(FILES));
   }
 
   public GridElement samples() {

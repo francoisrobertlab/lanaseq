@@ -119,7 +119,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
-    dialog.delete(0).click();
+    dialog.files().delete(0).click();
     Thread.sleep(1000);
 
     assertFalse(Files.exists(file));
