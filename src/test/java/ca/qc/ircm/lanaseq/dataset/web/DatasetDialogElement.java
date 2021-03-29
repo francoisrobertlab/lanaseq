@@ -45,7 +45,6 @@ import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
-import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.select.testbench.SelectElement;
@@ -54,10 +53,6 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class DatasetDialogElement extends DialogElement {
-  private static final int SAMPLE_ID_COLUMN = 0;
-  private static final int REPLICATE_COLUMN = 1;
-  private static final int REMOVE_COLUMN = 3;
-
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }
@@ -98,20 +93,8 @@ public class DatasetDialogElement extends DialogElement {
     return $(DatePickerElement.class).id(id(DATE));
   }
 
-  public GridElement samples() {
-    return $(GridElement.class).id(id(SAMPLES));
-  }
-
-  public TextFieldElement sampleId(int row) {
-    return samples().getCell(row, SAMPLE_ID_COLUMN).$(TextFieldElement.class).first();
-  }
-
-  public TextFieldElement replicate(int row) {
-    return samples().getCell(row, REPLICATE_COLUMN).$(TextFieldElement.class).first();
-  }
-
-  public ButtonElement remove(int row) {
-    return samples().getCell(row, REMOVE_COLUMN).$(ButtonElement.class).first();
+  public DatasetSamplesGridElement samples() {
+    return $(DatasetSamplesGridElement.class).id(id(SAMPLES));
   }
 
   public ButtonElement addNewSample() {

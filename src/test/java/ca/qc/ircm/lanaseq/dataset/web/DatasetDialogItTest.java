@@ -120,8 +120,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
     dialog.date().setDate(date);
-    dialog.sampleId(0).setValue(sampleId);
-    dialog.replicate(0).setValue(sampleReplicate);
+    dialog.samples().sampleId(0).setValue(sampleId);
+    dialog.samples().replicate(0).setValue(sampleReplicate);
   }
 
   private String name() {
