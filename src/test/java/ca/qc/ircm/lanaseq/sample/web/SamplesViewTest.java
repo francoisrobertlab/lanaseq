@@ -36,6 +36,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -58,9 +59,11 @@ import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
@@ -122,24 +125,28 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     view.name = mock(Column.class);
     when(view.samples.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
+    when(view.name.setSortProperty(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
     view.protocol = mock(Column.class);
     when(view.samples.addColumn(any(ValueProvider.class), eq(PROTOCOL))).thenReturn(view.protocol);
     when(view.protocol.setKey(any())).thenReturn(view.protocol);
+    when(view.protocol.setSortProperty(any())).thenReturn(view.protocol);
     when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     when(view.protocol.setFlexGrow(anyInt())).thenReturn(view.protocol);
     view.date = mock(Column.class);
     when(view.samples.addColumn(any(LocalDateRenderer.class), eq(DATE))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
+    when(view.date.setSortProperty(any())).thenReturn(view.date);
     when(view.date.setComparator(any(Comparator.class))).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
     when(view.date.setFlexGrow(anyInt())).thenReturn(view.date);
     view.owner = mock(Column.class);
     when(view.samples.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
+    when(view.owner.setSortProperty(any())).thenReturn(view.owner);
     when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
@@ -236,10 +243,20 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void samples() {
     assertEquals(4, view.samples.getColumns().size());
     assertNotNull(view.samples.getColumnByKey(NAME));
+    assertEquals(NAME, view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING)
+        .findFirst().map(so -> so.getSorted()).orElse(null));
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
+    assertEquals(PROTOCOL + "." + NAME, view.samples.getColumnByKey(PROTOCOL)
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertNotNull(view.samples.getColumnByKey(DATE));
+    assertEquals(DATE, view.samples.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING)
+        .findFirst().map(so -> so.getSorted()).orElse(null));
     assertNotNull(view.samples.getColumnByKey(OWNER));
+    assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
+    assertEquals(GridSortOrder.desc(view.date).thenAsc(view.name).build(),
+        view.samples.getSortOrder());
   }
 
   @Test

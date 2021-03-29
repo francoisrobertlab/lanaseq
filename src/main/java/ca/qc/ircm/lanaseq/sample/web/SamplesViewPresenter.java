@@ -22,8 +22,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
-import static java.util.Collections.sort;
-import static java.util.Comparator.comparing;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -31,14 +29,17 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleFilter;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
+import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.CallbackDataProvider.CountCallback;
+import com.vaadin.flow.data.provider.CallbackDataProvider.FetchCallback;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SamplesViewPresenter {
   private SamplesView view;
-  private ListDataProvider<Sample> samplesDataProvider;
+  private DataProvider<Sample, SampleFilter> samplesDataProvider;
   private WebSampleFilter filter = new WebSampleFilter();
   private Locale locale;
   private SampleService service;
@@ -80,9 +81,9 @@ public class SamplesViewPresenter {
       view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
     }
     loadSamples();
-    view.dialog.addSavedListener(e -> loadSamples());
-    view.dialog.addDeletedListener(e -> loadSamples());
-    view.protocolDialog.addSavedListener(e -> loadSamples());
+    view.dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
+    view.dialog.addDeletedListener(e -> view.samples.getDataProvider().refreshAll());
+    view.protocolDialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
   }
 
   void localeChange(Locale locale) {
@@ -90,10 +91,20 @@ public class SamplesViewPresenter {
   }
 
   private void loadSamples() {
-    List<Sample> samples = service.all();
-    sort(samples, comparing(Sample::getDate).reversed());
-    samplesDataProvider = DataProvider.ofCollection(samples);
-    ConfigurableFilterDataProvider<Sample, Void, SerializablePredicate<Sample>> dataProvider =
+    FetchCallback<Sample, SampleFilter> fetchCallback = query -> {
+      SampleFilter filter = query.getFilter().orElse(new SampleFilter());
+      filter.sort = VaadinSort.springDataSort(query.getSortOrders());
+      filter.page = query.getOffset() / view.samples.getPageSize();
+      filter.size = query.getLimit();
+      return service.all(filter).stream();
+    };
+    CountCallback<Sample, SampleFilter> countCallback = query -> {
+      SampleFilter filter = query.getFilter().orElse(new SampleFilter());
+      int count = (int) service.count(filter);
+      return count;
+    };
+    samplesDataProvider = new CallbackDataProvider<>(fetchCallback, countCallback);
+    ConfigurableFilterDataProvider<Sample, Void, SampleFilter> dataProvider =
         samplesDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     view.samples.setDataProvider(dataProvider);
