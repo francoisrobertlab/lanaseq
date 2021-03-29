@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
-import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
@@ -31,22 +30,12 @@ import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-vertical-layout")
 public class UsersViewElement extends VerticalLayoutElement {
-  private static final int EMAIL_COLUMN = 0;
-
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }
 
-  public GridElement users() {
-    return $(GridElement.class).first();
-  }
-
-  public void doubleClick(int row) {
-    users().getCell(row, EMAIL_COLUMN).doubleClick();
-  }
-
-  public String email(int row) {
-    return users().getCell(row, EMAIL_COLUMN).getText();
+  public UsersGridElement users() {
+    return $(UsersGridElement.class).first();
   }
 
   public DivElement switchFailed() {

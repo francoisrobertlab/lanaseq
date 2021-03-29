@@ -114,7 +114,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);
 
-    view.doubleClick(0);
+    view.users().doubleClick(0);
 
     assertTrue(view.dialog().isOpen());
   }
