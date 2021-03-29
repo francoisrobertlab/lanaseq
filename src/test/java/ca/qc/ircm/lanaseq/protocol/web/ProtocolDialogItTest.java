@@ -198,7 +198,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
     view.doubleClickProtocol(0);
     ProtocolDialogElement dialog = view.dialog();
-    AnchorElement filename = dialog.filename(0);
+    AnchorElement filename = dialog.files().filename(0);
     filename.click();
 
     // Wait for file to download.
