@@ -117,7 +117,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
-    dialog.delete(0).click();
+    dialog.files().delete(0).click();
     Thread.sleep(1000); // Allow time to apply changes to files.
 
     assertFalse(Files.exists(file));

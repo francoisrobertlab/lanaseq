@@ -25,25 +25,18 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
-import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-dialog")
 public class SampleFilesDialogElement extends DialogElement {
-  private static int DELETE_COLUMN = 1;
-
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }
 
-  public GridElement files() {
-    return $(GridElement.class).id(id(FILES));
-  }
-
-  public ButtonElement delete(int row) {
-    return files().getCell(row, DELETE_COLUMN).$(ButtonElement.class).first();
+  public SampleFilesGridElement files() {
+    return $(SampleFilesGridElement.class).id(id(FILES));
   }
 
   public TextFieldElement filenameEdit() {
