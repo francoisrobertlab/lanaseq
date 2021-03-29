@@ -81,7 +81,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
 
-    view.doubleClickProtocol(0);
+    view.protocols().doubleClickProtocol(0);
 
     assertTrue(view.dialog().isOpen());
   }
@@ -90,9 +90,9 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   public void history_User() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
-    view.ownerFilter().setValue("");
+    view.protocols().ownerFilter().setValue("");
 
-    view.altClickProtocol(2);
+    view.protocols().altClickProtocol(2);
 
     assertFalse(view.historyDialog().isOpen());
   }
@@ -103,7 +103,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
 
-    view.altClickProtocol(2);
+    view.protocols().altClickProtocol(2);
 
     assertTrue(view.historyDialog().isOpen());
   }

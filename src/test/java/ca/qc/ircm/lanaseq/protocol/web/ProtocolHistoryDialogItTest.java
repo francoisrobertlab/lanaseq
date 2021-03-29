@@ -61,7 +61,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.altClickProtocol(2);
+    view.protocols().altClickProtocol(2);
     ProtocolHistoryDialogElement dialog = view.historyDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
@@ -71,7 +71,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
   public void recover() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.altClickProtocol(2);
+    view.protocols().altClickProtocol(2);
     ProtocolHistoryDialogElement dialog = view.historyDialog();
 
     TestTransaction.flagForCommit();
@@ -101,7 +101,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     Path source = Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI());
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.altClickProtocol(2);
+    view.protocols().altClickProtocol(2);
     ProtocolHistoryDialogElement dialog = view.historyDialog();
     AnchorElement filename = dialog.files().filename(0);
     filename.click();

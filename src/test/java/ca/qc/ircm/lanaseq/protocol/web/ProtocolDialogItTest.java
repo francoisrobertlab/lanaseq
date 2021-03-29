@@ -83,7 +83,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.doubleClickProtocol(0);
+    view.protocols().doubleClickProtocol(0);
     ProtocolDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.name()).isPresent());
@@ -129,7 +129,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   public void save_Update() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.doubleClickProtocol(0);
+    view.protocols().doubleClickProtocol(0);
     ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
 
@@ -164,7 +164,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.doubleClickProtocol(0);
+    view.protocols().doubleClickProtocol(0);
     ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
 
@@ -196,7 +196,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     Path source = Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI());
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
-    view.doubleClickProtocol(0);
+    view.protocols().doubleClickProtocol(0);
     ProtocolDialogElement dialog = view.dialog();
     AnchorElement filename = dialog.files().filename(0);
     filename.click();
