@@ -81,14 +81,14 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void rename() throws Throwable {
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(10L).get();
     Path folder = configuration.folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().controlClick(2);
+    view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.files().getRow(0).doubleClick();
@@ -105,7 +105,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void delete() throws Throwable {
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(10L).get();
     Path folder = configuration.folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -114,7 +114,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().controlClick(2);
+    view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
     dialog.delete(0).click();

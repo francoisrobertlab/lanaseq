@@ -233,7 +233,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Path oldFolder = configuration.folder(sample);
     Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().doubleClick(2);
+    view.samples().doubleClick(view.samples().name(2).startsWith("JS1") ? 2 : 3);
     SampleDialogElement dialog = view.dialog();
     fill(dialog);
 

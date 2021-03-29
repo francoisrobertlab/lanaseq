@@ -143,7 +143,7 @@ public class SamplesView extends VerticalLayout
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
-    samples.sort(GridSortOrder.desc(date).thenAsc(name).build());
+    samples.sort(GridSortOrder.desc(date).build());
     samples.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && e.getItem().getProtocol() != null) {
         presenter.viewProtocol(e.getItem().getProtocol());

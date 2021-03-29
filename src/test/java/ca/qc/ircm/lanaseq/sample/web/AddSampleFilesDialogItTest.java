@@ -99,11 +99,11 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   public void refresh_Files() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().controlClick(2);
+    view.samples().controlClick(1);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(10L).get();
     assertEquals(0, dialog.files().getRowCount());
     copyFiles(sample);
     Thread.sleep(2500);
@@ -120,11 +120,11 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   public void save() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().controlClick(2);
+    view.samples().controlClick(1);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.add().click();
     final AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(10L).get();
     copyFiles(sample);
     String filenameInRoot = "prefix_" + sample.getName() + "_R1";
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),

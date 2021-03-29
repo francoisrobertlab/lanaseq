@@ -255,8 +255,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
-    assertEquals(GridSortOrder.desc(view.date).thenAsc(view.name).build(),
-        view.samples.getSortOrder());
+    assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
   }
 
   @Test

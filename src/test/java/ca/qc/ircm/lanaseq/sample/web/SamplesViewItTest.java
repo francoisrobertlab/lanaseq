@@ -32,7 +32,6 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
-import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SigninView;
@@ -124,12 +123,11 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Headless(false)
   public void merge() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.samples().select(1);
-    view.samples().select(3);
+    view.samples().select(view.samples().name(2).startsWith("JS2") ? 2 : 3);
 
     view.merge().click();
 
