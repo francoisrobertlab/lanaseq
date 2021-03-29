@@ -62,6 +62,10 @@ public class SamplesViewElement extends VerticalLayoutElement {
   public TextFieldElement ownerFilter() {
     return samples().getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
   }
+  
+  public String name(int row) {
+    return samples().getCell(row, NAME_COLUMN).getText();
+  }
 
   /**
    * Control click sample.

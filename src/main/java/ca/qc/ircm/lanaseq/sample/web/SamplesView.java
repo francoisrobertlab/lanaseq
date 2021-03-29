@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -42,6 +43,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -128,17 +130,20 @@ public class SamplesView extends VerticalLayout
     header.setId(HEADER);
     samples.setId(SAMPLES);
     samples.setSelectionMode(SelectionMode.MULTI);
-    name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
+    name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
-    protocol =
-        samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL).setKey(PROTOCOL)
-            .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
-            .setFlexGrow(1);
+    protocol = samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL)
+        .setKey(PROTOCOL).setSortProperty(PROTOCOL + "." + NAME)
+        .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
+        .setFlexGrow(1);
     date = samples
         .addColumn(new LocalDateRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
-        .setKey(DATE).setComparator(Comparator.comparing(Sample::getDate)).setFlexGrow(1);
+        .setKey(DATE).setSortProperty(DATE).setComparator(Comparator.comparing(Sample::getDate))
+        .setFlexGrow(1);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
+        .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
+    samples.sort(GridSortOrder.desc(date).thenAsc(name).build());
     samples.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && e.getItem().getProtocol() != null) {
         presenter.viewProtocol(e.getItem().getProtocol());

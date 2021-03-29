@@ -223,6 +223,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     assertEquals(date, sample.getDate());
+    assertEquals(5, view.samples().getRowCount());
   }
 
   @Test
@@ -267,6 +268,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Path folder = configuration.folder(sample);
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
+    assertEquals(4, view.samples().getRowCount());
+    assertEquals(name, view.name(0));
   }
 
   @Test
@@ -295,6 +298,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("G24D", sample.getStrainDescription());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertNull(sample.getTreatment());
+    assertEquals(4, view.samples().getRowCount());
   }
 
   @Test
@@ -321,5 +325,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(repository.findById(9L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.
     assertFalse(Files.exists(folder));
+    assertEquals(3, view.samples().getRowCount());
   }
 }

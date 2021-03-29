@@ -137,7 +137,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.filesDialog = mock(SampleFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
-    when(service.all()).thenReturn(new ArrayList<>(samples));
+    when(service.all(any())).thenReturn(new ArrayList<>(samples));
+    when(service.count(any())).thenReturn((long) samples.size());
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
@@ -151,12 +152,6 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
       assertTrue(sample.toString(), samples.contains(sample));
-    }
-    LocalDate date = samples.get(0).getDate();
-    for (Sample sample : samples) {
-      assertTrue(sample + " with date " + sample.getDate() + " <= " + date,
-          date.compareTo(sample.getDate()) >= 0);
-      date = sample.getDate();
     }
     assertEquals(0, view.samples.getSelectedItems().size());
     samples.forEach(dataset -> view.samples.select(dataset));
@@ -416,29 +411,32 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnSaved() {
+    view.samples.setDataProvider(dataProvider);
     verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<SampleDialog>> savedListener = savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(service, times(2)).all();
+    verify(dataProvider).refreshAll();
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnDeleted() {
+    view.samples.setDataProvider(dataProvider);
     verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
     ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener =
         deletedListenerCaptor.getValue();
     deletedListener.onComponentEvent(mock(DeletedEvent.class));
-    verify(service, times(2)).all();
+    verify(dataProvider).refreshAll();
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnProtocolSaved() {
+    view.samples.setDataProvider(dataProvider);
     verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         protocolSavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
-    verify(service, times(2)).all();
+    verify(dataProvider).refreshAll();
   }
 }
