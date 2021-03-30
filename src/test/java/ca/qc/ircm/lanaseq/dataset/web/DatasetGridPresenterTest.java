@@ -91,7 +91,8 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     grid = new DatasetGrid();
     grid.ownerFilter = new TextField();
     datasets = repository.findAll();
-    when(service.all()).thenReturn(new ArrayList<>(datasets));
+    when(service.all(any())).thenReturn(new ArrayList<>(datasets));
+    when(service.count(any())).thenReturn((long) datasets.size());
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(currentUser);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
@@ -104,11 +105,6 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
       assertTrue(dataset.toString(), datasets.contains(dataset));
-    }
-    LocalDate date = datasets.get(0).getDate();
-    for (Dataset dataset : datasets) {
-      assertTrue(date.compareTo(dataset.getDate()) >= 0);
-      date = dataset.getDate();
     }
   }
 
@@ -231,7 +227,8 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void refreshDatasets() {
+    grid.setDataProvider(dataProvider);
     presenter.refreshDatasets();
-    verify(service, times(2)).all();
+    verify(dataProvider).refreshAll();
   }
 }

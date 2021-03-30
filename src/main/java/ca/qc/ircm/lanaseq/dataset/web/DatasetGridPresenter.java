@@ -17,20 +17,20 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static java.util.Collections.sort;
-import static java.util.Comparator.comparing;
-
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetFilter;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
+import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.CallbackDataProvider.CountCallback;
+import com.vaadin.flow.data.provider.CallbackDataProvider.FetchCallback;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -44,7 +44,7 @@ public class DatasetGridPresenter {
   private DatasetGrid grid;
   private DatasetService service;
   private AuthorizationService authorizationService;
-  private ListDataProvider<Dataset> datasetsDataProvider;
+  private DataProvider<Dataset, DatasetFilter> datasetsDataProvider;
   private WebDatasetFilter filter = new WebDatasetFilter();
 
   protected DatasetGridPresenter() {
@@ -59,21 +59,34 @@ public class DatasetGridPresenter {
 
   void init(DatasetGrid grid) {
     this.grid = grid;
-    refreshDatasets();
+    loadDataset();
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       grid.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
     }
   }
 
-  @SuppressWarnings("checkstyle:linelength")
-  void refreshDatasets() {
-    List<Dataset> datasets = service.all();
-    sort(datasets, comparing(Dataset::getDate).reversed());
-    datasetsDataProvider = new ListDataProvider<>(datasets);
-    ConfigurableFilterDataProvider<Dataset, Void, SerializablePredicate<Dataset>> dataProvider =
+  private void loadDataset() {
+    FetchCallback<Dataset, DatasetFilter> fetchCallback = query -> {
+      DatasetFilter filter = query.getFilter().orElse(new DatasetFilter());
+      filter.sort = VaadinSort.springDataSort(query.getSortOrders());
+      filter.page = query.getOffset() / grid.getPageSize();
+      filter.size = query.getLimit();
+      return service.all(filter).stream();
+    };
+    CountCallback<Dataset, DatasetFilter> countCallback = query -> {
+      DatasetFilter filter = query.getFilter().orElse(new DatasetFilter());
+      int count = (int) service.count(filter);
+      return count;
+    };
+    datasetsDataProvider = new CallbackDataProvider<>(fetchCallback, countCallback);
+    ConfigurableFilterDataProvider<Dataset, Void, DatasetFilter> dataProvider =
         datasetsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
     grid.setDataProvider(dataProvider);
+  }
+
+  void refreshDatasets() {
+    grid.getDataProvider().refreshAll();
   }
 
   void filterName(String value) {

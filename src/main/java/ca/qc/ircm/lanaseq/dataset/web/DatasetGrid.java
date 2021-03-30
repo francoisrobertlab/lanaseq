@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -32,6 +33,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
@@ -75,18 +77,21 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
 
   @PostConstruct
   void init() {
-    name = addColumn(dataset -> dataset.getName(), NAME).setKey(NAME)
+    name = addColumn(dataset -> dataset.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
     tags = addColumn(dataset -> dataset.getTags().stream().collect(Collectors.joining(", ")), TAGS)
-        .setKey(TAGS).setFlexGrow(1);
+        .setKey(TAGS).setSortable(false).setFlexGrow(1);
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
+        .setSortProperty(PROTOCOL + "." + NAME)
         .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()))
         .setFlexGrow(1);
     date =
         addColumn(new LocalDateRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
-            .setKey(DATE).setFlexGrow(1);
+            .setKey(DATE).setSortProperty(DATE).setFlexGrow(1);
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
+        .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
+    sort(GridSortOrder.desc(date).build());
     appendHeaderRow(); // Headers.
     HeaderRow filtersRow = appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
