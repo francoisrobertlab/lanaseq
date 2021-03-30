@@ -17,8 +17,14 @@
 
 package ca.qc.ircm.lanaseq.dataset;
 
+import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,6 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,6 +73,10 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -197,6 +208,142 @@ public class DatasetServiceTest {
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
+  }
+
+  @Test
+  public void all_Filter() {
+    DatasetFilter filter = mock(DatasetFilter.class);
+    when(filter.predicate()).thenReturn(dataset.isNotNull());
+    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+
+    List<Dataset> datasets = service.all(filter);
+
+    assertEquals(7, datasets.size());
+    assertEquals((Long) 1L, datasets.get(0).getId());
+    assertEquals((Long) 2L, datasets.get(1).getId());
+    assertEquals((Long) 3L, datasets.get(2).getId());
+    assertEquals((Long) 4L, datasets.get(3).getId());
+    assertEquals((Long) 5L, datasets.get(4).getId());
+    assertEquals((Long) 6L, datasets.get(5).getId());
+    assertEquals((Long) 7L, datasets.get(6).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterName() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.nameContains = "JS";
+
+    List<Dataset> datasets = service.all(filter);
+
+    assertEquals(3, datasets.size());
+    assertEquals((Long) 2L, datasets.get(0).getId());
+    assertEquals((Long) 6L, datasets.get(1).getId());
+    assertEquals((Long) 7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterPage() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.page = 1;
+    filter.size = 3;
+
+    List<Dataset> datasets = service.all(filter);
+
+    assertEquals(3, datasets.size());
+    assertEquals((Long) 4L, datasets.get(0).getId());
+    assertEquals((Long) 5L, datasets.get(1).getId());
+    assertEquals((Long) 6L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterSortName() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.nameContains = "JS";
+    filter.sort = Sort.by(Direction.ASC, NAME);
+
+    List<Dataset> datasets = service.all(filter);
+
+    assertEquals(3, datasets.size());
+    assertEquals((Long) 2L, datasets.get(0).getId());
+    assertEquals((Long) 6L, datasets.get(1).getId());
+    assertEquals((Long) 7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterSortOwnerAndDate() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.sort = Sort.by(Order.asc(OWNER + "." + EMAIL), Order.desc(DATE), Order.asc(ID));
+
+    List<Dataset> datasets = service.all(filter);
+
+    assertEquals(7, datasets.size());
+    assertEquals((Long) 5L, datasets.get(0).getId());
+    assertEquals((Long) 4L, datasets.get(1).getId());
+    assertEquals((Long) 1L, datasets.get(2).getId());
+    assertEquals((Long) 7L, datasets.get(3).getId());
+    assertEquals((Long) 6L, datasets.get(4).getId());
+    assertEquals((Long) 3L, datasets.get(5).getId());
+    assertEquals((Long) 2L, datasets.get(6).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_NullFilter() {
+    List<Dataset> datasets = service.all(null);
+
+    assertEquals(7, datasets.size());
+    assertEquals((Long) 1L, datasets.get(0).getId());
+    assertEquals((Long) 2L, datasets.get(1).getId());
+    assertEquals((Long) 3L, datasets.get(2).getId());
+    assertEquals((Long) 4L, datasets.get(3).getId());
+    assertEquals((Long) 5L, datasets.get(4).getId());
+    assertEquals((Long) 6L, datasets.get(5).getId());
+    assertEquals((Long) 7L, datasets.get(6).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void count_Filter() {
+    DatasetFilter filter = mock(DatasetFilter.class);
+    when(filter.predicate()).thenReturn(dataset.isNotNull());
+    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+
+    long count = service.count(filter);
+
+    assertEquals(7, count);
+  }
+
+  @Test
+  public void count_FilterName() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.nameContains = "JS";
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_NullFilter() {
+    long count = service.count(null);
+
+    assertEquals(7, count);
   }
 
   @Test

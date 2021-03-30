@@ -24,13 +24,17 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -48,8 +52,10 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -110,32 +116,39 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
   @SuppressWarnings("unchecked")
   private DatasetGrid mockColumns() {
     DatasetGrid grid = spy(this.grid);
+    doNothing().when(grid).sort(any());
     grid.name = mock(Column.class);
     doReturn(grid.name).when(grid).addColumn(any(ValueProvider.class), eq(NAME));
     when(grid.name.setKey(any())).thenReturn(grid.name);
+    when(grid.name.setSortProperty(any())).thenReturn(grid.name);
     when(grid.name.setComparator(any(Comparator.class))).thenReturn(grid.name);
     when(grid.name.setHeader(any(String.class))).thenReturn(grid.name);
     when(grid.name.setFlexGrow(anyInt())).thenReturn(grid.name);
     grid.tags = mock(Column.class);
     doReturn(grid.tags).when(grid).addColumn(any(ValueProvider.class), eq(TAGS));
     when(grid.tags.setKey(any())).thenReturn(grid.tags);
+    when(grid.tags.setSortProperty(any())).thenReturn(grid.tags);
+    when(grid.tags.setSortable(anyBoolean())).thenReturn(grid.tags);
     when(grid.tags.setComparator(any(Comparator.class))).thenReturn(grid.tags);
     when(grid.tags.setHeader(any(String.class))).thenReturn(grid.tags);
     when(grid.tags.setFlexGrow(anyInt())).thenReturn(grid.tags);
     grid.protocol = mock(Column.class);
     doReturn(grid.protocol).when(grid).addColumn(any(ValueProvider.class), eq(PROTOCOL));
     when(grid.protocol.setKey(any())).thenReturn(grid.protocol);
+    when(grid.protocol.setSortProperty(any())).thenReturn(grid.protocol);
     when(grid.protocol.setComparator(any(Comparator.class))).thenReturn(grid.protocol);
     when(grid.protocol.setHeader(any(String.class))).thenReturn(grid.protocol);
     when(grid.protocol.setFlexGrow(anyInt())).thenReturn(grid.protocol);
     grid.date = mock(Column.class);
     doReturn(grid.date).when(grid).addColumn(any(LocalDateRenderer.class), eq(DATE));
     when(grid.date.setKey(any())).thenReturn(grid.date);
+    when(grid.date.setSortProperty(any())).thenReturn(grid.date);
     when(grid.date.setHeader(any(String.class))).thenReturn(grid.date);
     when(grid.date.setFlexGrow(anyInt())).thenReturn(grid.date);
     grid.owner = mock(Column.class);
     doReturn(grid.owner).when(grid).addColumn(any(ValueProvider.class), eq(OWNER));
     when(grid.owner.setKey(any())).thenReturn(grid.owner);
+    when(grid.owner.setSortProperty(any())).thenReturn(grid.owner);
     when(grid.owner.setComparator(any(Comparator.class))).thenReturn(grid.owner);
     when(grid.owner.setHeader(any(String.class))).thenReturn(grid.owner);
     when(grid.owner.setFlexGrow(anyInt())).thenReturn(grid.owner);
@@ -209,10 +222,20 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
   public void datasets() {
     assertEquals(5, grid.getColumns().size());
     assertNotNull(grid.getColumnByKey(NAME));
+    assertEquals(NAME, grid.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
+        .map(so -> so.getSorted()).orElse(null));
     assertNotNull(grid.getColumnByKey(TAGS));
+    assertFalse(grid.getColumnByKey(TAGS).isSortable());
     assertNotNull(grid.getColumnByKey(PROTOCOL));
+    assertEquals(PROTOCOL + "." + NAME, grid.getColumnByKey(PROTOCOL)
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertNotNull(grid.getColumnByKey(DATE));
+    assertEquals(DATE, grid.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING).findFirst()
+        .map(so -> so.getSorted()).orElse(null));
     assertNotNull(grid.getColumnByKey(OWNER));
+    assertEquals(OWNER + "." + EMAIL, grid.getColumnByKey(OWNER)
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
+    assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
   }
 
   @Test

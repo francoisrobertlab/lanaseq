@@ -398,6 +398,15 @@ public class SampleFilterTest {
   }
 
   @Test
+  public void pageable_NullSort() throws Exception {
+    filter.sort = null;
+
+    Pageable pageable = filter.pageable();
+
+    assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.unsorted()), pageable);
+  }
+
+  @Test
   public void pageable_PageAndSort() throws Exception {
     filter.page = 2;
     filter.size = 5;
