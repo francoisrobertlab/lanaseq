@@ -23,11 +23,13 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 /**
  * Repository for {@link Dataset}.
  */
-public interface DatasetRepository extends JpaRepository<Dataset, Long> {
+public interface DatasetRepository
+    extends JpaRepository<Dataset, Long>, QuerydslPredicateExecutor<Dataset> {
   public boolean existsByName(String name);
 
   public boolean existsBySamples(Sample sample);

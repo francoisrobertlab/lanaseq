@@ -121,6 +121,37 @@ public class DatasetService {
   }
 
   /**
+   * Returns all datasets passing filter.
+   *
+   * @param filter
+   *          filter
+   * @return all datasets passing filter
+   */
+  @PostFilter("hasPermission(filterObject, 'read')")
+  public List<Dataset> all(DatasetFilter filter) {
+    if (filter == null) {
+      filter = new DatasetFilter();
+    }
+
+    return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
+  }
+
+  /**
+   * Returns number of datasets passing filter.
+   *
+   * @param filter
+   *          filter
+   * @return number of datasets passing filter
+   */
+  public long count(DatasetFilter filter) {
+    if (filter == null) {
+      filter = new DatasetFilter();
+    }
+
+    return repository.count(filter.predicate());
+  }
+
+  /**
    * Returns all dataset's files.
    *
    * @param dataset
