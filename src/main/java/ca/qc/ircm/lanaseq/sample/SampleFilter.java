@@ -42,8 +42,8 @@ public class SampleFilter implements Predicate<Sample> {
   public Range<LocalDate> dateRange;
   public String ownerContains;
   public Sort sort = Sort.by(Direction.ASC, ID);
-  public Integer page = 0;
-  public Integer size = Integer.MAX_VALUE;
+  public int page = 0;
+  public int size = Integer.MAX_VALUE;
 
   @Override
   public boolean test(Sample sample) {
@@ -104,7 +104,7 @@ public class SampleFilter implements Predicate<Sample> {
   }
 
   public Pageable pageable() {
-    return PageRequest.of(page, size, sort);
+    return PageRequest.of(page, size, sort != null ? sort : Sort.unsorted());
   }
 
   private String replaceNull(String value) {
