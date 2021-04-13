@@ -18,7 +18,11 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import ca.qc.ircm.lanaseq.user.User;
+import com.querydsl.core.types.Predicate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
@@ -30,4 +34,8 @@ public interface SampleRepository
   public boolean existsByName(String name);
 
   public List<Sample> findByOwner(User owner);
+
+  @Override
+  @EntityGraph(attributePaths = { "protocol", "owner" })
+  public Page<Sample> findAll(Predicate predicate, Pageable pageable);
 }
