@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -26,6 +27,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -49,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,17 +70,20 @@ public class DatasetService {
   private SampleService sampleService;
   private AppConfiguration configuration;
   private AuthorizationService authorizationService;
+  private JPAQueryFactory queryFactory;
 
   protected DatasetService() {
   }
 
   @Autowired
   protected DatasetService(DatasetRepository repository, SampleService sampleService,
-      AppConfiguration configuration, AuthorizationService authorizationService) {
+      AppConfiguration configuration, AuthorizationService authorizationService,
+      JPAQueryFactory queryFactory) {
     this.repository = repository;
     this.sampleService = sampleService;
     this.configuration = configuration;
     this.authorizationService = authorizationService;
+    this.queryFactory = queryFactory;
   }
 
   /**
@@ -133,7 +139,10 @@ public class DatasetService {
       filter = new DatasetFilter();
     }
 
-    return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
+    Pageable pageable = filter.pageable();
+    List<Long> ids = queryFactory.select(dataset.id).from(dataset).where(filter.predicate())
+        .offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+    return repository.findAllByIdIn(ids, pageable.getSort());
   }
 
   /**

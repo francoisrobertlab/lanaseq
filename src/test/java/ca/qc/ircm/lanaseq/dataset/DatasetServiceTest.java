@@ -218,6 +218,9 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all(filter);
 
+    datasets.stream().forEach(dataset -> dataset.getTags().size());
+    datasets.stream().forEach(
+        dataset -> dataset.getSamples().stream().forEach(sample -> sample.getProtocol().getName()));
     assertEquals(7, datasets.size());
     assertEquals((Long) 1L, datasets.get(0).getId());
     assertEquals((Long) 2L, datasets.get(1).getId());

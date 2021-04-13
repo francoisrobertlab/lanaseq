@@ -23,6 +23,7 @@ import com.querydsl.core.types.Predicate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -41,6 +42,9 @@ public interface DatasetRepository
   public List<Dataset> findBySamples(Sample sample);
 
   public List<Dataset> findByOwner(User owner);
+
+  @EntityGraph(attributePaths = { "tags", "samples", "samples.protocol", "owner" })
+  public List<Dataset> findAllByIdIn(Iterable<Long> ids, Sort sort);
 
   @Override
   @EntityGraph(attributePaths = { "owner" })
