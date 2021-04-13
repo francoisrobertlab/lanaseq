@@ -82,9 +82,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     tags = addColumn(dataset -> dataset.getTags().stream().collect(Collectors.joining(", ")), TAGS)
         .setKey(TAGS).setSortable(false).setFlexGrow(1);
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
-        .setSortProperty(PROTOCOL + "." + NAME)
-        .setComparator(NormalizedComparator.of(dataset -> protocol(dataset).getName()))
-        .setFlexGrow(1);
+        .setSortable(false).setFlexGrow(1);
     date =
         addColumn(new LocalDateRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
             .setKey(DATE).setSortProperty(DATE).setFlexGrow(1);

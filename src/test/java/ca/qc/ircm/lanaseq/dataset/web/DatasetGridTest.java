@@ -121,6 +121,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     doReturn(grid.name).when(grid).addColumn(any(ValueProvider.class), eq(NAME));
     when(grid.name.setKey(any())).thenReturn(grid.name);
     when(grid.name.setSortProperty(any())).thenReturn(grid.name);
+    when(grid.name.setSortable(anyBoolean())).thenReturn(grid.name);
     when(grid.name.setComparator(any(Comparator.class))).thenReturn(grid.name);
     when(grid.name.setHeader(any(String.class))).thenReturn(grid.name);
     when(grid.name.setFlexGrow(anyInt())).thenReturn(grid.name);
@@ -136,6 +137,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     doReturn(grid.protocol).when(grid).addColumn(any(ValueProvider.class), eq(PROTOCOL));
     when(grid.protocol.setKey(any())).thenReturn(grid.protocol);
     when(grid.protocol.setSortProperty(any())).thenReturn(grid.protocol);
+    when(grid.protocol.setSortable(anyBoolean())).thenReturn(grid.protocol);
     when(grid.protocol.setComparator(any(Comparator.class))).thenReturn(grid.protocol);
     when(grid.protocol.setHeader(any(String.class))).thenReturn(grid.protocol);
     when(grid.protocol.setFlexGrow(anyInt())).thenReturn(grid.protocol);
@@ -143,12 +145,14 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     doReturn(grid.date).when(grid).addColumn(any(LocalDateRenderer.class), eq(DATE));
     when(grid.date.setKey(any())).thenReturn(grid.date);
     when(grid.date.setSortProperty(any())).thenReturn(grid.date);
+    when(grid.date.setSortable(anyBoolean())).thenReturn(grid.date);
     when(grid.date.setHeader(any(String.class))).thenReturn(grid.date);
     when(grid.date.setFlexGrow(anyInt())).thenReturn(grid.date);
     grid.owner = mock(Column.class);
     doReturn(grid.owner).when(grid).addColumn(any(ValueProvider.class), eq(OWNER));
     when(grid.owner.setKey(any())).thenReturn(grid.owner);
     when(grid.owner.setSortProperty(any())).thenReturn(grid.owner);
+    when(grid.owner.setSortable(anyBoolean())).thenReturn(grid.owner);
     when(grid.owner.setComparator(any(Comparator.class))).thenReturn(grid.owner);
     when(grid.owner.setHeader(any(String.class))).thenReturn(grid.owner);
     when(grid.owner.setFlexGrow(anyInt())).thenReturn(grid.owner);
@@ -227,8 +231,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     assertNotNull(grid.getColumnByKey(TAGS));
     assertFalse(grid.getColumnByKey(TAGS).isSortable());
     assertNotNull(grid.getColumnByKey(PROTOCOL));
-    assertEquals(PROTOCOL + "." + NAME, grid.getColumnByKey(PROTOCOL)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
+    assertFalse(grid.getColumnByKey(PROTOCOL).isSortable());
     assertNotNull(grid.getColumnByKey(DATE));
     assertEquals(DATE, grid.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING).findFirst()
         .map(so -> so.getSorted()).orElse(null));
@@ -264,13 +267,6 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     valueProvider = valueProviderCaptor.getValue();
     for (Dataset dataset : datasets) {
       assertEquals(protocol(dataset).getName(), valueProvider.apply(dataset));
-    }
-    verify(grid.protocol).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Dataset dataset : datasets) {
-      assertEquals(protocol(dataset).getName(),
-          ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
     verify(grid).addColumn(localDateRendererCaptor.capture(), eq(DATE));
     LocalDateRenderer<Dataset> localDateRenderer = localDateRendererCaptor.getValue();
