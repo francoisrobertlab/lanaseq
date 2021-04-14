@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,20 +62,16 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
@@ -97,8 +94,8 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<Command> commandCaptor;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
   private Path folder;
@@ -111,7 +108,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   @SuppressWarnings("unchecked")
   public void beforeTest() {
     ui.setLocale(locale);
@@ -125,7 +122,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     files.add(new File("sample_R2.fastq"));
     files.add(new File("sample.bw"));
     files.add(new File("sample.png"));
-    folder = temporaryFolder.getRoot().toPath().resolve("sample");
+    folder = temporaryFolder.resolve("sample");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", false));
     when(configuration.upload(any(Sample.class))).thenReturn(folder);
@@ -254,9 +251,11 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(sample, presenter.getSample());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void setSample_NewSample() {
-    presenter.setSample(new Sample(), locale);
+    assertThrows(IllegalArgumentException.class, () -> {
+      presenter.setSample(new Sample(), locale);
+    });
   }
 
   @Test
@@ -270,9 +269,11 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(files.isEmpty());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setSample_Null() {
-    presenter.setSample(null, locale);
+    assertThrows(NullPointerException.class, () -> {
+      presenter.setSample(null, locale);
+    });
   }
 
   @Test

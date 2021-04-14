@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.test.config;
 
 import com.vaadin.flow.component.UI;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Configures a mock UI.
@@ -29,7 +29,7 @@ public abstract class AbstractKaribuTestCase {
   /**
    * Gets UI instance.
    */
-  @Before
+  @BeforeEach
   public void obtainUi() {
     ui = UI.getCurrent();
   }

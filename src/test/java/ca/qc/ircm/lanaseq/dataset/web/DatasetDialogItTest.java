@@ -47,12 +47,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -60,16 +58,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TestTransaction;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogItTest.class);
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private DatasetRepository repository;
   @Autowired
@@ -89,10 +85,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String sampleId = "FR3";
   private String sampleReplicate = "R3";
 
-  @Before
+  @BeforeEach
   public void beforeTest() throws Throwable {
     protocol = protocolRepository.findById(1L).get();
-    setHome(temporaryFolder.newFolder("home").toPath());
+    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
   }
 
   private void open() {
@@ -267,7 +263,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Ignore("Drag and drop function moves to random element instead of the right location")
+  @Disabled("Drag and drop function moves to random element instead of the right location")
   public void save_ReorderSamples() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);

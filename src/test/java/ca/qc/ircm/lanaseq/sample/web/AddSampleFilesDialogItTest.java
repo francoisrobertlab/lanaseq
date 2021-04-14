@@ -37,22 +37,18 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TestTransaction;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
@@ -60,10 +56,10 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   private Path file1;
   private Path file2;
 
-  @Before
+  @BeforeEach
   public void beforeTest() throws Throwable {
-    setHome(temporaryFolder.newFolder("home").toPath());
-    setUpload(temporaryFolder.newFolder("upload").toPath());
+    setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
   }
 
   private void open() {

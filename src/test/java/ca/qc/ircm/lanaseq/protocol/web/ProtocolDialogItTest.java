@@ -40,16 +40,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TestTransaction;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
@@ -63,7 +60,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   private Path file1;
   private Path file2;
 
-  @Before
+  @BeforeEach
   public void beforeTest() throws Throwable {
     file1 = Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI());
     file2 = Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI());

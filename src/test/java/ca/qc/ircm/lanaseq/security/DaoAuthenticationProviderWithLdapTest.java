@@ -32,9 +32,8 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -42,9 +41,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class DaoAuthenticationProviderWithLdapTest {
   @Autowired
@@ -56,7 +53,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   @Autowired
   private UserRepository userRepository;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     ldapDaoAuthenticationProvider.setLdapService(ldapService);
     ldapDaoAuthenticationProvider.setLdapConfiguration(ldapConfiguration);

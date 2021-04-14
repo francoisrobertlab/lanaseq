@@ -22,14 +22,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class LdapServiceTest {
   private LdapService ldapService;
@@ -38,7 +35,7 @@ public class LdapServiceTest {
   @Autowired
   private LdapConfiguration ldapConfiguration;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     ldapService = new LdapService(ldapTemplate, ldapConfiguration);
   }

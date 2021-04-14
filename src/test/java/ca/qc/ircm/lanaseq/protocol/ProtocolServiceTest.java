@@ -24,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -40,18 +41,15 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class ProtocolServiceTest {
   private static final String READ = "read";
@@ -74,7 +72,7 @@ public class ProtocolServiceTest {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     currentUser = userRepository.getOne(3L);
@@ -118,10 +116,12 @@ public class ProtocolServiceTest {
     assertFalse(service.nameExists(null));
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithAnonymousUser
   public void nameExists_Anonymous() {
-    service.nameExists("test protocol");
+    assertThrows(AccessDeniedException.class, () -> {
+      service.nameExists("test protocol");
+    });
   }
 
   @Test
@@ -230,11 +230,13 @@ public class ProtocolServiceTest {
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithMockUser
   public void deletedFiles_User() throws Throwable {
-    Protocol protocol = repository.findById(3L).get();
-    service.deletedFiles(protocol);
+    assertThrows(AccessDeniedException.class, () -> {
+      Protocol protocol = repository.findById(3L).get();
+      service.deletedFiles(protocol);
+    });
   }
 
   @Test
@@ -276,13 +278,15 @@ public class ProtocolServiceTest {
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   @WithMockUser
   public void save_New_NoFile() {
-    Protocol protocol = new Protocol();
-    protocol.setName("New protocol");
+    assertThrows(IllegalArgumentException.class, () -> {
+      Protocol protocol = new Protocol();
+      protocol.setName("New protocol");
 
-    service.save(protocol, Collections.emptyList());
+      service.save(protocol, Collections.emptyList());
+    });
   }
 
   @Test

@@ -28,6 +28,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.atLeast;
@@ -66,20 +67,16 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
@@ -102,8 +99,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       ComponentEventListener<SavedEvent<AddSampleFilesDialog>>> savedListenerCaptor;
   @Autowired
   private SampleRepository repository;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -118,7 +115,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
     dialog.header = new H3();
@@ -211,11 +208,13 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(sample, presenter.getSample());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setSample_NewSample() {
-    Sample sample = new Sample();
+    assertThrows(NullPointerException.class, () -> {
+      Sample sample = new Sample();
 
-    presenter.setSample(sample);
+      presenter.setSample(sample);
+    });
   }
 
   @Test
@@ -268,9 +267,11 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.filenameEdit.isReadOnly());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setSample_Null() {
-    presenter.setSample(null);
+    assertThrows(NullPointerException.class, () -> {
+      presenter.setSample(null);
+    });
   }
 
   @Test
@@ -302,8 +303,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_Exists() throws Throwable {
-    File path = temporaryFolder.newFile("source.txt");
-    temporaryFolder.newFile("abc.txt");
+    File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
+    Files.createFile(temporaryFolder.resolve("abc.txt"));
     EditableFile file = new EditableFile(path);
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
@@ -323,7 +324,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_ExistsSameFile() throws Throwable {
-    temporaryFolder.newFile("abc.txt");
+    Files.createFile(temporaryFolder.resolve("abc.txt"));
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
     when(dialog.files.getEditor().getItem()).thenReturn(null);
@@ -398,7 +399,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void rename() throws Throwable {
-    File path = temporaryFolder.newFile("source.txt");
+    File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
     EditableFile file = new EditableFile(path);
     file.setFilename("target.txt");
     byte[] bytes = new byte[1024];
@@ -416,7 +417,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void deleteFile() throws Throwable {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    File path = temporaryFolder.newFile("source.txt");
+    File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
     EditableFile file = new EditableFile(path);
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);

@@ -28,6 +28,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.atLeast;
@@ -73,20 +74,16 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
@@ -112,8 +109,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
       ComponentEventListener<OpenedChangeEvent<Dialog>>> openedSampleFilesListenerCaptor;
   @Autowired
   private DatasetRepository repository;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   @Mock
   private Sample sample;
   private Locale locale = Locale.ENGLISH;
@@ -130,7 +127,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
     dialog.header = new H3();
@@ -225,11 +222,13 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(dataset, presenter.getDataset());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setDataset_NewDataset() {
-    Dataset dataset = new Dataset();
+    assertThrows(NullPointerException.class, () -> {
+      Dataset dataset = new Dataset();
 
-    presenter.setDataset(dataset);
+      presenter.setDataset(dataset);
+    });
   }
 
   @Test
@@ -297,9 +296,11 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     }
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setDataset_Null() {
-    presenter.setDataset(null);
+    assertThrows(NullPointerException.class, () -> {
+      presenter.setDataset(null);
+    });
   }
 
   @Test
@@ -331,8 +332,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_Exists() throws Throwable {
-    File file = temporaryFolder.newFile("source.txt");
-    temporaryFolder.newFile("abc.txt");
+    File file = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
+    Files.createFile(temporaryFolder.resolve("abc.txt"));
     EditableFile efile = new EditableFile(file);
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
@@ -352,7 +353,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void filenameEdit_ExistsSameFile() throws Throwable {
-    temporaryFolder.newFile("abc.txt");
+    Files.createFile(temporaryFolder.resolve("abc.txt"));
     dialog.files = mock(Grid.class);
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
     when(dialog.files.getEditor().getItem()).thenReturn(null);
@@ -442,7 +443,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void rename() throws Throwable {
-    File file = temporaryFolder.newFile("source.txt");
+    File file = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
     EditableFile efile = new EditableFile(file);
     efile.setFilename("target.txt");
     byte[] bytes = new byte[1024];
@@ -460,7 +461,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void deleteFile() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    File file = temporaryFolder.newFile("source.txt");
+    File file = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
     EditableFile efile = new EditableFile(file);
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);

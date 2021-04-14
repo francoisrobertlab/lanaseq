@@ -150,7 +150,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
               .orElse(null);
       ChromeOptions options = new ChromeOptions();
       if (downloadAnnotations != null) {
-        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        HashMap<String, Object> chromePrefs = new HashMap<>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
         chromePrefs.put("download.default_directory", downloadHome);
         options.setExperimentalOption("prefs", chromePrefs);

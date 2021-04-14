@@ -27,13 +27,10 @@ import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class MainViewTest {
   private MainView view;
@@ -42,7 +39,7 @@ public class MainViewTest {
   @Mock
   private BeforeEnterEvent event;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     view = new MainView(authorizationService);
   }

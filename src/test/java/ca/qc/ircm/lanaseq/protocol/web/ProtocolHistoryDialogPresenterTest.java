@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,18 +45,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class ProtocolHistoryDialogPresenterTest extends AbstractKaribuTestCase {
@@ -84,7 +82,7 @@ public class ProtocolHistoryDialogPresenterTest extends AbstractKaribuTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     dialog.header = new H3();
     dialog.files = new Grid<>();
@@ -134,9 +132,11 @@ public class ProtocolHistoryDialogPresenterTest extends AbstractKaribuTestCase {
     }
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setProtocol_Null() {
-    presenter.setProtocol(null);
+    assertThrows(NullPointerException.class, () -> {
+      presenter.setProtocol(null);
+    });
   }
 
   @Test

@@ -37,15 +37,12 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import javax.persistence.EntityManager;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @SuppressWarnings("unused")

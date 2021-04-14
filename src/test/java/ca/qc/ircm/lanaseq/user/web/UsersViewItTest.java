@@ -33,14 +33,11 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import java.util.Locale;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewItTest extends AbstractTestBenchTestCase {
@@ -145,7 +142,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @Ignore("Admins are allowed to switch to another admin right now")
+  @Disabled("Admins are allowed to switch to another admin right now")
   public void switchUser_Fail() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).id(ID);

@@ -34,14 +34,11 @@ import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @TestBenchTestAnnotations
 public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @SuppressWarnings("unused")

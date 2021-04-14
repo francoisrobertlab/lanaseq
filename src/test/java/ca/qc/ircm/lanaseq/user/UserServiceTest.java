@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -36,9 +37,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
@@ -46,9 +46,7 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 public class UserServiceTest {
   private static final String READ = "read";
@@ -68,7 +66,7 @@ public class UserServiceTest {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
@@ -365,28 +363,34 @@ public class UserServiceTest {
     verify(authorizationService, never()).reloadAuthorities();
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithMockUser
   public void save_UpdateFirstUserRemoveAdmin() {
-    User user = repository.findById(1L).get();
-    user.setAdmin(false);
+    assertThrows(AccessDeniedException.class, () -> {
+      User user = repository.findById(1L).get();
+      user.setAdmin(false);
 
-    service.save(user, "newpassword");
+      service.save(user, "newpassword");
+    });
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithMockUser
   public void save_UpdateFirstUserRemoveActive() {
-    User user = repository.findById(1L).get();
-    user.setActive(false);
+    assertThrows(AccessDeniedException.class, () -> {
+      User user = repository.findById(1L).get();
+      user.setActive(false);
 
-    service.save(user, "newpassword");
+      service.save(user, "newpassword");
+    });
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   @WithMockUser
   public void save_Null() {
-    service.save(null, null);
+    assertThrows(NullPointerException.class, () -> {
+      service.save(null, null);
+    });
   }
 
   @Test
@@ -443,21 +447,25 @@ public class UserServiceTest {
     verify(authorizationService, never()).reloadAuthorities();
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test
   @WithAnonymousUser
   public void save_PasswordAnonymousDenied() {
-    User user = repository.findById(3L).get();
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    assertThrows(AccessDeniedException.class, () -> {
+      User user = repository.findById(3L).get();
+      when(authorizationService.getCurrentUser()).thenReturn(user);
 
-    service.save("new password");
+      service.save("new password");
+    });
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   @WithMockUser
   public void save_PasswordNull() {
-    User user = repository.findById(3L).get();
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    assertThrows(NullPointerException.class, () -> {
+      User user = repository.findById(3L).get();
+      when(authorizationService.getCurrentUser()).thenReturn(user);
 
-    service.save(null);
+      service.save(null);
+    });
   }
 }

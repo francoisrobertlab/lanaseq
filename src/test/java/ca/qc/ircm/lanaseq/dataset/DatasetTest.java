@@ -24,7 +24,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DatasetTest {
   private void copy(Sample from, Sample to) {

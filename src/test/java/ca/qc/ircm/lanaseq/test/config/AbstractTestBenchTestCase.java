@@ -40,7 +40,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   /**
    * Saves home folder to reset it's value upon test completion.
    */
-  @Before
+  @BeforeEach
   public void saveHomeFolder() throws Throwable {
     Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
     getHome.setAccessible(true);
@@ -72,7 +72,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   /**
    * Saves upload folder to reset it's value upon test completion.
    */
-  @Before
+  @BeforeEach
   public void saveUploadFolder() throws Throwable {
     Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
     getUpload.setAccessible(true);

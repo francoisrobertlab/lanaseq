@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AppResourcesTest {
   private Locale locale = Locale.ENGLISH;

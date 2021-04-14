@@ -32,14 +32,11 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.MDC;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class MdcFilterTest {
   private MdcFilter mdcFilter;
@@ -54,7 +51,7 @@ public class MdcFilterTest {
   @Mock
   private FilterChain filterChain;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     mdcFilter = new MdcFilter(authorizationService);
   }

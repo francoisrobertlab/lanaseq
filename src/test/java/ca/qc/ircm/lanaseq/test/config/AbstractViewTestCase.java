@@ -37,7 +37,7 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WebBrowser;
 import javax.servlet.ServletContext;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -72,7 +72,7 @@ public abstract class AbstractViewTestCase {
   /**
    * Sets ui as current UI instance.
    */
-  @Before
+  @BeforeEach
   public void setUi() {
     when(ui.getSession()).thenReturn(session);
     when(session.getBrowser()).thenReturn(browser);

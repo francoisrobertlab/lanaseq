@@ -25,11 +25,8 @@ import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.Test;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class ProtocolFilterTest {
   private ProtocolFilter filter = new ProtocolFilter();

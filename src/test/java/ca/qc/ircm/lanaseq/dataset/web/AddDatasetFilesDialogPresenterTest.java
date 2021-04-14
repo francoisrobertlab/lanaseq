@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,20 +62,16 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
@@ -97,8 +94,8 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<Command> commandCaptor;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
   private Path folder;
@@ -111,9 +108,9 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   @SuppressWarnings("unchecked")
-  public void beforeTest() {
+  public void beforeTest() throws Throwable {
     ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
@@ -125,7 +122,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     files.add(new File("dataset_R2.fastq"));
     files.add(new File("dataset.bw"));
     files.add(new File("dataset.png"));
-    folder = temporaryFolder.getRoot().toPath().resolve("dataset");
+    folder = temporaryFolder.resolve("dataset");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", false));
     when(configuration.upload(any(Dataset.class))).thenReturn(folder);
@@ -254,9 +251,11 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(dataset, presenter.getDataset());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void setDataset_NewDataset() {
-    presenter.setDataset(new Dataset());
+    assertThrows(IllegalArgumentException.class, () -> {
+      presenter.setDataset(new Dataset());
+    });
   }
 
   @Test
@@ -270,9 +269,11 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(files.isEmpty());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setDataset_Null() {
-    presenter.setDataset(null);
+    assertThrows(NullPointerException.class, () -> {
+      presenter.setDataset(null);
+    });
   }
 
   @Test

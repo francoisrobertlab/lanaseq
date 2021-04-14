@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,17 +36,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class SpringDataUserDetailsServiceTest {
   private SpringDataUserDetailsService userDetailsService;
@@ -56,7 +54,7 @@ public class SpringDataUserDetailsServiceTest {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     userDetailsService = new SpringDataUserDetailsService(userRepository);
     user = new User();
@@ -142,11 +140,13 @@ public class SpringDataUserDetailsServiceTest {
     assertTrue(findAuthority(authorities, MANAGER).isPresent());
   }
 
-  @Test(expected = UsernameNotFoundException.class)
+  @Test
   public void loadUserByUsername_NotExists() {
-    when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+    assertThrows(UsernameNotFoundException.class, () -> {
+      when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
 
-    userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
+      userDetailsService.loadUserByUsername("lanaseq@ircm.qc.ca");
+    });
   }
 
   @Test

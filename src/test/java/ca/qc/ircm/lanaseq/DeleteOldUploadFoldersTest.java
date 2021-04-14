@@ -31,34 +31,30 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class DeleteOldUploadFoldersTest {
   @Autowired
   private DeleteOldUploadFolders task;
   @MockBean
   private AppConfiguration configuration;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
-    when(configuration.getUpload()).thenReturn(temporaryFolder.getRoot().toPath());
+    when(configuration.getUpload()).thenReturn(temporaryFolder);
     when(configuration.getUploadDeleteAge()).thenReturn(Duration.ofHours(24));
   }
 
   @Test
   public void deleteOldUploadFolders_OldEmptyFolder() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     Files.setLastModifiedTime(folder, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));
     assertTrue(Files.exists(folder));
     task.deleteOldUploadFolders();
@@ -67,7 +63,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_OldFolderWithOldFile() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     Path file = folder.resolve("test.txt");
     Files.write(file, Stream.of("test").collect(Collectors.toList()), StandardOpenOption.CREATE);
     Files.setLastModifiedTime(folder, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));
@@ -79,7 +75,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_OldFolderWithRecentFile() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     Path file = folder.resolve("test.txt");
     Files.write(file, Stream.of("test").collect(Collectors.toList()), StandardOpenOption.CREATE);
     Files.setLastModifiedTime(folder, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));
@@ -90,7 +86,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_OldFile() throws Throwable {
-    Path file = temporaryFolder.newFile("test.txt").toPath();
+    Path file = Files.createFile(temporaryFolder.resolve("test.txt"));
     Files.write(file, Stream.of("test").collect(Collectors.toList()), StandardOpenOption.CREATE);
     Files.setLastModifiedTime(file, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));
     assertTrue(Files.exists(file));
@@ -100,7 +96,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_NewEmptyFolder() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     assertTrue(Files.exists(folder));
     task.deleteOldUploadFolders();
     assertTrue(Files.exists(folder));
@@ -108,7 +104,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_NewEmptyFolderWithOldFile() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     Path file = folder.resolve("test.txt");
     Files.write(file, Stream.of("test").collect(Collectors.toList()), StandardOpenOption.CREATE);
     Files.setLastModifiedTime(file, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));
@@ -120,7 +116,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_NewEmptyFolderWithNewFile() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     Path file = folder.resolve("test.txt");
     Files.write(file, Stream.of("test").collect(Collectors.toList()), StandardOpenOption.CREATE);
     assertTrue(Files.exists(folder));
@@ -131,7 +127,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_NewFile() throws Throwable {
-    Path file = temporaryFolder.newFile("test.txt").toPath();
+    Path file = Files.createFile(temporaryFolder.resolve("test.txt"));
     Files.write(file, Stream.of("test").collect(Collectors.toList()), StandardOpenOption.CREATE);
     assertTrue(Files.exists(file));
     task.deleteOldUploadFolders();
@@ -140,7 +136,7 @@ public class DeleteOldUploadFoldersTest {
 
   @Test
   public void deleteOldUploadFolders_FutureEmptyFolder() throws Throwable {
-    Path folder = temporaryFolder.newFolder("test").toPath();
+    Path folder = Files.createDirectory(temporaryFolder.resolve("test"));
     Files.setLastModifiedTime(folder, FileTime.from(Instant.now().plus(1, ChronoUnit.HOURS)));
     assertTrue(Files.exists(folder));
     task.deleteOldUploadFolders();

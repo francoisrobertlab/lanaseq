@@ -34,12 +34,9 @@ import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class AccessDeniedViewTest extends AbstractViewTestCase {
   private AccessDeniedView view;
@@ -47,7 +44,7 @@ public class AccessDeniedViewTest extends AbstractViewTestCase {
   private AppResources resources = new AppResources(AccessDeniedView.class, locale);
   private AppResources generalResources = new AppResources(Constants.class, locale);
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     view = new AccessDeniedView();

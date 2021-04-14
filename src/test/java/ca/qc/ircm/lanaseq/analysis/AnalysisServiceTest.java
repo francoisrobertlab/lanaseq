@@ -30,19 +30,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.Consumer;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class AnalysisServiceTest {
@@ -63,8 +59,8 @@ public class AnalysisServiceTest {
   private PermissionEvaluator permissionEvaluator;
   @Mock
   private Consumer<String> errorHandler;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   private Dataset dataset;
   private Sample sample;
   private Sample sample2;
@@ -95,49 +91,54 @@ public class AnalysisServiceTest {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     dataset = datasetRepository.findById(2L).get();
     sample = sampleRepository.findById(4L).get();
     sample2 = sampleRepository.findById(5L).get();
-    Path folder = temporaryFolder.getRoot().toPath();
-    paired1 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
-    paired2 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
-    pairedPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    paired1 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
+    paired2 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
+    pairedPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);
-    pairedZip1 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq.gz");
-    pairedZip2 = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq.gz");
-    pairedZipPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    pairedZip1 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq.gz");
+    pairedZip2 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq.gz");
+    pairedZipPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     pairedZipPaths.add(pairedZip1);
     pairedZipPaths.add(pairedZip2);
-    unpaired = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq");
-    unpairedPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    unpaired = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq");
+    unpairedPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     unpairedPaths.add(unpaired);
-    unpairedZip = folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq.gz");
-    unpairedZipPaths.add(folder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    unpairedZip = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq.gz");
+    unpairedZipPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
     unpairedZipPaths.add(unpairedZip);
-    secondPaired1 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq");
-    secondPaired2 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq");
-    secondPairedPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondPaired1 = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq");
+    secondPaired2 = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq");
+    secondPairedPaths.add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedPaths.add(secondPaired1);
     secondPairedPaths.add(secondPaired2);
-    secondPairedZip1 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
-    secondPairedZip2 = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
-    secondPairedZipPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondPairedZip1 =
+        temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
+    secondPairedZip2 =
+        temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
+    secondPairedZipPaths
+        .add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedZipPaths.add(secondPairedZip1);
     secondPairedZipPaths.add(secondPairedZip2);
-    secondUnpaired = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq");
-    secondUnpairedPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondUnpaired = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq");
+    secondUnpairedPaths
+        .add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondUnpairedPaths.add(secondUnpaired);
-    secondUnpairedZip = folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq.gz");
-    secondUnpairedZipPaths.add(folder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondUnpairedZip =
+        temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq.gz");
+    secondUnpairedZipPaths
+        .add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondUnpairedZipPaths.add(secondUnpairedZip);
     when(configuration.analysis(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
-          ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
+          ? temporaryFolder.resolve(dataset.getName())
           : null;
     });
   }
@@ -161,9 +162,8 @@ public class AnalysisServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void validate_DatasetPairedNoSampleName() {
-    Path folder = temporaryFolder.getRoot().toPath();
-    paired1 = folder.resolve("R1.fastq");
-    paired2 = folder.resolve("R2.fastq");
+    paired1 = temporaryFolder.resolve("R1.fastq");
+    paired2 = temporaryFolder.resolve("R2.fastq");
     pairedPaths.clear();
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);
@@ -418,9 +418,8 @@ public class AnalysisServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void copyResources_DatasetNoSampleName() throws Throwable {
-    Path home = temporaryFolder.getRoot().toPath();
-    paired1 = home.resolve("R1.fastq");
-    paired2 = home.resolve("R2.fastq");
+    paired1 = temporaryFolder.resolve("R1.fastq");
+    paired2 = temporaryFolder.resolve("R2.fastq");
     pairedPaths.clear();
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);

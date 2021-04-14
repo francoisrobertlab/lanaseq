@@ -23,13 +23,10 @@ import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.server.VaadinSession;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class ByteArrayStreamResourceWriterTest {
   private ByteArrayStreamResourceWriter writer;
@@ -41,7 +38,7 @@ public class ByteArrayStreamResourceWriterTest {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() throws Throwable {
     random.nextBytes(content);
     writer = new ByteArrayStreamResourceWriter(content);

@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleType.NULL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SampleTypeTest {
   @Test

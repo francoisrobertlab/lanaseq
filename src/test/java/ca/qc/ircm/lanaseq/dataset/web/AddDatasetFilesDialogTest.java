@@ -79,19 +79,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
@@ -112,8 +108,8 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   private ComponentEventListener<SavedEvent<AddDatasetFilesDialog>> savedListener;
   @Autowired
   private DatasetRepository repository;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -123,14 +119,14 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() throws Throwable {
     ui.setLocale(locale);
     dialog = new AddDatasetFilesDialog(presenter);
-    files.add(temporaryFolder.newFile("dataset_R1.fastq"));
-    files.add(temporaryFolder.newFile("dataset_R2.fastq"));
-    files.add(temporaryFolder.newFile("dataset.bw"));
-    files.add(temporaryFolder.newFile("dataset.png"));
+    files.add(temporaryFolder.resolve("dataset_R1.fastq").toFile());
+    files.add(temporaryFolder.resolve("dataset_R2.fastq").toFile());
+    files.add(temporaryFolder.resolve("dataset.bw").toFile());
+    files.add(temporaryFolder.resolve("dataset.png").toFile());
     for (File file : files) {
       writeFile(file.toPath(), random.nextInt(10) * 1024 ^ 2);
     }

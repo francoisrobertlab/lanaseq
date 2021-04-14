@@ -31,7 +31,7 @@ import com.vaadin.flow.internal.CurrentInstance;
 import com.vaadin.flow.internal.ExecutionContext;
 import com.vaadin.flow.server.VaadinSession;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -54,7 +54,7 @@ public abstract class VaadinServiceTestCase {
   /**
    * Sets ui as current UI instance.
    */
-  @Before
+  @BeforeEach
   public void setUi() {
     when(ui.getSession()).thenReturn(VaadinSession.getCurrent());
     when(ui.getPage()).thenReturn(page);

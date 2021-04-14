@@ -46,13 +46,10 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
 public class DateRangeFieldTest extends AbstractViewTestCase {
   private DateRangeField dateRange;
@@ -64,7 +61,7 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     when(ui.getLocale()).thenReturn(locale);
     dateRange = new DateRangeField();

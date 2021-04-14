@@ -31,6 +31,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -66,11 +67,9 @@ import java.util.HashSet;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
@@ -79,9 +78,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ServiceTestAnnotations
 @WithMockUser
 public class DatasetServiceTest {
@@ -107,29 +104,29 @@ public class DatasetServiceTest {
   private AuthorizationService authorizationService;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  Path temporaryFolder;
 
   /**
    * Before test.
    */
-  @Before
+  @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     when(configuration.folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
-          ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
+          ? temporaryFolder.resolve(dataset.getName())
           : null;
     });
     when(configuration.upload(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
-          ? temporaryFolder.getRoot().toPath().resolve(dataset.getName())
+          ? temporaryFolder.resolve(dataset.getName())
           : null;
     });
     when(configuration.getUpload()).then(i -> {
-      return temporaryFolder.getRoot().toPath().resolve("upload");
+      return temporaryFolder.resolve("upload");
     });
     doAnswer(i -> {
       Sample sample = i.getArgument(0);
@@ -774,10 +771,8 @@ public class DatasetServiceTest {
   public void save_UpdateMoveFilesParentNotExists() throws Throwable {
     when(configuration.folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
-      return dataset != null && dataset.getName() != null
-          ? temporaryFolder.getRoot().toPath().resolve(String.valueOf(dataset.getDate().getYear()))
-              .resolve(dataset.getName())
-          : null;
+      return dataset != null && dataset.getName() != null ? temporaryFolder
+          .resolve(String.valueOf(dataset.getDate().getYear())).resolve(dataset.getName()) : null;
     });
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(user);
@@ -898,12 +893,14 @@ public class DatasetServiceTest {
     assertFalse(Files.exists(beforeFolder));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void save_UpdateNotEditable() {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
-    Dataset dataset = repository.findById(5L).orElse(null);
-    service.save(dataset);
+    assertThrows(IllegalArgumentException.class, () -> {
+      User user = userRepository.findById(2L).orElse(null);
+      when(authorizationService.getCurrentUser()).thenReturn(user);
+      Dataset dataset = repository.findById(5L).orElse(null);
+      service.save(dataset);
+    });
   }
 
   @Test
@@ -941,14 +938,12 @@ public class DatasetServiceTest {
   public void saveFiles() throws Throwable {
     final Dataset dataset = repository.findById(1L).orElse(null);
     List<Path> files = new ArrayList<>();
-    Path file = temporaryFolder.newFile("dataset_R1.fastq").toPath();
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
-        StandardCopyOption.REPLACE_EXISTING);
+    Path file = temporaryFolder.resolve("dataset_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     final FileTime filetime1 = Files.getLastModifiedTime(file);
     files.add(file);
-    file = temporaryFolder.newFile("dataset_R2.fastq").toPath();
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
-        StandardCopyOption.REPLACE_EXISTING);
+    file = temporaryFolder.resolve("dataset_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file);
     final FileTime filetime2 = Files.getLastModifiedTime(file);
     files.add(file);
     Thread.sleep(1000); // Allows to test file modification time.
@@ -989,10 +984,12 @@ public class DatasetServiceTest {
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void delete_NotEditable() {
-    Dataset dataset = repository.findById(5L).get();
-    service.delete(dataset);
+    assertThrows(IllegalArgumentException.class, () -> {
+      Dataset dataset = repository.findById(5L).get();
+      service.delete(dataset);
+    });
   }
 
   @Test
@@ -1049,29 +1046,33 @@ public class DatasetServiceTest {
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void deleteFile_FullPathNotInSampleFolder() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
-    Path file = temporaryFolder.getRoot().toPath().resolve("test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
-        StandardCopyOption.REPLACE_EXISTING);
-    Files.setLastModifiedTime(file,
-        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+    assertThrows(IllegalArgumentException.class, () -> {
+      Dataset dataset = repository.findById(4L).get();
+      Path file = temporaryFolder.resolve("test.txt");
+      Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+          StandardCopyOption.REPLACE_EXISTING);
+      Files.setLastModifiedTime(file,
+          FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
 
-    service.deleteFile(dataset, file);
+      service.deleteFile(dataset, file);
+    });
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
-    Path folder = configuration.folder(dataset);
-    Files.createDirectories(folder);
-    Path file = Paths.get("../test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
-        StandardCopyOption.REPLACE_EXISTING);
-    Files.setLastModifiedTime(file,
-        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+    assertThrows(IllegalArgumentException.class, () -> {
+      Dataset dataset = repository.findById(4L).get();
+      Path folder = configuration.folder(dataset);
+      Files.createDirectories(folder);
+      Path file = Paths.get("../test.txt");
+      Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+          StandardCopyOption.REPLACE_EXISTING);
+      Files.setLastModifiedTime(file,
+          FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
 
-    service.deleteFile(dataset, file);
+      service.deleteFile(dataset, file);
+    });
   }
 }
