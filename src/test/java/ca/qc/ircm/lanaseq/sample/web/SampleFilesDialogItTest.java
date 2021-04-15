@@ -29,6 +29,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 @TestBenchTestAnnotations
@@ -53,6 +55,8 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   private SampleRepository repository;
   @Autowired
   private AppConfiguration configuration;
+  @Value("${download-home}")
+  protected Path downloadHome;
 
   @BeforeEach
   public void beforeTest() throws Throwable {
@@ -97,6 +101,36 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
         Files.readAllBytes(file.resolveSibling(sample.getName() + "_R1.fastq")));
     assertFalse(Files.exists(file));
+  }
+
+  @Test
+  @Download
+  public void download() throws Throwable {
+    Files.createDirectories(downloadHome);
+    Path downloaded = downloadHome.resolve("R1.fastq");
+    Files.deleteIfExists(downloaded);
+    Sample sample = repository.findById(10L).get();
+    Path folder = configuration.folder(sample);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    view.samples().controlClick(1);
+    SampleFilesDialogElement dialog = view.filesDialog();
+
+    dialog.files().downloadButton(0).click();
+
+    // Wait for file to download.
+    Thread.sleep(2000);
+    assertTrue(Files.exists(downloaded));
+    try {
+      assertArrayEquals(Files.readAllBytes(file), Files.readAllBytes(downloaded));
+    } finally {
+      Files.delete(downloaded);
+    }
   }
 
   @Test

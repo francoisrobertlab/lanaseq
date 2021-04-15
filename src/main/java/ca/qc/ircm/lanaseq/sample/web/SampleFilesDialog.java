@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
+import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
@@ -33,6 +34,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -68,6 +70,7 @@ public class SampleFilesDialog extends Dialog
   protected Div message = new Div();
   protected Grid<EditableFile> files = new Grid<>();
   protected Column<EditableFile> filename;
+  protected Column<EditableFile> download;
   protected Column<EditableFile> delete;
   protected TextField filenameEdit = new TextField();
   protected Button add = new Button();
@@ -108,9 +111,11 @@ public class SampleFilesDialog extends Dialog
       filenameEdit.focus();
     });
     filename =
-        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setWidth("35em");
-    delete =
-        files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE).setKey(DELETE);
+        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setWidth("30em");
+    download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)), DOWNLOAD)
+        .setKey(DOWNLOAD).setSortable(false);
+    delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE)
+        .setKey(DELETE).setSortable(false);
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
@@ -118,6 +123,17 @@ public class SampleFilesDialog extends Dialog
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> presenter.add());
     presenter.init(this);
+  }
+
+  private Anchor downloadButton(EditableFile file) {
+    Anchor anchor = new Anchor();
+    anchor.addClassName(DOWNLOAD);
+    anchor.getElement().setAttribute("download", true);
+    anchor.setHref(presenter.download(file));
+    Button button = new Button();
+    anchor.add(button);
+    button.setIcon(VaadinIcon.DOWNLOAD.create());
+    return anchor;
   }
 
   private Button deleteButton(EditableFile file) {
@@ -137,6 +153,7 @@ public class SampleFilesDialog extends Dialog
     message.setText("");
     message.setTitle("");
     filename.setHeader(resources.message(FILENAME));
+    download.setHeader(webResources.message(DOWNLOAD));
     delete.setHeader(webResources.message(DELETE));
     add.setText(webResources.message(ADD));
     updateHeader();

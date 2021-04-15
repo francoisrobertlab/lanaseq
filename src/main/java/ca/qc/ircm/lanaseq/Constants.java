@@ -48,6 +48,7 @@ public class Constants {
   public static final String ADD = "add";
   public static final String REMOVE = "remove";
   public static final String UPLOAD = "upload";
+  public static final String DOWNLOAD = "download";
   public static final String CONFIRM = "confirm";
 
   /**

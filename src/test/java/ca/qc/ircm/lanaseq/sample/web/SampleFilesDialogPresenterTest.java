@@ -58,6 +58,10 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.StreamResourceWriter;
+import com.vaadin.flow.server.VaadinSession;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,6 +103,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       ComponentEventListener<SavedEvent<AddSampleFilesDialog>>> savedListenerCaptor;
   @Autowired
   private SampleRepository repository;
+  @Mock
+  private VaadinSession session;
   @TempDir
   Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
@@ -411,6 +417,25 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(Files.exists(path.toPath().resolveSibling("target.txt")));
     assertArrayEquals(bytes, Files.readAllBytes(path.toPath().resolveSibling("target.txt")));
     assertFalse(Files.exists(path.toPath()));
+  }
+
+  @Test
+  public void download() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
+    EditableFile file = new EditableFile(path);
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
+    Files.write(path.toPath(), bytes);
+
+    StreamResource resource = presenter.download(file);
+
+    assertEquals("source.txt", resource.getName());
+    StreamResourceWriter writer = resource.getWriter();
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    writer.accept(output, session);
+    assertArrayEquals(bytes, output.toByteArray());
   }
 
   @Test
