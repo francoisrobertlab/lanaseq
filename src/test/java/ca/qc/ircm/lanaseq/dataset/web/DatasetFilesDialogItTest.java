@@ -29,6 +29,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 @TestBenchTestAnnotations
@@ -53,6 +55,8 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   private DatasetRepository repository;
   @Autowired
   private AppConfiguration configuration;
+  @Value("${download-home}")
+  protected Path downloadHome;
 
   @BeforeEach
   public void beforeTest() throws Throwable {
@@ -99,6 +103,36 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
         Files.readAllBytes(file.resolveSibling(dataset.getName() + "_R1.fastq")));
     assertFalse(Files.exists(file));
+  }
+
+  @Test
+  @Download
+  public void download() throws Throwable {
+    Files.createDirectories(downloadHome);
+    Path downloaded = downloadHome.resolve("R1.fastq");
+    Files.deleteIfExists(downloaded);
+    Dataset dataset = repository.findById(2L).get();
+    Path folder = configuration.folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.datasets().controlClick(3);
+    DatasetFilesDialogElement dialog = view.filesDialog();
+
+    dialog.files().downloadButton(0).click();
+
+    // Wait for file to download.
+    Thread.sleep(2000);
+    assertTrue(Files.exists(downloaded));
+    try {
+      assertArrayEquals(Files.readAllBytes(file), Files.readAllBytes(downloaded));
+    } finally {
+      Files.delete(downloaded);
+    }
   }
 
   @Test

@@ -19,11 +19,21 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.testbench.elementsbase.Element;
 
 @Element("vaadin-grid")
 public class SampleFilesGridElement extends GridElement {
-  private static final int DELETE_COLUMN = 1;
+  private static final int DOWNLOAD_COLUMN = 1;
+  private static final int DELETE_COLUMN = 2;
+
+  public AnchorElement download(int row) {
+    return getCell(row, DOWNLOAD_COLUMN).$(AnchorElement.class).first();
+  }
+
+  public ButtonElement downloadButton(int row) {
+    return getCell(row, DOWNLOAD_COLUMN).$(ButtonElement.class).first();
+  }
 
   public ButtonElement delete(int row) {
     return getCell(row, DELETE_COLUMN).$(ButtonElement.class).first();

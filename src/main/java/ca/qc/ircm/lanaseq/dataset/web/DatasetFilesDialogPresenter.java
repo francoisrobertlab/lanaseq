@@ -42,6 +42,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.RegexpValidator;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
@@ -168,6 +169,12 @@ public class DatasetFilesDialogPresenter {
       dialog.showNotification(
           resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
     }
+  }
+
+  StreamResource download(EditableFile file) {
+    return new StreamResource(file.getFilename(), (output, session) -> {
+      Files.copy(file.getFile().toPath(), output);
+    });
   }
 
   void deleteFile(EditableFile file) {
