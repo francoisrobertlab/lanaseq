@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -61,13 +62,13 @@ public class UserService {
    *          user's id
    * @return user having specified id
    */
-  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
-  public User get(Long id) {
+  @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
+  public Optional<User> get(Long id) {
     if (id == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return repository.findById(id).orElse(null);
+    return repository.findById(id);
   }
 
   /**
@@ -77,13 +78,13 @@ public class UserService {
    *          user's email
    * @return user having specified email
    */
-  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
-  public User getByEmail(String email) {
+  @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
+  public Optional<User> getByEmail(String email) {
     if (email == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return repository.findByEmail(email).orElse(null);
+    return repository.findByEmail(email);
   }
 
   /**

@@ -75,7 +75,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get() {
-    User user = service.get(1L);
+    User user = service.get(1L).orElse(null);
 
     assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
@@ -99,7 +99,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get_Invalid() {
-    User user = service.get(0L);
+    User user = service.get(0L).orElse(null);
 
     assertNull(user);
   }
@@ -107,7 +107,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get_Null() {
-    User user = service.get(null);
+    User user = service.get(null).orElse(null);
 
     assertNull(user);
   }
@@ -115,7 +115,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail() {
-    User user = service.getByEmail("francois.robert@ircm.qc.ca");
+    User user = service.getByEmail("francois.robert@ircm.qc.ca").orElse(null);
 
     assertNotNull(user);
     assertEquals((Long) 2L, user.getId());
@@ -138,7 +138,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail_Invalid() {
-    User user = service.getByEmail("a");
+    User user = service.getByEmail("a").orElse(null);
 
     assertNull(user);
   }
@@ -146,7 +146,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail_Null() {
-    User user = service.getByEmail(null);
+    User user = service.getByEmail(null).orElse(null);
 
     assertNull(user);
   }
