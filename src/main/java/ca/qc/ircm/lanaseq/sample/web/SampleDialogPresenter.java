@@ -110,8 +110,8 @@ public class SampleDialogPresenter {
     if (valid) {
       Sample sample = binder.getBean();
       sample.generateName();
-      if (service.exists(sample.getName()) && (sample.getId() == null
-          || !sample.getName().equalsIgnoreCase(service.get(sample.getId()).getName()))) {
+      if (service.exists(sample.getName()) && (sample.getId() == null || !sample.getName()
+          .equalsIgnoreCase(service.get(sample.getId()).map(Sample::getName).orElse("")))) {
         valid = false;
         AppResources sampleResources = new AppResources(Sample.class, locale);
         dialog.error.setText(sampleResources.message(NAME_ALREADY_EXISTS, sample.getName()));

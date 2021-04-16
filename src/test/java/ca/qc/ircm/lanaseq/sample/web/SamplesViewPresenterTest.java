@@ -66,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -256,7 +257,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     Sample sample = new Sample();
     sample.setId(2L);
     Sample databaseSample = mock(Sample.class);
-    when(service.get(any())).thenReturn(databaseSample);
+    when(service.get(any())).thenReturn(Optional.of(databaseSample));
     presenter.view(sample);
     verify(service).get(2L);
     verify(view.dialog).setSample(databaseSample);

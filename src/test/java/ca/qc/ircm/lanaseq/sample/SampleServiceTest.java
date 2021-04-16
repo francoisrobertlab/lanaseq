@@ -138,7 +138,7 @@ public class SampleServiceTest {
 
   @Test
   public void get() {
-    Sample sample = service.get(1L);
+    Sample sample = service.get(1L).orElse(null);
 
     assertEquals((Long) 1L, sample.getId());
     assertEquals("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
@@ -160,7 +160,7 @@ public class SampleServiceTest {
 
   @Test
   public void get_Null() {
-    Sample sample = service.get(null);
+    Sample sample = service.get(null).orElse(null);
     assertNull(sample);
   }
 

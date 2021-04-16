@@ -111,7 +111,7 @@ public class SamplesViewPresenter {
   }
 
   void view(Sample sample) {
-    view.dialog.setSample(service.get(sample.getId()));
+    view.dialog.setSample(service.get(sample.getId()).orElse(null));
     view.dialog.open();
   }
 

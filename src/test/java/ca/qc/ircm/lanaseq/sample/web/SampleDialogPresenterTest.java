@@ -585,7 +585,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_NameExistsSameSample() {
     Sample sample = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(sample);
+    when(service.get(any())).thenReturn(Optional.of(sample));
     presenter.setSample(sample);
 
     presenter.save();
