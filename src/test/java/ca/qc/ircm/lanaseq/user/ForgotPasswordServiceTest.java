@@ -103,9 +103,7 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void get() throws Exception {
-    ForgotPassword forgotPassword = service.get(9L, "174407008");
-
-    forgotPassword = service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber());
+    ForgotPassword forgotPassword = service.get(9L, "174407008").orElse(null);
 
     assertEquals((Long) 9L, forgotPassword.getId());
     assertEquals("174407008", forgotPassword.getConfirmNumber());
@@ -117,35 +115,35 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void get_Expired() throws Exception {
-    ForgotPassword forgotPassword = service.get(7L, "803369922");
+    ForgotPassword forgotPassword = service.get(7L, "803369922").orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_Invalid() throws Exception {
-    ForgotPassword forgotPassword = service.get(20L, "435FA");
+    ForgotPassword forgotPassword = service.get(20L, "435FA").orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_NullId() throws Exception {
-    ForgotPassword forgotPassword = service.get(null, confirmNumber);
+    ForgotPassword forgotPassword = service.get(null, confirmNumber).orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_NullConfirmNumber() throws Exception {
-    ForgotPassword forgotPassword = service.get(7L, null);
+    ForgotPassword forgotPassword = service.get(7L, null).orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_Used() throws Exception {
-    ForgotPassword forgotPassword = service.get(10L, "460559412");
+    ForgotPassword forgotPassword = service.get(10L, "460559412").orElse(null);
 
     assertNull(forgotPassword);
   }
@@ -236,7 +234,7 @@ public class ForgotPasswordServiceTest {
     service.updatePassword(forgotPassword, "abc");
 
     repository.flush();
-    assertNull(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()));
+    assertNull(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()).orElse(null));
     verify(passwordEncoder).encode("abc");
     User user = userRepository.findById(9L).orElse(null);
     assertEquals(hashedPassword, user.getHashedPassword());

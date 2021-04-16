@@ -24,6 +24,7 @@ import ca.qc.ircm.lanaseq.mail.MailService;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Locale;
+import java.util.Optional;
 import javax.mail.MessagingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -73,18 +74,18 @@ public class ForgotPasswordService {
    *          The confirm number of ForgotPassword.
    * @return ForgotPassword having this id.
    */
-  public ForgotPassword get(final Long id, final String confirmNumber) {
+  public Optional<ForgotPassword> get(final Long id, final String confirmNumber) {
     if (id == null || confirmNumber == null) {
-      return null;
+      return Optional.empty();
     }
 
     ForgotPassword forgotPassword = repository.findById(id).orElse(null);
     if (forgotPassword != null && confirmNumber.equals(forgotPassword.getConfirmNumber())
         && !forgotPassword.isUsed()
         && forgotPassword.getRequestMoment().isAfter(LocalDateTime.now().minus(VALID_PERIOD))) {
-      return forgotPassword;
+      return Optional.of(forgotPassword);
     } else {
-      return null;
+      return Optional.empty();
     }
   }
 
