@@ -220,8 +220,8 @@ public class DatasetDialogPresenter {
         }
       }
       dataset.generateName();
-      if (service.exists(dataset.getName()) && (dataset.getId() == null
-          || !dataset.getName().equalsIgnoreCase(service.get(dataset.getId()).getName()))) {
+      if (service.exists(dataset.getName()) && (dataset.getId() == null || !dataset.getName()
+          .equalsIgnoreCase(service.get(dataset.getId()).map(Dataset::getName).orElse("")))) {
         valid = false;
         AppResources datasetResources = new AppResources(Dataset.class, locale);
         dialog.error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));

@@ -87,7 +87,7 @@ public class DatasetsViewPresenter {
 
   void view(Dataset dataset) {
     clearError();
-    view.dialog.setDataset(service.get(dataset.getId()));
+    view.dialog.setDataset(service.get(dataset.getId()).orElse(null));
     view.dialog.open();
   }
 

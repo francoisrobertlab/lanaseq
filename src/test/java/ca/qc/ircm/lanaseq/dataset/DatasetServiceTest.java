@@ -148,7 +148,7 @@ public class DatasetServiceTest {
 
   @Test
   public void get() {
-    Dataset dataset = service.get(1L);
+    Dataset dataset = service.get(1L).orElse(null);
 
     assertEquals((Long) 1L, dataset.getId());
     assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
@@ -168,7 +168,7 @@ public class DatasetServiceTest {
 
   @Test
   public void get_Null() {
-    Dataset dataset = service.get(null);
+    Dataset dataset = service.get(null).orElse(null);
     assertNull(dataset);
   }
 

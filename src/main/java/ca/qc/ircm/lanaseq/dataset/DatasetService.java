@@ -93,13 +93,13 @@ public class DatasetService {
    *          dataset's id
    * @return dataset having specified id
    */
-  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
-  public Dataset get(Long id) {
+  @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
+  public Optional<Dataset> get(Long id) {
     if (id == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return repository.findById(id).orElse(null);
+    return repository.findById(id);
   }
 
   /**

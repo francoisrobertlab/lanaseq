@@ -147,7 +147,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = new Dataset();
     dataset.setId(2L);
     Dataset databaseDataset = new Dataset();
-    when(service.get(any())).thenReturn(databaseDataset);
+    when(service.get(any())).thenReturn(Optional.of(databaseDataset));
     presenter.view(dataset);
     verify(service).get(2L);
     verify(view.dialog).setDataset(databaseDataset);
