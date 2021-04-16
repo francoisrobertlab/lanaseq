@@ -56,7 +56,8 @@ public class SelectSampleDialogPresenter {
   void init(SelectSampleDialog dialog) {
     this.dialog = dialog;
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      dialog.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
+      authorizationService.getCurrentUser()
+          .ifPresent(user -> dialog.ownerFilter.setValue(user.getEmail()));
     }
     loadSamples();
   }

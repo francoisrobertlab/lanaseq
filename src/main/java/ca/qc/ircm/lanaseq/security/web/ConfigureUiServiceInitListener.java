@@ -69,8 +69,8 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
         UI ui = event.getUI();
         AppResources resources =
             new AppResources(ConfigureUiServiceInitListener.class, ui.getLocale());
-        User user = authorizationService.getCurrentUser();
-        String email = user != null ? user.getEmail() : null;
+        String email =
+            authorizationService.getCurrentUser().map(User::getEmail).orElse("<anonymous>");
         String message = resources.message(AccessDeniedException.class.getSimpleName(), email,
             event.getNavigationTarget().getSimpleName());
         logger.info(message);

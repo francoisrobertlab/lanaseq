@@ -53,7 +53,8 @@ public class ProtocolsViewPresenter {
   void init(ProtocolsView view) {
     this.view = view;
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
+      authorizationService.getCurrentUser()
+          .ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
     loadProtocols();
     view.dialog.addSavedListener(e -> loadProtocols());

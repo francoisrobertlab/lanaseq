@@ -42,6 +42,7 @@ import com.vaadin.flow.server.UIInitListener;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.shared.Registration;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -84,7 +85,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     when(serviceInitEvent.getSource()).thenReturn(vaadinService);
     when(vaadinService.addUIInitListener(any())).then(i -> {
       UIInitListener listener = i.getArgument(0);

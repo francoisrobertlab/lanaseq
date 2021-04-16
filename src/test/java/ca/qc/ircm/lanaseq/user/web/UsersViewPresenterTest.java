@@ -105,7 +105,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     presenter.init(view);
     presenter.localeChange(locale);
   }

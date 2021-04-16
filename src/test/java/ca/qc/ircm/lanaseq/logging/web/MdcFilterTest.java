@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import java.util.Optional;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,7 +77,7 @@ public class MdcFilterTest {
   public void doFilter_User() throws Throwable {
     Long userId = 3L;
     String email = "test@ircm.qc.ca";
-    when(authorizationService.getCurrentUser()).thenReturn(new User(userId, email));
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(new User(userId, email)));
     doAnswer(i -> {
       assertEquals("3:test", MDC.get(USER_CONTEXT_KEY));
       return null;

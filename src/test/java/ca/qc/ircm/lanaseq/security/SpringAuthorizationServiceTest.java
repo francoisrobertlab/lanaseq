@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -107,13 +106,13 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithAnonymousUser
   public void currentUser_Anonymous() throws Throwable {
-    assertNull(authorizationService.getCurrentUser());
+    assertTrue(!authorizationService.getCurrentUser().isPresent());
   }
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void currentUser() throws Throwable {
-    User user = authorizationService.getCurrentUser();
+    User user = authorizationService.getCurrentUser().orElse(null);
     assertNotNull(authorizationService.getCurrentUser());
     assertEquals((Long) 1L, user.getId());
   }

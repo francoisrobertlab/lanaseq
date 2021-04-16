@@ -72,7 +72,7 @@ public class ProfileViewPresenterTest extends AbstractViewTestCase {
     view.buttonsLayout = new HorizontalLayout();
     view.save = new Button();
     when(service.get(any(Long.class))).thenReturn(Optional.of(user));
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     presenter.init(view);
     presenter.localeChange(locale);
   }

@@ -78,7 +78,8 @@ public class SamplesViewPresenter {
   void init(SamplesView view) {
     this.view = view;
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
+      authorizationService.getCurrentUser()
+          .ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
     loadSamples();
     view.dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());

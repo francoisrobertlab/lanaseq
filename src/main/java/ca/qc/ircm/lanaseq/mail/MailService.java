@@ -132,12 +132,7 @@ public class MailService {
 
     StringBuilder message = new StringBuilder();
     message.append("User:");
-    User user = authorizationService.getCurrentUser();
-    if (user != null) {
-      message.append(user.getEmail());
-    } else {
-      message.append("null");
-    }
+    message.append(authorizationService.getCurrentUser().map(User::getEmail).orElse("null"));
     message.append("\n");
     message.append(error.getMessage());
     message.append("\n");

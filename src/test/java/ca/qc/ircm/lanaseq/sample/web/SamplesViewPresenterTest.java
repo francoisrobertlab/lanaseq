@@ -138,7 +138,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.all(any())).thenReturn(new ArrayList<>(samples));
     when(service.count(any())).thenReturn((long) samples.size());
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);

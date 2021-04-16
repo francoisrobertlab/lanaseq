@@ -265,7 +265,7 @@ public class DatasetService {
       throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
     }
     LocalDateTime now = LocalDateTime.now();
-    User user = authorizationService.getCurrentUser();
+    User user = authorizationService.getCurrentUser().orElse(null);
     if (dataset.getId() == null) {
       dataset.setOwner(user);
       dataset.setCreationDate(now);

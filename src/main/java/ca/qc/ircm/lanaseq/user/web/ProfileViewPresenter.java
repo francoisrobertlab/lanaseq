@@ -54,7 +54,7 @@ public class ProfileViewPresenter {
 
   void init(ProfileView view) {
     this.view = view;
-    view.form.setUser(authorizationService.getCurrentUser());
+    view.form.setUser(authorizationService.getCurrentUser().orElse(null));
   }
 
   void localeChange(Locale locale) {

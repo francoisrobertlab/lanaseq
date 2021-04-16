@@ -22,6 +22,8 @@ import static ca.qc.ircm.lanaseq.security.UserAuthority.FORCE_CHANGE_PASSWORD;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,48 +63,37 @@ public class SpringAuthorizationService implements AuthorizationService {
     this.permissionEvaluator = permissionEvaluator;
   }
 
-  private Authentication getAuthentication() {
-    return SecurityContextHolder.getContext().getAuthentication();
+  private Optional<Authentication> getAuthentication() {
+    return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
   }
 
-  private UserDetails getUser() {
-    Authentication authentication = getAuthentication();
-    if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-      return (UserDetails) authentication.getPrincipal();
-    } else {
-      return null;
-    }
+  private Optional<UserDetails> getUser() {
+    return getAuthentication().filter(au -> au.getPrincipal() instanceof UserDetails)
+        .map(au -> ((UserDetails) au.getPrincipal()));
   }
 
   @Override
-  public User getCurrentUser() {
-    UserDetails user = getUser();
-    if (user instanceof AuthenticatedUser) {
-      Long userId = ((AuthenticatedUser) user).getId();
-      if (userId == null) {
-        return null;
-      }
-
-      return userRepository.findById(userId).orElse(null);
-    } else {
-      return null;
-    }
+  public Optional<User> getCurrentUser() {
+    return getUser().filter(user -> user instanceof AuthenticatedUser)
+        .map(user -> ((AuthenticatedUser) user))
+        .map(user -> userRepository.findById(user.getId()).orElse(null));
   }
 
   @Override
   public boolean isAnonymous() {
-    return getUser() == null;
+    return !getUser().isPresent();
   }
 
   @Override
   public boolean hasRole(String role) {
-    Authentication authentication = getAuthentication();
-    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+    Collection<? extends GrantedAuthority> authorities =
+        getAuthentication().map(Authentication::getAuthorities).orElse(Collections.emptyList());
     boolean hasRole = false;
     for (GrantedAuthority authority : authorities) {
       hasRole |= authority.getAuthority().equals(role);
     }
-    logger.trace("user {} hasRole {}? {}", authentication.getName(), role, hasRole);
+    logger.trace("user {} hasRole {}? {}",
+        getAuthentication().map(Authentication::getName).orElse("<anonymous>"), role, hasRole);
     return hasRole;
   }
 
@@ -127,12 +118,15 @@ public class SpringAuthorizationService implements AuthorizationService {
   @Override
   public void reloadAuthorities() {
     if (hasRole(FORCE_CHANGE_PASSWORD)) {
-      Authentication oldAuthentication = getAuthentication();
-      logger.debug("reload authorities from user {}", oldAuthentication.getName());
-      UserDetails userDetails = userDetailsService.loadUserByUsername(oldAuthentication.getName());
-      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-          userDetails, oldAuthentication.getCredentials(), userDetails.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      getAuthentication().ifPresent(oldAuthentication -> {
+        logger.debug("reload authorities from user {}", oldAuthentication.getName());
+        UserDetails userDetails =
+            userDetailsService.loadUserByUsername(oldAuthentication.getName());
+        UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(userDetails, oldAuthentication.getCredentials(),
+                userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      });
     }
   }
 
@@ -149,6 +143,7 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasPermission(Object object, Permission permission) {
-    return permissionEvaluator.hasPermission(getAuthentication(), object, permission);
+    return getAuthentication().map(au -> permissionEvaluator.hasPermission(au, object, permission))
+        .orElse(false);
   }
 }

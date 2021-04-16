@@ -84,7 +84,7 @@ public class UserFormPresenterTest extends AbstractViewTestCase {
     form.passwords.password = new PasswordField();
     form.passwords.passwordConfirm = new PasswordField();
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     when(form.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
   }

@@ -146,7 +146,7 @@ public class ProtocolService {
     }
     LocalDateTime now = LocalDateTime.now();
     if (protocol.getId() == null) {
-      User user = authorizationService.getCurrentUser();
+      User user = authorizationService.getCurrentUser().orElse(null);
       protocol.setOwner(user);
       protocol.setDate(now);
     } else {

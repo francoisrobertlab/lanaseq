@@ -44,6 +44,7 @@ import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -91,7 +92,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     when(service.all(any())).thenReturn(new ArrayList<>(datasets));
     when(service.count(any())).thenReturn((long) datasets.size());
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(grid);
   }

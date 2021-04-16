@@ -65,6 +65,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -132,7 +133,7 @@ public class DatasetServiceTest {
       Sample sample = i.getArgument(0);
       if (sample.getId() == null) {
         sample.setCreationDate(LocalDateTime.now());
-        sample.setOwner(authorizationService.getCurrentUser());
+        sample.setOwner(authorizationService.getCurrentUser().orElse(null));
       }
       sample.generateName();
       sampleRepository.save(sample);
@@ -190,7 +191,7 @@ public class DatasetServiceTest {
   @Test
   public void all() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
 
     List<Dataset> datasets = service.all();
 
@@ -556,7 +557,7 @@ public class DatasetServiceTest {
   @Test
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
     dataset.setTags(new HashSet<>());
     dataset.getTags().add("tag1");
@@ -612,7 +613,7 @@ public class DatasetServiceTest {
   @Test
   public void save_Update() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     dataset.getTags().remove("rappa");
@@ -668,7 +669,7 @@ public class DatasetServiceTest {
   @Test
   public void save_UpdateMoveFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setSampleId("sample1");
@@ -723,7 +724,7 @@ public class DatasetServiceTest {
   @Test
   public void save_UpdateMoveFilesAlreadyRenamed() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     Sample sample1 = dataset.getSamples().get(0);
@@ -775,7 +776,7 @@ public class DatasetServiceTest {
           .resolve(String.valueOf(dataset.getDate().getYear())).resolve(dataset.getName()) : null;
     });
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     Path beforeFolder = configuration.folder(dataset);
@@ -816,7 +817,7 @@ public class DatasetServiceTest {
   @Test
   public void save_RenameFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setSampleId("sample1");
@@ -897,7 +898,7 @@ public class DatasetServiceTest {
   public void save_UpdateNotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
       User user = userRepository.findById(2L).orElse(null);
-      when(authorizationService.getCurrentUser()).thenReturn(user);
+      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
       Dataset dataset = repository.findById(5L).orElse(null);
       service.save(dataset);
     });
@@ -906,7 +907,7 @@ public class DatasetServiceTest {
   @Test
   public void save_NotEditableSample() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.getTags().remove("rappa");
     dataset.getTags().add("tag1");

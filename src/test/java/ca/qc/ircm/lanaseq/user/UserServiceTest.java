@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,7 +180,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void all() {
-    when(authorizationService.getCurrentUser()).thenReturn(repository.findById(3L).get());
+    when(authorizationService.getCurrentUser()).thenReturn(repository.findById(3L));
 
     List<User> users = service.all();
 
@@ -397,7 +398,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_Password() {
     User user = repository.findById(6L).get();
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
 
     service.save("newpassword");
 
@@ -424,7 +425,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_PasswordNoAuthorityChange() {
     User user = repository.findById(3L).get();
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
 
     service.save("newpassword");
 
@@ -452,7 +453,7 @@ public class UserServiceTest {
   public void save_PasswordAnonymousDenied() {
     assertThrows(AccessDeniedException.class, () -> {
       User user = repository.findById(3L).get();
-      when(authorizationService.getCurrentUser()).thenReturn(user);
+      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
 
       service.save("new password");
     });
@@ -463,7 +464,7 @@ public class UserServiceTest {
   public void save_PasswordNull() {
     assertThrows(NullPointerException.class, () -> {
       User user = repository.findById(3L).get();
-      when(authorizationService.getCurrentUser()).thenReturn(user);
+      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
 
       service.save(null);
     });

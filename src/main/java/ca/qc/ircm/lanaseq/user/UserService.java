@@ -160,15 +160,16 @@ public class UserService {
     if (password == null) {
       throw new NullPointerException("password parameter cannot be null");
     }
-    User user = authorizationService.getCurrentUser();
 
-    final boolean reloadAuthorities = user.isExpiredPassword();
-    String hashedPassword = passwordEncoder.encode(password);
-    user.setHashedPassword(hashedPassword);
-    user.setExpiredPassword(false);
-    repository.save(user);
-    if (reloadAuthorities) {
-      authorizationService.reloadAuthorities();
-    }
+    authorizationService.getCurrentUser().ifPresent(user -> {
+      final boolean reloadAuthorities = user.isExpiredPassword();
+      String hashedPassword = passwordEncoder.encode(password);
+      user.setHashedPassword(hashedPassword);
+      user.setExpiredPassword(false);
+      repository.save(user);
+      if (reloadAuthorities) {
+        authorizationService.reloadAuthorities();
+      }
+    });
   }
 }

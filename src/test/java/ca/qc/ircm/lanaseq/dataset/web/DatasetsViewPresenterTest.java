@@ -124,7 +124,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     datasets = repository.findAll();
     view.datasets.setItems(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);

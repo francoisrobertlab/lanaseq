@@ -58,10 +58,8 @@ public class MdcFilter extends GenericFilterBean {
   }
 
   private void setNdc(HttpServletRequest request) {
-    if (authorizationService.getCurrentUser() != null) {
-      MDC.put(USER_CONTEXT_KEY, authorizationService.getCurrentUser().getId() + ":"
-          + authorizationService.getCurrentUser().getEmail().replaceFirst("@.*", ""));
-    }
+    authorizationService.getCurrentUser().ifPresent(user -> MDC.put(USER_CONTEXT_KEY,
+        user.getId() + ":" + user.getEmail().replaceFirst("@.*", "")));
   }
 
   private void removeNdc() {

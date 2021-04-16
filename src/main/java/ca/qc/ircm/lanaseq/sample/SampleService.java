@@ -263,7 +263,7 @@ public class SampleService {
       throw new IllegalArgumentException("sample " + sample + " cannot be edited");
     }
     LocalDateTime now = LocalDateTime.now();
-    User user = authorizationService.getCurrentUser();
+    User user = authorizationService.getCurrentUser().orElse(null);
     if (sample.getId() == null) {
       sample.setOwner(user);
       sample.setCreationDate(now);

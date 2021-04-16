@@ -98,7 +98,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     protocols = protocolRepository.findAll();
     when(protocolService.all()).thenReturn(protocols);
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
   }
 
   @Test
