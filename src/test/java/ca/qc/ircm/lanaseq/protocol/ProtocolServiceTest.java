@@ -82,7 +82,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void get() throws Throwable {
-    Protocol protocol = service.get(1L);
+    Protocol protocol = service.get(1L).orElse(null);
 
     assertEquals((Long) 1L, protocol.getId());
     assertEquals("FLAG", protocol.getName());
@@ -94,7 +94,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void get_Null() {
-    Protocol protocol = service.get(null);
+    Protocol protocol = service.get(null).orElse(null);
     assertNull(protocol);
   }
 

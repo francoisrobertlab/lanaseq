@@ -139,7 +139,7 @@ public class SamplesViewPresenter {
   }
 
   void viewProtocol(Protocol protocol) {
-    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
+    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
     view.protocolDialog.open();
   }
 

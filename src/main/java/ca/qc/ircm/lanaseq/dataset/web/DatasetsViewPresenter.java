@@ -116,7 +116,7 @@ public class DatasetsViewPresenter {
 
   void viewProtocol(Protocol protocol) {
     clearError();
-    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
+    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
     view.protocolDialog.open();
   }
 

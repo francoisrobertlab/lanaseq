@@ -57,6 +57,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -196,7 +197,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     Protocol protocol = new Protocol();
     protocol.setId(1L);
     Protocol databaseProtocol = new Protocol();
-    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.viewProtocol(protocol);
     verify(protocolService).get(1L);
     verify(view.protocolDialog).setProtocol(databaseProtocol);

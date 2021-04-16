@@ -307,7 +307,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     Protocol protocol = new Protocol();
     protocol.setId(1L);
     Protocol databaseProtocol = mock(Protocol.class);
-    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.viewProtocol(protocol);
     verify(protocolService).get(1L);
     verify(view.protocolDialog).setProtocol(databaseProtocol);
