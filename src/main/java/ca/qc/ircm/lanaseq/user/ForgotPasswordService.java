@@ -96,9 +96,8 @@ public class ForgotPasswordService {
    *          user's email
    * @param webContext
    *          web context used to send email to user
-   * @return forgot password request created for user
    */
-  public ForgotPassword insert(String email, ForgotPasswordWebContext webContext) {
+  public void insert(String email, ForgotPasswordWebContext webContext) {
     ForgotPassword forgotPassword = new ForgotPassword();
 
     // Set time.
@@ -107,26 +106,21 @@ public class ForgotPasswordService {
     // Generate random confirm number.
     forgotPassword.setConfirmNumber(RandomStringUtils.randomAlphanumeric(40));
 
-    User user = userRepository.findByEmail(email).orElse(null);
-    if (user == null) {
-      // Ignore request.
-      return null;
-    }
-    if (user.getId() == User.ROBOT_ID) {
-      throw new AccessDeniedException("Cannot change password for robot");
-    }
-    forgotPassword.setUser(user);
-    repository.saveAndFlush(forgotPassword);
-    Locale locale = user.getLocale() != null ? user.getLocale() : Constants.DEFAULT_LOCALE;
-    try {
-      this.sendMail(email, forgotPassword, locale, webContext);
-    } catch (Throwable e) {
-      logger.error("Could not send email to user " + email + " that forgot his password", e);
-    }
+    userRepository.findByEmail(email).ifPresent(user -> {
+      if (user.getId() == User.ROBOT_ID) {
+        throw new AccessDeniedException("Cannot change password for robot");
+      }
+      forgotPassword.setUser(user);
+      repository.saveAndFlush(forgotPassword);
+      Locale locale = user.getLocale() != null ? user.getLocale() : Constants.DEFAULT_LOCALE;
+      try {
+        this.sendMail(email, forgotPassword, locale, webContext);
+      } catch (Throwable e) {
+        logger.error("Could not send email to user " + email + " that forgot his password", e);
+      }
 
-    logger.info("Forgot password request {} added to database", forgotPassword);
-
-    return forgotPassword;
+      logger.info("Forgot password request {} added to database", forgotPassword);
+    });
   }
 
   private void sendMail(String emailAddress, ForgotPassword forgotPassword, Locale locale,
