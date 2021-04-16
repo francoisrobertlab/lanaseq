@@ -49,7 +49,7 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
       return false;
     }
     Protocol protocol = (Protocol) targetDomainObject;
-    User currentUser = getUser(authentication);
+    User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(protocol, currentUser, realPermission);
   }
@@ -66,7 +66,7 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
     if (protocol == null) {
       return false;
     }
-    User currentUser = getUser(authentication);
+    User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(protocol, currentUser, realPermission);
   }

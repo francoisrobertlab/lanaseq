@@ -66,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -137,7 +138,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.all(any())).thenReturn(new ArrayList<>(samples));
     when(service.count(any())).thenReturn((long) samples.size());
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);
@@ -256,7 +257,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     Sample sample = new Sample();
     sample.setId(2L);
     Sample databaseSample = mock(Sample.class);
-    when(service.get(any())).thenReturn(databaseSample);
+    when(service.get(any())).thenReturn(Optional.of(databaseSample));
     presenter.view(sample);
     verify(service).get(2L);
     verify(view.dialog).setSample(databaseSample);
@@ -306,7 +307,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     Protocol protocol = new Protocol();
     protocol.setId(1L);
     Protocol databaseProtocol = mock(Protocol.class);
-    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.viewProtocol(protocol);
     verify(protocolService).get(1L);
     verify(view.protocolDialog).setProtocol(databaseProtocol);

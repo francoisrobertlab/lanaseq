@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,13 +77,13 @@ public class ProtocolServiceTest {
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     currentUser = userRepository.getOne(3L);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
   }
 
   @Test
   @WithMockUser
   public void get() throws Throwable {
-    Protocol protocol = service.get(1L);
+    Protocol protocol = service.get(1L).orElse(null);
 
     assertEquals((Long) 1L, protocol.getId());
     assertEquals("FLAG", protocol.getName());
@@ -94,7 +95,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void get_Null() {
-    Protocol protocol = service.get(null);
+    Protocol protocol = service.get(null).orElse(null);
     assertNull(protocol);
   }
 

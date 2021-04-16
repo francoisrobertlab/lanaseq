@@ -107,7 +107,7 @@ public class UsersViewPresenter {
 
   void view(User user) {
     clearError();
-    view.userDialog.setUser(userService.get(user.getId()));
+    view.userDialog.setUser(userService.get(user.getId()).orElse(null));
     view.userDialog.open();
   }
 

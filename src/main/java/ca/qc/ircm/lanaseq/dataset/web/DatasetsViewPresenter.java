@@ -87,7 +87,7 @@ public class DatasetsViewPresenter {
 
   void view(Dataset dataset) {
     clearError();
-    view.dialog.setDataset(service.get(dataset.getId()));
+    view.dialog.setDataset(service.get(dataset.getId()).orElse(null));
     view.dialog.open();
   }
 
@@ -116,7 +116,7 @@ public class DatasetsViewPresenter {
 
   void viewProtocol(Protocol protocol) {
     clearError();
-    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
+    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
     view.protocolDialog.open();
   }
 

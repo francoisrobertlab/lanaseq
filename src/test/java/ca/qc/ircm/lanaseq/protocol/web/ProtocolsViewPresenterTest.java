@@ -48,6 +48,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -97,7 +98,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     protocols = protocolRepository.findAll();
     when(protocolService.all()).thenReturn(protocols);
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
   }
 
   @Test
@@ -205,7 +206,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     Protocol databaseProtocol = new Protocol();
-    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.view(protocol);
     verify(protocolService).get(2L);
     verify(view.dialog).setProtocol(databaseProtocol);
@@ -229,7 +230,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     Protocol databaseProtocol = new Protocol();
-    when(protocolService.get(any())).thenReturn(databaseProtocol);
+    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.history(protocol);
     verify(authorizationService).hasAnyRole(UserRole.MANAGER, UserRole.ADMIN);
     verify(protocolService).get(2L);

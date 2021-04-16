@@ -61,6 +61,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -138,7 +139,7 @@ public class SampleServiceTest {
 
   @Test
   public void get() {
-    Sample sample = service.get(1L);
+    Sample sample = service.get(1L).orElse(null);
 
     assertEquals((Long) 1L, sample.getId());
     assertEquals("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
@@ -160,7 +161,7 @@ public class SampleServiceTest {
 
   @Test
   public void get_Null() {
-    Sample sample = service.get(null);
+    Sample sample = service.get(null).orElse(null);
     assertNull(sample);
   }
 
@@ -846,7 +847,7 @@ public class SampleServiceTest {
   @Test
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -886,7 +887,7 @@ public class SampleServiceTest {
   @Test
   public void save_Update() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -971,7 +972,7 @@ public class SampleServiceTest {
   public void save_UpdateNotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
       User user = userRepository.findById(2L).orElse(null);
-      when(authorizationService.getCurrentUser()).thenReturn(user);
+      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
       Sample sample = repository.findById(8L).orElse(null);
       service.save(sample);
     });
@@ -980,7 +981,7 @@ public class SampleServiceTest {
   @Test
   public void save_UpdateMoveFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     sample.setSampleId("my sample");
@@ -1013,7 +1014,7 @@ public class SampleServiceTest {
   @Test
   public void save_UpdateMoveFilesAlreadyRenamed() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     sample.setSampleId("my sample");
@@ -1052,7 +1053,7 @@ public class SampleServiceTest {
           .resolve(String.valueOf(sample.getDate().getYear())).resolve(sample.getName()) : null;
     });
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     Path beforeFolder = configuration.folder(sample);
@@ -1087,7 +1088,7 @@ public class SampleServiceTest {
   @Test
   public void save_RenameFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(user);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     sample.setSampleId("my sample");

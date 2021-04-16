@@ -18,17 +18,18 @@
 package ca.qc.ircm.lanaseq.security;
 
 import ca.qc.ircm.lanaseq.user.User;
+import java.util.Optional;
 
 /**
  * Authorization service.
  */
 public interface AuthorizationService {
   /**
-   * Returns current user or null for anonymous.
+   * Returns current user or empty for anonymous.
    *
-   * @return current user or null for anonymous
+   * @return current user or empty for anonymous
    */
-  public User getCurrentUser();
+  public Optional<User> getCurrentUser();
 
   /**
    * Returns true if current user is anonymous, false otherwise.

@@ -79,13 +79,13 @@ public class SampleService {
    *          sample's id
    * @return sample with id
    */
-  @PostAuthorize("returnObject == null || hasPermission(returnObject, 'read')")
-  public Sample get(Long id) {
+  @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
+  public Optional<Sample> get(Long id) {
     if (id == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return repository.findById(id).orElse(null);
+    return repository.findById(id);
   }
 
   /**
@@ -263,7 +263,7 @@ public class SampleService {
       throw new IllegalArgumentException("sample " + sample + " cannot be edited");
     }
     LocalDateTime now = LocalDateTime.now();
-    User user = authorizationService.getCurrentUser();
+    User user = authorizationService.getCurrentUser().orElse(null);
     if (sample.getId() == null) {
       sample.setOwner(user);
       sample.setCreationDate(now);

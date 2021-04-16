@@ -77,7 +77,7 @@ public class LdapService {
    *          username
    * @return user's email from LDAP or null if user does not exists
    */
-  public String getEmail(String username) {
+  public Optional<String> getEmail(String username) {
     ContainerCriteria builder = query().attributes(ldapConfiguration.getMailAttribute())
         .where(ldapConfiguration.getIdAttribute()).is(username);
     if (ldapConfiguration.getObjectClass() != null) {
@@ -89,10 +89,10 @@ public class LdapService {
           try {
             return attr.get();
           } catch (NamingException e) {
-            return null;
+            return Optional.empty();
           }
         }).map(value -> value.toString()).orElse(null);
-    String email = ldapTemplate.search(query, mapper).stream().findFirst().orElse(null);
+    Optional<String> email = ldapTemplate.search(query, mapper).stream().findFirst();
     logger.debug("Found LDAP email {} for user [{}]", username, email);
     return email;
   }
@@ -104,7 +104,7 @@ public class LdapService {
    *          user's email
    * @return user's username on LDAP or null if user does not exists
    */
-  public String getUsername(String email) {
+  public Optional<String> getUsername(String email) {
     ContainerCriteria builder = query().attributes(ldapConfiguration.getIdAttribute())
         .where(ldapConfiguration.getMailAttribute()).is(email);
     if (ldapConfiguration.getObjectClass() != null) {
@@ -116,10 +116,10 @@ public class LdapService {
           try {
             return attr.get();
           } catch (NamingException e) {
-            return null;
+            return Optional.empty();
           }
         }).map(value -> value.toString()).orElse(null);
-    String username = ldapTemplate.search(query, mapper).stream().findFirst().orElse(null);
+    Optional<String> username = ldapTemplate.search(query, mapper).stream().findFirst();
     logger.debug("Found LDAP username {} for user [{}]", username, email);
     return username;
   }

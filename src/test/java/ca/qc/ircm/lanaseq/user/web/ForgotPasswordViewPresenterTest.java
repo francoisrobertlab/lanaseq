@@ -89,7 +89,6 @@ public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
     forgotPassword = new ForgotPassword();
     forgotPassword.setId(id);
     forgotPassword.setConfirmNumber(confirmNumber);
-    when(service.insert(any(), any())).thenReturn(forgotPassword);
     presenter.init(view);
     presenter.localeChange(locale);
   }

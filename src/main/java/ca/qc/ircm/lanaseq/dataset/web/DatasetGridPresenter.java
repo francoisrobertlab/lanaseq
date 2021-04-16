@@ -61,7 +61,8 @@ public class DatasetGridPresenter {
     this.grid = grid;
     loadDataset();
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      grid.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
+      authorizationService.getCurrentUser()
+          .ifPresent(user -> grid.ownerFilter.setValue(user.getEmail()));
     }
   }
 

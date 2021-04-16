@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -104,7 +105,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(currentUser);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
     presenter.init(view);
     presenter.localeChange(locale);
   }
@@ -245,7 +246,7 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     User user = new User();
     user.setId(2L);
     User databaseUser = userRepository.findById(2L).orElse(null);
-    when(userService.get(any())).thenReturn(databaseUser);
+    when(userService.get(any())).thenReturn(Optional.of(databaseUser));
     presenter.view(user);
     verify(userService).get(2L);
     verify(view.userDialog).setUser(databaseUser);

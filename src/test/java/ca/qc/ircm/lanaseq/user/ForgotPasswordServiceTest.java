@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -71,7 +72,11 @@ public class ForgotPasswordServiceTest {
   @MockBean
   private PasswordEncoder passwordEncoder;
   @Mock
+  private ForgotPasswordWebContext forgotPasswordWebContext;
+  @Mock
   private MimeMessageHelper email;
+  @Captor
+  private ArgumentCaptor<ForgotPassword> forgotPasswordCaptor;
   @Captor
   private ArgumentCaptor<String> stringCaptor;
   private String hashedPassword;
@@ -94,18 +99,14 @@ public class ForgotPasswordServiceTest {
     hashedPassword = "da78f3a74658706/4ae8470fc73a83f369fed012";
     when(passwordEncoder.encode(any(String.class))).thenReturn(hashedPassword);
     when(mailService.htmlEmail()).thenReturn(email);
+    when(forgotPasswordWebContext.getChangeForgottenPasswordUrl(any(), any()))
+        .thenReturn(forgotPasswordUrl);
     confirmNumber = "70987756";
-  }
-
-  private ForgotPasswordWebContext forgotPasswordWebContext() {
-    return (forgotPassword, locale) -> forgotPasswordUrl;
   }
 
   @Test
   public void get() throws Exception {
-    ForgotPassword forgotPassword = service.get(9L, "174407008");
-
-    forgotPassword = service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber());
+    ForgotPassword forgotPassword = service.get(9L, "174407008").orElse(null);
 
     assertEquals((Long) 9L, forgotPassword.getId());
     assertEquals("174407008", forgotPassword.getConfirmNumber());
@@ -117,35 +118,35 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void get_Expired() throws Exception {
-    ForgotPassword forgotPassword = service.get(7L, "803369922");
+    ForgotPassword forgotPassword = service.get(7L, "803369922").orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_Invalid() throws Exception {
-    ForgotPassword forgotPassword = service.get(20L, "435FA");
+    ForgotPassword forgotPassword = service.get(20L, "435FA").orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_NullId() throws Exception {
-    ForgotPassword forgotPassword = service.get(null, confirmNumber);
+    ForgotPassword forgotPassword = service.get(null, confirmNumber).orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_NullConfirmNumber() throws Exception {
-    ForgotPassword forgotPassword = service.get(7L, null);
+    ForgotPassword forgotPassword = service.get(7L, null).orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_Used() throws Exception {
-    ForgotPassword forgotPassword = service.get(10L, "460559412");
+    ForgotPassword forgotPassword = service.get(10L, "460559412").orElse(null);
 
     assertNull(forgotPassword);
   }
@@ -154,19 +155,19 @@ public class ForgotPasswordServiceTest {
   public void insert_Robot() throws Exception {
     user = userRepository.findById(1L).orElse(null);
 
-    try {
-      service.insert(user.getEmail(), forgotPasswordWebContext());
-      fail("Expected AccessDeniedException");
-    } catch (AccessDeniedException e) {
-      // Ignore.
-    }
+    assertThrows(AccessDeniedException.class, () -> {
+      service.insert(user.getEmail(), forgotPasswordWebContext);
+    });
   }
 
   @Test
   public void insert() throws Exception {
-    ForgotPassword forgotPassword = service.insert(user.getEmail(), forgotPasswordWebContext());
+    service.insert(user.getEmail(), forgotPasswordWebContext);
 
     repository.flush();
+    verify(forgotPasswordWebContext).getChangeForgottenPasswordUrl(forgotPasswordCaptor.capture(),
+        any());
+    ForgotPassword forgotPassword = forgotPasswordCaptor.getValue();
     assertNotNull(forgotPassword.getId());
     verify(mailService).htmlEmail();
     verify(mailService).send(email);
@@ -192,7 +193,7 @@ public class ForgotPasswordServiceTest {
     user.setLocale(locale);
     userRepository.save(user);
 
-    service.insert(user.getEmail(), forgotPasswordWebContext());
+    service.insert(user.getEmail(), forgotPasswordWebContext);
 
     repository.flush();
     verify(mailService).htmlEmail();
@@ -223,9 +224,10 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void insert_NotExists() throws Exception {
-    ForgotPassword forgotPassword = service.insert("test@ircm.qc.ca", forgotPasswordWebContext());
+    service.insert("test@ircm.qc.ca", forgotPasswordWebContext);
 
-    assertNull(forgotPassword);
+    assertEquals(4, repository.findAll().size());
+    verifyNoInteractions(forgotPasswordWebContext);
     verifyNoInteractions(mailService);
   }
 
@@ -236,7 +238,7 @@ public class ForgotPasswordServiceTest {
     service.updatePassword(forgotPassword, "abc");
 
     repository.flush();
-    assertNull(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()));
+    assertNull(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()).orElse(null));
     verify(passwordEncoder).encode("abc");
     User user = userRepository.findById(9L).orElse(null);
     assertEquals(hashedPassword, user.getHashedPassword());

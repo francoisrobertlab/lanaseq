@@ -78,7 +78,8 @@ public class SamplesViewPresenter {
   void init(SamplesView view) {
     this.view = view;
     if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      view.ownerFilter.setValue(authorizationService.getCurrentUser().getEmail());
+      authorizationService.getCurrentUser()
+          .ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
     loadSamples();
     view.dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
@@ -111,7 +112,7 @@ public class SamplesViewPresenter {
   }
 
   void view(Sample sample) {
-    view.dialog.setSample(service.get(sample.getId()));
+    view.dialog.setSample(service.get(sample.getId()).orElse(null));
     view.dialog.open();
   }
 
@@ -139,7 +140,7 @@ public class SamplesViewPresenter {
   }
 
   void viewProtocol(Protocol protocol) {
-    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()));
+    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
     view.protocolDialog.open();
   }
 

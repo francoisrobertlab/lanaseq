@@ -38,7 +38,7 @@ public class UserServiceInjectionTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void get() {
-    User user = userService.get(1L);
+    User user = userService.get(1L).orElse(null);
 
     assertNotNull(user);
     assertEquals((Long) 1L, user.getId());

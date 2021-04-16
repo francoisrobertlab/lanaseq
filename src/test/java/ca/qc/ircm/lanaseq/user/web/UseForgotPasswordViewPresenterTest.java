@@ -42,6 +42,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -72,7 +73,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
     view.form = mock(PasswordsForm.class);
     view.buttonsLayout = new HorizontalLayout();
     view.save = new Button();
-    when(service.get(any(Long.class), any())).thenReturn(forgotPassword);
+    when(service.get(any(Long.class), any())).thenReturn(Optional.of(forgotPassword));
     presenter.init(view);
     presenter.localeChange(locale);
   }
@@ -130,7 +131,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
   @Test
   public void setParameter_NullForgotPassword() {
-    when(service.get(any(Long.class), any())).thenReturn(null);
+    when(service.get(any(Long.class), any())).thenReturn(Optional.empty());
     presenter.setParameter(parameter, locale);
     verify(service).get(id, confirmNumber);
     verify(view).showNotification(resources.message(INVALID));

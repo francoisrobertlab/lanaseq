@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.security;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -32,26 +33,16 @@ public abstract class AbstractPermissionEvaluator implements PermissionEvaluator
   @Autowired
   private UserRepository userRepository;
 
-  protected UserDetails getUserDetails(Authentication authentication) {
-    if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-      return (UserDetails) authentication.getPrincipal();
-    } else {
-      return null;
-    }
+  protected Optional<UserDetails> getUserDetails(Authentication authentication) {
+    return Optional.ofNullable(authentication)
+        .filter(au -> au.getPrincipal() instanceof UserDetails)
+        .map(au -> (UserDetails) au.getPrincipal());
   }
 
-  protected User getUser(Authentication authentication) {
-    UserDetails user = getUserDetails(authentication);
-    if (user instanceof AuthenticatedUser) {
-      Long userId = ((AuthenticatedUser) user).getId();
-      if (userId == null) {
-        return null;
-      }
-
-      return userRepository.findById(userId).orElse(null);
-    } else {
-      return null;
-    }
+  protected Optional<User> getUser(Authentication authentication) {
+    return getUserDetails(authentication).filter(ud -> ud instanceof AuthenticatedUser)
+        .map(ud -> (AuthenticatedUser) ud).map(au -> au.getId())
+        .map(id -> userRepository.findById(id).orElse(null));
   }
 
   protected Permission resolvePermission(Object permission) {

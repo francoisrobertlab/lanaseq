@@ -49,7 +49,7 @@ public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
       return false;
     }
     Dataset dataset = (Dataset) targetDomainObject;
-    User currentUser = getUser(authentication);
+    User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(dataset, currentUser, realPermission);
   }
@@ -66,7 +66,7 @@ public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
     if (dataset == null) {
       return false;
     }
-    User currentUser = getUser(authentication);
+    User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(dataset, currentUser, realPermission);
   }

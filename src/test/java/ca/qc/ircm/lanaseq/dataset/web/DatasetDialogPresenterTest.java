@@ -1446,7 +1446,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void save_NameExistsSameDataset() {
     Dataset dataset = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(dataset);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
     presenter.setDataset(dataset);
 
     presenter.save();

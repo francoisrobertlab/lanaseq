@@ -70,7 +70,7 @@ public class PasswordViewPresenter {
 
   void save() {
     if (validate()) {
-      User user = authorizationService.getCurrentUser();
+      User user = authorizationService.getCurrentUser().orElse(null);
       String password = view.passwords.getPassword();
       logger.debug("save new password for user {}", user);
       service.save(password);
