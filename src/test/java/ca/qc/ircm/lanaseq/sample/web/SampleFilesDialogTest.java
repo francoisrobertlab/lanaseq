@@ -135,8 +135,8 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setSortable(anyBoolean())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
-    when(dialog.filename.setWidth(any())).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
+    when(dialog.filename.setFlexGrow(10)).thenReturn(dialog.filename);
     dialog.download = mock(Column.class);
     when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DOWNLOAD)))
         .thenReturn(dialog.download);

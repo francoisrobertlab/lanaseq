@@ -106,23 +106,24 @@ public class DatasetFilesDialog extends Dialog
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
+    setHeight("700px");
+    setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
-    layout.setHeight("40em");
     layout.add(header, message, files, samples, add);
+    layout.setSizeFull();
+    layout.expand(files);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
-    files.setSizeFull();
     files.getEditor().addCloseListener(e -> presenter.rename(e.getItem()));
     files.addItemDoubleClickListener(e -> {
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
     });
     filename =
-        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setWidth("35em");
+        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setFlexGrow(10);
     download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)), DOWNLOAD)
         .setKey(DOWNLOAD).setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE)
@@ -132,7 +133,7 @@ public class DatasetFilesDialog extends Dialog
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
     samples.setId(id(SAMPLES));
     samples.addItemDoubleClickListener(e -> presenter.viewFiles(e.getItem()));
-    name = samples.addColumn(sa -> sa.getName(), NAME).setKey(NAME).setWidth("35em");
+    name = samples.addColumn(sa -> sa.getName(), NAME).setKey(NAME).setFlexGrow(10);
     fileCount = samples.addColumn(sa -> presenter.fileCount(sa), FILE_COUNT).setKey(FILE_COUNT);
     add.setId(id(ADD));
     add.setIcon(VaadinIcon.PLUS.create());

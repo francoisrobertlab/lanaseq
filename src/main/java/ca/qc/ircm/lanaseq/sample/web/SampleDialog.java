@@ -119,10 +119,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
     FormLayout sampleForm = new FormLayout(sampleId, replicate, protocol, assay, type);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment, date);
@@ -135,6 +134,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
     layout.add(header, form, error, buttons, confirm);
+    layout.setSizeFull();
     header.setId(id(HEADER));
     sampleId.setId(id(SAMPLE_ID));
     replicate.setId(id(REPLICATE));

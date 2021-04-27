@@ -38,6 +38,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -158,6 +159,7 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
+    when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.size = mock(Column.class);
     when(dialog.files.addColumn(any(ValueProvider.class), eq(SIZE))).thenReturn(dialog.size);
     when(dialog.size.setKey(any())).thenReturn(dialog.size);

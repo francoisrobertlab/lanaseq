@@ -82,11 +82,12 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1280px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("80em");
-    layout.setMinWidth("50em");
     layout.add(samples);
+    layout.setSizeFull();
+    layout.expand(samples);
     samples.setId(id(SAMPLES));
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName));

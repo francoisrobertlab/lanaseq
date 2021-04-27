@@ -57,11 +57,11 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
     layout.add(header, message, createFolder, confirm, errors);
+    layout.setSizeFull();
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     createFolder.setId(id(CREATE_FOLDER));

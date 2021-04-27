@@ -81,19 +81,17 @@ public class ProtocolHistoryDialog extends Dialog
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
     layout.add(header, files);
+    layout.setSizeFull();
+    layout.expand(files);
     header.setId(id(HEADER));
     files.setId(id(FILES));
-    files.setHeight("15em");
-    files.setMinHeight("15em");
-    files.setWidth("45em");
-    files.setMinWidth("45em");
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
-        .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename));
+        .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
+        .setFlexGrow(10);
     recover =
         files
             .addColumn(TemplateRenderer.<ProtocolFile>of(RECOVER_BUTTON)

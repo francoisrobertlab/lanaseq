@@ -38,6 +38,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -152,8 +153,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setSortable(anyBoolean())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
-    when(dialog.filename.setWidth(any())).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
+    when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.download = mock(Column.class);
     when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DOWNLOAD)))
         .thenReturn(dialog.download);
@@ -174,8 +175,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.name = mock(Column.class);
     when(dialog.samples.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(dialog.name);
     when(dialog.name.setKey(any())).thenReturn(dialog.name);
-    when(dialog.name.setWidth(any())).thenReturn(dialog.name);
     when(dialog.name.setHeader(any(String.class))).thenReturn(dialog.name);
+    when(dialog.name.setFlexGrow(anyInt())).thenReturn(dialog.name);
     dialog.fileCount = mock(Column.class);
     when(dialog.samples.addColumn(any(ValueProvider.class), eq(FILE_COUNT)))
         .thenReturn(dialog.fileCount);

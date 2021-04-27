@@ -95,23 +95,24 @@ public class SampleFilesDialog extends Dialog
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
+    setHeight("700px");
+    setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
-    layout.setHeight("40em");
     layout.add(header, message, files, add);
+    layout.setSizeFull();
+    layout.expand(files);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
-    files.setSizeFull();
     files.getEditor().addCloseListener(e -> presenter.rename(e.getItem()));
     files.addItemDoubleClickListener(e -> {
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
     });
     filename =
-        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setWidth("30em");
+        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setFlexGrow(10);
     download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)), DOWNLOAD)
         .setKey(DOWNLOAD).setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE)

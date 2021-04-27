@@ -112,13 +112,14 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
     FormLayout form = new FormLayout(name);
     HorizontalLayout buttonsLayout = new HorizontalLayout(save, cancel);
     layout.add(header, form, upload, files, filesError, buttonsLayout);
+    layout.setSizeFull();
+    layout.expand(files);
     header.setId(id(HEADER));
     name.setId(id(NAME));
     upload.setId(id(UPLOAD));
@@ -128,12 +129,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     upload.addSucceededListener(event -> presenter.addFile(event.getFileName(),
         uploadBuffer.getInputStream(event.getFileName())));
     files.setId(id(FILES));
-    files.setHeight("15em");
-    files.setMinHeight("15em");
-    files.setWidth("45em");
-    files.setMinWidth("45em");
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
-        .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename));
+        .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
+        .setFlexGrow(10);
     remove =
         files
             .addColumn(TemplateRenderer.<ProtocolFile>of(REMOVE_BUTTON)

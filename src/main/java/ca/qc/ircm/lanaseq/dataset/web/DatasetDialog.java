@@ -147,10 +147,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
     FormLayout datasetForm = new FormLayout(date, tags);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
     datasetForm.setColspan(tags, 3);
@@ -166,6 +165,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
     layout.add(header, datasetForm, form, samples, error, buttons, confirm);
+    layout.setSizeFull();
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));

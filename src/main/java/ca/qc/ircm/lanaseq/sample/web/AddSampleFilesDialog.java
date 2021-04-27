@@ -103,17 +103,21 @@ public class AddSampleFilesDialog extends Dialog
   @PostConstruct
   void init() {
     setId(ID);
+    setWidth("1000px");
+    setHeight("700px");
+    setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.setMaxWidth("60em");
-    layout.setMinWidth("22em");
     layout.add(header, message, network, files, error, save);
+    layout.setSizeFull();
+    layout.expand(files);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     network.setId(id(NETWORK));
     files.setId(id(FILES));
-    filename = files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME)
-        .setKey(FILENAME).setComparator(NormalizedComparator.of(file -> file.getName()));
+    filename =
+        files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME)
+            .setComparator(NormalizedComparator.of(file -> file.getName())).setFlexGrow(10);
     overwrite = files.addColumn(new ComponentRenderer<>(file -> overwrite(file)), OVERWRITE)
         .setKey(OVERWRITE).setSortable(false);
     files.appendHeaderRow(); // Headers.
