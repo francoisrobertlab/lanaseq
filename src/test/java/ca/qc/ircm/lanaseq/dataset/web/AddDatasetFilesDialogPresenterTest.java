@@ -156,6 +156,11 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     }
   }
 
+  @Test
+  public void localeChange_Null() {
+    presenter.localeChange(null);
+  }
+
   private Path uploadFolder(Dataset dataset) {
     return configuration.upload(dataset);
   }

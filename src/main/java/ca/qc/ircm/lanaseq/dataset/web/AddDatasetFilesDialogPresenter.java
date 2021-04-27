@@ -94,6 +94,9 @@ public class AddDatasetFilesDialogPresenter {
   }
 
   void localeChange(Locale locale) {
+    if (locale == null) {
+      return;
+    }
     this.locale = locale;
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     dialog.getUI().ifPresent(ui -> {
