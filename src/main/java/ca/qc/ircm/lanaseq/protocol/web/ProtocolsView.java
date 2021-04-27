@@ -97,7 +97,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     logger.debug("protocols view");
     setId(ID);
     setHeightFull();
-    add(header, protocols, add, dialog, historyDialog);
+    add(header, protocols, add);
     expand(protocols);
     header.setId(HEADER);
     protocols.setId(PROTOCOLS);

@@ -165,7 +165,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, datasetForm, form, samples, error, buttons, confirm, selectSampleDialog);
+    layout.add(header, datasetForm, form, samples, error, buttons, confirm);
     header.setId(id(HEADER));
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));

@@ -123,7 +123,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     logger.debug("users view");
     setId(ID);
     setHeightFull();
-    add(header, users, error, new HorizontalLayout(add, switchUser), switchUserForm, userDialog);
+    add(header, users, error, new HorizontalLayout(add, switchUser), switchUserForm);
     expand(users);
     header.setId(HEADER);
     users.setId(USERS);

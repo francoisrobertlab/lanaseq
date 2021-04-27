@@ -100,7 +100,7 @@ public class SampleFilesDialog extends Dialog
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
     layout.setHeight("40em");
-    layout.add(header, message, files, add, addFilesDialog);
+    layout.add(header, message, files, add);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     files.setId(id(FILES));

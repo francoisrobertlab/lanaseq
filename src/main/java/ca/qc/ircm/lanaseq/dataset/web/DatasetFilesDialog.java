@@ -111,7 +111,7 @@ public class DatasetFilesDialog extends Dialog
     layout.setMaxWidth("60em");
     layout.setMinWidth("22em");
     layout.setHeight("40em");
-    layout.add(header, message, files, samples, add, addFilesDialog, sampleFilesDialog);
+    layout.add(header, message, files, samples, add);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     files.setId(id(FILES));

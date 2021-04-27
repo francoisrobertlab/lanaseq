@@ -60,7 +60,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
     logger.debug("analysis view");
     setId(ID);
     setHeightFull();
-    add(header, datasets, robtools, dialog);
+    add(header, datasets, robtools);
     expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
