@@ -30,7 +30,9 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 @Element("vaadin-vertical-layout")
 public class DatasetsViewElement extends VerticalLayoutElement {
@@ -59,14 +61,17 @@ public class DatasetsViewElement extends VerticalLayoutElement {
   }
 
   public DatasetDialogElement dialog() {
-    return $(DatasetDialogElement.class).id(DatasetDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(DatasetDialog.ID)))
+        .wrap(DatasetDialogElement.class);
   }
 
   public DatasetFilesDialogElement filesDialog() {
-    return $(DatasetFilesDialogElement.class).id(DatasetFilesDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(DatasetFilesDialog.ID)))
+        .wrap(DatasetFilesDialogElement.class);
   }
 
   public ProtocolDialogElement protocolDialog() {
-    return $(ProtocolDialogElement.class).id(ProtocolDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolDialog.ID)))
+        .wrap(ProtocolDialogElement.class);
   }
 }

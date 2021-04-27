@@ -27,7 +27,9 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 @Element("vaadin-dialog")
 public class SampleFilesDialogElement extends DialogElement {
@@ -48,6 +50,7 @@ public class SampleFilesDialogElement extends DialogElement {
   }
 
   public AddSampleFilesDialogElement addFilesDialog() {
-    return $(AddSampleFilesDialogElement.class).id(AddSampleFilesDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(AddSampleFilesDialog.ID)))
+        .wrap(AddSampleFilesDialogElement.class);
   }
 }

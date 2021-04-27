@@ -103,7 +103,6 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(() -> view.switchFailed()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.switchUser()).isPresent());
-    assertTrue(optional(() -> view.dialog()).isPresent());
   }
 
   @Test

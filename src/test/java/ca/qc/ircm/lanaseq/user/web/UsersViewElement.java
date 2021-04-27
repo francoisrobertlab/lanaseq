@@ -26,7 +26,9 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 @Element("vaadin-vertical-layout")
 public class UsersViewElement extends VerticalLayoutElement {
@@ -51,6 +53,7 @@ public class UsersViewElement extends VerticalLayoutElement {
   }
 
   public UserDialogElement dialog() {
-    return $(UserDialogElement.class).id(UserDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(UserDialog.ID)))
+        .wrap(UserDialogElement.class);
   }
 }

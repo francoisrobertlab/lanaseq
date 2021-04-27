@@ -49,7 +49,9 @@ import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.select.testbench.SelectElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 @Element("vaadin-dialog")
 public class DatasetDialogElement extends DialogElement {
@@ -126,6 +128,7 @@ public class DatasetDialogElement extends DialogElement {
   }
 
   public SelectSampleDialogElement selectSampleDialog() {
-    return $(SelectSampleDialogElement.class).id(SelectSampleDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(SelectSampleDialog.ID)))
+        .wrap(SelectSampleDialogElement.class);
   }
 }

@@ -61,7 +61,6 @@ public class AnalysisViewItTest extends AbstractTestBenchTestCase {
     AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
-    assertTrue(optional(() -> view.dialog()).isPresent());
   }
 
   @Test

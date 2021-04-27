@@ -82,9 +82,6 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
     assertTrue(optional(() -> view.files()).isPresent());
-    assertTrue(optional(() -> view.dialog()).isPresent());
-    assertTrue(optional(() -> view.filesDialog()).isPresent());
-    assertTrue(optional(() -> view.protocolDialog()).isPresent());
   }
 
   @Test

@@ -31,7 +31,9 @@ import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 @Element("vaadin-dialog")
 public class DatasetFilesDialogElement extends DialogElement {
@@ -56,10 +58,12 @@ public class DatasetFilesDialogElement extends DialogElement {
   }
 
   public AddDatasetFilesDialogElement addFilesDialog() {
-    return $(AddDatasetFilesDialogElement.class).id(AddDatasetFilesDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(AddDatasetFilesDialog.ID)))
+        .wrap(AddDatasetFilesDialogElement.class);
   }
 
   public SampleFilesDialogElement sampleFilesDialog() {
-    return $(SampleFilesDialogElement.class).id(SampleFilesDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID)))
+        .wrap(SampleFilesDialogElement.class);
   }
 }

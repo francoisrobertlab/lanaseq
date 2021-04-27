@@ -25,7 +25,9 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 @ServiceTestAnnotations
 @Element("vaadin-vertical-layout")
@@ -43,10 +45,12 @@ public class ProtocolsViewElement extends VerticalLayoutElement {
   }
 
   public ProtocolDialogElement dialog() {
-    return $(ProtocolDialogElement.class).id(ProtocolDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolDialog.ID)))
+        .wrap(ProtocolDialogElement.class);
   }
 
   public ProtocolHistoryDialogElement historyDialog() {
-    return $(ProtocolHistoryDialogElement.class).id(ProtocolHistoryDialog.ID);
+    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolHistoryDialog.ID)))
+        .wrap(ProtocolHistoryDialogElement.class);
   }
 }

@@ -76,7 +76,6 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.add()).isPresent());
-    assertTrue(optional(() -> dialog.addFilesDialog()).isPresent());
   }
 
   @Test

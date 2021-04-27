@@ -69,8 +69,6 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
-    assertTrue(optional(() -> view.dialog()).isPresent());
-    assertTrue(optional(() -> view.historyDialog()).isPresent());
   }
 
   @Test
@@ -91,7 +89,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     view.protocols().altClickProtocol(2);
 
-    assertFalse(view.historyDialog().isOpen());
+    assertFalse(optional(() -> view.historyDialog()).map(dialog -> dialog.isOpen()).orElse(false));
   }
 
   @Test
