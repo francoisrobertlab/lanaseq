@@ -89,7 +89,7 @@ public class LdapService {
           try {
             return attr.get();
           } catch (NamingException e) {
-            return Optional.empty();
+            return null;
           }
         }).map(value -> value.toString()).orElse(null);
     Optional<String> email = ldapTemplate.search(query, mapper).stream().findFirst();
@@ -116,7 +116,7 @@ public class LdapService {
           try {
             return attr.get();
           } catch (NamingException e) {
-            return Optional.empty();
+            return null;
           }
         }).map(value -> value.toString()).orElse(null);
     Optional<String> username = ldapTemplate.search(query, mapper).stream().findFirst();
