@@ -91,4 +91,18 @@ public class MdcFilterTest {
     verify(filterChain).doFilter(request, response);
     assertNull(MDC.get(USER_CONTEXT_KEY));
   }
+
+  @Test
+  public void doFilter_EmptyUser() throws Throwable {
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.empty());
+    doAnswer(i -> {
+      assertNull(MDC.get(USER_CONTEXT_KEY));
+      return null;
+    }).when(filterChain).doFilter(any(), any());
+
+    mdcFilter.doFilter(request, response, filterChain);
+
+    verify(filterChain).doFilter(request, response);
+    assertNull(MDC.get(USER_CONTEXT_KEY));
+  }
 }
