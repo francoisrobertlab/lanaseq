@@ -43,6 +43,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 
+/**
+ * Tests for {@link DatasetFilter}.
+ */
 @NonTransactionalTestAnnotations
 public class DatasetFilterTest {
   private DatasetFilter filter = new DatasetFilter();

@@ -41,6 +41,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link AnalysisDialog}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class AnalysisDialogTest extends AbstractKaribuTestCase {

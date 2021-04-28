@@ -42,6 +42,9 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Integration tests for {@link AnalysisDialog}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AnalysisDialogItTest extends AbstractTestBenchTestCase {

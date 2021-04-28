@@ -38,6 +38,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Integration tests for {@link UsersView}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewItTest extends AbstractTestBenchTestCase {

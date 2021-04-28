@@ -27,6 +27,9 @@ import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link UseForgotPasswordView}.
+ */
 @Element("vaadin-vertical-layout")
 public class UseForgotPasswordViewElement extends VerticalLayoutElement {
   public H2Element header() {

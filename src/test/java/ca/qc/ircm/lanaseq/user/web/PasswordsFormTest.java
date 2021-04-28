@@ -42,6 +42,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link PasswordsForm}.
+ */
 @ServiceTestAnnotations
 public class PasswordsFormTest extends AbstractViewTestCase {
   private PasswordsForm form;

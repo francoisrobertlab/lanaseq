@@ -24,6 +24,9 @@ import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Tests for {@link LdapConfiguration}.
+ */
 @NonTransactionalTestAnnotations
 public class LdapConfigurationTest {
   @Autowired

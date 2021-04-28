@@ -29,6 +29,9 @@ import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
+/**
+ * Web element for {@link AnalysisView}.
+ */
 @Element("vaadin-vertical-layout")
 public class AnalysisViewElement extends VerticalLayoutElement {
   public H2Element header() {

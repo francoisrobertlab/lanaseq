@@ -22,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link Sample}.
+ */
 public class SampleTest {
   @Test
   public void generateName() {

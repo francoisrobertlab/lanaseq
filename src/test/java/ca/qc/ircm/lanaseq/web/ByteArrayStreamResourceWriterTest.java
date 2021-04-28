@@ -27,6 +27,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link ByteArrayStreamResourceWriter}.
+ */
 @NonTransactionalTestAnnotations
 public class ByteArrayStreamResourceWriterTest {
   private ByteArrayStreamResourceWriter writer;

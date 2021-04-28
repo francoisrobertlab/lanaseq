@@ -22,6 +22,9 @@ import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.Keys;
 
+/**
+ * Web element for {@link ProtocolView} grid.
+ */
 @Element("vaadin-grid")
 public class ProtocolsGridElement extends GridElement {
   private static final int NAME_COLUMN = 0;

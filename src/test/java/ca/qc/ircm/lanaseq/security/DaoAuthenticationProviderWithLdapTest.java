@@ -43,6 +43,9 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+/**
+ * Tests for {@link DaoAuthenticationProviderWithLdap}.
+ */
 @ServiceTestAnnotations
 public class DaoAuthenticationProviderWithLdapTest {
   @Autowired

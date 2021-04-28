@@ -35,6 +35,9 @@ import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
+/**
+ * Web element for {@link DatasetFilesDialog}.
+ */
 @Element("vaadin-dialog")
 public class DatasetFilesDialogElement extends DialogElement {
   public H3Element header() {

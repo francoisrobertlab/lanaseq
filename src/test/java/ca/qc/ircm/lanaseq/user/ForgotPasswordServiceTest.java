@@ -55,6 +55,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thymeleaf.util.StringUtils;
 
+/**
+ * Tests for {@link ForgotPasswordService}.
+ */
 @ServiceTestAnnotations
 public class ForgotPasswordServiceTest {
   @SuppressWarnings("unused")

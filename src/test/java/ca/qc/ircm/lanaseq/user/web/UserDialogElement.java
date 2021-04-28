@@ -27,6 +27,9 @@ import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link UserDialog}.
+ */
 @Element("vaadin-dialog")
 public class UserDialogElement extends DialogElement {
   public H3Element header() {

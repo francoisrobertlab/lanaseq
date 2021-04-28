@@ -31,6 +31,9 @@ import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link AnalysisDialog}.
+ */
 @Element("vaadin-dialog")
 public class AnalysisDialogElement extends DialogElement {
   public H3Element header() {

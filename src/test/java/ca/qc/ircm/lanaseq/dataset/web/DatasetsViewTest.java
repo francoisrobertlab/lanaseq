@@ -60,6 +60,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link DatasetsView}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class DatasetsViewTest extends AbstractKaribuTestCase {

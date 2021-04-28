@@ -23,6 +23,9 @@ import com.vaadin.testbench.elementsbase.Element;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Keys;
 
+/**
+ * Web element for {@link SamplesView} grid.
+ */
 @Element("vaadin-grid")
 public class SamplesGridElement extends MultiSelectGridElement {
   private static final int NAME_COLUMN = 1;

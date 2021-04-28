@@ -50,6 +50,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ContextConfiguration;
 
+/**
+ * Tests for {@link MailService}.
+ */
 @ContextConfiguration(initializers = SmtpPortRandomizer.class)
 @NonTransactionalTestAnnotations
 public class MailServiceTest {

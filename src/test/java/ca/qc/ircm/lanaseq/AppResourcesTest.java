@@ -22,6 +22,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link AppResources}.
+ */
 public class AppResourcesTest {
   private Locale locale = Locale.ENGLISH;
 

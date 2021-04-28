@@ -23,6 +23,9 @@ import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link SelectSampleDialog}.
+ */
 @Element("vaadin-dialog")
 public class SelectSampleDialogElement extends DialogElement {
   public SelectSampleGridElement samples() {

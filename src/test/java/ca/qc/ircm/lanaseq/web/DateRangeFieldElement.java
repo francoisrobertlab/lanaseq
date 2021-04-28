@@ -24,6 +24,9 @@ import com.vaadin.flow.component.customfield.testbench.CustomFieldElement;
 import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link DateRangeField}.
+ */
 @Element("vaadin-custom-field")
 public class DateRangeFieldElement extends CustomFieldElement {
   public DatePickerElement form() {

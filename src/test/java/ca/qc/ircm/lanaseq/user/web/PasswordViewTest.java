@@ -42,6 +42,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link PasswordView}.
+ */
 @ServiceTestAnnotations
 public class PasswordViewTest extends AbstractViewTestCase {
   private PasswordView view;

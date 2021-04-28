@@ -23,6 +23,9 @@ import static org.junit.Assert.assertTrue;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link UserFilter}.
+ */
 @NonTransactionalTestAnnotations
 public class UserFilterTest {
   private UserFilter filter = new UserFilter();

@@ -43,6 +43,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link ProfileViewPresenter}.
+ */
 @ServiceTestAnnotations
 public class ProfileViewPresenterTest extends AbstractViewTestCase {
   private ProfileViewPresenter presenter;

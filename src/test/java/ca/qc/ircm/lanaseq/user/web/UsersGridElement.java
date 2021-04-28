@@ -20,6 +20,9 @@ package ca.qc.ircm.lanaseq.user.web;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link UsersView} grid.
+ */
 @Element("vaadin-grid")
 public class UsersGridElement extends GridElement {
   private static final int EMAIL_COLUMN = 0;

@@ -45,6 +45,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Integration tests for {@link DatasetsView}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsViewItTest extends AbstractTestBenchTestCase {

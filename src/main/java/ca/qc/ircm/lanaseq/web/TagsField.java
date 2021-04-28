@@ -132,6 +132,9 @@ public class TagsField extends CustomField<Set<String>> implements LocaleChangeO
     updateValue();
   }
 
+  /**
+   * A tag.
+   */
   protected static class Tag {
     private String tag;
 

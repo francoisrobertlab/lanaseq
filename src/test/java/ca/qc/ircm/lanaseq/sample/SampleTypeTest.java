@@ -25,6 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link SampleType}.
+ */
 public class SampleTypeTest {
   @Test
   public void getLabel_English() {

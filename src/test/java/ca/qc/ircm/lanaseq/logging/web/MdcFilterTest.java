@@ -38,6 +38,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.MDC;
 
+/**
+ * Tests for {@link MdcFilter}.
+ */
 @NonTransactionalTestAnnotations
 public class MdcFilterTest {
   private MdcFilter mdcFilter;

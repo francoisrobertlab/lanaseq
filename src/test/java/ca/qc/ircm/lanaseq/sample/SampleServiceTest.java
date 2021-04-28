@@ -78,6 +78,9 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link SampleService}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class SampleServiceTest {

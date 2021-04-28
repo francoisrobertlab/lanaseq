@@ -30,6 +30,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Tests for {@link UserServiceInjection}.
+ */
 @ServiceTestAnnotations
 public class UserServiceInjectionTest {
   @Autowired

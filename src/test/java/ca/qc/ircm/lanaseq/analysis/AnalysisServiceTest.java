@@ -39,6 +39,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link AnalysisService}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class AnalysisServiceTest {

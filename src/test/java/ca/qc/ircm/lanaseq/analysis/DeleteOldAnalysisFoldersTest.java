@@ -38,6 +38,9 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+/**
+ * Tests for {@link DeleteOldAnalysisFolders}.
+ */
 @NonTransactionalTestAnnotations
 public class DeleteOldAnalysisFoldersTest {
   @Autowired

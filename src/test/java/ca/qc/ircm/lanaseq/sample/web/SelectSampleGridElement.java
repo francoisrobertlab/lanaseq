@@ -21,6 +21,9 @@ import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link SelectSampleDialog} grid.
+ */
 @Element("vaadin-grid")
 public class SelectSampleGridElement extends GridElement {
   private static final int NAME_COLUMN = 0;

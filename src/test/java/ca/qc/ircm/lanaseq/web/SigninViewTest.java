@@ -62,6 +62,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+/**
+ * Tests for {@link SigninView}.
+ */
 @NonTransactionalTestAnnotations
 public class SigninViewTest extends AbstractViewTestCase {
   private SigninView view;

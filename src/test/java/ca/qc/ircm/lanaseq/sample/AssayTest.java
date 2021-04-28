@@ -29,6 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link Assay}.
+ */
 public class AssayTest {
   @Test
   public void getNullLabel_English() {

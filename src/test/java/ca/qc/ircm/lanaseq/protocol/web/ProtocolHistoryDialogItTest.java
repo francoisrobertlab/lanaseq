@@ -42,6 +42,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
+/**
+ * Integration tests for {@link ProtocolHistoryDialog}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("francois.robert@ircm.qc.ca")
 public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {

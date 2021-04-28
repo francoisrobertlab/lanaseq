@@ -21,6 +21,9 @@ import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link ProtocolDialog} files grid.
+ */
 @Element("vaadin-grid")
 public class ProtocolFilesGridElement extends GridElement {
   private static final int FILENAME_COLUMN = 0;

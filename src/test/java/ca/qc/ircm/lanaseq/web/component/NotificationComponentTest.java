@@ -25,6 +25,9 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link NotificationComponent}.
+ */
 @NonTransactionalTestAnnotations
 public class NotificationComponentTest extends AbstractViewTestCase {
   private NotificationComponentForTest notificationComponent = new NotificationComponentForTest();

@@ -125,7 +125,10 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
     to.setValue(range.hasUpperBound() ? range.upperEndpoint() : null);
   }
 
-  public static class Dates {
+  /**
+   * From and to dates to allow date range.
+   */
+  protected static class Dates {
     private LocalDate from;
     private LocalDate to;
 

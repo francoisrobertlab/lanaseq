@@ -49,6 +49,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Tests for {@link UserDialog}.
+ */
 @ServiceTestAnnotations
 public class UserDialogTest extends AbstractViewTestCase {
   private UserDialog dialog;

@@ -28,6 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
+/**
+ * Tests for {@link VaadinSort}.
+ */
 @NonTransactionalTestAnnotations
 public class VaadinSortTest {
   @Test

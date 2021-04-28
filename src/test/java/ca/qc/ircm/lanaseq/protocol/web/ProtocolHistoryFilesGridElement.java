@@ -22,6 +22,9 @@ import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link ProtocolHistoryDialog} files grid.
+ */
 @Element("vaadin-grid")
 public class ProtocolHistoryFilesGridElement extends GridElement {
   private static final int FILENAME_COLUMN = 0;

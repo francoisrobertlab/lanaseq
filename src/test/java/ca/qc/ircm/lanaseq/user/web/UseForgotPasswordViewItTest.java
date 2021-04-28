@@ -43,6 +43,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Integration tests for {@link UseForgotPasswordView}.
+ */
 @TestBenchTestAnnotations
 public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @SuppressWarnings("unused")

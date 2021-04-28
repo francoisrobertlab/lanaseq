@@ -75,6 +75,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link ProtocolsView}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class ProtocolsViewTest extends AbstractKaribuTestCase {

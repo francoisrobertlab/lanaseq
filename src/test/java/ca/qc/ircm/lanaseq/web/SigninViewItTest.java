@@ -38,6 +38,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Integration tests for {@link SigninView}.
+ */
 @TestBenchTestAnnotations
 public class SigninViewItTest extends AbstractTestBenchTestCase {
   @Autowired

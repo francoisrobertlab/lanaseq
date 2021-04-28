@@ -45,6 +45,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link ProfileView}.
+ */
 @ServiceTestAnnotations
 public class ProfileViewTest extends AbstractViewTestCase {
   private ProfileView view;

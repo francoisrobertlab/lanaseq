@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Tests for {@link AppConfiguration}.
+ */
 @NonTransactionalTestAnnotations
 public class AppConfigurationTest {
   @Autowired

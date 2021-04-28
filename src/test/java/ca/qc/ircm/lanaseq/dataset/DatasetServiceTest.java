@@ -80,6 +80,9 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link DatasetService}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class DatasetServiceTest {

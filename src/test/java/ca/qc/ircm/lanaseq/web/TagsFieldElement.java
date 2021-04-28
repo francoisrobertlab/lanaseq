@@ -23,6 +23,9 @@ import com.vaadin.flow.component.customfield.testbench.CustomFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 import java.util.List;
 
+/**
+ * Web element for {@link TagsField}.
+ */
 @Element("vaadin-custom-field")
 public class TagsFieldElement extends CustomFieldElement {
   public List<ButtonElement> tags() {

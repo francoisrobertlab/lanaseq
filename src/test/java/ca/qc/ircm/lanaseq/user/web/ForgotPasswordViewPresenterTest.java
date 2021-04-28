@@ -56,6 +56,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link ForgotPasswordViewPresenter}.
+ */
 @ServiceTestAnnotations
 public class ForgotPasswordViewPresenterTest extends AbstractViewTestCase {
   private ForgotPasswordViewPresenter presenter;

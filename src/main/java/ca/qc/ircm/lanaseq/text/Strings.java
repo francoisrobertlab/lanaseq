@@ -21,6 +21,9 @@ import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * Utilities for strings.
+ */
 public class Strings {
   /**
    * Concatenates properties separating them by dots.

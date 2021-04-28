@@ -24,6 +24,9 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Tests for {@link SecurityConfiguration}.
+ */
 @NonTransactionalTestAnnotations
 public class SecurityConfigurationTest {
   @Autowired

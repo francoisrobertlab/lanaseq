@@ -44,6 +44,9 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
+/**
+ * Integration tests for {@link ProfileView}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProfileViewItTest extends AbstractTestBenchTestCase {

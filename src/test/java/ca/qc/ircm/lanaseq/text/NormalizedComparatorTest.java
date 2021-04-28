@@ -22,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link NormalizedComparator}.
+ */
 public class NormalizedComparatorTest {
   @Test
   public void compare_Identity() {

@@ -33,6 +33,9 @@ import com.vaadin.flow.component.tabs.testbench.TabElement;
 import com.vaadin.flow.component.tabs.testbench.TabsElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link ViewLayout}.
+ */
 @Element("vaadin-vertical-layout")
 public class ViewLayoutElement extends VerticalLayoutElement {
   public TabsElement tabs() {

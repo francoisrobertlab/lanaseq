@@ -34,6 +34,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Tests for {@link ProtocolPermissionEvaluator}.
+ */
 @ServiceTestAnnotations
 public class ProtocolPermissionEvaluatorTest {
   private static final String PROTOCOL_CLASS = Protocol.class.getName();

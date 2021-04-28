@@ -50,6 +50,9 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Tests for {@link UserFormPresenter}.
+ */
 @ServiceTestAnnotations
 public class UserFormPresenterTest extends AbstractViewTestCase {
   private UserFormPresenter presenter;

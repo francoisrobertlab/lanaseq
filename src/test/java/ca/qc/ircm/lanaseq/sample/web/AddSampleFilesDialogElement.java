@@ -30,6 +30,9 @@ import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link AddSampleFilesDialog}.
+ */
 @Element("vaadin-dialog")
 public class AddSampleFilesDialogElement extends DialogElement {
   public H3Element header() {

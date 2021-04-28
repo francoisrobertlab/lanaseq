@@ -40,6 +40,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link UserForm}.
+ */
 @ServiceTestAnnotations
 public class UserFormTest extends AbstractViewTestCase {
   private UserForm form;

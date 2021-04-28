@@ -24,6 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+/**
+ * Tests for {@link MailConfiguration}.
+ */
 @NonTransactionalTestAnnotations
 public class MailConfigurationTest {
   @Autowired

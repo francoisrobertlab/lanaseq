@@ -31,6 +31,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Tests for {@link UserPermissionEvaluator}.
+ */
 @ServiceTestAnnotations
 public class UserPermissionEvaluatorTest {
   private static final String USER_CLASS = User.class.getName();

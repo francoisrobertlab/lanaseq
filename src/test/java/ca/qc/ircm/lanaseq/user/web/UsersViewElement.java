@@ -30,6 +30,9 @@ import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
+/**
+ * Web element for {@link UsersView}.
+ */
 @Element("vaadin-vertical-layout")
 public class UsersViewElement extends VerticalLayoutElement {
   public H2Element header() {

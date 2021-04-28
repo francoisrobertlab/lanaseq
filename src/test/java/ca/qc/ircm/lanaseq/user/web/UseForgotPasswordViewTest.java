@@ -46,6 +46,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+/**
+ * Tests for {@link UseForgotPasswordView}.
+ */
 @ServiceTestAnnotations
 public class UseForgotPasswordViewTest extends AbstractViewTestCase {
   private UseForgotPasswordView view;

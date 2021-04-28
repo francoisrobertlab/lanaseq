@@ -27,6 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 
+/**
+ * Tests for {@link LdapService}.
+ */
 @ServiceTestAnnotations
 public class LdapServiceTest {
   private LdapService ldapService;

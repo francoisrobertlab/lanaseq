@@ -48,6 +48,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link UserService}.
+ */
 @ServiceTestAnnotations
 public class UserServiceTest {
   private static final String READ = "read";

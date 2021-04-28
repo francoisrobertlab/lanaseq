@@ -37,6 +37,9 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link AccessDeniedView}.
+ */
 @NonTransactionalTestAnnotations
 public class AccessDeniedViewTest extends AbstractViewTestCase {
   private AccessDeniedView view;

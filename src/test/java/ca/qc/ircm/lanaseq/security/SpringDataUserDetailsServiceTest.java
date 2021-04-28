@@ -44,6 +44,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+/**
+ * Tests for {@link SpringDataUserDetailsService}.
+ */
 @NonTransactionalTestAnnotations
 public class SpringDataUserDetailsServiceTest {
   private SpringDataUserDetailsService userDetailsService;

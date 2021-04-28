@@ -44,6 +44,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
+/**
+ * Integration tests for {@link AddDatasetFilesDialog}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {

@@ -22,6 +22,9 @@ import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link DatasetDialog} samples grid.
+ */
 @Element("vaadin-grid")
 public class DatasetSamplesGridElement extends GridElement {
   private static final int SAMPLE_ID_COLUMN = 0;

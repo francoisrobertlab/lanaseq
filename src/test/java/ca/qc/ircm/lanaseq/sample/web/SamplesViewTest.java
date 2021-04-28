@@ -82,6 +82,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link SamplesView}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class SamplesViewTest extends AbstractKaribuTestCase {

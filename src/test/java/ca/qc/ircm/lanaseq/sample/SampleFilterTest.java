@@ -39,6 +39,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 
+/**
+ * Tests for {@link SampleFilter}.
+ */
 @NonTransactionalTestAnnotations
 public class SampleFilterTest {
   private SampleFilter filter = new SampleFilter();

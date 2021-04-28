@@ -27,6 +27,9 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+/**
+ * Configuration for tests not requiring access to database.
+ */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest

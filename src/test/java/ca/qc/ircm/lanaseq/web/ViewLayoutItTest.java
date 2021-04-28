@@ -36,6 +36,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Integration tests for {@link ViewLayout}.
+ */
 @TestBenchTestAnnotations
 public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   private void open() {

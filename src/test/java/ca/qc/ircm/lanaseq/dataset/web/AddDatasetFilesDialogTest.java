@@ -89,6 +89,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link AddDatasetFilesDialog}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {

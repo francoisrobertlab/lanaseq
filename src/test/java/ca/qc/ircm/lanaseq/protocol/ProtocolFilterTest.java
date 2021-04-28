@@ -27,6 +27,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link ProtocolFilter}.
+ */
 @NonTransactionalTestAnnotations
 public class ProtocolFilterTest {
   private ProtocolFilter filter = new ProtocolFilter();

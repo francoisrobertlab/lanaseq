@@ -44,6 +44,9 @@ import com.vaadin.flow.component.select.testbench.SelectElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link SampleDialog}.
+ */
 @Element("vaadin-dialog")
 public class SampleDialogElement extends DialogElement {
   public H3Element header() {

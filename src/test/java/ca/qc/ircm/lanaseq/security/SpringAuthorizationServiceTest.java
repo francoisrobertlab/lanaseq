@@ -59,6 +59,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 
+/**
+ * Tests for {@link SpringAuthorizationService}.
+ */
 @ServiceTestAnnotations
 public class SpringAuthorizationServiceTest {
   private static final String DEFAULT_ROLE = USER;
@@ -357,21 +360,36 @@ public class SpringAuthorizationServiceTest {
     verify(permissionEvaluator).hasPermission(authentication, object, permission);
   }
 
+  /**
+   * Class with no {@link RolesAllowed} annotation.
+   */
   public static final class NoRoleTest {
   }
 
+  /**
+   * Class accessible only by users.
+   */
   @RolesAllowed(USER)
   public static final class UserRoleTest {
   }
 
+  /**
+   * Class accessible only by managers.
+   */
   @RolesAllowed(MANAGER)
   public static final class ManagerRoleTest {
   }
 
+  /**
+   * Class accessible only by administrators.
+   */
   @RolesAllowed(ADMIN)
   public static final class AdminRoleTest {
   }
 
+  /**
+   * Class accessible only by managers or administrators.
+   */
   @RolesAllowed({ MANAGER, ADMIN })
   public static final class ManagerOrAdminRoleTest {
   }

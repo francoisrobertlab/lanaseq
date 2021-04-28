@@ -24,6 +24,9 @@ import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link UrlComponent}.
+ */
 @NonTransactionalTestAnnotations
 public class UrlComponentTest extends AbstractViewTestCase {
   private UrlComponentForTest urlComponent = new UrlComponentForTest();

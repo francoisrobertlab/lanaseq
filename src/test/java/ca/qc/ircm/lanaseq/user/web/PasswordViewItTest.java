@@ -43,6 +43,9 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
+/**
+ * Integration tests for {@link PasswordView}.
+ */
 @TestBenchTestAnnotations
 @WithUserDetails("christian.poitras@ircm.qc.ca")
 public class PasswordViewItTest extends AbstractTestBenchTestCase {

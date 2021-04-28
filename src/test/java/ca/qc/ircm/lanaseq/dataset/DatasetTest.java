@@ -26,6 +26,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link Dataset}.
+ */
 public class DatasetTest {
   private void copy(Sample from, Sample to) {
     to.setAssay(from.getAssay());

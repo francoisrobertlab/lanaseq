@@ -34,6 +34,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+/**
+ * Tests for {@link SamplePermissionEvaluator}.
+ */
 @ServiceTestAnnotations
 public class SamplePermissionEvaluatorTest {
   private static final String DATASET_CLASS = Sample.class.getName();

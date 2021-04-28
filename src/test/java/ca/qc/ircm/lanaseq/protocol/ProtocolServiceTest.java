@@ -51,6 +51,9 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link ProtocolService}.
+ */
 @ServiceTestAnnotations
 public class ProtocolServiceTest {
   private static final String READ = "read";

@@ -40,6 +40,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link AnalysisView}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class AnalysisViewTest extends AbstractKaribuTestCase {

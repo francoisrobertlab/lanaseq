@@ -26,6 +26,9 @@ import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link ProtocolHistoryDialog}.
+ */
 @ServiceTestAnnotations
 @Element("vaadin-dialog")
 public class ProtocolHistoryDialogElement extends DialogElement {

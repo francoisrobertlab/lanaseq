@@ -52,6 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
 
+/**
+ * Tests for {@link ConfigureUiServiceInitListener}.
+ */
 @NonTransactionalTestAnnotations
 public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   @Autowired
@@ -177,6 +180,9 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
     verify(ui, never()).navigate(PasswordView.class);
   }
 
+  /**
+   * Fake view for tests.
+   */
   public static class ViewTest {
   }
 }

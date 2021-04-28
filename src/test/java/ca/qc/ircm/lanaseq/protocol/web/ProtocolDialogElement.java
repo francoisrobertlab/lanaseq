@@ -35,6 +35,9 @@ import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.flow.component.upload.testbench.UploadElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link ProtocolDialog}.
+ */
 @ServiceTestAnnotations
 @Element("vaadin-dialog")
 public class ProtocolDialogElement extends DialogElement {

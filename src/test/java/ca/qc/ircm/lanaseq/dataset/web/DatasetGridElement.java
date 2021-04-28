@@ -24,6 +24,9 @@ import com.vaadin.testbench.elementsbase.Element;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Keys;
 
+/**
+ * Web element for {@link DatasetGrid}.
+ */
 @Element("vaadin-grid")
 public class DatasetGridElement extends GridElement {
   private static final int NAME_COLUMN = 0;

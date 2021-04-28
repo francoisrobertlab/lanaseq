@@ -27,6 +27,9 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Simple component for tests using custom Vaadin mocking.
+ */
 @Route("testvaadinservice")
 @UIScope
 public class VaadinServiceTestComponent extends Label {

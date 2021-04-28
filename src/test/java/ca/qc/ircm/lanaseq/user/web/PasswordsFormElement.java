@@ -25,6 +25,9 @@ import com.vaadin.flow.component.formlayout.testbench.FormLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.PasswordFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
 
+/**
+ * Web element for {@link PasswordsForm}.
+ */
 @Element("vaadin-form-layout")
 public class PasswordsFormElement extends FormLayoutElement {
   public PasswordFieldElement password() {

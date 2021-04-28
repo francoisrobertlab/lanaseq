@@ -81,6 +81,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * Tests for {@link SampleDialog}.
+ */
 @ServiceTestAnnotations
 @WithMockUser
 public class SampleDialogTest extends AbstractKaribuTestCase {

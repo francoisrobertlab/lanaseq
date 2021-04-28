@@ -62,6 +62,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
+/**
+ * Tests for {@link ViewLayout}.
+ */
 @NonTransactionalTestAnnotations
 public class ViewLayoutTest extends AbstractViewTestCase {
   private ViewLayout view;
@@ -406,6 +409,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertEquals(view.users, view.tabs.getSelectedTab());
   }
 
+  /**
+   * Fake view for tests.
+   */
   public static class ViewTest {
   }
 }
