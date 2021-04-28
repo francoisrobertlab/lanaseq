@@ -64,7 +64,6 @@ import org.springframework.util.FileSystemUtils;
 @Service
 @Transactional
 public class DatasetService {
-  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
   private SampleService sampleService;

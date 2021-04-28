@@ -57,7 +57,6 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   private static final String SKIP_TESTS_SYSTEM_PROPERTY = "testbench.skip";
   private static final String DRIVER_SYSTEM_PROPERTY = "testbench.driver";
   private static final String RETRIES_SYSTEM_PROPERTY = "testbench.retries";
-  @SuppressWarnings("unused")
   private static final String FIREFOX_DRIVER = FirefoxDriver.class.getName();
   private static final String CHROME_DRIVER = ChromeDriver.class.getName();
   @SuppressWarnings("unused")

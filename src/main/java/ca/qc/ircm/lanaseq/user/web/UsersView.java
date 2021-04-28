@@ -87,7 +87,6 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   public static final String SWITCH_USERNAME = "switchUsername";
   public static final String SWITCH_FAILED = "switchFailed";
   private static final long serialVersionUID = 2568742367790329628L;
-  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(UsersView.class);
   protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
