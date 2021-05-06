@@ -18,7 +18,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>ca.qc.ircm</groupId>
     <artifactId>parent</artifactId>
@@ -57,7 +57,7 @@
     <testbench.maxAttempts>3</testbench.maxAttempts>
     <!-- Dependencies -->
     <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
-    <vaadin.version>14.4.10</vaadin.version>
+    <vaadin.version>14.5.3</vaadin.version>
     <generate-property-names.version>0.5</generate-property-names.version>
     <querydsl.version>4.2.1</querydsl.version>
     <guava.version>30.0-jre</guava.version>
@@ -302,7 +302,8 @@
             <systemPropertyVariables>
               <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>
               <testbench.skip>${testbench.skip}</testbench.skip>
-              <com.vaadin.testbench.Parameters.maxAttempts>${testbench.maxAttempts}</com.vaadin.testbench.Parameters.maxAttempts>
+              <com.vaadin.testbench.Parameters.maxAttempts>${testbench.maxAttempts}
+              </com.vaadin.testbench.Parameters.maxAttempts>
             </systemPropertyVariables>
             <argLine>-Dvaadin.productionMode=true</argLine>
           </configuration>
@@ -439,7 +440,9 @@
             </excludes>
             <executions>
               <execution>
-                <goals><goal>check</goal></goals>
+                <goals>
+                  <goal>check</goal>
+                </goals>
               </execution>
             </executions>
           </configuration>
