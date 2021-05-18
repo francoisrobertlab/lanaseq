@@ -45,7 +45,7 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
   protected void additionalAuthenticationChecks(UserDetails userDetails,
       UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
     String username = authentication.getName();
-    logger.trace("user {} tries to authenticate", username);
+    logger.debug("user {} tries to authenticate", username);
     User user = getUser(userDetails);
     if (!user.isActive()) {
       logger.debug("user {} account is disabled", username);
