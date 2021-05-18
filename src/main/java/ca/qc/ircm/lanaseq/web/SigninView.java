@@ -102,8 +102,8 @@ public class SigninView extends LoginOverlay
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
     // Redirect to main view if user is known.
-    logger.debug("user is known, redirecting to main view");
     if (!authorizationService.isAnonymous()) {
+      logger.debug("user is known, redirecting to main view");
       event.forwardTo(MainView.class);
     }
   }
