@@ -92,7 +92,8 @@ public class LdapService {
             return null;
           }
         }).map(value -> value.toString()).orElse(null);
-    Optional<String> email = ldapTemplate.search(query, mapper).stream().findFirst();
+    Optional<String> email =
+        ldapTemplate.search(query, mapper).stream().filter(value -> value != null).findFirst();
     logger.debug("Found LDAP email {} for user [{}]", email, username);
     return email;
   }
@@ -119,7 +120,8 @@ public class LdapService {
             return null;
           }
         }).map(value -> value.toString()).orElse(null);
-    Optional<String> username = ldapTemplate.search(query, mapper).stream().findFirst();
+    Optional<String> username =
+        ldapTemplate.search(query, mapper).stream().filter(value -> value != null).findFirst();
     logger.debug("Found LDAP username {} for user [{}]", username, email);
     return username;
   }

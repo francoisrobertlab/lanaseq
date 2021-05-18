@@ -20,28 +20,29 @@ package ca.qc.ircm.lanaseq.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.query.LdapQuery;
 
 /**
  * Tests for {@link LdapService}.
  */
 @ServiceTestAnnotations
 public class LdapServiceTest {
+  @Autowired
   private LdapService ldapService;
   @Autowired
   private LdapTemplate ldapTemplate;
   @Autowired
   private LdapConfiguration ldapConfiguration;
-
-  @BeforeEach
-  public void beforeTest() {
-    ldapService = new LdapService(ldapTemplate, ldapConfiguration);
-  }
 
   @Test
   public void isPasswordValid_True() {
@@ -69,6 +70,16 @@ public class LdapServiceTest {
   }
 
   @Test
+  public void getEmail_NullElementSearch() {
+    LdapTemplate ldapTemplate = mock(LdapTemplate.class);
+    when(ldapTemplate.search(any(LdapQuery.class), any(AttributesMapper.class)))
+        .thenReturn(Collections.nCopies(1, (String) null));
+    ldapService = new LdapService(ldapTemplate, ldapConfiguration);
+
+    assertFalse(ldapService.getEmail("robertf").isPresent());
+  }
+
+  @Test
   public void getUsername() {
     assertEquals("robertf", ldapService.getUsername("francois.robert@ircm.qc.ca").orElse(null));
   }
@@ -76,5 +87,15 @@ public class LdapServiceTest {
   @Test
   public void getUsername_Invalid() {
     assertFalse(ldapService.getUsername("not.used@ircm.qc.ca").isPresent());
+  }
+
+  @Test
+  public void getUsername_NullElementSearch() {
+    LdapTemplate ldapTemplate = mock(LdapTemplate.class);
+    when(ldapTemplate.search(any(LdapQuery.class), any(AttributesMapper.class)))
+        .thenReturn(Collections.nCopies(1, (String) null));
+    ldapService = new LdapService(ldapTemplate, ldapConfiguration);
+
+    assertFalse(ldapService.getUsername("francois.robert@ircm.qc.ca").isPresent());
   }
 }
