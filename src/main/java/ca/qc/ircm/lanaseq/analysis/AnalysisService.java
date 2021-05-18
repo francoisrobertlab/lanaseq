@@ -29,6 +29,7 @@ public class AnalysisService {
   private static final String FASTQ_PATTERN = ".*" + FASTQ;
   private static final String FASTQ1_PATTERN = "(?:.*_)?R1" + FASTQ;
   private static final String FASTQ2_PATTERN = "(?:.*_)?R2" + FASTQ;
+  private static final String BAM_PATTERN = "(?:.*)\\.bam";
   private SampleService sampleService;
   private AppConfiguration configuration;
 
@@ -81,31 +82,30 @@ public class AnalysisService {
     Pattern fastqPattern = Pattern.compile(FASTQ_PATTERN);
     Pattern fastq1Pattern = Pattern.compile(FASTQ1_PATTERN);
     Pattern fastq2Pattern = Pattern.compile(FASTQ2_PATTERN);
-    List<Path> fastqs = sampleService.files(sample).stream()
-        .filter(file -> fastqPattern.matcher(file.toString()).matches())
-        .collect(Collectors.toList());
+    Pattern bamPattern = Pattern.compile(BAM_PATTERN);
+    List<Path> files = sampleService.files(sample);
+    List<Path> fastqs =
+        files.stream().filter(file -> fastqPattern.matcher(file.toString()).matches())
+            .collect(Collectors.toList());
     Path fastq1 = fastqs.stream()
         .filter(file -> fastq1Pattern.matcher(file.getFileName().toString()).matches()).findAny()
         .orElse(fastqs.isEmpty() ? null : fastqs.get(0));
     Path fastq2 = fastqs.stream()
         .filter(file -> fastq2Pattern.matcher(file.getFileName().toString()).matches()).findAny()
         .orElse(null);
+    List<Path> bams = files.stream().filter(file -> bamPattern.matcher(file.toString()).matches())
+        .collect(Collectors.toList());
     if (fastq1 == null) {
       String message = resources.message("sample.noFastq", sample.getName());
       errorHandler.accept(message);
       return Optional.empty();
-    } else if (fastq2 == null || fastq2.equals(fastq1)) {
-      SampleAnalysis analysis = new SampleAnalysis();
-      analysis.sample = sample;
-      analysis.paired = false;
-      analysis.fastq1 = fastq1;
-      return Optional.of(analysis);
     } else {
       SampleAnalysis analysis = new SampleAnalysis();
       analysis.sample = sample;
-      analysis.paired = true;
+      analysis.paired = fastq2 != null && !fastq2.equals(fastq1);
       analysis.fastq1 = fastq1;
       analysis.fastq2 = fastq2;
+      analysis.bams = bams;
       return Optional.of(analysis);
     }
   }
@@ -141,6 +141,9 @@ public class AnalysisService {
         Path fastq2 = folder.resolve(sample.sample.getName() + "_R2.fastq"
             + (sample.fastq2.toString().endsWith(".gz") ? ".gz" : ""));
         copy(sample.fastq2, fastq2, symlinks);
+      }
+      for (Path bam : sample.bams) {
+        copy(bam, folder.resolve(bam.getFileName()), symlinks);
       }
     }
     Path samples = folder.resolve("samples.txt");
