@@ -25,7 +25,7 @@ import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.ID;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.id;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

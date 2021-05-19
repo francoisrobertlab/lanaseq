@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.test.utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;

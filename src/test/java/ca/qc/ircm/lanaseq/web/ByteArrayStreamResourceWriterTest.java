@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.server.VaadinSession;

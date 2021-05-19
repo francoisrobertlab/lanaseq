@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.security;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import java.time.Duration;

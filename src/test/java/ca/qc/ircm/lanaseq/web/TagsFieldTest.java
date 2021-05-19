@@ -25,10 +25,10 @@ import static ca.qc.ircm.lanaseq.web.TagsField.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG;
 import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.web.TagsField.TAG;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;

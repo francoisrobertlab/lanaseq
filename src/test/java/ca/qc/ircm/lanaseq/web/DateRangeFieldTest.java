@@ -29,10 +29,10 @@ import static ca.qc.ircm.lanaseq.web.DateRangeField.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.web.DateRangeField.FROM;
 import static ca.qc.ircm.lanaseq.web.DateRangeField.FROM_AFTER_TO;
 import static ca.qc.ircm.lanaseq.web.DateRangeField.TO;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;

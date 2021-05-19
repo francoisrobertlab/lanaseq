@@ -23,8 +23,8 @@ import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SEPARATOR;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.VIEW_NAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;

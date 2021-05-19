@@ -18,9 +18,9 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -110,7 +110,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     List<Protocol> protocols = items(view.protocols);
     assertEquals(this.protocols.size(), protocols.size());
     for (Protocol protocol : this.protocols) {
-      assertTrue(protocol.toString(), protocols.contains(protocol));
+      assertTrue(protocols.contains(protocol), () -> protocol.toString());
     }
     assertEquals(0, view.protocols.getSelectedItems().size());
     protocols.forEach(protocol -> view.protocols.select(protocol));

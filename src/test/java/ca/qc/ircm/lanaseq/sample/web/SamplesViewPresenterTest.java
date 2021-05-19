@@ -23,10 +23,10 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -152,7 +152,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(view.samples);
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
-      assertTrue(sample.toString(), samples.contains(sample));
+      assertTrue(samples.contains(sample), () -> sample.toString());
     }
     assertEquals(0, view.samples.getSelectedItems().size());
     samples.forEach(dataset -> view.samples.select(dataset));

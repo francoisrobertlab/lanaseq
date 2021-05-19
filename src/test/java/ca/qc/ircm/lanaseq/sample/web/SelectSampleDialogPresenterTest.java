@@ -18,8 +18,8 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -113,7 +113,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(dialog.samples);
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
-      assertTrue(sample.toString(), samples.contains(sample));
+      assertTrue(samples.contains(sample), () -> sample.toString());
     }
   }
 

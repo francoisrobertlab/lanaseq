@@ -18,8 +18,8 @@
 package ca.qc.ircm.lanaseq.logging.web;
 
 import static ca.qc.ircm.lanaseq.logging.web.MdcFilter.USER_CONTEXT_KEY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;

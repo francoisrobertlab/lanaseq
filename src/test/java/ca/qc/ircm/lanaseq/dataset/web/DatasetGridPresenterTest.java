@@ -18,8 +18,8 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -105,7 +105,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     List<Dataset> datasets = items(grid);
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
-      assertTrue(dataset.toString(), datasets.contains(dataset));
+      assertTrue(datasets.contains(dataset), () -> dataset.toString());
     }
   }
 

@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.time;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDate;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.time.LocalDate;
