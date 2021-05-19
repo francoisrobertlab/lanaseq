@@ -429,10 +429,15 @@
               <yml>SCRIPT_STYLE</yml>
               <ini>SEMICOLON_STYLE</ini>
               <scss>JAVADOC_STYLE</scss>
+              <ldif>SCRIPT_STYLE</ldif>
             </mapping>
             <excludes>
               <exclude>**/.*</exclude>
+              <exclude>**/LICENSE</exclude>
               <exclude>**/*.txt</exclude>
+              <exclude>**/*.log*</exclude>
+              <exclude>**/*.fastq</exclude>
+              <exclude>node_modules/**</exclude>
             </excludes>
           </configuration>
           <executions>
