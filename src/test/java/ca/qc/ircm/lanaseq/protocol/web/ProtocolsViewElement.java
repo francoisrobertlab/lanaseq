@@ -30,7 +30,7 @@ import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
 /**
- * Web element for {@link ProtocolView}.
+ * Web element for {@link ProtocolsView}.
  */
 @ServiceTestAnnotations
 @Element("vaadin-vertical-layout")

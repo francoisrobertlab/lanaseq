@@ -23,7 +23,7 @@ import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.Keys;
 
 /**
- * Web element for {@link ProtocolView} grid.
+ * Web element for {@link ProtocolsView} grid.
  */
 @Element("vaadin-grid")
 public class ProtocolsGridElement extends GridElement {

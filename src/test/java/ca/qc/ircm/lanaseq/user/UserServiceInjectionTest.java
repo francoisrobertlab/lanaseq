@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
- * Tests for {@link UserServiceInjection}.
+ * Tests injection for {@link UserService}.
  */
 @ServiceTestAnnotations
 public class UserServiceInjectionTest {
