@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.protocol.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
@@ -42,6 +43,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -64,6 +66,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String PROTOCOLS = "protocols";
+  public static final String EDIT_BUTTON =
+      "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
+          + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
   private static final long serialVersionUID = -2370599174391239721L;
   private static final Logger logger = LoggerFactory.getLogger(ProtocolsView.class);
   protected H2 header = new H2();
@@ -71,6 +76,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected Column<Protocol> name;
   protected Column<Protocol> date;
   protected Column<Protocol> owner;
+  protected Column<Protocol> edit;
   protected TextField nameFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
@@ -109,6 +115,10 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
         .setKey(DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
+    edit = protocols
+        .addColumn(TemplateRenderer.<Protocol>of(EDIT_BUTTON).withEventHandler("edit",
+            protocol -> presenter.view(protocol)), EDIT)
+        .setKey(EDIT).setSortable(false).setFlexGrow(0);
     protocols.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     protocols.addItemClickListener(e -> {
       if (e.isAltKey()) {
@@ -146,6 +156,8 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = protocolResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
+    String editHeader = webResources.message(EDIT);
+    edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));

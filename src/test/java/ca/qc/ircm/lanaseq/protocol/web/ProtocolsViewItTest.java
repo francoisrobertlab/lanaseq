@@ -85,6 +85,16 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  public void edit() throws Throwable {
+    open();
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+
+    view.protocols().edit(0).click();
+
+    assertTrue(view.dialog().isOpen());
+  }
+
+  @Test
   public void history_User() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);

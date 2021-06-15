@@ -20,10 +20,12 @@ package ca.qc.ircm.lanaseq.protocol.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
@@ -31,11 +33,15 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -57,6 +63,7 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -88,6 +95,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<ValueProvider<Protocol, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<LocalDateTimeRenderer<Protocol>> localDateTimeRendererCaptor;
+  @Captor
+  private ArgumentCaptor<TemplateRenderer<Protocol>> templateRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Protocol>> comparatorCaptor;
   @Autowired
@@ -122,18 +131,31 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     view.name = mock(Column.class);
     when(view.protocols.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
+    when(view.name.setSortable(anyBoolean())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
+    when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
     view.date = mock(Column.class);
     when(view.protocols.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
         .thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
+    when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
+    when(view.date.setFlexGrow(anyInt())).thenReturn(view.date);
     view.owner = mock(Column.class);
     when(view.protocols.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
+    when(view.owner.setSortable(anyBoolean())).thenReturn(view.owner);
     when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
+    when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
+    view.edit = mock(Column.class);
+    when(view.protocols.addColumn(any(TemplateRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.edit.setKey(any())).thenReturn(view.edit);
+    when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
+    when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
+    when(view.edit.setHeader(any(String.class))).thenReturn(view.edit);
+    when(view.edit.setFlexGrow(anyInt())).thenReturn(view.edit);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.protocols.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
@@ -168,6 +190,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     verify(view.date).setFooter(protocolResources.message(DATE));
     verify(view.owner).setHeader(protocolResources.message(OWNER));
     verify(view.owner).setFooter(protocolResources.message(OWNER));
+    verify(view.edit).setHeader(webResources.message(EDIT));
+    verify(view.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
@@ -192,6 +216,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     verify(view.date, atLeastOnce()).setFooter(protocolResources.message(DATE));
     verify(view.owner, atLeastOnce()).setHeader(protocolResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(protocolResources.message(OWNER));
+    verify(view.edit, atLeastOnce()).setHeader(webResources.message(EDIT));
+    verify(view.edit, atLeastOnce()).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
@@ -206,10 +232,15 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void protocols() {
-    assertEquals(3, view.protocols.getColumns().size());
+    assertEquals(4, view.protocols.getColumns().size());
     assertNotNull(view.protocols.getColumnByKey(NAME));
+    assertTrue(view.name.isSortable());
     assertNotNull(view.protocols.getColumnByKey(DATE));
+    assertTrue(view.date.isSortable());
     assertNotNull(view.protocols.getColumnByKey(OWNER));
+    assertTrue(view.owner.isSortable());
+    assertNotNull(view.protocols.getColumnByKey(EDIT));
+    assertFalse(view.edit.isSortable());
     assertTrue(view.protocols.getSelectionModel() instanceof SelectionModel.Single);
   }
 
@@ -246,6 +277,14 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     for (Protocol protocol : protocols) {
       assertEquals(protocol.getOwner().getEmail(),
           ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
+    }
+    verify(view.protocols).addColumn(templateRendererCaptor.capture(), eq(EDIT));
+    TemplateRenderer<Protocol> templateRenderer = templateRendererCaptor.getValue();
+    for (Protocol protocol : protocols) {
+      assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
+      assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
+      templateRenderer.getEventHandlers().get("edit").accept(protocol);
+      verify(presenter).view(protocol);
     }
   }
 
