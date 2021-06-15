@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
@@ -52,6 +53,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -83,6 +85,9 @@ public class SamplesView extends VerticalLayout
   public static final String SAMPLES_MORE_THAN_ONE = property(SAMPLES, "moreThanOne");
   public static final String SAMPLES_CANNOT_WRITE = property(SAMPLES, "cannotWrite");
   public static final String MERGE_ERROR = property(MERGE, "error");
+  public static final String EDIT_BUTTON =
+      "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
+          + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
   private static final long serialVersionUID = -6945706067250351889L;
   private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
   protected H2 header = new H2();
@@ -91,6 +96,7 @@ public class SamplesView extends VerticalLayout
   protected Column<Sample> protocol;
   protected Column<Sample> date;
   protected Column<Sample> owner;
+  protected Column<Sample> edit;
   protected TextField nameFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
@@ -142,6 +148,11 @@ public class SamplesView extends VerticalLayout
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
+    edit =
+        samples
+            .addColumn(TemplateRenderer.<Sample>of(EDIT_BUTTON).withEventHandler("edit",
+                sample -> presenter.view(sample)), EDIT)
+            .setKey(EDIT).setSortable(false).setFlexGrow(0);
     samples.sort(GridSortOrder.desc(date).build());
     samples.addItemDoubleClickListener(e -> {
       if (e.getColumn() == protocol && e.getItem().getProtocol() != null) {
@@ -201,6 +212,8 @@ public class SamplesView extends VerticalLayout
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = sampleResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
+    String editHeader = webResources.message(EDIT);
+    edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));

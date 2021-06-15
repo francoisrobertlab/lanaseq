@@ -112,6 +112,14 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  public void edit() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    view.samples().edit(0).click();
+    assertTrue(view.dialog().isOpen());
+  }
+
+  @Test
   public void add() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);

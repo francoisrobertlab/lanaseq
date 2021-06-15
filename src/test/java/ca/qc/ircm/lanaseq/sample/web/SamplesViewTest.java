@@ -20,12 +20,14 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
@@ -35,12 +37,14 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -65,6 +69,7 @@ import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -96,6 +101,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<LocalDateRenderer<Sample>> localDateRendererCaptor;
   @Captor
+  private ArgumentCaptor<TemplateRenderer<Sample>> templateRendererCaptor;
+  @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Autowired
   private SampleRepository sampleRepository;
@@ -125,6 +132,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     view.name = mock(Column.class);
     when(view.samples.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
+    when(view.name.setSortable(anyBoolean())).thenReturn(view.name);
     when(view.name.setSortProperty(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
@@ -132,6 +140,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     view.protocol = mock(Column.class);
     when(view.samples.addColumn(any(ValueProvider.class), eq(PROTOCOL))).thenReturn(view.protocol);
     when(view.protocol.setKey(any())).thenReturn(view.protocol);
+    when(view.protocol.setSortable(anyBoolean())).thenReturn(view.protocol);
     when(view.protocol.setSortProperty(any())).thenReturn(view.protocol);
     when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
@@ -139,6 +148,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     view.date = mock(Column.class);
     when(view.samples.addColumn(any(LocalDateRenderer.class), eq(DATE))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
+    when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
     when(view.date.setSortProperty(any())).thenReturn(view.date);
     when(view.date.setComparator(any(Comparator.class))).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
@@ -146,10 +156,19 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     view.owner = mock(Column.class);
     when(view.samples.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
     when(view.owner.setKey(any())).thenReturn(view.owner);
+    when(view.owner.setSortable(anyBoolean())).thenReturn(view.owner);
     when(view.owner.setSortProperty(any())).thenReturn(view.owner);
     when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
+    view.edit = mock(Column.class);
+    when(view.samples.addColumn(any(TemplateRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.edit.setKey(any())).thenReturn(view.edit);
+    when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
+    when(view.edit.setSortProperty(any())).thenReturn(view.edit);
+    when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
+    when(view.edit.setHeader(any(String.class))).thenReturn(view.edit);
+    when(view.edit.setFlexGrow(anyInt())).thenReturn(view.edit);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.samples.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell nameFilterCell = mock(HeaderCell.class);
@@ -195,6 +214,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     verify(view.date).setFooter(sampleResources.message(DATE));
     verify(view.owner).setHeader(sampleResources.message(OWNER));
     verify(view.owner).setFooter(sampleResources.message(OWNER));
+    verify(view.edit).setHeader(webResources.message(EDIT));
+    verify(view.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
@@ -224,6 +245,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     verify(view.date, atLeastOnce()).setFooter(sampleResources.message(DATE));
     verify(view.owner, atLeastOnce()).setHeader(sampleResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(sampleResources.message(OWNER));
+    verify(view.edit).setHeader(webResources.message(EDIT));
+    verify(view.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
@@ -241,21 +264,25 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void samples() {
-    assertEquals(4, view.samples.getColumns().size());
+    assertEquals(5, view.samples.getColumns().size());
     assertNotNull(view.samples.getColumnByKey(NAME));
     assertEquals(NAME, view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING)
         .findFirst().map(so -> so.getSorted()).orElse(null));
+    assertTrue(view.name.isSortable());
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
     assertEquals(PROTOCOL + "." + NAME, view.samples.getColumnByKey(PROTOCOL)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
+    assertTrue(view.protocol.isSortable());
     assertNotNull(view.samples.getColumnByKey(DATE));
     assertEquals(DATE, view.samples.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING)
         .findFirst().map(so -> so.getSorted()).orElse(null));
     assertNotNull(view.samples.getColumnByKey(OWNER));
+    assertTrue(view.date.isSortable());
     assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
+    assertTrue(view.owner.isSortable());
   }
 
   @Test
@@ -310,6 +337,14 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     for (Sample sample : samples) {
       assertEquals(sample.getOwner().getEmail(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
+    }
+    verify(view.samples).addColumn(templateRendererCaptor.capture(), eq(EDIT));
+    TemplateRenderer<Sample> templateRenderer = templateRendererCaptor.getValue();
+    for (Sample sample : samples) {
+      assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
+      assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
+      templateRenderer.getEventHandlers().get("edit").accept(sample);
+      verify(presenter).view(sample);
     }
   }
 
