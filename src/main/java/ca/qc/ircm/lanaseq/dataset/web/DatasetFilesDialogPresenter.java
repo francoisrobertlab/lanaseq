@@ -21,6 +21,8 @@ import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_RENAME_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE_TITLE;
@@ -46,8 +48,10 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -55,6 +59,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Dataset dialog presenter.
@@ -71,6 +78,13 @@ public class DatasetFilesDialogPresenter {
   private AuthorizationService authorizationService;
   private AppConfiguration configuration;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
+  /**
+   * Currently authenticated user.
+   * <p>
+   * This is needed because Vaadin's upload does not contain authentication information.
+   * </p>
+   */
+  private Authentication authentication;
 
   @Autowired
   protected DatasetFilesDialogPresenter(DatasetService service, SampleService sampleService,
@@ -83,6 +97,7 @@ public class DatasetFilesDialogPresenter {
 
   void init(DatasetFilesDialog dialog) {
     this.dialog = dialog;
+    this.authentication = SecurityContextHolder.getContext().getAuthentication();
     dialog.files.getEditor().setBinder(fileBinder);
     dialog.addFilesDialog.addSavedListener(e -> updateFiles());
     dialog.sampleFilesDialog.addOpenedChangeListener(e -> {
@@ -150,7 +165,28 @@ public class DatasetFilesDialogPresenter {
     dialog.sampleFilesDialog.open();
   }
 
-  void add() {
+  public void addSmallFile(String filename, InputStream inputStream) {
+    logger.debug("saving file {} to dataset {}", filename, dataset);
+    SecurityContextHolder.getContext().setAuthentication(authentication); // Sets user for current thread.
+    AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
+    try {
+      Path folder = Files.createTempDirectory("lanaseq-dataset-");
+      try {
+        Path file = folder.resolve(filename);
+        Files.copy(inputStream, file);
+        service.saveFiles(dataset, Collections.nCopies(1, file));
+        dialog.showNotification(resources.message(FILES_SUCCESS, filename));
+      } finally {
+        FileSystemUtils.deleteRecursively(folder);
+      }
+    } catch (IOException | IllegalStateException e) {
+      dialog.showNotification(resources.message(FILES_IOEXCEPTION, filename));
+      return;
+    }
+    updateFiles();
+  }
+
+  void addLargeFiles() {
     if (!isReadOnly()) {
       dialog.addFilesDialog.open();
     }

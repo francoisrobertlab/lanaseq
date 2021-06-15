@@ -17,8 +17,9 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
+import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
@@ -31,6 +32,7 @@ import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.flow.component.upload.testbench.UploadElement;
 import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
@@ -56,8 +58,12 @@ public class DatasetFilesDialogElement extends DialogElement {
     return $(TextFieldElement.class).id(id(FILENAME));
   }
 
-  public ButtonElement add() {
-    return $(ButtonElement.class).id(id(ADD));
+  public UploadElement upload() {
+    return $(UploadElement.class).id(id(UPLOAD));
+  }
+
+  public ButtonElement addLargeFiles() {
+    return $(ButtonElement.class).id(id(ADD_LARGE_FILES));
   }
 
   public AddDatasetFilesDialogElement addFilesDialog() {

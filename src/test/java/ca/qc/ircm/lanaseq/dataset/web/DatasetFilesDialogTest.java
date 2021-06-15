@@ -17,20 +17,27 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
+import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_COUNT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MAXIMUM_SMALL_FILES_COUNT;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MAXIMUM_SMALL_FILES_SIZE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.web.UploadInternationalization.englishUploadI18N;
+import static ca.qc.ircm.lanaseq.web.UploadInternationalization.frenchUploadI18N;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -50,6 +57,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -66,11 +74,14 @@ import com.vaadin.flow.component.grid.editor.EditorCloseEvent;
 import com.vaadin.flow.component.grid.editor.EditorCloseListener;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.upload.SucceededEvent;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.server.StreamResource;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -93,10 +104,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 @ServiceTestAnnotations
 @WithMockUser
 public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
-  @Autowired
   private DatasetFilesDialog dialog;
   @MockBean
   private DatasetFilesDialogPresenter presenter;
+  @MockBean
+  private AddDatasetFilesDialog addFilesDialog;
+  @MockBean
+  private SampleFilesDialog sampleFilesDialog;
   @Mock
   private Dataset dataset;
   @Captor
@@ -132,6 +146,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
+    dialog = new DatasetFilesDialog(presenter, addFilesDialog, sampleFilesDialog);
+    dialog.init();
     files.add(new File("dataset", "dataset_R1.fastq"));
     files.add(new File("dataset", "dataset_R2.fastq"));
     files.add(new File("dataset", "dataset.bw"));
@@ -200,8 +216,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
-    assertEquals(id(ADD), dialog.add.getId().orElse(""));
-    validateIcon(VaadinIcon.PLUS.create(), dialog.add.getIcon());
+    assertEquals(id(UPLOAD), dialog.upload.getId().orElse(""));
+    assertEquals(id(ADD_LARGE_FILES), dialog.addLargeFiles.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), dialog.addLargeFiles.getIcon());
   }
 
   @Test
@@ -215,6 +232,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     verify(dialog.delete).setHeader(webResources.message(DELETE));
     verify(dialog.name).setHeader(sampleResources.message(NAME));
     verify(dialog.fileCount).setHeader(resources.message(FILE_COUNT));
+    validateEquals(englishUploadI18N(), dialog.upload.getI18n());
+    assertEquals(resources.message(ADD_LARGE_FILES), dialog.addLargeFiles.getText());
     verify(presenter).localeChange(locale);
   }
 
@@ -234,6 +253,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     verify(dialog.delete).setHeader(webResources.message(DELETE));
     verify(dialog.name).setHeader(sampleResources.message(NAME));
     verify(dialog.fileCount).setHeader(resources.message(FILE_COUNT));
+    validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
+    assertEquals(resources.message(ADD_LARGE_FILES), dialog.addLargeFiles.getText());
     verify(presenter).localeChange(locale);
   }
 
@@ -341,6 +362,26 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void upload() {
+    assertEquals(MAXIMUM_SMALL_FILES_COUNT, dialog.upload.getMaxFiles());
+    assertEquals(MAXIMUM_SMALL_FILES_SIZE, dialog.upload.getMaxFileSize());
+  }
+
+  @Test
+  public void upload_File() {
+    dialog.uploadBuffer = mock(MultiFileMemoryBuffer.class);
+    ByteArrayInputStream input = new ByteArrayInputStream(new byte[0]);
+    when(dialog.uploadBuffer.getInputStream(any())).thenReturn(input);
+    String filename = "test_file.txt";
+    String mimeType = "text/plain";
+    long filesize = 84325;
+    SucceededEvent event = new SucceededEvent(dialog.upload, filename, mimeType, filesize);
+    fireEvent(dialog.upload, event);
+    verify(presenter).addSmallFile(filename, input);
+    verify(dialog.uploadBuffer).getInputStream(filename);
+  }
+
+  @Test
   public void getDataset() {
     when(presenter.getDataset()).thenReturn(dataset);
     assertEquals(dataset, dialog.getDataset());
@@ -406,9 +447,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void add() {
-    dialog.add.click();
+  public void addLargeFiles() {
+    dialog.addLargeFiles.click();
 
-    verify(presenter).add();
+    verify(presenter).addLargeFiles();
   }
 }

@@ -18,19 +18,22 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,10 +63,12 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   private AppConfiguration configuration;
   @Value("${download-home}")
   protected Path downloadHome;
+  private Path file1;
 
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    file1 = Paths.get(getClass().getResource("/sample/R1.fastq").toURI());
   }
 
   private void open() {
@@ -79,7 +84,8 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
-    assertTrue(optional(() -> dialog.add()).isPresent());
+    assertTrue(optional(() -> dialog.upload()).isPresent());
+    assertTrue(optional(() -> dialog.addLargeFiles()).isPresent());
   }
 
   @Test
@@ -178,13 +184,33 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void add() throws Throwable {
+  public void upload() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.datasets().controlClick(3);
+    DatasetFilesDialogElement dialog = view.filesDialog();
+    Dataset dataset = repository.findById(2L).get();
+
+    dialog.upload().upload(file1.toFile());
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(DatasetFilesDialog.class);
+    assertEquals(resources.message(FILES_SUCCESS, file1.getFileName()), notification.getText());
+    Path folder = configuration.folder(dataset);
+    assertTrue(Files.exists(folder.resolve(file1.getFileName())));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve(file1.getFileName())));
+  }
+
+  @Test
+  public void addLargeFiles() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
-    dialog.add().click();
+    dialog.addLargeFiles().click();
 
     assertTrue(dialog.addFilesDialog().isOpen());
   }

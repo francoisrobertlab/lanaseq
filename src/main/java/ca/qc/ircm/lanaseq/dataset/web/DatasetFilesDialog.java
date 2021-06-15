@@ -17,13 +17,14 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
+import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
+import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -42,8 +43,12 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -70,6 +75,11 @@ public class DatasetFilesDialog extends Dialog
   public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
   public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
   public static final String FILE_COUNT = "fileCount";
+  public static final String ADD_LARGE_FILES = "addLargeFiles";
+  public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");
+  public static final String FILES_SUCCESS = property(FILES, "success");
+  public static final int MAXIMUM_SMALL_FILES_SIZE = 20 * 1024 * 1024; // 20MB
+  public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
@@ -81,7 +91,9 @@ public class DatasetFilesDialog extends Dialog
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
   protected Column<Sample> fileCount;
-  protected Button add = new Button();
+  protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
+  protected Upload upload = new Upload(uploadBuffer);
+  protected Button addLargeFiles = new Button();
   @Autowired
   protected AddDatasetFilesDialog addFilesDialog;
   @Autowired
@@ -111,7 +123,10 @@ public class DatasetFilesDialog extends Dialog
     setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, message, files, samples, add);
+    HorizontalLayout buttonsLayout = new HorizontalLayout();
+    layout.add(header, message, files, samples, buttonsLayout);
+    buttonsLayout.add(upload, addLargeFiles);
+    buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
     layout.setSizeFull();
     layout.expand(files);
     header.setId(id(HEADER));
@@ -135,9 +150,15 @@ public class DatasetFilesDialog extends Dialog
     samples.addItemDoubleClickListener(e -> presenter.viewFiles(e.getItem()));
     name = samples.addColumn(sa -> sa.getName(), NAME).setKey(NAME).setFlexGrow(10);
     fileCount = samples.addColumn(sa -> presenter.fileCount(sa), FILE_COUNT).setKey(FILE_COUNT);
-    add.setId(id(ADD));
-    add.setIcon(VaadinIcon.PLUS.create());
-    add.addClickListener(e -> presenter.add());
+    upload.setId(id(UPLOAD));
+    upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
+    upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
+    upload.setMaxHeight("2.5em"); // Hide name of uploaded files.
+    upload.addSucceededListener(event -> presenter.addSmallFile(event.getFileName(),
+        uploadBuffer.getInputStream(event.getFileName())));
+    addLargeFiles.setId(id(ADD_LARGE_FILES));
+    addLargeFiles.setIcon(VaadinIcon.PLUS.create());
+    addLargeFiles.addClickListener(e -> presenter.addLargeFiles());
     presenter.init(this);
   }
 
@@ -174,7 +195,8 @@ public class DatasetFilesDialog extends Dialog
     delete.setHeader(webResources.message(DELETE));
     name.setHeader(sampleResources.message(NAME));
     fileCount.setHeader(resources.message(FILE_COUNT));
-    add.setText(webResources.message(ADD));
+    upload.setI18n(uploadI18N(getLocale()));
+    addLargeFiles.setText(resources.message(ADD_LARGE_FILES));
     updateHeader();
     presenter.localeChange(getLocale());
   }
