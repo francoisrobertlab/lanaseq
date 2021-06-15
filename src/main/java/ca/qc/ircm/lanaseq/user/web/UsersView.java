@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
@@ -93,6 +94,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   protected Column<User> email;
   protected Column<User> name;
   protected Column<User> active;
+  protected Column<User> edit;
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected Select<Optional<Boolean>> activeFilter = new Select<>();
@@ -133,6 +135,8 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
         .setComparator(NormalizedComparator.of(User::getName));
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
         .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
+    edit = users.addColumn(new ComponentRenderer<>(user -> editButton(user)), EDIT).setKey(EDIT)
+        .setSortable(false).setFlexGrow(0);
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();
     filtersRow.getCell(email).setComponent(emailFilter);
@@ -170,6 +174,15 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     return button;
   }
 
+  private Button editButton(User user) {
+    Button button = new Button();
+    button.addClassName(EDIT);
+    button.addThemeVariants(ButtonVariant.LUMO_ICON);
+    button.setIcon(VaadinIcon.EDIT.create());
+    button.addClickListener(e -> presenter.view(user));
+    return button;
+  }
+
   private void updateActiveButton(Button button, User user) {
     final AppResources userResources = new AppResources(User.class, getLocale());
     button.setIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create());
@@ -190,6 +203,8 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     name.setHeader(nameHeader).setFooter(nameHeader);
     String activeHeader = userResources.message(ACTIVE);
     active.setHeader(activeHeader).setFooter(activeHeader);
+    String editHeader = webResources.message(EDIT);
+    edit.setHeader(editHeader).setFooter(editHeader);
     emailFilter.setPlaceholder(webResources.message(ALL));
     nameFilter.setPlaceholder(webResources.message(ALL));
     activeFilter.setItemLabelGenerator(value -> value

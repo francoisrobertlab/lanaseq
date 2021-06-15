@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER;
@@ -41,9 +42,12 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
@@ -128,16 +132,29 @@ public class UsersViewTest extends AbstractViewTestCase {
     when(view.email.setKey(any())).thenReturn(view.email);
     when(view.email.setComparator(any(Comparator.class))).thenReturn(view.email);
     when(view.email.setHeader(any(String.class))).thenReturn(view.email);
+    when(view.email.setSortable(anyBoolean())).thenReturn(view.email);
+    when(view.email.setFlexGrow(anyInt())).thenReturn(view.email);
     view.name = mock(Column.class);
     when(view.users.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
     when(view.name.setKey(any())).thenReturn(view.name);
     when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
+    when(view.name.setSortable(anyBoolean())).thenReturn(view.name);
+    when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
     view.active = mock(Column.class);
     when(view.users.addColumn(any(ComponentRenderer.class), eq(ACTIVE))).thenReturn(view.active);
     when(view.active.setKey(any())).thenReturn(view.active);
     when(view.active.setComparator(any(Comparator.class))).thenReturn(view.active);
     when(view.active.setHeader(any(String.class))).thenReturn(view.active);
+    when(view.active.setSortable(anyBoolean())).thenReturn(view.active);
+    when(view.active.setFlexGrow(anyInt())).thenReturn(view.active);
+    view.edit = mock(Column.class);
+    when(view.users.addColumn(any(ComponentRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.edit.setKey(any())).thenReturn(view.edit);
+    when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
+    when(view.edit.setHeader(any(String.class))).thenReturn(view.edit);
+    when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
+    when(view.edit.setFlexGrow(anyInt())).thenReturn(view.edit);
     HeaderRow filtersRow = mock(HeaderRow.class);
     when(view.users.appendHeaderRow()).thenReturn(filtersRow);
     HeaderCell emailFilterCell = mock(HeaderCell.class);
@@ -183,6 +200,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(userResources.message(NAME));
     verify(view.active).setHeader(userResources.message(ACTIVE));
     verify(view.active).setFooter(userResources.message(ACTIVE));
+    verify(view.edit).setHeader(webResources.message(EDIT));
+    verify(view.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL),
@@ -216,6 +235,8 @@ public class UsersViewTest extends AbstractViewTestCase {
     verify(view.name).setFooter(userResources.message(NAME));
     verify(view.active).setHeader(userResources.message(ACTIVE));
     verify(view.active).setFooter(userResources.message(ACTIVE));
+    verify(view.edit).setHeader(webResources.message(EDIT));
+    verify(view.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), view.emailFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL),
@@ -244,13 +265,15 @@ public class UsersViewTest extends AbstractViewTestCase {
 
   @Test
   public void users_Columns() {
-    assertEquals(3, view.users.getColumns().size());
+    assertEquals(4, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertTrue(view.users.getColumnByKey(EMAIL).isSortable());
     assertNotNull(view.users.getColumnByKey(NAME));
     assertTrue(view.users.getColumnByKey(NAME).isSortable());
     assertNotNull(view.users.getColumnByKey(ACTIVE));
     assertTrue(view.users.getColumnByKey(ACTIVE).isSortable());
+    assertNotNull(view.users.getColumnByKey(EDIT));
+    assertFalse(view.users.getColumnByKey(EDIT).isSortable());
   }
 
   @Test
@@ -312,6 +335,16 @@ public class UsersViewTest extends AbstractViewTestCase {
     assertTrue(comparator.compare(active(false), active(false)) == 0);
     assertTrue(comparator.compare(active(true), active(true)) == 0);
     assertTrue(comparator.compare(active(true), active(false)) > 0);
+    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(EDIT));
+    buttonRenderer = buttonRendererCaptor.getValue();
+    for (User user : users) {
+      Button button = buttonRenderer.createComponent(user);
+      assertTrue(button.hasClassName(EDIT));
+      assertTrue(button.hasThemeName(ButtonVariant.LUMO_ICON.getVariantName()));
+      validateIcon(VaadinIcon.EDIT.create(), button.getIcon());
+      clickButton(button);
+      verify(presenter).view(user);
+    }
   }
 
   @Test
