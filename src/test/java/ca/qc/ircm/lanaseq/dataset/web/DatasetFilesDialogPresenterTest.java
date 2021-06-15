@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -420,19 +421,20 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void addSmallFiles() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     final Path tempfile = temporaryFolder.resolve("lanaseq-test-");
     Mockito.doAnswer(i -> {
       Collection<Path> files = i.getArgument(1);
       Path file = files.stream().findFirst().orElse(null);
       Files.copy(file, tempfile, StandardCopyOption.REPLACE_EXISTING);
+      assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
       return null;
     }).when(service).saveFiles(any(), any());
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     SecurityContextHolder.getContext().setAuthentication(null);
 
     presenter.addSmallFile(filename, new ByteArrayInputStream(fileContent));
 
-    assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
+    assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().get();
@@ -453,7 +455,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addSmallFile(filename, new ByteArrayInputStream(fileContent));
 
-    assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
+    assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().get();

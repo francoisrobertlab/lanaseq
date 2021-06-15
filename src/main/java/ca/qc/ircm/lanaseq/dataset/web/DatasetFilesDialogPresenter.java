@@ -167,23 +167,27 @@ public class DatasetFilesDialogPresenter {
 
   public void addSmallFile(String filename, InputStream inputStream) {
     logger.debug("saving file {} to dataset {}", filename, dataset);
-    SecurityContextHolder.getContext().setAuthentication(authentication); // Sets user for current thread.
-    AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
     try {
-      Path folder = Files.createTempDirectory("lanaseq-dataset-");
+      SecurityContextHolder.getContext().setAuthentication(authentication); // Sets user for current thread.
+      AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
       try {
-        Path file = folder.resolve(filename);
-        Files.copy(inputStream, file);
-        service.saveFiles(dataset, Collections.nCopies(1, file));
-        dialog.showNotification(resources.message(FILES_SUCCESS, filename));
-      } finally {
-        FileSystemUtils.deleteRecursively(folder);
+        Path folder = Files.createTempDirectory("lanaseq-dataset-");
+        try {
+          Path file = folder.resolve(filename);
+          Files.copy(inputStream, file);
+          service.saveFiles(dataset, Collections.nCopies(1, file));
+          dialog.showNotification(resources.message(FILES_SUCCESS, filename));
+        } finally {
+          FileSystemUtils.deleteRecursively(folder);
+        }
+      } catch (IOException | IllegalStateException e) {
+        dialog.showNotification(resources.message(FILES_IOEXCEPTION, filename));
+        return;
       }
-    } catch (IOException | IllegalStateException e) {
-      dialog.showNotification(resources.message(FILES_IOEXCEPTION, filename));
-      return;
+      updateFiles();
+    } finally {
+      SecurityContextHolder.getContext().setAuthentication(null); // Unset user for current thread.
     }
-    updateFiles();
   }
 
   void addLargeFiles() {
