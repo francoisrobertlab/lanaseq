@@ -32,6 +32,7 @@ import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -311,5 +312,31 @@ public class VaadinTestUtils {
     assertEquals(expected.getMonthNames(), actual.getMonthNames());
     assertEquals(expected.getWeekdays(), actual.getWeekdays());
     assertEquals(expected.getWeekdaysShort(), actual.getWeekdaysShort());
+  }
+
+  /**
+   * Validates that two {@link UploadI18N} are identical.
+   *
+   * @param expected
+   *          expected
+   * @param actual
+   *          actual
+   */
+  public static void validateEquals(UploadI18N expected, UploadI18N actual) {
+    assertEquals(expected.getAddFiles().getOne(), actual.getAddFiles().getOne());
+    assertEquals(expected.getAddFiles().getMany(), actual.getAddFiles().getMany());
+    assertEquals(expected.getCancel(), actual.getCancel());
+    assertEquals(expected.getDropFiles().getOne(), actual.getDropFiles().getOne());
+    assertEquals(expected.getDropFiles().getMany(), actual.getDropFiles().getMany());
+    assertEquals(expected.getError().getFileIsTooBig(), actual.getError().getFileIsTooBig());
+    assertEquals(expected.getError().getIncorrectFileType(),
+        actual.getError().getIncorrectFileType());
+    assertEquals(expected.getError().getTooManyFiles(), actual.getError().getTooManyFiles());
+    assertEquals(expected.getUploading().getError().getForbidden(),
+        actual.getUploading().getError().getForbidden());
+    assertEquals(expected.getUploading().getRemainingTime().getPrefix(),
+        actual.getUploading().getRemainingTime().getPrefix());
+    assertEquals(expected.getUploading().getStatus().getConnecting(),
+        actual.getUploading().getStatus().getConnecting());
   }
 }

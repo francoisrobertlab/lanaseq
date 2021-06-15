@@ -35,7 +35,10 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.web.UploadInternationalization.englishUploadI18N;
+import static ca.qc.ircm.lanaseq.web.UploadInternationalization.frenchUploadI18N;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -170,6 +173,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
     verify(dialog.remove).setHeader(webResources.message(REMOVE));
+    validateEquals(englishUploadI18N(), dialog.upload.getI18n());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -191,6 +195,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
     verify(dialog.remove).setHeader(webResources.message(REMOVE));
+    validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
