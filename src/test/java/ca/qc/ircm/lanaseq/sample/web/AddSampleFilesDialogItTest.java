@@ -86,7 +86,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().controlClick(0);
     SampleFilesDialogElement filesDialog = view.filesDialog();
-    filesDialog.add().click();
+    filesDialog.addLargeFiles().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
@@ -100,7 +100,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().controlClick(1);
     SampleFilesDialogElement filesDialog = view.filesDialog();
-    filesDialog.add().click();
+    filesDialog.addLargeFiles().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     Sample sample = repository.findById(10L).get();
     assertEquals(0, dialog.files().getRowCount());
@@ -121,7 +121,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().controlClick(1);
     SampleFilesDialogElement filesDialog = view.filesDialog();
-    filesDialog.add().click();
+    filesDialog.addLargeFiles().click();
     final AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     Sample sample = repository.findById(10L).get();
     copyFiles(sample);

@@ -19,6 +19,8 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
@@ -27,11 +29,13 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -61,11 +65,14 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.StreamResourceWriter;
 import com.vaadin.flow.server.VaadinSession;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -77,8 +84,11 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -104,6 +114,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<
       ComponentEventListener<SavedEvent<AddSampleFilesDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<Collection<Path>> filesCaptor;
   @Autowired
   private SampleRepository repository;
   @Mock
@@ -119,6 +131,8 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private String folderLabelWindows = "lanaseq\\upload";
   private String folderNetworkLinux = "smb://lanaseq01/lanaseq";
   private String folderNetworkWindows = "\\\\lanaseq01\\lanaseq";
+  private String filename = "test file";
+  private byte[] fileContent = new byte[5120];
   private Random random = new Random();
 
   /**
@@ -151,6 +165,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       boolean linux = i.getArgument(0);
       return (linux ? folderNetworkLinux : folderNetworkWindows);
     });
+    random.nextBytes(fileContent);
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -358,22 +373,68 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void add() {
+  public void addSmallFiles() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    final Path tempfile = temporaryFolder.resolve("lanaseq-test-");
+    Mockito.doAnswer(i -> {
+      Collection<Path> files = i.getArgument(1);
+      Path file = files.stream().findFirst().orElse(null);
+      Files.copy(file, tempfile, StandardCopyOption.REPLACE_EXISTING);
+      return null;
+    }).when(service).saveFiles(any(), any());
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    SecurityContextHolder.getContext().setAuthentication(null);
+
+    presenter.addSmallFile(filename, new ByteArrayInputStream(fileContent));
+
+    assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture());
+    assertEquals(1, filesCaptor.getValue().size());
+    Path file = filesCaptor.getValue().stream().findFirst().get();
+    assertEquals(filename, file.getFileName().toString());
+    assertArrayEquals(fileContent, Files.readAllBytes(tempfile));
+    verify(dialog).showNotification(resources.message(FILES_SUCCESS, filename));
+    assertFalse(Files.exists(file));
+    assertFalse(Files.exists(file.getParent()));
+  }
+
+  @Test
+  public void addSmallFiles_Error() throws Throwable {
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    doThrow(new IllegalStateException("test")).when(service).saveFiles(any(), any());
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    SecurityContextHolder.getContext().setAuthentication(null);
+
+    presenter.addSmallFile(filename, new ByteArrayInputStream(fileContent));
+
+    assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture());
+    assertEquals(1, filesCaptor.getValue().size());
+    Path file = filesCaptor.getValue().stream().findFirst().get();
+    verify(dialog).showNotification(resources.message(FILES_IOEXCEPTION, filename));
+    assertFalse(Files.exists(file));
+    assertFalse(Files.exists(file.getParent()));
+  }
+
+  @Test
+  public void addLargeFiles() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
 
-    presenter.add();
+    presenter.addLargeFiles();
 
     verify(dialog.addFilesDialog).open();
   }
 
   @Test
-  public void add_CannotWrite() {
+  public void addLargeFiles_CannotWrite() {
     when(authorizationService.hasPermission(any(), any())).thenReturn(false);
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
 
-    presenter.add();
+    presenter.addLargeFiles();
 
     verify(dialog.addFilesDialog, never()).open();
   }
@@ -383,14 +444,14 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     Sample sample = repository.findById(8L).get();
     presenter.setSample(sample);
 
-    presenter.add();
+    presenter.addLargeFiles();
 
     verify(dialog.addFilesDialog, never()).open();
   }
 
   @Test
   public void add_NoSample() {
-    presenter.add();
+    presenter.addLargeFiles();
 
     verify(dialog.addFilesDialog, never()).open();
   }

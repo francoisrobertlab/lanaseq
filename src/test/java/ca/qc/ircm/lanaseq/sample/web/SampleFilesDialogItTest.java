@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -26,11 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,10 +64,12 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   private AppConfiguration configuration;
   @Value("${download-home}")
   protected Path downloadHome;
+  private Path file1;
 
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    file1 = Paths.get(getClass().getResource("/sample/R1.fastq").toURI());
   }
 
   private void open() {
@@ -78,7 +84,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SampleFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
-    assertTrue(optional(() -> dialog.add()).isPresent());
+    assertTrue(optional(() -> dialog.addLargeFiles()).isPresent());
   }
 
   @Test
@@ -166,13 +172,33 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void add() throws Throwable {
+  public void upload() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    view.samples().controlClick(1);
+    SampleFilesDialogElement dialog = view.filesDialog();
+    Sample sample = repository.findById(10L).get();
+
+    dialog.upload().upload(file1.toFile());
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(DatasetFilesDialog.class);
+    assertEquals(resources.message(FILES_SUCCESS, file1.getFileName()), notification.getText());
+    Path folder = configuration.folder(sample);
+    assertTrue(Files.exists(folder.resolve(file1.getFileName())));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve(file1.getFileName())));
+  }
+
+  @Test
+  public void addLargeFiles() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().controlClick(0);
     SampleFilesDialogElement dialog = view.filesDialog();
 
-    dialog.add().click();
+    dialog.addLargeFiles().click();
 
     assertTrue(dialog.addFilesDialog().isOpen());
   }
