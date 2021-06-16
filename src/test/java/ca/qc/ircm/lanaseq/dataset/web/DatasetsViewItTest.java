@@ -112,6 +112,14 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  public void edit() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.datasets().edit(0).click();
+    assertTrue(view.dialog().isOpen());
+  }
+
+  @Test
   public void add() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);

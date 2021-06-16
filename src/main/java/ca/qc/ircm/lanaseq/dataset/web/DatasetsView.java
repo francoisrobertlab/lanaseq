@@ -112,6 +112,7 @@ public class DatasetsView extends VerticalLayout
         presenter.viewFiles(e.getItem());
       }
     });
+    datasets.addEditListener(e -> presenter.view(e.getItem()));
     datasets.addItemDoubleClickListener(e -> {
       if (e.getColumn() == datasets.protocol && protocol(e.getItem()).getId() != null) {
         presenter.viewProtocol(protocol(e.getItem()));

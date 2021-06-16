@@ -18,17 +18,20 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -50,15 +53,19 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.web.EditEvent;
 import com.google.common.collect.Range;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.shared.Registration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -71,6 +78,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -80,14 +88,20 @@ import org.springframework.security.test.context.support.WithMockUser;
 @WithMockUser
 public class DatasetGridTest extends AbstractKaribuTestCase {
   private DatasetGrid grid;
-  @Mock
+  @MockBean
   private DatasetGridPresenter presenter;
+  @Mock
+  private ComponentEventListener<EditEvent<DatasetGrid, Dataset>> editListener;
   @Captor
   private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
   @Captor
   private ArgumentCaptor<LocalDateRenderer<Dataset>> localDateRendererCaptor;
   @Captor
+  private ArgumentCaptor<TemplateRenderer<Dataset>> templateRendererCaptor;
+  @Captor
   private ArgumentCaptor<Comparator<Dataset>> comparatorCaptor;
+  @Captor
+  private ArgumentCaptor<EditEvent<DatasetGrid, Dataset>> editEventCaptor;
   @Autowired
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
@@ -156,6 +170,14 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     when(grid.owner.setComparator(any(Comparator.class))).thenReturn(grid.owner);
     when(grid.owner.setHeader(any(String.class))).thenReturn(grid.owner);
     when(grid.owner.setFlexGrow(anyInt())).thenReturn(grid.owner);
+    grid.edit = mock(Column.class);
+    doReturn(grid.edit).when(grid).addColumn(any(TemplateRenderer.class), eq(EDIT));
+    when(grid.edit.setKey(any())).thenReturn(grid.edit);
+    when(grid.edit.setSortProperty(any())).thenReturn(grid.edit);
+    when(grid.edit.setSortable(anyBoolean())).thenReturn(grid.edit);
+    when(grid.edit.setComparator(any(Comparator.class))).thenReturn(grid.edit);
+    when(grid.edit.setHeader(any(String.class))).thenReturn(grid.edit);
+    when(grid.edit.setFlexGrow(anyInt())).thenReturn(grid.edit);
     HeaderRow filtersRow = mock(HeaderRow.class);
     doReturn(filtersRow).when(grid).appendHeaderRow();
     HeaderCell nameFilterCell = mock(HeaderCell.class);
@@ -190,6 +212,8 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     verify(grid.date).setFooter(datasetResources.message(DATE));
     verify(grid.owner).setHeader(datasetResources.message(OWNER));
     verify(grid.owner).setFooter(datasetResources.message(OWNER));
+    verify(grid.edit).setHeader(webResources.message(EDIT));
+    verify(grid.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), grid.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), grid.tagsFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), grid.protocolFilter.getPlaceholder());
@@ -216,6 +240,8 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     verify(grid.date, atLeastOnce()).setFooter(datasetResources.message(DATE));
     verify(grid.owner, atLeastOnce()).setHeader(datasetResources.message(OWNER));
     verify(grid.owner, atLeastOnce()).setFooter(datasetResources.message(OWNER));
+    verify(grid.edit).setHeader(webResources.message(EDIT));
+    verify(grid.edit).setFooter(webResources.message(EDIT));
     assertEquals(webResources.message(ALL), grid.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), grid.tagsFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), grid.protocolFilter.getPlaceholder());
@@ -224,27 +250,34 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
 
   @Test
   public void datasets() {
-    assertEquals(5, grid.getColumns().size());
+    assertEquals(6, grid.getColumns().size());
     assertNotNull(grid.getColumnByKey(NAME));
+    assertTrue(grid.name.isSortable());
     assertEquals(NAME, grid.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
         .map(so -> so.getSorted()).orElse(null));
     assertNotNull(grid.getColumnByKey(TAGS));
-    assertFalse(grid.getColumnByKey(TAGS).isSortable());
+    assertFalse(grid.tags.isSortable());
     assertNotNull(grid.getColumnByKey(PROTOCOL));
-    assertFalse(grid.getColumnByKey(PROTOCOL).isSortable());
+    assertFalse(grid.protocol.isSortable());
     assertNotNull(grid.getColumnByKey(DATE));
+    assertTrue(grid.date.isSortable());
     assertEquals(DATE, grid.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING).findFirst()
         .map(so -> so.getSorted()).orElse(null));
     assertNotNull(grid.getColumnByKey(OWNER));
+    assertTrue(grid.owner.isSortable());
     assertEquals(OWNER + "." + EMAIL, grid.getColumnByKey(OWNER)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
+    assertNotNull(grid.getColumnByKey(EDIT));
+    assertFalse(grid.edit.isSortable());
+    assertFalse(grid.edit.isVisible());
   }
 
   @Test
   public void datasets_ColumnsValueProvider() {
     grid = mockColumns();
     grid.init();
+    grid.addEditListener(editListener);
     verify(grid).addColumn(valueProviderCaptor.capture(), eq(NAME));
     ValueProvider<Dataset, String> valueProvider = valueProviderCaptor.getValue();
     for (Dataset dataset : datasets) {
@@ -286,6 +319,15 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
       assertEquals(dataset.getOwner().getEmail(),
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
+    verify(grid).addColumn(templateRendererCaptor.capture(), eq(EDIT));
+    TemplateRenderer<Dataset> templateRenderer = templateRendererCaptor.getValue();
+    for (Dataset dataset : datasets) {
+      assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
+      assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
+      templateRenderer.getEventHandlers().get("edit").accept(dataset);
+      verify(editListener, atLeastOnce()).onComponentEvent(editEventCaptor.capture());
+      assertEquals(dataset, editEventCaptor.getValue().getItem());
+    }
   }
 
   @Test
@@ -323,6 +365,14 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     grid.ownerFilter.setValue("test");
 
     verify(presenter).filterOwner("test");
+  }
+
+  @Test
+  public void addEditListener() {
+    Registration registration = grid.addEditListener(editListener);
+    assertTrue(grid.edit.isVisible());
+    registration.remove();
+    assertFalse(grid.edit.isVisible());
   }
 
   @Test

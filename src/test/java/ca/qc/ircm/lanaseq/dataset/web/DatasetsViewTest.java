@@ -30,6 +30,7 @@ import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,6 +45,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.web.EditEvent;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
@@ -56,8 +58,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -67,8 +69,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 @WithMockUser
 public class DatasetsViewTest extends AbstractKaribuTestCase {
   private DatasetsView view;
-  @Mock
+  @MockBean
   private DatasetsViewPresenter presenter;
+  @MockBean
+  private DatasetGridPresenter datasetGridPresenter;
+  private DatasetGrid datasetGrid;
   @Captor
   private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
   @Captor
@@ -88,8 +93,10 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new DatasetsView(presenter, new DatasetGrid(), new DatasetDialog(),
-        new DatasetFilesDialog(), new ProtocolDialog());
+    datasetGrid = new DatasetGrid(datasetGridPresenter);
+    datasetGrid.init();
+    view = new DatasetsView(presenter, datasetGrid, new DatasetDialog(), new DatasetFilesDialog(),
+        new ProtocolDialog());
     view.init();
     view.datasets.protocol = view.datasets.addColumn(dataset -> dataset.getName());
     datasets = datasetRepository.findAll();
@@ -166,7 +173,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void addFiles_Conrol() {
+  public void addFiles_Control() {
     Dataset dataset = datasets.get(0);
     clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
 
@@ -194,6 +201,13 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     Dataset dataset = find(datasets, 3L).get();
     doubleClickItem(view.datasets, dataset, view.datasets.protocol);
 
+    verify(presenter).view(dataset);
+  }
+
+  @Test
+  public void edit() {
+    Dataset dataset = datasets.get(0);
+    fireEvent(view.datasets, new EditEvent<>(view.datasets, false, dataset));
     verify(presenter).view(dataset);
   }
 

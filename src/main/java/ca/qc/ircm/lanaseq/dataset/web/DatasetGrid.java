@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
@@ -32,14 +33,18 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
+import ca.qc.ircm.lanaseq.web.EditEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
@@ -54,12 +59,16 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
+  public static final String EDIT_BUTTON =
+      "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
+          + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
   private static final long serialVersionUID = -3052158575710045415L;
   protected Column<Dataset> name;
   protected Column<Dataset> tags;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
+  protected Column<Dataset> edit;
   protected TextField nameFilter = new TextField();
   protected TextField tagsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
@@ -89,6 +98,10 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
+    edit = addColumn(TemplateRenderer.<Dataset>of(EDIT_BUTTON).withEventHandler("edit",
+        dataset -> fireEvent(new EditEvent(this, false, dataset))), EDIT).setKey(EDIT)
+            .setSortable(false).setFlexGrow(0);
+    edit.setVisible(false);
     sort(GridSortOrder.desc(date).build());
     appendHeaderRow(); // Headers.
     HeaderRow filtersRow = appendHeaderRow();
@@ -135,10 +148,31 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = datasetResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
+    String editHeader = webResources.message(EDIT);
+    edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
     tagsFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
+  }
+
+  /**
+   * Adds listener to be informed when a dataset is to be edited.
+   *
+   * @param listener
+   *          listener
+   * @return listener registration
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Registration
+      addEditListener(ComponentEventListener<EditEvent<DatasetGrid, Dataset>> listener) {
+    edit.setVisible(true);
+    Registration hideEdit = Registration.once(() -> {
+      if (!this.getEventBus().hasListener(EditEvent.class)) {
+        edit.setVisible(false);
+      }
+    });
+    return Registration.combine(addListener((Class) EditEvent.class, listener), hideEdit);
   }
 
   public void refreshDatasets() {
