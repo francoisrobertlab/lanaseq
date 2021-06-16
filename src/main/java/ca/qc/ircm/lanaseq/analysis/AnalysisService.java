@@ -25,6 +25,7 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Services for analysis.
@@ -149,6 +151,7 @@ public class AnalysisService {
     }
     boolean symlinks = configuration.isAnalysisSymlinks();
     Path folder = configuration.analysis(analysis.dataset);
+    FileSystemUtils.deleteRecursively(folder);
     Files.createDirectories(folder);
     for (SampleAnalysis sample : analysis.samples) {
       Path fastq1 = folder.resolve(sample.sample.getName() + "_R1.fastq"
@@ -183,7 +186,7 @@ public class AnalysisService {
     if (symlink) {
       Files.createSymbolicLink(destination, source);
     } else {
-      Files.copy(source, destination);
+      Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
     }
   }
 }

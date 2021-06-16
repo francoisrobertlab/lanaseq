@@ -19,9 +19,9 @@ package ca.qc.ircm.lanaseq.analysis;
 
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -829,6 +829,56 @@ public class AnalysisServiceTest {
     assertTrue(Files.exists(bam6));
     assertFalse(Files.isSymbolicLink(bam6));
     assertArrayEquals(secondRawbamContent, Files.readAllBytes(bam6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(3, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample.getName(), samplesContent.get(1));
+    assertEquals(sample2.getName(), samplesContent.get(2));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(dataset.getName() + "\t" + sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(1));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copyResources_DatasetAlreadyExists() throws Throwable {
+    when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    Path folder = configuration.analysis(dataset);
+    String extraFilename = "test.bam";
+    Files.createDirectories(folder);
+    Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
+    Files.write(folder.resolve(extraFilename), fastq1Content);
+
+    Path copyFolder = service.copyResources(dataset);
+
+    assertEquals(folder, copyFolder);
+    assertFalse(Files.exists(folder.resolve(extraFilename)));
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
     List<String> samplesContent = Files.readAllLines(samples);
