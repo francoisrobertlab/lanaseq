@@ -121,6 +121,7 @@
       <groupId>com.github.mvysny.kaributesting</groupId>
       <artifactId>karibu-testing-v10</artifactId>
       <version>${karibu-testing.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
