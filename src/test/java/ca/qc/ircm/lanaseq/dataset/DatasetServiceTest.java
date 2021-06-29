@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -944,13 +944,10 @@ public class DatasetServiceTest {
     List<Path> files = new ArrayList<>();
     Path file = temporaryFolder.resolve("dataset_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
-    final FileTime filetime1 = Files.getLastModifiedTime(file);
     files.add(file);
     file = temporaryFolder.resolve("dataset_R2.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file);
-    final FileTime filetime2 = Files.getLastModifiedTime(file);
     files.add(file);
-    Thread.sleep(1000); // Allows to test file modification time.
 
     service.saveFiles(dataset, files);
 
@@ -960,14 +957,10 @@ public class DatasetServiceTest {
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
         Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
-    assertTrue(
-        filetime1.compareTo(Files.getLastModifiedTime(folder.resolve("dataset_R1.fastq"))) < 0);
     assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
-    assertTrue(
-        filetime2.compareTo(Files.getLastModifiedTime(folder.resolve("dataset_R2.fastq"))) < 0);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
