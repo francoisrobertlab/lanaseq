@@ -30,7 +30,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        enable_lazy_load_no_trans : true
+        '[enable_lazy_load_no_trans]': true
   mail:
     host: myemailserver.com
 
