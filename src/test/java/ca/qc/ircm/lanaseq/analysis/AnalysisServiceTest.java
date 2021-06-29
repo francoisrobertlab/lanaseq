@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.Consumer;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -497,6 +499,7 @@ public class AnalysisServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void copyResources_DatasetSymlinks() throws Throwable {
+    assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
@@ -696,6 +699,7 @@ public class AnalysisServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void copyResources_DatasetSymlinksWithBams() throws Throwable {
+    assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
     when(sampleService.files(any())).thenReturn(pairedPaths, secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
