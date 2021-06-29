@@ -123,50 +123,50 @@ public class AnalysisServiceTest {
     dataset = datasetRepository.findById(2L).get();
     sample = sampleRepository.findById(4L).get();
     sample2 = sampleRepository.findById(5L).get();
-    paired1 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
-    paired2 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
-    pairedPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    paired1 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
+    paired2 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
+    pairedPaths.add(temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bed"));
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);
-    pairedZip1 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R1.fastq.gz");
-    pairedZip2 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022_R2.fastq.gz");
-    pairedZipPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    pairedZip1 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R1.fastq.gz");
+    pairedZip2 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R2.fastq.gz");
+    pairedZipPaths.add(temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bed"));
     pairedZipPaths.add(pairedZip1);
     pairedZipPaths.add(pairedZip2);
-    unpaired = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq");
-    unpairedPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    unpaired = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.fastq");
+    unpairedPaths.add(temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bed"));
     unpairedPaths.add(unpaired);
-    unpairedZip = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.fastq.gz");
-    unpairedZipPaths.add(temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bed"));
+    unpairedZip = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.fastq.gz");
+    unpairedZipPaths.add(temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bed"));
     unpairedZipPaths.add(unpairedZip);
-    secondPaired1 = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq");
-    secondPaired2 = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq");
-    secondPairedPaths.add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondPaired1 = temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R1.fastq");
+    secondPaired2 = temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R2.fastq");
+    secondPairedPaths.add(temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedPaths.add(secondPaired1);
     secondPairedPaths.add(secondPaired2);
     secondPairedZip1 =
-        temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
+        temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
     secondPairedZip2 =
-        temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
+        temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
     secondPairedZipPaths
-        .add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+        .add(temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedZipPaths.add(secondPairedZip1);
     secondPairedZipPaths.add(secondPairedZip2);
-    secondUnpaired = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq");
+    secondUnpaired = temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.fastq");
     secondUnpairedPaths
-        .add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+        .add(temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondUnpairedPaths.add(secondUnpaired);
     secondUnpairedZip =
-        temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.fastq.gz");
+        temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.fastq.gz");
     secondUnpairedZipPaths
-        .add(temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bed"));
+        .add(temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondUnpairedZipPaths.add(secondUnpairedZip);
-    bam = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022.bam");
-    bam2 = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022-test.bam");
-    rawbam = temporaryFolder.resolve("JS1_ChIPSeq_Spt16_yFR101_G24D_R1_20181022-raw.bam");
-    secondBam = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022.bam");
-    secondBam2 = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022-test.bam");
-    secondRawbam = temporaryFolder.resolve("JS2_ChIPSeq_Spt16_yFR101_G24D_R2_20181022-raw.bam");
+    bam = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bam");
+    bam2 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022-test.bam");
+    rawbam = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022-raw.bam");
+    secondBam = temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bam");
+    secondBam2 = temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022-test.bam");
+    secondRawbam = temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022-raw.bam");
     when(configuration.analysis(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
