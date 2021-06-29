@@ -435,6 +435,8 @@
               <exclude>**/*.log*</exclude>
               <exclude>**/*.fastq</exclude>
               <exclude>node_modules/**</exclude>
+              <exclude>package*.json</exclude>
+              <exclude>webpack.*.js</exclude>
             </excludes>
           </configuration>
           <executions>
