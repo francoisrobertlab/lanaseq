@@ -429,8 +429,6 @@ public class DatasetServiceTest {
     file = folder.resolve("dataset_R2.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
-    file = folder.resolve(".deleted");
-    Files.createFile(file);
     file = folder.resolve(".hiddenFile");
     Files.createFile(file);
     if (SystemUtils.IS_OS_WINDOWS) {
@@ -489,8 +487,6 @@ public class DatasetServiceTest {
     file = folder.resolve("dataset_R2.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
-    file = folder.resolve(".deleted");
-    Files.createFile(file);
     file = folder.resolve(".hiddenFile");
     Files.createFile(file);
     if (SystemUtils.IS_OS_WINDOWS) {
