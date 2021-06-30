@@ -23,7 +23,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.customfield.CustomField;
-import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.ValidationResult;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 /**
  * List of tags field.
  */
-@HtmlImport("styles/tags-field-styles.html")
+@JsModule("./styles/tags-field-styles.js")
 public class TagsField extends CustomField<Set<String>> implements LocaleChangeObserver {
   public static final String CLASS_NAME = "tags-field";
   public static final String TAG = "tag";

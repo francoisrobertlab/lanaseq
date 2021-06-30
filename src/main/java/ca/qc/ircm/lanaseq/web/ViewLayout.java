@@ -31,7 +31,7 @@ import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.tabs.Tab;
@@ -54,7 +54,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 /**
  * Main layout.
  */
-@HtmlImport("styles/shared-styles.html")
+@JsModule("./styles/shared-styles.js")
 @Push(PushMode.MANUAL)
 public class ViewLayout extends VerticalLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver {
