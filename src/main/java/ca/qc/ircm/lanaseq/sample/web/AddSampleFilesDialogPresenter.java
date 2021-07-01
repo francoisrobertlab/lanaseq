@@ -27,6 +27,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.File;
@@ -113,7 +114,11 @@ public class AddSampleFilesDialogPresenter {
       while (!Thread.currentThread().isInterrupted()) {
         dialog.getUI().ifPresent(ui -> ui.access(() -> {
           updateFiles();
-          ui.push();
+          try {
+            ui.push();
+          } catch (IllegalStateException | UIDetachedException e) {
+            return;
+          }
         }));
         try {
           Thread.sleep(2000);
