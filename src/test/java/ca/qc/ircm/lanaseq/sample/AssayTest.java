@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.sample.Assay.CHEC_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.CHEM_MAP;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_EXO;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_SEQ;
 import static ca.qc.ircm.lanaseq.sample.Assay.MNASE_SEQ;
@@ -54,6 +55,7 @@ public class AssayTest {
     assertEquals("MNase-seq", MNASE_SEQ.getLabel(locale));
     assertEquals("NET-seq", NET_SEQ.getLabel(locale));
     assertEquals("RNA-seq", RNA_SEQ.getLabel(locale));
+    assertEquals("Chem-Map", CHEM_MAP.getLabel(locale));
   }
 
   @Test
@@ -65,5 +67,6 @@ public class AssayTest {
     assertEquals("MNase-seq", MNASE_SEQ.getLabel(locale));
     assertEquals("NET-seq", NET_SEQ.getLabel(locale));
     assertEquals("RNA-seq", RNA_SEQ.getLabel(locale));
+    assertEquals("Chem-Map", CHEM_MAP.getLabel(locale));
   }
 }
