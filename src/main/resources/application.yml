@@ -33,6 +33,10 @@ spring:
         '[enable_lazy_load_no_trans]': true
   mail:
     host: myemailserver.com
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 app:
   home: ${user.home}/lanaseq
