@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.sample.Sample.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.NOTE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
@@ -98,6 +99,7 @@ public class SampleDialogPresenter {
     binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
     binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
     binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
+    binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
   }
 
   BinderValidationStatus<Sample> validateSample() {

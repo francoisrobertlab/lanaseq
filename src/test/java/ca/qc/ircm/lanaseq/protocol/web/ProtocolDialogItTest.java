@@ -60,6 +60,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Value("${download-home}")
   protected Path downloadHome;
   private String name = "test protocol";
+  private String note = "test note\nsecond line";
   private Path file1;
   private Path file2;
 
@@ -75,6 +76,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
   private void setFields(ProtocolDialogElement dialog) {
     dialog.name().setValue(name);
+    dialog.note().setValue(note);
     dialog.upload().upload(file1.toFile());
     dialog.upload().upload(file2.toFile());
   }
@@ -87,6 +89,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     ProtocolDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.name()).isPresent());
+    assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.upload()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());

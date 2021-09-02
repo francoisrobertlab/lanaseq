@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -90,6 +90,7 @@ public class ProtocolServiceTest {
 
     assertEquals((Long) 1L, protocol.getId());
     assertEquals("FLAG", protocol.getName());
+    assertEquals("First FLAG protocol", protocol.getNote());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
@@ -255,6 +256,7 @@ public class ProtocolServiceTest {
   public void save_New() {
     Protocol protocol = new Protocol();
     protocol.setName("New protocol");
+    protocol.setNote("test note");
     byte[] content = new byte[5120];
     random.nextBytes(content);
     ProtocolFile file = new ProtocolFile();
@@ -267,6 +269,7 @@ public class ProtocolServiceTest {
     assertNotNull(protocol.getId());
     Protocol database = repository.findById(protocol.getId()).orElse(null);
     assertEquals(protocol.getName(), database.getName());
+    assertEquals(protocol.getNote(), database.getNote());
     assertEquals(currentUser.getId(), database.getOwner().getId());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(protocol.getDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(protocol.getDate()));
@@ -298,6 +301,7 @@ public class ProtocolServiceTest {
   public void save_Update() throws Throwable {
     Protocol protocol = repository.findById(1L).orElse(null);
     protocol.setName("New name");
+    protocol.setNote("test note");
     byte[] content = new byte[5120];
     random.nextBytes(content);
     ProtocolFile file = new ProtocolFile();
@@ -309,6 +313,7 @@ public class ProtocolServiceTest {
     repository.flush();
     protocol = repository.findById(1L).orElse(null);
     assertEquals("New name", protocol.getName());
+    assertEquals("test note", protocol.getNote());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);

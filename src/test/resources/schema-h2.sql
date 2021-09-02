@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS protocol (
   name varchar(255) NOT NULL,
   owner_id bigint(20) NOT NULL,
   date DATETIME NOT NULL,
+  note clob,
   PRIMARY KEY (id),
   CONSTRAINT protocolOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
 );
@@ -65,6 +66,7 @@ CREATE TABLE IF NOT EXISTS dataset (
   owner_id bigint(20) NOT NULL,
   editable tinyint NOT NULL DEFAULT 0,
   creation_date DATETIME NOT NULL,
+  note clob,
   PRIMARY KEY (id),
   UNIQUE (name),
   CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
@@ -85,6 +87,7 @@ CREATE TABLE IF NOT EXISTS sample (
   owner_id bigint(20) NOT NULL,
   editable tinyint NOT NULL DEFAULT 0,
   creation_date DATETIME NOT NULL,
+  note clob,
   PRIMARY KEY (id),
   UNIQUE (name),
   CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE

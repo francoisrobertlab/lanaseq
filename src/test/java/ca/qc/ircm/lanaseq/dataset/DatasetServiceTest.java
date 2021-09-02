@@ -159,6 +159,7 @@ public class DatasetServiceTest {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
+    assertEquals("robtools version 2", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertTrue(dataset.isEditable());
     assertEquals(3, dataset.getSamples().size());
@@ -563,6 +564,7 @@ public class DatasetServiceTest {
     dataset.getTags().add("tag2");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
+    dataset.setNote("test note");
     Sample sample1 = new Sample();
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
@@ -574,6 +576,7 @@ public class DatasetServiceTest {
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(1L).get());
     sample1.setDate(LocalDate.of(2020, 7, 21));
+    sample1.setNote("test note");
     dataset.getSamples().add(sample1);
     Sample sample2 = new Sample();
     sample2.setSampleId("sample2");
@@ -586,6 +589,7 @@ public class DatasetServiceTest {
     sample2.setTreatment("37C");
     sample2.setProtocol(protocolRepository.findById(1L).get());
     sample2.setDate(LocalDate.of(2020, 7, 21));
+    sample2.setNote("test note");
     dataset.getSamples().add(sample2);
 
     service.save(dataset);
@@ -597,6 +601,7 @@ public class DatasetServiceTest {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("tag1"));
     assertTrue(dataset.getTags().contains("tag2"));
+    assertEquals("test note", dataset.getNote());
     assertEquals(user.getId(), dataset.getOwner().getId());
     assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
     assertTrue(dataset.isEditable());
@@ -617,6 +622,7 @@ public class DatasetServiceTest {
     detach(dataset);
     dataset.getTags().remove("rappa");
     dataset.getTags().add("tag1");
+    dataset.setNote("test note");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setSampleId("sample1");
@@ -629,6 +635,7 @@ public class DatasetServiceTest {
     sample1.setTreatment("37C");
     sample1.setProtocol(protocolRepository.findById(3L).get());
     sample1.setDate(LocalDate.of(2020, 7, 21));
+    sample1.setNote("test note");
     final Sample removed = dataset.getSamples().remove(1);
     Sample sample3 = new Sample();
     sample3.setSampleId("sample4");
@@ -641,6 +648,7 @@ public class DatasetServiceTest {
     sample3.setTreatment("37C");
     sample3.setProtocol(protocolRepository.findById(3L).get());
     sample3.setDate(LocalDate.of(2020, 7, 21));
+    sample3.setNote("test note");
     dataset.getSamples().add(sample3);
 
     service.save(dataset);
@@ -658,6 +666,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("tag1"));
+    assertEquals("test note", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
     assertTrue(dataset.isEditable());
@@ -696,6 +705,7 @@ public class DatasetServiceTest {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
+    assertEquals("robtools version 2", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
@@ -910,6 +920,7 @@ public class DatasetServiceTest {
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.getTags().remove("rappa");
     dataset.getTags().add("tag1");
+    dataset.setNote("test note");
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setEditable(false);
     Sample sample2 = dataset.getSamples().get(1);
@@ -925,6 +936,7 @@ public class DatasetServiceTest {
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("tag1"));
+    assertEquals("test note", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());

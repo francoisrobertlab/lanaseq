@@ -54,6 +54,11 @@ public class Protocol implements Data, Owned, Serializable {
   @Size(max = 255)
   private String name;
   /**
+   * Notes.
+   */
+  @Column
+  private String note;
+  /**
    * Creation date.
    */
   @Column
@@ -118,5 +123,13 @@ public class Protocol implements Data, Owned, Serializable {
 
   public void setDate(LocalDateTime date) {
     this.date = date;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public void setNote(String note) {
+    this.note = note;
   }
 }

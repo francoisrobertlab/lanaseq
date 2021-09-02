@@ -157,6 +157,7 @@ public class SampleServiceTest {
     assertTrue(sample.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getCreationDate());
     assertEquals(LocalDate.of(2018, 10, 20), sample.getDate());
+    assertEquals("robtools version 2", sample.getNote());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
@@ -862,6 +863,7 @@ public class SampleServiceTest {
     sample.setTreatment("37C");
     sample.setProtocol(protocolRepository.findById(1L).get());
     sample.setDate(LocalDate.of(2020, 7, 21));
+    sample.setNote("test note");
 
     service.save(sample);
 
@@ -876,6 +878,7 @@ public class SampleServiceTest {
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
     assertEquals("37C", sample.getTreatment());
+    assertEquals("test note", sample.getNote());
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
     assertTrue(sample.isEditable());
@@ -902,6 +905,7 @@ public class SampleServiceTest {
     sample.setTreatment("37C");
     sample.setProtocol(protocolRepository.findById(3L).get());
     sample.setDate(LocalDate.of(2020, 7, 21));
+    sample.setNote("test note");
 
     service.save(sample);
 
@@ -915,6 +919,7 @@ public class SampleServiceTest {
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
     assertEquals("37C", sample.getTreatment());
+    assertEquals("test note", sample.getNote());
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     assertTrue(sample.isEditable());

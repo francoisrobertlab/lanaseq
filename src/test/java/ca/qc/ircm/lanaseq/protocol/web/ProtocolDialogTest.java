@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_ERROR;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
@@ -154,6 +155,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(NAME), dialog.name.getId().orElse(""));
+    assertEquals(id(NOTE), dialog.note.getId().orElse(""));
     assertEquals(id(UPLOAD), dialog.upload.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILES_ERROR), dialog.filesError.getId().orElse(""));
@@ -171,6 +173,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
+    assertEquals(protocolResources.message(NOTE), dialog.note.getLabel());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
     verify(dialog.remove).setHeader(webResources.message(REMOVE));
     validateEquals(englishUploadI18N(), dialog.upload.getI18n());
@@ -193,6 +196,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
+    assertEquals(protocolResources.message(NOTE), dialog.note.getLabel());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
     verify(dialog.remove).setHeader(webResources.message(REMOVE));
     validateEquals(frenchUploadI18N(), dialog.upload.getI18n());

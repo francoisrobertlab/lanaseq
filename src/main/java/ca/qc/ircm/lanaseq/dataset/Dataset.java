@@ -87,6 +87,11 @@ public class Dataset implements Data, Owned, Serializable {
   @Column(nullable = false)
   private LocalDateTime creationDate;
   /**
+   * Notes.
+   */
+  @Column
+  private String note;
+  /**
    * Owner.
    */
   @ManyToOne(optional = false)
@@ -211,5 +216,13 @@ public class Dataset implements Data, Owned, Serializable {
 
   public void setDate(LocalDate date) {
     this.date = date;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public void setNote(String note) {
+    this.note = note;
   }
 }

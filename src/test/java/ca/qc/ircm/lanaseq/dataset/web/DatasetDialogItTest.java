@@ -84,6 +84,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
+  private String note = "test note\nsecond line";
   private LocalDate date = LocalDate.of(2020, 07, 20);
   private String sampleId = "FR3";
   private String sampleReplicate = "R3";
@@ -118,6 +119,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
+    dialog.note().setValue(note);
     dialog.date().setDate(date);
     dialog.samples().sampleId(0).setValue(sampleId);
     dialog.samples().replicate(0).setValue(sampleReplicate);
@@ -144,6 +146,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
+    assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
     assertTrue(optional(() -> dialog.addNewSample()).isPresent());
@@ -180,6 +183,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(note, dataset.getNote());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -194,6 +198,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertNull(sample.getNote());
   }
 
   @Test
@@ -223,6 +228,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -237,6 +243,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getSampleId());
@@ -248,6 +255,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208",
         repository.findById(6L).get().getName());
@@ -291,6 +299,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("G24D"));
+    assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -306,6 +315,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals((Long) 4L, sample.getId());
@@ -318,6 +328,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
   }
 
@@ -347,6 +358,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("G24D"));
+    assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -362,6 +374,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals((Long) 5L, sample.getId());
@@ -374,6 +387,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(2);
     assertEquals((Long) 10L, sample.getId());
@@ -386,6 +400,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 12, 10), sample.getDate());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.folder(dataset);
@@ -413,6 +428,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));
     assertTrue(dataset.getTags().contains("G24D"));
+    assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
     assertEquals((Long) 3L, dataset.getOwner().getId());
@@ -427,6 +443,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getSampleId());
@@ -437,6 +454,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertNull(sample.getTreatment());
   }

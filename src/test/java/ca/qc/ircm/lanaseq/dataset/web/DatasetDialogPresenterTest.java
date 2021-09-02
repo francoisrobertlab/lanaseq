@@ -65,6 +65,7 @@ import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
@@ -141,6 +142,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   private String strain = "yFR20";
   private String strainDescription = "WT";
   private String treatment = "37C";
+  private String note = "test note\nsecond line";
   private LocalDate date = LocalDate.of(2020, 7, 20);
   private String sampleId1 = "test sample 1";
   private String sampleReplicate1 = "rep1";
@@ -164,6 +166,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
     dialog.treatment = new TextField();
+    dialog.note = new TextArea();
     dialog.date = new DatePicker();
     dialog.samples = new Grid<>();
     dialog.addNewSample = new Button();
@@ -211,6 +214,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.strain.setValue(strain);
     dialog.strainDescription.setValue(strainDescription);
     dialog.treatment.setValue(treatment);
+    dialog.note.setValue(note);
     dialog.date.setValue(date);
     List<Sample> samples = items(dialog.samples);
     sampleIdFields.get(samples.get(0)).setValue(sampleId1);
@@ -263,6 +267,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.now(), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -302,6 +308,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -349,6 +357,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertTrue(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertTrue(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -394,6 +404,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertTrue(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
     assertTrue(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -430,6 +442,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertTrue(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
     assertTrue(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -467,6 +481,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -514,6 +530,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -564,6 +582,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -611,6 +631,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -658,6 +680,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -695,6 +719,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
@@ -726,6 +752,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.now(), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     assertEquals(LocalDate.now(), dialog.date.getValue());
@@ -752,6 +780,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strain.isRequiredIndicatorVisible());
     assertFalse(dialog.strainDescription.isRequiredIndicatorVisible());
     assertFalse(dialog.treatment.isRequiredIndicatorVisible());
+    assertFalse(dialog.note.isRequiredIndicatorVisible());
     assertTrue(dialog.date.isRequiredIndicatorVisible());
     List<Sample> samples = items(dialog.samples);
     assertTrue(sampleIdFields.get(samples.get(0)).isRequiredIndicatorVisible());
@@ -805,6 +834,9 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
+    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertTrue(find(samples, 8L).isPresent());
@@ -972,6 +1004,9 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
+    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertTrue(find(samples, 2L).isPresent());
@@ -1227,6 +1262,23 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void save_NoteEmpty() {
+    fillForm();
+    dialog.note.setValue("");
+
+    presenter.save();
+
+    BinderValidationStatus<Sample> status = presenter.validateSample();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getSamples().get(0).getNote());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
   public void save_DateEmpty() {
     fillForm();
     dialog.date.setValue(null);
@@ -1473,6 +1525,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -1486,6 +1539,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     assertEquals(date, sample.getDate());
+    assertEquals(null, sample.getNote());
     sample = dataset.getSamples().get(1);
     assertEquals(sampleId2, sample.getSampleId());
     assertEquals(sampleReplicate2, sample.getReplicate());
@@ -1496,7 +1550,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    assertEquals(date, sample.getDate());
+    assertEquals(null, sample.getNote());
     verify(dialog).showNotification(resources.message(SAVED, dataset.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -1515,6 +1569,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
@@ -1527,6 +1582,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertEquals(null, sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals(sampleId2, sample.getSampleId());
@@ -1538,6 +1594,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
+    assertEquals(null, sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     verify(dialog).showNotification(resources.message(SAVED, dataset.getName()));
     verify(dialog).close();

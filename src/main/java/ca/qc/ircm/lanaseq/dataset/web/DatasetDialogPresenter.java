@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
@@ -111,6 +112,7 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.strainDescription).withNullRepresentation("")
         .bind(STRAIN_DESCRIPTION);
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
+    binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
     binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
   }
 

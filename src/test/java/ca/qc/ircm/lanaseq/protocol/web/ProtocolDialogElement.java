@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_ERROR;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
@@ -31,6 +32,7 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.flow.component.textfield.testbench.TextAreaElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.flow.component.upload.testbench.UploadElement;
 import com.vaadin.testbench.elementsbase.Element;
@@ -47,6 +49,10 @@ public class ProtocolDialogElement extends DialogElement {
 
   public TextFieldElement name() {
     return $(TextFieldElement.class).id(id(NAME));
+  }
+
+  public TextAreaElement note() {
+    return $(TextAreaElement.class).id(id(NOTE));
   }
 
   public DivElement filesError() {

@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -72,6 +73,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -111,6 +113,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
   protected TextField treatment = new TextField();
+  protected TextArea note = new TextArea();
   protected DatePicker date = new DatePicker();
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> sampleId;
@@ -153,9 +156,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     FormLayout datasetForm = new FormLayout(date, tags);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
     datasetForm.setColspan(tags, 3);
-    FormLayout sampleForm = new FormLayout(protocol, assay, type, target);
+    FormLayout sampleForm = new FormLayout(protocol, assay, type, target, strain);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
-    FormLayout strainForm = new FormLayout(strain, strainDescription, treatment);
+    FormLayout strainForm = new FormLayout(strainDescription, treatment, note);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(sampleForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
@@ -182,7 +185,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
     date.setId(id(DATE));
+    note.setId(id(NOTE));
+    note.setHeight("10em");
     samples.setId(id(SAMPLES));
+    samples.setMinHeight("15em");
     samples.setHeight("15em");
     samples.setSelectionMode(SelectionMode.NONE);
     sampleId = samples
@@ -297,6 +303,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     date.setLabel(datasetResources.message(DATE));
     date.setI18n(datePickerI18n(getLocale()));
     date.setLocale(Locale.CANADA);
+    note.setLabel(datasetResources.message(NOTE));
     String sampleIdHeader = sampleResources.message(SampleProperties.SAMPLE_ID);
     sampleId.setHeader(sampleIdHeader).setFooter(sampleIdHeader);
     String sampleReplicateHeader = sampleResources.message(SampleProperties.REPLICATE);

@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.protocol.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_IOEXCEPTION;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_OVER_MAXIMUM;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_REQUIRED;
@@ -86,6 +87,7 @@ public class ProtocolDialogPresenter {
     AppResources resources = new AppResources(Constants.class, locale);
     binder.forField(dialog.name).asRequired(resources.message(REQUIRED)).withNullRepresentation("")
         .withValidator(nameExists()).bind(NAME);
+    binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
   }
 
   private Validator<String> nameExists() {
