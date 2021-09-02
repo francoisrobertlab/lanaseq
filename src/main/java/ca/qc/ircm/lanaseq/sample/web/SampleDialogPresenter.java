@@ -86,6 +86,7 @@ public class SampleDialogPresenter {
   void localeChange(Locale locale) {
     this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
+    binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
     binder.forField(dialog.sampleId).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("").bind(SAMPLE_ID);
     binder.forField(dialog.replicate).asRequired(webResources.message(REQUIRED))
@@ -98,7 +99,6 @@ public class SampleDialogPresenter {
         .withNullRepresentation("").bind(STRAIN);
     binder.forField(dialog.strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
     binder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
-    binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
     binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
   }
 

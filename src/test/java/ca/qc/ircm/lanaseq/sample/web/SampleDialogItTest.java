@@ -70,6 +70,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private AppConfiguration configuration;
   private Protocol protocol;
+  private LocalDate date = LocalDate.of(2020, 07, 20);
   private Assay assay = Assay.MNASE_SEQ;
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
   private String target = "polr3a";
@@ -78,7 +79,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private String treatment = "37C";
   private String sampleId = "FR3";
   private String replicate = "R3";
-  private LocalDate date = LocalDate.of(2020, 07, 20);
   private String note = "test note\nsecond line";
 
   /**
@@ -95,6 +95,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void fill(SampleDialogElement dialog) throws InterruptedException {
+    dialog.date().setDate(date);
     dialog.sampleId().setValue(sampleId);
     dialog.replicate().setValue(replicate);
     dialog.protocol().selectByText(protocol.getName());
@@ -108,7 +109,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
-    dialog.date().setDate(date);
     dialog.note().setValue(note);
   }
 
@@ -125,6 +125,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     view.add().click();
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
     assertTrue(optional(() -> dialog.replicate()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
@@ -134,7 +135,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -149,6 +149,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     view.samples().doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
     assertTrue(optional(() -> dialog.replicate()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
@@ -158,7 +159,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -175,6 +175,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     view.samples().doubleClick(0);
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.sampleId()).isPresent());
     assertTrue(optional(() -> dialog.replicate()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
@@ -184,7 +185,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -217,6 +217,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(sample.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(sample.getCreationDate()));
     assertEquals((Long) 3L, sample.getOwner().getId());
+    assertEquals(date, sample.getDate());
     assertEquals(sampleId, sample.getSampleId());
     assertEquals(replicate, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
@@ -226,7 +227,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    assertEquals(date, sample.getDate());
     assertEquals(note, sample.getNote());
     assertEquals(5, view.samples().getRowCount());
   }
@@ -254,6 +254,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(name, sample.getName());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
     assertEquals((Long) 3L, sample.getOwner().getId());
+    assertEquals(date, sample.getDate());
     assertEquals(sampleId, sample.getSampleId());
     assertEquals(replicate, sample.getReplicate());
     assertEquals(protocol.getId(), sample.getProtocol().getId());
@@ -263,7 +264,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    assertEquals(date, sample.getDate());
     assertEquals(note, sample.getNote());
     Dataset dataset = datasetRepository.findById(2L).get();
     assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "-JS2_20181022",
@@ -294,6 +294,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Sample sample = repository.findById(4L).get();
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
     assertEquals((Long) 3L, sample.getOwner().getId());
+    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
@@ -302,7 +303,6 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
     assertEquals(4, view.samples().getRowCount());

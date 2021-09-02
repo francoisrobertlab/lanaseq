@@ -89,6 +89,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
+  protected DatePicker date = new DatePicker();
   protected TextField sampleId = new TextField();
   protected TextField replicate = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
@@ -99,7 +100,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField strainDescription = new TextField();
   protected TextField treatment = new TextField();
   protected TextArea note = new TextArea();
-  protected DatePicker date = new DatePicker();
   protected Div error = new Div();
   protected Button save = new Button();
   protected Button cancel = new Button();
@@ -125,9 +125,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout sampleForm = new FormLayout(sampleId, replicate, protocol, assay, type, target);
+    FormLayout sampleForm = new FormLayout(date, sampleId, replicate, protocol, assay, type);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
-    FormLayout strainForm = new FormLayout(strain, strainDescription, treatment, date, note);
+    FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment, note);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(sampleForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
@@ -139,6 +139,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     layout.add(header, form, error, buttons, confirm);
     layout.setSizeFull();
     header.setId(id(HEADER));
+    date.setId(id(DATE));
     sampleId.setId(id(SAMPLE_ID));
     replicate.setId(id(REPLICATE));
     protocol.setId(id(PROTOCOL));
@@ -154,7 +155,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
-    date.setId(id(DATE));
     note.setId(id(NOTE));
     note.setHeight("10em");
     error.setId(id(ERROR_TEXT));
@@ -183,6 +183,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
+    date.setLabel(sampleResources.message(DATE));
+    date.setI18n(datePickerI18n(getLocale()));
+    date.setLocale(Locale.CANADA);
     sampleId.setLabel(sampleResources.message(SAMPLE_ID));
     replicate.setLabel(sampleResources.message(REPLICATE));
     protocol.setLabel(sampleResources.message(PROTOCOL));
@@ -197,9 +200,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
         .setPlaceholder(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
     treatment.setLabel(sampleResources.message(TREATMENT));
     treatment.setPlaceholder(sampleResources.message(property(TREATMENT, PLACEHOLDER)));
-    date.setLabel(sampleResources.message(DATE));
-    date.setI18n(datePickerI18n(getLocale()));
-    date.setLocale(Locale.CANADA);
     note.setLabel(sampleResources.message(NOTE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));

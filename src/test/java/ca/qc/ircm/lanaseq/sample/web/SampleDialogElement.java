@@ -55,6 +55,10 @@ public class SampleDialogElement extends DialogElement {
     return $(H3Element.class).id(id(HEADER));
   }
 
+  public TextAreaElement note() {
+    return $(TextAreaElement.class).id(id(NOTE));
+  }
+
   public TextFieldElement sampleId() {
     return $(TextFieldElement.class).id(id(SAMPLE_ID));
   }
@@ -93,10 +97,6 @@ public class SampleDialogElement extends DialogElement {
 
   public DatePickerElement date() {
     return $(DatePickerElement.class).id(id(DATE));
-  }
-
-  public TextAreaElement note() {
-    return $(TextAreaElement.class).id(id(NOTE));
   }
 
   public ButtonElement save() {
