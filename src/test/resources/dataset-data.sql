@@ -43,6 +43,8 @@ INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
 VALUES ('6', 'ChIPseq_Spt16_yFR101_G24D_JS1_20181208', '2018-12-08', '3', 1, '2018-12-08 10:28:23', null);
 INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
 VALUES ('7', 'ChIPseq_Spt16_yFR101_G24D_JS3_20181211', '2018-12-11', '3', 1, '2018-12-11 10:28:23', null);
+INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+VALUES ('8', '20181211', '2018-10-19', '3', 1, '2018-12-12 10:30:10', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (1, 'FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:23', 'robtools version 2');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date,note)

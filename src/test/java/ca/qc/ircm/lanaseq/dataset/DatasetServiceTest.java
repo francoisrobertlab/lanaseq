@@ -199,7 +199,7 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all();
 
-    assertEquals(7, datasets.size());
+    assertEquals(8, datasets.size());
     assertTrue(find(datasets, 1L).isPresent());
     assertTrue(find(datasets, 2L).isPresent());
     assertTrue(find(datasets, 3L).isPresent());
@@ -207,6 +207,7 @@ public class DatasetServiceTest {
     assertTrue(find(datasets, 5L).isPresent());
     assertTrue(find(datasets, 6L).isPresent());
     assertTrue(find(datasets, 7L).isPresent());
+    assertTrue(find(datasets, 8L).isPresent());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -223,7 +224,7 @@ public class DatasetServiceTest {
     datasets.stream().forEach(dataset -> dataset.getTags().size());
     datasets.stream().forEach(
         dataset -> dataset.getSamples().stream().forEach(sample -> sample.getProtocol().getName()));
-    assertEquals(7, datasets.size());
+    assertEquals(8, datasets.size());
     assertEquals((Long) 1L, datasets.get(0).getId());
     assertEquals((Long) 2L, datasets.get(1).getId());
     assertEquals((Long) 3L, datasets.get(2).getId());
@@ -231,6 +232,7 @@ public class DatasetServiceTest {
     assertEquals((Long) 5L, datasets.get(4).getId());
     assertEquals((Long) 6L, datasets.get(5).getId());
     assertEquals((Long) 7L, datasets.get(6).getId());
+    assertEquals((Long) 8L, datasets.get(7).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -293,7 +295,7 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all(filter);
 
-    assertEquals(7, datasets.size());
+    assertEquals(8, datasets.size());
     assertEquals((Long) 5L, datasets.get(0).getId());
     assertEquals((Long) 4L, datasets.get(1).getId());
     assertEquals((Long) 1L, datasets.get(2).getId());
@@ -301,6 +303,7 @@ public class DatasetServiceTest {
     assertEquals((Long) 6L, datasets.get(4).getId());
     assertEquals((Long) 3L, datasets.get(5).getId());
     assertEquals((Long) 2L, datasets.get(6).getId());
+    assertEquals((Long) 8L, datasets.get(7).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -310,7 +313,7 @@ public class DatasetServiceTest {
   public void all_NullFilter() {
     List<Dataset> datasets = service.all(null);
 
-    assertEquals(7, datasets.size());
+    assertEquals(8, datasets.size());
     assertEquals((Long) 1L, datasets.get(0).getId());
     assertEquals((Long) 2L, datasets.get(1).getId());
     assertEquals((Long) 3L, datasets.get(2).getId());
@@ -318,6 +321,7 @@ public class DatasetServiceTest {
     assertEquals((Long) 5L, datasets.get(4).getId());
     assertEquals((Long) 6L, datasets.get(5).getId());
     assertEquals((Long) 7L, datasets.get(6).getId());
+    assertEquals((Long) 8L, datasets.get(7).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -331,7 +335,7 @@ public class DatasetServiceTest {
 
     long count = service.count(filter);
 
-    assertEquals(7, count);
+    assertEquals(8, count);
   }
 
   @Test
@@ -348,7 +352,7 @@ public class DatasetServiceTest {
   public void count_NullFilter() {
     long count = service.count(null);
 
-    assertEquals(7, count);
+    assertEquals(8, count);
   }
 
   @Test

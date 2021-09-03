@@ -20,9 +20,9 @@ package ca.qc.ircm.lanaseq.analysis.web;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ID;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -140,5 +140,22 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("#merge\tsamples", datasetMetaContent.get(0));
     assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
         datasetMetaContent.get(1));
+  }
+
+  @Test
+  public void create_Error() throws Throwable {
+    Dataset dataset = repository.findById(8L).get();
+    open();
+    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
+    view.datasets().getCell(3, 0).doubleClick();
+    AnalysisDialogElement dialog = view.dialog();
+
+    dialog.create().click();
+
+    assertTrue(dialog.isOpen());
+    dialog.errors().getConfirmButton().click();
+    assertFalse(dialog.isOpen());
+    Path folder = configuration.analysis(dataset);
+    assertFalse(Files.exists(folder));
   }
 }

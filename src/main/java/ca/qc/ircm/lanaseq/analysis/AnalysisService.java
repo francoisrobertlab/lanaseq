@@ -70,7 +70,14 @@ public class AnalysisService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public void validate(Dataset dataset, Locale locale, Consumer<String> errorHandler) {
+    if (dataset == null) {
+      throw new NullPointerException("dataset parameter cannot be null");
+    }
+
     AppResources resources = new AppResources(AnalysisService.class, locale);
+    if (dataset.getSamples().isEmpty()) {
+      errorHandler.accept(resources.message("dataset.noSample", dataset.getName()));
+    }
     metadata(dataset, resources, errorHandler);
   }
 
@@ -78,7 +85,8 @@ public class AnalysisService {
       Consumer<String> errorHandler) {
     List<Optional<SampleAnalysis>> samples = dataset.getSamples().stream()
         .map(sample -> metadata(sample, resources, errorHandler)).collect(Collectors.toList());
-    if (!samples.stream().filter(sample -> !sample.isPresent()).findAny().isPresent()) {
+    if (!samples.isEmpty()
+        && !samples.stream().filter(sample -> !sample.isPresent()).findAny().isPresent()) {
       boolean paired =
           samples.stream().findFirst().map(sample -> sample.get().paired).orElse(false);
       if (samples.stream().filter(sample -> sample.get().paired != paired).findAny().isPresent()) {
@@ -142,6 +150,10 @@ public class AnalysisService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public Path copyResources(Dataset dataset) throws IOException {
+    if (dataset == null) {
+      throw new NullPointerException("dataset parameter cannot be null");
+    }
+
     DatasetAnalysis analysis =
         metadata(dataset, new AppResources(AnalysisService.class, Locale.getDefault()), message -> {
         }).orElse(null);

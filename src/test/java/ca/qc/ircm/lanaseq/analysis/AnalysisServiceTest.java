@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -182,6 +183,16 @@ public class AnalysisServiceTest {
     random.nextBytes(content);
     Files.write(file, content, StandardOpenOption.CREATE);
     return content;
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validate_DatasetNoSample() {
+    dataset.setSamples(new ArrayList<>());
+    service.validate(dataset, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("dataset.noSample", dataset.getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
@@ -405,6 +416,24 @@ public class AnalysisServiceTest {
     verify(errorHandler).accept(resources.message("sample.noFastq", sample.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validate_NullDataset() {
+    assertThrows(NullPointerException.class, () -> {
+      service.validate(null, locale, errorHandler);
+    });
+    verify(errorHandler, never()).accept(any());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copyResources_DatasetNoSample() throws Throwable {
+    dataset.setSamples(new ArrayList<>());
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copyResources(dataset);
+    });
   }
 
   @Test
@@ -896,5 +925,13 @@ public class AnalysisServiceTest {
     assertEquals("#merge\tsamples", datasetMetaContent.get(0));
     assertEquals(dataset.getName() + "\t" + sample.getName() + "\t" + sample2.getName(),
         datasetMetaContent.get(1));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copyResources_NullDataset() throws Throwable {
+    assertThrows(NullPointerException.class, () -> {
+      service.copyResources(null);
+    });
   }
 }

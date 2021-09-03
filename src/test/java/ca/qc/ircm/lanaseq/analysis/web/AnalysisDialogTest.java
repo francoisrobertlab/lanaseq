@@ -24,8 +24,10 @@ import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.HEADER;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.ID;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.id;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +36,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,6 +123,18 @@ public class AnalysisDialogTest extends AbstractKaribuTestCase {
   public void createFolder() {
     dialog.createFolder.click();
     verify(presenter).createFolder();
+  }
+
+  @Test
+  public void closeOnConfirm() throws Throwable {
+    fireEvent(dialog.confirm, new ConfirmDialog.ConfirmEvent(dialog.confirm, false));
+    assertFalse(dialog.isOpened());
+  }
+
+  @Test
+  public void closeOnErrorsConfirm() throws Throwable {
+    fireEvent(dialog.errors, new ConfirmDialog.ConfirmEvent(dialog.errors, false));
+    assertFalse(dialog.isOpened());
   }
 
   @Test

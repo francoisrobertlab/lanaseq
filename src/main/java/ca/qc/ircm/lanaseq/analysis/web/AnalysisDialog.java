@@ -85,8 +85,10 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
     createFolder.addClickListener(e -> presenter.createFolder());
     confirm.setId(id(CONFIRM));
     confirm.setText(confirmLayout);
+    confirm.addConfirmListener(e -> close());
     errors.setId(id(ERRORS));
     errors.setText(errorsLayout);
+    errors.addConfirmListener(e -> close());
     presenter.init(this);
   }
 

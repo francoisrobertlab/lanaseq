@@ -64,7 +64,6 @@ public class AnalysisDialogPresenter {
         validate();
       }
     });
-    dialog.confirm.addConfirmListener(e -> dialog.close());
   }
 
   void localChange(Locale locale) {

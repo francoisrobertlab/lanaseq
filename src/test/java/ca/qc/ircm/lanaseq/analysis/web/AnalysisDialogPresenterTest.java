@@ -129,7 +129,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
       errorHandler.accept("error1");
       errorHandler.accept("error2");
       return null;
-    }).when(service).validate(any(), any(), any());
+    }).when(service).validate(any(Dataset.class), any(), any());
     presenter.validate();
     verify(service).validate(eq(dataset), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
@@ -148,7 +148,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
       errorHandler.accept("error1");
       errorHandler.accept("error2");
       return null;
-    }).when(service).validate(any(), any(), any());
+    }).when(service).validate(any(Dataset.class), any(), any());
     presenter.validate();
     presenter.validate();
     verify(service, times(2)).validate(eq(dataset), eq(locale), any());
@@ -317,7 +317,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
         calls++;
         return null;
       }
-    }).when(service).validate(any(), any(), any());
+    }).when(service).validate(any(Dataset.class), any(), any());
     presenter.createFolder();
     verify(service, times(2)).validate(eq(dataset), eq(locale), any());
     verify(service).copyResources(dataset);
@@ -327,13 +327,6 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
     verify(dialog.errors).open();
     verify(dialog, never()).close();
-  }
-
-  @Test
-  public void createFolder_CloseOnConfirm() throws Throwable {
-    verify(dialog.confirm).addConfirmListener(confirmListenerCaptor.capture());
-    confirmListenerCaptor.getValue().onComponentEvent(new ConfirmEvent(dialog.confirm, false));
-    verify(dialog).close();
   }
 
   @Test
