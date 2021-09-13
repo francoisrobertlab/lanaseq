@@ -289,7 +289,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void createFolder_IoException() throws Throwable {
-    doThrow(new IOException("test")).when(service).copyResources(any());
+    doThrow(new IOException("test")).when(service).copyResources(any(Dataset.class));
     presenter.createFolder();
     verify(service).validate(eq(dataset), eq(locale), any());
     verify(service).copyResources(dataset);
@@ -304,7 +304,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void createFolder_IllegalArgumentException() throws Throwable {
-    doThrow(new IllegalArgumentException("test")).when(service).copyResources(any());
+    doThrow(new IllegalArgumentException("test")).when(service).copyResources(any(Dataset.class));
     doAnswer(new Answer<Void>() {
       private int calls = 0;
 

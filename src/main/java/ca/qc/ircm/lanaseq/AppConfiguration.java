@@ -19,11 +19,17 @@ package ca.qc.ircm.lanaseq;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.user.User;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -89,6 +95,8 @@ public class AppConfiguration {
    * Year formatter.
    */
   private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
+  @Autowired
+  private AuthorizationService authorizationService;
 
   public Path getLogFile() {
     return Paths.get(logfile);
@@ -140,6 +148,25 @@ public class AppConfiguration {
 
   public String folderNetwork(boolean unix) {
     return unix ? userHome.network.unix : userHome.network.windows;
+  }
+
+  public Path analysis(Collection<Dataset> datasets) {
+    if (datasets == null || datasets.isEmpty()) {
+      throw new IllegalArgumentException("datasets cannot be null or empty");
+    }
+    Optional<User> user = authorizationService.getCurrentUser();
+    Dataset dataset = datasets.iterator().next();
+    Optional<Sample> sample = datasets.stream().flatMap(ds -> ds.getSamples().stream()).findFirst();
+    StringBuilder builder = new StringBuilder();
+    user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
+        .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
+    sample.map(sa -> sa.getAssay()).ifPresent(assay -> builder.append("_" + assay));
+    builder.append("_");
+    builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(dataset.getDate()));
+    if (builder.length() > 0) {
+      builder.deleteCharAt(0);
+    }
+    return getAnalysis().resolve(builder.toString());
   }
 
   public Path analysis(Dataset dataset) {

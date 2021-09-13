@@ -18,23 +18,29 @@
 package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link AppConfiguration}.
  */
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AppConfigurationTest {
   @Autowired
   private AppConfiguration appConfiguration;
@@ -58,6 +64,7 @@ public class AppConfigurationTest {
     Dataset dataset = new Dataset();
     dataset.setSamples(new ArrayList<>());
     dataset.setCreationDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    dataset.setDate(LocalDate.of(2019, 12, 8));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -73,6 +80,31 @@ public class AppConfigurationTest {
     dataset.getSamples().add(sample);
     dataset.generateName();
     return dataset;
+  }
+
+  private Collection<Dataset> datasets() {
+    ArrayList<Dataset> datasets = new ArrayList<>();
+    datasets.add(dataset());
+    Dataset dataset = new Dataset();
+    datasets.add(dataset);
+    dataset.setSamples(new ArrayList<>());
+    dataset.setCreationDate(LocalDateTime.of(2020, 1, 10, 11, 15, 20));
+    dataset.setDate(LocalDate.of(2020, 1, 4));
+    Sample sample = new Sample();
+    sample.setSampleId("s1");
+    sample.setReplicate("r1");
+    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setTarget("my target");
+    sample.setStrain("yFR213");
+    sample.setStrainDescription("F56G");
+    sample.setTreatment("37C");
+    dataset.getSamples().add(sample);
+    sample = new Sample();
+    sample.setSampleId("s2");
+    dataset.getSamples().add(sample);
+    dataset.generateName();
+    return datasets;
   }
 
   @Test
@@ -194,6 +226,23 @@ public class AppConfigurationTest {
   public void getAnalysis() {
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis"),
         appConfiguration.getAnalysis());
+  }
+
+  @Test
+  public void analysis_Datasets() {
+    Collection<Dataset> datasets = datasets();
+    Path path = appConfiguration.analysis(datasets);
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis"), path.getParent());
+    assertTrue(path.getFileName().toString().startsWith("jonh_CHIP_SEQ_20191208"));
+  }
+
+  @Test
+  public void analysis_DatasetsNoSample() {
+    Collection<Dataset> datasets = datasets();
+    datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
+    Path path = appConfiguration.analysis(datasets);
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis"), path.getParent());
+    assertTrue(path.getFileName().toString().startsWith("jonh_20191208"));
   }
 
   @Test

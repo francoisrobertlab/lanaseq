@@ -28,12 +28,14 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,39 @@ public class AnalysisService {
   }
 
   /**
+   * Validates if datasets can be analyzed.
+   *
+   * @param datasets
+   *          datasets
+   * @param locale
+   *          locale for error messages
+   * @param errorHandler
+   *          handles error messages
+   */
+  @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
+  public void validate(Collection<Dataset> datasets, Locale locale, Consumer<String> errorHandler) {
+    if (datasets == null) {
+      throw new NullPointerException("dataset parameter cannot be null");
+    }
+    if (datasets.isEmpty()) {
+      // Nothing to validate.
+      return;
+    }
+
+    AppResources resources = new AppResources(AnalysisService.class, locale);
+    List<Optional<DatasetAnalysis>> metadatas =
+        datasets.stream().map(ds -> metadata(ds, resources, errorHandler))
+            .filter(md -> md.isPresent()).collect(Collectors.toList());
+    boolean paired =
+        metadatas.stream().flatMap(omd -> omd.map(md -> md.samples.stream()).orElse(Stream.empty()))
+            .map(ms -> ms.paired).findFirst().orElse(false);
+    if (metadatas.stream().flatMap(omd -> omd.get().samples.stream())
+        .filter(ms -> ms.paired != paired).findFirst().isPresent()) {
+      errorHandler.accept(resources.message("datasets.pairedMissmatch"));
+    }
+  }
+
+  /**
    * Validates if dataset can be analyzed.
    *
    * @param dataset
@@ -75,18 +110,19 @@ public class AnalysisService {
     }
 
     AppResources resources = new AppResources(AnalysisService.class, locale);
-    if (dataset.getSamples().isEmpty()) {
-      errorHandler.accept(resources.message("dataset.noSample", dataset.getName()));
-    }
     metadata(dataset, resources, errorHandler);
   }
 
   private Optional<DatasetAnalysis> metadata(Dataset dataset, AppResources resources,
       Consumer<String> errorHandler) {
+    if (dataset.getSamples().isEmpty()) {
+      errorHandler.accept(resources.message("dataset.noSample", dataset.getName()));
+      return Optional.empty();
+    }
+
     List<Optional<SampleAnalysis>> samples = dataset.getSamples().stream()
         .map(sample -> metadata(sample, resources, errorHandler)).collect(Collectors.toList());
-    if (!samples.isEmpty()
-        && !samples.stream().filter(sample -> !sample.isPresent()).findAny().isPresent()) {
+    if (!samples.stream().filter(sample -> !sample.isPresent()).findAny().isPresent()) {
       boolean paired =
           samples.stream().findFirst().map(sample -> sample.get().paired).orElse(false);
       if (samples.stream().filter(sample -> sample.get().paired != paired).findAny().isPresent()) {
@@ -138,6 +174,53 @@ public class AnalysisService {
   }
 
   /**
+   * Copy datasets resources used for analysis to a new folder.
+   *
+   * @param datasets
+   *          datasets
+   * @return folder the folder containing analysis files
+   * @throws IOException
+   *           could not copy analysis files to folder
+   * @throws IllegalArgumentException
+   *           dataset analysis validation failed
+   */
+  @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
+  public Path copyResources(Collection<Dataset> datasets) throws IOException {
+    if (datasets == null || datasets.isEmpty()) {
+      throw new IllegalArgumentException("datasets parameter cannot be null or empty");
+    }
+
+    Collection<DatasetAnalysis> analyses = datasets.stream().map(ds -> metadata(ds,
+        new AppResources(AnalysisService.class, Locale.getDefault()), message -> {
+        })).filter(opt -> opt.isPresent()).map(Optional::get).collect(Collectors.toList());
+    if (analyses.size() != datasets.size()) {
+      throw new IllegalArgumentException(
+          "at least one dataset is missing files required for analysis");
+    }
+    boolean symlinks = configuration.isAnalysisSymlinks();
+    Path folder = configuration.analysis(datasets);
+    FileSystemUtils.deleteRecursively(folder);
+    Files.createDirectories(folder);
+    for (DatasetAnalysis analysis : analyses) {
+      copyFiles(analysis.dataset, analysis, folder, symlinks);
+    }
+    Path samples = folder.resolve("samples.txt");
+    List<String> samplesLines = new ArrayList<>();
+    samplesLines.add("#sample");
+    analyses.stream().flatMap(analysis -> analysis.dataset.getSamples().stream())
+        .forEach(sample -> samplesLines.add(sample.getName()));
+    Files.write(samples, samplesLines, StandardOpenOption.CREATE);
+    Path datasetFile = folder.resolve("dataset.txt");
+    List<String> datasetLines = new ArrayList<>();
+    datasetLines.add("#merge\tsamples");
+    analyses
+        .forEach(analysis -> datasetLines.add(analysis.dataset.getName() + "\t" + analysis.samples
+            .stream().map(sample -> sample.sample.getName()).collect(Collectors.joining("\t"))));
+    Files.write(datasetFile, datasetLines, StandardOpenOption.CREATE);
+    return folder;
+  }
+
+  /**
    * Copy dataset resources used for analysis to a new folder.
    *
    * @param dataset
@@ -165,19 +248,7 @@ public class AnalysisService {
     Path folder = configuration.analysis(analysis.dataset);
     FileSystemUtils.deleteRecursively(folder);
     Files.createDirectories(folder);
-    for (SampleAnalysis sample : analysis.samples) {
-      Path fastq1 = folder.resolve(sample.sample.getName() + "_R1.fastq"
-          + (sample.fastq1.toString().endsWith(".gz") ? ".gz" : ""));
-      copy(sample.fastq1, fastq1, symlinks);
-      if (sample.paired) {
-        Path fastq2 = folder.resolve(sample.sample.getName() + "_R2.fastq"
-            + (sample.fastq2.toString().endsWith(".gz") ? ".gz" : ""));
-        copy(sample.fastq2, fastq2, symlinks);
-      }
-      for (Path bam : sample.bams) {
-        copy(bam, folder.resolve(bam.getFileName()), symlinks);
-      }
-    }
+    copyFiles(dataset, analysis, folder, symlinks);
     Path samples = folder.resolve("samples.txt");
     List<String> samplesLines = new ArrayList<>();
     samplesLines.add("#sample");
@@ -192,6 +263,23 @@ public class AnalysisService {
         .map(sample -> sample.sample.getName()).collect(Collectors.joining("\t")));
     Files.write(datasetFile, datasetLines, StandardOpenOption.CREATE);
     return folder;
+  }
+
+  private void copyFiles(Dataset dataset, DatasetAnalysis analysis, Path folder, boolean symlinks)
+      throws IOException {
+    for (SampleAnalysis sample : analysis.samples) {
+      Path fastq1 = folder.resolve(sample.sample.getName() + "_R1.fastq"
+          + (sample.fastq1.toString().endsWith(".gz") ? ".gz" : ""));
+      copy(sample.fastq1, fastq1, symlinks);
+      if (sample.paired) {
+        Path fastq2 = folder.resolve(sample.sample.getName() + "_R2.fastq"
+            + (sample.fastq2.toString().endsWith(".gz") ? ".gz" : ""));
+        copy(sample.fastq2, fastq2, symlinks);
+      }
+      for (Path bam : sample.bams) {
+        copy(bam, folder.resolve(bam.getFileName()), symlinks);
+      }
+    }
   }
 
   private void copy(Path source, Path destination, boolean symlink) throws IOException {

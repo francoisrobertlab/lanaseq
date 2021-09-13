@@ -22,6 +22,9 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.Serializable;
+import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.PermissionEvaluator;
@@ -31,9 +34,10 @@ import org.springframework.stereotype.Component;
 /**
  * Implementation of {@link PermissionEvaluator}.
  */
-@Component
+@Component("permissionEvaluator")
 @Primary
 public class PermissionEvaluatorDelegator implements PermissionEvaluator {
+  private static Logger logger = LoggerFactory.getLogger(PermissionEvaluatorDelegator.class);
   @Autowired
   private UserPermissionEvaluator userPermissionEvaluator;
   @Autowired
@@ -78,5 +82,11 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
           permission);
     }
     return false;
+  }
+
+  public boolean hasCollectionPermission(Authentication authentication,
+      Collection<? extends Object> targetDomainObjects, Object permission) {
+    return !targetDomainObjects.stream().map(ob -> hasPermission(authentication, ob, permission))
+        .filter(allowed -> !allowed).findFirst().isPresent();
   }
 }
