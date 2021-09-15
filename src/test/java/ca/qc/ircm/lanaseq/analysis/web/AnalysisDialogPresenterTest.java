@@ -54,6 +54,10 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -92,7 +96,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AnalysisDialog.class, locale);
-  private Dataset dataset;
+  private List<Dataset> datasets = new ArrayList<>();
 
   /**
    * Before test.
@@ -100,7 +104,8 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
-    dataset = datasetRepository.findById(2L).get();
+    datasets.add(datasetRepository.findById(2L).get());
+    datasets.add(datasetRepository.findById(7L).get());
     dialog.header = new H3();
     dialog.message = new Div();
     dialog.createFolder = new Button();
@@ -110,13 +115,13 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.errorsLayout = new VerticalLayout();
     presenter.init(dialog);
     presenter.localChange(locale);
-    presenter.setDataset(dataset);
+    presenter.setDatasets(datasets);
   }
 
   @Test
   public void validate_Success() {
     presenter.validate();
-    verify(service).validate(eq(dataset), eq(locale), any());
+    verify(service).validate(eq(datasets), eq(locale), any());
     assertEquals(0, dialog.errorsLayout.getComponentCount());
     verify(dialog.errors, never()).open();
     assertTrue(dialog.createFolder.isEnabled());
@@ -129,9 +134,9 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
       errorHandler.accept("error1");
       errorHandler.accept("error2");
       return null;
-    }).when(service).validate(any(Dataset.class), any(), any());
+    }).when(service).validate(any(Collection.class), any(), any());
     presenter.validate();
-    verify(service).validate(eq(dataset), eq(locale), any());
+    verify(service).validate(eq(datasets), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
     assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
@@ -148,10 +153,10 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
       errorHandler.accept("error1");
       errorHandler.accept("error2");
       return null;
-    }).when(service).validate(any(Dataset.class), any(), any());
+    }).when(service).validate(any(Collection.class), any(), any());
     presenter.validate();
     presenter.validate();
-    verify(service, times(2)).validate(eq(dataset), eq(locale), any());
+    verify(service, times(2)).validate(eq(datasets), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
     assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
@@ -168,7 +173,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     when(event.isOpened()).thenReturn(true);
     verify(dialog).addOpenedChangeListener(openListenerCaptor.capture());
     openListenerCaptor.getValue().onComponentEvent(event);
-    verify(service).validate(eq(dataset), eq(locale), any());
+    verify(service).validate(eq(datasets), eq(locale), any());
   }
 
   @Test
@@ -176,12 +181,12 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_Windows() throws Throwable {
     String folder = "test/dataset";
     String network = "smb://test";
-    when(configuration.analysisLabel(any(), anyBoolean())).thenReturn(folder);
+    when(configuration.analysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
     when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
-    verify(service).validate(eq(dataset), eq(locale), any());
-    verify(service).copyResources(dataset);
-    verify(configuration).analysisLabel(dataset, false);
+    verify(service).validate(eq(datasets), eq(locale), any());
+    verify(service).copyResources(datasets);
+    verify(configuration).analysisLabel(datasets, false);
     verify(configuration).folderNetwork(false);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
     assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
@@ -199,11 +204,11 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_WindowsNoNetwork() throws Throwable {
     String folder = "test/dataset";
-    when(configuration.analysisLabel(any(), anyBoolean())).thenReturn(folder);
+    when(configuration.analysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
-    verify(service).validate(eq(dataset), eq(locale), any());
-    verify(service).copyResources(dataset);
-    verify(configuration).analysisLabel(dataset, false);
+    verify(service).validate(eq(datasets), eq(locale), any());
+    verify(service).copyResources(datasets);
+    verify(configuration).analysisLabel(datasets, false);
     verify(configuration).folderNetwork(false);
     assertEquals(1, dialog.confirmLayout.getComponentCount());
     assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
@@ -219,12 +224,12 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_Unix() throws Throwable {
     String folder = "test/dataset";
     String network = "smb://test";
-    when(configuration.analysisLabel(any(), anyBoolean())).thenReturn(folder);
+    when(configuration.analysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
     when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
-    verify(service).validate(eq(dataset), eq(locale), any());
-    verify(service).copyResources(dataset);
-    verify(configuration).analysisLabel(dataset, true);
+    verify(service).validate(eq(datasets), eq(locale), any());
+    verify(service).copyResources(datasets);
+    verify(configuration).analysisLabel(datasets, true);
     verify(configuration).folderNetwork(true);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
     assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
@@ -243,12 +248,12 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_Mac() throws Throwable {
     String folder = "test/dataset";
     String network = "smb://test";
-    when(configuration.analysisLabel(any(), anyBoolean())).thenReturn(folder);
+    when(configuration.analysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
     when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
-    verify(service).validate(eq(dataset), eq(locale), any());
-    verify(service).copyResources(dataset);
-    verify(configuration).analysisLabel(dataset, true);
+    verify(service).validate(eq(datasets), eq(locale), any());
+    verify(service).copyResources(datasets);
+    verify(configuration).analysisLabel(datasets, true);
     verify(configuration).folderNetwork(true);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
     assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
@@ -267,13 +272,13 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_MultipleCalls() throws Throwable {
     String folder = "test/dataset";
     String network = "smb://test";
-    when(configuration.analysisLabel(any(), anyBoolean())).thenReturn(folder);
+    when(configuration.analysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
     when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     presenter.createFolder();
-    verify(service, times(2)).validate(eq(dataset), eq(locale), any());
-    verify(service, times(2)).copyResources(dataset);
-    verify(configuration, times(2)).analysisLabel(dataset, false);
+    verify(service, times(2)).validate(eq(datasets), eq(locale), any());
+    verify(service, times(2)).copyResources(datasets);
+    verify(configuration, times(2)).analysisLabel(datasets, false);
     verify(configuration, times(2)).folderNetwork(false);
     assertEquals(2, dialog.confirmLayout.getComponentCount());
     assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
@@ -289,14 +294,14 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void createFolder_IoException() throws Throwable {
-    doThrow(new IOException("test")).when(service).copyResources(any(Dataset.class));
+    doThrow(new IOException("test")).when(service).copyResources(any(Collection.class));
     presenter.createFolder();
-    verify(service).validate(eq(dataset), eq(locale), any());
-    verify(service).copyResources(dataset);
+    verify(service).validate(eq(datasets), eq(locale), any());
+    verify(service).copyResources(datasets);
     verify(dialog.confirm, never()).open();
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(CREATE_FOLDER_EXCEPTION, dataset.getName()),
+    assertEquals(resources.message(CREATE_FOLDER_EXCEPTION),
         ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
     verify(dialog.errors).open();
     verify(dialog, never()).close();
@@ -304,7 +309,8 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void createFolder_IllegalArgumentException() throws Throwable {
-    doThrow(new IllegalArgumentException("test")).when(service).copyResources(any(Dataset.class));
+    doThrow(new IllegalArgumentException("test")).when(service)
+        .copyResources(any(Collection.class));
     doAnswer(new Answer<Void>() {
       private int calls = 0;
 
@@ -317,10 +323,10 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
         calls++;
         return null;
       }
-    }).when(service).validate(any(Dataset.class), any(), any());
+    }).when(service).validate(any(Collection.class), any(), any());
     presenter.createFolder();
-    verify(service, times(2)).validate(eq(dataset), eq(locale), any());
-    verify(service).copyResources(dataset);
+    verify(service, times(2)).validate(eq(datasets), eq(locale), any());
+    verify(service).copyResources(datasets);
     verify(dialog.confirm, never()).open();
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
@@ -330,7 +336,14 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void getDataset() {
-    assertEquals(dataset, presenter.getDataset());
+  public void getDatasets() {
+    assertEquals(datasets, presenter.getDatasets());
+  }
+
+  @Test
+  public void getDatasets_OneDataset() {
+    Dataset dataset = datasets.get(0);
+    presenter.setDataset(dataset);
+    assertEquals(Arrays.asList(dataset), presenter.getDatasets());
   }
 }

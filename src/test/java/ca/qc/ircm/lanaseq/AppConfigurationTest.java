@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Assay;
@@ -232,8 +231,9 @@ public class AppConfigurationTest {
   public void analysis_Datasets() {
     Collection<Dataset> datasets = datasets();
     Path path = appConfiguration.analysis(datasets);
-    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis"), path.getParent());
-    assertTrue(path.getFileName().toString().startsWith("jonh_CHIP_SEQ_20191208"));
+    assertEquals(
+        Paths.get(System.getProperty("user.home"), "lanaseq/analysis/jonh_CHIP_SEQ_20191208"),
+        path);
   }
 
   @Test
@@ -241,8 +241,8 @@ public class AppConfigurationTest {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     Path path = appConfiguration.analysis(datasets);
-    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis"), path.getParent());
-    assertTrue(path.getFileName().toString().startsWith("jonh_20191208"));
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis/jonh_20191208"),
+        path);
   }
 
   @Test
@@ -250,6 +250,35 @@ public class AppConfigurationTest {
     Dataset dataset = dataset();
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis", dataset.getName()),
         appConfiguration.analysis(dataset));
+  }
+
+  @Test
+  public void analysisLabel_Datasets() {
+    Collection<Dataset> datasets = datasets();
+    assertEquals("lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
+        appConfiguration.analysisLabel(datasets, false));
+  }
+
+  @Test
+  public void analysisLabel_DatasetsUnix() {
+    Collection<Dataset> datasets = datasets();
+    assertEquals("lanaseq/analysis/jonh_CHIP_SEQ_20191208",
+        appConfiguration.analysisLabel(datasets, true));
+  }
+
+  @Test
+  public void analysisLabel_DatasetsNoSample() {
+    Collection<Dataset> datasets = datasets();
+    datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
+    assertEquals("lanaseq\\analysis\\jonh_20191208",
+        appConfiguration.analysisLabel(datasets, false));
+  }
+
+  @Test
+  public void analysisLabel_DatasetsNoSampleUnix() {
+    Collection<Dataset> datasets = datasets();
+    datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
+    assertEquals("lanaseq/analysis/jonh_20191208", appConfiguration.analysisLabel(datasets, true));
   }
 
   @Test

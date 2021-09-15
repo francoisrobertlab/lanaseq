@@ -17,9 +17,14 @@
 
 package ca.qc.ircm.lanaseq.analysis.web;
 
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.DATASETS_REQUIRED;
+
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -30,16 +35,35 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AnalysisViewPresenter {
   private AnalysisView view;
+  private Locale locale;
 
   void init(AnalysisView view) {
     this.view = view;
+    clearError();
   }
 
   void localChange(Locale locale) {
+    this.locale = locale;
   }
 
-  void view(Dataset dataset) {
+  private void clearError() {
+    view.error.setVisible(false);
+  }
+
+  void analyze(Dataset dataset) {
     view.dialog.setDataset(dataset);
     view.dialog.open();
+  }
+
+  void analyze(Set<Dataset> datasets) {
+    clearError();
+    if (!datasets.isEmpty()) {
+      view.dialog.setDatasets(datasets.stream().collect(Collectors.toList()));
+      view.dialog.open();
+    } else {
+      AppResources resources = new AppResources(AnalysisView.class, locale);
+      view.error.setText(resources.message(DATASETS_REQUIRED));
+      view.error.setVisible(true);
+    }
   }
 }

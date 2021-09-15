@@ -18,15 +18,21 @@
 package ca.qc.ircm.lanaseq.analysis.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetGrid;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -49,12 +55,16 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public static final String ID = styleName(VIEW_NAME, "view");
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
+  public static final String ANALYZE = "analyze";
   public static final String ROBTOOLS = "robtools";
   public static final String ROBTOOLS_LINK =
       "https://github.com/francoisrobertlab/robtools/tree/master/computecanada";
+  public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
   private static final long serialVersionUID = 6718796782451862327L;
   private static final Logger logger = LoggerFactory.getLogger(AnalysisView.class);
   protected H2 header = new H2();
+  protected Div error = new Div();
+  protected Button analyze = new Button();
   protected Anchor robtools = new Anchor();
   @Autowired
   protected DatasetGrid datasets;
@@ -77,11 +87,16 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
     logger.debug("analysis view");
     setId(ID);
     setHeightFull();
-    add(header, datasets, robtools);
+    add(header, datasets, error, analyze, robtools);
     expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
-    datasets.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    datasets.addItemDoubleClickListener(e -> presenter.analyze(e.getItem()));
+    datasets.setSelectionMode(Grid.SelectionMode.MULTI);
+    error.setId(ERROR_TEXT);
+    error.addClassName(ERROR_TEXT);
+    analyze.setId(ANALYZE);
+    analyze.addClickListener(e -> presenter.analyze(datasets.getSelectedItems()));
     robtools.setId(ROBTOOLS);
     robtools.setHref(ROBTOOLS_LINK);
     robtools.setTarget("_blank");
@@ -92,6 +107,7 @@ public class AnalysisView extends VerticalLayout implements LocaleChangeObserver
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(AnalysisView.class, getLocale());
     header.setText(resources.message(HEADER));
+    analyze.setText(resources.message(ANALYZE));
     robtools.setText(resources.message(ROBTOOLS));
     presenter.localChange(getLocale());
   }

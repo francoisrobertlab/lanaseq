@@ -17,12 +17,16 @@
 
 package ca.qc.ircm.lanaseq.analysis.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ANALYZE;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.DATASETS;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.HEADER;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ROBTOOLS;
 
-import com.vaadin.flow.component.grid.testbench.GridElement;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetGridElement;
+import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.AnchorElement;
+import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.testbench.TestBenchElement;
@@ -38,8 +42,16 @@ public class AnalysisViewElement extends VerticalLayoutElement {
     return $(H2Element.class).id(HEADER);
   }
 
-  public GridElement datasets() {
-    return $(GridElement.class).id(DATASETS);
+  public DatasetGridElement datasets() {
+    return $(DatasetGridElement.class).id(DATASETS);
+  }
+
+  public DivElement error() {
+    return $(DivElement.class).id(ERROR_TEXT);
+  }
+
+  public ButtonElement analyze() {
+    return $(ButtonElement.class).id(ANALYZE);
   }
 
   public AnchorElement robtools() {

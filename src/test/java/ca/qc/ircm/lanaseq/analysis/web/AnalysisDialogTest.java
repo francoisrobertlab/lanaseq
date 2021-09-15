@@ -38,6 +38,8 @@ import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +90,7 @@ public class AnalysisDialogTest extends AbstractKaribuTestCase {
   @Test
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
     assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
@@ -107,7 +109,7 @@ public class AnalysisDialogTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(AnalysisDialog.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
     assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
@@ -140,9 +142,18 @@ public class AnalysisDialogTest extends AbstractKaribuTestCase {
   @Test
   public void setDataset() {
     when(dataset.getName()).thenReturn("Test Dataset Name");
-    when(presenter.getDataset()).thenReturn(dataset);
+    when(presenter.getDatasets()).thenReturn(Collections.nCopies(1, dataset));
     dialog.setDataset(dataset);
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+  }
+
+  @Test
+  public void setDatasets() {
+    when(presenter.getDatasets())
+        .thenReturn(Arrays.asList(mock(Dataset.class), mock(Dataset.class), mock(Dataset.class)));
+    dialog.setDataset(dataset);
+    verify(presenter).setDataset(dataset);
+    assertEquals(resources.message(HEADER, 3), dialog.header.getText());
   }
 }

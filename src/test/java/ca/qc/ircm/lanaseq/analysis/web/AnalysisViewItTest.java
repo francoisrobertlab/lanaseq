@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ID;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ROBTOOLS_LINK;
 import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -64,14 +65,35 @@ public class AnalysisViewItTest extends AbstractTestBenchTestCase {
     AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
+    assertFalse(optional(() -> view.error()).isPresent());
+    assertTrue(optional(() -> view.analyze()).isPresent());
+    assertTrue(optional(() -> view.robtools()).isPresent());
   }
 
   @Test
-  public void view() throws Throwable {
+  public void analyze_One() throws Throwable {
     open();
     AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
-    view.datasets().getCell(0, 0).doubleClick();
+    view.datasets().getCell(0, 1).doubleClick();
     assertTrue(view.dialog().isOpen());
+  }
+
+  @Test
+  public void analyze_Many() throws Throwable {
+    open();
+    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
+    view.datasets().select(0);
+    view.datasets().select(1);
+    view.analyze().click();
+    assertTrue(view.dialog().isOpen());
+  }
+
+  @Test
+  public void analyze_ManyEmpty() throws Throwable {
+    open();
+    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
+    view.analyze().click();
+    assertTrue(optional(() -> view.error()).isPresent());
   }
 
   @Test

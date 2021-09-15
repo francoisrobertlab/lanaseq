@@ -32,6 +32,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.Collection;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -108,16 +110,22 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
 
   private void updateHeader() {
     final AppResources resources = new AppResources(AnalysisDialog.class, getLocale());
-    Dataset dataset = presenter.getDataset();
-    if (dataset != null && dataset.getName() != null) {
-      header.setText(resources.message(HEADER, dataset.getName()));
+    Collection<Dataset> datasets = presenter.getDatasets();
+    if (datasets != null && datasets.size() > 1) {
+      header.setText(resources.message(HEADER, datasets.size()));
     } else {
-      header.setText(resources.message(HEADER, ""));
+      header.setText(resources.message(HEADER, datasets.size(),
+          datasets.stream().findFirst().map(Dataset::getName).orElse("")));
     }
   }
 
   public void setDataset(Dataset dataset) {
     presenter.setDataset(dataset);
+    updateHeader();
+  }
+
+  public void setDatasets(List<Dataset> datasets) {
+    presenter.setDatasets(datasets);
     updateHeader();
   }
 }

@@ -174,13 +174,31 @@ public class AppConfiguration {
   }
 
   /**
-   * Returns label to be shown to user so he can find the dataset's analysis folder on the network.
+   * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
+   *
+   * @param datasets
+   *          datasets
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user, so he can find the dataset's analysis folder on the network
+   */
+  public String analysisLabel(Collection<Dataset> datasets, boolean unix) {
+    Path relative = home.relativize(analysis(datasets));
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+    } else {
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+    }
+  }
+
+  /**
+   * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
    *
    * @param dataset
    *          dataset
    * @param unix
    *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user so he can find the dataset's analysis folder on the network
+   * @return label to be shown to user, so he can find the dataset's analysis folder on the network
    */
   public String analysisLabel(Dataset dataset, boolean unix) {
     Path relative = home.relativize(analysis(dataset));
