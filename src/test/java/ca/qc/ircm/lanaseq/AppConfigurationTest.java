@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -246,10 +247,10 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void analysis_Dataset() {
+  public void analysis_OneDataset() {
     Dataset dataset = dataset();
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis", dataset.getName()),
-        appConfiguration.analysis(dataset));
+        appConfiguration.analysis(Arrays.asList(dataset)));
   }
 
   @Test
@@ -282,17 +283,17 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void analysisLabel_Dataset() {
+  public void analysisLabel_OneDataset() {
     Dataset dataset = dataset();
     assertEquals("lanaseq\\analysis\\" + dataset.getName(),
-        appConfiguration.analysisLabel(dataset, false));
+        appConfiguration.analysisLabel(Arrays.asList(dataset), false));
   }
 
   @Test
-  public void analysisLabel_DatasetUnix() {
+  public void analysisLabel_OneDatasetUnix() {
     Dataset dataset = dataset();
     assertEquals("lanaseq/analysis/" + dataset.getName(),
-        appConfiguration.analysisLabel(dataset, true));
+        appConfiguration.analysisLabel(Arrays.asList(dataset), true));
   }
 
   @Test

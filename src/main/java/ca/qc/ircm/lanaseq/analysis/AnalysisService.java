@@ -93,26 +93,6 @@ public class AnalysisService {
     }
   }
 
-  /**
-   * Validates if dataset can be analyzed.
-   *
-   * @param dataset
-   *          dataset
-   * @param locale
-   *          locale for error messages
-   * @param errorHandler
-   *          handles error messages
-   */
-  @PreAuthorize("hasPermission(#dataset, 'read')")
-  public void validate(Dataset dataset, Locale locale, Consumer<String> errorHandler) {
-    if (dataset == null) {
-      throw new NullPointerException("dataset parameter cannot be null");
-    }
-
-    AppResources resources = new AppResources(AnalysisService.class, locale);
-    metadata(dataset, resources, errorHandler);
-  }
-
   private Optional<DatasetAnalysis> metadata(Dataset dataset, AppResources resources,
       Consumer<String> errorHandler) {
     if (dataset.getSamples().isEmpty()) {
@@ -216,51 +196,6 @@ public class AnalysisService {
     analyses
         .forEach(analysis -> datasetLines.add(analysis.dataset.getName() + "\t" + analysis.samples
             .stream().map(sample -> sample.sample.getName()).collect(Collectors.joining("\t"))));
-    Files.write(datasetFile, datasetLines, StandardOpenOption.CREATE);
-    return folder;
-  }
-
-  /**
-   * Copy dataset resources used for analysis to a new folder.
-   *
-   * @param dataset
-   *          dataset
-   * @return folder the folder containing analysis files
-   * @throws IOException
-   *           could not copy analysis files to folder
-   * @throws IllegalArgumentException
-   *           dataset analysis validation failed
-   */
-  @PreAuthorize("hasPermission(#dataset, 'read')")
-  public Path copyResources(Dataset dataset) throws IOException {
-    if (dataset == null) {
-      throw new NullPointerException("dataset parameter cannot be null");
-    }
-
-    DatasetAnalysis analysis =
-        metadata(dataset, new AppResources(AnalysisService.class, Locale.getDefault()), message -> {
-        }).orElse(null);
-    if (analysis == null) {
-      throw new IllegalArgumentException(
-          "dataset " + dataset + " is missing files required for analysis");
-    }
-    boolean symlinks = configuration.isAnalysisSymlinks();
-    Path folder = configuration.analysis(analysis.dataset);
-    FileSystemUtils.deleteRecursively(folder);
-    Files.createDirectories(folder);
-    copyFiles(dataset, analysis, folder, symlinks);
-    Path samples = folder.resolve("samples.txt");
-    List<String> samplesLines = new ArrayList<>();
-    samplesLines.add("#sample");
-    for (SampleAnalysis sample : analysis.samples) {
-      samplesLines.add(sample.sample.getName());
-    }
-    Files.write(samples, samplesLines, StandardOpenOption.CREATE);
-    Path datasetFile = folder.resolve("dataset.txt");
-    List<String> datasetLines = new ArrayList<>();
-    datasetLines.add("#merge\tsamples");
-    datasetLines.add(analysis.dataset.getName() + "\t" + analysis.samples.stream()
-        .map(sample -> sample.sample.getName()).collect(Collectors.joining("\t")));
     Files.write(datasetFile, datasetLines, StandardOpenOption.CREATE);
     return folder;
   }

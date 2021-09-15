@@ -154,23 +154,24 @@ public class AppConfiguration {
     if (datasets == null || datasets.isEmpty()) {
       throw new IllegalArgumentException("datasets cannot be null or empty");
     }
-    Optional<User> user = authorizationService.getCurrentUser();
-    Dataset dataset = datasets.iterator().next();
-    Optional<Sample> sample = datasets.stream().flatMap(ds -> ds.getSamples().stream()).findFirst();
-    StringBuilder builder = new StringBuilder();
-    user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
-        .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
-    sample.map(sa -> sa.getAssay()).ifPresent(assay -> builder.append("_" + assay));
-    builder.append("_");
-    builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(dataset.getDate()));
-    if (builder.length() > 0) {
-      builder.deleteCharAt(0);
+    if (datasets.size() == 1) {
+      return getAnalysis().resolve(datasets.stream().findFirst().map(Dataset::getName).get());
+    } else {
+      Optional<User> user = authorizationService.getCurrentUser();
+      Dataset dataset = datasets.iterator().next();
+      Optional<Sample> sample =
+          datasets.stream().flatMap(ds -> ds.getSamples().stream()).findFirst();
+      StringBuilder builder = new StringBuilder();
+      user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
+          .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
+      sample.map(sa -> sa.getAssay()).ifPresent(assay -> builder.append("_" + assay));
+      builder.append("_");
+      builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(dataset.getDate()));
+      if (builder.length() > 0) {
+        builder.deleteCharAt(0);
+      }
+      return getAnalysis().resolve(builder.toString());
     }
-    return getAnalysis().resolve(builder.toString());
-  }
-
-  public Path analysis(Dataset dataset) {
-    return getAnalysis().resolve(dataset.getName());
   }
 
   /**
@@ -184,24 +185,6 @@ public class AppConfiguration {
    */
   public String analysisLabel(Collection<Dataset> datasets, boolean unix) {
     Path relative = home.relativize(analysis(datasets));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
-    }
-  }
-
-  /**
-   * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
-   *
-   * @param dataset
-   *          dataset
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user, so he can find the dataset's analysis folder on the network
-   */
-  public String analysisLabel(Dataset dataset, boolean unix) {
-    Path relative = home.relativize(analysis(dataset));
     if (unix) {
       return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
     } else {

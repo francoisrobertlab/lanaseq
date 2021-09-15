@@ -114,7 +114,7 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.analysis(dataset);
+    Path folder = configuration.analysis(Arrays.asList(dataset));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,
@@ -232,7 +232,7 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.errors().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.analysis(dataset);
+    Path folder = configuration.analysis(Arrays.asList(dataset));
     assertFalse(Files.exists(folder));
   }
 }
