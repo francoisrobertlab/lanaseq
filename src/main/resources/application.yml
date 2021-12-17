@@ -19,7 +19,6 @@ spring:
   application:
     name: lanaseq
   datasource:
-    platform: h2
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;IGNORECASE=TRUE;MODE=MYSQL
     username: sa
@@ -94,7 +93,7 @@ logging:
 
 ---
 spring:
-  profiles: test
+  config:    activate:      on-profile: test
   ldap:
     embedded:
       base-dn: dc=mycompany,dc=com
@@ -125,7 +124,9 @@ logging:
 
 ---
 spring:
-  profiles: integration-test
+  config:
+    activate:
+      on-profile: integration-test
   jpa:
     show-sql: false
     hibernate:
@@ -144,6 +145,6 @@ mail:
   enabled: false
 
 logging:
-  file: test.log
+  file:    name: test.log
 
 download-home: ${user.dir}/target/download
