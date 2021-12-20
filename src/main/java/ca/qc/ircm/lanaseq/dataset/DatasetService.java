@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
-import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -51,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -138,10 +136,7 @@ public class DatasetService {
       filter = new DatasetFilter();
     }
 
-    Pageable pageable = filter.pageable();
-    List<Long> ids = queryFactory.select(dataset.id).from(dataset).where(filter.predicate())
-        .offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
-    return repository.findAllByIdIn(ids, pageable.getSort());
+    return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
   }
 
   /**

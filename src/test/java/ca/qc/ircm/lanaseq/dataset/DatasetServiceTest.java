@@ -272,6 +272,24 @@ public class DatasetServiceTest {
   }
 
   @Test
+  public void all_FilterPageSort() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.page = 1;
+    filter.size = 3;
+    filter.sort = Sort.by(Direction.ASC, NAME);
+
+    List<Dataset> datasets = service.all(filter);
+
+    assertEquals(3, datasets.size());
+    assertEquals((Long) 4L, datasets.get(0).getId());
+    assertEquals((Long) 2L, datasets.get(1).getId());
+    assertEquals((Long) 6L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
   public void all_FilterSortName() {
     DatasetFilter filter = new DatasetFilter();
     filter.nameContains = "JS";

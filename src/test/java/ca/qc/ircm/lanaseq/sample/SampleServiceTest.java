@@ -267,6 +267,26 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void all_FilterPageSort() {
+    SampleFilter filter = new SampleFilter();
+    filter.page = 1;
+    filter.size = 5;
+    filter.sort = Sort.by(Direction.ASC, NAME);
+
+    List<Sample> samples = service.all(filter);
+
+    assertEquals(5, samples.size());
+    assertEquals((Long) 2L, samples.get(0).getId());
+    assertEquals((Long) 3L, samples.get(1).getId());
+    assertEquals((Long) 4L, samples.get(2).getId());
+    assertEquals((Long) 10L, samples.get(3).getId());
+    assertEquals((Long) 5L, samples.get(4).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
   public void all_FilterSortName() {
     SampleFilter filter = new SampleFilter();
     filter.nameContains = "BC";
