@@ -92,7 +92,8 @@ public class ProtocolDialogPresenter {
 
   private Validator<String> nameExists() {
     return (value, context) -> {
-      if (service.nameExists(value)) {
+      if (service.nameExists(value) && !service.get(binder.getBean().getId())
+          .map(pr -> value.equals(pr.getName())).orElse(false)) {
         final AppResources resources = new AppResources(Constants.class, locale);
         return ValidationResult.error(resources.message(ALREADY_EXISTS));
       }

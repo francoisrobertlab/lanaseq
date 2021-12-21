@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -234,7 +235,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void save_NameExists() {
+  public void save_NameExistsNewProtocol() {
     when(service.nameExists(any())).thenReturn(true);
     fillFields();
 
@@ -247,6 +248,51 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+    verify(service, atLeastOnce()).nameExists(name);
+    verify(service, never()).save(any(), any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NameExistsSameProtocol() {
+    when(service.nameExists(any())).thenReturn(true);
+    when(service.get(any())).thenReturn(Optional.of(protocol));
+    presenter.setProtocol(protocol);
+    fillFields();
+    dialog.name.setValue(protocol.getName());
+
+    presenter.save();
+
+    BinderValidationStatus<Protocol> status = presenter.validateProtocol();
+    assertTrue(status.isOk());
+    verify(service, atLeastOnce()).nameExists(protocol.getName());
+    verify(service, atLeastOnce()).get(protocol.getId());
+    verify(service).save(any(), any());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NameExistsDifferentProtocol() {
+    when(service.nameExists(any())).thenReturn(true);
+    when(service.get(any())).thenReturn(Optional.of(protocol));
+    presenter.setProtocol(protocol);
+    fillFields();
+
+    presenter.save();
+
+    BinderValidationStatus<Protocol> status = presenter.validateProtocol();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.name);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+    verify(service, atLeastOnce()).nameExists(name);
+    verify(service, atLeastOnce()).get(protocol.getId());
     verify(service, never()).save(any(), any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
