@@ -27,6 +27,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ANALYZE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
@@ -119,7 +120,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     ui.setLocale(locale);
     view = new SamplesView(presenter, new SampleDialog(), new SampleFilesDialog(),
-        new ProtocolDialog());
+        new SampleAnalysisDialog(), new ProtocolDialog());
     view.init();
     samples = sampleRepository.findAll();
   }
@@ -199,6 +200,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
     assertEquals(FILES, view.files.getId().orElse(""));
     validateIcon(VaadinIcon.FILE_O.create(), view.files.getIcon());
+    assertEquals(ANALYZE, view.analyze.getId().orElse(""));
   }
 
   @Test
@@ -222,6 +224,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
+    assertEquals(resources.message(ANALYZE), view.analyze.getText());
     verify(presenter).localeChange(locale);
   }
 
@@ -253,6 +256,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
+    assertEquals(resources.message(ANALYZE), view.analyze.getText());
     verify(presenter).localeChange(locale);
   }
 
@@ -425,5 +429,11 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void files() {
     clickButton(view.files);
     verify(presenter).viewFiles();
+  }
+
+  @Test
+  public void analyze() {
+    clickButton(view.analyze);
+    verify(presenter).analyze();
   }
 }

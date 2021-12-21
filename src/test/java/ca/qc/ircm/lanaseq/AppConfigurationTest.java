@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -56,6 +57,7 @@ public class AppConfigurationTest {
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
     sample.setCreationDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    sample.setDate(LocalDate.of(2019, 12, 8));
     sample.generateName();
     return sample;
   }
@@ -74,6 +76,7 @@ public class AppConfigurationTest {
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
+    sample.setDate(LocalDate.of(2019, 12, 8));
     dataset.getSamples().add(sample);
     sample = new Sample();
     sample.setSampleId("my sample2");
@@ -229,71 +232,147 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void analysis_Datasets() {
+  public void datasetAnalysis_Datasets() {
     Collection<Dataset> datasets = datasets();
-    Path path = appConfiguration.analysis(datasets);
+    Path path = appConfiguration.datasetAnalysis(datasets);
     assertEquals(
         Paths.get(System.getProperty("user.home"), "lanaseq/analysis/jonh_CHIP_SEQ_20191208"),
         path);
   }
 
   @Test
-  public void analysis_DatasetsNoSample() {
+  public void datasetAnalysis_DatasetsNoSample() {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
-    Path path = appConfiguration.analysis(datasets);
+    Path path = appConfiguration.datasetAnalysis(datasets);
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis/jonh_20191208"),
         path);
   }
 
   @Test
-  public void analysis_OneDataset() {
+  public void datasetAnalysis_OneDataset() {
     Dataset dataset = dataset();
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis", dataset.getName()),
-        appConfiguration.analysis(Arrays.asList(dataset)));
+        appConfiguration.datasetAnalysis(Arrays.asList(dataset)));
   }
 
   @Test
-  public void analysisLabel_Datasets() {
+  public void sampleAnalysis() {
+    Collection<Sample> samples =
+        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    Path path = appConfiguration.sampleAnalysis(samples);
+    assertEquals(
+        Paths.get(System.getProperty("user.home"), "lanaseq/analysis/jonh_CHIP_SEQ_20191208"),
+        path);
+  }
+
+  @Test
+  public void sampleAnalysis_NoAssay() {
+    Collection<Sample> samples =
+        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    samples.forEach(sa -> sa.setAssay(null));
+    Path path = appConfiguration.sampleAnalysis(samples);
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis/jonh_20191208"),
+        path);
+  }
+
+  @Test
+  public void sampleAnalysis_One() {
+    Sample sample = sample();
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq/analysis", sample.getName()),
+        appConfiguration.sampleAnalysis(Arrays.asList(sample)));
+  }
+
+  @Test
+  public void datasetAnalysisLabel_Datasets() {
     Collection<Dataset> datasets = datasets();
     assertEquals("lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
-        appConfiguration.analysisLabel(datasets, false));
+        appConfiguration.datasetAnalysisLabel(datasets, false));
   }
 
   @Test
-  public void analysisLabel_DatasetsUnix() {
+  public void datasetAnalysisLabel_DatasetsUnix() {
     Collection<Dataset> datasets = datasets();
     assertEquals("lanaseq/analysis/jonh_CHIP_SEQ_20191208",
-        appConfiguration.analysisLabel(datasets, true));
+        appConfiguration.datasetAnalysisLabel(datasets, true));
   }
 
   @Test
-  public void analysisLabel_DatasetsNoSample() {
+  public void datasetAnalysisLabel_DatasetsNoSample() {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     assertEquals("lanaseq\\analysis\\jonh_20191208",
-        appConfiguration.analysisLabel(datasets, false));
+        appConfiguration.datasetAnalysisLabel(datasets, false));
   }
 
   @Test
-  public void analysisLabel_DatasetsNoSampleUnix() {
+  public void datasetAnalysisLabel_DatasetsNoSampleUnix() {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
-    assertEquals("lanaseq/analysis/jonh_20191208", appConfiguration.analysisLabel(datasets, true));
+    assertEquals("lanaseq/analysis/jonh_20191208",
+        appConfiguration.datasetAnalysisLabel(datasets, true));
   }
 
   @Test
-  public void analysisLabel_OneDataset() {
+  public void datasetAnalysisLabel_OneDataset() {
     Dataset dataset = dataset();
     assertEquals("lanaseq\\analysis\\" + dataset.getName(),
-        appConfiguration.analysisLabel(Arrays.asList(dataset), false));
+        appConfiguration.datasetAnalysisLabel(Arrays.asList(dataset), false));
   }
 
   @Test
-  public void analysisLabel_OneDatasetUnix() {
+  public void datasetAnalysisLabel_OneDatasetUnix() {
     Dataset dataset = dataset();
     assertEquals("lanaseq/analysis/" + dataset.getName(),
-        appConfiguration.analysisLabel(Arrays.asList(dataset), true));
+        appConfiguration.datasetAnalysisLabel(Arrays.asList(dataset), true));
+  }
+
+  @Test
+  public void sampleAnalysisLabel() {
+    Collection<Sample> samples =
+        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    assertEquals("lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
+        appConfiguration.sampleAnalysisLabel(samples, false));
+  }
+
+  @Test
+  public void sampleAnalysisLabel_Unix() {
+    Collection<Sample> samples =
+        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    assertEquals("lanaseq/analysis/jonh_CHIP_SEQ_20191208",
+        appConfiguration.sampleAnalysisLabel(samples, true));
+  }
+
+  @Test
+  public void sampleAnalysisLabel_NoAssay() {
+    Collection<Sample> samples =
+        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    samples.forEach(sa -> sa.setAssay(null));
+    assertEquals("lanaseq\\analysis\\jonh_20191208",
+        appConfiguration.sampleAnalysisLabel(samples, false));
+  }
+
+  @Test
+  public void sampleAnalysisLabel_NoAssayUnix() {
+    Collection<Sample> samples =
+        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    samples.forEach(sa -> sa.setAssay(null));
+    assertEquals("lanaseq/analysis/jonh_20191208",
+        appConfiguration.sampleAnalysisLabel(samples, true));
+  }
+
+  @Test
+  public void sampleAnalysisLabel_OneDataset() {
+    Sample sample = sample();
+    assertEquals("lanaseq\\analysis\\" + sample.getName(),
+        appConfiguration.sampleAnalysisLabel(Arrays.asList(sample), false));
+  }
+
+  @Test
+  public void sampleAnalysisLabel_OneDatasetUnix() {
+    Sample sample = sample();
+    assertEquals("lanaseq/analysis/" + sample.getName(),
+        appConfiguration.sampleAnalysisLabel(Arrays.asList(sample), true));
   }
 
   @Test

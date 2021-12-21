@@ -86,6 +86,7 @@ public class AnalysisServiceTest {
   @TempDir
   Path temporaryFolder;
   private List<Dataset> datasets = new ArrayList<>();
+  private List<Sample> samples = new ArrayList<>();
   private Dataset dataset;
   private Sample sample;
   private Sample sample2;
@@ -142,6 +143,7 @@ public class AnalysisServiceTest {
     dataset = datasetRepository.findById(2L).get();
     datasets.add(datasetRepository.findById(7L).get());
     datasets.add(dataset);
+    datasets.forEach(ds -> samples.addAll(ds.getSamples()));
     sample = sampleRepository.findById(4L).get();
     sample2 = sampleRepository.findById(5L).get();
     paired1 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
@@ -213,10 +215,16 @@ public class AnalysisServiceTest {
     thirdBam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bam");
     thirdBam2 = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-test.bam");
     thirdRawbam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-raw.bam");
-    when(configuration.analysis(any(Collection.class))).then(i -> {
+    when(configuration.datasetAnalysis(any(Collection.class))).then(i -> {
       Collection<Dataset> datasets = i.getArgument(0);
       return datasets != null && !datasets.isEmpty() && datasets.iterator().next().getName() != null
           ? temporaryFolder.resolve(datasets.iterator().next().getName())
+          : null;
+    });
+    when(configuration.sampleAnalysis(any(Collection.class))).then(i -> {
+      Collection<Sample> samples = i.getArgument(0);
+      return samples != null && !samples.isEmpty() && samples.iterator().next().getName() != null
+          ? temporaryFolder.resolve(samples.iterator().next().getName())
           : null;
     });
   }
@@ -230,9 +238,9 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsNoSample() {
+  public void validateDatasets_NoSample() {
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     datasets.stream().forEach(
         ds -> verify(errorHandler).accept(resources.message("dataset.noSample", ds.getName())));
     verifyNoMoreInteractions(errorHandler);
@@ -241,9 +249,9 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedMissmatch() {
+  public void validateDatasets_PairedMissmatch() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("datasets.pairedMissmatch"));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -251,45 +259,45 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPaired() {
+  public void validateDatasets_Paired() {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedNoSampleName() {
+  public void validateDatasets_PairedNoSampleName() {
     paired1 = temporaryFolder.resolve("R1.fastq");
     paired2 = temporaryFolder.resolve("R2.fastq");
     pairedPaths.clear();
     pairedPaths.add(paired1);
     pairedPaths.add(paired2);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedFirstMissing() {
+  public void validateDatasets_PairedFirstMissing() {
     pairedPaths.remove(paired1);
     secondPairedPaths.remove(secondPaired1);
     thirdPairedPaths.remove(thirdPaired1);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedFirstMissingFirstSample() {
+  public void validateDatasets_PairedFirstMissingFirstSample() {
     pairedPaths.remove(paired1);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -297,22 +305,22 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedSecondMissing() {
+  public void validateDatasets_PairedSecondMissing() {
     pairedPaths.remove(paired2);
     secondPairedPaths.remove(secondPaired2);
     thirdPairedPaths.remove(thirdPaired2);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedSecondMissingFirstSample() {
+  public void validateDatasets_PairedSecondMissingFirstSample() {
     pairedPaths.remove(paired2);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -320,10 +328,10 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZipMissmatch() {
+  public void validateDatasets_PairedZipMissmatch() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedZipPaths, pairedZipPaths,
         pairedZipPaths, secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("datasets.pairedMissmatch"));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -331,34 +339,34 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZip() {
+  public void validateDatasets_PairedZip() {
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZipFirstMissing() {
+  public void validateDatasets_PairedZipFirstMissing() {
     pairedZipPaths.remove(pairedZip1);
     secondPairedZipPaths.remove(secondPairedZip1);
     thirdPairedZipPaths.remove(thirdPairedZip1);
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZipFirstMissingFirstSample() {
+  public void validateDatasets_PairedZipFirstMissingFirstSample() {
     pairedZipPaths.remove(pairedZip1);
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -366,24 +374,24 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZipSecondMissing() {
+  public void validateDatasets_PairedZipSecondMissing() {
     pairedZipPaths.remove(pairedZip2);
     secondPairedZipPaths.remove(secondPairedZip2);
     thirdPairedZipPaths.remove(thirdPairedZip2);
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZipSecondMissingFirstSample() {
+  public void validateDatasets_PairedZipSecondMissingFirstSample() {
     pairedZipPaths.remove(pairedZip2);
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -391,29 +399,29 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedSecondSampleZip() {
+  public void validateDatasets_PairedSecondSampleZip() {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths,
         secondPairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsUnpaired() {
+  public void validateDatasets_Unpaired() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
         secondUnpairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedSecondSampleUnpaired() {
+  public void validateDatasets_PairedSecondSampleUnpaired() {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondUnpairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -421,20 +429,20 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsUnpairedZip() {
+  public void validateDatasets_UnpairedZip() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedZipPaths, unpairedZipPaths,
         secondUnpairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsPairedZipSecondSampleUnpaired() {
+  public void validateDatasets_PairedZipSecondSampleUnpaired() {
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondUnpairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -442,18 +450,18 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsUnpairedSecondSampleZip() {
+  public void validateDatasets_UnpairedSecondSampleZip() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
         secondUnpairedZipPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler, never()).accept(any());
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
 
   @Test
-  public void validate_DatasetsNoFastq() {
+  public void validateDatasets_NoFastq() {
     when(sampleService.files(any())).thenReturn(new ArrayList<>());
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler)
         .accept(resources.message("sample.noFastq", datasets.get(0).getSamples().get(0).getName()));
     verify(errorHandler)
@@ -466,10 +474,10 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsNoFastqFistSample() {
+  public void validateDatasets_NoFastqFistSample() {
     when(sampleService.files(any())).thenReturn(new ArrayList<>(), new ArrayList<>(),
         secondPairedPaths);
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler)
         .accept(resources.message("sample.noFastq", datasets.get(0).getSamples().get(0).getName()));
     verify(errorHandler)
@@ -480,9 +488,9 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsNoFastqSecondSample() {
+  public void validateDatasets_NoFastqSecondSample() {
     when(sampleService.files(any())).thenReturn(pairedPaths, pairedPaths, new ArrayList<>());
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("sample.noFastq", sample2.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -490,12 +498,12 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_DatasetsFirstPairedSecondUnpairedThirdNoFastq() {
+  public void validateDatasets_FirstPairedSecondUnpairedThirdNoFastq() {
     Sample sample = sampleRepository.findById(1L).get();
     dataset.getSamples().add(sample);
     when(sampleService.files(any())).thenReturn(pairedPaths, pairedPaths, secondUnpairedPaths,
         new ArrayList<>());
-    service.validate(datasets, locale, errorHandler);
+    service.validateDatasets(datasets, locale, errorHandler);
     verify(errorHandler).accept(resources.message("sample.noFastq", sample.getName()));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
@@ -503,32 +511,238 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_NullDatasets() {
+  public void validateDatasets_Null() {
     assertThrows(NullPointerException.class, () -> {
-      service.validate((Collection<Dataset>) null, locale, errorHandler);
+      service.validateDatasets((Collection<Dataset>) null, locale, errorHandler);
     });
     verify(errorHandler, never()).accept(any());
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void validate_EmptyDatasets() {
-    service.validate(new ArrayList<>(), locale, errorHandler);
+  public void validateDatasets_Empty() {
+    service.validateDatasets(new ArrayList<>(), locale, errorHandler);
     verify(errorHandler, never()).accept(any());
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsNoSample() throws Throwable {
+  public void validateSamples_PairedMissmatch() {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, pairedPaths, secondPairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_Paired() {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedNoSampleName() {
+    paired1 = temporaryFolder.resolve("R1.fastq");
+    paired2 = temporaryFolder.resolve("R2.fastq");
+    pairedPaths.clear();
+    pairedPaths.add(paired1);
+    pairedPaths.add(paired2);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedFirstMissing() {
+    pairedPaths.remove(paired1);
+    secondPairedPaths.remove(secondPaired1);
+    thirdPairedPaths.remove(thirdPaired1);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedSecondMissing() {
+    pairedPaths.remove(paired2);
+    secondPairedPaths.remove(secondPaired2);
+    thirdPairedPaths.remove(thirdPaired2);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedZipMissmatch() {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedZipPaths, pairedZipPaths,
+        pairedZipPaths, secondPairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedZip() {
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
+        secondPairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedZipFirstMissing() {
+    pairedZipPaths.remove(pairedZip1);
+    secondPairedZipPaths.remove(secondPairedZip1);
+    thirdPairedZipPaths.remove(thirdPairedZip1);
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
+        secondPairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedZipSecondMissing() {
+    pairedZipPaths.remove(pairedZip2);
+    secondPairedZipPaths.remove(secondPairedZip2);
+    thirdPairedZipPaths.remove(thirdPairedZip2);
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
+        secondPairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_PairedSecondSampleZip() {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths,
+        secondPairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_Unpaired() {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
+        secondUnpairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_UnpairedZip() {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedZipPaths, unpairedZipPaths,
+        secondUnpairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_UnpairedSecondSampleZip() {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
+        secondUnpairedZipPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  public void validateSamples_NoFastq() {
+    when(sampleService.files(any())).thenReturn(new ArrayList<>());
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(0).getName()));
+    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(1).getName()));
+    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(2).getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_NoFastqFistAndSecondSample() {
+    when(sampleService.files(any())).thenReturn(new ArrayList<>(), new ArrayList<>(),
+        secondPairedPaths);
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(0).getName()));
+    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(1).getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_NoFastqThirdSample() {
+    when(sampleService.files(any())).thenReturn(pairedPaths, pairedPaths, new ArrayList<>());
+    service.validateSamples(samples, locale, errorHandler);
+    verify(errorHandler).accept(resources.message("sample.noFastq", sample2.getName()));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_FirstPairedSecondUnpairedThirdNoFastq() {
+    when(sampleService.files(any())).thenReturn(pairedPaths, secondUnpairedPaths,
+        new ArrayList<>());
+    service.validateSamples(samples, locale, errorHandler);
+    System.out.println();
+    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(2).getName()));
+    verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
+    verifyNoMoreInteractions(errorHandler);
+    verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_Null() {
+    assertThrows(NullPointerException.class, () -> {
+      service.validateSamples((Collection<Sample>) null, locale, errorHandler);
+    });
+    verify(errorHandler, never()).accept(any());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void validateSamples_Empty() {
+    service.validateSamples(new ArrayList<>(), locale, errorHandler);
+    verify(errorHandler, never()).accept(any());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copyDatasetsResources_NoSample() throws Throwable {
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     assertThrows(IllegalArgumentException.class, () -> {
-      service.copyResources(datasets);
+      service.copyDatasetsResources(datasets);
     });
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_Datasets() throws Throwable {
+  public void copyDatasetsResources() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
@@ -536,8 +750,8 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPaired2);
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -584,7 +798,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsNoSampleName() throws Throwable {
+  public void copyDatasetsResources_NoSampleName() throws Throwable {
     paired1 = temporaryFolder.resolve("R1.fastq");
     paired2 = temporaryFolder.resolve("R2.fastq");
     pairedPaths.clear();
@@ -597,8 +811,8 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPaired2);
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -645,7 +859,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsSymlinks() throws Throwable {
+  public void copyDatasetsResources_Symlinks() throws Throwable {
     assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
@@ -655,8 +869,8 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPaired2);
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -703,7 +917,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsZip() throws Throwable {
+  public void copyDatasetsResources_Zip() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
     final byte[] fastq1Content = writeRandom(pairedZip1);
@@ -712,8 +926,8 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPairedZip2);
     final byte[] fastq5Content = writeRandom(thirdPairedZip1);
     final byte[] fastq6Content = writeRandom(thirdPairedZip2);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
     assertTrue(Files.exists(fastq1));
@@ -760,14 +974,14 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsUnpaired() throws Throwable {
+  public void copyDatasetsResources_Unpaired() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
         secondUnpairedPaths);
     final byte[] fastq1Content = writeRandom(unpaired);
     final byte[] fastq3Content = writeRandom(secondUnpaired);
     final byte[] fastq5Content = writeRandom(thirdUnpaired);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -808,7 +1022,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsPairedWithBams() throws Throwable {
+  public void copyDatasetsResources_PairedWithBams() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
@@ -834,8 +1048,8 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(thirdBam);
     thirdPairedPaths.add(thirdBam2);
     thirdPairedPaths.add(thirdRawbam);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -918,7 +1132,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsSymlinksWithBams() throws Throwable {
+  public void copyDatasetsResources_SymlinksWithBams() throws Throwable {
     assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
@@ -946,8 +1160,8 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(thirdBam);
     thirdPairedPaths.add(thirdBam2);
     thirdPairedPaths.add(thirdRawbam);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1030,7 +1244,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsUnpairedWithBams() throws Throwable {
+  public void copyDatasetsResources_UnpairedWithBams() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
         secondUnpairedPaths);
     final byte[] fastq1Content = writeRandom(unpaired);
@@ -1054,8 +1268,8 @@ public class AnalysisServiceTest {
     thirdUnpairedPaths.add(thirdBam);
     thirdUnpairedPaths.add(thirdBam2);
     thirdUnpairedPaths.add(thirdRawbam);
-    Path folder = service.copyResources(datasets);
-    assertEquals(configuration.analysis(datasets), folder);
+    Path folder = service.copyDatasetsResources(datasets);
+    assertEquals(configuration.datasetAnalysis(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1132,7 +1346,7 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_DatasetsAlreadyExists() throws Throwable {
+  public void copyDatasetsResources_AlreadyExists() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
@@ -1140,13 +1354,13 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPaired2);
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
-    Path folder = configuration.analysis(datasets);
+    Path folder = configuration.datasetAnalysis(datasets);
     String extraFilename = "test.bam";
     Files.createDirectories(folder);
     Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
     Files.write(folder.resolve(extraFilename), fastq1Content);
 
-    Path copyFolder = service.copyResources(datasets);
+    Path copyFolder = service.copyDatasetsResources(datasets);
 
     assertEquals(folder, copyFolder);
     assertFalse(Files.exists(folder.resolve(extraFilename)));
@@ -1196,17 +1410,647 @@ public class AnalysisServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_NullDatasets() throws Throwable {
+  public void copyDatasetsResources_Null() throws Throwable {
     assertThrows(IllegalArgumentException.class, () -> {
-      service.copyResources((Collection<Dataset>) null);
+      service.copyDatasetsResources((Collection<Dataset>) null);
     });
   }
 
   @Test
   @SuppressWarnings("unchecked")
-  public void copyResources_EmptyDatasets() throws Throwable {
+  public void copyDatasetsResources_Empty() throws Throwable {
     assertThrows(IllegalArgumentException.class, () -> {
-      service.copyResources(new ArrayList<>());
+      service.copyDatasetsResources(new ArrayList<>());
+    });
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_NoSampleName() throws Throwable {
+    paired1 = temporaryFolder.resolve("R1.fastq");
+    paired2 = temporaryFolder.resolve("R2.fastq");
+    pairedPaths.clear();
+    pairedPaths.add(paired1);
+    pairedPaths.add(paired2);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_Symlinks() throws Throwable {
+    assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
+    when(configuration.isAnalysisSymlinks()).thenReturn(true);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertTrue(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertTrue(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertTrue(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertTrue(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertTrue(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertTrue(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_Zip() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
+        secondPairedZipPaths);
+    final byte[] fastq1Content = writeRandom(pairedZip1);
+    final byte[] fastq2Content = writeRandom(pairedZip2);
+    final byte[] fastq3Content = writeRandom(secondPairedZip1);
+    final byte[] fastq4Content = writeRandom(secondPairedZip2);
+    final byte[] fastq5Content = writeRandom(thirdPairedZip1);
+    final byte[] fastq6Content = writeRandom(thirdPairedZip2);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_Unpaired() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
+        secondUnpairedPaths);
+    final byte[] fastq1Content = writeRandom(unpaired);
+    final byte[] fastq3Content = writeRandom(secondUnpaired);
+    final byte[] fastq5Content = writeRandom(thirdUnpaired);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertFalse(Files.exists(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertFalse(Files.exists(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertFalse(Files.exists(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_PairedWithBams() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    final byte[] bamContent = writeRandom(bam);
+    final byte[] bam2Content = writeRandom(bam2);
+    final byte[] rawbamContent = writeRandom(rawbam);
+    pairedPaths.add(bam);
+    pairedPaths.add(bam2);
+    pairedPaths.add(rawbam);
+    final byte[] secondBamContent = writeRandom(secondBam);
+    final byte[] secondBam2Content = writeRandom(secondBam2);
+    final byte[] secondRawbamContent = writeRandom(secondRawbam);
+    secondPairedPaths.add(secondBam);
+    secondPairedPaths.add(secondBam2);
+    secondPairedPaths.add(secondRawbam);
+    final byte[] thirdBamContent = writeRandom(thirdBam);
+    final byte[] thirdBam2Content = writeRandom(thirdBam2);
+    final byte[] thirdRawbamContent = writeRandom(thirdRawbam);
+    thirdPairedPaths.add(thirdBam);
+    thirdPairedPaths.add(thirdBam2);
+    thirdPairedPaths.add(thirdRawbam);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path bam1 = folder.resolve(sample.getName() + ".bam");
+    assertTrue(Files.exists(bam1));
+    assertFalse(Files.isSymbolicLink(bam1));
+    assertArrayEquals(bamContent, Files.readAllBytes(bam1));
+    Path bam2 = folder.resolve(sample.getName() + "-test.bam");
+    assertTrue(Files.exists(bam2));
+    assertFalse(Files.isSymbolicLink(bam2));
+    assertArrayEquals(bam2Content, Files.readAllBytes(bam2));
+    Path bam3 = folder.resolve(sample.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam3));
+    assertFalse(Files.isSymbolicLink(bam3));
+    assertArrayEquals(rawbamContent, Files.readAllBytes(bam3));
+    Path bam4 = folder.resolve(sample2.getName() + ".bam");
+    assertTrue(Files.exists(bam4));
+    assertFalse(Files.isSymbolicLink(bam4));
+    assertArrayEquals(secondBamContent, Files.readAllBytes(bam4));
+    Path bam5 = folder.resolve(sample2.getName() + "-test.bam");
+    assertTrue(Files.exists(bam5));
+    assertFalse(Files.isSymbolicLink(bam5));
+    assertArrayEquals(secondBam2Content, Files.readAllBytes(bam5));
+    Path bam6 = folder.resolve(sample2.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam6));
+    assertFalse(Files.isSymbolicLink(bam6));
+    assertArrayEquals(secondRawbamContent, Files.readAllBytes(bam6));
+    Path bam7 = folder.resolve(sample3.getName() + ".bam");
+    assertTrue(Files.exists(bam7));
+    assertFalse(Files.isSymbolicLink(bam7));
+    assertArrayEquals(thirdBamContent, Files.readAllBytes(bam7));
+    Path bam8 = folder.resolve(sample3.getName() + "-test.bam");
+    assertTrue(Files.exists(bam8));
+    assertFalse(Files.isSymbolicLink(bam8));
+    assertArrayEquals(thirdBam2Content, Files.readAllBytes(bam8));
+    Path bam9 = folder.resolve(sample3.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam9));
+    assertFalse(Files.isSymbolicLink(bam9));
+    assertArrayEquals(thirdRawbamContent, Files.readAllBytes(bam9));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_SymlinksWithBams() throws Throwable {
+    assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
+    when(configuration.isAnalysisSymlinks()).thenReturn(true);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    final byte[] bamContent = writeRandom(bam);
+    final byte[] bam2Content = writeRandom(bam2);
+    final byte[] rawbamContent = writeRandom(rawbam);
+    pairedPaths.add(bam);
+    pairedPaths.add(bam2);
+    pairedPaths.add(rawbam);
+    final byte[] secondBamContent = writeRandom(secondBam);
+    final byte[] secondBam2Content = writeRandom(secondBam2);
+    final byte[] secondRawbamContent = writeRandom(secondRawbam);
+    secondPairedPaths.add(secondBam);
+    secondPairedPaths.add(secondBam2);
+    secondPairedPaths.add(secondRawbam);
+    final byte[] thirdBamContent = writeRandom(thirdBam);
+    final byte[] thirdBam2Content = writeRandom(thirdBam2);
+    final byte[] thirdRawbamContent = writeRandom(thirdRawbam);
+    thirdPairedPaths.add(thirdBam);
+    thirdPairedPaths.add(thirdBam2);
+    thirdPairedPaths.add(thirdRawbam);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertTrue(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertTrue(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertTrue(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertTrue(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertTrue(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertTrue(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path bam1 = folder.resolve(sample.getName() + ".bam");
+    assertTrue(Files.exists(bam1));
+    assertTrue(Files.isSymbolicLink(bam1));
+    assertArrayEquals(bamContent, Files.readAllBytes(bam1));
+    Path bam2 = folder.resolve(sample.getName() + "-test.bam");
+    assertTrue(Files.exists(bam2));
+    assertTrue(Files.isSymbolicLink(bam2));
+    assertArrayEquals(bam2Content, Files.readAllBytes(bam2));
+    Path bam3 = folder.resolve(sample.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam3));
+    assertTrue(Files.isSymbolicLink(bam3));
+    assertArrayEquals(rawbamContent, Files.readAllBytes(bam3));
+    Path bam4 = folder.resolve(sample2.getName() + ".bam");
+    assertTrue(Files.exists(bam4));
+    assertTrue(Files.isSymbolicLink(bam4));
+    assertArrayEquals(secondBamContent, Files.readAllBytes(bam4));
+    Path bam5 = folder.resolve(sample2.getName() + "-test.bam");
+    assertTrue(Files.exists(bam5));
+    assertTrue(Files.isSymbolicLink(bam5));
+    assertArrayEquals(secondBam2Content, Files.readAllBytes(bam5));
+    Path bam6 = folder.resolve(sample2.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam6));
+    assertTrue(Files.isSymbolicLink(bam6));
+    assertArrayEquals(secondRawbamContent, Files.readAllBytes(bam6));
+    Path bam7 = folder.resolve(sample3.getName() + ".bam");
+    assertTrue(Files.exists(bam7));
+    assertTrue(Files.isSymbolicLink(bam7));
+    assertArrayEquals(thirdBamContent, Files.readAllBytes(bam7));
+    Path bam8 = folder.resolve(sample3.getName() + "-test.bam");
+    assertTrue(Files.exists(bam8));
+    assertTrue(Files.isSymbolicLink(bam8));
+    assertArrayEquals(thirdBam2Content, Files.readAllBytes(bam8));
+    Path bam9 = folder.resolve(sample3.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam9));
+    assertTrue(Files.isSymbolicLink(bam9));
+    assertArrayEquals(thirdRawbamContent, Files.readAllBytes(bam9));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_UnpairedWithBams() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, unpairedPaths,
+        secondUnpairedPaths);
+    final byte[] fastq1Content = writeRandom(unpaired);
+    final byte[] fastq3Content = writeRandom(secondUnpaired);
+    final byte[] fastq5Content = writeRandom(thirdUnpaired);
+    final byte[] bamContent = writeRandom(bam);
+    final byte[] bam2Content = writeRandom(bam2);
+    final byte[] rawbamContent = writeRandom(rawbam);
+    unpairedPaths.add(bam);
+    unpairedPaths.add(bam2);
+    unpairedPaths.add(rawbam);
+    final byte[] secondBamContent = writeRandom(secondBam);
+    final byte[] secondBam2Content = writeRandom(secondBam2);
+    final byte[] secondRawbamContent = writeRandom(secondRawbam);
+    secondUnpairedPaths.add(secondBam);
+    secondUnpairedPaths.add(secondBam2);
+    secondUnpairedPaths.add(secondRawbam);
+    final byte[] thirdBamContent = writeRandom(thirdBam);
+    final byte[] thirdBam2Content = writeRandom(thirdBam2);
+    final byte[] thirdRawbamContent = writeRandom(thirdRawbam);
+    thirdUnpairedPaths.add(thirdBam);
+    thirdUnpairedPaths.add(thirdBam2);
+    thirdUnpairedPaths.add(thirdRawbam);
+    Path folder = service.copySamplesResources(samples);
+    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertFalse(Files.exists(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertFalse(Files.exists(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertFalse(Files.exists(fastq6));
+    Path bam1 = folder.resolve(sample.getName() + ".bam");
+    assertTrue(Files.exists(bam1));
+    assertFalse(Files.isSymbolicLink(bam1));
+    assertArrayEquals(bamContent, Files.readAllBytes(bam1));
+    Path bam2 = folder.resolve(sample.getName() + "-test.bam");
+    assertTrue(Files.exists(bam2));
+    assertFalse(Files.isSymbolicLink(bam2));
+    assertArrayEquals(bam2Content, Files.readAllBytes(bam2));
+    Path bam3 = folder.resolve(sample.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam3));
+    assertFalse(Files.isSymbolicLink(bam3));
+    assertArrayEquals(rawbamContent, Files.readAllBytes(bam3));
+    Path bam4 = folder.resolve(sample2.getName() + ".bam");
+    assertTrue(Files.exists(bam4));
+    assertFalse(Files.isSymbolicLink(bam4));
+    assertArrayEquals(secondBamContent, Files.readAllBytes(bam4));
+    Path bam5 = folder.resolve(sample2.getName() + "-test.bam");
+    assertTrue(Files.exists(bam5));
+    assertFalse(Files.isSymbolicLink(bam5));
+    assertArrayEquals(secondBam2Content, Files.readAllBytes(bam5));
+    Path bam6 = folder.resolve(sample2.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam6));
+    assertFalse(Files.isSymbolicLink(bam6));
+    assertArrayEquals(secondRawbamContent, Files.readAllBytes(bam6));
+    Path bam7 = folder.resolve(sample3.getName() + ".bam");
+    assertTrue(Files.exists(bam7));
+    assertFalse(Files.isSymbolicLink(bam7));
+    assertArrayEquals(thirdBamContent, Files.readAllBytes(bam7));
+    Path bam8 = folder.resolve(sample3.getName() + "-test.bam");
+    assertTrue(Files.exists(bam8));
+    assertFalse(Files.isSymbolicLink(bam8));
+    assertArrayEquals(thirdBam2Content, Files.readAllBytes(bam8));
+    Path bam9 = folder.resolve(sample3.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam9));
+    assertFalse(Files.isSymbolicLink(bam9));
+    assertArrayEquals(thirdRawbamContent, Files.readAllBytes(bam9));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_AlreadyExists() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    Path folder = configuration.sampleAnalysis(samples);
+    String extraFilename = "test.bam";
+    Files.createDirectories(folder);
+    Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
+    Files.write(folder.resolve(extraFilename), fastq1Content);
+
+    Path copyFolder = service.copySamplesResources(samples);
+
+    assertEquals(folder, copyFolder);
+    assertFalse(Files.exists(folder.resolve(extraFilename)));
+    assertTrue(Files.exists(folder));
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_Null() throws Throwable {
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copySamplesResources((Collection<Sample>) null);
+    });
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void copySamplesResources_Empty() throws Throwable {
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copySamplesResources(new ArrayList<>());
     });
   }
 }

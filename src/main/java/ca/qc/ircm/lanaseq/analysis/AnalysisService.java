@@ -36,6 +36,8 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,7 @@ public class AnalysisService {
   private static final String FASTQ1_PATTERN = "(?:.*_)?R1" + FASTQ;
   private static final String FASTQ2_PATTERN = "(?:.*_)?R2" + FASTQ;
   private static final String BAM_PATTERN = "(?:.*)\\.bam";
+  private static final Logger logger = LoggerFactory.getLogger(AnalysisService.class);
   private SampleService sampleService;
   private AppConfiguration configuration;
 
@@ -71,9 +74,10 @@ public class AnalysisService {
    *          handles error messages
    */
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
-  public void validate(Collection<Dataset> datasets, Locale locale, Consumer<String> errorHandler) {
+  public void validateDatasets(Collection<Dataset> datasets, Locale locale,
+      Consumer<String> errorHandler) {
     if (datasets == null) {
-      throw new NullPointerException("dataset parameter cannot be null");
+      throw new NullPointerException("datasets parameter cannot be null");
     }
     if (datasets.isEmpty()) {
       // Nothing to validate.
@@ -90,6 +94,39 @@ public class AnalysisService {
     if (metadatas.stream().flatMap(omd -> omd.get().samples.stream())
         .filter(ms -> ms.paired != paired).findFirst().isPresent()) {
       errorHandler.accept(resources.message("datasets.pairedMissmatch"));
+    }
+  }
+
+  /**
+   * Validates if samples can be analyzed.
+   *
+   * @param samples
+   *          samples
+   * @param locale
+   *          locale for error messages
+   * @param errorHandler
+   *          handles error messages
+   */
+  @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #samples, 'read')")
+  public void validateSamples(Collection<Sample> samples, Locale locale,
+      Consumer<String> errorHandler) {
+    if (samples == null) {
+      throw new NullPointerException("samples parameter cannot be null");
+    }
+    if (samples.isEmpty()) {
+      // Nothing to validate.
+      return;
+    }
+
+    AppResources resources = new AppResources(AnalysisService.class, locale);
+    List<Optional<SampleAnalysis>> metadatas =
+        samples.stream().map(sa -> metadata(sa, resources, errorHandler))
+            .filter(ms -> ms.isPresent()).collect(Collectors.toList());
+    boolean paired = metadatas.stream().map(oms -> oms.map(ms -> ms.paired).orElse(false))
+        .findFirst().orElse(false);
+    if (metadatas.stream().map(oms -> oms.get()).filter(ms -> ms.paired != paired).findFirst()
+        .isPresent()) {
+      errorHandler.accept(resources.message("samples.pairedMissmatch"));
     }
   }
 
@@ -165,7 +202,7 @@ public class AnalysisService {
    *           dataset analysis validation failed
    */
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
-  public Path copyResources(Collection<Dataset> datasets) throws IOException {
+  public Path copyDatasetsResources(Collection<Dataset> datasets) throws IOException {
     if (datasets == null || datasets.isEmpty()) {
       throw new IllegalArgumentException("datasets parameter cannot be null or empty");
     }
@@ -178,11 +215,13 @@ public class AnalysisService {
           "at least one dataset is missing files required for analysis");
     }
     boolean symlinks = configuration.isAnalysisSymlinks();
-    Path folder = configuration.analysis(datasets);
+    Path folder = configuration.datasetAnalysis(datasets);
     FileSystemUtils.deleteRecursively(folder);
     Files.createDirectories(folder);
     for (DatasetAnalysis analysis : analyses) {
-      copyFiles(analysis.dataset, analysis, folder, symlinks);
+      for (SampleAnalysis sample : analysis.samples) {
+        copyFiles(sample, folder, symlinks);
+      }
     }
     Path samples = folder.resolve("samples.txt");
     List<String> samplesLines = new ArrayList<>();
@@ -200,20 +239,47 @@ public class AnalysisService {
     return folder;
   }
 
-  private void copyFiles(Dataset dataset, DatasetAnalysis analysis, Path folder, boolean symlinks)
+  @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #samples, 'read')")
+  public Path copySamplesResources(Collection<Sample> samples) throws IOException {
+    if (samples == null || samples.isEmpty()) {
+      throw new IllegalArgumentException("samples parameter cannot be null or empty");
+    }
+
+    Collection<SampleAnalysis> analyses = samples.stream().map(sample -> metadata(sample,
+        new AppResources(AnalysisService.class, Locale.getDefault()), message -> {
+        })).filter(opt -> opt.isPresent()).map(Optional::get).collect(Collectors.toList());
+    if (analyses.size() != samples.size()) {
+      throw new IllegalArgumentException(
+          "at least one dataset is missing files required for analysis");
+    }
+    boolean symlinks = configuration.isAnalysisSymlinks();
+    Path folder = configuration.sampleAnalysis(samples);
+    FileSystemUtils.deleteRecursively(folder);
+    Files.createDirectories(folder);
+    for (SampleAnalysis analysis : analyses) {
+      copyFiles(analysis, folder, symlinks);
+    }
+    Path samplesFile = folder.resolve("samples.txt");
+    List<String> samplesLines = new ArrayList<>();
+    samplesLines.add("#sample");
+    analyses.stream().map(analysis -> analysis.sample)
+        .forEach(sample -> samplesLines.add(sample.getName()));
+    Files.write(samplesFile, samplesLines, StandardOpenOption.CREATE);
+    return folder;
+  }
+
+  private void copyFiles(SampleAnalysis analysis, Path folder, boolean symlinks)
       throws IOException {
-    for (SampleAnalysis sample : analysis.samples) {
-      Path fastq1 = folder.resolve(sample.sample.getName() + "_R1.fastq"
-          + (sample.fastq1.toString().endsWith(".gz") ? ".gz" : ""));
-      copy(sample.fastq1, fastq1, symlinks);
-      if (sample.paired) {
-        Path fastq2 = folder.resolve(sample.sample.getName() + "_R2.fastq"
-            + (sample.fastq2.toString().endsWith(".gz") ? ".gz" : ""));
-        copy(sample.fastq2, fastq2, symlinks);
-      }
-      for (Path bam : sample.bams) {
-        copy(bam, folder.resolve(bam.getFileName()), symlinks);
-      }
+    Path fastq1 = folder.resolve(analysis.sample.getName() + "_R1.fastq"
+        + (analysis.fastq1.toString().endsWith(".gz") ? ".gz" : ""));
+    copy(analysis.fastq1, fastq1, symlinks);
+    if (analysis.paired) {
+      Path fastq2 = folder.resolve(analysis.sample.getName() + "_R2.fastq"
+          + (analysis.fastq2.toString().endsWith(".gz") ? ".gz" : ""));
+      copy(analysis.fastq2, fastq2, symlinks);
+    }
+    for (Path bam : analysis.bams) {
+      copy(bam, folder.resolve(bam.getFileName()), symlinks);
     }
   }
 

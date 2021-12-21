@@ -139,6 +139,21 @@ public class SamplesViewPresenter {
     }
   }
 
+  void analyze() {
+    List<Sample> samples = new ArrayList<>(view.samples.getSelectedItems());
+    AppResources resources = new AppResources(SamplesView.class, locale);
+    boolean error = false;
+    if (samples.isEmpty()) {
+      view.error.setText(resources.message(SAMPLES_REQUIRED));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      view.analysisDialog.setSamples(samples);
+      view.analysisDialog.open();
+    }
+  }
+
   void viewProtocol(Protocol protocol) {
     view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
     view.protocolDialog.open();

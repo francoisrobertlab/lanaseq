@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ANALYZE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
@@ -63,6 +64,10 @@ public class SamplesViewElement extends VerticalLayoutElement {
     return $(ButtonElement.class).id(FILES);
   }
 
+  public ButtonElement analyze() {
+    return $(ButtonElement.class).id(ANALYZE);
+  }
+
   public SampleDialogElement dialog() {
     return ((TestBenchElement) getDriver().findElement(By.id(SampleDialog.ID)))
         .wrap(SampleDialogElement.class);
@@ -71,6 +76,11 @@ public class SamplesViewElement extends VerticalLayoutElement {
   public SampleFilesDialogElement filesDialog() {
     return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID)))
         .wrap(SampleFilesDialogElement.class);
+  }
+
+  public SampleAnalysisDialogElement analyzeDialog() {
+    return ((TestBenchElement) getDriver().findElement(By.id(SampleAnalysisDialog.ID)))
+        .wrap(SampleAnalysisDialogElement.class);
   }
 
   public ProtocolDialogElement protocolDialog() {

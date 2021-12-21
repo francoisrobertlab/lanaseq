@@ -15,16 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.analysis.web;
+package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.CREATE_FOLDER_EXCEPTION;
+import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
-import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.sample.Sample;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -45,24 +46,24 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AnalysisDialogPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(AnalysisDialogPresenter.class);
-  private AnalysisDialog dialog;
-  private Collection<Dataset> datasets;
-  private Locale locale;
+public class SampleAnalysisDialogPresenter {
+  private static final Logger logger = LoggerFactory.getLogger(SampleAnalysisDialogPresenter.class);
+  private SampleAnalysisDialog dialog;
+  private Collection<Sample> samples;
+  private Locale locale = Constants.DEFAULT_LOCALE;
   private AnalysisService service;
   private AppConfiguration configuration;
 
   @Autowired
-  protected AnalysisDialogPresenter(AnalysisService service, AppConfiguration configuration) {
+  protected SampleAnalysisDialogPresenter(AnalysisService service, AppConfiguration configuration) {
     this.service = service;
     this.configuration = configuration;
   }
 
-  void init(AnalysisDialog dialog) {
+  void init(SampleAnalysisDialog dialog) {
     this.dialog = dialog;
     dialog.addOpenedChangeListener(e -> {
-      if (e.isOpened() && datasets != null) {
+      if (e.isOpened() && samples != null) {
         validate();
       }
     });
@@ -74,7 +75,7 @@ public class AnalysisDialogPresenter {
 
   boolean validate() {
     List<String> errors = new ArrayList<>();
-    service.validateDatasets(datasets, locale, error -> errors.add(error));
+    service.validateSamples(samples, locale, error -> errors.add(error));
     if (!errors.isEmpty()) {
       dialog.errorsLayout.removeAll();
       errors.forEach(error -> dialog.errorsLayout.add(new Span(error)));
@@ -86,15 +87,15 @@ public class AnalysisDialogPresenter {
 
   void createFolder() {
     if (validate()) {
-      logger.debug("creating analysis folder for datasets {}", datasets);
-      AppResources resources = new AppResources(AnalysisDialog.class, locale);
+      logger.debug("creating analysis folder for samples {}", samples);
+      AppResources resources = new AppResources(SampleAnalysisDialog.class, locale);
       try {
-        service.copyDatasetsResources(datasets);
+        service.copySamplesResources(samples);
         boolean unix = dialog.getUI().map(ui -> {
           WebBrowser browser = ui.getSession().getBrowser();
           return browser.isMacOSX() || browser.isLinux();
         }).orElse(false);
-        String folder = configuration.datasetAnalysisLabel(datasets, unix);
+        String folder = configuration.sampleAnalysisLabel(samples, unix);
         String network = configuration.folderNetwork(unix);
         dialog.confirmLayout.removeAll();
         dialog.confirmLayout.add(new Span(resources.message(property(CONFIRM, "message"), folder)));
@@ -114,15 +115,15 @@ public class AnalysisDialogPresenter {
     }
   }
 
-  Collection<Dataset> getDatasets() {
-    return datasets;
+  Collection<Sample> getSamples() {
+    return samples;
   }
 
-  void setDataset(Dataset dataset) {
-    this.datasets = Collections.nCopies(1, dataset);
+  void setSample(Sample sample) {
+    this.samples = Collections.nCopies(1, sample);
   }
 
-  void setDatasets(List<Dataset> datasets) {
-    this.datasets = datasets;
+  void setSamples(List<Sample> samples) {
+    this.samples = samples;
   }
 }

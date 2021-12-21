@@ -101,6 +101,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Collection<Sample>> samplesCaptor;
   @Captor
+  private ArgumentCaptor<List<Sample>> sampleListCaptor;
+  @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<SampleDialog>>> savedListenerCaptor;
@@ -134,8 +136,11 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.error = new Div();
     view.add = new Button();
     view.merge = new Button();
+    view.files = new Button();
+    view.analyze = new Button();
     view.dialog = mock(SampleDialog.class);
     view.filesDialog = mock(SampleFilesDialog.class);
+    view.analysisDialog = mock(SampleAnalysisDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
     samples = repository.findAll();
     when(service.all(any())).thenReturn(new ArrayList<>(samples));
@@ -303,6 +308,40 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     presenter.viewFiles(sample);
     verify(view.filesDialog).setSample(sample);
     verify(view.filesDialog).open();
+  }
+
+  @Test
+  public void analyze_One() {
+    Sample sample = samples.get(0);
+    view.samples.select(sample);
+    presenter.analyze();
+    assertFalse(view.error.isVisible());
+    verify(view.analysisDialog).setSamples(sampleListCaptor.capture());
+    assertEquals(1, sampleListCaptor.getValue().size());
+    assertTrue(sampleListCaptor.getValue().contains(sample));
+    verify(view.analysisDialog).open();
+  }
+
+  @Test
+  public void analyze_NoSelection() {
+    presenter.analyze();
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    verify(view.analysisDialog, never()).setSample(any());
+    verify(view.analysisDialog, never()).open();
+  }
+
+  @Test
+  public void analyze_MoreThanOneSampleSelected() {
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+    presenter.analyze();
+    assertFalse(view.error.isVisible());
+    verify(view.analysisDialog).setSamples(sampleListCaptor.capture());
+    assertEquals(2, sampleListCaptor.getValue().size());
+    assertTrue(sampleListCaptor.getValue().contains(samples.get(0)));
+    assertTrue(sampleListCaptor.getValue().contains(samples.get(1)));
+    verify(view.analysisDialog).open();
   }
 
   @Test

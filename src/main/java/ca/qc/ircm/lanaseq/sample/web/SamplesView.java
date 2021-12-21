@@ -80,6 +80,7 @@ public class SamplesView extends VerticalLayout
   public static final String SAMPLES = "samples";
   public static final String MERGE = "merge";
   public static final String FILES = "files";
+  public static final String ANALYZE = "analyze";
   public static final String MERGED = "merged";
   public static final String SAMPLES_REQUIRED = property(SAMPLES, "required");
   public static final String SAMPLES_MORE_THAN_ONE = property(SAMPLES, "moreThanOne");
@@ -105,10 +106,13 @@ public class SamplesView extends VerticalLayout
   protected Button add = new Button();
   protected Button merge = new Button();
   protected Button files = new Button();
+  protected Button analyze = new Button();
   @Autowired
   protected SampleDialog dialog;
   @Autowired
   protected SampleFilesDialog filesDialog;
+  @Autowired
+  protected SampleAnalysisDialog analysisDialog;
   @Autowired
   protected ProtocolDialog protocolDialog;
   @Autowired
@@ -118,10 +122,11 @@ public class SamplesView extends VerticalLayout
   }
 
   SamplesView(SamplesViewPresenter presenter, SampleDialog dialog, SampleFilesDialog filesDialog,
-      ProtocolDialog protocolDialog) {
+      SampleAnalysisDialog analysisDialog, ProtocolDialog protocolDialog) {
     this.presenter = presenter;
     this.dialog = dialog;
     this.filesDialog = filesDialog;
+    this.analysisDialog = analysisDialog;
     this.protocolDialog = protocolDialog;
   }
 
@@ -130,7 +135,7 @@ public class SamplesView extends VerticalLayout
     logger.debug("samples view");
     setId(ID);
     setHeightFull();
-    add(header, samples, error, new HorizontalLayout(add, merge, files));
+    add(header, samples, error, new HorizontalLayout(add, merge, files, analyze));
     expand(samples);
     header.setId(HEADER);
     samples.setId(SAMPLES);
@@ -195,6 +200,8 @@ public class SamplesView extends VerticalLayout
     files.setId(FILES);
     files.setIcon(VaadinIcon.FILE_O.create());
     files.addClickListener(e -> presenter.viewFiles());
+    analyze.setId(ANALYZE);
+    analyze.addClickListener(e -> presenter.analyze());
     presenter.init(this);
   }
 
@@ -220,6 +227,7 @@ public class SamplesView extends VerticalLayout
     add.setText(webResources.message(ADD));
     merge.setText(resources.message(MERGE));
     files.setText(resources.message(FILES));
+    analyze.setText(resources.message(ANALYZE));
     presenter.localeChange(getLocale());
   }
 

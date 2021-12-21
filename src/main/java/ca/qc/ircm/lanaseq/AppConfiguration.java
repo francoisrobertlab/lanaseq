@@ -150,7 +150,7 @@ public class AppConfiguration {
     return unix ? userHome.network.unix : userHome.network.windows;
   }
 
-  public Path analysis(Collection<Dataset> datasets) {
+  public Path datasetAnalysis(Collection<Dataset> datasets) {
     if (datasets == null || datasets.isEmpty()) {
       throw new IllegalArgumentException("datasets cannot be null or empty");
     }
@@ -174,6 +174,28 @@ public class AppConfiguration {
     }
   }
 
+  public Path sampleAnalysis(Collection<Sample> samples) {
+    if (samples == null || samples.isEmpty()) {
+      throw new IllegalArgumentException("samples cannot be null or empty");
+    }
+    if (samples.size() == 1) {
+      return getAnalysis().resolve(samples.stream().findFirst().map(Sample::getName).get());
+    } else {
+      Optional<User> user = authorizationService.getCurrentUser();
+      Sample sample = samples.iterator().next();
+      StringBuilder builder = new StringBuilder();
+      user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
+          .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
+      builder.append(sample.getAssay() != null ? "_" + sample.getAssay() : "");
+      builder.append("_");
+      builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(sample.getDate()));
+      if (builder.length() > 0) {
+        builder.deleteCharAt(0);
+      }
+      return getAnalysis().resolve(builder.toString());
+    }
+  }
+
   /**
    * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
    *
@@ -183,8 +205,26 @@ public class AppConfiguration {
    *          true if path elements should be separated by slashes instead of backslashes
    * @return label to be shown to user, so he can find the dataset's analysis folder on the network
    */
-  public String analysisLabel(Collection<Dataset> datasets, boolean unix) {
-    Path relative = home.relativize(analysis(datasets));
+  public String datasetAnalysisLabel(Collection<Dataset> datasets, boolean unix) {
+    Path relative = home.relativize(datasetAnalysis(datasets));
+    if (unix) {
+      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+    } else {
+      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+    }
+  }
+
+  /**
+   * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
+   *
+   * @param samples
+   *          samples
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return label to be shown to user, so he can find the dataset's analysis folder on the network
+   */
+  public String sampleAnalysisLabel(Collection<Sample> samples, boolean unix) {
+    Path relative = home.relativize(sampleAnalysis(samples));
     if (unix) {
       return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
     } else {
