@@ -57,7 +57,7 @@
     <testbench.skip>false</testbench.skip>
     <testbench.maxAttempts>3</testbench.maxAttempts>
     <!-- Dependencies -->
-    <spring-boot.version>2.5.2</spring-boot.version>
+    <spring-boot.version>2.6.7</spring-boot.version>
     <vaadin.version>14.7.8</vaadin.version>
     <generate-property-names.version>0.5</generate-property-names.version>
     <querydsl.version>4.2.1</querydsl.version>
