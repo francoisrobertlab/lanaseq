@@ -39,7 +39,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
   @Autowired
   private SampleRepository repository;
   @Autowired
-  private AuthorizationService authorizationService;
+  private RoleValidator roleValidator;
 
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
@@ -75,7 +75,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
     if (currentUser == null) {
       return false;
     }
-    if (authorizationService.hasRole(ADMIN)) {
+    if (roleValidator.hasRole(ADMIN)) {
       return true;
     }
     if (sample.getId() == null) {
@@ -84,7 +84,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
     User owner = sample.getOwner();
     boolean authorized = owner.getId().equals(currentUser.getId());
     authorized |= permission.equals(READ);
-    authorized |= permission.equals(WRITE) && authorizationService.hasRole(MANAGER);
+    authorized |= permission.equals(WRITE) && roleValidator.hasRole(MANAGER);
     return authorized;
   }
 }

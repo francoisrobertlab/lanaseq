@@ -21,8 +21,6 @@ import static ca.qc.ircm.lanaseq.security.UserAuthority.FORCE_CHANGE_PASSWORD;
 
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
@@ -32,7 +30,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,15 +48,19 @@ public class SpringAuthorizationService implements AuthorizationService {
   @Autowired
   private UserDetailsService userDetailsService;
   @Autowired
+  private RoleValidator roleValidator;
+  @Autowired
   private PermissionEvaluator permissionEvaluator;
 
   protected SpringAuthorizationService() {
   }
 
   protected SpringAuthorizationService(UserRepository userRepository,
-      UserDetailsService userDetailsService, PermissionEvaluator permissionEvaluator) {
+      UserDetailsService userDetailsService, RoleValidator roleValidator,
+      PermissionEvaluator permissionEvaluator) {
     this.userRepository = userRepository;
     this.userDetailsService = userDetailsService;
+    this.roleValidator = roleValidator;
     this.permissionEvaluator = permissionEvaluator;
   }
 
@@ -86,38 +87,22 @@ public class SpringAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasRole(String role) {
-    Collection<? extends GrantedAuthority> authorities =
-        getAuthentication().map(Authentication::getAuthorities).orElse(Collections.emptyList());
-    boolean hasRole = false;
-    for (GrantedAuthority authority : authorities) {
-      hasRole |= authority.getAuthority().equals(role);
-    }
-    logger.trace("user {} hasRole {}? {}",
-        getAuthentication().map(Authentication::getName).orElse("<anonymous>"), role, hasRole);
-    return hasRole;
+    return roleValidator.hasRole(role);
   }
 
   @Override
   public boolean hasAnyRole(String... roles) {
-    boolean hasAnyRole = false;
-    for (String role : roles) {
-      hasAnyRole |= hasRole(role);
-    }
-    return hasAnyRole;
+    return roleValidator.hasAnyRole(roles);
   }
 
   @Override
   public boolean hasAllRoles(String... roles) {
-    boolean hasAllRole = true;
-    for (String role : roles) {
-      hasAllRole &= hasRole(role);
-    }
-    return hasAllRole;
+    return roleValidator.hasAllRoles(roles);
   }
 
   @Override
   public void reloadAuthorities() {
-    if (hasRole(FORCE_CHANGE_PASSWORD)) {
+    if (roleValidator.hasRole(FORCE_CHANGE_PASSWORD)) {
       getAuthentication().ifPresent(oldAuthentication -> {
         logger.debug("reload authorities from user {}", oldAuthentication.getName());
         UserDetails userDetails =
@@ -135,7 +120,7 @@ public class SpringAuthorizationService implements AuthorizationService {
     RolesAllowed rolesAllowed = AnnotationUtils.findAnnotation(type, RolesAllowed.class);
     if (rolesAllowed != null) {
       String[] roles = rolesAllowed.value();
-      return hasAnyRole(roles);
+      return roleValidator.hasAnyRole(roles);
     } else {
       return true;
     }

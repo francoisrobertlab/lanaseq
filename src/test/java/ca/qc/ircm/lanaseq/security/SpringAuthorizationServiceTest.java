@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,12 +41,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -65,12 +66,15 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserGran
 @ServiceTestAnnotations
 public class SpringAuthorizationServiceTest {
   private static final String DEFAULT_ROLE = USER;
+  @Autowired
   private SpringAuthorizationService authorizationService;
   @Autowired
   private UserRepository userRepository;
   @Autowired
   private UserDetailsService userDetailsService;
-  @Mock
+  @MockBean
+  private RoleValidator roleValidator;
+  @MockBean
   private PermissionEvaluator permissionEvaluator;
   @Mock
   private User user;
@@ -80,15 +84,6 @@ public class SpringAuthorizationServiceTest {
   private Object object;
   @Captor
   private ArgumentCaptor<List<Permission>> permissionsCaptor;
-
-  /**
-   * Before test.
-   */
-  @BeforeEach
-  public void beforeTest() {
-    authorizationService =
-        new SpringAuthorizationService(userRepository, userDetailsService, permissionEvaluator);
-  }
 
   private void switchToUser(String username) {
     Authentication previousAuthentication = SecurityContextHolder.getContext().getAuthentication();
@@ -135,45 +130,46 @@ public class SpringAuthorizationServiceTest {
   @Test
   @WithMockUser
   public void hasRole_False() throws Throwable {
-    assertFalse(authorizationService.hasRole(ADMIN));
+    assertFalse(authorizationService.hasRole(DEFAULT_ROLE));
+    verify(roleValidator).hasRole(DEFAULT_ROLE);
   }
 
   @Test
   @WithMockUser
   public void hasRole_True() throws Throwable {
+    when(roleValidator.hasRole(any())).thenReturn(true);
     assertTrue(authorizationService.hasRole(DEFAULT_ROLE));
-  }
-
-  @Test
-  @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasRole_SwitchedUser() throws Throwable {
-    switchToUser("francois.robert@ircm.qc.ca");
-    assertTrue(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+    verify(roleValidator).hasRole(DEFAULT_ROLE);
   }
 
   @Test
   @WithMockUser
   public void hasAnyRole_False() throws Throwable {
-    assertFalse(authorizationService.hasAnyRole(ADMIN, MANAGER));
+    assertFalse(authorizationService.hasAnyRole(DEFAULT_ROLE, MANAGER));
+    verify(roleValidator).hasAnyRole(DEFAULT_ROLE, MANAGER);
   }
 
   @Test
   @WithMockUser
-  public void hasAnyRole_TrueFirst() throws Throwable {
+  public void hasAnyRole_True() throws Throwable {
+    when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authorizationService.hasAnyRole(DEFAULT_ROLE, MANAGER));
+    verify(roleValidator).hasAnyRole(DEFAULT_ROLE, MANAGER);
   }
 
   @Test
   @WithMockUser
-  public void hasAnyRole_TrueLast() throws Throwable {
-    assertTrue(authorizationService.hasAnyRole(ADMIN, DEFAULT_ROLE));
+  public void hasAllRoles_False() throws Throwable {
+    assertFalse(authorizationService.hasAllRoles(DEFAULT_ROLE, MANAGER));
+    verify(roleValidator).hasAllRoles(DEFAULT_ROLE, MANAGER);
   }
 
   @Test
-  @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasAnyRole_SwitchedUser() throws Throwable {
-    switchToUser("francois.robert@ircm.qc.ca");
-    assertTrue(authorizationService.hasAnyRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+  @WithMockUser
+  public void hasAllRoles_True() throws Throwable {
+    when(roleValidator.hasAllRoles(any())).thenReturn(true);
+    assertTrue(authorizationService.hasAllRoles(DEFAULT_ROLE, MANAGER));
+    verify(roleValidator).hasAllRoles(DEFAULT_ROLE, MANAGER);
   }
 
   @Test
@@ -206,6 +202,7 @@ public class SpringAuthorizationServiceTest {
     assertTrue(user.isAccountNonLocked());
     assertTrue(user.isCredentialsNonExpired());
     assertTrue(user.isEnabled());
+    when(roleValidator.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
 
     authorizationService.reloadAuthorities();
 
@@ -275,65 +272,75 @@ public class SpringAuthorizationServiceTest {
   @WithMockUser
   public void isAuthorized_NoRole() throws Throwable {
     assertTrue(authorizationService.isAuthorized(NoRoleTest.class));
+    verify(roleValidator, never()).hasAnyRole(any());
   }
 
   @Test
   @WithMockUser
   public void isAuthorized_UserRole_True() throws Throwable {
+    when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(UserRoleTest.class));
+    verify(roleValidator).hasAnyRole(USER);
   }
 
   @Test
   @WithMockUser(roles = {})
   public void isAuthorized_UserRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(UserRoleTest.class));
+    verify(roleValidator).hasAnyRole(USER);
   }
 
   @Test
   @WithMockUser(authorities = { MANAGER })
   public void isAuthorized_ManagerRole_True() throws Throwable {
+    when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(ManagerRoleTest.class));
+    verify(roleValidator).hasAnyRole(MANAGER);
   }
 
   @Test
   @WithMockUser
   public void isAuthorized_ManagerRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(ManagerRoleTest.class));
+    verify(roleValidator).hasAnyRole(MANAGER);
   }
 
   @Test
   @WithMockUser(authorities = { ADMIN })
   public void isAuthorized_AdminRole_True() throws Throwable {
+    when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(AdminRoleTest.class));
+    verify(roleValidator).hasAnyRole(ADMIN);
   }
 
   @Test
   @WithMockUser
   public void isAuthorized_AdminRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(AdminRoleTest.class));
+    verify(roleValidator).hasAnyRole(ADMIN);
   }
 
   @Test
   @WithMockUser(authorities = { MANAGER })
-  public void isAuthorized_ManagerOrAdminRole_Manager() throws Throwable {
+  public void isAuthorized_ManagerOrAdminRole_True() throws Throwable {
+    when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
-  }
-
-  @Test
-  @WithMockUser(authorities = { ADMIN })
-  public void isAuthorized_ManagerOrAdminRole_Admin() throws Throwable {
-    assertTrue(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
+    verify(roleValidator).hasAnyRole(MANAGER, ADMIN);
   }
 
   @Test
   @WithMockUser
   public void isAuthorized_ManagerOrAdminRole_False() throws Throwable {
     assertFalse(authorizationService.isAuthorized(ManagerOrAdminRoleTest.class));
+    verify(roleValidator).hasAnyRole(MANAGER, ADMIN);
   }
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void isAuthorized_SwitchedUser() throws Throwable {
+    when(roleValidator.hasAnyRole(USER)).thenReturn(true);
+    when(roleValidator.hasAnyRole(MANAGER)).thenReturn(true);
+    when(roleValidator.hasAnyRole(MANAGER, ADMIN)).thenReturn(true);
     switchToUser("francois.robert@ircm.qc.ca");
     assertTrue(authorizationService.isAuthorized(UserRoleTest.class));
     assertTrue(authorizationService.isAuthorized(ManagerRoleTest.class));
