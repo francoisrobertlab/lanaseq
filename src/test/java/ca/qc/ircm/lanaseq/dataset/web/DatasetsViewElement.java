@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
@@ -49,10 +48,6 @@ public class DatasetsViewElement extends VerticalLayoutElement {
 
   public DivElement error() {
     return $(DivElement.class).id(ERROR_TEXT);
-  }
-
-  public ButtonElement add() {
-    return $(ButtonElement.class).id(ADD);
   }
 
   public ButtonElement merge() {

@@ -50,7 +50,6 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -120,7 +119,6 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.datasets = new DatasetGrid();
     view.datasets.setSelectionMode(SelectionMode.MULTI);
     view.error = new Div();
-    view.add = new Button();
     view.dialog = mock(DatasetDialog.class);
     view.filesDialog = mock(DatasetFilesDialog.class);
     view.protocolDialog = mock(ProtocolDialog.class);
@@ -205,13 +203,6 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     verify(protocolService).get(1L);
     verify(view.protocolDialog).setProtocol(databaseProtocol);
     verify(view.protocolDialog).open();
-  }
-
-  @Test
-  public void add() {
-    presenter.add();
-    verify(view.dialog).setDataset(null);
-    verify(view.dialog).open();
   }
 
   @Test

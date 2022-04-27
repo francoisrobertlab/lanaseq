@@ -22,7 +22,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,14 +37,12 @@ import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -156,49 +153,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());
     assertTrue(optional(() -> dialog.confirm()).isPresent());
-  }
-
-  @Test
-  public void save_New() throws Throwable {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
-    view.add().click();
-    DatasetDialogElement dialog = view.dialog();
-    fill(dialog);
-
-    TestTransaction.flagForCommit();
-    dialog.save().click();
-    TestTransaction.end();
-
-    String name = name() + "_" + sampleId + "_20200720";
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
-    List<Dataset> datasets = repository.findByOwner(new User(3L));
-    Dataset dataset =
-        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
-    assertNotNull(dataset);
-    assertNotNull(dataset.getId());
-    assertEquals(name, dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains(tag1));
-    assertTrue(dataset.getTags().contains(tag2));
-    assertEquals(note, dataset.getNote());
-    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
-    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));
-    assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(1, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleId, sample.getSampleId());
-    assertEquals(sampleReplicate, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertNull(sample.getNote());
   }
 
   @Test

@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
@@ -71,7 +70,6 @@ public class DatasetsView extends VerticalLayout
   private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
   protected H2 header = new H2();
   protected Div error = new Div();
-  protected Button add = new Button();
   protected Button merge = new Button();
   protected Button files = new Button();
   @Autowired
@@ -102,7 +100,7 @@ public class DatasetsView extends VerticalLayout
     logger.debug("datasets view");
     setId(ID);
     setHeightFull();
-    add(header, datasets, error, new HorizontalLayout(add, merge, files));
+    add(header, datasets, error, new HorizontalLayout(merge, files));
     expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
@@ -122,9 +120,6 @@ public class DatasetsView extends VerticalLayout
     });
     error.setId(ERROR_TEXT);
     error.addClassName(ERROR_TEXT);
-    add.setId(ADD);
-    add.setIcon(VaadinIcon.PLUS.create());
-    add.addClickListener(e -> presenter.add());
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
     merge.addClickListener(e -> presenter.merge());
@@ -143,9 +138,7 @@ public class DatasetsView extends VerticalLayout
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(DatasetsView.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
-    add.setText(webResources.message(ADD));
     merge.setText(resources.message(MERGE));
     files.setText(resources.message(FILES));
     presenter.localeChange(getLocale());
