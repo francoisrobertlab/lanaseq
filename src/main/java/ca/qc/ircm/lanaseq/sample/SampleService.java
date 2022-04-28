@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.file.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -277,7 +276,6 @@ public class SampleService {
     Path folder = configuration.folder(sample);
     Renamer.moveFolder(oldFolder, folder);
     Renamer.renameFiles(oldName, sample.getName(), folder);
-    renameDatasets(sample);
   }
 
   @Transactional(TxType.REQUIRES_NEW)
@@ -286,19 +284,6 @@ public class SampleService {
       return repository.findById(sample.getId());
     } else {
       return Optional.empty();
-    }
-  }
-
-  private void renameDatasets(Sample sample) {
-    List<Dataset> datasets = datasetRepository.findBySamples(sample);
-    for (Dataset dataset : datasets) {
-      final String oldName = dataset.getName();
-      Path oldFolder = configuration.folder(dataset);
-      dataset.generateName();
-      datasetRepository.save(dataset);
-      Path folder = configuration.folder(dataset);
-      Renamer.moveFolder(oldFolder, folder);
-      Renamer.renameFiles(oldName, dataset.getName(), folder);
     }
   }
 

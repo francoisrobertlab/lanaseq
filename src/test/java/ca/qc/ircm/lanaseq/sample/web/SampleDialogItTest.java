@@ -266,10 +266,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(treatment, sample.getTreatment());
     assertEquals(note, sample.getNote());
     Dataset dataset = datasetRepository.findById(2L).get();
-    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "-JS2_20181022",
-        dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     dataset = datasetRepository.findById(6L).get();
-    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208", dataset.getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.folder(sample);
     assertTrue(Files.exists(folder));
