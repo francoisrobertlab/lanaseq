@@ -587,6 +587,42 @@ public class DatasetServiceTest {
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     dataset.setNote("test note");
+    dataset.getSamples().add(sampleRepository.findById(1L).get());
+    dataset.getSamples().add(sampleRepository.findById(2L).get());
+
+    service.save(dataset);
+
+    repository.flush();
+    assertNotNull(dataset.getId());
+    dataset = repository.findById(dataset.getId()).orElse(null);
+    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20200721", dataset.getName());
+    assertEquals(2, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("tag1"));
+    assertTrue(dataset.getTags().contains("tag2"));
+    assertEquals("test note", dataset.getNote());
+    assertEquals(user.getId(), dataset.getOwner().getId());
+    assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
+    assertTrue(dataset.isEditable());
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getCreationDate()));
+    assertEquals(2, dataset.getSamples().size());
+    for (Sample sample : dataset.getSamples()) {
+      verify(sampleService, never()).save(sample);
+    }
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void save_NewWithNewSample() {
+    User user = userRepository.findById(3L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    Dataset dataset = new Dataset();
+    dataset.setTags(new HashSet<>());
+    dataset.getTags().add("tag1");
+    dataset.getTags().add("tag2");
+    dataset.setDate(LocalDate.of(2020, 7, 21));
+    dataset.setSamples(new ArrayList<>());
+    dataset.setNote("test note");
     Sample sample1 = new Sample();
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
@@ -600,40 +636,10 @@ public class DatasetServiceTest {
     sample1.setDate(LocalDate.of(2020, 7, 21));
     sample1.setNote("test note");
     dataset.getSamples().add(sample1);
-    Sample sample2 = new Sample();
-    sample2.setSampleId("sample2");
-    sample2.setReplicate("r2");
-    sample2.setAssay(Assay.CHIP_SEQ);
-    sample2.setType(SampleType.IMMUNO_PRECIPITATION);
-    sample2.setTarget("my target");
-    sample2.setStrain("yFR213");
-    sample2.setStrainDescription("F56G");
-    sample2.setTreatment("37C");
-    sample2.setProtocol(protocolRepository.findById(1L).get());
-    sample2.setDate(LocalDate.of(2020, 7, 21));
-    sample2.setNote("test note");
-    dataset.getSamples().add(sample2);
 
-    service.save(dataset);
-
-    repository.flush();
-    assertNotNull(dataset.getId());
-    dataset = repository.findById(dataset.getId()).orElse(null);
-    assertEquals("ChIPseq_IP_mytarget_yFR213_F56G_37C_sample1-sample2_20200721", dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("tag1"));
-    assertTrue(dataset.getTags().contains("tag2"));
-    assertEquals("test note", dataset.getNote());
-    assertEquals(user.getId(), dataset.getOwner().getId());
-    assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
-    assertTrue(dataset.isEditable());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(dataset.getCreationDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(dataset.getCreationDate()));
-    assertEquals(2, dataset.getSamples().size());
-    for (Sample sample : dataset.getSamples()) {
-      verify(sampleService).save(sample);
-    }
-    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.save(dataset);
+    });
   }
 
   @Test
@@ -659,30 +665,18 @@ public class DatasetServiceTest {
     sample1.setDate(LocalDate.of(2020, 7, 21));
     sample1.setNote("test note");
     final Sample removed = dataset.getSamples().remove(1);
-    Sample sample3 = new Sample();
-    sample3.setSampleId("sample4");
-    sample3.setReplicate("r4");
-    sample3.setAssay(Assay.CHIP_SEQ);
-    sample3.setType(SampleType.INPUT);
-    sample3.setTarget("my target");
-    sample3.setStrain("yFR213");
-    sample3.setStrainDescription("F56G");
-    sample3.setTreatment("37C");
-    sample3.setProtocol(protocolRepository.findById(3L).get());
-    sample3.setDate(LocalDate.of(2020, 7, 21));
-    sample3.setNote("test note");
-    dataset.getSamples().add(sample3);
+    dataset.getSamples().add(sampleRepository.findById(4L).get());
 
     service.save(dataset);
 
     repository.flush();
     for (Sample sample : dataset.getSamples()) {
-      verify(sampleService).save(sample);
+      verify(sampleService, never()).save(sample);
     }
     verify(sampleService, never()).save(removed);
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-sample4_20200721",
+    assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-JS1_20200721",
         dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
@@ -694,6 +688,38 @@ public class DatasetServiceTest {
     assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
+    assertTrue(find(dataset.getSamples(), 1L).isPresent());
+    assertTrue(find(dataset.getSamples(), 3L).isPresent());
+    assertTrue(find(dataset.getSamples(), 4L).isPresent());
+  }
+
+  @Test
+  public void save_UpdateWithNewSample() {
+    User user = userRepository.findById(3L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    Dataset dataset = repository.findById(1L).orElse(null);
+    detach(dataset);
+    dataset.getTags().remove("rappa");
+    dataset.getTags().add("tag1");
+    dataset.setNote("test note");
+    dataset.setDate(LocalDate.of(2020, 7, 21));
+    Sample newSample = new Sample();
+    newSample.setSampleId("new_sample");
+    newSample.setReplicate("new_r");
+    newSample.setAssay(Assay.CHIP_SEQ);
+    newSample.setType(SampleType.IMMUNO_PRECIPITATION);
+    newSample.setTarget("my target");
+    newSample.setStrain("yFR213");
+    newSample.setStrainDescription("F56G");
+    newSample.setTreatment("37C");
+    newSample.setProtocol(protocolRepository.findById(1L).get());
+    newSample.setDate(LocalDate.of(2020, 7, 21));
+    newSample.setNote("test note");
+    dataset.getSamples().add(newSample);
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.save(dataset);
+    });
   }
 
   @Test
@@ -732,9 +758,6 @@ public class DatasetServiceTest {
     assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
-    for (Sample sample : dataset.getSamples()) {
-      verify(sampleService).save(sample);
-    }
     Sample sample = dataset.getSamples().get(0);
     assertEquals((Long) 1L, sample.getId());
     assertEquals("sample1", sample.getSampleId());
@@ -781,9 +804,6 @@ public class DatasetServiceTest {
 
     repository.flush();
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
-    for (Sample sample : dataset.getSamples()) {
-      verify(sampleService).save(sample);
-    }
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
@@ -885,9 +905,6 @@ public class DatasetServiceTest {
 
     repository.flush();
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
-    for (Sample sample : dataset.getSamples()) {
-      verify(sampleService).save(sample);
-    }
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
@@ -962,9 +979,6 @@ public class DatasetServiceTest {
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
-    verify(sampleService, never()).save(dataset.getSamples().get(0));
-    verify(sampleService).save(dataset.getSamples().get(1));
-    verify(sampleService).save(dataset.getSamples().get(2));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
