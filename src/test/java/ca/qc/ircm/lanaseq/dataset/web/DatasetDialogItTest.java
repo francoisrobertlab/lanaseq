@@ -29,11 +29,10 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
@@ -43,7 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -69,26 +67,18 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private DatasetRepository repository;
   @Autowired
+  private SampleRepository sampleRepository;
+  @Autowired
   private ProtocolRepository protocolRepository;
   @Autowired
   private AppConfiguration configuration;
   private String tag1 = "mnase";
   private String tag2 = "ip";
-  private Protocol protocol;
-  private Assay assay = Assay.MNASE_SEQ;
-  private SampleType type = SampleType.IMMUNO_PRECIPITATION;
-  private String target = "polr3a";
-  private String strain = "yFR20";
-  private String strainDescription = "WT";
-  private String treatment = "37C";
   private String note = "test note\nsecond line";
   private LocalDate date = LocalDate.of(2020, 07, 20);
-  private String sampleId = "FR3";
-  private String sampleReplicate = "R3";
 
   @BeforeEach
   public void beforeTest() throws Throwable {
-    protocol = protocolRepository.findById(1L).get();
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
   }
 
@@ -105,27 +95,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.tags().newTag().setFilter(tag2);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
-    dialog.protocol().selectByText(protocol.getName());
-    dialog.assay().openPopup(); // Causes delay to make unit test work.
-    dialog.assay().selectByText(assay.getLabel(currentLocale()));
-    dialog.assay().closePopup(); // Causes delay to make unit test work.
-    dialog.type().openPopup(); // Causes delay to make unit test work.
-    dialog.type().selectByText(type.getLabel(currentLocale()));
-    dialog.type().closePopup(); // Causes delay to make unit test work.
-    dialog.target().setValue(target);
-    dialog.strain().setValue(strain);
-    dialog.strainDescription().setValue(strainDescription);
-    dialog.treatment().setValue(treatment);
     dialog.note().setValue(note);
     dialog.date().setDate(date);
-    dialog.samples().sampleId(0).setValue(sampleId);
-    dialog.samples().replicate(0).setValue(sampleReplicate);
-  }
-
-  private String name() {
-    return assay.getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_"
-        + type.getLabel(Locale.ENGLISH) + "_" + target + "_" + strain + "_" + strainDescription
-        + "_" + treatment;
   }
 
   @Test
@@ -146,7 +117,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.date()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
-    assertTrue(optional(() -> dialog.addNewSample()).isPresent());
     assertTrue(optional(() -> dialog.addSample()).isPresent());
     assertFalse(optional(() -> dialog.error()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
@@ -172,7 +142,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name = name() + "_" + sampleId + "-JS2_20200720";
+    String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -188,42 +158,36 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleId, sample.getSampleId());
-    assertEquals(sampleReplicate, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
+    assertEquals("JS1", sample.getSampleId());
+    assertEquals("R1", sample.getReplicate());
+    assertEquals(3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
     assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
+    assertEquals(3L, sample.getProtocol().getId());
+    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertNull(sample.getType());
+    assertEquals("Spt16", sample.getTarget());
+    assertEquals("yFR101", sample.getStrain());
+    assertEquals("G24D", sample.getStrainDescription());
+    assertNull(sample.getTreatment());
     assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
-    assertEquals("MNaseseq_IP_polr3a_yFR20_WT_37C_" + sampleId + "_20181208",
-        repository.findById(6L).get().getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", repository.findById(6L).get().getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.folder(dataset);
     Path sampleFolder = configuration.folder(dataset.getSamples().get(0));
-    logger.debug("dataset folder {} exists {}", folder, Files.exists(folder));
-    logger.debug("dataset old folder {} exists {}", oldFolder, Files.exists(oldFolder));
-    logger.debug("sample folder {} exists {}", sampleFolder, Files.exists(sampleFolder));
-    logger.debug("sample old folder {} exists {}", oldSampleFolder, Files.exists(oldSampleFolder));
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
     assertTrue(Files.exists(sampleFolder));
-    assertFalse(Files.exists(oldSampleFolder));
   }
 
   @Test

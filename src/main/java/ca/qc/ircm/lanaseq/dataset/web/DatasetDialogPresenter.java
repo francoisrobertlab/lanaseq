@@ -38,7 +38,6 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
@@ -46,17 +45,12 @@ import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +68,6 @@ public class DatasetDialogPresenter {
   private Locale locale;
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
   private Binder<Sample> sampleBinder = new BeanValidationBinder<>(Sample.class);
-  private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
   private List<Sample> samples = new ArrayList<>();
   private DatasetService service;
   private ProtocolService protocolService;
@@ -96,6 +89,7 @@ public class DatasetDialogPresenter {
     dialog.error.setVisible(false);
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null);
+    sampleBinder.setReadOnly(true);
   }
 
   void localeChange(Locale locale) {
@@ -123,37 +117,7 @@ public class DatasetDialogPresenter {
 
   private void setReadOnly() {
     Dataset dataset = binder.getBean();
-    boolean readOnly = isReadOnly(dataset);
-    binder.setReadOnly(readOnly);
-    boolean sampleReadOnly = readOnly || !samples.stream()
-        .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE) && sa.isEditable())
-        .filter(val -> val).findFirst().orElse(false);
-    sampleBinder.setReadOnly(sampleReadOnly);
-  }
-
-  private void bindSampleFields(Sample sample) {
-    final boolean forceReadOnly = isReadOnly(binder.getBean()) || !sample.isEditable();
-    final AppResources webResources = new AppResources(Constants.class, locale);
-    Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
-    binder.forField(dialog.sampleIdField(sample))
-        .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
-        .withNullRepresentation("").bind(SampleProperties.SAMPLE_ID);
-    binder.forField(dialog.sampleReplicateField(sample))
-        .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
-        .withNullRepresentation("").bind(SampleProperties.REPLICATE);
-    binder.setBean(sample);
-    binder.setReadOnly(
-        forceReadOnly || !authorizationService.hasPermission(sample, Permission.WRITE));
-    sampleBinders.put(sample, binder);
-  }
-
-  void addNewSample() {
-    Sample sample = new Sample();
-    sample.setEditable(true);
-    samples.add(sample);
-    bindSampleFields(sample);
-    refreshSamplesDataProvider();
-    setReadOnly();
+    binder.setReadOnly(isReadOnly(dataset));
   }
 
   void addSample() {
@@ -164,16 +128,13 @@ public class DatasetDialogPresenter {
     if (!samples.stream().filter(sa -> sa.getId() != null && sa.getId().equals(sample.getId()))
         .findAny().isPresent()) {
       samples.add(sample);
-      bindSampleFields(sample);
       refreshSamplesDataProvider();
-      setReadOnly();
     }
   }
 
   void removeSample(Sample sample) {
     samples.remove(sample);
     refreshSamplesDataProvider();
-    setReadOnly();
   }
 
   void dropSample(Sample dragged, Sample drop, GridDropLocation dropLocation) {
@@ -197,28 +158,15 @@ public class DatasetDialogPresenter {
     return sampleBinder.validate();
   }
 
-  List<BinderValidationStatus<Sample>> validateSamples() {
-    return samples.stream().map(sample -> sampleBinders.get(sample).validate())
-        .collect(Collectors.toList());
-  }
-
   private boolean validate() {
     dialog.error.setVisible(false);
-    boolean valid = validateDataset().isOk() && validateSample().isOk()
-        && !validateSamples().stream().filter(status -> !status.isOk()).findAny().isPresent();
+    boolean valid = validateDataset().isOk() && validateSample().isOk();
     if (valid) {
       Dataset dataset = binder.getBean();
       dataset.setSamples(new ArrayList<>(samples));
       for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
         if (empty(dataset.getSamples().get(i))) {
           dataset.getSamples().remove(i);
-        }
-      }
-      Sample from = sampleBinder.getBean();
-      for (Sample sample : dataset.getSamples()) {
-        copy(from, sample);
-        if (sample.getId() == null) {
-          sample.setDate(dataset.getDate());
         }
       }
       dataset.generateName();
@@ -280,20 +228,12 @@ public class DatasetDialogPresenter {
     if (dataset.getSamples() == null) {
       dataset.setSamples(new ArrayList<>());
     }
-    if (dataset.getId() == null) {
-      while (dataset.getSamples().size() < 2) {
-        Sample sample = new Sample();
-        sample.setEditable(true);
-        dataset.getSamples().add(sample);
-      }
-    }
     Sample sample = new Sample();
     copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
     binder.setBean(dataset);
     sampleBinder.setBean(sample);
     samples = new ArrayList<>(dataset.getSamples());
     dialog.samples.setItems(samples);
-    dataset.getSamples().forEach(s -> bindSampleFields(s));
     setReadOnly();
   }
 
@@ -305,14 +245,6 @@ public class DatasetDialogPresenter {
     to.setStrainDescription(from.getStrainDescription());
     to.setTreatment(from.getTreatment());
     to.setProtocol(from.getProtocol());
-  }
-
-  private Validator<String> sampleRequiredValidator(Sample sample, String errorMessage) {
-    return (value,
-        context) -> (!dialog.sampleIdField(sample).isEmpty()
-            || !dialog.sampleReplicateField(sample).isEmpty()) && value.isEmpty()
-                ? ValidationResult.error(errorMessage)
-                : ValidationResult.ok();
   }
 
   List<Sample> getSamples() {

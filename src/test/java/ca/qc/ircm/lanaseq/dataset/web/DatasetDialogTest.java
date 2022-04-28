@@ -27,7 +27,6 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_NEW_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_MESSAGE;
@@ -54,7 +53,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -97,7 +95,6 @@ import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -134,8 +131,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   private Sample sample;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentRenderer<TextField, Sample>> textFieldRendererCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, Sample>> buttonRendererCaptor;
   @Captor
@@ -187,14 +182,14 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     dialog.samples = mock(Grid.class);
     when(dialog.samples.getElement()).thenReturn(samplesElement);
     dialog.sampleId = mock(Column.class);
-    when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(SampleProperties.SAMPLE_ID)))
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.SAMPLE_ID)))
         .thenReturn(dialog.sampleId);
     when(dialog.sampleId.setKey(any())).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setComparator(any(Comparator.class))).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setHeader(any(String.class))).thenReturn(dialog.sampleId);
     when(dialog.sampleId.setFooter(any(String.class))).thenReturn(dialog.sampleId);
     dialog.sampleReplicate = mock(Column.class);
-    when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(SampleProperties.REPLICATE)))
+    when(dialog.samples.addColumn(any(ValueProvider.class), eq(SampleProperties.REPLICATE)))
         .thenReturn(dialog.sampleReplicate);
     when(dialog.sampleReplicate.setKey(any())).thenReturn(dialog.sampleReplicate);
     when(dialog.sampleReplicate.setComparator(any(Comparator.class)))
@@ -247,7 +242,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(NOTE), dialog.note.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
-    assertEquals(id(ADD_NEW_SAMPLE), dialog.addNewSample.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
     assertEquals(id(ERROR_TEXT), dialog.error.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
@@ -298,7 +292,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     verify(dialog.sampleName).setFooter(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
     verify(dialog.sampleReplicate).setFooter(sampleResources.message(SampleProperties.REPLICATE));
-    assertEquals(resources.message(ADD_NEW_SAMPLE), dialog.addNewSample.getText());
     assertEquals(resources.message(ADD_SAMPLE), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -351,7 +344,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     verify(dialog.sampleName).setFooter(sampleResources.message(SampleProperties.NAME));
     verify(dialog.sampleReplicate).setHeader(sampleResources.message(SampleProperties.REPLICATE));
     verify(dialog.sampleReplicate).setFooter(sampleResources.message(SampleProperties.REPLICATE));
-    assertEquals(resources.message(ADD_NEW_SAMPLE), dialog.addNewSample.getText());
     assertEquals(resources.message(ADD_SAMPLE), dialog.addSample.getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -409,13 +401,10 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   public void samples_ColumnsValueProvider() {
     mockSamplesColumns();
     dialog.init();
-    verify(dialog.samples).addColumn(textFieldRendererCaptor.capture(),
-        eq(SampleProperties.SAMPLE_ID));
-    ComponentRenderer<TextField, Sample> textFieldRenderer = textFieldRendererCaptor.getValue();
+    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.SAMPLE_ID));
+    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
     for (Sample sample : samples) {
-      TextField textField = textFieldRenderer.createComponent(sample);
-      assertTrue(textField.hasClassName(SampleProperties.SAMPLE_ID));
-      assertSame(textField, dialog.sampleIdField(sample));
+      assertEquals(sample.getSampleId(), valueProvider.apply(sample));
     }
     verify(dialog.sampleId).setComparator(comparatorCaptor.capture());
     Comparator<Sample> comparator = comparatorCaptor.getValue();
@@ -424,13 +413,10 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
       assertEquals(sample.getSampleId(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(dialog.samples).addColumn(textFieldRendererCaptor.capture(),
-        eq(SampleProperties.REPLICATE));
-    textFieldRenderer = textFieldRendererCaptor.getValue();
+    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.REPLICATE));
+    valueProvider = valueProviderCaptor.getValue();
     for (Sample sample : samples) {
-      TextField textField = textFieldRenderer.createComponent(sample);
-      assertTrue(textField.hasClassName(SampleProperties.REPLICATE));
-      assertSame(textField, dialog.sampleReplicateField(sample));
+      assertEquals(sample.getReplicate(), valueProvider.apply(sample));
     }
     verify(dialog.sampleReplicate).setComparator(comparatorCaptor.capture());
     comparator = comparatorCaptor.getValue();
@@ -440,7 +426,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
     verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(SampleProperties.NAME));
-    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
+    valueProvider = valueProviderCaptor.getValue();
     for (Sample sample : samples) {
       assertEquals(sample.getName(), valueProvider.apply(sample));
     }
@@ -594,13 +580,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setDataset(null);
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-  }
-
-  @Test
-  public void addNewSample() {
-    clickButton(dialog.addNewSample);
-
-    verify(presenter).addNewSample();
   }
 
   @Test

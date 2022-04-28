@@ -72,13 +72,10 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -129,8 +126,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
-  private Map<Sample, TextField> sampleIdFields = new HashMap<>();
-  private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
   private List<String> topTags = new ArrayList<>();
   private List<Protocol> protocols;
   private String tag1 = "Tag 1";
@@ -169,7 +164,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.note = new TextArea();
     dialog.date = new DatePicker();
     dialog.samples = new Grid<>();
-    dialog.addNewSample = new Button();
     dialog.addSample = new Button();
     dialog.error = new Div();
     dialog.save = new Button();
@@ -179,24 +173,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
-    when(dialog.sampleIdField(any())).then(i -> {
-      Sample sample = i.getArgument(0);
-      if (sampleIdFields.containsKey(sample)) {
-        return sampleIdFields.get(sample);
-      }
-      TextField field = new TextField();
-      sampleIdFields.put(sample, field);
-      return field;
-    });
-    when(dialog.sampleReplicateField(any())).then(i -> {
-      Sample sample = i.getArgument(0);
-      if (sampleReplicateFields.containsKey(sample)) {
-        return sampleReplicateFields.get(sample);
-      }
-      TextField field = new TextField();
-      sampleReplicateFields.put(sample, field);
-      return field;
-    });
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     topTags.add("input");
     topTags.add("chip");
@@ -216,11 +192,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.treatment.setValue(treatment);
     dialog.note.setValue(note);
     dialog.date.setValue(date);
-    List<Sample> samples = items(dialog.samples);
-    sampleIdFields.get(samples.get(0)).setValue(sampleId1);
-    sampleReplicateFields.get(samples.get(0)).setValue(sampleReplicate1);
-    sampleIdFields.get(samples.get(1)).setValue(sampleId2);
-    sampleReplicateFields.get(samples.get(1)).setValue(sampleReplicate2);
   }
 
   @Test
@@ -254,33 +225,25 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.tags.getValue().isEmpty());
     assertFalse(dialog.tags.isReadOnly());
     assertNull(dialog.protocol.getValue());
-    assertFalse(dialog.protocol.isReadOnly());
+    assertTrue(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
+    assertTrue(dialog.assay.isReadOnly());
     assertEquals(SampleType.NULL, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
+    assertTrue(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
+    assertTrue(dialog.target.isReadOnly());
     assertEquals("", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
+    assertTrue(dialog.strain.isReadOnly());
     assertEquals("", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
+    assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
+    assertTrue(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.now(), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
-    assertEquals(2, samples.size());
-    assertNull(samples.get(0).getSampleId());
-    assertEquals("", sampleIdFields.get(samples.get(0)).getValue());
-    assertNull(samples.get(0).getReplicate());
-    assertEquals("", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertNull(samples.get(1).getSampleId());
-    assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
-    assertNull(samples.get(1).getReplicate());
-    assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertEquals(0, samples.size());
   }
 
   @Test
@@ -295,19 +258,19 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.tags.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertFalse(dialog.protocol.isReadOnly());
+    assertTrue(dialog.protocol.isReadOnly());
     assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
+    assertTrue(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
+    assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
+    assertTrue(dialog.target.isReadOnly());
     assertEquals("yFR100", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
+    assertTrue(dialog.strain.isReadOnly());
     assertEquals("WT", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
+    assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
+    assertTrue(dialog.treatment.isReadOnly());
     assertEquals("robtools version 2", dialog.note.getValue());
     assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
@@ -315,20 +278,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
     assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(1)).isReadOnly());
     assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
   }
 
   @Test
@@ -364,20 +315,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
     assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
     assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
   }
 
   @Test
@@ -411,325 +350,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(dialog.samples);
     assertEquals(1, samples.size());
     assertTrue(find(samples, 8L).isPresent());
-    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_NotEditableWithEditableSamples() {
-    Dataset dataset = repository.findById(5L).get();
-    dataset.getSamples().get(0).setEditable(true);
-
-    presenter.setDataset(dataset);
-
-    assertEquals(1, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("chipseq"));
-    assertTrue(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
-    assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertTrue(dialog.type.isReadOnly());
-    assertEquals("polr2b", dialog.target.getValue());
-    assertTrue(dialog.target.isReadOnly());
-    assertEquals("yBC103", dialog.strain.getValue());
-    assertTrue(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertEquals("", dialog.treatment.getValue());
-    assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertTrue(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
-    assertTrue(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(1, samples.size());
-    assertTrue(find(samples, 8L).isPresent());
-    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_CannotWriteAnySample() {
-    when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
-    Dataset dataset = repository.findById(1L).get();
-
-    presenter.setDataset(dataset);
-
-    assertEquals(2, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("mnase"));
-    assertTrue(dialog.tags.getValue().contains("ip"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertTrue(dialog.type.isReadOnly());
-    assertEquals("polr2a", dialog.target.getValue());
-    assertTrue(dialog.target.isReadOnly());
-    assertEquals("yFR100", dialog.strain.getValue());
-    assertTrue(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertEquals("Rappa", dialog.treatment.getValue());
-    assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(3, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
-    assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_NoEditableSamples() {
-    Dataset dataset = repository.findById(1L).get();
-    dataset.getSamples().forEach(sample -> sample.setEditable(false));
-
-    presenter.setDataset(dataset);
-
-    assertEquals(2, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("mnase"));
-    assertTrue(dialog.tags.getValue().contains("ip"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertTrue(dialog.type.isReadOnly());
-    assertEquals("polr2a", dialog.target.getValue());
-    assertTrue(dialog.target.isReadOnly());
-    assertEquals("yFR100", dialog.strain.getValue());
-    assertTrue(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertEquals("Rappa", dialog.treatment.getValue());
-    assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(3, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
-    assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(2)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_CannotWriteOneSample() {
-    when(authorizationService.hasPermission(any(Sample.class), any())).then(i -> {
-      Sample sample = i.getArgument(0);
-      return sample.getId() == null || sample.getId() != 2;
-    });
-    Dataset dataset = repository.findById(1L).get();
-
-    presenter.setDataset(dataset);
-
-    assertEquals(2, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("mnase"));
-    assertTrue(dialog.tags.getValue().contains("ip"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertFalse(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
-    assertEquals("polr2a", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
-    assertEquals("yFR100", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
-    assertEquals("Rappa", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(3, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
-    assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_OneSampleNotEditable() {
-    Dataset dataset = repository.findById(1L).get();
-    dataset.getSamples().get(1).setEditable(false);
-
-    presenter.setDataset(dataset);
-
-    assertEquals(2, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("mnase"));
-    assertTrue(dialog.tags.getValue().contains("ip"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
-    assertFalse(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
-    assertEquals("polr2a", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
-    assertEquals("yFR100", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
-    assertEquals("Rappa", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(3, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
-    assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(2)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(2)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(2)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(2)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_CannotWriteOnlyOneSample() {
-    when(authorizationService.hasPermission(any(Sample.class), any())).thenReturn(false);
-    Dataset dataset = repository.findById(5L).get();
-    dataset.setEditable(true);
-
-    presenter.setDataset(dataset);
-
-    assertEquals(1, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("chipseq"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
-    assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertTrue(dialog.type.isReadOnly());
-    assertEquals("polr2b", dialog.target.getValue());
-    assertTrue(dialog.target.isReadOnly());
-    assertEquals("yBC103", dialog.strain.getValue());
-    assertTrue(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertEquals("", dialog.treatment.getValue());
-    assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(1, samples.size());
-    assertTrue(find(samples, 8L).isPresent());
-    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-  }
-
-  @Test
-  public void setDataset_NotEditableOnlyOneSample() {
-    Dataset dataset = repository.findById(5L).get();
-    dataset.setEditable(true);
-    dataset.getSamples().get(0).setEditable(false);
-
-    presenter.setDataset(dataset);
-
-    assertEquals(1, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("chipseq"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
-    assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertTrue(dialog.type.isReadOnly());
-    assertEquals("polr2b", dialog.target.getValue());
-    assertTrue(dialog.target.isReadOnly());
-    assertEquals("yBC103", dialog.strain.getValue());
-    assertTrue(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertEquals("", dialog.treatment.getValue());
-    assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(1, samples.size());
-    assertTrue(find(samples, 8L).isPresent());
-    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
   }
 
   @Test
@@ -739,35 +359,25 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.tags.getValue().isEmpty());
     assertFalse(dialog.tags.isReadOnly());
     assertNull(dialog.protocol.getValue());
-    assertFalse(dialog.protocol.isReadOnly());
+    assertTrue(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
+    assertTrue(dialog.assay.isReadOnly());
     assertEquals(SampleType.NULL, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
+    assertTrue(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
+    assertTrue(dialog.target.isReadOnly());
     assertEquals("", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
+    assertTrue(dialog.strain.isReadOnly());
     assertEquals("", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
+    assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
+    assertTrue(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertFalse(dialog.note.isReadOnly());
     assertEquals(LocalDate.now(), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
-    assertEquals(LocalDate.now(), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
-    assertEquals(2, samples.size());
-    assertNull(samples.get(0).getSampleId());
-    assertEquals("", sampleIdFields.get(samples.get(0)).getValue());
-    assertNull(samples.get(0).getReplicate());
-    assertEquals("", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertNull(samples.get(1).getSampleId());
-    assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
-    assertNull(samples.get(1).getReplicate());
-    assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
+    assertEquals(0, samples.size());
   }
 
   @Test
@@ -782,9 +392,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.treatment.isRequiredIndicatorVisible());
     assertFalse(dialog.note.isRequiredIndicatorVisible());
     assertTrue(dialog.date.isRequiredIndicatorVisible());
-    List<Sample> samples = items(dialog.samples);
-    assertTrue(sampleIdFields.get(samples.get(0)).isRequiredIndicatorVisible());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isRequiredIndicatorVisible());
   }
 
   @Test
@@ -794,60 +401,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     for (int i = 0; i < protocols.size(); i++) {
       assertEquals(this.protocols.get(i), protocols.get(i));
     }
-  }
-
-  @Test
-  public void addNewSample() {
-    assertEquals(2, items(dialog.samples).size());
-    presenter.addNewSample();
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(3, samples.size());
-    Sample sample = samples.get(samples.size() - 1);
-    assertEquals(null, sample.getSampleId());
-    assertEquals(null, sample.getReplicate());
-  }
-
-  @Test
-  public void addNewSample_NotEditableSamples() {
-    Dataset dataset = repository.findById(5L).get();
-    dataset.setEditable(true);
-    dataset.getSamples().get(0).setEditable(false);
-    presenter.setDataset(dataset);
-
-    presenter.addNewSample();
-
-    assertEquals(1, dialog.tags.getValue().size());
-    assertTrue(dialog.tags.getValue().contains("chipseq"));
-    assertFalse(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
-    assertFalse(dialog.protocol.isReadOnly());
-    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
-    assertEquals("polr2b", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
-    assertEquals("yBC103", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
-    assertEquals("WT", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
-    assertEquals("", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertFalse(dialog.date.isReadOnly());
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(2, samples.size());
-    assertTrue(find(samples, 8L).isPresent());
-    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertEquals("", sampleIdFields.get(samples.get(1)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(1)).isReadOnly());
   }
 
   @Test
@@ -901,14 +454,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(2, samples.size());
     assertTrue(find(samples, 8L).isPresent());
     assertTrue(find(samples, 1L).isPresent());
-    assertEquals("BC1", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertEquals("FR1", sampleIdFields.get(samples.get(1)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(1)).isReadOnly());
   }
 
   @Test
@@ -930,32 +475,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(find(samples, 2L).isPresent());
     assertTrue(find(samples, 3L).isPresent());
     assertTrue(find(samples, 8L).isPresent());
-    assertEquals("FR1", sampleIdFields.get(samples.get(0)).getValue());
-    assertFalse(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertFalse(sampleReplicateFields.get(samples.get(0)).isReadOnly());
-    assertEquals("BC1", sampleIdFields.get(samples.get(3)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(3)).isReadOnly());
-    assertEquals("R1", sampleReplicateFields.get(samples.get(3)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(3)).isReadOnly());
-  }
-
-  @Test
-  public void addSample_AfterAddNewSample() {
-    Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset);
-    assertEquals(3, items(dialog.samples).size());
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
-    presenter.addNewSample();
-    presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
-    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
-        selectListenerCaptor.getValue();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
-    List<Sample> samples = items(dialog.samples);
-    assertEquals(5, samples.size());
-    assertEquals(sample, samples.get(samples.size() - 1));
-    assertNull(samples.get(samples.size() - 2).getId());
   }
 
   @Test
@@ -1010,15 +529,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertTrue(find(samples, 2L).isPresent());
-    assertEquals("FR2", sampleIdFields.get(samples.get(0)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(0)).isReadOnly());
-    assertEquals("R2", sampleReplicateFields.get(samples.get(0)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(0)).isReadOnly());
     assertTrue(find(samples, 3L).isPresent());
-    assertEquals("FR3", sampleIdFields.get(samples.get(1)).getValue());
-    assertTrue(sampleIdFields.get(samples.get(1)).isReadOnly());
-    assertEquals("R3", sampleReplicateFields.get(samples.get(1)).getValue());
-    assertTrue(sampleReplicateFields.get(samples.get(1)).isReadOnly());
   }
 
   @Test
@@ -1114,154 +625,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void save_ProtocolEmpty() {
-    fillForm();
-    dialog.protocol.setItems();
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.protocol);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_ProtocolEmptyNoSample() {
-    fillForm();
-    dialog.protocol.setItems();
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.protocol);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_AssayEmpty() {
-    fillForm();
-    dialog.assay.clear();
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.assay);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_TypeEmpty() {
-    fillForm();
-    dialog.type.setValue(SampleType.NULL);
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getSamples().get(0).getType());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
-  public void save_TargetEmpty() {
-    fillForm();
-    dialog.target.setValue("");
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getSamples().get(0).getTarget());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
-  public void save_StrainEmpty() {
-    fillForm();
-    dialog.strain.setValue("");
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.strain);
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_StrainDescriptionEmpty() {
-    fillForm();
-    dialog.strainDescription.setValue("");
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getSamples().get(0).getStrainDescription());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
-  public void save_TreatmentEmpty() {
-    fillForm();
-    dialog.treatment.setValue("");
-
-    presenter.save();
-
-    BinderValidationStatus<Sample> status = presenter.validateSample();
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getSamples().get(0).getTreatment());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
   public void save_NoteEmpty() {
     fillForm();
     dialog.note.setValue("");
@@ -1271,8 +634,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     BinderValidationStatus<Sample> status = presenter.validateSample();
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getSamples().get(0).getNote());
     verify(dialog).showNotification(any());
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -1299,198 +660,14 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void save_FirstSampleIdEmpty() {
-    fillForm();
-    Sample sample = items(dialog.samples).get(0);
-    sampleIdFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(0);
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, sampleIdFields.get(sample));
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_FirstSampleReplicateEmpty() {
-    fillForm();
-    Sample sample = items(dialog.samples).get(0);
-    sampleReplicateFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(0);
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, sampleReplicateFields.get(sample));
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_FirstSampleIdAndReplicateEmpty() {
-    fillForm();
-    Sample sample = items(dialog.samples).get(0);
-    sampleIdFields.get(sample).setValue("");
-    sampleReplicateFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(0);
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertEquals(1, dataset.getSamples().size());
-    assertEquals(sampleId2, dataset.getSamples().get(0).getSampleId());
-    assertEquals(sampleReplicate2, dataset.getSamples().get(0).getReplicate());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
-  public void save_SecondSampleIdEmpty() {
-    fillForm();
-    Sample sample = items(dialog.samples).get(1);
-    sampleIdFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(1);
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, sampleIdFields.get(sample));
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_SecondSampleReplicateEmpty() {
-    fillForm();
-    Sample sample = items(dialog.samples).get(1);
-    sampleReplicateFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(1);
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, sampleReplicateFields.get(sample));
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_SecondSampleIdAndReplicateEmpty() {
-    fillForm();
-    Sample sample = items(dialog.samples).get(1);
-    sampleIdFields.get(sample).setValue("");
-    sampleReplicateFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(1);
-    assertTrue(status.isOk());
-    verify(service).save(datasetCaptor.capture());
-    Dataset dataset = datasetCaptor.getValue();
-    assertEquals(1, dataset.getSamples().size());
-    assertEquals(sampleId1, dataset.getSamples().get(0).getSampleId());
-    assertEquals(sampleReplicate1, dataset.getSamples().get(0).getReplicate());
-    verify(dialog).showNotification(any());
-    verify(dialog).close();
-    verify(dialog).fireSavedEvent();
-  }
-
-  @Test
-  public void save_NewSampleIdEmpty() {
-    fillForm();
-    presenter.addNewSample();
-    List<Sample> samples = items(dialog.samples);
-    Sample sample = samples.get(2);
-    sampleReplicateFields.get(sample).setValue(sampleReplicate2 + "-new");
-    sampleIdFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(2);
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, sampleIdFields.get(sample));
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
-  public void save_NewSampleReplicateEmpty() {
-    fillForm();
-    presenter.addNewSample();
-    List<Sample> samples = items(dialog.samples);
-    Sample sample = samples.get(2);
-    sampleIdFields.get(sample).setValue(sampleId2 + "-new");
-    sampleReplicateFields.get(sample).setValue("");
-
-    presenter.save();
-
-    List<BinderValidationStatus<Sample>> statuses = presenter.validateSamples();
-    BinderValidationStatus<Sample> status = statuses.get(2);
-    assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, sampleReplicateFields.get(sample));
-    assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    verify(service, never()).save(any());
-    verify(dialog, never()).showNotification(any());
-    verify(dialog, never()).close();
-    verify(dialog, never()).fireSavedEvent();
-  }
-
-  @Test
   public void save_NameExists() {
+    Dataset dataset = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
-    fillForm();
+    presenter.setDataset(dataset);
 
     presenter.save();
 
-    verify(service).exists(
-        ("ChIPseq_IP_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_"
-            + sampleId1 + "-" + sampleId2 + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
-                .replaceAll("[^\\w-]", ""));
+    verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service, never()).save(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
@@ -1527,30 +704,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dataset.getTags().contains(tag2));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
-    assertEquals(2, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleId1, sample.getSampleId());
-    assertEquals(sampleReplicate1, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertEquals(date, sample.getDate());
-    assertEquals(null, sample.getNote());
-    sample = dataset.getSamples().get(1);
-    assertEquals(sampleId2, sample.getSampleId());
-    assertEquals(sampleReplicate2, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertEquals(null, sample.getNote());
+    assertEquals(0, dataset.getSamples().size());
     verify(dialog).showNotification(resources.message(SAVED, dataset.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();
@@ -1572,30 +726,32 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(2, dataset.getSamples().size());
+    Sample expectedSample = sampleRepository.getById(4L);
     Sample sample = dataset.getSamples().get(0);
-    assertEquals(sampleId1, sample.getSampleId());
-    assertEquals(sampleReplicate1, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertEquals(null, sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    assertEquals(expectedSample.getSampleId(), sample.getSampleId());
+    assertEquals(expectedSample.getReplicate(), sample.getReplicate());
+    assertEquals(expectedSample.getProtocol().getId(), sample.getProtocol().getId());
+    assertEquals(expectedSample.getAssay(), sample.getAssay());
+    assertEquals(expectedSample.getType(), sample.getType());
+    assertEquals(expectedSample.getTarget(), sample.getTarget());
+    assertEquals(expectedSample.getStrain(), sample.getStrain());
+    assertEquals(expectedSample.getStrainDescription(), sample.getStrainDescription());
+    assertEquals(expectedSample.getTreatment(), sample.getTreatment());
+    assertEquals(expectedSample.getNote(), sample.getNote());
+    assertEquals(expectedSample.getDate(), sample.getDate());
+    expectedSample = sampleRepository.getById(5L);
     sample = dataset.getSamples().get(1);
-    assertEquals(sampleId2, sample.getSampleId());
-    assertEquals(sampleReplicate2, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertEquals(null, sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    assertEquals(expectedSample.getSampleId(), sample.getSampleId());
+    assertEquals(expectedSample.getReplicate(), sample.getReplicate());
+    assertEquals(expectedSample.getProtocol().getId(), sample.getProtocol().getId());
+    assertEquals(expectedSample.getAssay(), sample.getAssay());
+    assertEquals(expectedSample.getType(), sample.getType());
+    assertEquals(expectedSample.getTarget(), sample.getTarget());
+    assertEquals(expectedSample.getStrain(), sample.getStrain());
+    assertEquals(expectedSample.getStrainDescription(), sample.getStrainDescription());
+    assertEquals(expectedSample.getTreatment(), sample.getTreatment());
+    assertEquals(expectedSample.getNote(), sample.getNote());
+    assertEquals(expectedSample.getDate(), sample.getDate());
     verify(dialog).showNotification(resources.message(SAVED, dataset.getName()));
     verify(dialog).close();
     verify(dialog).fireSavedEvent();

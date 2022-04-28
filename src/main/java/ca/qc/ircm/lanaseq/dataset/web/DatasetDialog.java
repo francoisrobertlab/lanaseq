@@ -68,6 +68,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -120,7 +121,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Column<Sample> sampleReplicate;
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleRemove;
-  protected Button addNewSample = new Button();
   protected Button addSample = new Button();
   protected Div error = new Div();
   protected Button save = new Button();
@@ -131,8 +131,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected SelectSampleDialog selectSampleDialog;
   @Autowired
   private transient DatasetDialogPresenter presenter;
-  private Map<Sample, TextField> sampleIdFields = new HashMap<>();
-  private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
+  private Map<Sample, Label> sampleIdFields = new HashMap<>();
+  private Map<Sample, Label> sampleReplicateFields = new HashMap<>();
   private Sample draggedSample;
 
   protected DatasetDialog() {
@@ -191,14 +191,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.setMinHeight("15em");
     samples.setHeight("15em");
     samples.setSelectionMode(SelectionMode.NONE);
-    sampleId = samples
-        .addColumn(new ComponentRenderer<>(sample -> sampleIdField(sample)),
-            SampleProperties.SAMPLE_ID)
+    sampleId = samples.addColumn(Sample::getSampleId, SampleProperties.SAMPLE_ID)
         .setKey(SampleProperties.SAMPLE_ID)
         .setComparator(NormalizedComparator.of(sample -> sample.getSampleId()));
-    sampleReplicate = samples
-        .addColumn(new ComponentRenderer<>(sample -> sampleReplicateField(sample)),
-            SampleProperties.REPLICATE)
+    sampleReplicate = samples.addColumn(Sample::getReplicate, SampleProperties.REPLICATE)
         .setKey(SampleProperties.REPLICATE)
         .setComparator(NormalizedComparator.of(sample -> sample.getReplicate()));
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
@@ -225,10 +221,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.appendFooterRow(); // Footers
     FooterRow footer = samples.appendFooterRow();
     footer.join(footer.getCell(sampleId), footer.getCell(sampleReplicate));
-    footer.getCell(sampleId).setComponent(new HorizontalLayout(addNewSample, addSample));
-    addNewSample.setId(id(ADD_NEW_SAMPLE));
-    addNewSample.setIcon(VaadinIcon.PLUS.create());
-    addNewSample.addClickListener(e -> presenter.addNewSample());
+    footer.getCell(sampleId).setComponent(new HorizontalLayout(addSample));
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> presenter.addSample());
@@ -250,26 +243,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> presenter.delete());
     presenter.init(this);
-  }
-
-  TextField sampleIdField(Sample sample) {
-    if (sampleIdFields.containsKey(sample)) {
-      return sampleIdFields.get(sample);
-    }
-    TextField field = new TextField();
-    field.addClassName(SampleProperties.SAMPLE_ID);
-    sampleIdFields.put(sample, field);
-    return field;
-  }
-
-  TextField sampleReplicateField(Sample sample) {
-    if (sampleReplicateFields.containsKey(sample)) {
-      return sampleReplicateFields.get(sample);
-    }
-    TextField field = new TextField();
-    field.addClassName(SampleProperties.REPLICATE);
-    sampleReplicateFields.put(sample, field);
-    return field;
   }
 
   Button sampleDelete(Sample sample) {
@@ -310,7 +283,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleReplicate.setHeader(sampleReplicateHeader).setFooter(sampleReplicateHeader);
     String sampleNameHeader = sampleResources.message(SampleProperties.NAME);
     sampleName.setHeader(sampleNameHeader).setFooter(sampleNameHeader);
-    addNewSample.setText(resources.message(ADD_NEW_SAMPLE));
     addSample.setText(resources.message(ADD_SAMPLE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
