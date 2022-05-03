@@ -72,6 +72,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolRepository protocolRepository;
   @Autowired
   private AppConfiguration configuration;
+  private String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20200720";
   private String tag1 = "mnase";
   private String tag2 = "ip";
   private String note = "test note\nsecond line";
@@ -91,6 +92,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     if (tag != null) {
       tag.click();
     }
+    dialog.name().setValue(name);
     dialog.tags().newTag().setFilter(tag1);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.tags().newTag().setFilter(tag2);
@@ -106,6 +108,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().doubleClick(0);
     DatasetDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.name()).isPresent());
+    assertTrue(optional(() -> dialog.generateName()).isPresent());
     assertTrue(optional(() -> dialog.tags()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
@@ -142,7 +146,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -207,7 +210,6 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    String name = "ChIPseq_Spt16_yFR101_G24D_JS2-JS1_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -262,6 +264,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.addSample().click();
     SelectSampleDialogElement selectSampleDialog = dialog.selectSampleDialog();
     selectSampleDialog.samples().doubleClick(2);
+    dialog.generateName().click();
 
     TestTransaction.flagForCommit();
     dialog.save().click();
@@ -342,6 +345,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Dataset dataset = repository.findById(2L).get();
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("chipseq"));
     assertTrue(dataset.getTags().contains("ip"));

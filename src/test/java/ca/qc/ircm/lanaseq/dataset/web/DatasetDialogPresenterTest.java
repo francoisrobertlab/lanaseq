@@ -128,6 +128,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<String> topTags = new ArrayList<>();
   private List<Protocol> protocols;
+  private String name = "ChIPseq_IP_polr3a_yFR20_WT_37C_testsample1-testsample2_20200720";
   private String tag1 = "Tag 1";
   private String tag2 = "Tag 2";
   private Protocol protocol;
@@ -151,6 +152,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     ui.setLocale(locale);
     dialog.header = new H3();
+    dialog.name = new TextField();
     dialog.tags = new TagsField();
     dialog.protocol = new ComboBox<>();
     dialog.assay = new Select<>();
@@ -182,6 +184,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   private void fillForm() {
+    dialog.name.setValue(name);
     dialog.tags.setValue(Stream.of(tag1, tag2).collect(Collectors.toSet()));
     dialog.protocol.setValue(protocol);
     dialog.assay.setValue(assay);
@@ -222,6 +225,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.setDataset(dataset);
 
+    assertEquals("", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
     assertTrue(dialog.tags.getValue().isEmpty());
     assertFalse(dialog.tags.isReadOnly());
     assertNull(dialog.protocol.getValue());
@@ -252,6 +257,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.setDataset(dataset);
 
+    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
     assertEquals(2, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("mnase"));
     assertTrue(dialog.tags.getValue().contains("ip"));
@@ -289,6 +296,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.setDataset(dataset);
 
+    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dialog.name.getValue());
+    assertTrue(dialog.name.isReadOnly());
     assertEquals(2, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("mnase"));
     assertTrue(dialog.tags.getValue().contains("ip"));
@@ -325,6 +334,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.setDataset(dataset);
 
+    assertEquals("ChIPseq_IP_polr2b_yBC103_WT_BC1_20181118", dialog.name.getValue());
+    assertTrue(dialog.name.isReadOnly());
     assertEquals(1, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("chipseq"));
     assertTrue(dialog.tags.isReadOnly());
@@ -356,6 +367,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void setDataset_Null() {
     presenter.setDataset(null);
 
+    assertEquals("", dialog.name.getValue());
+    assertFalse(dialog.name.isReadOnly());
     assertTrue(dialog.tags.getValue().isEmpty());
     assertFalse(dialog.tags.isReadOnly());
     assertNull(dialog.protocol.getValue());
@@ -382,6 +395,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void requiredIndicator() {
+    assertTrue(dialog.name.isRequiredIndicatorVisible());
     assertFalse(dialog.tags.isRequiredIndicatorVisible());
     assertTrue(dialog.protocol.isRequiredIndicatorVisible());
     assertTrue(dialog.assay.isRequiredIndicatorVisible());
@@ -401,6 +415,39 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     for (int i = 0; i < protocols.size(); i++) {
       assertEquals(this.protocols.get(i), protocols.get(i));
     }
+  }
+
+  @Test
+  public void generateName() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    dialog.name.setValue("test");
+    dialog.date.setValue(LocalDate.of(2022, 05, 02));
+    assertEquals("test", dialog.name.getValue());
+
+    presenter.generateName();
+
+    dialog.name.setValue("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20220502");
+  }
+
+  @Test
+  public void generateName_NewSample() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    dialog.name.setValue("test");
+    dialog.date.setValue(LocalDate.of(2022, 05, 02));
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    Sample sample = sampleRepository.findById(4L).get();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    assertEquals("test", dialog.name.getValue());
+
+    presenter.generateName();
+
+    dialog.name.setValue("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1_20220502");
   }
 
   @Test
@@ -608,6 +655,26 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void save_NameEmpty() {
+    fillForm();
+    dialog.name.setValue("");
+
+    presenter.save();
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.name);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
   public void save_TagsEmpty() {
     fillForm();
     dialog.tags.setValue(new HashSet<>());
@@ -699,6 +766,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
+    assertEquals(name, dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));
@@ -720,6 +788,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     verify(service).save(datasetCaptor.capture());
     dataset = datasetCaptor.getValue();
+    assertEquals(name, dataset.getName());
     assertEquals(2, dataset.getTags().size());
     assertTrue(dataset.getTags().contains(tag1));
     assertTrue(dataset.getTags().contains(tag2));

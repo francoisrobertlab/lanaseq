@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
@@ -95,6 +96,8 @@ public class DatasetDialogPresenter {
   void localeChange(Locale locale) {
     this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
+    binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("").bind(NAME);
     binder.forField(dialog.tags).bind(TAGS);
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
         .bind(PROTOCOL);
@@ -118,6 +121,23 @@ public class DatasetDialogPresenter {
   private void setReadOnly() {
     Dataset dataset = binder.getBean();
     binder.setReadOnly(isReadOnly(dataset));
+  }
+
+  private void updateSamplesInBinderBean() {
+    Dataset dataset = binder.getBean();
+    dataset.setSamples(new ArrayList<>(samples));
+    for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
+      if (empty(dataset.getSamples().get(i))) {
+        dataset.getSamples().remove(i);
+      }
+    }
+  }
+
+  void generateName() {
+    updateSamplesInBinderBean();
+    Dataset dataset = binder.getBean();
+    dataset.generateName();
+    dialog.name.setValue(dataset.getName());
   }
 
   void addSample() {
@@ -175,15 +195,9 @@ public class DatasetDialogPresenter {
   }
 
   void save() {
-    Dataset dataset = binder.getBean();
-    dataset.setSamples(new ArrayList<>(samples));
-    for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
-      if (empty(dataset.getSamples().get(i))) {
-        dataset.getSamples().remove(i);
-      }
-    }
-    dataset.generateName();
+    updateSamplesInBinderBean();
     if (validate()) {
+      Dataset dataset = binder.getBean();
       logger.debug("save dataset {}", dataset);
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);
