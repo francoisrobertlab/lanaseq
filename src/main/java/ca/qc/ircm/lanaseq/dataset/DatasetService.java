@@ -253,6 +253,9 @@ public class DatasetService {
     if (dataset.getId() != null && !dataset.isEditable()) {
       throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
     }
+    if (dataset.getName() == null) {
+      throw new NullPointerException("dataset's name cannot be null");
+    }
     if (dataset.getSamples() != null && dataset.getSamples().stream()
         .filter(sample -> sample.getId() == null).findAny().isPresent()) {
       throw new IllegalArgumentException("all dataset's samples must already be in database");
@@ -267,7 +270,6 @@ public class DatasetService {
     Dataset old = old(dataset).orElse(null);
     final String oldName = old != null ? old.getName() : null;
     Path oldFolder = old != null ? configuration.folder(old) : null;
-    dataset.generateName();
     repository.save(dataset);
     Path folder = configuration.folder(dataset);
     Renamer.moveFolder(oldFolder, folder);

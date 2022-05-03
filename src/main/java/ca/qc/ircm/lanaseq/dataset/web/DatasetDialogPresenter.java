@@ -163,13 +163,6 @@ public class DatasetDialogPresenter {
     boolean valid = validateDataset().isOk() && validateSample().isOk();
     if (valid) {
       Dataset dataset = binder.getBean();
-      dataset.setSamples(new ArrayList<>(samples));
-      for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
-        if (empty(dataset.getSamples().get(i))) {
-          dataset.getSamples().remove(i);
-        }
-      }
-      dataset.generateName();
       if (service.exists(dataset.getName()) && (dataset.getId() == null || !dataset.getName()
           .equalsIgnoreCase(service.get(dataset.getId()).map(Dataset::getName).orElse("")))) {
         valid = false;
@@ -182,8 +175,15 @@ public class DatasetDialogPresenter {
   }
 
   void save() {
+    Dataset dataset = binder.getBean();
+    dataset.setSamples(new ArrayList<>(samples));
+    for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
+      if (empty(dataset.getSamples().get(i))) {
+        dataset.getSamples().remove(i);
+      }
+    }
+    dataset.generateName();
     if (validate()) {
-      Dataset dataset = binder.getBean();
       logger.debug("save dataset {}", dataset);
       service.save(dataset);
       AppResources resources = new AppResources(DatasetDialog.class, locale);

@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -132,16 +131,6 @@ public class DatasetServiceTest {
     when(configuration.getUpload()).then(i -> {
       return temporaryFolder.resolve("upload");
     });
-    doAnswer(i -> {
-      Sample sample = i.getArgument(0);
-      if (sample.getId() == null) {
-        sample.setCreationDate(LocalDateTime.now());
-        sample.setOwner(authorizationService.getCurrentUser().orElse(null));
-      }
-      sample.generateName();
-      sampleRepository.save(sample);
-      return null;
-    }).when(sampleService).save(any());
   }
 
   private void detach(Dataset dataset) {
@@ -589,6 +578,7 @@ public class DatasetServiceTest {
     dataset.setNote("test note");
     dataset.getSamples().add(sampleRepository.findById(1L).get());
     dataset.getSamples().add(sampleRepository.findById(2L).get());
+    dataset.generateName();
 
     service.save(dataset);
 
@@ -636,8 +626,27 @@ public class DatasetServiceTest {
     sample1.setDate(LocalDate.of(2020, 7, 21));
     sample1.setNote("test note");
     dataset.getSamples().add(sample1);
+    dataset.generateName();
 
     assertThrows(IllegalArgumentException.class, () -> {
+      service.save(dataset);
+    });
+  }
+
+  @Test
+  public void save_NewNoName() {
+    User user = userRepository.findById(3L).orElse(null);
+    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    Dataset dataset = new Dataset();
+    dataset.setTags(new HashSet<>());
+    dataset.getTags().add("tag1");
+    dataset.getTags().add("tag2");
+    dataset.setDate(LocalDate.of(2020, 7, 21));
+    dataset.setSamples(new ArrayList<>());
+    dataset.setNote("test note");
+    dataset.getSamples().add(sampleRepository.findById(1L).get());
+
+    assertThrows(NullPointerException.class, () -> {
       service.save(dataset);
     });
   }
@@ -666,6 +675,7 @@ public class DatasetServiceTest {
     sample1.setNote("test note");
     final Sample removed = dataset.getSamples().remove(1);
     dataset.getSamples().add(sampleRepository.findById(4L).get());
+    dataset.generateName();
 
     service.save(dataset);
 
@@ -727,17 +737,9 @@ public class DatasetServiceTest {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
-    Sample sample1 = dataset.getSamples().get(0);
-    sample1.setSampleId("sample1");
-    sample1.setReplicate("r1");
-    sample1.setAssay(Assay.CHIP_SEQ);
-    sample1.setType(SampleType.INPUT);
-    sample1.setTarget("my target");
-    sample1.setStrain("yFR213");
-    sample1.setStrainDescription("F56G");
-    sample1.setTreatment("37C");
-    sample1.setProtocol(protocolRepository.findById(3L).get());
+    detach(dataset);
     Path beforeFolder = configuration.folder(dataset);
+    dataset.setName("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeFolder.resolve("dataset_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
@@ -747,6 +749,7 @@ public class DatasetServiceTest {
     service.save(dataset);
 
     repository.flush();
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
@@ -758,64 +761,19 @@ public class DatasetServiceTest {
     assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
-    Sample sample = dataset.getSamples().get(0);
-    assertEquals((Long) 1L, sample.getId());
-    assertEquals("sample1", sample.getSampleId());
-    assertEquals("r1", sample.getReplicate());
-    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+    assertTrue(find(dataset.getSamples(), 1L).isPresent());
+    assertTrue(find(dataset.getSamples(), 2L).isPresent());
+    assertTrue(find(dataset.getSamples(), 3L).isPresent());
     Path folder = configuration.folder(dataset);
+    assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
-        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
+            Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+            Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
-        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
-    assertFalse(Files.exists(beforeFolder));
-  }
-
-  @Test
-  public void save_UpdateMoveFilesAlreadyRenamed() throws Throwable {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
-    Dataset dataset = repository.findById(1L).orElse(null);
-    detach(dataset);
-    Sample sample1 = dataset.getSamples().get(0);
-    sample1.setSampleId("sample1");
-    sample1.setReplicate("r1");
-    sample1.setAssay(Assay.CHIP_SEQ);
-    sample1.setType(SampleType.INPUT);
-    sample1.setTarget("my target");
-    sample1.setStrain("yFR213");
-    sample1.setStrainDescription("F56G");
-    sample1.setTreatment("37C");
-    sample1.setProtocol(protocolRepository.findById(3L).get());
-    Path beforeFolder = configuration.folder(dataset);
-    Files.createDirectories(beforeFolder);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
-        beforeFolder.resolve("dataset_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        beforeFolder.resolve("dataset_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
-    sample1.generateName();
-    dataset.generateName();
-
-    service.save(dataset);
-
-    repository.flush();
-    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
-    dataset = repository.findById(1L).orElse(null);
-    assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
-        dataset.getName());
-    Path folder = configuration.folder(dataset);
-    assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
-        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
-    assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
-        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+            Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+            Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
   }
 
@@ -831,22 +789,13 @@ public class DatasetServiceTest {
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     Path beforeFolder = configuration.folder(dataset);
+    dataset.setName("MNaseseq_IP_polr2a_yFR100_WT_Rappa_sample1-FR2-FR3_20200112");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeFolder.resolve("dataset_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
         beforeFolder.resolve("dataset_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
     dataset.setDate(LocalDate.of(2020, 01, 12));
-    Sample sample1 = dataset.getSamples().get(0);
-    sample1.setSampleId("sample1");
-    sample1.setReplicate("r1");
-    sample1.setAssay(Assay.CHIP_SEQ);
-    sample1.setType(SampleType.INPUT);
-    sample1.setTarget("my target");
-    sample1.setStrain("yFR213");
-    sample1.setStrainDescription("F56G");
-    sample1.setTreatment("37C");
-    sample1.setProtocol(protocolRepository.findById(3L).get());
 
     service.save(dataset);
 
@@ -870,17 +819,9 @@ public class DatasetServiceTest {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
-    Sample sample1 = dataset.getSamples().get(0);
-    sample1.setSampleId("sample1");
-    sample1.setReplicate("r1");
-    sample1.setAssay(Assay.CHIP_SEQ);
-    sample1.setType(SampleType.INPUT);
-    sample1.setTarget("my target");
-    sample1.setStrain("yFR213");
-    sample1.setStrainDescription("F56G");
-    sample1.setTreatment("37C");
-    sample1.setProtocol(protocolRepository.findById(3L).get());
+    detach(dataset);
     Path beforeFolder = configuration.folder(dataset);
+    dataset.setName("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
@@ -957,20 +898,18 @@ public class DatasetServiceTest {
     User user = userRepository.findById(2L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
+    dataset.setName("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020");
     dataset.getTags().remove("rappa");
     dataset.getTags().add("tag1");
     dataset.setNote("test note");
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setEditable(false);
-    Sample sample2 = dataset.getSamples().get(1);
-    sample2.setSampleId("sample2");
-    sample2.setReplicate("r2");
 
     service.save(dataset);
 
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
-    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-sample2-FR3_20181020", dataset.getName());
+    assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("mnase"));
     assertTrue(dataset.getTags().contains("ip"));
