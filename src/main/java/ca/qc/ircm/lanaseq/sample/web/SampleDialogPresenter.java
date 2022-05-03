@@ -111,7 +111,6 @@ public class SampleDialogPresenter {
     boolean valid = validateSample().isOk();
     if (valid) {
       Sample sample = binder.getBean();
-      sample.generateName();
       if (service.exists(sample.getName()) && (sample.getId() == null || !sample.getName()
           .equalsIgnoreCase(service.get(sample.getId()).map(Sample::getName).orElse("")))) {
         valid = false;
@@ -124,8 +123,9 @@ public class SampleDialogPresenter {
   }
 
   void save() {
+    Sample sample = binder.getBean();
+    sample.generateName();
     if (validate()) {
-      Sample sample = binder.getBean();
       logger.debug("save sample {}", sample);
       service.save(sample);
       AppResources resources = new AppResources(SampleDialog.class, locale);

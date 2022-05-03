@@ -261,6 +261,9 @@ public class SampleService {
     if (sample.getId() != null && !sample.isEditable()) {
       throw new IllegalArgumentException("sample " + sample + " cannot be edited");
     }
+    if (sample.getName() == null) {
+      throw new NullPointerException("dataset's name cannot be null");
+    }
     LocalDateTime now = LocalDateTime.now();
     User user = authorizationService.getCurrentUser().orElse(null);
     if (sample.getId() == null) {
@@ -268,7 +271,6 @@ public class SampleService {
       sample.setCreationDate(now);
       sample.setEditable(true);
     }
-    sample.generateName();
     Sample old = old(sample).orElse(null);
     final String oldName = old != null ? old.getName() : null;
     final Path oldFolder = old != null ? configuration.folder(old) : null;
