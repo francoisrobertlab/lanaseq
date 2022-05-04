@@ -23,12 +23,12 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.GENERATE_NAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
@@ -65,8 +65,8 @@ public class DatasetDialogElement extends DialogElement {
     return $(H3Element.class).id(id(HEADER));
   }
 
-  public TextFieldElement name() {
-    return $(TextFieldElement.class).id(id(NAME));
+  public TextFieldElement namePrefix() {
+    return $(TextFieldElement.class).id(id(NAME_PREFIX));
   }
 
   public ButtonElement generateName() {

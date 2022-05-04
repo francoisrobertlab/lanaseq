@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
@@ -99,6 +98,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
+  public static final String NAME_PREFIX = "namePrefix";
   public static final String GENERATE_NAME = "generateName";
   public static final String ADD_NEW_SAMPLE = "addNewSample";
   public static final String ADD_SAMPLE = "addSample";
@@ -108,7 +108,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   protected H3 header = new H3();
-  protected TextField name = new TextField();
+  protected TextField namePrefix = new TextField();
   protected Button generateName = new Button();
   protected TagsField tags = new TagsField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
@@ -157,9 +157,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout datasetForm = new FormLayout(name, generateName, date, tags, note);
+    FormLayout datasetForm = new FormLayout(namePrefix, generateName, date, tags, note);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
-    datasetForm.setColspan(name, 3);
+    datasetForm.setColspan(namePrefix, 3);
     datasetForm.setColspan(tags, 3);
     datasetForm.setColspan(note, 4);
     FormLayout sampleForm = new FormLayout(protocol, assay, type, target);
@@ -176,7 +176,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     layout.add(header, datasetForm, form, samples, error, buttons, confirm);
     layout.setSizeFull();
     header.setId(id(HEADER));
-    name.setId(id(NAME));
+    namePrefix.setId(id(NAME_PREFIX));
     generateName.setId(id(GENERATE_NAME));
     generateName.addClickListener(e -> presenter.generateName());
     tags.setId(id(TAGS));
@@ -269,7 +269,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
-    name.setLabel(datasetResources.message(NAME));
+    namePrefix.setLabel(resources.message(NAME_PREFIX));
     generateName.setText(resources.message(GENERATE_NAME));
     tags.setLabel(datasetResources.message(TAGS));
     protocol.setLabel(sampleResources.message(PROTOCOL));

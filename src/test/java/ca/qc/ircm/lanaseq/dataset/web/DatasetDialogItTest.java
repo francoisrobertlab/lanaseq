@@ -42,6 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolRepository protocolRepository;
   @Autowired
   private AppConfiguration configuration;
-  private String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20200720";
+  private String namePrefix = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2";
   private String tag1 = "mnase";
   private String tag2 = "ip";
   private String note = "test note\nsecond line";
@@ -92,7 +93,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     if (tag != null) {
       tag.click();
     }
-    dialog.name().setValue(name);
+    dialog.namePrefix().setValue(namePrefix);
     dialog.tags().newTag().setFilter(tag1);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.tags().newTag().setFilter(tag2);
@@ -108,7 +109,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().doubleClick(0);
     DatasetDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.name()).isPresent());
+    assertTrue(optional(() -> dialog.namePrefix()).isPresent());
     assertTrue(optional(() -> dialog.generateName()).isPresent());
     assertTrue(optional(() -> dialog.tags()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
@@ -146,6 +147,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
+    String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());
@@ -210,6 +212,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
+    String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetDialog.class);
     assertEquals(resources.message(SAVED, name), notification.getText());

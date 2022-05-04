@@ -48,10 +48,14 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +100,20 @@ public class DatasetDialogPresenter {
   void localeChange(Locale locale) {
     this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
-    binder.forField(dialog.name).asRequired(webResources.message(REQUIRED))
-        .withNullRepresentation("").bind(NAME);
+    DateTimeFormatter dateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
+    binder.forField(dialog.namePrefix).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("")
+        .withConverter(
+            namePrefix -> namePrefix + dialog.date.getOptionalValue()
+                .map(date -> "_" + dateFormatter.format(date)).orElse(""),
+            name -> nameToNamePrefix(name))
+        .bind(NAME);
+    dialog.date.addValueChangeListener(e -> {
+      // Force update of dataset name.
+      String namePrefix = dialog.namePrefix.getValue();
+      dialog.namePrefix.setValue("");
+      dialog.namePrefix.setValue(namePrefix);
+    });
     binder.forField(dialog.tags).bind(TAGS);
     sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
         .bind(PROTOCOL);
@@ -111,6 +127,12 @@ public class DatasetDialogPresenter {
     sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
     binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
     binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
+  }
+
+  private String nameToNamePrefix(String name) {
+    Pattern namePattern = Pattern.compile("(?:(.*)_)?\\d{8}");
+    return Optional.ofNullable(name).map(namePattern::matcher).filter(Matcher::matches)
+        .map(matcher -> matcher.group(1)).orElse("");
   }
 
   private boolean isReadOnly(Dataset dataset) {
@@ -137,7 +159,7 @@ public class DatasetDialogPresenter {
     updateSamplesInBinderBean();
     Dataset dataset = binder.getBean();
     dataset.generateName();
-    dialog.name.setValue(dataset.getName());
+    dialog.namePrefix.setValue(nameToNamePrefix(dataset.getName()));
   }
 
   void addSample() {

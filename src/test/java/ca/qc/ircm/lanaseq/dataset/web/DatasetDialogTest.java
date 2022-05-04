@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
@@ -34,6 +33,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.GENERATE_NAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
@@ -234,7 +234,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
-    assertEquals(id(NAME), dialog.name.getId().orElse(""));
+    assertEquals(id(NAME_PREFIX), dialog.namePrefix.getId().orElse(""));
     assertEquals(id(GENERATE_NAME), dialog.generateName.getId().orElse(""));
     assertEquals(id(TAGS), dialog.tags.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
@@ -270,7 +270,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
+    assertEquals(resources.message(NAME_PREFIX), dialog.namePrefix.getLabel());
     assertEquals(resources.message(GENERATE_NAME), dialog.generateName.getText());
     assertEquals(datasetResources.message(TAGS), dialog.tags.getLabel());
     assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
@@ -324,7 +324,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());
-    assertEquals(datasetResources.message(NAME), dialog.name.getLabel());
+    assertEquals(resources.message(NAME_PREFIX), dialog.namePrefix.getLabel());
     assertEquals(resources.message(GENERATE_NAME), dialog.generateName.getText());
     assertEquals(datasetResources.message(TAGS), dialog.tags.getLabel());
     assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
