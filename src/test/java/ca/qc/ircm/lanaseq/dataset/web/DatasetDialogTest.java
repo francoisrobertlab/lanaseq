@@ -45,13 +45,11 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDatePickerI18n;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -68,13 +66,10 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -363,31 +358,6 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(CANCEL),
         dialog.confirm.getElement().getProperty("cancelText"));
     verify(presenter).localeChange(locale);
-  }
-
-  @Test
-  public void protocol() {
-    for (Protocol protocol : protocolRepository.findAll()) {
-      assertEquals(protocol.getName(), dialog.protocol.getItemLabelGenerator().apply(protocol));
-    }
-  }
-
-  @Test
-  public void assay() {
-    List<Assay> assays = items(dialog.assay);
-    assertArrayEquals(Assay.values(), assays.toArray(new Assay[0]));
-    for (Assay assay : assays) {
-      assertEquals(assay.getLabel(locale), dialog.assay.getItemLabelGenerator().apply(assay));
-    }
-  }
-
-  @Test
-  public void type() {
-    List<SampleType> types = items(dialog.type);
-    assertArrayEquals(SampleType.values(), types.toArray(new SampleType[0]));
-    for (SampleType type : types) {
-      assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
-    }
   }
 
   @Test

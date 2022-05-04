@@ -20,13 +20,16 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
+import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.MNASE_SEQ;
+import static ca.qc.ircm.lanaseq.sample.SampleType.IMMUNO_PRECIPITATION;
+import static ca.qc.ircm.lanaseq.sample.SampleType.INPUT;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -40,10 +43,6 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
@@ -64,7 +63,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -102,8 +100,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetService service;
   @MockBean
-  private ProtocolService protocolService;
-  @MockBean
   private AuthorizationService authorizationService;
   @Mock
   private Sample sample;
@@ -121,31 +117,17 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private DatasetRepository repository;
   @Autowired
-  private ProtocolRepository protocolRepository;
-  @Autowired
   private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<String> topTags = new ArrayList<>();
-  private List<Protocol> protocols;
   private DateTimeFormatter nameDateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
   private String namePrefix = "ChIPseq_IP_polr3a_yFR20_WT_37C_testsample1-testsample2";
   private String tag1 = "Tag 1";
   private String tag2 = "Tag 2";
-  private Protocol protocol;
-  private Assay assay = Assay.CHIP_SEQ;
-  private SampleType type = SampleType.IMMUNO_PRECIPITATION;
-  private String target = "polr3a";
-  private String strain = "yFR20";
-  private String strainDescription = "WT";
-  private String treatment = "37C";
-  private String note = "test note\nsecond line";
   private LocalDate date = LocalDate.of(2020, 7, 20);
-  private String sampleId1 = "test sample 1";
-  private String sampleReplicate1 = "rep1";
-  private String sampleId2 = "test sample 2";
-  private String sampleReplicate2 = "rep2";
+  private String note = "test note\nsecond line";
 
   /**
    * Before test.
@@ -156,11 +138,9 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.header = new H3();
     dialog.namePrefix = new TextField();
     dialog.tags = new TagsField();
-    dialog.protocol = new ComboBox<>();
-    dialog.assay = new Select<>();
-    dialog.assay.setItems(Assay.values());
-    dialog.type = new Select<>();
-    dialog.type.setItems(SampleType.values());
+    dialog.protocol = new TextField();
+    dialog.assay = new TextField();
+    dialog.type = new TextField();
     dialog.target = new TextField();
     dialog.strain = new TextField();
     dialog.strainDescription = new TextField();
@@ -174,9 +154,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.cancel = new Button();
     dialog.delete = new Button();
     dialog.selectSampleDialog = mock(SelectSampleDialog.class);
-    protocols = protocolRepository.findAll();
-    protocol = protocolRepository.findById(1L).get();
-    when(protocolService.all()).thenReturn(protocols);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     topTags.add("input");
     topTags.add("chip");
@@ -188,15 +165,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   private void fillForm() {
     dialog.namePrefix.setValue(namePrefix);
     dialog.tags.setValue(Stream.of(tag1, tag2).collect(Collectors.toSet()));
-    dialog.protocol.setValue(protocol);
-    dialog.assay.setValue(assay);
-    dialog.type.setValue(type);
-    dialog.target.setValue(target);
-    dialog.strain.setValue(strain);
-    dialog.strainDescription.setValue(strainDescription);
-    dialog.treatment.setValue(treatment);
-    dialog.note.setValue(note);
     dialog.date.setValue(date);
+    dialog.note.setValue(note);
   }
 
   @Test
@@ -231,11 +201,15 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.namePrefix.isReadOnly());
     assertTrue(dialog.tags.getValue().isEmpty());
     assertFalse(dialog.tags.isReadOnly());
-    assertNull(dialog.protocol.getValue());
+    assertEquals(LocalDate.now(), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
+    assertEquals("", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
-    assertNull(dialog.assay.getValue());
+    assertEquals("", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.NULL, dialog.type.getValue());
+    assertEquals("", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -245,10 +219,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.now(), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(0, samples.size());
   }
@@ -265,12 +235,16 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.tags.getValue().contains("mnase"));
     assertTrue(dialog.tags.getValue().contains("ip"));
     assertFalse(dialog.tags.isReadOnly());
+    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertEquals("FLAG", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -280,10 +254,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     assertTrue(find(samples, 1L).isPresent());
@@ -313,12 +283,15 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.tags.getValue().contains("mnase"));
     assertTrue(dialog.tags.getValue().contains("ip"));
     assertTrue(dialog.tags.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
+    assertTrue(dialog.date.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertTrue(dialog.note.isReadOnly());
+    assertEquals("FLAG", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -328,10 +301,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertTrue(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
-    assertTrue(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
     assertTrue(find(samples, 1L).isPresent());
@@ -350,12 +319,16 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(1, dialog.tags.getValue().size());
     assertTrue(dialog.tags.getValue().contains("chipseq"));
     assertTrue(dialog.tags.isReadOnly());
+    assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
+    assertTrue(dialog.date.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertTrue(dialog.note.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 2L, dialog.protocol.getValue().getId());
+    assertEquals("BioID", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertEquals("ChIP-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2b", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -365,13 +338,53 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertTrue(dialog.note.isReadOnly());
-    assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
-    assertTrue(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(1, samples.size());
     assertTrue(find(samples, 8L).isPresent());
+  }
+
+  @Test
+  public void setDataset_SampleWithDifferentFields() {
+    Dataset dataset = repository.findById(1L).get();
+    Sample sample = sampleRepository.findById(4L).get();
+    sample.setType(SampleType.INPUT);
+    sample.setTreatment("Heat shock");
+    dataset.getSamples().add(sample);
+
+    presenter.setDataset(dataset);
+
+    assertEquals("FLAG, Histone FLAG", dialog.protocol.getValue());
+    assertEquals(MNASE_SEQ.getLabel(locale) + ", " + CHIP_SEQ.getLabel(locale),
+        dialog.assay.getValue());
+    assertEquals(IMMUNO_PRECIPITATION.getLabel(locale) + ", " + INPUT.getLabel(locale),
+        dialog.type.getValue());
+    assertEquals("polr2a, Spt16", dialog.target.getValue());
+    assertEquals("yFR100, yFR101", dialog.strain.getValue());
+    assertEquals("WT, G24D", dialog.strainDescription.getValue());
+    assertEquals("Rappa, Heat shock", dialog.treatment.getValue());
+  }
+
+  @Test
+  public void setDataset_SampleWithEmtpyFields() {
+    Dataset dataset = repository.findById(1L).get();
+    Sample sample = dataset.getSamples().get(0);
+    sample.setProtocol(null);
+    sample.setAssay(null);
+    sample.setType(null);
+    sample.setTarget(null);
+    sample.setStrain(null);
+    sample.setStrainDescription(null);
+    sample.setTreatment(null);
+
+    presenter.setDataset(dataset);
+
+    assertEquals("FLAG", dialog.protocol.getValue());
+    assertEquals(MNASE_SEQ.getLabel(locale), dialog.assay.getValue());
+    assertEquals(IMMUNO_PRECIPITATION.getLabel(locale), dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
   }
 
   @Test
@@ -382,11 +395,15 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.namePrefix.isReadOnly());
     assertTrue(dialog.tags.getValue().isEmpty());
     assertFalse(dialog.tags.isReadOnly());
-    assertNull(dialog.protocol.getValue());
+    assertEquals(LocalDate.now(), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
+    assertEquals("", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
+    assertEquals("", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
-    assertNull(dialog.assay.getValue());
+    assertEquals("", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.NULL, dialog.type.getValue());
+    assertEquals("", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -396,10 +413,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(LocalDate.now(), dialog.date.getValue());
-    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(0, samples.size());
   }
@@ -408,24 +421,8 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   public void requiredIndicator() {
     assertTrue(dialog.namePrefix.isRequiredIndicatorVisible());
     assertFalse(dialog.tags.isRequiredIndicatorVisible());
-    assertTrue(dialog.protocol.isRequiredIndicatorVisible());
-    assertTrue(dialog.assay.isRequiredIndicatorVisible());
-    assertFalse(dialog.type.isRequiredIndicatorVisible());
-    assertFalse(dialog.target.isRequiredIndicatorVisible());
-    assertTrue(dialog.strain.isRequiredIndicatorVisible());
-    assertFalse(dialog.strainDescription.isRequiredIndicatorVisible());
-    assertFalse(dialog.treatment.isRequiredIndicatorVisible());
-    assertFalse(dialog.note.isRequiredIndicatorVisible());
     assertTrue(dialog.date.isRequiredIndicatorVisible());
-  }
-
-  @Test
-  public void protocols() {
-    List<Protocol> protocols = items(dialog.protocol);
-    assertEquals(this.protocols.size(), protocols.size());
-    for (int i = 0; i < protocols.size(); i++) {
-      assertEquals(this.protocols.get(i), protocols.get(i));
-    }
+    assertFalse(dialog.note.isRequiredIndicatorVisible());
   }
 
   @Test
@@ -566,12 +563,16 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.tags.getValue().contains("mnase"));
     assertTrue(dialog.tags.getValue().contains("ip"));
     assertFalse(dialog.tags.isReadOnly());
+    assertEquals("robtools version 2", dialog.note.getValue());
+    assertFalse(dialog.note.isReadOnly());
+    assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
+    assertFalse(dialog.date.isReadOnly());
     assertNotNull(dialog.protocol.getValue());
-    assertEquals((Long) 1L, dialog.protocol.getValue().getId());
+    assertEquals("FLAG", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -581,9 +582,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.strainDescription.isReadOnly());
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals("robtools version 2", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertFalse(dialog.date.isReadOnly());
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
     assertTrue(find(samples, 2L).isPresent());
@@ -709,7 +707,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.save();
 
-    BinderValidationStatus<Sample> status = presenter.validateSample();
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     verify(dialog).showNotification(any());

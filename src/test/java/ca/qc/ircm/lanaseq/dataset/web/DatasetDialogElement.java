@@ -43,13 +43,11 @@ import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.web.TagsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
-import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
-import com.vaadin.flow.component.select.testbench.SelectElement;
 import com.vaadin.flow.component.textfield.testbench.TextAreaElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.TestBenchElement;
@@ -77,16 +75,16 @@ public class DatasetDialogElement extends DialogElement {
     return $(TagsFieldElement.class).id(id(TAGS));
   }
 
-  public ComboBoxElement protocol() {
-    return $(ComboBoxElement.class).id(id(PROTOCOL));
+  public TextFieldElement protocol() {
+    return $(TextFieldElement.class).id(id(PROTOCOL));
   }
 
-  public SelectElement assay() {
-    return $(SelectElement.class).id(id(ASSAY));
+  public TextFieldElement assay() {
+    return $(TextFieldElement.class).id(id(ASSAY));
   }
 
-  public SelectElement type() {
-    return $(SelectElement.class).id(id(TYPE));
+  public TextFieldElement type() {
+    return $(TextFieldElement.class).id(id(TYPE));
   }
 
   public TextFieldElement target() {
