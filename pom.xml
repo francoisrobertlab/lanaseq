@@ -52,7 +52,7 @@
   <properties>
     <resource.delimiter>$[*]</resource.delimiter>
     <slow-tests.skip>false</slow-tests.skip>
-    <javac.version>1.8</javac.version>
+    <javac.version>11</javac.version>
     <main-class>ca.qc.ircm.lanaseq.Main</main-class>
     <testbench.skip>false</testbench.skip>
     <testbench.maxAttempts>3</testbench.maxAttempts>
