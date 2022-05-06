@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.file.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -262,6 +261,9 @@ public class SampleService {
     if (sample.getId() != null && !sample.isEditable()) {
       throw new IllegalArgumentException("sample " + sample + " cannot be edited");
     }
+    if (sample.getName() == null) {
+      throw new NullPointerException("dataset's name cannot be null");
+    }
     LocalDateTime now = LocalDateTime.now();
     User user = authorizationService.getCurrentUser().orElse(null);
     if (sample.getId() == null) {
@@ -269,7 +271,6 @@ public class SampleService {
       sample.setCreationDate(now);
       sample.setEditable(true);
     }
-    sample.generateName();
     Sample old = old(sample).orElse(null);
     final String oldName = old != null ? old.getName() : null;
     final Path oldFolder = old != null ? configuration.folder(old) : null;
@@ -277,7 +278,6 @@ public class SampleService {
     Path folder = configuration.folder(sample);
     Renamer.moveFolder(oldFolder, folder);
     Renamer.renameFiles(oldName, sample.getName(), folder);
-    renameDatasets(sample);
   }
 
   @Transactional(TxType.REQUIRES_NEW)
@@ -286,19 +286,6 @@ public class SampleService {
       return repository.findById(sample.getId());
     } else {
       return Optional.empty();
-    }
-  }
-
-  private void renameDatasets(Sample sample) {
-    List<Dataset> datasets = datasetRepository.findBySamples(sample);
-    for (Dataset dataset : datasets) {
-      final String oldName = dataset.getName();
-      Path oldFolder = configuration.folder(dataset);
-      dataset.generateName();
-      datasetRepository.save(dataset);
-      Path folder = configuration.folder(dataset);
-      Renamer.moveFolder(oldFolder, folder);
-      Renamer.renameFiles(oldName, dataset.getName(), folder);
     }
   }
 

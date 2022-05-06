@@ -20,42 +20,35 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleProperties;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,49 +64,62 @@ import org.springframework.context.annotation.Scope;
 public class DatasetDialogPresenter {
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogPresenter.class);
   private DatasetDialog dialog;
-  private Locale locale;
+  private Locale locale = Constants.DEFAULT_LOCALE;
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
-  private Binder<Sample> sampleBinder = new BeanValidationBinder<>(Sample.class);
-  private Map<Sample, Binder<Sample>> sampleBinders = new HashMap<>();
   private List<Sample> samples = new ArrayList<>();
   private DatasetService service;
-  private ProtocolService protocolService;
   private AuthorizationService authorizationService;
 
   @Autowired
-  protected DatasetDialogPresenter(DatasetService service, ProtocolService protocolService,
+  protected DatasetDialogPresenter(DatasetService service,
       AuthorizationService authorizationService) {
     this.service = service;
-    this.protocolService = protocolService;
     this.authorizationService = authorizationService;
   }
 
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
-    dialog.protocol.setItems(protocolService.all());
     dialog.tags.setTagSuggestions(service.topTags(50));
     dialog.selectSampleDialog.addSelectedListener(e -> addSample(e.getSelection()));
     dialog.error.setVisible(false);
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null);
+    dialog.protocol.setReadOnly(true);
+    dialog.assay.setReadOnly(true);
+    dialog.type.setReadOnly(true);
+    dialog.target.setReadOnly(true);
+    dialog.strain.setReadOnly(true);
+    dialog.strainDescription.setReadOnly(true);
+    dialog.treatment.setReadOnly(true);
   }
 
   void localeChange(Locale locale) {
     this.locale = locale;
     final AppResources webResources = new AppResources(Constants.class, locale);
+    DateTimeFormatter dateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
+    binder.forField(dialog.namePrefix).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("")
+        .withConverter(
+            namePrefix -> namePrefix + dialog.date.getOptionalValue()
+                .map(date -> "_" + dateFormatter.format(date)).orElse(""),
+            name -> nameToNamePrefix(name))
+        .bind(NAME);
+    dialog.date.addValueChangeListener(e -> {
+      // Force update of dataset name.
+      String namePrefix = dialog.namePrefix.getValue();
+      dialog.namePrefix.setValue("");
+      dialog.namePrefix.setValue(namePrefix);
+    });
     binder.forField(dialog.tags).bind(TAGS);
-    sampleBinder.forField(dialog.protocol).asRequired(webResources.message(REQUIRED))
-        .bind(PROTOCOL);
-    sampleBinder.forField(dialog.assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
-    sampleBinder.forField(dialog.type).withNullRepresentation(SampleType.NULL).bind(TYPE);
-    sampleBinder.forField(dialog.target).withNullRepresentation("").bind(TARGET);
-    sampleBinder.forField(dialog.strain).asRequired(webResources.message(REQUIRED))
-        .withNullRepresentation("").bind(STRAIN);
-    sampleBinder.forField(dialog.strainDescription).withNullRepresentation("")
-        .bind(STRAIN_DESCRIPTION);
-    sampleBinder.forField(dialog.treatment).withNullRepresentation("").bind(TREATMENT);
-    binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
     binder.forField(dialog.date).asRequired(webResources.message(REQUIRED)).bind(DATE);
+    binder.forField(dialog.note).withNullRepresentation("").bind(NOTE);
+    updateSamplesFields();
+  }
+
+  private String nameToNamePrefix(String name) {
+    Pattern namePattern = Pattern.compile("(?:(.*)_)?\\d{8}");
+    return Optional.ofNullable(name).map(namePattern::matcher).filter(Matcher::matches)
+        .map(matcher -> matcher.group(1)).orElse("");
   }
 
   private boolean isReadOnly(Dataset dataset) {
@@ -123,37 +129,24 @@ public class DatasetDialogPresenter {
 
   private void setReadOnly() {
     Dataset dataset = binder.getBean();
-    boolean readOnly = isReadOnly(dataset);
-    binder.setReadOnly(readOnly);
-    boolean sampleReadOnly = readOnly || !samples.stream()
-        .map(sa -> authorizationService.hasPermission(sa, Permission.WRITE) && sa.isEditable())
-        .filter(val -> val).findFirst().orElse(false);
-    sampleBinder.setReadOnly(sampleReadOnly);
+    binder.setReadOnly(isReadOnly(dataset));
   }
 
-  private void bindSampleFields(Sample sample) {
-    final boolean forceReadOnly = isReadOnly(binder.getBean()) || !sample.isEditable();
-    final AppResources webResources = new AppResources(Constants.class, locale);
-    Binder<Sample> binder = new BeanValidationBinder<Sample>(Sample.class);
-    binder.forField(dialog.sampleIdField(sample))
-        .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
-        .withNullRepresentation("").bind(SampleProperties.SAMPLE_ID);
-    binder.forField(dialog.sampleReplicateField(sample))
-        .asRequired(sampleRequiredValidator(sample, webResources.message(REQUIRED)))
-        .withNullRepresentation("").bind(SampleProperties.REPLICATE);
-    binder.setBean(sample);
-    binder.setReadOnly(
-        forceReadOnly || !authorizationService.hasPermission(sample, Permission.WRITE));
-    sampleBinders.put(sample, binder);
+  private void updateSamplesInBinderBean() {
+    Dataset dataset = binder.getBean();
+    dataset.setSamples(new ArrayList<>(samples));
+    for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
+      if (empty(dataset.getSamples().get(i))) {
+        dataset.getSamples().remove(i);
+      }
+    }
   }
 
-  void addNewSample() {
-    Sample sample = new Sample();
-    sample.setEditable(true);
-    samples.add(sample);
-    bindSampleFields(sample);
-    refreshSamplesDataProvider();
-    setReadOnly();
+  void generateName() {
+    updateSamplesInBinderBean();
+    Dataset dataset = binder.getBean();
+    dataset.generateName();
+    dialog.namePrefix.setValue(nameToNamePrefix(dataset.getName()));
   }
 
   void addSample() {
@@ -164,16 +157,13 @@ public class DatasetDialogPresenter {
     if (!samples.stream().filter(sa -> sa.getId() != null && sa.getId().equals(sample.getId()))
         .findAny().isPresent()) {
       samples.add(sample);
-      bindSampleFields(sample);
       refreshSamplesDataProvider();
-      setReadOnly();
     }
   }
 
   void removeSample(Sample sample) {
     samples.remove(sample);
     refreshSamplesDataProvider();
-    setReadOnly();
   }
 
   void dropSample(Sample dragged, Sample drop, GridDropLocation dropLocation) {
@@ -193,35 +183,11 @@ public class DatasetDialogPresenter {
     return binder.validate();
   }
 
-  BinderValidationStatus<Sample> validateSample() {
-    return sampleBinder.validate();
-  }
-
-  List<BinderValidationStatus<Sample>> validateSamples() {
-    return samples.stream().map(sample -> sampleBinders.get(sample).validate())
-        .collect(Collectors.toList());
-  }
-
   private boolean validate() {
     dialog.error.setVisible(false);
-    boolean valid = validateDataset().isOk() && validateSample().isOk()
-        && !validateSamples().stream().filter(status -> !status.isOk()).findAny().isPresent();
+    boolean valid = validateDataset().isOk();
     if (valid) {
       Dataset dataset = binder.getBean();
-      dataset.setSamples(new ArrayList<>(samples));
-      for (int i = dataset.getSamples().size() - 1; i >= 0; i--) {
-        if (empty(dataset.getSamples().get(i))) {
-          dataset.getSamples().remove(i);
-        }
-      }
-      Sample from = sampleBinder.getBean();
-      for (Sample sample : dataset.getSamples()) {
-        copy(from, sample);
-        if (sample.getId() == null) {
-          sample.setDate(dataset.getDate());
-        }
-      }
-      dataset.generateName();
       if (service.exists(dataset.getName()) && (dataset.getId() == null || !dataset.getName()
           .equalsIgnoreCase(service.get(dataset.getId()).map(Dataset::getName).orElse("")))) {
         valid = false;
@@ -234,6 +200,7 @@ public class DatasetDialogPresenter {
   }
 
   void save() {
+    updateSamplesInBinderBean();
     if (validate()) {
       Dataset dataset = binder.getBean();
       logger.debug("save dataset {}", dataset);
@@ -280,21 +247,29 @@ public class DatasetDialogPresenter {
     if (dataset.getSamples() == null) {
       dataset.setSamples(new ArrayList<>());
     }
-    if (dataset.getId() == null) {
-      while (dataset.getSamples().size() < 2) {
-        Sample sample = new Sample();
-        sample.setEditable(true);
-        dataset.getSamples().add(sample);
-      }
-    }
-    Sample sample = new Sample();
-    copy(dataset.getSamples().stream().findFirst().orElse(new Sample()), sample);
     binder.setBean(dataset);
-    sampleBinder.setBean(sample);
-    samples = new ArrayList<>(dataset.getSamples());
-    dialog.samples.setItems(samples);
-    dataset.getSamples().forEach(s -> bindSampleFields(s));
     setReadOnly();
+    updateSamplesFields();
+  }
+
+  private void updateSamplesFields() {
+    samples =
+        Optional.ofNullable(binder.getBean()).map(Dataset::getSamples).orElse(new ArrayList<>());
+    dialog.samples.setItems(samples);
+    dialog.protocol.setValue(samples.stream().map(Sample::getProtocol).filter(Objects::nonNull)
+        .map(Protocol::getName).distinct().collect(Collectors.joining(", ")));
+    dialog.assay.setValue(samples.stream().map(Sample::getAssay).filter(Objects::nonNull).distinct()
+        .map(assay -> assay.getLabel(locale)).collect(Collectors.joining(", ")));
+    dialog.type.setValue(samples.stream().map(Sample::getType).filter(Objects::nonNull).distinct()
+        .map(type -> type.getLabel(locale)).collect(Collectors.joining(", ")));
+    dialog.target.setValue(samples.stream().map(Sample::getTarget).filter(Objects::nonNull)
+        .distinct().collect(Collectors.joining(", ")));
+    dialog.strain.setValue(samples.stream().map(Sample::getStrain).filter(Objects::nonNull)
+        .distinct().collect(Collectors.joining(", ")));
+    dialog.strainDescription.setValue(samples.stream().map(Sample::getStrainDescription)
+        .filter(Objects::nonNull).distinct().collect(Collectors.joining(", ")));
+    dialog.treatment.setValue(samples.stream().map(Sample::getTreatment).filter(Objects::nonNull)
+        .distinct().collect(Collectors.joining(", ")));
   }
 
   private void copy(Sample from, Sample to) {
@@ -305,14 +280,6 @@ public class DatasetDialogPresenter {
     to.setStrainDescription(from.getStrainDescription());
     to.setTreatment(from.getTreatment());
     to.setProtocol(from.getProtocol());
-  }
-
-  private Validator<String> sampleRequiredValidator(Sample sample, String errorMessage) {
-    return (value,
-        context) -> (!dialog.sampleIdField(sample).isEmpty()
-            || !dialog.sampleReplicateField(sample).isEmpty()) && value.isEmpty()
-                ? ValidationResult.error(errorMessage)
-                : ValidationResult.ok();
   }
 
   List<Sample> getSamples() {

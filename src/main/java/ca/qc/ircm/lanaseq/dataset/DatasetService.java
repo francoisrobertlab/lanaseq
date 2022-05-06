@@ -22,8 +22,6 @@ import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.file.Renamer;
-import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -64,7 +62,6 @@ import org.springframework.util.FileSystemUtils;
 public class DatasetService {
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
-  private SampleService sampleService;
   private AppConfiguration configuration;
   private AuthorizationService authorizationService;
   private JPAQueryFactory queryFactory;
@@ -73,11 +70,9 @@ public class DatasetService {
   }
 
   @Autowired
-  protected DatasetService(DatasetRepository repository, SampleService sampleService,
-      AppConfiguration configuration, AuthorizationService authorizationService,
-      JPAQueryFactory queryFactory) {
+  protected DatasetService(DatasetRepository repository, AppConfiguration configuration,
+      AuthorizationService authorizationService, JPAQueryFactory queryFactory) {
     this.repository = repository;
-    this.sampleService = sampleService;
     this.configuration = configuration;
     this.authorizationService = authorizationService;
     this.queryFactory = queryFactory;
@@ -258,6 +253,13 @@ public class DatasetService {
     if (dataset.getId() != null && !dataset.isEditable()) {
       throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
     }
+    if (dataset.getName() == null) {
+      throw new NullPointerException("dataset's name cannot be null");
+    }
+    if (dataset.getSamples() != null && dataset.getSamples().stream()
+        .filter(sample -> sample.getId() == null).findAny().isPresent()) {
+      throw new IllegalArgumentException("all dataset's samples must already be in database");
+    }
     LocalDateTime now = LocalDateTime.now();
     User user = authorizationService.getCurrentUser().orElse(null);
     if (dataset.getId() == null) {
@@ -265,17 +267,9 @@ public class DatasetService {
       dataset.setCreationDate(now);
       dataset.setEditable(true);
     }
-    if (dataset.getSamples() != null) {
-      for (Sample sample : dataset.getSamples()) {
-        if (sample.getId() == null || sample.isEditable()) {
-          sampleService.save(sample);
-        }
-      }
-    }
     Dataset old = old(dataset).orElse(null);
     final String oldName = old != null ? old.getName() : null;
     Path oldFolder = old != null ? configuration.folder(old) : null;
-    dataset.generateName();
     repository.save(dataset);
     Path folder = configuration.folder(dataset);
     Renamer.moveFolder(oldFolder, folder);

@@ -120,12 +120,6 @@ public class DatasetsViewPresenter {
     view.protocolDialog.open();
   }
 
-  void add() {
-    clearError();
-    view.dialog.setDataset(null);
-    view.dialog.open();
-  }
-
   private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
     Map<Object, Boolean> seen = new ConcurrentHashMap<>();
     return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;

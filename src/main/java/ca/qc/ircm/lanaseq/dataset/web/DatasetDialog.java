@@ -41,11 +41,8 @@ import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI1
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -55,7 +52,6 @@ import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -68,11 +64,11 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -97,6 +93,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
+  public static final String NAME_PREFIX = "namePrefix";
+  public static final String GENERATE_NAME = "generateName";
   public static final String ADD_NEW_SAMPLE = "addNewSample";
   public static final String ADD_SAMPLE = "addSample";
   public static final String SAMPLES = "samples";
@@ -105,10 +103,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   protected H3 header = new H3();
+  protected TextField namePrefix = new TextField();
+  protected Button generateName = new Button();
   protected TagsField tags = new TagsField();
-  protected ComboBox<Protocol> protocol = new ComboBox<>();
-  protected Select<Assay> assay = new Select<>();
-  protected Select<SampleType> type = new Select<>();
+  protected TextField protocol = new TextField();
+  protected TextField assay = new TextField();
+  protected TextField type = new TextField();
   protected TextField target = new TextField();
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
@@ -120,7 +120,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Column<Sample> sampleReplicate;
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleRemove;
-  protected Button addNewSample = new Button();
   protected Button addSample = new Button();
   protected Div error = new Div();
   protected Button save = new Button();
@@ -131,8 +130,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected SelectSampleDialog selectSampleDialog;
   @Autowired
   private transient DatasetDialogPresenter presenter;
-  private Map<Sample, TextField> sampleIdFields = new HashMap<>();
-  private Map<Sample, TextField> sampleReplicateFields = new HashMap<>();
+  private Map<Sample, Label> sampleIdFields = new HashMap<>();
+  private Map<Sample, Label> sampleReplicateFields = new HashMap<>();
   private Sample draggedSample;
 
   protected DatasetDialog() {
@@ -153,12 +152,14 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout datasetForm = new FormLayout(date, tags);
+    FormLayout datasetForm = new FormLayout(namePrefix, generateName, date, tags, note);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
+    datasetForm.setColspan(namePrefix, 3);
     datasetForm.setColspan(tags, 3);
-    FormLayout sampleForm = new FormLayout(protocol, assay, type, target, strain);
+    datasetForm.setColspan(note, 4);
+    FormLayout sampleForm = new FormLayout(protocol, assay, type, target);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
-    FormLayout strainForm = new FormLayout(strainDescription, treatment, note);
+    FormLayout strainForm = new FormLayout(strain, strainDescription, treatment);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(sampleForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
@@ -170,35 +171,28 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     layout.add(header, datasetForm, form, samples, error, buttons, confirm);
     layout.setSizeFull();
     header.setId(id(HEADER));
+    namePrefix.setId(id(NAME_PREFIX));
+    generateName.setId(id(GENERATE_NAME));
+    generateName.addClickListener(e -> presenter.generateName());
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));
-    protocol.setItemLabelGenerator(Protocol::getName);
-    protocol.setPreventInvalidInput(true);
     assay.setId(id(ASSAY));
-    assay.setItemLabelGenerator(a -> a.getLabel(getLocale()));
-    assay.setItems(Assay.values());
     type.setId(id(TYPE));
-    type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
-    type.setItems(SampleType.values());
     target.setId(id(TARGET));
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
     date.setId(id(DATE));
     note.setId(id(NOTE));
-    note.setHeight("10em");
+    note.setHeight("6em");
     samples.setId(id(SAMPLES));
     samples.setMinHeight("15em");
     samples.setHeight("15em");
     samples.setSelectionMode(SelectionMode.NONE);
-    sampleId = samples
-        .addColumn(new ComponentRenderer<>(sample -> sampleIdField(sample)),
-            SampleProperties.SAMPLE_ID)
+    sampleId = samples.addColumn(Sample::getSampleId, SampleProperties.SAMPLE_ID)
         .setKey(SampleProperties.SAMPLE_ID)
         .setComparator(NormalizedComparator.of(sample -> sample.getSampleId()));
-    sampleReplicate = samples
-        .addColumn(new ComponentRenderer<>(sample -> sampleReplicateField(sample)),
-            SampleProperties.REPLICATE)
+    sampleReplicate = samples.addColumn(Sample::getReplicate, SampleProperties.REPLICATE)
         .setKey(SampleProperties.REPLICATE)
         .setComparator(NormalizedComparator.of(sample -> sample.getReplicate()));
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
@@ -225,10 +219,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.appendFooterRow(); // Footers
     FooterRow footer = samples.appendFooterRow();
     footer.join(footer.getCell(sampleId), footer.getCell(sampleReplicate));
-    footer.getCell(sampleId).setComponent(new HorizontalLayout(addNewSample, addSample));
-    addNewSample.setId(id(ADD_NEW_SAMPLE));
-    addNewSample.setIcon(VaadinIcon.PLUS.create());
-    addNewSample.addClickListener(e -> presenter.addNewSample());
+    footer.getCell(sampleId).setComponent(new HorizontalLayout(addSample));
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> presenter.addSample());
@@ -252,26 +243,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     presenter.init(this);
   }
 
-  TextField sampleIdField(Sample sample) {
-    if (sampleIdFields.containsKey(sample)) {
-      return sampleIdFields.get(sample);
-    }
-    TextField field = new TextField();
-    field.addClassName(SampleProperties.SAMPLE_ID);
-    sampleIdFields.put(sample, field);
-    return field;
-  }
-
-  TextField sampleReplicateField(Sample sample) {
-    if (sampleReplicateFields.containsKey(sample)) {
-      return sampleReplicateFields.get(sample);
-    }
-    TextField field = new TextField();
-    field.addClassName(SampleProperties.REPLICATE);
-    sampleReplicateFields.put(sample, field);
-    return field;
-  }
-
   Button sampleDelete(Sample sample) {
     Button button = new Button();
     button.addClassName(REMOVE);
@@ -287,6 +258,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
+    namePrefix.setLabel(resources.message(NAME_PREFIX));
+    generateName.setText(resources.message(GENERATE_NAME));
     tags.setLabel(datasetResources.message(TAGS));
     protocol.setLabel(sampleResources.message(PROTOCOL));
     assay.setLabel(sampleResources.message(ASSAY));
@@ -310,7 +283,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleReplicate.setHeader(sampleReplicateHeader).setFooter(sampleReplicateHeader);
     String sampleNameHeader = sampleResources.message(SampleProperties.NAME);
     sampleName.setHeader(sampleNameHeader).setFooter(sampleNameHeader);
-    addNewSample.setText(resources.message(ADD_NEW_SAMPLE));
     addSample.setText(resources.message(ADD_SAMPLE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));

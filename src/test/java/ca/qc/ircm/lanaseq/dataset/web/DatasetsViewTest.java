@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
@@ -120,8 +119,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(DATASETS, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
-    assertEquals(ADD, view.add.getId().orElse(""));
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
     assertEquals(FILES, view.files.getId().orElse(""));
@@ -132,7 +129,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   public void labels() {
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
     verify(presenter).localeChange(locale);
@@ -147,7 +143,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
     verify(presenter).localeChange(locale);
@@ -209,12 +204,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     Dataset dataset = datasets.get(0);
     fireEvent(view.datasets, new EditEvent<>(view.datasets, false, dataset));
     verify(presenter).view(dataset);
-  }
-
-  @Test
-  public void add() {
-    clickButton(view.add);
-    verify(presenter).add();
   }
 
   @Test
