@@ -116,8 +116,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextArea note = new TextArea();
   protected DatePicker date = new DatePicker();
   protected Grid<Sample> samples = new Grid<>();
-  protected Column<Sample> sampleId;
-  protected Column<Sample> sampleReplicate;
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleRemove;
   protected Button addSample = new Button();
@@ -189,12 +187,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.setMinHeight("15em");
     samples.setHeight("15em");
     samples.setSelectionMode(SelectionMode.NONE);
-    sampleId = samples.addColumn(Sample::getSampleId, SampleProperties.SAMPLE_ID)
-        .setKey(SampleProperties.SAMPLE_ID)
-        .setComparator(NormalizedComparator.of(sample -> sample.getSampleId()));
-    sampleReplicate = samples.addColumn(Sample::getReplicate, SampleProperties.REPLICATE)
-        .setKey(SampleProperties.REPLICATE)
-        .setComparator(NormalizedComparator.of(sample -> sample.getReplicate()));
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
         .setKey(SampleProperties.NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getName()));
@@ -218,8 +210,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     });
     samples.appendFooterRow(); // Footers
     FooterRow footer = samples.appendFooterRow();
-    footer.join(footer.getCell(sampleId), footer.getCell(sampleReplicate));
-    footer.getCell(sampleId).setComponent(new HorizontalLayout(addSample));
+    footer.join(footer.getCell(sampleName), footer.getCell(sampleRemove));
+    footer.getCell(sampleName).setComponent(new HorizontalLayout(addSample));
     addSample.setId(id(ADD_SAMPLE));
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> presenter.addSample());
@@ -277,10 +269,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     date.setI18n(datePickerI18n(getLocale()));
     date.setLocale(Locale.CANADA);
     note.setLabel(datasetResources.message(NOTE));
-    String sampleIdHeader = sampleResources.message(SampleProperties.SAMPLE_ID);
-    sampleId.setHeader(sampleIdHeader).setFooter(sampleIdHeader);
-    String sampleReplicateHeader = sampleResources.message(SampleProperties.REPLICATE);
-    sampleReplicate.setHeader(sampleReplicateHeader).setFooter(sampleReplicateHeader);
     String sampleNameHeader = sampleResources.message(SampleProperties.NAME);
     sampleName.setHeader(sampleNameHeader).setFooter(sampleNameHeader);
     addSample.setText(resources.message(ADD_SAMPLE));
