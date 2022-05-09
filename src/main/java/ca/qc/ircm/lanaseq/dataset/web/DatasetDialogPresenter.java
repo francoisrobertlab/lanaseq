@@ -177,6 +177,7 @@ public class DatasetDialogPresenter {
 
   private void refreshSamplesDataProvider() {
     dialog.samples.getDataProvider().refreshAll();
+    updateSamplesFields();
   }
 
   BinderValidationStatus<Dataset> validateDataset() {

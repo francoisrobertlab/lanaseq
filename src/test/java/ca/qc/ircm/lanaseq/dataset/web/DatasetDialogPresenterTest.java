@@ -239,7 +239,6 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.date.isReadOnly());
     assertEquals("robtools version 2", dialog.note.getValue());
     assertFalse(dialog.note.isReadOnly());
-    assertNotNull(dialog.protocol.getValue());
     assertEquals("FLAG", dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
     assertEquals("MNase-seq", dialog.assay.getValue());
@@ -472,6 +471,37 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     List<Sample> samples = items(dialog.samples);
     assertEquals(4, samples.size());
     assertEquals(sample, samples.get(samples.size() - 1));
+    assertEquals("FLAG", dialog.protocol.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
+    assertEquals("IP", dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
+  }
+
+  @Test
+  public void addSample_SampleWithDifferentInfo() {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    assertEquals(3, items(dialog.samples).size());
+    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    presenter.addSample();
+    verify(dialog.selectSampleDialog).open();
+    ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
+        selectListenerCaptor.getValue();
+    Sample sample = sampleRepository.findById(4L).get();
+    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    List<Sample> samples = items(dialog.samples);
+    assertEquals(4, samples.size());
+    assertEquals(sample, samples.get(samples.size() - 1));
+    assertEquals("FLAG, Histone FLAG", dialog.protocol.getValue());
+    assertEquals("MNase-seq, ChIP-seq", dialog.assay.getValue());
+    assertEquals("IP", dialog.type.getValue());
+    assertEquals("polr2a, Spt16", dialog.target.getValue());
+    assertEquals("yFR100, yFR101", dialog.strain.getValue());
+    assertEquals("WT, G24D", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
   }
 
   @Test
@@ -548,6 +578,39 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     for (int i = 1; i < samples.size(); i++) {
       assertEquals(samples.get(i), items.get(i - 1));
     }
+    assertEquals("FLAG", dialog.protocol.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
+    assertEquals("IP", dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void removeSample_SampleWithDifferentInfo() {
+    Dataset dataset = repository.findById(1L).get();
+    dataset.getSamples().add(sampleRepository.findById(4L).get());
+    presenter.setDataset(dataset);
+    dialog.samples = mock(Grid.class);
+    when(dialog.samples.getDataProvider()).thenReturn(mock(ListDataProvider.class));
+    List<Sample> samples = new ArrayList<>(dataset.getSamples());
+    Sample sample = samples.get(samples.size() - 1);
+    presenter.removeSample(sample);
+    verify(dialog.samples.getDataProvider()).refreshAll();
+    List<Sample> items = presenter.getSamples();
+    assertEquals(samples.size() - 1, items.size());
+    for (int i = 0; i < samples.size() - 1; i++) {
+      assertEquals(samples.get(i), items.get(i));
+    }
+    assertEquals("FLAG", dialog.protocol.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
+    assertEquals("IP", dialog.type.getValue());
+    assertEquals("polr2a", dialog.target.getValue());
+    assertEquals("yFR100", dialog.strain.getValue());
+    assertEquals("WT", dialog.strainDescription.getValue());
+    assertEquals("Rappa", dialog.treatment.getValue());
   }
 
   @Test
