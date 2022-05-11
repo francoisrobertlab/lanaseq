@@ -17,6 +17,10 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_MORE_THAN_ONE;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
+
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
@@ -28,6 +32,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -41,6 +48,7 @@ public class ProtocolsViewPresenter {
   private ProtocolsView view;
   private ListDataProvider<Protocol> protocolsDataProvider;
   private WebProtocolFilter filter = new WebProtocolFilter();
+  private Locale locale;
   private ProtocolService service;
   private AuthorizationService authorizationService;
 
@@ -52,12 +60,18 @@ public class ProtocolsViewPresenter {
 
   void init(ProtocolsView view) {
     this.view = view;
-    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+    boolean manager = authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    if (!manager) {
       authorizationService.getCurrentUser()
           .ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
+    view.history.setVisible(manager);
     loadProtocols();
     view.dialog.addSavedListener(e -> loadProtocols());
+  }
+
+  void localeChange(Locale locale) {
+    this.locale = locale;
   }
 
   private void loadProtocols() {
@@ -68,9 +82,27 @@ public class ProtocolsViewPresenter {
     view.protocols.setDataProvider(dataProvider);
   }
 
-  void view(Protocol protocol) {
+  void edit(Protocol protocol) {
     view.dialog.setProtocol(service.get(protocol.getId()).orElse(null));
     view.dialog.open();
+  }
+
+  void history() {
+    List<Protocol> protocols = new ArrayList<>(view.protocols.getSelectedItems());
+    AppResources resources = new AppResources(ProtocolsView.class, locale);
+    boolean error = false;
+    if (protocols.isEmpty()) {
+      view.error.setText(resources.message(PROTOCOLS_REQUIRED));
+      error = true;
+    } else if (protocols.size() > 1) {
+      view.error.setText(resources.message(PROTOCOLS_MORE_THAN_ONE));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      Protocol protocol = protocols.iterator().next();
+      history(protocol);
+    }
   }
 
   void history(Protocol protocol) {

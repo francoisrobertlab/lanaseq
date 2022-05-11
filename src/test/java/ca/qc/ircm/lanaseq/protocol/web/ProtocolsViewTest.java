@@ -21,12 +21,14 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
@@ -176,7 +178,12 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(PROTOCOLS, view.protocols.getId().orElse(""));
+    assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
+    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(ADD, view.add.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(HISTORY, view.history.getId().orElse(""));
+    validateIcon(VaadinIcon.ARCHIVE.create(), view.history.getIcon());
   }
 
   @Test
@@ -195,7 +202,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(resources.message(HISTORY), view.history.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -221,7 +229,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(resources.message(HISTORY), view.history.getText());
+    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -284,20 +293,20 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
       assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
       assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
       templateRenderer.getEventHandlers().get("edit").accept(protocol);
-      verify(presenter).view(protocol);
+      verify(presenter).edit(protocol);
     }
   }
 
   @Test
-  public void view() {
+  public void doubleClick() {
     Protocol protocol = protocols.get(0);
     doubleClickItem(view.protocols, protocol);
 
-    verify(presenter).view(protocol);
+    verify(presenter).edit(protocol);
   }
 
   @Test
-  public void history() {
+  public void altClick() {
     Protocol protocol = protocols.get(0);
     clickItem(view.protocols, protocol, view.name, false, false, true, false);
 
@@ -331,5 +340,11 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   public void add() {
     clickButton(view.add);
     verify(presenter).add();
+  }
+
+  @Test
+  public void history() {
+    clickButton(view.history);
+    verify(presenter).history();
   }
 }

@@ -72,16 +72,18 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertFalse(optional(() -> view.history()).isPresent());
   }
 
   @Test
-  public void view() throws Throwable {
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Manager() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
-
-    view.protocols().doubleClickProtocol(0);
-
-    assertTrue(view.dialog().isOpen());
+    assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(() -> view.protocols()).isPresent());
+    assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.history()).isPresent());
   }
 
   @Test
@@ -95,23 +97,13 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void history_User() throws Throwable {
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
-    view.protocols().ownerFilter().setValue("");
-
-    view.protocols().altClickProtocol(2);
-
-    assertFalse(optional(() -> view.historyDialog()).map(dialog -> dialog.isOpen()).orElse(false));
-  }
-
-  @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void history_Manager() throws Throwable {
+  public void history() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
 
-    view.protocols().altClickProtocol(2);
+    view.protocols().select(2);
+    view.history().click();
 
     assertTrue(view.historyDialog().isOpen());
   }

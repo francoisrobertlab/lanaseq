@@ -21,11 +21,13 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
+import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -38,8 +40,10 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
@@ -69,6 +73,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public static final String EDIT_BUTTON =
       "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
           + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
+  public static final String HISTORY = "history";
+  public static final String PROTOCOLS_REQUIRED = property(PROTOCOLS, "required");
+  public static final String PROTOCOLS_MORE_THAN_ONE = property(PROTOCOLS, "moreThanOne");
   private static final long serialVersionUID = -2370599174391239721L;
   private static final Logger logger = LoggerFactory.getLogger(ProtocolsView.class);
   protected H2 header = new H2();
@@ -80,7 +87,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected TextField nameFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
+  protected Div error = new Div();
   protected Button add = new Button();
+  protected Button history = new Button();
   @Autowired
   protected ProtocolDialog dialog;
   @Autowired
@@ -103,7 +112,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     logger.debug("protocols view");
     setId(ID);
     setHeightFull();
-    add(header, protocols, add);
+    add(header, protocols, error, new HorizontalLayout(add, history));
     expand(protocols);
     header.setId(HEADER);
     protocols.setId(PROTOCOLS);
@@ -117,9 +126,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     edit = protocols
         .addColumn(TemplateRenderer.<Protocol>of(EDIT_BUTTON).withEventHandler("edit",
-            protocol -> presenter.view(protocol)), EDIT)
+            protocol -> presenter.edit(protocol)), EDIT)
         .setKey(EDIT).setSortable(false).setFlexGrow(0);
-    protocols.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    protocols.addItemDoubleClickListener(e -> presenter.edit(e.getItem()));
     protocols.addItemClickListener(e -> {
       if (e.isAltKey()) {
         presenter.history(e.getItem());
@@ -138,9 +147,15 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
+    error.setId(ERROR_TEXT);
+    error.addClassName(ERROR_TEXT);
+    error.setVisible(false);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> presenter.add());
+    history.setId(HISTORY);
+    history.setIcon(VaadinIcon.ARCHIVE.create());
+    history.addClickListener(e -> presenter.history());
     presenter.init(this);
   }
 
@@ -161,6 +176,8 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     nameFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
+    history.setText(resources.message(HISTORY));
+    presenter.localeChange(getLocale());
   }
 
   @Override

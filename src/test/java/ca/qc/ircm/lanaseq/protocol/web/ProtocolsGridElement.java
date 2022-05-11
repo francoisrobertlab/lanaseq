@@ -21,7 +21,6 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.elementsbase.Element;
-import org.openqa.selenium.Keys;
 
 /**
  * Web element for {@link ProtocolsView} grid.
@@ -38,13 +37,5 @@ public class ProtocolsGridElement extends GridElement {
 
   public ButtonElement edit(int row) {
     return getCell(row, EDIT_COLUMN).$(ButtonElement.class).first();
-  }
-
-  public void doubleClickProtocol(int row) {
-    getCell(row, NAME_COLUMN).doubleClick();
-  }
-
-  public void altClickProtocol(int row) {
-    getCell(row, NAME_COLUMN).click(0, 0, Keys.ALT);
   }
 }

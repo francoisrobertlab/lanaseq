@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -45,6 +46,10 @@ public class ProtocolsViewElement extends VerticalLayoutElement {
 
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
+  }
+
+  public ButtonElement history() {
+    return $(ButtonElement.class).id(HISTORY);
   }
 
   public ProtocolDialogElement dialog() {

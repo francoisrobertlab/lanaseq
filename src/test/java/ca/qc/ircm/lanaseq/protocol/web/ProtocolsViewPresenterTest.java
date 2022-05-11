@@ -17,17 +17,22 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_MORE_THAN_ONE;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -43,11 +48,13 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,6 +91,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   private UserRepository userRepository;
   private List<Protocol> protocols;
   private User currentUser;
+  private Locale locale = Locale.ENGLISH;
+  private AppResources resources = new AppResources(ProtocolsView.class, locale);
 
   /**
    * Before test.
@@ -95,18 +104,21 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     view.protocols.setSelectionMode(SelectionMode.MULTI);
     view.nameFilter = new TextField();
     view.ownerFilter = new TextField();
+    view.error = new Div();
     view.add = new Button();
+    view.history = new Button();
     view.dialog = mock(ProtocolDialog.class);
     view.historyDialog = mock(ProtocolHistoryDialog.class);
     protocols = protocolRepository.findAll();
     when(protocolService.all()).thenReturn(protocols);
     currentUser = userRepository.findById(3L).orElse(null);
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
+    presenter.init(view);
+    presenter.localeChange(locale);
   }
 
   @Test
   public void protocols() {
-    presenter.init(view);
     List<Protocol> protocols = items(view.protocols);
     assertEquals(this.protocols.size(), protocols.size());
     for (Protocol protocol : this.protocols) {
@@ -118,26 +130,43 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void ownerFilter_User() {
-    presenter.init(view);
+  public void visible_User() {
+    assertFalse(view.history.isVisible());
+  }
 
+  @Test
+  public void visible_Manager() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    presenter.init(view);
+    assertTrue(view.history.isVisible());
+  }
+
+  @Test
+  public void visible_Admin() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    presenter.init(view);
+    assertTrue(view.history.isVisible());
+  }
+
+  @Test
+  public void ownerFilter_User() {
     assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
     verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void ownerFilter_ManagerOrAdmin() {
+    view.ownerFilter.setValue("");
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
 
     presenter.init(view);
 
     assertEquals("", view.ownerFilter.getValue());
-    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void filterName() {
-    presenter.init(view);
     view.protocols.setDataProvider(dataProvider);
 
     presenter.filterName("test");
@@ -148,7 +177,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName_Empty() {
-    presenter.init(view);
     view.protocols.setDataProvider(dataProvider);
 
     presenter.filterName("");
@@ -159,7 +187,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate() {
-    presenter.init(view);
     view.protocols.setDataProvider(dataProvider);
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(5), LocalDate.now().minusDays(1));
@@ -172,7 +199,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate_Null() {
-    presenter.init(view);
     view.protocols.setDataProvider(dataProvider);
 
     presenter.filterDate(null);
@@ -183,7 +209,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner() {
-    presenter.init(view);
     view.protocols.setDataProvider(dataProvider);
 
     presenter.filterOwner("test");
@@ -194,7 +219,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner_Empty() {
-    presenter.init(view);
     view.protocols.setDataProvider(dataProvider);
 
     presenter.filterOwner("");
@@ -204,21 +228,64 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void view() {
-    presenter.init(view);
+  public void edit() {
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     Protocol databaseProtocol = new Protocol();
     when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
-    presenter.view(protocol);
+    presenter.edit(protocol);
     verify(protocolService).get(2L);
     verify(view.dialog).setProtocol(databaseProtocol);
     verify(view.dialog).open();
   }
 
   @Test
+  public void history() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    Protocol protocol = protocols.get(0);
+    view.protocols.select(protocol);
+    Protocol databaseProtocol = new Protocol();
+    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
+    presenter.history();
+    assertFalse(view.error.isVisible());
+    verify(view.historyDialog).setProtocol(databaseProtocol);
+    verify(view.historyDialog).open();
+  }
+
+  @Test
   public void history_NoRole() {
-    presenter.init(view);
+    Protocol protocol = protocols.get(0);
+    view.protocols.select(protocol);
+    presenter.history();
+    assertFalse(view.error.isVisible());
+    verify(view.historyDialog, never()).setProtocol(any());
+    verify(view.historyDialog, never()).open();
+  }
+
+  @Test
+  public void history_NoSelection() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    presenter.history();
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(PROTOCOLS_REQUIRED), view.error.getText());
+    verify(view.historyDialog, never()).setProtocol(any());
+    verify(view.historyDialog, never()).open();
+  }
+
+  @Test
+  public void history_MoreThanOneProtocolSelected() {
+    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    view.protocols.select(protocols.get(0));
+    view.protocols.select(protocols.get(1));
+    presenter.history();
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(PROTOCOLS_MORE_THAN_ONE), view.error.getText());
+    verify(view.historyDialog, never()).setProtocol(any());
+    verify(view.historyDialog, never()).open();
+  }
+
+  @Test
+  public void history_Protocol_NoRole() {
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     presenter.history(protocol);
@@ -227,9 +294,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void history_WithRole() {
+  public void history_Protocol_WithRole() {
     when(authorizationService.hasAnyRole(any())).thenReturn(true);
-    presenter.init(view);
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     Protocol databaseProtocol = new Protocol();
@@ -243,7 +309,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void add() {
-    presenter.init(view);
     presenter.add();
     verify(view.dialog).setProtocol(protocolCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
@@ -255,7 +320,6 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshProtocolsOnSaved() {
-    presenter.init(view);
     verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         savedListenerCaptor.getValue();
