@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.analysis.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -44,7 +44,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
+public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserver {
   private static final long serialVersionUID = 3521519771905055445L;
   public static final String ID = "analysis-dialog";
   public static final String HEADER = "header";
@@ -60,12 +60,12 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   @Autowired
-  private transient AnalysisDialogPresenter presenter;
+  private transient DatasetsAnalysisDialogPresenter presenter;
 
-  public AnalysisDialog() {
+  public DatasetsAnalysisDialog() {
   }
 
-  AnalysisDialog(AnalysisDialogPresenter presenter) {
+  DatasetsAnalysisDialog(DatasetsAnalysisDialogPresenter presenter) {
     this.presenter = presenter;
   }
 
@@ -96,7 +96,7 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(AnalysisDialog.class, getLocale());
+    AppResources resources = new AppResources(DatasetsAnalysisDialog.class, getLocale());
     header.setText(resources.message(HEADER));
     message.setText(resources.message(MESSAGE));
     createFolder.setText(resources.message(CREATE_FOLDER));
@@ -109,7 +109,7 @@ public class AnalysisDialog extends Dialog implements LocaleChangeObserver {
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(AnalysisDialog.class, getLocale());
+    final AppResources resources = new AppResources(DatasetsAnalysisDialog.class, getLocale());
     Collection<Dataset> datasets = presenter.getDatasets();
     if (datasets != null && datasets.size() > 1) {
       header.setText(resources.message(HEADER, datasets.size()));

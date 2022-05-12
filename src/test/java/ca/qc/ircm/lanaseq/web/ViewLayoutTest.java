@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.ANALYSE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER_FORM;
@@ -41,7 +40,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.analysis.web.AnalysisView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -94,7 +92,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertEquals(styleName(DATASETS, TAB), view.datasets.getId().orElse(""));
     assertEquals(styleName(SAMPLES, TAB), view.samples.getId().orElse(""));
     assertEquals(styleName(PROTOCOLS, TAB), view.protocols.getId().orElse(""));
-    assertEquals(styleName(ANALYSE, TAB), view.analyse.getId().orElse(""));
     assertEquals(styleName(PROFILE, TAB), view.profile.getId().orElse(""));
     assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
@@ -111,7 +108,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(SAMPLES), view.samples.getLabel());
     assertEquals(resources.message(PROTOCOLS), view.protocols.getLabel());
-    assertEquals(resources.message(ANALYSE), view.analyse.getLabel());
     assertEquals(resources.message(PROFILE), view.profile.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
     assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
@@ -128,7 +124,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(SAMPLES), view.samples.getLabel());
     assertEquals(resources.message(PROTOCOLS), view.protocols.getLabel());
-    assertEquals(resources.message(ANALYSE), view.analyse.getLabel());
     assertEquals(resources.message(PROFILE), view.profile.getLabel());
     assertEquals(resources.message(USERS), view.users.getLabel());
     assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
@@ -141,7 +136,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertTrue(view.datasets.isVisible());
     assertTrue(view.samples.isVisible());
     assertTrue(view.protocols.isVisible());
-    assertTrue(view.analyse.isVisible());
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
@@ -156,7 +150,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertTrue(view.datasets.isVisible());
     assertTrue(view.samples.isVisible());
     assertTrue(view.protocols.isVisible());
-    assertTrue(view.analyse.isVisible());
     assertTrue(view.profile.isVisible());
     assertTrue(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
@@ -172,7 +165,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     assertTrue(view.datasets.isVisible());
     assertTrue(view.samples.isVisible());
     assertTrue(view.protocols.isVisible());
-    assertTrue(view.analyse.isVisible());
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
@@ -247,30 +239,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.afterNavigation(afterNavigationEvent);
 
     view.tabs.setSelectedTab(view.protocols);
-
-    verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJs(any());
-  }
-
-  @Test
-  public void tabs_SelectAnalyse() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
-
-    view.tabs.setSelectedTab(view.analyse);
-
-    verify(ui).navigate(AnalysisView.VIEW_NAME);
-    verify(page, never()).executeJs(any());
-  }
-
-  @Test
-  public void tabs_SelectAnalyseNoChange() {
-    Location location = new Location(AnalysisView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
-
-    view.tabs.setSelectedTab(view.analyse);
 
     verify(ui, never()).navigate(any(String.class));
     verify(page, never()).executeJs(any());
@@ -377,16 +345,6 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.afterNavigation(afterNavigationEvent);
 
     assertEquals(view.protocols, view.tabs.getSelectedTab());
-  }
-
-  @Test
-  public void afterNavigation_Analyse() {
-    Location location = new Location(AnalysisView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-
-    view.afterNavigation(afterNavigationEvent);
-
-    assertEquals(view.analyse, view.tabs.getSelectedTab());
   }
 
   @Test

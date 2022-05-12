@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
@@ -56,6 +57,10 @@ public class DatasetsViewElement extends VerticalLayoutElement {
     return $(ButtonElement.class).id(FILES);
   }
 
+  public ButtonElement analyze() {
+    return $(ButtonElement.class).id(ANALYZE);
+  }
+
   public DatasetDialogElement dialog() {
     return ((TestBenchElement) getDriver().findElement(By.id(DatasetDialog.ID)))
         .wrap(DatasetDialogElement.class);
@@ -64,5 +69,10 @@ public class DatasetsViewElement extends VerticalLayoutElement {
   public DatasetFilesDialogElement filesDialog() {
     return ((TestBenchElement) getDriver().findElement(By.id(DatasetFilesDialog.ID)))
         .wrap(DatasetFilesDialogElement.class);
+  }
+
+  public DatasetsAnalysisDialogElement analyzeDialog() {
+    return ((TestBenchElement) getDriver().findElement(By.id(DatasetsAnalysisDialog.ID)))
+        .wrap(DatasetsAnalysisDialogElement.class);
   }
 }

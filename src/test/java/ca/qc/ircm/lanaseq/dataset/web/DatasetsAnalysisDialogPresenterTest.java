@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.analysis.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.CREATE_FOLDER_EXCEPTION;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -73,15 +73,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
- * Tests for {@link AnalysisDialogPresenter}.
+ * Tests for {@link DatasetsAnalysisDialogPresenter}.
  */
 @ServiceTestAnnotations
 @WithMockUser
-public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
+public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
-  private AnalysisDialogPresenter presenter;
+  private DatasetsAnalysisDialogPresenter presenter;
   @Mock
-  private AnalysisDialog dialog;
+  private DatasetsAnalysisDialog dialog;
   @MockBean
   private AnalysisService service;
   @MockBean
@@ -95,7 +95,7 @@ public class AnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(AnalysisDialog.class, locale);
+  private AppResources resources = new AppResources(DatasetsAnalysisDialog.class, locale);
   private List<Dataset> datasets = new ArrayList<>();
 
   /**

@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.ANALYSE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
@@ -52,10 +51,6 @@ public class ViewLayoutElement extends VerticalLayoutElement {
 
   public TabElement protocols() {
     return $(TabElement.class).id(styleName(PROTOCOLS, TAB));
-  }
-
-  public TabElement analyse() {
-    return $(TabElement.class).id(styleName(ANALYSE, TAB));
   }
 
   public TabElement profile() {

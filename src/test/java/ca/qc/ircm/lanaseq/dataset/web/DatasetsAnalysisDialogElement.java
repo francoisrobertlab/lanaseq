@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.analysis.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.CREATE_FOLDER;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.ERRORS;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.HEADER;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.id;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.CREATE_FOLDER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.ERRORS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
@@ -32,10 +32,10 @@ import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.testbench.elementsbase.Element;
 
 /**
- * Web element for {@link AnalysisDialog}.
+ * Web element for {@link DatasetsAnalysisDialog}.
  */
 @Element("vaadin-dialog")
-public class AnalysisDialogElement extends DialogElement {
+public class DatasetsAnalysisDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }

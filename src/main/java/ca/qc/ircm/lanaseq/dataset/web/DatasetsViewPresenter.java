@@ -107,6 +107,21 @@ public class DatasetsViewPresenter {
     view.filesDialog.open();
   }
 
+  void analyze() {
+    List<Dataset> datasets = new ArrayList<>(view.datasets.getSelectedItems());
+    AppResources resources = new AppResources(DatasetsView.class, locale);
+    boolean error = false;
+    if (datasets.isEmpty()) {
+      view.error.setText(resources.message(DATASETS_REQUIRED));
+      error = true;
+    }
+    view.error.setVisible(error);
+    if (!error) {
+      view.analysisDialog.setDatasets(datasets);
+      view.analysisDialog.open();
+    }
+  }
+
   private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
     Map<Object, Boolean> seen = new ConcurrentHashMap<>();
     return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;

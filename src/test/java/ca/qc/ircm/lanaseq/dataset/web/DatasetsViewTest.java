@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
@@ -82,7 +83,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     datasetGrid = new DatasetGrid(datasetGridPresenter);
     datasetGrid.init();
-    view = new DatasetsView(presenter, datasetGrid, new DatasetDialog(), new DatasetFilesDialog());
+    view = new DatasetsView(presenter, datasetGrid, new DatasetDialog(), new DatasetFilesDialog(),
+        new DatasetsAnalysisDialog());
     view.init();
     view.datasets.protocol = view.datasets.addColumn(dataset -> dataset.getName());
     datasets = datasetRepository.findAll();
@@ -110,6 +112,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
     assertEquals(FILES, view.files.getId().orElse(""));
     validateIcon(VaadinIcon.FILE_O.create(), view.files.getIcon());
+    assertEquals(ANALYZE, view.analyze.getId().orElse(""));
   }
 
   @Test
@@ -118,6 +121,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
+    assertEquals(resources.message(ANALYZE), view.analyze.getText());
     verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
@@ -132,6 +136,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
+    assertEquals(resources.message(ANALYZE), view.analyze.getText());
     verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
@@ -187,5 +192,11 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   public void files() {
     clickButton(view.files);
     verify(presenter).viewFiles();
+  }
+
+  @Test
+  public void analyze() {
+    clickButton(view.analyze);
+    verify(presenter).analyze();
   }
 }

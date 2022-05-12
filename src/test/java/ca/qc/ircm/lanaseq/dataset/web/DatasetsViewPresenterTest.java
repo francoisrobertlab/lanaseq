@@ -91,6 +91,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<List<Sample>> samplesCaptor;
   @Captor
+  private ArgumentCaptor<List<Dataset>> datasetsCaptor;
+  @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<DatasetDialog>>> savedListenerCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<DeletedEvent<DatasetDialog>>> deletedListenerCaptor;
@@ -120,6 +122,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.error = new Div();
     view.dialog = mock(DatasetDialog.class);
     view.filesDialog = mock(DatasetFilesDialog.class);
+    view.analysisDialog = mock(DatasetsAnalysisDialog.class);
     datasets = repository.findAll();
     view.datasets.setItems(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -330,6 +333,52 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     verify(service).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
     verify(service, never()).save(any());
     verify(view, never()).showNotification(any());
+  }
+
+  @Test
+  public void analyze_One() {
+    Dataset dataset = datasets.get(0);
+    view.datasets.select(dataset);
+    presenter.analyze();
+    assertFalse(view.error.isVisible());
+    verify(view.analysisDialog).setDatasets(datasetsCaptor.capture());
+    List<Dataset> datasets = datasetsCaptor.getValue();
+    assertEquals(1, datasets.size());
+    assertTrue(datasets.contains(dataset));
+    verify(view.analysisDialog).open();
+  }
+
+  @Test
+  public void analyze_Many() {
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+    presenter.analyze();
+    assertFalse(view.error.isVisible());
+    verify(view.analysisDialog).setDatasets(datasetsCaptor.capture());
+    List<Dataset> datasets = datasetsCaptor.getValue();
+    assertEquals(2, datasets.size());
+    assertTrue(datasets.contains(datasets.get(0)));
+    assertTrue(datasets.contains(datasets.get(1)));
+    verify(view.analysisDialog).open();
+  }
+
+  @Test
+  public void analyze_NoSelection() {
+    datasets.clear();
+    presenter.analyze();
+    verify(view.analysisDialog, never()).setDatasets(any());
+    verify(view.analysisDialog, never()).open();
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+  }
+
+  @Test
+  public void analyze_ClearError() {
+    presenter.analyze();
+    assertTrue(view.error.isVisible());
+    view.datasets.select(datasets.get(0));
+    presenter.analyze();
+    assertFalse(view.error.isVisible());
   }
 
   @Test

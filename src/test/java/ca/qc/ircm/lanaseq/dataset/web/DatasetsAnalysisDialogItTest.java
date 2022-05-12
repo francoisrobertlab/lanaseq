@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.analysis.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.ID;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,11 +44,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
- * Integration tests for {@link AnalysisDialog}.
+ * Integration tests for {@link DatasetsAnalysisDialog}.
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
+public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @TempDir
   Path temporaryFolder;
   @Autowired
@@ -76,9 +76,10 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
-    view.datasets().getCell(0, 1).doubleClick();
-    AnalysisDialogElement dialog = view.dialog();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.datasets().select(0);
+    view.analyze().click();
+    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
     assertTrue(optional(() -> dialog.create()).isPresent());
@@ -104,9 +105,10 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
     open();
-    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
-    view.datasets().getCell(3, 1).doubleClick();
-    AnalysisDialogElement dialog = view.dialog();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.datasets().select(3);
+    view.analyze().click();
+    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
 
     dialog.create().click();
     Thread.sleep(2000); // Wait for file copy.
@@ -170,11 +172,11 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq6 = sample3Folder.resolve(sample3.getName() + "_R2.fastq");
     final byte[] fastq6Content = writeFile(fastq6);
     open();
-    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
     view.datasets().select(3);
     view.datasets().select(0);
     view.analyze().click();
-    AnalysisDialogElement dialog = view.dialog();
+    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
 
     dialog.create().click();
     Thread.sleep(2000); // Wait for file copy.
@@ -223,9 +225,10 @@ public class AnalysisDialogItTest extends AbstractTestBenchTestCase {
   public void create_Error() throws Throwable {
     Dataset dataset = repository.findById(8L).get();
     open();
-    AnalysisViewElement view = $(AnalysisViewElement.class).id(ID);
-    view.datasets().getCell(3, 1).doubleClick();
-    AnalysisDialogElement dialog = view.dialog();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    view.datasets().select(3);
+    view.analyze().click();
+    DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
 
     dialog.create().click();
 

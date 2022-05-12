@@ -61,6 +61,7 @@ public class DatasetsView extends VerticalLayout
   public static final String DATASETS = "datasets";
   public static final String MERGE = "merge";
   public static final String FILES = "files";
+  public static final String ANALYZE = "analyze";
   public static final String MERGE_ERROR = property(MERGE, "error");
   public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
   public static final String DATASETS_MORE_THAN_ONE = property(DATASETS, "moreThanOne");
@@ -71,6 +72,7 @@ public class DatasetsView extends VerticalLayout
   protected Div error = new Div();
   protected Button merge = new Button();
   protected Button files = new Button();
+  protected Button analyze = new Button();
   @Autowired
   protected DatasetGrid datasets;
   @Autowired
@@ -78,17 +80,20 @@ public class DatasetsView extends VerticalLayout
   @Autowired
   protected DatasetFilesDialog filesDialog;
   @Autowired
+  protected DatasetsAnalysisDialog analysisDialog;
+  @Autowired
   private transient DatasetsViewPresenter presenter;
 
   public DatasetsView() {
   }
 
   protected DatasetsView(DatasetsViewPresenter presenter, DatasetGrid datasets,
-      DatasetDialog dialog, DatasetFilesDialog filesDialog) {
+      DatasetDialog dialog, DatasetFilesDialog filesDialog, DatasetsAnalysisDialog analysisDialog) {
     this.presenter = presenter;
     this.datasets = datasets;
     this.dialog = dialog;
     this.filesDialog = filesDialog;
+    this.analysisDialog = analysisDialog;
   }
 
   @PostConstruct
@@ -96,7 +101,7 @@ public class DatasetsView extends VerticalLayout
     logger.debug("datasets view");
     setId(ID);
     setHeightFull();
-    add(header, datasets, error, new HorizontalLayout(merge, files));
+    add(header, datasets, error, new HorizontalLayout(merge, files, analyze));
     expand(datasets);
     header.setId(HEADER);
     datasets.setId(DATASETS);
@@ -116,6 +121,8 @@ public class DatasetsView extends VerticalLayout
     files.setId(FILES);
     files.setIcon(VaadinIcon.FILE_O.create());
     files.addClickListener(e -> presenter.viewFiles());
+    analyze.setId(ANALYZE);
+    analyze.addClickListener(e -> presenter.analyze());
     presenter.init(this);
   }
 
@@ -131,6 +138,7 @@ public class DatasetsView extends VerticalLayout
     header.setText(resources.message(HEADER));
     merge.setText(resources.message(MERGE));
     files.setText(resources.message(FILES));
+    analyze.setText(resources.message(ANALYZE));
     presenter.localeChange(getLocale());
   }
 

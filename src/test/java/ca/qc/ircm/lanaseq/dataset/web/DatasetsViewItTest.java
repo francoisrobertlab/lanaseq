@@ -153,4 +153,13 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     view.files().click();
     assertTrue(view.filesDialog().isOpen());
   }
+
+  @Test
+  public void analyze() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.datasets().select(0);
+    view.analyze().click();
+    assertTrue(view.analyzeDialog().isOpen());
+  }
 }

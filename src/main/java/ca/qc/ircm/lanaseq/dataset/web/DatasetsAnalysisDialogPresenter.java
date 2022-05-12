@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.lanaseq.analysis.web;
+package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.analysis.web.AnalysisDialog.CREATE_FOLDER_EXCEPTION;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -45,21 +45,23 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AnalysisDialogPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(AnalysisDialogPresenter.class);
-  private AnalysisDialog dialog;
+public class DatasetsAnalysisDialogPresenter {
+  private static final Logger logger =
+      LoggerFactory.getLogger(DatasetsAnalysisDialogPresenter.class);
+  private DatasetsAnalysisDialog dialog;
   private Collection<Dataset> datasets;
   private Locale locale;
   private AnalysisService service;
   private AppConfiguration configuration;
 
   @Autowired
-  protected AnalysisDialogPresenter(AnalysisService service, AppConfiguration configuration) {
+  protected DatasetsAnalysisDialogPresenter(AnalysisService service,
+      AppConfiguration configuration) {
     this.service = service;
     this.configuration = configuration;
   }
 
-  void init(AnalysisDialog dialog) {
+  void init(DatasetsAnalysisDialog dialog) {
     this.dialog = dialog;
     dialog.addOpenedChangeListener(e -> {
       if (e.isOpened() && datasets != null) {
@@ -87,7 +89,7 @@ public class AnalysisDialogPresenter {
   void createFolder() {
     if (validate()) {
       logger.debug("creating analysis folder for datasets {}", datasets);
-      AppResources resources = new AppResources(AnalysisDialog.class, locale);
+      AppResources resources = new AppResources(DatasetsAnalysisDialog.class, locale);
       try {
         service.copyDatasetsResources(datasets);
         boolean unix = dialog.getUI().map(ui -> {
