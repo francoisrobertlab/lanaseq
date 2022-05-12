@@ -95,14 +95,6 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void view_Protocol() throws Throwable {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
-    view.datasets().doubleClickProtocol(0);
-    assertTrue(view.protocolDialog().isOpen());
-  }
-
-  @Test
   public void view_Files() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);

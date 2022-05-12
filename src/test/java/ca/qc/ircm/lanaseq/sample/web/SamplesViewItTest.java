@@ -105,14 +105,6 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void view_Protocol() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.samples().doubleClickProtocol(0);
-    assertTrue(view.protocolDialog().isOpen());
-  }
-
-  @Test
   public void edit() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);

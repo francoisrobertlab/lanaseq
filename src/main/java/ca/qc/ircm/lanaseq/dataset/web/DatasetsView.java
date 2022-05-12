@@ -29,7 +29,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
@@ -79,20 +78,17 @@ public class DatasetsView extends VerticalLayout
   @Autowired
   protected DatasetFilesDialog filesDialog;
   @Autowired
-  protected ProtocolDialog protocolDialog;
-  @Autowired
   private transient DatasetsViewPresenter presenter;
 
   public DatasetsView() {
   }
 
   protected DatasetsView(DatasetsViewPresenter presenter, DatasetGrid datasets,
-      DatasetDialog dialog, DatasetFilesDialog filesDialog, ProtocolDialog protocolDialog) {
+      DatasetDialog dialog, DatasetFilesDialog filesDialog) {
     this.presenter = presenter;
     this.datasets = datasets;
     this.dialog = dialog;
     this.filesDialog = filesDialog;
-    this.protocolDialog = protocolDialog;
   }
 
   @PostConstruct
@@ -111,13 +107,7 @@ public class DatasetsView extends VerticalLayout
       }
     });
     datasets.addEditListener(e -> presenter.view(e.getItem()));
-    datasets.addItemDoubleClickListener(e -> {
-      if (e.getColumn() == datasets.protocol && protocol(e.getItem()).getId() != null) {
-        presenter.viewProtocol(protocol(e.getItem()));
-      } else {
-        presenter.view(e.getItem());
-      }
-    });
+    datasets.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     error.setId(ERROR_TEXT);
     error.addClassName(ERROR_TEXT);
     merge.setId(MERGE);

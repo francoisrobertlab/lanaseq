@@ -26,8 +26,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -55,17 +53,13 @@ public class DatasetsViewPresenter {
   @Autowired
   private DatasetService service;
   @Autowired
-  private ProtocolService protocolService;
-  @Autowired
   private SampleService sampleService;
 
   protected DatasetsViewPresenter() {
   }
 
-  protected DatasetsViewPresenter(DatasetService service, ProtocolService protocolService,
-      SampleService sampleService) {
+  protected DatasetsViewPresenter(DatasetService service, SampleService sampleService) {
     this.service = service;
-    this.protocolService = protocolService;
     this.sampleService = sampleService;
   }
 
@@ -73,7 +67,6 @@ public class DatasetsViewPresenter {
     this.view = view;
     view.dialog.addSavedListener(e -> view.datasets.refreshDatasets());
     view.dialog.addDeletedListener(e -> view.datasets.refreshDatasets());
-    view.protocolDialog.addSavedListener(e -> view.datasets.refreshDatasets());
     clearError();
   }
 
@@ -112,12 +105,6 @@ public class DatasetsViewPresenter {
   void viewFiles(Dataset dataset) {
     view.filesDialog.setDataset(dataset);
     view.filesDialog.open();
-  }
-
-  void viewProtocol(Protocol protocol) {
-    clearError();
-    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
-    view.protocolDialog.open();
   }
 
   private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {

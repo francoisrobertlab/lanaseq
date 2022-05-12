@@ -26,8 +26,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleFilter;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -62,15 +60,13 @@ public class SamplesViewPresenter {
   private WebSampleFilter filter = new WebSampleFilter();
   private Locale locale;
   private SampleService service;
-  private ProtocolService protocolService;
   private DatasetService datasetService;
   private AuthorizationService authorizationService;
 
   @Autowired
-  SamplesViewPresenter(SampleService service, ProtocolService protocolService,
-      DatasetService datasetService, AuthorizationService authorizationService) {
+  SamplesViewPresenter(SampleService service, DatasetService datasetService,
+      AuthorizationService authorizationService) {
     this.service = service;
-    this.protocolService = protocolService;
     this.datasetService = datasetService;
     this.authorizationService = authorizationService;
   }
@@ -84,7 +80,6 @@ public class SamplesViewPresenter {
     loadSamples();
     view.dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
     view.dialog.addDeletedListener(e -> view.samples.getDataProvider().refreshAll());
-    view.protocolDialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
   }
 
   void localeChange(Locale locale) {
@@ -152,11 +147,6 @@ public class SamplesViewPresenter {
       view.analysisDialog.setSamples(samples);
       view.analysisDialog.open();
     }
-  }
-
-  void viewProtocol(Protocol protocol) {
-    view.protocolDialog.setProtocol(protocolService.get(protocol.getId()).orElse(null));
-    view.protocolDialog.open();
   }
 
   void add() {

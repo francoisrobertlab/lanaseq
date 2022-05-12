@@ -23,8 +23,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
@@ -66,10 +64,5 @@ public class DatasetsViewElement extends VerticalLayoutElement {
   public DatasetFilesDialogElement filesDialog() {
     return ((TestBenchElement) getDriver().findElement(By.id(DatasetFilesDialog.ID)))
         .wrap(DatasetFilesDialogElement.class);
-  }
-
-  public ProtocolDialogElement protocolDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolDialog.ID)))
-        .wrap(ProtocolDialogElement.class);
   }
 }

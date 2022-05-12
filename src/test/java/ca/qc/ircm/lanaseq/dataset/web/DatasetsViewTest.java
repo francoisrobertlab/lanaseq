@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
@@ -33,6 +32,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -41,22 +41,16 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.EditEvent;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -73,12 +67,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetGridPresenter datasetGridPresenter;
   private DatasetGrid datasetGrid;
-  @Captor
-  private ArgumentCaptor<ValueProvider<Dataset, String>> valueProviderCaptor;
-  @Captor
-  private ArgumentCaptor<LocalDateRenderer<Dataset>> localDateRendererCaptor;
-  @Captor
-  private ArgumentCaptor<Comparator<Dataset>> comparatorCaptor;
   @Autowired
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
@@ -94,8 +82,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     datasetGrid = new DatasetGrid(datasetGridPresenter);
     datasetGrid.init();
-    view = new DatasetsView(presenter, datasetGrid, new DatasetDialog(), new DatasetFilesDialog(),
-        new ProtocolDialog());
+    view = new DatasetsView(presenter, datasetGrid, new DatasetDialog(), new DatasetFilesDialog());
     view.init();
     view.datasets.protocol = view.datasets.addColumn(dataset -> dataset.getName());
     datasets = datasetRepository.findAll();
@@ -131,7 +118,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
-    verify(presenter).localeChange(locale);
+    verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
@@ -145,7 +132,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
-    verify(presenter).localeChange(locale);
+    verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
@@ -181,22 +168,6 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
 
     verify(presenter).viewFiles(dataset);
-  }
-
-  @Test
-  public void viewProtocol() {
-    Dataset dataset = datasets.get(0);
-    doubleClickItem(view.datasets, dataset, view.datasets.protocol);
-
-    verify(presenter).viewProtocol(protocol(dataset));
-  }
-
-  @Test
-  public void viewProtocol_NoProtocol() {
-    Dataset dataset = find(datasets, 3L).get();
-    doubleClickItem(view.datasets, dataset, view.datasets.protocol);
-
-    verify(presenter).view(dataset);
   }
 
   @Test

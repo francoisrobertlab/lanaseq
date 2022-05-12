@@ -34,7 +34,6 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
@@ -114,20 +113,17 @@ public class SamplesView extends VerticalLayout
   @Autowired
   protected SampleAnalysisDialog analysisDialog;
   @Autowired
-  protected ProtocolDialog protocolDialog;
-  @Autowired
   private transient SamplesViewPresenter presenter;
 
   public SamplesView() {
   }
 
   SamplesView(SamplesViewPresenter presenter, SampleDialog dialog, SampleFilesDialog filesDialog,
-      SampleAnalysisDialog analysisDialog, ProtocolDialog protocolDialog) {
+      SampleAnalysisDialog analysisDialog) {
     this.presenter = presenter;
     this.dialog = dialog;
     this.filesDialog = filesDialog;
     this.analysisDialog = analysisDialog;
-    this.protocolDialog = protocolDialog;
   }
 
   @PostConstruct
@@ -159,13 +155,7 @@ public class SamplesView extends VerticalLayout
                 sample -> presenter.view(sample)), EDIT)
             .setKey(EDIT).setSortable(false).setFlexGrow(0);
     samples.sort(GridSortOrder.desc(date).build());
-    samples.addItemDoubleClickListener(e -> {
-      if (e.getColumn() == protocol && e.getItem().getProtocol() != null) {
-        presenter.viewProtocol(e.getItem().getProtocol());
-      } else {
-        presenter.view(e.getItem());
-      }
-    });
+    samples.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     samples.addItemClickListener(e -> {
       if (e.isCtrlKey() || e.isMetaKey()) {
         presenter.viewFiles(e.getItem());

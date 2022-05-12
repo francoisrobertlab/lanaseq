@@ -55,7 +55,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
@@ -120,7 +119,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     ui.setLocale(locale);
     view = new SamplesView(presenter, new SampleDialog(), new SampleFilesDialog(),
-        new SampleAnalysisDialog(), new ProtocolDialog());
+        new SampleAnalysisDialog());
     view.init();
     samples = sampleRepository.findAll();
   }
@@ -374,14 +373,6 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     clickItem(view.samples, sample, view.name, false, false, false, true);
 
     verify(presenter).viewFiles(sample);
-  }
-
-  @Test
-  public void view_Protocol() {
-    Sample sample = samples.get(0);
-    doubleClickItem(view.samples, sample, view.protocol);
-
-    verify(presenter).viewProtocol(sample.getProtocol());
   }
 
   @Test

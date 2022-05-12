@@ -37,7 +37,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -121,7 +120,6 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.error = new Div();
     view.dialog = mock(DatasetDialog.class);
     view.filesDialog = mock(DatasetFilesDialog.class);
-    view.protocolDialog = mock(ProtocolDialog.class);
     datasets = repository.findAll();
     view.datasets.setItems(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -191,18 +189,6 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     presenter.viewFiles(dataset);
     verify(view.filesDialog).setDataset(dataset);
     verify(view.filesDialog).open();
-  }
-
-  @Test
-  public void viewProtocol() {
-    Protocol protocol = new Protocol();
-    protocol.setId(1L);
-    Protocol databaseProtocol = new Protocol();
-    when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
-    presenter.viewProtocol(protocol);
-    verify(protocolService).get(1L);
-    verify(view.protocolDialog).setProtocol(databaseProtocol);
-    verify(view.protocolDialog).open();
   }
 
   @Test
@@ -365,17 +351,6 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     ComponentEventListener<DeletedEvent<DatasetDialog>> deletedListener =
         deletedListenerCaptor.getValue();
     deletedListener.onComponentEvent(mock(DeletedEvent.class));
-    verify(view.datasets).refreshDatasets();
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void refreshDatasetsOnProtocolSaved() {
-    view.datasets = mock(DatasetGrid.class);
-    verify(view.protocolDialog).addSavedListener(protocolSavedListenerCaptor.capture());
-    ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
-        protocolSavedListenerCaptor.getValue();
-    savedListener.onComponentEvent(mock(SavedEvent.class));
     verify(view.datasets).refreshDatasets();
   }
 }
