@@ -87,14 +87,6 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void view() throws Throwable {
-    open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
-    view.datasets().doubleClick(0);
-    assertTrue(view.dialog().isOpen());
-  }
-
-  @Test
   public void view_Files() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
