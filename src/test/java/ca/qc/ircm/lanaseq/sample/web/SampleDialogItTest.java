@@ -146,7 +146,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Update() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().doubleClick(0);
+    view.samples().edit(0).click();
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.date()).isPresent());
@@ -172,7 +172,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.samples().doubleClick(0);
+    view.samples().edit(0).click();
     SampleDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.date()).isPresent());
@@ -238,7 +238,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Path oldFolder = configuration.folder(sample);
     Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().doubleClick(view.samples().name(2).startsWith("JS1") ? 2 : 3);
+    view.samples().edit(view.samples().name(2).startsWith("JS1") ? 2 : 3).click();
     SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
@@ -281,7 +281,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
-    view.samples().doubleClick(0);
+    view.samples().edit(0).click();
     SampleDialogElement dialog = view.dialog();
     fill(dialog);
 
@@ -316,7 +316,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(folder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
-    view.samples().doubleClick(0);
+    view.samples().edit(0).click();
     SampleDialogElement dialog = view.dialog();
     final String name = sample.getName();
 

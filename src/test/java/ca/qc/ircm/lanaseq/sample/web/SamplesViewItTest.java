@@ -89,14 +89,6 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void view() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
-    view.samples().doubleClick(0);
-    assertTrue(view.dialog().isOpen());
-  }
-
-  @Test
   public void viewFiles() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
