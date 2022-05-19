@@ -42,11 +42,11 @@
   <scm>
     <connection>scm:git:https://github.com/francoisrobertlab/lanaseq.git</connection>
     <developerConnection>scm:git:https://github.com/francoisrobertlab/lanaseq.git</developerConnection>
-    <url>https://bitbucket.org/ircm/lanaseq</url>
+    <url>https://github.com/francoisrobertlab/lanaseq</url>
   </scm>
   <issueManagement>
-    <system>Bitbucket</system>
-    <url>https://bitbucket.org/ircm/lanaseq/issues</url>
+    <system>GitHub</system>
+    <url>https://github.com/francoisrobertlab/lanaseq</url>
   </issueManagement>
 
   <properties>
