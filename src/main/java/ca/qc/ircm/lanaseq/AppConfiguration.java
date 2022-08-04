@@ -50,19 +50,19 @@ public class AppConfiguration {
   /**
    * Application home folder.
    */
-  private Path home;
+  private NetworkDrive home;
   /**
    * Where sample files are stored.
    */
-  private Path sampleHome;
+  private Path sampleFolder;
   /**
    * Where dataset files are stored.
    */
-  private Path datasetHome;
+  private Path datasetFolder;
   /**
    * Analysis folder.
    */
-  private Path analysis;
+  private Path analysisFolder;
   /**
    * Use symbolic links for analysis instead of copying files.
    */
@@ -74,19 +74,11 @@ public class AppConfiguration {
   /**
    * Upload folder.
    */
-  private Path upload;
+  private Path uploadFolder;
   /**
    * Time that must elapse before an upload folder get deleted.
    */
   private Duration uploadDeleteAge;
-  /**
-   * Application home folder as shown to users.
-   */
-  private Folder userHome;
-  /**
-   * Application upload folder as shown to users.
-   */
-  private Folder userUpload;
   /**
    * Server's actual URL, used in emails.
    */
@@ -102,52 +94,58 @@ public class AppConfiguration {
     return Paths.get(logfile);
   }
 
+  private Path resolveHome(Path subfolder) {
+    return home.folder.resolve(subfolder);
+  }
+
   public Path folder(Sample sample) {
-    return sampleHome.resolve(year.format(sample.getCreationDate())).resolve(sample.getName());
+    return resolveHome(sampleFolder).resolve(year.format(sample.getCreationDate()))
+        .resolve(sample.getName());
   }
 
   public Path folder(Dataset dataset) {
-    return datasetHome.resolve(year.format(dataset.getCreationDate())).resolve(dataset.getName());
+    return resolveHome(datasetFolder).resolve(year.format(dataset.getCreationDate()))
+        .resolve(dataset.getName());
   }
 
   /**
-   * Returns label to be shown to user so he can find the sample's folder on the network.
+   * Returns label to be shown to user, so he can find the sample's folder on the network.
    *
    * @param sample
    *          sample
    * @param unix
    *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user so he can find the sample's folder on the network
+   * @return label to be shown to user, so he can find the sample's folder on the network
    */
   public String folderLabel(Sample sample, boolean unix) {
-    Path relative = home.relativize(folder(sample));
+    Path relative = home.folder.relativize(folder(sample));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
     }
   }
 
   /**
-   * Returns label to be shown to user so he can find the dataset's folder on the network.
+   * Returns label to be shown to user, so he can find the dataset's folder on the network.
    *
    * @param dataset
    *          dataset
    * @param unix
    *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user so he can find the dataset's folder on the network
+   * @return label to be shown to user, so he can find the dataset's folder on the network
    */
   public String folderLabel(Dataset dataset, boolean unix) {
-    Path relative = home.relativize(folder(dataset));
+    Path relative = home.folder.relativize(folder(dataset));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
     }
   }
 
-  public String folderNetwork(boolean unix) {
-    return unix ? userHome.network.unix : userHome.network.windows;
+  public Path analysis() {
+    return resolveHome(analysisFolder);
   }
 
   public Path datasetAnalysis(Collection<Dataset> datasets) {
@@ -155,7 +153,8 @@ public class AppConfiguration {
       throw new IllegalArgumentException("datasets cannot be null or empty");
     }
     if (datasets.size() == 1) {
-      return getAnalysis().resolve(datasets.stream().findFirst().map(Dataset::getName).get());
+      return resolveHome(analysisFolder)
+          .resolve(datasets.stream().findFirst().map(Dataset::getName).get());
     } else {
       Optional<User> user = authorizationService.getCurrentUser();
       Dataset dataset = datasets.iterator().next();
@@ -170,7 +169,7 @@ public class AppConfiguration {
       if (builder.length() > 0) {
         builder.deleteCharAt(0);
       }
-      return getAnalysis().resolve(builder.toString());
+      return resolveHome(analysisFolder).resolve(builder.toString());
     }
   }
 
@@ -179,7 +178,8 @@ public class AppConfiguration {
       throw new IllegalArgumentException("samples cannot be null or empty");
     }
     if (samples.size() == 1) {
-      return getAnalysis().resolve(samples.stream().findFirst().map(Sample::getName).get());
+      return resolveHome(analysisFolder)
+          .resolve(samples.stream().findFirst().map(Sample::getName).get());
     } else {
       Optional<User> user = authorizationService.getCurrentUser();
       Sample sample = samples.iterator().next();
@@ -192,7 +192,7 @@ public class AppConfiguration {
       if (builder.length() > 0) {
         builder.deleteCharAt(0);
       }
-      return getAnalysis().resolve(builder.toString());
+      return resolveHome(analysisFolder).resolve(builder.toString());
     }
   }
 
@@ -206,11 +206,11 @@ public class AppConfiguration {
    * @return label to be shown to user, so he can find the dataset's analysis folder on the network
    */
   public String datasetAnalysisLabel(Collection<Dataset> datasets, boolean unix) {
-    Path relative = home.relativize(datasetAnalysis(datasets));
+    Path relative = home.folder.relativize(datasetAnalysis(datasets));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
     }
   }
 
@@ -224,20 +224,24 @@ public class AppConfiguration {
    * @return label to be shown to user, so he can find the dataset's analysis folder on the network
    */
   public String sampleAnalysisLabel(Collection<Sample> samples, boolean unix) {
-    Path relative = home.relativize(sampleAnalysis(samples));
+    Path relative = home.folder.relativize(sampleAnalysis(samples));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userHome.unix + "/" + relative.toString());
+      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userHome.windows + "/" + relative.toString());
+      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
     }
   }
 
+  public Path upload() {
+    return resolveHome(uploadFolder);
+  }
+
   public Path upload(Sample sample) {
-    return getUpload().resolve(sample.getName());
+    return resolveHome(uploadFolder).resolve(sample.getName());
   }
 
   public Path upload(Dataset dataset) {
-    return getUpload().resolve(dataset.getName());
+    return resolveHome(uploadFolder).resolve(dataset.getName());
   }
 
   /**
@@ -250,10 +254,11 @@ public class AppConfiguration {
    * @return label to be shown to user so he can find the sample's upload folder on the network
    */
   public String uploadLabel(Sample sample, boolean unix) {
+    Path relative = home.folder.relativize(upload(sample));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userUpload.unix + "/" + sample.getName());
+      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userUpload.windows + "/" + sample.getName());
+      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
     }
   }
 
@@ -267,15 +272,12 @@ public class AppConfiguration {
    * @return label to be shown to user so he can find the dataset's upload folder on the network
    */
   public String uploadLabel(Dataset dataset, boolean unix) {
+    Path relative = home.folder.relativize(upload(dataset));
     if (unix) {
-      return FilenameUtils.separatorsToUnix(userUpload.unix + "/" + dataset.getName());
+      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
     } else {
-      return FilenameUtils.separatorsToWindows(userUpload.windows + "/" + dataset.getName());
+      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
     }
-  }
-
-  public String uploadNetwork(boolean unix) {
-    return unix ? userUpload.network.unix : userUpload.network.windows;
   }
 
   /**
@@ -293,36 +295,36 @@ public class AppConfiguration {
     return serverUrl + urlEnd;
   }
 
-  Path getHome() {
+  NetworkDrive getHome() {
     return home;
   }
 
-  void setHome(Path home) {
+  void setHome(NetworkDrive home) {
     this.home = home;
   }
 
-  Path getSampleHome() {
-    return sampleHome;
+  Path getSampleFolder() {
+    return sampleFolder;
   }
 
-  void setSampleHome(Path sampleHome) {
-    this.sampleHome = sampleHome;
+  void setSampleFolder(Path sampleFolder) {
+    this.sampleFolder = sampleFolder;
   }
 
-  Path getDatasetHome() {
-    return datasetHome;
+  Path getDatasetFolder() {
+    return datasetFolder;
   }
 
-  void setDatasetHome(Path datasetHome) {
-    this.datasetHome = datasetHome;
+  void setDatasetFolder(Path datasetFolder) {
+    this.datasetFolder = datasetFolder;
   }
 
-  public Path getUpload() {
-    return upload;
+  Path getUploadFolder() {
+    return uploadFolder;
   }
 
-  void setUpload(Path upload) {
-    this.upload = upload;
+  void setUploadFolder(Path uploadFolder) {
+    this.uploadFolder = uploadFolder;
   }
 
   public String getServerUrl() {
@@ -333,22 +335,6 @@ public class AppConfiguration {
     this.serverUrl = serverUrl;
   }
 
-  Folder getUserHome() {
-    return userHome;
-  }
-
-  void setUserHome(Folder userHome) {
-    this.userHome = userHome;
-  }
-
-  Folder getUserUpload() {
-    return userUpload;
-  }
-
-  void setUserUpload(Folder userUpload) {
-    this.userUpload = userUpload;
-  }
-
   public Duration getUploadDeleteAge() {
     return uploadDeleteAge;
   }
@@ -357,12 +343,12 @@ public class AppConfiguration {
     this.uploadDeleteAge = uploadDeleteAge;
   }
 
-  public Path getAnalysis() {
-    return analysis;
+  Path getAnalysisFolder() {
+    return analysisFolder;
   }
 
-  void setAnalysis(Path analysis) {
-    this.analysis = analysis;
+  void setAnalysisFolder(Path analysisFolder) {
+    this.analysisFolder = analysisFolder;
   }
 
   public boolean isAnalysisSymlinks() {
@@ -381,56 +367,33 @@ public class AppConfiguration {
     this.analysisDeleteAge = analysisDeleteAge;
   }
 
-  @SuppressWarnings("unused")
-  private static class Folder {
-    private String windows;
-    private String unix;
-    private Network network;
+  public static class NetworkDrive {
+    private Path folder;
+    private String windowsPath;
+    private String unixPath;
 
-    String getWindows() {
-      return windows;
+    public Path getFolder() {
+      return folder;
     }
 
-    void setWindows(String windows) {
-      this.windows = windows;
+    public void setFolder(Path folder) {
+      this.folder = folder;
     }
 
-    String getUnix() {
-      return unix;
+    public String getWindowsPath() {
+      return windowsPath;
     }
 
-    void setUnix(String unix) {
-      this.unix = unix;
+    public void setWindowsPath(String windowsPath) {
+      this.windowsPath = windowsPath;
     }
 
-    Network getNetwork() {
-      return network;
+    public String getUnixPath() {
+      return unixPath;
     }
 
-    void setNetwork(Network network) {
-      this.network = network;
-    }
-  }
-
-  @SuppressWarnings("unused")
-  private static class Network {
-    private String windows;
-    private String unix;
-
-    String getWindows() {
-      return windows;
-    }
-
-    void setWindows(String windows) {
-      this.windows = windows;
-    }
-
-    String getUnix() {
-      return unix;
-    }
-
-    void setUnix(String unix) {
-      this.unix = unix;
+    public void setUnixPath(String unixPath) {
+      this.unixPath = unixPath;
     }
   }
 }

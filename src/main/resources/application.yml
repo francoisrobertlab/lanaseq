@@ -37,26 +37,17 @@ spring:
       enabled: false
 
 app:
-  home: ${user.home}/lanaseq
-  sample-home: ${app.home}/sample
-  dataset-home: ${app.home}/dataset
-  user-home:
-    windows: 'lanaseq'
-    unix: 'lanaseq'
-    network:
-      windows: '\\lanaseq01\lanaseq'
-      unix: 'smb://lanaseq01/lanaseq'
-  analysis: ${app.home}/analysis
+  home:
+    folder: ${user.home}/lanaseq
+    windowsPath: '\\lanaseq01\lanaseq'
+    unixPath: 'smb://lanaseq01/lanaseq'
+  sample-folder: sample
+  dataset-folder: dataset
+  analysis-folder: analysis
   analysis-delete-age: PT48H
   analysis-symlinks: true
-  upload: ${app.home}/upload
+  upload-folder: upload
   upload-delete-age: PT6H
-  user-upload:
-    windows: 'lanaseq\upload'
-    unix: 'lanaseq/upload'
-    network:
-      windows: '\\lanaseq01\lanaseq\upload'
-      unix: 'smb://lanaseq01/lanaseq/upload'
   serverUrl: http://localhost:8080
 
 security:
@@ -93,7 +84,9 @@ logging:
 
 ---
 spring:
-  config:    activate:      on-profile: test
+  config:
+    activate:
+      on-profile: test
   ldap:
     embedded:
       base-dn: dc=mycompany,dc=com
@@ -145,6 +138,7 @@ mail:
   enabled: false
 
 logging:
-  file:    name: test.log
+  file:
+    name: test.log
 
 download-home: ${user.dir}/target/download

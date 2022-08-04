@@ -19,11 +19,10 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_IOEXCEPTION;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -162,10 +161,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       boolean linux = i.getArgument(1);
       return (linux ? folderLabelLinux : folderLabelWindows) + "/" + sample.getName();
     });
-    when(configuration.folderNetwork(anyBoolean())).then(i -> {
-      boolean linux = i.getArgument(0);
-      return (linux ? folderNetworkLinux : folderNetworkWindows);
-    });
     random.nextBytes(fileContent);
     presenter.init(dialog);
     presenter.localeChange(locale);
@@ -178,8 +173,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, false)),
         dialog.message.getText());
-    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(false)),
-        dialog.message.getTitle().orElse(""));
   }
 
   @Test
@@ -189,8 +182,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
         dialog.message.getText());
-    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(true)),
-        dialog.message.getTitle().orElse(""));
   }
 
   @Test
@@ -200,30 +191,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
         dialog.message.getText());
-    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(true)),
-        dialog.message.getTitle().orElse(""));
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Empty() {
-    Sample sample = repository.findById(1L).get();
-    when(configuration.folderNetwork(anyBoolean())).thenReturn("");
-    presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
-        dialog.message.getText());
-    assertEquals("", dialog.message.getTitle().orElse(""));
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Null() {
-    Sample sample = repository.findById(1L).get();
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(null);
-    presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
-        dialog.message.getText());
-    assertEquals("", dialog.message.getTitle().orElse(""));
   }
 
   @Test

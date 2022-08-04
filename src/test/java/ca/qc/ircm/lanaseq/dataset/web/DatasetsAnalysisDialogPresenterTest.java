@@ -110,7 +110,6 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
     dialog.message = new Div();
     dialog.createFolder = new Button();
     dialog.confirm = mock(ConfirmDialog.class);
-    dialog.confirmLayout = new VerticalLayout();
     dialog.errors = mock(ConfirmDialog.class);
     dialog.errorsLayout = new VerticalLayout();
     presenter.init(dialog);
@@ -179,43 +178,14 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @Test
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_Windows() throws Throwable {
-    String folder = "test/dataset";
-    String network = "smb://test";
-    when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
-        .thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
-    presenter.createFolder();
-    verify(service).validateDatasets(eq(datasets), eq(locale), any());
-    verify(service).copyDatasetsResources(datasets);
-    verify(configuration).datasetAnalysisLabel(datasets, false);
-    verify(configuration).folderNetwork(false);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
-    verify(dialog.confirm).open();
-    verify(dialog.errors, never()).open();
-    verify(dialog, never()).close();
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
-  public void createFolder_WindowsNoNetwork() throws Throwable {
-    String folder = "test/dataset";
+    String folder = "smb://test/dataset";
     when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
         .thenReturn(folder);
     presenter.createFolder();
     verify(service).validateDatasets(eq(datasets), eq(locale), any());
     verify(service).copyDatasetsResources(datasets);
     verify(configuration).datasetAnalysisLabel(datasets, false);
-    verify(configuration).folderNetwork(false);
-    assertEquals(1, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
+    verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
@@ -224,23 +194,14 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @Test
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void createFolder_Unix() throws Throwable {
-    String folder = "test/dataset";
-    String network = "smb://test";
+    String folder = "smb://test/dataset";
     when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
         .thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     verify(service).validateDatasets(eq(datasets), eq(locale), any());
     verify(service).copyDatasetsResources(datasets);
     verify(configuration).datasetAnalysisLabel(datasets, true);
-    verify(configuration).folderNetwork(true);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
@@ -249,23 +210,14 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @Test
   @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void createFolder_Mac() throws Throwable {
-    String folder = "test/dataset";
-    String network = "smb://test";
+    String folder = "smb://test/dataset";
     when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
         .thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     verify(service).validateDatasets(eq(datasets), eq(locale), any());
     verify(service).copyDatasetsResources(datasets);
     verify(configuration).datasetAnalysisLabel(datasets, true);
-    verify(configuration).folderNetwork(true);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
@@ -274,24 +226,16 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @Test
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_MultipleCalls() throws Throwable {
-    String folder = "test/dataset";
-    String network = "smb://test";
+    String folder = "smb://test/dataset";
     when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
         .thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     presenter.createFolder();
     verify(service, times(2)).validateDatasets(eq(datasets), eq(locale), any());
     verify(service, times(2)).copyDatasetsResources(datasets);
     verify(configuration, times(2)).datasetAnalysisLabel(datasets, false);
-    verify(configuration, times(2)).folderNetwork(false);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm, times(2))
+        .setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm, times(2)).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();

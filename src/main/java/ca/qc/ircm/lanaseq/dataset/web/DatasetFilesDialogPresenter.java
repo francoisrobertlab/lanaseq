@@ -25,7 +25,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTIO
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_RENAME_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE_TITLE;
 import static ca.qc.ircm.lanaseq.web.EditableFileProperties.FILENAME;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -140,9 +139,6 @@ public class DatasetFilesDialogPresenter {
         dialog.message
             .setText(resources.message(MESSAGE, configuration.folderLabel(dataset, unix)));
       }
-      String network = configuration.folderNetwork(unix);
-      dialog.message.setTitle(
-          network != null && !network.isEmpty() ? resources.message(MESSAGE_TITLE, network) : "");
     });
   }
 

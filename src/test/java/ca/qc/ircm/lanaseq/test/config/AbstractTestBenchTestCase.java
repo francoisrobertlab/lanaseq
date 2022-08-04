@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -66,33 +66,15 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   public void saveHomeFolder() throws Throwable {
     Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
     getHome.setAccessible(true);
-    home = (Path) getHome.invoke(configuration);
-  }
-
-  /**
-   * Saves upload folder to reset it's value upon test completion.
-   */
-  @BeforeEach
-  public void saveUploadFolder() throws Throwable {
-    Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
-    getUpload.setAccessible(true);
-    upload = (Path) getUpload.invoke(configuration);
+    home = ((AppConfiguration.NetworkDrive) getHome.invoke(configuration)).getFolder();
   }
 
   /**
    * Restores home folder's value.
    */
-  @After
+  @AfterEach
   public void restoreHomeFolder() throws Throwable {
     setHome(home);
-  }
-
-  /**
-   * Restores upload folder's value.
-   */
-  @After
-  public void restoreUploadFolder() throws Throwable {
-    setUpload(upload);
   }
 
   protected String homeUrl() {
@@ -180,34 +162,10 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     throw new UnsupportedOperationException("Not updated for Vaadin 10+");
   }
 
-  protected Path getHome() {
-    return home;
-  }
-
   protected void setHome(Path home) throws NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setHome = AppConfiguration.class.getDeclaredMethod("setHome", Path.class);
-    setHome.setAccessible(true);
-    setHome.invoke(configuration, home);
-    Method setSampleHome = AppConfiguration.class.getDeclaredMethod("setSampleHome", Path.class);
-    setSampleHome.setAccessible(true);
-    setSampleHome.invoke(configuration, home.resolve("sample"));
-    Method setDatasetHome = AppConfiguration.class.getDeclaredMethod("setDatasetHome", Path.class);
-    setDatasetHome.setAccessible(true);
-    setDatasetHome.invoke(configuration, home.resolve("dataset"));
-    Method setAnalysis = AppConfiguration.class.getDeclaredMethod("setAnalysis", Path.class);
-    setAnalysis.setAccessible(true);
-    setAnalysis.invoke(configuration, home);
-  }
-
-  protected Path getUpload() {
-    return upload;
-  }
-
-  protected void setUpload(Path upload) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setUpload = AppConfiguration.class.getDeclaredMethod("setUpload", Path.class);
-    setUpload.setAccessible(true);
-    setUpload.invoke(configuration, upload);
+    Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
+    getHome.setAccessible(true);
+    ((AppConfiguration.NetworkDrive) getHome.invoke(configuration)).setFolder(home);
   }
 }

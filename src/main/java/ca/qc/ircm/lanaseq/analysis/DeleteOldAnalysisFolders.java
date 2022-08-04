@@ -55,7 +55,7 @@ public class DeleteOldAnalysisFolders {
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
   public void deleteOldAnalysisFolders() {
-    Path analysis = configuration.getAnalysis();
+    Path analysis = configuration.analysis();
     if (analysis == null) {
       return;
     }

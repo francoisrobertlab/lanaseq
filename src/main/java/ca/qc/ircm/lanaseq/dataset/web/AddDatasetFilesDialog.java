@@ -65,7 +65,6 @@ public class AddDatasetFilesDialog extends Dialog
   public static final String ID = "add-dataset-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
-  public static final String NETWORK = "network";
   public static final String FILES = "files";
   public static final String FILENAME = "filename";
   public static final String SIZE = "size";
@@ -77,7 +76,6 @@ public class AddDatasetFilesDialog extends Dialog
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
-  protected Div network = new Div();
   protected Grid<File> files = new Grid<>();
   protected Column<File> filename;
   protected Column<File> size;
@@ -107,12 +105,11 @@ public class AddDatasetFilesDialog extends Dialog
     setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, message, network, files, error, save);
+    layout.add(header, message, files, error, save);
     layout.setSizeFull();
     layout.expand(files);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
-    network.setId(id(NETWORK));
     files.setId(id(FILES));
     filename =
         files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME)
@@ -164,7 +161,6 @@ public class AddDatasetFilesDialog extends Dialog
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER, 0));
     message.setText("");
-    network.setText("");
     filename.setHeader(resources.message(FILENAME));
     if (size != null) {
       files.removeColumn(size);

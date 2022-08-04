@@ -96,13 +96,7 @@ public class SampleAnalysisDialogPresenter {
           return browser.isMacOSX() || browser.isLinux();
         }).orElse(false);
         String folder = configuration.sampleAnalysisLabel(samples, unix);
-        String network = configuration.folderNetwork(unix);
-        dialog.confirmLayout.removeAll();
-        dialog.confirmLayout.add(new Span(resources.message(property(CONFIRM, "message"), folder)));
-        if (network != null) {
-          dialog.confirmLayout
-              .add(new Span(resources.message(property(CONFIRM, "network"), network)));
-        }
+        dialog.confirm.setText(resources.message(property(CONFIRM, "message"), folder));
         dialog.confirm.open();
       } catch (IOException e) {
         dialog.errorsLayout.removeAll();

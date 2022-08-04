@@ -82,7 +82,6 @@ public class SampleAnalysisDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(CREATE_FOLDER), dialog.createFolder.getId().orElse(""));
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
-    assertEquals(dialog.confirmLayout.getElement(), dialog.confirm.getElement().getChild(0));
     assertEquals(id(ERRORS), dialog.errors.getId().orElse(""));
     assertEquals(dialog.errorsLayout.getElement(), dialog.errors.getElement().getChild(0));
   }

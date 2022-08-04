@@ -54,7 +54,7 @@ public class DeleteOldUploadFolders {
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
   public void deleteOldUploadFolders() {
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     if (upload == null) {
       return;
     }

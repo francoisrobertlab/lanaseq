@@ -128,7 +128,7 @@ public class DatasetServiceTest {
           ? temporaryFolder.resolve(dataset.getName())
           : null;
     });
-    when(configuration.getUpload()).then(i -> {
+    when(configuration.upload()).then(i -> {
       return temporaryFolder.resolve("upload");
     });
   }
@@ -418,7 +418,7 @@ public class DatasetServiceTest {
   @Test
   public void uploadFiles() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(dataset.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -451,7 +451,7 @@ public class DatasetServiceTest {
 
     List<Path> files = service.uploadFiles(dataset);
 
-    verify(configuration, times(2)).getUpload();
+    verify(configuration, times(2)).upload();
     verify(configuration, times(2)).upload(dataset);
     assertEquals(3, files.size());
     assertTrue(files.contains(upload.resolve(dataset.getName() + ".fastq")));
@@ -463,7 +463,7 @@ public class DatasetServiceTest {
   @Test
   public void uploadFiles_DatasetFolderNotExists() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(dataset.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -481,7 +481,7 @@ public class DatasetServiceTest {
 
     List<Path> files = service.uploadFiles(dataset);
 
-    verify(configuration, times(2)).getUpload();
+    verify(configuration, times(2)).upload();
     verify(configuration).upload(dataset);
     assertEquals(1, files.size());
     assertTrue(files.contains(upload.resolve(dataset.getName() + ".fastq")));
@@ -509,7 +509,7 @@ public class DatasetServiceTest {
 
     List<Path> files = service.uploadFiles(dataset);
 
-    verify(configuration).getUpload();
+    verify(configuration).upload();
     verify(configuration, times(2)).upload(dataset);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
@@ -768,12 +768,12 @@ public class DatasetServiceTest {
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(
-            Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
-            Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
     assertArrayEquals(
-            Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
-            Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
   }
 

@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX_E
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE_TITLE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -176,10 +175,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
       boolean linux = i.getArgument(1);
       return (linux ? folderLabelLinux : folderLabelWindows) + "/" + dataset.getName();
     });
-    when(configuration.folderNetwork(anyBoolean())).then(i -> {
-      boolean linux = i.getArgument(0);
-      return (linux ? folderNetworkLinux : folderNetworkWindows);
-    });
     random.nextBytes(fileContent);
     presenter.init(dialog);
     presenter.localeChange(locale);
@@ -192,8 +187,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, false)),
         dialog.message.getText());
-    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(false)),
-        dialog.message.getTitle().orElse(""));
   }
 
   @Test
@@ -203,8 +196,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, true)),
         dialog.message.getText());
-    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(true)),
-        dialog.message.getTitle().orElse(""));
   }
 
   @Test
@@ -214,30 +205,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, true)),
         dialog.message.getText());
-    assertEquals(resources.message(MESSAGE_TITLE, configuration.folderNetwork(true)),
-        dialog.message.getTitle().orElse(""));
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Empty() {
-    Dataset dataset = repository.findById(1L).get();
-    when(configuration.folderNetwork(anyBoolean())).thenReturn("");
-    presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, true)),
-        dialog.message.getText());
-    assertEquals("", dialog.message.getTitle().orElse(""));
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Null() {
-    Dataset dataset = repository.findById(1L).get();
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(null);
-    presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, true)),
-        dialog.message.getText());
-    assertEquals("", dialog.message.getTitle().orElse(""));
   }
 
   @Test

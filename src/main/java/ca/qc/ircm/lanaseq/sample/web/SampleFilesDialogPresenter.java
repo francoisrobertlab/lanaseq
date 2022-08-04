@@ -19,13 +19,12 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_IOEXCEPTION;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILE_RENAME_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE_TITLE;
 import static ca.qc.ircm.lanaseq.web.EditableFileProperties.FILENAME;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -132,9 +131,6 @@ public class SampleFilesDialogPresenter {
       if (sample != null) {
         dialog.message.setText(resources.message(MESSAGE, configuration.folderLabel(sample, unix)));
       }
-      String network = configuration.folderNetwork(unix);
-      dialog.message.setTitle(
-          network != null && !network.isEmpty() ? resources.message(MESSAGE_TITLE, network) : "");
     });
   }
 

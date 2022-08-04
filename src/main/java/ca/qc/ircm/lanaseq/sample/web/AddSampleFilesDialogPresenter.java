@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.CREATE_FOLDER_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 
@@ -102,9 +101,6 @@ public class AddSampleFilesDialogPresenter {
       if (sample != null) {
         dialog.message.setText(resources.message(MESSAGE, configuration.uploadLabel(sample, unix)));
       }
-      String network = configuration.uploadNetwork(unix);
-      dialog.network.setVisible(network != null && !network.isEmpty());
-      dialog.network.setText(resources.message(NETWORK, network));
     });
   }
 

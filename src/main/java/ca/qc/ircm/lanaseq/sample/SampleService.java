@@ -176,7 +176,7 @@ public class SampleService {
     if (sample == null || sample.getId() == null) {
       return new ArrayList<>();
     }
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     Path sampleUpload = configuration.upload(sample);
     try {
       List<Path> files = new ArrayList<>();

@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

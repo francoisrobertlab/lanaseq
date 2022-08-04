@@ -125,7 +125,7 @@ public class SampleServiceTest {
       return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
           : null;
     });
-    when(configuration.getUpload()).then(i -> {
+    when(configuration.upload()).then(i -> {
       return temporaryFolder.resolve("upload");
     });
     when(configuration.folder(any(Dataset.class))).then(i -> {
@@ -433,7 +433,7 @@ public class SampleServiceTest {
   @Test
   public void uploadFiles() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(sample.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -466,7 +466,7 @@ public class SampleServiceTest {
 
     List<Path> files = service.uploadFiles(sample);
 
-    verify(configuration, times(2)).getUpload();
+    verify(configuration, times(2)).upload();
     verify(configuration, times(2)).upload(sample);
     assertEquals(3, files.size());
     assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
@@ -478,7 +478,7 @@ public class SampleServiceTest {
   @Test
   public void uploadFiles_SampleFolderNotExists() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(sample.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -496,7 +496,7 @@ public class SampleServiceTest {
 
     List<Path> files = service.uploadFiles(sample);
 
-    verify(configuration, times(2)).getUpload();
+    verify(configuration, times(2)).upload();
     verify(configuration).upload(sample);
     assertEquals(1, files.size());
     assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
@@ -524,7 +524,7 @@ public class SampleServiceTest {
 
     List<Path> files = service.uploadFiles(sample);
 
-    verify(configuration).getUpload();
+    verify(configuration).upload();
     verify(configuration, times(2)).upload(sample);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("sample_R1.fastq")));

@@ -56,7 +56,6 @@ public class SampleAnalysisDialog extends Dialog implements LocaleChangeObserver
   protected Div message = new Div();
   protected Button createFolder = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
-  protected VerticalLayout confirmLayout = new VerticalLayout();
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   @Autowired
@@ -86,7 +85,6 @@ public class SampleAnalysisDialog extends Dialog implements LocaleChangeObserver
     createFolder.setId(id(CREATE_FOLDER));
     createFolder.addClickListener(e -> presenter.createFolder());
     confirm.setId(id(CONFIRM));
-    confirm.setText(confirmLayout);
     confirm.addConfirmListener(e -> close());
     errors.setId(id(ERRORS));
     errors.setText(errorsLayout);

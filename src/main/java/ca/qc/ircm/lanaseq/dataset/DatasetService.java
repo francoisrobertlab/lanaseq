@@ -183,7 +183,7 @@ public class DatasetService {
     if (dataset == null || dataset.getId() == null) {
       return new ArrayList<>();
     }
-    Path upload = configuration.getUpload();
+    Path upload = configuration.upload();
     Path datasetUpload = configuration.upload(dataset);
     try {
       List<Path> files = new ArrayList<>();

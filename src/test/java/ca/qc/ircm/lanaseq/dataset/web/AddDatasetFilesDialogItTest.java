@@ -62,7 +62,6 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
-    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
   }
 
   private void open() {
@@ -110,7 +109,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         configuration.upload(dataset).resolve("other.fastq"));
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        configuration.getUpload().resolve("prefix_" + dataset.getName() + "_R1"));
+        configuration.upload().resolve("prefix_" + dataset.getName() + "_R1"));
     Thread.sleep(2500);
     assertEquals(4, dialog.files().getRowCount());
   }
@@ -127,7 +126,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     copyFiles(dataset);
     String filenameInRoot = "prefix_" + dataset.getName() + "_R1";
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        configuration.getUpload().resolve(filenameInRoot));
+        configuration.upload().resolve(filenameInRoot));
 
     TestTransaction.flagForCommit();
     dialog.save().click();

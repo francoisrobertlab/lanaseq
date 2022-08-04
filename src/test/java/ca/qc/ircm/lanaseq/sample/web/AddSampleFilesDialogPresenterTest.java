@@ -18,14 +18,13 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -117,7 +116,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
-    dialog.network = new Div();
     dialog.files = new Grid<>();
     dialog.error = new Div();
     dialog.save = new Button();
@@ -133,10 +131,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
       Sample sample = i.getArgument(0);
       boolean linux = i.getArgument(1);
       return (linux ? uploadLabelLinux : uploadLabelWindows) + "/" + sample.getName();
-    });
-    when(configuration.uploadNetwork(anyBoolean())).then(i -> {
-      boolean linux = i.getArgument(0);
-      return (linux ? uploadNetworkLinux : uploadNetworkWindows);
     });
     when(service.uploadFiles(any())).thenReturn(new ArrayList<>(),
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
@@ -199,8 +193,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, false)),
         dialog.message.getText());
-    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(false)),
-        dialog.network.getText());
   }
 
   @Test
@@ -210,8 +202,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
         dialog.message.getText());
-    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
-        dialog.network.getText());
   }
 
   @Test
@@ -221,30 +211,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setSample(sample, locale);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
         dialog.message.getText());
-    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
-        dialog.network.getText());
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Empty() {
-    Sample sample = repository.findById(1L).get();
-    when(configuration.uploadNetwork(anyBoolean())).thenReturn("");
-    presenter.setSample(sample, locale);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
-        dialog.message.getText());
-    assertFalse(dialog.network.isVisible());
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Null() {
-    Sample sample = repository.findById(1L).get();
-    when(configuration.uploadNetwork(anyBoolean())).thenReturn(null);
-    presenter.setSample(sample, locale);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
-        dialog.message.getText());
-    assertFalse(dialog.network.isVisible());
   }
 
   @Test

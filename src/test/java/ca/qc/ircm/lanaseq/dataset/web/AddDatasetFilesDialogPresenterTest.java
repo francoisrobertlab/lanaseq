@@ -18,14 +18,13 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -117,7 +116,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
-    dialog.network = new Div();
     dialog.files = new Grid<>();
     dialog.error = new Div();
     dialog.save = new Button();
@@ -133,10 +131,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
       Dataset dataset = i.getArgument(0);
       boolean linux = i.getArgument(1);
       return (linux ? uploadLabelLinux : uploadLabelWindows) + "/" + dataset.getName();
-    });
-    when(configuration.uploadNetwork(anyBoolean())).then(i -> {
-      boolean linux = i.getArgument(0);
-      return (linux ? uploadNetworkLinux : uploadNetworkWindows);
     });
     when(service.uploadFiles(any())).thenReturn(new ArrayList<>(),
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
@@ -204,8 +198,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, false)),
         dialog.message.getText());
-    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(false)),
-        dialog.network.getText());
   }
 
   @Test
@@ -215,8 +207,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
         dialog.message.getText());
-    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
-        dialog.network.getText());
   }
 
   @Test
@@ -226,30 +216,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
         dialog.message.getText());
-    assertEquals(resources.message(NETWORK, configuration.uploadNetwork(true)),
-        dialog.network.getText());
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Empty() {
-    when(configuration.uploadNetwork(anyBoolean())).thenReturn("");
-    Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
-        dialog.message.getText());
-    assertFalse(dialog.network.isVisible());
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
-  public void network_Null() {
-    when(configuration.uploadNetwork(anyBoolean())).thenReturn(null);
-    Dataset dataset = repository.findById(1L).get();
-    presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
-        dialog.message.getText());
-    assertFalse(dialog.network.isVisible());
   }
 
   @Test

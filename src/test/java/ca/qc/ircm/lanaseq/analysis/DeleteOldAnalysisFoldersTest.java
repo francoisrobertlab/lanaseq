@@ -52,7 +52,7 @@ public class DeleteOldAnalysisFoldersTest {
 
   @BeforeEach
   public void beforeTest() {
-    when(configuration.getAnalysis()).thenReturn(temporaryFolder);
+    when(configuration.analysis()).thenReturn(temporaryFolder);
     when(configuration.getAnalysisDeleteAge()).thenReturn(Duration.ofHours(24));
   }
 

@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.OVERWRITE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SIZE;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SIZE_VALUE;
@@ -190,7 +189,6 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
-    assertEquals(id(NETWORK), dialog.network.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
@@ -204,7 +202,6 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), dialog.header.getText());
     assertEquals("", dialog.message.getText());
-    assertEquals("", dialog.network.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));
     verify(dialog.size).setHeader(resources.message(SIZE));
     verify(dialog.overwrite).setHeader(resources.message(OVERWRITE));
@@ -224,7 +221,6 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), dialog.header.getText());
     assertEquals("", dialog.message.getText());
-    assertEquals("", dialog.network.getText());
     verify(dialog.filename).setHeader(resources.message(FILENAME));
     verify(dialog.size).setHeader(resources.message(SIZE));
     verify(dialog.overwrite).setHeader(resources.message(OVERWRITE));

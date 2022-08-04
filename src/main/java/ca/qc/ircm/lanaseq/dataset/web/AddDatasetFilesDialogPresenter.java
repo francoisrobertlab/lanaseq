@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.CREATE_FOLDER_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.NETWORK;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 
@@ -107,9 +106,6 @@ public class AddDatasetFilesDialogPresenter {
         dialog.message
             .setText(resources.message(MESSAGE, configuration.uploadLabel(dataset, unix)));
       }
-      String network = configuration.uploadNetwork(unix);
-      dialog.network.setVisible(network != null && !network.isEmpty());
-      dialog.network.setText(resources.message(NETWORK, network));
     });
   }
 

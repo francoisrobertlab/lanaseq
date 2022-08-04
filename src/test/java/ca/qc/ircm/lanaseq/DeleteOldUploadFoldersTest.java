@@ -51,7 +51,7 @@ public class DeleteOldUploadFoldersTest {
 
   @BeforeEach
   public void beforeTest() {
-    when(configuration.getUpload()).thenReturn(temporaryFolder);
+    when(configuration.upload()).thenReturn(temporaryFolder);
     when(configuration.getUploadDeleteAge()).thenReturn(Duration.ofHours(24));
   }
 

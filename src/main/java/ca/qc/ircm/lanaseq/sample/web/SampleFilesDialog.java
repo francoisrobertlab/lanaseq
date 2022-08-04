@@ -64,7 +64,6 @@ public class SampleFilesDialog extends Dialog
   public static final String ID = "sample-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
-  public static final String MESSAGE_TITLE = property(MESSAGE, "title");
   public static final String FILES = "files";
   public static final String FILENAME = "filename";
   public static final String FILENAME_REGEX = "[\\w-\\.]*";

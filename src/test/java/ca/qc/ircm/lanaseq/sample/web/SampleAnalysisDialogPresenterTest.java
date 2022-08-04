@@ -110,7 +110,6 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.message = new Div();
     dialog.createFolder = new Button();
     dialog.confirm = mock(ConfirmDialog.class);
-    dialog.confirmLayout = new VerticalLayout();
     dialog.errors = mock(ConfirmDialog.class);
     dialog.errorsLayout = new VerticalLayout();
     presenter.init(dialog);
@@ -182,38 +181,11 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     String folder = "test/sample";
     String network = "smb://test";
     when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     verify(service).validateSamples(eq(samples), eq(locale), any());
     verify(service).copySamplesResources(samples);
     verify(configuration).sampleAnalysisLabel(samples, false);
-    verify(configuration).folderNetwork(false);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
-    verify(dialog.confirm).open();
-    verify(dialog.errors, never()).open();
-    verify(dialog, never()).close();
-  }
-
-  @Test
-  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
-  public void createFolder_WindowsNoNetwork() throws Throwable {
-    String folder = "test/sample";
-    when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
-    presenter.createFolder();
-    verify(service).validateSamples(eq(samples), eq(locale), any());
-    verify(service).copySamplesResources(samples);
-    verify(configuration).sampleAnalysisLabel(samples, false);
-    verify(configuration).folderNetwork(false);
-    assertEquals(1, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
+    verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
@@ -225,19 +197,11 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     String folder = "test/sample";
     String network = "smb://test";
     when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     verify(service).validateSamples(eq(samples), eq(locale), any());
     verify(service).copySamplesResources(samples);
     verify(configuration).sampleAnalysisLabel(samples, true);
-    verify(configuration).folderNetwork(true);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
@@ -249,19 +213,11 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     String folder = "test/sample";
     String network = "smb://test";
     when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     verify(service).validateSamples(eq(samples), eq(locale), any());
     verify(service).copySamplesResources(samples);
     verify(configuration).sampleAnalysisLabel(samples, true);
-    verify(configuration).folderNetwork(true);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
@@ -273,20 +229,13 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     String folder = "test/sample";
     String network = "smb://test";
     when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
-    when(configuration.folderNetwork(anyBoolean())).thenReturn(network);
     presenter.createFolder();
     presenter.createFolder();
     verify(service, times(2)).validateSamples(eq(samples), eq(locale), any());
     verify(service, times(2)).copySamplesResources(samples);
     verify(configuration, times(2)).sampleAnalysisLabel(samples, false);
-    verify(configuration, times(2)).folderNetwork(false);
-    assertEquals(2, dialog.confirmLayout.getComponentCount());
-    assertTrue(dialog.confirmLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
-        ((Span) dialog.confirmLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.confirmLayout.getComponentAt(1) instanceof Span);
-    assertEquals(resources.message(property(CONFIRM, "network"), network),
-        ((Span) dialog.confirmLayout.getComponentAt(1)).getText());
+    verify(dialog.confirm, times(2))
+        .setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm, times(2)).open();
     verify(dialog.errors, never()).open();
     verify(dialog, never()).close();
