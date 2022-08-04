@@ -401,6 +401,7 @@
               <com.vaadin.testbench.Parameters.maxAttempts>${testbench.maxAttempts}
               </com.vaadin.testbench.Parameters.maxAttempts>
             </systemPropertyVariables>
+            <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
           </configuration>
           <executions>
             <execution>
