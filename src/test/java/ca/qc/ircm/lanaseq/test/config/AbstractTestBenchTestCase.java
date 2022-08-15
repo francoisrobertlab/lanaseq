@@ -55,18 +55,47 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
   private Path home;
+  private Path analysis;
   private Path upload;
   @Autowired
   private AppConfiguration configuration;
 
   /**
-   * Saves home folder to reset it's value upon test completion.
+   * Saves home folder to reset its value upon test completion.
    */
   @BeforeEach
   public void saveHomeFolder() throws Throwable {
     Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
     getHome.setAccessible(true);
-    home = ((AppConfiguration.NetworkDrive) getHome.invoke(configuration)).getFolder();
+    Method getFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("getFolder");
+    getFolder.setAccessible(true);
+    home = (Path) getFolder.invoke((AppConfiguration.NetworkDrive) getHome.invoke(configuration));
+  }
+
+  /**
+   * Saves analysis folder to reset its value upon test completion.
+   */
+  @BeforeEach
+  public void saveAnalysisFolder() throws Throwable {
+    Method getAnalysis = AppConfiguration.class.getDeclaredMethod("getAnalysis");
+    getAnalysis.setAccessible(true);
+    Method getFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("getFolder");
+    getFolder.setAccessible(true);
+    upload =
+        (Path) getFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration));
+  }
+
+  /**
+   * Saves upload folder to reset its value upon test completion.
+   */
+  @BeforeEach
+  public void saveUploadFolder() throws Throwable {
+    Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
+    getUpload.setAccessible(true);
+    Method getFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("getFolder");
+    getFolder.setAccessible(true);
+    upload =
+        (Path) getFolder.invoke((AppConfiguration.NetworkDrive) getUpload.invoke(configuration));
   }
 
   /**
@@ -75,6 +104,22 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   @AfterEach
   public void restoreHomeFolder() throws Throwable {
     setHome(home);
+  }
+
+  /**
+   * Restores upload folder's value.
+   */
+  @AfterEach
+  public void restoreAnalysisFolder() throws Throwable {
+    setAnalysis(analysis);
+  }
+
+  /**
+   * Restores upload folder's value.
+   */
+  @AfterEach
+  public void restoreUploadFolder() throws Throwable {
+    setUpload(upload);
   }
 
   protected String homeUrl() {
@@ -166,6 +211,29 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Method getHome = AppConfiguration.class.getDeclaredMethod("getHome");
     getHome.setAccessible(true);
-    ((AppConfiguration.NetworkDrive) getHome.invoke(configuration)).setFolder(home);
+    Method setFolder =
+        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+    setFolder.setAccessible(true);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getHome.invoke(configuration), home);
+  }
+
+  protected void setAnalysis(Path home) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method getAnalysis = AppConfiguration.class.getDeclaredMethod("getAnalysis");
+    getAnalysis.setAccessible(true);
+    Method setFolder =
+        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+    setFolder.setAccessible(true);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration), home);
+  }
+
+  protected void setUpload(Path home) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
+    getUpload.setAccessible(true);
+    Method setFolder =
+        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+    setFolder.setAccessible(true);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getUpload.invoke(configuration), home);
   }
 }

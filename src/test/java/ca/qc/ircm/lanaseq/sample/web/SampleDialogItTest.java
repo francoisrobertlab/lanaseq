@@ -235,7 +235,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void save_Update() throws Throwable {
     open();
     Sample sample = repository.findById(4L).get();
-    Path oldFolder = configuration.folder(sample);
+    Path oldFolder = configuration.getHome().folder(sample);
     Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().edit(view.samples().name(2).startsWith("JS1") ? 2 : 3).click();
@@ -270,7 +270,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     dataset = datasetRepository.findById(6L).get();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
     assertEquals(4, view.samples().getRowCount());
@@ -312,7 +312,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   public void delete() throws Throwable {
     open();
     Sample sample = repository.findById(9L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
     view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");

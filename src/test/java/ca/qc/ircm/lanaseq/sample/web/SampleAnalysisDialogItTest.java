@@ -59,6 +59,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    setAnalysis(Files.createDirectory(temporaryFolder.resolve("analysis")));
   }
 
   private void open() {
@@ -89,7 +90,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void create_One() throws Throwable {
     Sample sample = repository.findById(10L).get();
-    Path sampleFolder = configuration.folder(sample);
+    Path sampleFolder = configuration.getHome().folder(sample);
     Files.createDirectories(sampleFolder);
     Path fastq1 = sampleFolder.resolve(sample.getName() + "_R1.fastq");
     final byte[] fastq1Content = writeFile(fastq1);
@@ -107,7 +108,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.sampleAnalysis(Arrays.asList(sample));
+    Path folder = configuration.getAnalysis().folder(Arrays.asList(sample));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,
@@ -130,13 +131,13 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Sample sample1 = repository.findById(4L).get();
     Sample sample2 = repository.findById(10L).get();
     List<Sample> samples = Arrays.asList(sample1, sample2);
-    Path sample1Folder = configuration.folder(sample1);
+    Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);
     Path fastq1 = sample1Folder.resolve(sample1.getName() + "_R1.fastq");
     final byte[] fastq1Content = writeFile(fastq1);
     Path fastq2 = sample1Folder.resolve(sample1.getName() + "_R2.fastq");
     final byte[] fastq2Content = writeFile(fastq2);
-    Path sample2Folder = configuration.folder(sample2);
+    Path sample2Folder = configuration.getHome().folder(sample2);
     Files.createDirectories(sample2Folder);
     Path fastq3 = sample2Folder.resolve("a_R1.fastq");
     final byte[] fastq3Content = writeFile(fastq3);
@@ -155,7 +156,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.sampleAnalysis(samples);
+    Path folder = configuration.getAnalysis().folder(samples);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,
@@ -185,13 +186,13 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Sample sample1 = repository.findById(10L).get();
     Sample sample2 = repository.findById(11L).get();
     List<Sample> samples = Arrays.asList(sample1, sample2);
-    Path sample1Folder = configuration.folder(sample1);
+    Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);
     Path fastq1 = sample1Folder.resolve(sample1.getName() + "_R1.fastq");
     final byte[] fastq1Content = writeFile(fastq1);
     Path fastq2 = sample1Folder.resolve(sample1.getName() + "_R2.fastq");
     final byte[] fastq2Content = writeFile(fastq2);
-    Path sample2Folder = configuration.folder(sample2);
+    Path sample2Folder = configuration.getHome().folder(sample2);
     Files.createDirectories(sample2Folder);
     Path fastq3 = sample2Folder.resolve("a_R1.fastq");
     final byte[] fastq3Content = writeFile(fastq3);
@@ -207,7 +208,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.errors().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.sampleAnalysis(samples);
+    Path folder = configuration.getAnalysis().folder(samples);
     assertFalse(Files.exists(folder));
   }
 }

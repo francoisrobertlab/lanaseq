@@ -60,6 +60,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    setAnalysis(Files.createDirectory(temporaryFolder.resolve("analysis")));
   }
 
   private void open() {
@@ -91,14 +92,14 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   public void create_One() throws Throwable {
     Dataset dataset = repository.findById(2L).get();
     Sample sample1 = dataset.getSamples().get(0);
-    Path sample1Folder = configuration.folder(sample1);
+    Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);
     Path fastq1 = sample1Folder.resolve(sample1.getName() + "_R1.fastq");
     final byte[] fastq1Content = writeFile(fastq1);
     Path fastq2 = sample1Folder.resolve(sample1.getName() + "_R2.fastq");
     final byte[] fastq2Content = writeFile(fastq2);
     Sample sample2 = dataset.getSamples().get(1);
-    Path sample2Folder = configuration.folder(sample2);
+    Path sample2Folder = configuration.getHome().folder(sample2);
     Files.createDirectories(sample2Folder);
     Path fastq3 = sample2Folder.resolve("a_R1.fastq");
     final byte[] fastq3Content = writeFile(fastq3);
@@ -116,7 +117,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.datasetAnalysis(Arrays.asList(dataset));
+    Path folder = configuration.getAnalysis().folder(Arrays.asList(dataset));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,
@@ -151,21 +152,21 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Dataset dataset2 = repository.findById(7L).get();
     List<Dataset> datasets = Arrays.asList(dataset, dataset2);
     Sample sample1 = dataset.getSamples().get(0);
-    Path sample1Folder = configuration.folder(sample1);
+    Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);
     Path fastq1 = sample1Folder.resolve(sample1.getName() + "_R1.fastq");
     final byte[] fastq1Content = writeFile(fastq1);
     Path fastq2 = sample1Folder.resolve(sample1.getName() + "_R2.fastq");
     final byte[] fastq2Content = writeFile(fastq2);
     Sample sample2 = dataset.getSamples().get(1);
-    Path sample2Folder = configuration.folder(sample2);
+    Path sample2Folder = configuration.getHome().folder(sample2);
     Files.createDirectories(sample2Folder);
     Path fastq3 = sample2Folder.resolve("a_R1.fastq");
     final byte[] fastq3Content = writeFile(fastq3);
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
     Sample sample3 = dataset2.getSamples().get(0);
-    Path sample3Folder = configuration.folder(sample3);
+    Path sample3Folder = configuration.getHome().folder(sample3);
     Files.createDirectories(sample3Folder);
     Path fastq5 = sample3Folder.resolve(sample3.getName() + "_R1.fastq");
     final byte[] fastq5Content = writeFile(fastq5);
@@ -184,7 +185,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.datasetAnalysis(datasets);
+    Path folder = configuration.getAnalysis().folder(datasets);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,
@@ -235,7 +236,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.errors().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.datasetAnalysis(Arrays.asList(dataset));
+    Path folder = configuration.getAnalysis().folder(Arrays.asList(dataset));
     assertFalse(Files.exists(folder));
   }
 }

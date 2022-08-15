@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -126,8 +127,9 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     folder = temporaryFolder.resolve("dataset");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", false));
-    when(configuration.upload(any(Dataset.class))).thenReturn(folder);
-    when(configuration.uploadLabel(any(Dataset.class), anyBoolean())).then(i -> {
+    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().folder(any(Dataset.class))).thenReturn(folder);
+    when(configuration.getUpload().label(any(Dataset.class), anyBoolean())).then(i -> {
       Dataset dataset = i.getArgument(0);
       boolean linux = i.getArgument(1);
       return (linux ? uploadLabelLinux : uploadLabelWindows) + "/" + dataset.getName();
@@ -159,7 +161,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   private Path uploadFolder(Dataset dataset) {
-    return configuration.upload(dataset);
+    return configuration.getUpload().folder(dataset);
   }
 
   @Test
@@ -196,7 +198,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, false)),
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, false)),
         dialog.message.getText());
   }
 
@@ -205,7 +207,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Linux() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
         dialog.message.getText());
   }
 
@@ -214,7 +216,7 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Mac() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(dataset, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
         dialog.message.getText());
   }
 

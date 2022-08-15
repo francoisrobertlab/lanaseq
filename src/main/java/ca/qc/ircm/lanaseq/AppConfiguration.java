@@ -27,7 +27,9 @@ import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,15 +44,31 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = AppConfiguration.PREFIX)
 public class AppConfiguration {
+  /**
+   * Default name of application.
+   */
   public static final String APPLICATION_NAME = "lanaseq";
+  /**
+   * Prefix for all application properties inside configuration file.
+   */
   public static final String PREFIX = "app";
+  /**
+   * Filename containing deleted file metadata.
+   */
   public static final String DELETED_FILENAME = ".deleted";
+  /**
+   * Year formatter.
+   */
+  private static DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
+  /**
+   * Log file.
+   */
   @Value("${logging.path:${user.dir}}/${logging.file.name:" + APPLICATION_NAME + "log}")
   private String logfile;
   /**
    * Application home folder.
    */
-  private NetworkDrive home;
+  private NetworkDrive<DataWithFiles> home;
   /**
    * Where sample files are stored.
    */
@@ -59,6 +77,10 @@ public class AppConfiguration {
    * Where dataset files are stored.
    */
   private Path datasetFolder;
+  /**
+   * Analysis network drive.
+   */
+  private NetworkDrive<Collection<? extends DataWithFiles>> analysis;
   /**
    * Analysis folder.
    */
@@ -72,6 +94,10 @@ public class AppConfiguration {
    */
   private Duration analysisDeleteAge;
   /**
+   * Upload network drive.
+   */
+  private NetworkDrive<DataWithFiles> upload;
+  /**
    * Upload folder.
    */
   private Path uploadFolder;
@@ -83,12 +109,51 @@ public class AppConfiguration {
    * Server's actual URL, used in emails.
    */
   private String serverUrl;
-  /**
-   * Year formatter.
-   */
-  private DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
   @Autowired
   private AuthorizationService authorizationService;
+  /**
+   * Location of files inside home folder.
+   */
+  private Function<DataWithFiles, Path> subfolder = df -> {
+    Path base = df instanceof Dataset ? datasetFolder : sampleFolder;
+    return base.resolve(year.format(df.getCreationDate())).resolve(df.getName());
+  };
+  /**
+   * Location of upload files.
+   */
+  private Function<DataWithFiles, Path> uploadSubfolder = df -> Paths.get(df.getName());
+  /**
+   * Location of analysis files.
+   */
+  private Function<Collection<? extends DataWithFiles>, Path> analysisSubfolder = collection -> {
+    if (collection.isEmpty()) {
+      throw new IllegalArgumentException("collection cannot be empty");
+    } else if (collection.stream().findAny().get() instanceof Dataset) {
+      return datasetAnalysisSubfolder((Collection<Dataset>) collection);
+    } else {
+      return sampleAnalysisSubfolder((Collection<Sample>) collection);
+    }
+  };
+
+  /**
+   * Initializes instances of NetworkDrive.
+   */
+  @PostConstruct
+  void initNetworkDrives() {
+    home.subfolder = subfolder;
+    analysis = new NetworkDrive<>();
+    copy(home, analysis, analysisFolder.toString());
+    analysis.subfolder = analysisSubfolder;
+    upload = new NetworkDrive<>();
+    copy(home, upload, uploadFolder.toString());
+    upload.subfolder = uploadSubfolder;
+  }
+
+  private void copy(NetworkDrive<?> from, NetworkDrive<?> to, String subfolder) {
+    to.folder = from.folder.resolve(subfolder);
+    to.unixPath = from.unixPath + "/" + subfolder;
+    to.windowsPath = from.windowsPath + "\\" + subfolder;
+  }
 
   public Path getLogFile() {
     return Paths.get(logfile);
@@ -98,63 +163,21 @@ public class AppConfiguration {
     return home.folder.resolve(subfolder);
   }
 
-  public Path folder(Sample sample) {
-    return resolveHome(sampleFolder).resolve(year.format(sample.getCreationDate()))
-        .resolve(sample.getName());
-  }
-
-  public Path folder(Dataset dataset) {
-    return resolveHome(datasetFolder).resolve(year.format(dataset.getCreationDate()))
-        .resolve(dataset.getName());
-  }
-
   /**
-   * Returns label to be shown to user, so he can find the sample's folder on the network.
-   *
-   * @param sample
-   *          sample
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user, so he can find the sample's folder on the network
+   * Returns analysis folder.
+   * 
+   * @return analysis folder
    */
-  public String folderLabel(Sample sample, boolean unix) {
-    Path relative = home.folder.relativize(folder(sample));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
-    }
+  public NetworkDrive<Collection<? extends DataWithFiles>> getAnalysis() {
+    return analysis;
   }
 
-  /**
-   * Returns label to be shown to user, so he can find the dataset's folder on the network.
-   *
-   * @param dataset
-   *          dataset
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user, so he can find the dataset's folder on the network
-   */
-  public String folderLabel(Dataset dataset, boolean unix) {
-    Path relative = home.folder.relativize(folder(dataset));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
-    }
-  }
-
-  public Path analysis() {
-    return resolveHome(analysisFolder);
-  }
-
-  public Path datasetAnalysis(Collection<Dataset> datasets) {
+  private Path datasetAnalysisSubfolder(Collection<Dataset> datasets) {
     if (datasets == null || datasets.isEmpty()) {
       throw new IllegalArgumentException("datasets cannot be null or empty");
     }
     if (datasets.size() == 1) {
-      return resolveHome(analysisFolder)
-          .resolve(datasets.stream().findFirst().map(Dataset::getName).get());
+      return Paths.get(datasets.stream().findFirst().map(Dataset::getName).get());
     } else {
       Optional<User> user = authorizationService.getCurrentUser();
       Dataset dataset = datasets.iterator().next();
@@ -169,17 +192,16 @@ public class AppConfiguration {
       if (builder.length() > 0) {
         builder.deleteCharAt(0);
       }
-      return resolveHome(analysisFolder).resolve(builder.toString());
+      return Paths.get(builder.toString());
     }
   }
 
-  public Path sampleAnalysis(Collection<Sample> samples) {
+  private Path sampleAnalysisSubfolder(Collection<Sample> samples) {
     if (samples == null || samples.isEmpty()) {
       throw new IllegalArgumentException("samples cannot be null or empty");
     }
     if (samples.size() == 1) {
-      return resolveHome(analysisFolder)
-          .resolve(samples.stream().findFirst().map(Sample::getName).get());
+      return Paths.get(samples.stream().findFirst().map(Sample::getName).get());
     } else {
       Optional<User> user = authorizationService.getCurrentUser();
       Sample sample = samples.iterator().next();
@@ -192,92 +214,17 @@ public class AppConfiguration {
       if (builder.length() > 0) {
         builder.deleteCharAt(0);
       }
-      return resolveHome(analysisFolder).resolve(builder.toString());
+      return Paths.get(builder.toString());
     }
   }
 
   /**
-   * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
+   * Returns upload folder.
    *
-   * @param datasets
-   *          datasets
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user, so he can find the dataset's analysis folder on the network
+   * @return upload folder
    */
-  public String datasetAnalysisLabel(Collection<Dataset> datasets, boolean unix) {
-    Path relative = home.folder.relativize(datasetAnalysis(datasets));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
-    }
-  }
-
-  /**
-   * Returns label to be shown to user, so he can find the dataset's analysis folder on the network.
-   *
-   * @param samples
-   *          samples
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user, so he can find the dataset's analysis folder on the network
-   */
-  public String sampleAnalysisLabel(Collection<Sample> samples, boolean unix) {
-    Path relative = home.folder.relativize(sampleAnalysis(samples));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
-    }
-  }
-
-  public Path upload() {
-    return resolveHome(uploadFolder);
-  }
-
-  public Path upload(Sample sample) {
-    return resolveHome(uploadFolder).resolve(sample.getName());
-  }
-
-  public Path upload(Dataset dataset) {
-    return resolveHome(uploadFolder).resolve(dataset.getName());
-  }
-
-  /**
-   * Returns label to be shown to user so he can find the sample's upload folder on the network.
-   *
-   * @param sample
-   *          sample
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user so he can find the sample's upload folder on the network
-   */
-  public String uploadLabel(Sample sample, boolean unix) {
-    Path relative = home.folder.relativize(upload(sample));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
-    }
-  }
-
-  /**
-   * Returns label to be shown to user so he can find the dataset's upload folder on the network.
-   *
-   * @param dataset
-   *          dataset
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
-   * @return label to be shown to user so he can find the dataset's upload folder on the network
-   */
-  public String uploadLabel(Dataset dataset, boolean unix) {
-    Path relative = home.folder.relativize(upload(dataset));
-    if (unix) {
-      return FilenameUtils.separatorsToUnix(home.unixPath + "/" + relative.toString());
-    } else {
-      return FilenameUtils.separatorsToWindows(home.windowsPath + "/" + relative.toString());
-    }
+  public NetworkDrive<DataWithFiles> getUpload() {
+    return upload;
   }
 
   /**
@@ -295,11 +242,11 @@ public class AppConfiguration {
     return serverUrl + urlEnd;
   }
 
-  NetworkDrive getHome() {
+  public NetworkDrive<DataWithFiles> getHome() {
     return home;
   }
 
-  void setHome(NetworkDrive home) {
+  void setHome(NetworkDrive<DataWithFiles> home) {
     this.home = home;
   }
 
@@ -367,32 +314,65 @@ public class AppConfiguration {
     this.analysisDeleteAge = analysisDeleteAge;
   }
 
-  public static class NetworkDrive {
+  /**
+   * Folder that can be on a network drive.
+   */
+  public static class NetworkDrive<DF> {
     private Path folder;
     private String windowsPath;
     private String unixPath;
+    private Function<DF, Path> subfolder;
+
+    /**
+     * Returns data's files folder.
+     * 
+     * @param df
+     *          data with files
+     * @return data's files folder
+     */
+    public Path folder(DF df) {
+      return folder.resolve(subfolder.apply(df));
+    }
+
+    /**
+     * Returns label to be shown to user, so he can find the data's files folder on the network.
+     *
+     * @param df
+     *          data with files
+     * @param unix
+     *          true if path elements should be separated by slashes instead of backslashes
+     * @return label to be shown to user, so he can find the data's files folder on the network
+     */
+    public String label(DF df, boolean unix) {
+      Path subfolder = this.subfolder.apply(df);
+      if (unix) {
+        return FilenameUtils.separatorsToUnix(unixPath + "/" + subfolder.toString());
+      } else {
+        return FilenameUtils.separatorsToWindows(windowsPath + "/" + subfolder.toString());
+      }
+    }
 
     public Path getFolder() {
       return folder;
     }
 
-    public void setFolder(Path folder) {
+    void setFolder(Path folder) {
       this.folder = folder;
     }
 
-    public String getWindowsPath() {
+    String getWindowsPath() {
       return windowsPath;
     }
 
-    public void setWindowsPath(String windowsPath) {
+    void setWindowsPath(String windowsPath) {
       this.windowsPath = windowsPath;
     }
 
-    public String getUnixPath() {
+    String getUnixPath() {
       return unixPath;
     }
 
-    public void setUnixPath(String unixPath) {
+    void setUnixPath(String unixPath) {
       this.unixPath = unixPath;
     }
   }

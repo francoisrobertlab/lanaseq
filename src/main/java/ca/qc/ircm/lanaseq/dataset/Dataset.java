@@ -21,7 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static javax.persistence.GenerationType.IDENTITY;
 
-import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
@@ -50,7 +50,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @GeneratePropertyNames
-public class Dataset implements Data, Owned, Serializable {
+public class Dataset implements DataWithFiles, Owned, Serializable {
   public static final String NAME_ALREADY_EXISTS = property(DatasetProperties.NAME, ALREADY_EXISTS);
   private static final long serialVersionUID = -8296884268335212959L;
   /**

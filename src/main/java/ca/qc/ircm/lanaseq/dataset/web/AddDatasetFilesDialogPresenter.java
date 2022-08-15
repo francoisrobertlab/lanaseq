@@ -104,7 +104,7 @@ public class AddDatasetFilesDialogPresenter {
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (dataset != null) {
         dialog.message
-            .setText(resources.message(MESSAGE, configuration.uploadLabel(dataset, unix)));
+            .setText(resources.message(MESSAGE, configuration.getUpload().label(dataset, unix)));
       }
     });
   }
@@ -147,7 +147,7 @@ public class AddDatasetFilesDialogPresenter {
   }
 
   private Path folder() {
-    return dataset != null ? configuration.upload(dataset) : null;
+    return dataset != null ? configuration.getUpload().folder(dataset) : null;
   }
 
   private boolean validate(Collection<Path> files) {

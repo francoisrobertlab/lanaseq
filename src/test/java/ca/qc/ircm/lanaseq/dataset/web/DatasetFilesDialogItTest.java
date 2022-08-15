@@ -91,7 +91,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void rename() throws Throwable {
     Dataset dataset = repository.findById(2L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
@@ -119,7 +119,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path downloaded = downloadHome.resolve("R1.fastq");
     Files.deleteIfExists(downloaded);
     Dataset dataset = repository.findById(2L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
@@ -145,7 +145,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void delete() throws Throwable {
     Dataset dataset = repository.findById(2L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
@@ -196,7 +196,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetFilesDialog.class);
     assertEquals(resources.message(FILES_SUCCESS, file1.getFileName()), notification.getText());
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),

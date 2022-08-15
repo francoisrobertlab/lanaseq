@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Assay;
@@ -118,7 +119,7 @@ public class AppConfigurationTest {
 
   @Test
   public void getHome() {
-    AppConfiguration.NetworkDrive home = appConfiguration.getHome();
+    AppConfiguration.NetworkDrive<DataWithFiles> home = appConfiguration.getHome();
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq"), home.getFolder());
     assertEquals("\\\\lanaseq01\\lanaseq", home.getWindowsPath());
     assertEquals("smb://lanaseq01/lanaseq", home.getUnixPath());
@@ -143,7 +144,7 @@ public class AppConfigurationTest {
     Sample sample = sample();
     String name = sample.getName();
     assertEquals(resolveHome(appConfiguration.getSampleFolder()).resolve("2019/" + name),
-        appConfiguration.folder(sample));
+        appConfiguration.getHome().folder(sample));
   }
 
   @Test
@@ -159,7 +160,7 @@ public class AppConfigurationTest {
     sample.generateName();
     String name = sample.getName();
     assertEquals(resolveHome(appConfiguration.getSampleFolder()).resolve("2020/" + name),
-        appConfiguration.folder(sample));
+        appConfiguration.getHome().folder(sample));
   }
 
   @Test
@@ -167,7 +168,7 @@ public class AppConfigurationTest {
     Dataset dataset = dataset();
     String name = dataset.getName();
     assertEquals(resolveHome(appConfiguration.getDatasetFolder()).resolve("2019/" + name),
-        appConfiguration.folder(dataset));
+        appConfiguration.getHome().folder(dataset));
   }
 
   @Test
@@ -189,35 +190,35 @@ public class AppConfigurationTest {
     dataset.generateName();
     String name = dataset.getName();
     assertEquals(resolveHome(appConfiguration.getDatasetFolder()).resolve("2020/" + name),
-        appConfiguration.folder(dataset));
+        appConfiguration.getHome().folder(dataset));
   }
 
   @Test
-  public void folderLabel_Sample() {
+  public void label_Sample() {
     Sample sample = sample();
     assertEquals("\\\\lanaseq01\\lanaseq\\sample\\2019\\" + sample.getName(),
-        appConfiguration.folderLabel(sample, false));
+        appConfiguration.getHome().label(sample, false));
   }
 
   @Test
-  public void folderLabel_SampleUnix() {
+  public void label_SampleUnix() {
     Sample sample = sample();
     assertEquals("smb://lanaseq01/lanaseq/sample/2019/" + sample.getName(),
-        appConfiguration.folderLabel(sample, true));
+        appConfiguration.getHome().label(sample, true));
   }
 
   @Test
-  public void folderLabel_Dataset() {
+  public void label_Dataset() {
     Dataset dataset = dataset();
     assertEquals("\\\\lanaseq01\\lanaseq\\dataset\\2019\\" + dataset.getName(),
-        appConfiguration.folderLabel(dataset, false));
+        appConfiguration.getHome().label(dataset, false));
   }
 
   @Test
-  public void folderLabel_DatasetUnix() {
+  public void label_DatasetUnix() {
     Dataset dataset = dataset();
     assertEquals("smb://lanaseq01/lanaseq/dataset/2019/" + dataset.getName(),
-        appConfiguration.folderLabel(dataset, true));
+        appConfiguration.getHome().label(dataset, true));
   }
 
   @Test
@@ -226,148 +227,156 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void analysis() {
-    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()), appConfiguration.analysis());
+  public void analysis_Folder() {
+    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()),
+        appConfiguration.getAnalysis().getFolder());
   }
 
   @Test
-  public void datasetAnalysis_Datasets() {
+  public void analysis_Empty() {
+    Collection<Dataset> datasets = new ArrayList<>();
+    assertThrows(IllegalArgumentException.class,
+        () -> appConfiguration.getAnalysis().folder(datasets));
+  }
+
+  @Test
+  public void analysis_Datasets() {
     Collection<Dataset> datasets = datasets();
-    Path path = appConfiguration.datasetAnalysis(datasets);
+    Path path = appConfiguration.getAnalysis().folder(datasets);
     assertEquals(
         resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_CHIP_SEQ_20191208"), path);
   }
 
   @Test
-  public void datasetAnalysis_DatasetsNoSample() {
+  public void analysis_DatasetsNoSample() {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
-    Path path = appConfiguration.datasetAnalysis(datasets);
+    Path path = appConfiguration.getAnalysis().folder(datasets);
     assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_20191208"), path);
   }
 
   @Test
-  public void datasetAnalysis_OneDataset() {
+  public void analysis_OneDataset() {
     Dataset dataset = dataset();
     assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve(dataset.getName()),
-        appConfiguration.datasetAnalysis(Arrays.asList(dataset)));
+        appConfiguration.getAnalysis().folder(Arrays.asList(dataset)));
   }
 
   @Test
-  public void sampleAnalysis() {
+  public void analysis_Samples() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
-    Path path = appConfiguration.sampleAnalysis(samples);
+    Path path = appConfiguration.getAnalysis().folder(samples);
     assertEquals(
         resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_CHIP_SEQ_20191208"), path);
   }
 
   @Test
-  public void sampleAnalysis_NoAssay() {
+  public void analysis_NoAssay() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     samples.forEach(sa -> sa.setAssay(null));
-    Path path = appConfiguration.sampleAnalysis(samples);
+    Path path = appConfiguration.getAnalysis().folder(samples);
     assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_20191208"), path);
   }
 
   @Test
-  public void sampleAnalysis_One() {
+  public void analysis_OneSample() {
     Sample sample = sample();
     assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve(sample.getName()),
-        appConfiguration.sampleAnalysis(Arrays.asList(sample)));
+        appConfiguration.getAnalysis().folder(Arrays.asList(sample)));
   }
 
   @Test
-  public void datasetAnalysisLabel_Datasets() {
+  public void analysisLabel_Datasets() {
     Collection<Dataset> datasets = datasets();
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
-        appConfiguration.datasetAnalysisLabel(datasets, false));
+        appConfiguration.getAnalysis().label(datasets, false));
   }
 
   @Test
-  public void datasetAnalysisLabel_DatasetsUnix() {
+  public void analysisLabel_DatasetsUnix() {
     Collection<Dataset> datasets = datasets();
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_CHIP_SEQ_20191208",
-        appConfiguration.datasetAnalysisLabel(datasets, true));
+        appConfiguration.getAnalysis().label(datasets, true));
   }
 
   @Test
-  public void datasetAnalysisLabel_DatasetsNoSample() {
+  public void analysisLabel_DatasetsNoSample() {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_20191208",
-        appConfiguration.datasetAnalysisLabel(datasets, false));
+        appConfiguration.getAnalysis().label(datasets, false));
   }
 
   @Test
-  public void datasetAnalysisLabel_DatasetsNoSampleUnix() {
+  public void analysisLabel_DatasetsNoSampleUnix() {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_20191208",
-        appConfiguration.datasetAnalysisLabel(datasets, true));
+        appConfiguration.getAnalysis().label(datasets, true));
   }
 
   @Test
-  public void datasetAnalysisLabel_OneDataset() {
+  public void analysisLabel_OneDataset() {
     Dataset dataset = dataset();
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\" + dataset.getName(),
-        appConfiguration.datasetAnalysisLabel(Arrays.asList(dataset), false));
+        appConfiguration.getAnalysis().label(Arrays.asList(dataset), false));
   }
 
   @Test
-  public void datasetAnalysisLabel_OneDatasetUnix() {
+  public void analysisLabel_OneDatasetUnix() {
     Dataset dataset = dataset();
     assertEquals("smb://lanaseq01/lanaseq/analysis/" + dataset.getName(),
-        appConfiguration.datasetAnalysisLabel(Arrays.asList(dataset), true));
+        appConfiguration.getAnalysis().label(Arrays.asList(dataset), true));
   }
 
   @Test
-  public void sampleAnalysisLabel() {
+  public void analysisLabel_Samples() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
-        appConfiguration.sampleAnalysisLabel(samples, false));
+        appConfiguration.getAnalysis().label(samples, false));
   }
 
   @Test
-  public void sampleAnalysisLabel_Unix() {
+  public void analysisLabel_SamplesUnix() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_CHIP_SEQ_20191208",
-        appConfiguration.sampleAnalysisLabel(samples, true));
+        appConfiguration.getAnalysis().label(samples, true));
   }
 
   @Test
-  public void sampleAnalysisLabel_NoAssay() {
+  public void analysisLabel_SamplesNoAssay() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     samples.forEach(sa -> sa.setAssay(null));
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_20191208",
-        appConfiguration.sampleAnalysisLabel(samples, false));
+        appConfiguration.getAnalysis().label(samples, false));
   }
 
   @Test
-  public void sampleAnalysisLabel_NoAssayUnix() {
+  public void analysisLabel_SamplesNoAssayUnix() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     samples.forEach(sa -> sa.setAssay(null));
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_20191208",
-        appConfiguration.sampleAnalysisLabel(samples, true));
+        appConfiguration.getAnalysis().label(samples, true));
   }
 
   @Test
-  public void sampleAnalysisLabel_OneDataset() {
+  public void analysisLabel_OneSample() {
     Sample sample = sample();
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\" + sample.getName(),
-        appConfiguration.sampleAnalysisLabel(Arrays.asList(sample), false));
+        appConfiguration.getAnalysis().label(Arrays.asList(sample), false));
   }
 
   @Test
-  public void sampleAnalysisLabel_OneDatasetUnix() {
+  public void analysisLabel_OneSampleUnix() {
     Sample sample = sample();
     assertEquals("smb://lanaseq01/lanaseq/analysis/" + sample.getName(),
-        appConfiguration.sampleAnalysisLabel(Arrays.asList(sample), true));
+        appConfiguration.getAnalysis().label(Arrays.asList(sample), true));
   }
 
   @Test
@@ -386,8 +395,9 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void upload() {
-    assertEquals(resolveHome(appConfiguration.getUploadFolder()), appConfiguration.upload());
+  public void upload_Folder() {
+    assertEquals(resolveHome(appConfiguration.getUploadFolder()),
+        appConfiguration.getUpload().getFolder());
   }
 
   @Test
@@ -395,7 +405,7 @@ public class AppConfigurationTest {
     Sample sample = sample();
     String name = sample.getName();
     assertEquals(resolveHome(appConfiguration.getUploadFolder()).resolve(name),
-        appConfiguration.upload(sample));
+        appConfiguration.getUpload().folder(sample));
   }
 
   @Test
@@ -403,35 +413,35 @@ public class AppConfigurationTest {
     Dataset dataset = dataset();
     String name = dataset.getName();
     assertEquals(resolveHome(appConfiguration.getUploadFolder()).resolve(name),
-        appConfiguration.upload(dataset));
+        appConfiguration.getUpload().folder(dataset));
   }
 
   @Test
   public void uploadLabel_Sample() {
     Sample sample = sample();
     assertEquals("\\\\lanaseq01\\lanaseq\\upload\\" + sample.getName(),
-        appConfiguration.uploadLabel(sample, false));
+        appConfiguration.getUpload().label(sample, false));
   }
 
   @Test
   public void uploadLabel_SampleUnix() {
     Sample sample = sample();
     assertEquals("smb://lanaseq01/lanaseq/upload/" + sample.getName(),
-        appConfiguration.uploadLabel(sample, true));
+        appConfiguration.getUpload().label(sample, true));
   }
 
   @Test
   public void uploadLabel_Dataset() {
     Dataset dataset = dataset();
     assertEquals("\\\\lanaseq01\\lanaseq\\upload\\" + dataset.getName(),
-        appConfiguration.uploadLabel(dataset, false));
+        appConfiguration.getUpload().label(dataset, false));
   }
 
   @Test
   public void uploadLabel_DatasetUnix() {
     Dataset dataset = dataset();
     assertEquals("smb://lanaseq01/lanaseq/upload/" + dataset.getName(),
-        appConfiguration.uploadLabel(dataset, true));
+        appConfiguration.getUpload().label(dataset, true));
   }
 
   @Test

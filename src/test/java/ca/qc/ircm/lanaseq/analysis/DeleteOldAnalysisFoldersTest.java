@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.analysis;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -52,7 +53,8 @@ public class DeleteOldAnalysisFoldersTest {
 
   @BeforeEach
   public void beforeTest() {
-    when(configuration.analysis()).thenReturn(temporaryFolder);
+    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getAnalysis().getFolder()).thenReturn(temporaryFolder);
     when(configuration.getAnalysisDeleteAge()).thenReturn(Duration.ofHours(24));
   }
 

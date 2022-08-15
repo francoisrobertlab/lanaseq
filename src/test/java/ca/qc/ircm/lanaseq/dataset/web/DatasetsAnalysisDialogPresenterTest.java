@@ -104,6 +104,7 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @BeforeEach
   public void beforeTest() {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
+    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     datasets.add(datasetRepository.findById(2L).get());
     datasets.add(datasetRepository.findById(7L).get());
     dialog.header = new H3();
@@ -179,12 +180,11 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_Windows() throws Throwable {
     String folder = "smb://test/dataset";
-    when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
-        .thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     verify(service).validateDatasets(eq(datasets), eq(locale), any());
     verify(service).copyDatasetsResources(datasets);
-    verify(configuration).datasetAnalysisLabel(datasets, false);
+    verify(configuration.getAnalysis()).label(datasets, false);
     verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
@@ -195,12 +195,11 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void createFolder_Unix() throws Throwable {
     String folder = "smb://test/dataset";
-    when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
-        .thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     verify(service).validateDatasets(eq(datasets), eq(locale), any());
     verify(service).copyDatasetsResources(datasets);
-    verify(configuration).datasetAnalysisLabel(datasets, true);
+    verify(configuration.getAnalysis()).label(datasets, true);
     verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
@@ -211,12 +210,11 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void createFolder_Mac() throws Throwable {
     String folder = "smb://test/dataset";
-    when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
-        .thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     verify(service).validateDatasets(eq(datasets), eq(locale), any());
     verify(service).copyDatasetsResources(datasets);
-    verify(configuration).datasetAnalysisLabel(datasets, true);
+    verify(configuration.getAnalysis()).label(datasets, true);
     verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
@@ -227,13 +225,12 @@ public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase 
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_MultipleCalls() throws Throwable {
     String folder = "smb://test/dataset";
-    when(configuration.datasetAnalysisLabel(any(Collection.class), anyBoolean()))
-        .thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     presenter.createFolder();
     verify(service, times(2)).validateDatasets(eq(datasets), eq(locale), any());
     verify(service, times(2)).copyDatasetsResources(datasets);
-    verify(configuration, times(2)).datasetAnalysisLabel(datasets, false);
+    verify(configuration.getAnalysis(), times(2)).label(datasets, false);
     verify(dialog.confirm, times(2))
         .setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm, times(2)).open();

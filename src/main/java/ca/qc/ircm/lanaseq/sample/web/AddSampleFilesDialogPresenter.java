@@ -99,7 +99,8 @@ public class AddSampleFilesDialogPresenter {
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (sample != null) {
-        dialog.message.setText(resources.message(MESSAGE, configuration.uploadLabel(sample, unix)));
+        dialog.message
+            .setText(resources.message(MESSAGE, configuration.getUpload().label(sample, unix)));
       }
     });
   }
@@ -142,7 +143,7 @@ public class AddSampleFilesDialogPresenter {
   }
 
   private Path folder() {
-    return sample != null ? configuration.upload(sample) : null;
+    return sample != null ? configuration.getUpload().folder(sample) : null;
   }
 
   private boolean validate(Collection<Path> files) {

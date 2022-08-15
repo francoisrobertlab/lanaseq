@@ -155,8 +155,9 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.files(any()))
         .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
-    when(configuration.folder(any(Sample.class))).thenReturn(folder);
-    when(configuration.folderLabel(any(Sample.class), anyBoolean())).then(i -> {
+    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().folder(any(Sample.class))).thenReturn(folder);
+    when(configuration.getHome().label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
       boolean linux = i.getArgument(1);
       return (linux ? folderLabelLinux : folderLabelWindows) + "/" + sample.getName();
@@ -171,7 +172,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, false)),
+    assertEquals(resources.message(MESSAGE, configuration.getHome().label(sample, false)),
         dialog.message.getText());
   }
 
@@ -180,7 +181,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Linux() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getHome().label(sample, true)),
         dialog.message.getText());
   }
 
@@ -189,7 +190,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Mac() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(sample, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getHome().label(sample, true)),
         dialog.message.getText());
   }
 

@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -126,8 +127,9 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     folder = temporaryFolder.resolve("sample");
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(dialog.overwrite(any())).thenReturn(new Checkbox("test", false));
-    when(configuration.upload(any(Sample.class))).thenReturn(folder);
-    when(configuration.uploadLabel(any(Sample.class), anyBoolean())).then(i -> {
+    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().folder(any(Sample.class))).thenReturn(folder);
+    when(configuration.getUpload().label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
       boolean linux = i.getArgument(1);
       return (linux ? uploadLabelLinux : uploadLabelWindows) + "/" + sample.getName();
@@ -154,7 +156,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   }
 
   private Path uploadFolder(Sample sample) {
-    return configuration.upload(sample);
+    return configuration.getUpload().folder(sample);
   }
 
   @Test
@@ -191,7 +193,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, false)),
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, false)),
         dialog.message.getText());
   }
 
@@ -200,7 +202,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Linux() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
         dialog.message.getText());
   }
 
@@ -209,7 +211,7 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Mac() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample, locale);
-    assertEquals(resources.message(MESSAGE, configuration.uploadLabel(sample, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
         dialog.message.getText());
   }
 

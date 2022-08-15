@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -215,17 +216,24 @@ public class AnalysisServiceTest {
     thirdBam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bam");
     thirdBam2 = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-test.bam");
     thirdRawbam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-raw.bam");
-    when(configuration.datasetAnalysis(any(Collection.class))).then(i -> {
-      Collection<Dataset> datasets = i.getArgument(0);
-      return datasets != null && !datasets.isEmpty() && datasets.iterator().next().getName() != null
-          ? temporaryFolder.resolve(datasets.iterator().next().getName())
-          : null;
-    });
-    when(configuration.sampleAnalysis(any(Collection.class))).then(i -> {
-      Collection<Sample> samples = i.getArgument(0);
-      return samples != null && !samples.isEmpty() && samples.iterator().next().getName() != null
-          ? temporaryFolder.resolve(samples.iterator().next().getName())
-          : null;
+    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getAnalysis().folder(any(Collection.class))).then(i -> {
+      Collection<?> collection = i.getArgument(0);
+      if (collection == null || collection.isEmpty()) {
+        return null;
+      }
+      if (collection.stream().findFirst().get() instanceof Dataset) {
+        Collection<Dataset> datasets = (Collection<Dataset>) collection;
+        return datasets != null && !datasets.isEmpty()
+            && datasets.iterator().next().getName() != null
+                ? temporaryFolder.resolve(datasets.iterator().next().getName())
+                : null;
+      } else {
+        Collection<Sample> samples = (Collection<Sample>) collection;
+        return samples != null && !samples.isEmpty() && samples.iterator().next().getName() != null
+            ? temporaryFolder.resolve(samples.iterator().next().getName())
+            : null;
+      }
     });
   }
 
@@ -751,7 +759,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -812,7 +820,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -870,7 +878,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -927,7 +935,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPairedZip1);
     final byte[] fastq6Content = writeRandom(thirdPairedZip2);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
     assertTrue(Files.exists(fastq1));
@@ -981,7 +989,7 @@ public class AnalysisServiceTest {
     final byte[] fastq3Content = writeRandom(secondUnpaired);
     final byte[] fastq5Content = writeRandom(thirdUnpaired);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1049,7 +1057,7 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(thirdBam2);
     thirdPairedPaths.add(thirdRawbam);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1161,7 +1169,7 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(thirdBam2);
     thirdPairedPaths.add(thirdRawbam);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1269,7 +1277,7 @@ public class AnalysisServiceTest {
     thirdUnpairedPaths.add(thirdBam2);
     thirdUnpairedPaths.add(thirdRawbam);
     Path folder = service.copyDatasetsResources(datasets);
-    assertEquals(configuration.datasetAnalysis(datasets), folder);
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1354,7 +1362,7 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPaired2);
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
-    Path folder = configuration.datasetAnalysis(datasets);
+    Path folder = configuration.getAnalysis().folder(datasets);
     String extraFilename = "test.bam";
     Files.createDirectories(folder);
     Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
@@ -1435,7 +1443,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1490,7 +1498,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1542,7 +1550,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1593,7 +1601,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPairedZip1);
     final byte[] fastq6Content = writeRandom(thirdPairedZip2);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
     assertTrue(Files.exists(fastq1));
@@ -1641,7 +1649,7 @@ public class AnalysisServiceTest {
     final byte[] fastq3Content = writeRandom(secondUnpaired);
     final byte[] fastq5Content = writeRandom(thirdUnpaired);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1703,7 +1711,7 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(thirdBam2);
     thirdPairedPaths.add(thirdRawbam);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1809,7 +1817,7 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(thirdBam2);
     thirdPairedPaths.add(thirdRawbam);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1911,7 +1919,7 @@ public class AnalysisServiceTest {
     thirdUnpairedPaths.add(thirdBam2);
     thirdUnpairedPaths.add(thirdRawbam);
     Path folder = service.copySamplesResources(samples);
-    assertEquals(configuration.sampleAnalysis(samples), folder);
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
@@ -1990,7 +1998,7 @@ public class AnalysisServiceTest {
     final byte[] fastq4Content = writeRandom(secondPaired2);
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
-    Path folder = configuration.sampleAnalysis(samples);
+    Path folder = configuration.getAnalysis().folder(samples);
     String extraFilename = "test.bam";
     Files.createDirectories(folder);
     Files.write(folder.resolve(paired1.getFileName()), fastq2Content);

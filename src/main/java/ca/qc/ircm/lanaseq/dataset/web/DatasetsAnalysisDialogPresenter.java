@@ -96,7 +96,7 @@ public class DatasetsAnalysisDialogPresenter {
           WebBrowser browser = ui.getSession().getBrowser();
           return browser.isMacOSX() || browser.isLinux();
         }).orElse(false);
-        String folder = configuration.datasetAnalysisLabel(datasets, unix);
+        String folder = configuration.getAnalysis().label(datasets, unix);
         dialog.confirm.setText(resources.message(property(CONFIRM, "message"), folder));
         dialog.confirm.open();
       } catch (IOException e) {

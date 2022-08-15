@@ -161,7 +161,7 @@ public class DatasetService {
     if (dataset == null || dataset.getId() == null) {
       return new ArrayList<>();
     }
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     try (Stream<Path> files = Files.list(folder)) {
       return files.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
           .filter(file -> !file.toFile().isHidden())
@@ -183,8 +183,8 @@ public class DatasetService {
     if (dataset == null || dataset.getId() == null) {
       return new ArrayList<>();
     }
-    Path upload = configuration.upload();
-    Path datasetUpload = configuration.upload(dataset);
+    Path upload = configuration.getUpload().getFolder();
+    Path datasetUpload = configuration.getUpload().folder(dataset);
     try {
       List<Path> files = new ArrayList<>();
       if (Files.exists(upload)) {
@@ -269,9 +269,9 @@ public class DatasetService {
     }
     Dataset old = old(dataset).orElse(null);
     final String oldName = old != null ? old.getName() : null;
-    Path oldFolder = old != null ? configuration.folder(old) : null;
+    Path oldFolder = old != null ? configuration.getHome().folder(old) : null;
     repository.save(dataset);
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Renamer.moveFolder(oldFolder, folder);
     Renamer.renameFiles(oldName, dataset.getName(), folder);
   }
@@ -295,7 +295,7 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void saveFiles(Dataset dataset, Collection<Path> files) {
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     try {
       Files.createDirectories(folder);
     } catch (IOException e) {
@@ -325,7 +325,7 @@ public class DatasetService {
       throw new IllegalArgumentException("dataset cannot be deleted");
     }
     repository.delete(dataset);
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     try {
       FileSystemUtils.deleteRecursively(folder);
     } catch (IOException e) {
@@ -346,7 +346,7 @@ public class DatasetService {
     if (filename == null) {
       throw new IllegalArgumentException("file " + file + " is empty");
     }
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Path toDelete = folder.resolve(file);
     Path toDeleteParent = toDelete.getParent();
     if (toDeleteParent == null || !toDeleteParent.equals(folder)) {

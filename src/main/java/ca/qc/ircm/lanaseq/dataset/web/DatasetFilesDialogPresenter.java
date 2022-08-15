@@ -137,7 +137,7 @@ public class DatasetFilesDialogPresenter {
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (dataset != null) {
         dialog.message
-            .setText(resources.message(MESSAGE, configuration.folderLabel(dataset, unix)));
+            .setText(resources.message(MESSAGE, configuration.getHome().label(dataset, unix)));
       }
     });
   }

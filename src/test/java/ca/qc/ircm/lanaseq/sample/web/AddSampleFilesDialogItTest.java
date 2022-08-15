@@ -62,6 +62,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
   }
 
   private void open() {
@@ -71,7 +72,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   private void copyFiles(Sample sample)
       throws IOException, URISyntaxException, NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Path folder = configuration.upload(sample);
+    Path folder = configuration.getUpload().folder(sample);
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
     file2 = folder.resolve("R2.fastq");
@@ -107,9 +108,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Thread.sleep(2500);
     assertEquals(2, dialog.files().getRowCount());
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
-        configuration.upload(sample).resolve("other.fastq"));
+        configuration.getUpload().folder(sample).resolve("other.fastq"));
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        configuration.upload().resolve("prefix_" + sample.getName() + "_R1"));
+        configuration.getUpload().getFolder().resolve("prefix_" + sample.getName() + "_R1"));
     Thread.sleep(2500);
     assertEquals(4, dialog.files().getRowCount());
   }
@@ -126,7 +127,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     copyFiles(sample);
     String filenameInRoot = "prefix_" + sample.getName() + "_R1";
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        configuration.upload().resolve(filenameInRoot));
+        configuration.getUpload().getFolder().resolve(filenameInRoot));
 
     TestTransaction.flagForCommit();
     dialog.save().click();
@@ -135,8 +136,8 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(AddSampleFilesDialog.class);
     assertEquals(resources.message(SAVED, 3, sample.getName()), notification.getText());
-    Path folder = configuration.folder(sample);
-    Path upload = configuration.upload(sample);
+    Path folder = configuration.getHome().folder(sample);
+    Path upload = configuration.getUpload().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertTrue(Files.exists(folder.resolve(file2.getFileName())));
     assertFalse(Files.exists(upload.getParent().resolve(filenameInRoot)));

@@ -134,9 +134,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   public void save_Update() throws Throwable {
     open();
     Dataset dataset = repository.findById(2L).get();
-    Path oldFolder = configuration.folder(dataset);
+    Path oldFolder = configuration.getHome().folder(dataset);
     Files.createDirectories(oldFolder);
-    Path oldSampleFolder = configuration.folder(dataset.getSamples().get(0));
+    Path oldSampleFolder = configuration.getHome().folder(dataset.getSamples().get(0));
     Files.createDirectories(oldSampleFolder);
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().edit(3).click();
@@ -188,8 +188,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", repository.findById(6L).get().getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
-    Path folder = configuration.folder(dataset);
-    Path sampleFolder = configuration.folder(dataset.getSamples().get(0));
+    Path folder = configuration.getHome().folder(dataset);
+    Path sampleFolder = configuration.getHome().folder(dataset.getSamples().get(0));
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
     assertTrue(Files.exists(sampleFolder));
@@ -259,7 +259,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   public void addSample() throws Throwable {
     open();
     Dataset dataset = repository.findById(2L).get();
-    Path oldFolder = configuration.folder(dataset);
+    Path oldFolder = configuration.getHome().folder(dataset);
     Files.createDirectories(oldFolder);
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().edit(3).click();
@@ -327,7 +327,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 12, 10), sample.getDate());
     Thread.sleep(1000); // Allow time to apply changes to files.
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     logger.debug("dataset folder {} exists {}", folder, Files.exists(folder));
     logger.debug("dataset old folder {} exists {}", oldFolder, Files.exists(oldFolder));
     assertTrue(Files.exists(folder));
@@ -389,7 +389,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   public void delete() throws Throwable {
     open();
     Dataset dataset = repository.findById(4L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
     view.datasets().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");

@@ -129,7 +129,8 @@ public class SampleFilesDialogPresenter {
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (sample != null) {
-        dialog.message.setText(resources.message(MESSAGE, configuration.folderLabel(sample, unix)));
+        dialog.message
+            .setText(resources.message(MESSAGE, configuration.getHome().label(sample, unix)));
       }
     });
   }

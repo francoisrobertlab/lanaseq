@@ -90,7 +90,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void rename() throws Throwable {
     Sample sample = repository.findById(10L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
@@ -118,7 +118,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Path downloaded = downloadHome.resolve("R1.fastq");
     Files.deleteIfExists(downloaded);
     Sample sample = repository.findById(10L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
@@ -144,7 +144,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void delete() throws Throwable {
     Sample sample = repository.findById(10L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
@@ -184,7 +184,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(DatasetFilesDialog.class);
     assertEquals(resources.message(FILES_SUCCESS, file1.getFileName()), notification.getText());
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),

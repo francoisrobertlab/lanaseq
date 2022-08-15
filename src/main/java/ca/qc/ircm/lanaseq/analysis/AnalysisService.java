@@ -215,7 +215,7 @@ public class AnalysisService {
           "at least one dataset is missing files required for analysis");
     }
     boolean symlinks = configuration.isAnalysisSymlinks();
-    Path folder = configuration.datasetAnalysis(datasets);
+    Path folder = configuration.getAnalysis().folder(datasets);
     FileSystemUtils.deleteRecursively(folder);
     Files.createDirectories(folder);
     for (DatasetAnalysis analysis : analyses) {
@@ -253,7 +253,7 @@ public class AnalysisService {
           "at least one dataset is missing files required for analysis");
     }
     boolean symlinks = configuration.isAnalysisSymlinks();
-    Path folder = configuration.sampleAnalysis(samples);
+    Path folder = configuration.getAnalysis().folder(samples);
     FileSystemUtils.deleteRecursively(folder);
     Files.createDirectories(folder);
     for (SampleAnalysis analysis : analyses) {

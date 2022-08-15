@@ -154,7 +154,7 @@ public class SampleService {
     if (sample == null || sample.getId() == null) {
       return new ArrayList<>();
     }
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     try (Stream<Path> files = Files.list(folder)) {
       return files.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
           .filter(file -> !file.toFile().isHidden())
@@ -176,8 +176,8 @@ public class SampleService {
     if (sample == null || sample.getId() == null) {
       return new ArrayList<>();
     }
-    Path upload = configuration.upload();
-    Path sampleUpload = configuration.upload(sample);
+    Path upload = configuration.getUpload().getFolder();
+    Path sampleUpload = configuration.getUpload().folder(sample);
     try {
       List<Path> files = new ArrayList<>();
       if (Files.exists(upload)) {
@@ -273,9 +273,9 @@ public class SampleService {
     }
     Sample old = old(sample).orElse(null);
     final String oldName = old != null ? old.getName() : null;
-    final Path oldFolder = old != null ? configuration.folder(old) : null;
+    final Path oldFolder = old != null ? configuration.getHome().folder(old) : null;
     repository.save(sample);
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Renamer.moveFolder(oldFolder, folder);
     Renamer.renameFiles(oldName, sample.getName(), folder);
   }
@@ -299,7 +299,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void saveFiles(Sample sample, Collection<Path> files) {
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     try {
       Files.createDirectories(folder);
     } catch (IOException e) {
@@ -329,7 +329,7 @@ public class SampleService {
       throw new IllegalArgumentException("sample cannot be deleted");
     }
     repository.delete(sample);
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     try {
       FileSystemUtils.deleteRecursively(folder);
     } catch (IOException e) {
@@ -350,7 +350,7 @@ public class SampleService {
     if (filename == null) {
       throw new IllegalArgumentException("file " + file + " is empty");
     }
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Path toDelete = folder.resolve(file);
     Path toDeleteParent = toDelete.getParent();
     if (toDeleteParent == null || !toDeleteParent.equals(folder)) {

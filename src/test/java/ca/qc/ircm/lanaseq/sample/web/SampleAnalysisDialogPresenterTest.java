@@ -104,6 +104,7 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
+    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     samples.add(repository.findById(4L).get());
     samples.add(repository.findById(10L).get());
     dialog.header = new H3();
@@ -180,11 +181,11 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_Windows() throws Throwable {
     String folder = "test/sample";
     String network = "smb://test";
-    when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     verify(service).validateSamples(eq(samples), eq(locale), any());
     verify(service).copySamplesResources(samples);
-    verify(configuration).sampleAnalysisLabel(samples, false);
+    verify(configuration.getAnalysis()).label(samples, false);
     verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
@@ -196,11 +197,11 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_Unix() throws Throwable {
     String folder = "test/sample";
     String network = "smb://test";
-    when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     verify(service).validateSamples(eq(samples), eq(locale), any());
     verify(service).copySamplesResources(samples);
-    verify(configuration).sampleAnalysisLabel(samples, true);
+    verify(configuration.getAnalysis()).label(samples, true);
     verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
@@ -212,11 +213,11 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_Mac() throws Throwable {
     String folder = "test/sample";
     String network = "smb://test";
-    when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     verify(service).validateSamples(eq(samples), eq(locale), any());
     verify(service).copySamplesResources(samples);
-    verify(configuration).sampleAnalysisLabel(samples, true);
+    verify(configuration.getAnalysis()).label(samples, true);
     verify(dialog.confirm).setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm).open();
     verify(dialog.errors, never()).open();
@@ -228,12 +229,12 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   public void createFolder_MultipleCalls() throws Throwable {
     String folder = "test/sample";
     String network = "smb://test";
-    when(configuration.sampleAnalysisLabel(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     presenter.createFolder();
     presenter.createFolder();
     verify(service, times(2)).validateSamples(eq(samples), eq(locale), any());
     verify(service, times(2)).copySamplesResources(samples);
-    verify(configuration, times(2)).sampleAnalysisLabel(samples, false);
+    verify(configuration.getAnalysis(), times(2)).label(samples, false);
     verify(dialog.confirm, times(2))
         .setText(resources.message(property(CONFIRM, "message"), folder));
     verify(dialog.confirm, times(2)).open();

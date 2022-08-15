@@ -62,6 +62,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
   }
 
   private void open() {
@@ -71,7 +72,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   private void copyFiles(Dataset dataset)
       throws IOException, URISyntaxException, NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Path folder = configuration.upload(dataset);
+    Path folder = configuration.getUpload().folder(dataset);
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
     file2 = folder.resolve("R2.fastq");
@@ -107,9 +108,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Thread.sleep(2500);
     assertEquals(2, dialog.files().getRowCount());
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
-        configuration.upload(dataset).resolve("other.fastq"));
+        configuration.getUpload().folder(dataset).resolve("other.fastq"));
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        configuration.upload().resolve("prefix_" + dataset.getName() + "_R1"));
+        configuration.getUpload().getFolder().resolve("prefix_" + dataset.getName() + "_R1"));
     Thread.sleep(2500);
     assertEquals(4, dialog.files().getRowCount());
   }
@@ -126,7 +127,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     copyFiles(dataset);
     String filenameInRoot = "prefix_" + dataset.getName() + "_R1";
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
-        configuration.upload().resolve(filenameInRoot));
+        configuration.getUpload().getFolder().resolve(filenameInRoot));
 
     TestTransaction.flagForCommit();
     dialog.save().click();
@@ -135,8 +136,8 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     AppResources resources = this.resources(AddDatasetFilesDialog.class);
     assertEquals(resources.message(SAVED, 3, dataset.getName()), notification.getText());
-    Path folder = configuration.folder(dataset);
-    Path upload = configuration.upload(dataset);
+    Path folder = configuration.getHome().folder(dataset);
+    Path upload = configuration.getUpload().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertTrue(Files.exists(folder.resolve(file2.getFileName())));
     assertFalse(Files.exists(upload.getParent().resolve(filenameInRoot)));

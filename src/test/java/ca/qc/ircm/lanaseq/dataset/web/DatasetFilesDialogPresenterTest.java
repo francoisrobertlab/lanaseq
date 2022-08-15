@@ -169,8 +169,9 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(service.files(any()))
         .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
-    when(configuration.folder(any(Dataset.class))).thenReturn(folder);
-    when(configuration.folderLabel(any(Dataset.class), anyBoolean())).then(i -> {
+    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().folder(any(Dataset.class))).thenReturn(folder);
+    when(configuration.getHome().label(any(Dataset.class), anyBoolean())).then(i -> {
       Dataset dataset = i.getArgument(0);
       boolean linux = i.getArgument(1);
       return (linux ? folderLabelLinux : folderLabelWindows) + "/" + dataset.getName();
@@ -185,7 +186,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, false)),
+    assertEquals(resources.message(MESSAGE, configuration.getHome().label(dataset, false)),
         dialog.message.getText());
   }
 
@@ -194,7 +195,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Linux() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getHome().label(dataset, true)),
         dialog.message.getText());
   }
 
@@ -203,7 +204,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Mac() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.folderLabel(dataset, true)),
+    assertEquals(resources.message(MESSAGE, configuration.getHome().label(dataset, true)),
         dialog.message.getText());
   }
 

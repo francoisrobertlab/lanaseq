@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
@@ -51,7 +52,8 @@ public class DeleteOldUploadFoldersTest {
 
   @BeforeEach
   public void beforeTest() {
-    when(configuration.upload()).thenReturn(temporaryFolder);
+    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().getFolder()).thenReturn(temporaryFolder);
     when(configuration.getUploadDeleteAge()).thenReturn(Duration.ofHours(24));
   }
 

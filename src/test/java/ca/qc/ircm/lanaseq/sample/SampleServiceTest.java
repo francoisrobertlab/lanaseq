@@ -115,20 +115,22 @@ public class SampleServiceTest {
   @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    when(configuration.folder(any(Sample.class))).then(i -> {
+    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
           : null;
     });
-    when(configuration.upload(any(Sample.class))).then(i -> {
+    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
           : null;
     });
-    when(configuration.upload()).then(i -> {
+    when(configuration.getUpload().getFolder()).then(i -> {
       return temporaryFolder.resolve("upload");
     });
-    when(configuration.folder(any(Dataset.class))).then(i -> {
+    when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
           ? temporaryFolder.resolve(dataset.getName())
@@ -380,7 +382,7 @@ public class SampleServiceTest {
   @Test
   public void files() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -398,7 +400,7 @@ public class SampleServiceTest {
 
     List<Path> files = service.files(sample);
 
-    verify(configuration, times(2)).folder(sample);
+    verify(configuration.getHome(), times(2)).folder(sample);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
     assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
@@ -411,7 +413,7 @@ public class SampleServiceTest {
 
     List<Path> files = service.files(sample);
 
-    verify(configuration).folder(sample);
+    verify(configuration.getHome()).folder(sample);
     assertTrue(files.isEmpty());
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }
@@ -433,7 +435,7 @@ public class SampleServiceTest {
   @Test
   public void uploadFiles() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
-    Path upload = configuration.upload();
+    Path upload = configuration.getUpload().getFolder();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(sample.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -448,7 +450,7 @@ public class SampleServiceTest {
     }
     uploadFile = upload.resolve(sample.getName());
     Files.createDirectory(uploadFile);
-    Path folder = configuration.upload(sample);
+    Path folder = configuration.getUpload().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -466,8 +468,8 @@ public class SampleServiceTest {
 
     List<Path> files = service.uploadFiles(sample);
 
-    verify(configuration, times(2)).upload();
-    verify(configuration, times(2)).upload(sample);
+    verify(configuration.getUpload(), times(2)).getFolder();
+    verify(configuration.getUpload(), times(2)).folder(sample);
     assertEquals(3, files.size());
     assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
     assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
@@ -478,7 +480,7 @@ public class SampleServiceTest {
   @Test
   public void uploadFiles_SampleFolderNotExists() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
-    Path upload = configuration.upload();
+    Path upload = configuration.getUpload().getFolder();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(sample.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -496,8 +498,8 @@ public class SampleServiceTest {
 
     List<Path> files = service.uploadFiles(sample);
 
-    verify(configuration, times(2)).upload();
-    verify(configuration).upload(sample);
+    verify(configuration.getUpload(), times(2)).getFolder();
+    verify(configuration.getUpload()).folder(sample);
     assertEquals(1, files.size());
     assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
@@ -506,7 +508,7 @@ public class SampleServiceTest {
   @Test
   public void uploadFiles_UploadFolderNotExists() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
-    Path folder = configuration.upload(sample);
+    Path folder = configuration.getUpload().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -524,8 +526,8 @@ public class SampleServiceTest {
 
     List<Path> files = service.uploadFiles(sample);
 
-    verify(configuration).upload();
-    verify(configuration, times(2)).upload(sample);
+    verify(configuration.getUpload()).getFolder();
+    verify(configuration.getUpload(), times(2)).folder(sample);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
     assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
@@ -1017,7 +1019,7 @@ public class SampleServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
-    Path beforeFolder = configuration.folder(sample);
+    Path beforeFolder = configuration.getHome().folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -1031,7 +1033,7 @@ public class SampleServiceTest {
     sample = repository.findById(1L).orElse(null);
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
@@ -1045,7 +1047,7 @@ public class SampleServiceTest {
 
   @Test
   public void save_UpdateMoveFilesParentNotExists() throws Throwable {
-    when(configuration.folder(any(Sample.class))).then(i -> {
+    when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null ? temporaryFolder
           .resolve(String.valueOf(sample.getDate().getYear())).resolve(sample.getName()) : null;
@@ -1054,7 +1056,7 @@ public class SampleServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
-    Path beforeFolder = configuration.folder(sample);
+    Path beforeFolder = configuration.getHome().folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -1070,7 +1072,7 @@ public class SampleServiceTest {
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
     assertEquals(LocalDate.of(2020, 01, 12), sample.getDate());
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
@@ -1090,7 +1092,7 @@ public class SampleServiceTest {
     detach(sample);
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    Path beforeFolder = configuration.folder(sample);
+    Path beforeFolder = configuration.getHome().folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -1116,7 +1118,7 @@ public class SampleServiceTest {
     sample = repository.findById(1L).orElse(null);
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder
         .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertArrayEquals(
@@ -1163,8 +1165,8 @@ public class SampleServiceTest {
 
     service.saveFiles(sample, files);
 
-    verify(configuration).folder(sample);
-    Path folder = configuration.folder(sample);
+    verify(configuration.getHome()).folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
@@ -1179,7 +1181,7 @@ public class SampleServiceTest {
   @Test
   public void delete() throws Throwable {
     Sample sample = repository.findById(9L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Path file = folder.resolve("R1.fastq");
     Files.createDirectories(folder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -1213,7 +1215,7 @@ public class SampleServiceTest {
   @Test
   public void deleteFile_FullPath() throws Throwable {
     Sample sample = repository.findById(9L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("test.txt");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -1223,7 +1225,7 @@ public class SampleServiceTest {
 
     service.deleteFile(sample, file);
 
-    verify(configuration, times(2)).folder(sample);
+    verify(configuration.getHome(), times(2)).folder(sample);
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(".deleted");
     List<String> deletedLines = Files.readAllLines(deleted);
@@ -1240,7 +1242,7 @@ public class SampleServiceTest {
   @Test
   public void deleteFile_RelativePath() throws Throwable {
     Sample sample = repository.findById(9L).get();
-    Path folder = configuration.folder(sample);
+    Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
@@ -1250,7 +1252,7 @@ public class SampleServiceTest {
 
     service.deleteFile(sample, file);
 
-    verify(configuration, times(2)).folder(sample);
+    verify(configuration.getHome(), times(2)).folder(sample);
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(".deleted");
     List<String> deletedLines = Files.readAllLines(deleted);
@@ -1282,7 +1284,7 @@ public class SampleServiceTest {
   public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
     assertThrows(IllegalArgumentException.class, () -> {
       Sample sample = repository.findById(9L).get();
-      Path folder = configuration.folder(sample);
+      Path folder = configuration.getHome().folder(sample);
       Files.createDirectories(folder);
       Path file = Paths.get("../test.txt");
       Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,

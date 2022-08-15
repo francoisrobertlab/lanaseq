@@ -116,19 +116,21 @@ public class DatasetServiceTest {
   @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    when(configuration.folder(any(Dataset.class))).then(i -> {
+    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
           ? temporaryFolder.resolve(dataset.getName())
           : null;
     });
-    when(configuration.upload(any(Dataset.class))).then(i -> {
+    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
           ? temporaryFolder.resolve(dataset.getName())
           : null;
     });
-    when(configuration.upload()).then(i -> {
+    when(configuration.getUpload().getFolder()).then(i -> {
       return temporaryFolder.resolve("upload");
     });
   }
@@ -365,7 +367,7 @@ public class DatasetServiceTest {
   @Test
   public void files() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("dataset_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -383,7 +385,7 @@ public class DatasetServiceTest {
 
     List<Path> files = service.files(dataset);
 
-    verify(configuration, times(2)).folder(dataset);
+    verify(configuration.getHome(), times(2)).folder(dataset);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
     assertTrue(files.contains(folder.resolve("dataset_R2.fastq")));
@@ -396,7 +398,7 @@ public class DatasetServiceTest {
 
     List<Path> files = service.files(dataset);
 
-    verify(configuration).folder(dataset);
+    verify(configuration.getHome()).folder(dataset);
     assertTrue(files.isEmpty());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
@@ -418,7 +420,7 @@ public class DatasetServiceTest {
   @Test
   public void uploadFiles() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
-    Path upload = configuration.upload();
+    Path upload = configuration.getUpload().getFolder();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(dataset.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -433,7 +435,7 @@ public class DatasetServiceTest {
     }
     uploadFile = upload.resolve(dataset.getName());
     Files.createDirectory(uploadFile);
-    Path folder = configuration.upload(dataset);
+    Path folder = configuration.getUpload().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("dataset_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -451,8 +453,8 @@ public class DatasetServiceTest {
 
     List<Path> files = service.uploadFiles(dataset);
 
-    verify(configuration, times(2)).upload();
-    verify(configuration, times(2)).upload(dataset);
+    verify(configuration.getUpload(), times(2)).getFolder();
+    verify(configuration.getUpload(), times(2)).folder(dataset);
     assertEquals(3, files.size());
     assertTrue(files.contains(upload.resolve(dataset.getName() + ".fastq")));
     assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
@@ -463,7 +465,7 @@ public class DatasetServiceTest {
   @Test
   public void uploadFiles_DatasetFolderNotExists() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
-    Path upload = configuration.upload();
+    Path upload = configuration.getUpload().getFolder();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(dataset.getName() + ".fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
@@ -481,8 +483,8 @@ public class DatasetServiceTest {
 
     List<Path> files = service.uploadFiles(dataset);
 
-    verify(configuration, times(2)).upload();
-    verify(configuration).upload(dataset);
+    verify(configuration.getUpload(), times(2)).getFolder();
+    verify(configuration.getUpload()).folder(dataset);
     assertEquals(1, files.size());
     assertTrue(files.contains(upload.resolve(dataset.getName() + ".fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
@@ -491,7 +493,7 @@ public class DatasetServiceTest {
   @Test
   public void uploadFiles_UploadFolderNotExists() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
-    Path folder = configuration.upload(dataset);
+    Path folder = configuration.getUpload().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("dataset_R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -509,8 +511,8 @@ public class DatasetServiceTest {
 
     List<Path> files = service.uploadFiles(dataset);
 
-    verify(configuration).upload();
-    verify(configuration, times(2)).upload(dataset);
+    verify(configuration.getUpload()).getFolder();
+    verify(configuration.getUpload(), times(2)).folder(dataset);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("dataset_R1.fastq")));
     assertTrue(files.contains(folder.resolve("dataset_R2.fastq")));
@@ -738,7 +740,7 @@ public class DatasetServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
-    Path beforeFolder = configuration.folder(dataset);
+    Path beforeFolder = configuration.getHome().folder(dataset);
     dataset.setName("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -764,7 +766,7 @@ public class DatasetServiceTest {
     assertTrue(find(dataset.getSamples(), 1L).isPresent());
     assertTrue(find(dataset.getSamples(), 2L).isPresent());
     assertTrue(find(dataset.getSamples(), 3L).isPresent());
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(
@@ -779,7 +781,7 @@ public class DatasetServiceTest {
 
   @Test
   public void save_UpdateMoveFilesParentNotExists() throws Throwable {
-    when(configuration.folder(any(Dataset.class))).then(i -> {
+    when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null ? temporaryFolder
           .resolve(String.valueOf(dataset.getDate().getYear())).resolve(dataset.getName()) : null;
@@ -788,7 +790,7 @@ public class DatasetServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
-    Path beforeFolder = configuration.folder(dataset);
+    Path beforeFolder = configuration.getHome().folder(dataset);
     dataset.setName("MNaseseq_IP_polr2a_yFR100_WT_Rappa_sample1-FR2-FR3_20200112");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -802,7 +804,7 @@ public class DatasetServiceTest {
     repository.flush();
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
     dataset = repository.findById(1L).orElse(null);
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
@@ -820,7 +822,7 @@ public class DatasetServiceTest {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
-    Path beforeFolder = configuration.folder(dataset);
+    Path beforeFolder = configuration.getHome().folder(dataset);
     dataset.setName("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -849,7 +851,7 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder
         .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
     assertArrayEquals(
@@ -934,8 +936,8 @@ public class DatasetServiceTest {
 
     service.saveFiles(dataset, files);
 
-    verify(configuration).folder(dataset);
-    Path folder = configuration.folder(dataset);
+    verify(configuration.getHome()).folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
     assertArrayEquals(
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
@@ -950,7 +952,7 @@ public class DatasetServiceTest {
   @Test
   public void delete() throws Throwable {
     Dataset dataset = repository.findById(1L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Path file = folder.resolve("R1.fastq");
     Files.createDirectories(folder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -975,7 +977,7 @@ public class DatasetServiceTest {
   @Test
   public void deleteFile_FullPath() throws Throwable {
     Dataset dataset = repository.findById(4L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("test.txt");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
@@ -985,7 +987,7 @@ public class DatasetServiceTest {
 
     service.deleteFile(dataset, file);
 
-    verify(configuration, times(2)).folder(dataset);
+    verify(configuration.getHome(), times(2)).folder(dataset);
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(".deleted");
     List<String> deletedLines = Files.readAllLines(deleted);
@@ -1002,7 +1004,7 @@ public class DatasetServiceTest {
   @Test
   public void deleteFile_RelativePath() throws Throwable {
     Dataset dataset = repository.findById(4L).get();
-    Path folder = configuration.folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
@@ -1012,7 +1014,7 @@ public class DatasetServiceTest {
 
     service.deleteFile(dataset, file);
 
-    verify(configuration, times(2)).folder(dataset);
+    verify(configuration.getHome(), times(2)).folder(dataset);
     assertFalse(Files.exists(file));
     Path deleted = folder.resolve(".deleted");
     List<String> deletedLines = Files.readAllLines(deleted);
@@ -1044,7 +1046,7 @@ public class DatasetServiceTest {
   public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
     assertThrows(IllegalArgumentException.class, () -> {
       Dataset dataset = repository.findById(4L).get();
-      Path folder = configuration.folder(dataset);
+      Path folder = configuration.getHome().folder(dataset);
       Files.createDirectories(folder);
       Path file = Paths.get("../test.txt");
       Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
