@@ -116,7 +116,7 @@ public class AppConfiguration {
    */
   private Function<DataWithFiles, Path> subfolder = df -> {
     Path base = df instanceof Dataset ? datasetFolder : sampleFolder;
-    return base.resolve(year.format(df.getCreationDate())).resolve(df.getName());
+    return base.resolve(year.format(df.getDate())).resolve(df.getName());
   };
   /**
    * Location of upload files.

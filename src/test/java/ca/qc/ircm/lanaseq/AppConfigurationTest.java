@@ -57,7 +57,7 @@ public class AppConfigurationTest {
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
-    sample.setCreationDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    sample.setCreationDate(LocalDateTime.of(2018, 12, 8, 10, 20, 30));
     sample.setDate(LocalDate.of(2019, 12, 8));
     sample.generateName();
     return sample;
@@ -66,7 +66,7 @@ public class AppConfigurationTest {
   private Dataset dataset() {
     Dataset dataset = new Dataset();
     dataset.setSamples(new ArrayList<>());
-    dataset.setCreationDate(LocalDateTime.of(2019, 12, 8, 10, 20, 30));
+    dataset.setCreationDate(LocalDateTime.of(2018, 12, 8, 10, 20, 30));
     dataset.setDate(LocalDate.of(2019, 12, 8));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
@@ -92,7 +92,7 @@ public class AppConfigurationTest {
     Dataset dataset = new Dataset();
     datasets.add(dataset);
     dataset.setSamples(new ArrayList<>());
-    dataset.setCreationDate(LocalDateTime.of(2020, 1, 10, 11, 15, 20));
+    dataset.setCreationDate(LocalDateTime.of(2019, 1, 10, 11, 15, 20));
     dataset.setDate(LocalDate.of(2020, 1, 4));
     Sample sample = new Sample();
     sample.setSampleId("s1");
@@ -156,7 +156,7 @@ public class AppConfigurationTest {
     sample.setType(SampleType.INPUT);
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
-    sample.setCreationDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
+    sample.setDate(LocalDate.of(2020, 4, 10));
     sample.generateName();
     String name = sample.getName();
     assertEquals(resolveHome(appConfiguration.getSampleFolder()).resolve("2020/" + name),
@@ -175,7 +175,7 @@ public class AppConfigurationTest {
   public void folder_Dataset2020() {
     Dataset dataset = new Dataset();
     dataset.setSamples(new ArrayList<>());
-    dataset.setCreationDate(LocalDateTime.of(2020, 4, 10, 7, 12, 43));
+    dataset.setDate(LocalDate.of(2020, 4, 10));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
