@@ -43,10 +43,16 @@ app:
     unixPath: 'smb://lanaseq01/lanaseq'
   sample-folder: sample
   dataset-folder: dataset
-  analysis-folder: analysis
+  analysis:
+    folder: ${app.home.folder}/analysis
+    windowsPath: '${app.home.windowsPath}\analysis'
+    unixPath: '${app.home.unixPath}/analysis'
   analysis-delete-age: PT48H
   analysis-symlinks: true
-  upload-folder: upload
+  upload:
+    folder: ${app.home.folder}/upload
+    windowsPath: '${app.home.windowsPath}\upload'
+    unixPath: '${app.home.unixPath}/upload'
   upload-delete-age: PT6H
   serverUrl: http://localhost:8080
 

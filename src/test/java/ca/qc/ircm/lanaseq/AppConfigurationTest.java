@@ -125,8 +125,16 @@ public class AppConfigurationTest {
     assertEquals("smb://lanaseq01/lanaseq", home.getUnixPath());
   }
 
-  private Path resolveHome(Path subfolder) {
-    return appConfiguration.getHome().getFolder().resolve(subfolder);
+  private Path homeFolder() {
+    return appConfiguration.getHome().getFolder();
+  }
+
+  private Path analysisFolder() {
+    return appConfiguration.getHome().getFolder().resolve("analysis");
+  }
+
+  private Path uploadFolder() {
+    return appConfiguration.getHome().getFolder().resolve("upload");
   }
 
   @Test
@@ -143,7 +151,7 @@ public class AppConfigurationTest {
   public void folder_Sample2019() {
     Sample sample = sample();
     String name = sample.getName();
-    assertEquals(resolveHome(appConfiguration.getSampleFolder()).resolve("2019/" + name),
+    assertEquals(homeFolder().resolve(appConfiguration.getSampleFolder()).resolve("2019/" + name),
         appConfiguration.getHome().folder(sample));
   }
 
@@ -159,7 +167,7 @@ public class AppConfigurationTest {
     sample.setDate(LocalDate.of(2020, 4, 10));
     sample.generateName();
     String name = sample.getName();
-    assertEquals(resolveHome(appConfiguration.getSampleFolder()).resolve("2020/" + name),
+    assertEquals(homeFolder().resolve(appConfiguration.getSampleFolder()).resolve("2020/" + name),
         appConfiguration.getHome().folder(sample));
   }
 
@@ -167,7 +175,7 @@ public class AppConfigurationTest {
   public void folder_Dataset2019() {
     Dataset dataset = dataset();
     String name = dataset.getName();
-    assertEquals(resolveHome(appConfiguration.getDatasetFolder()).resolve("2019/" + name),
+    assertEquals(homeFolder().resolve(appConfiguration.getDatasetFolder()).resolve("2019/" + name),
         appConfiguration.getHome().folder(dataset));
   }
 
@@ -189,7 +197,7 @@ public class AppConfigurationTest {
     dataset.getSamples().add(sample);
     dataset.generateName();
     String name = dataset.getName();
-    assertEquals(resolveHome(appConfiguration.getDatasetFolder()).resolve("2020/" + name),
+    assertEquals(homeFolder().resolve(appConfiguration.getDatasetFolder()).resolve("2020/" + name),
         appConfiguration.getHome().folder(dataset));
   }
 
@@ -222,14 +230,8 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void getAnalysisFolder() {
-    assertEquals(Paths.get("analysis"), appConfiguration.getAnalysisFolder());
-  }
-
-  @Test
   public void analysis_Folder() {
-    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()),
-        appConfiguration.getAnalysis().getFolder());
+    assertEquals(homeFolder().resolve("analysis"), appConfiguration.getAnalysis().getFolder());
   }
 
   @Test
@@ -243,8 +245,7 @@ public class AppConfigurationTest {
   public void analysis_Datasets() {
     Collection<Dataset> datasets = datasets();
     Path path = appConfiguration.getAnalysis().folder(datasets);
-    assertEquals(
-        resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_CHIP_SEQ_20191208"), path);
+    assertEquals(analysisFolder().resolve("jonh_CHIP_SEQ_20191208"), path);
   }
 
   @Test
@@ -252,13 +253,13 @@ public class AppConfigurationTest {
     Collection<Dataset> datasets = datasets();
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     Path path = appConfiguration.getAnalysis().folder(datasets);
-    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_20191208"), path);
+    assertEquals(analysisFolder().resolve("jonh_20191208"), path);
   }
 
   @Test
   public void analysis_OneDataset() {
     Dataset dataset = dataset();
-    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve(dataset.getName()),
+    assertEquals(analysisFolder().resolve(dataset.getName()),
         appConfiguration.getAnalysis().folder(Arrays.asList(dataset)));
   }
 
@@ -267,8 +268,7 @@ public class AppConfigurationTest {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     Path path = appConfiguration.getAnalysis().folder(samples);
-    assertEquals(
-        resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_CHIP_SEQ_20191208"), path);
+    assertEquals(analysisFolder().resolve("jonh_CHIP_SEQ_20191208"), path);
   }
 
   @Test
@@ -277,13 +277,13 @@ public class AppConfigurationTest {
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     samples.forEach(sa -> sa.setAssay(null));
     Path path = appConfiguration.getAnalysis().folder(samples);
-    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve("jonh_20191208"), path);
+    assertEquals(analysisFolder().resolve("jonh_20191208"), path);
   }
 
   @Test
   public void analysis_OneSample() {
     Sample sample = sample();
-    assertEquals(resolveHome(appConfiguration.getAnalysisFolder()).resolve(sample.getName()),
+    assertEquals(analysisFolder().resolve(sample.getName()),
         appConfiguration.getAnalysis().folder(Arrays.asList(sample)));
   }
 
@@ -390,30 +390,22 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void getUploadFolder() {
-    assertEquals(Paths.get("upload"), appConfiguration.getUploadFolder());
-  }
-
-  @Test
   public void upload_Folder() {
-    assertEquals(resolveHome(appConfiguration.getUploadFolder()),
-        appConfiguration.getUpload().getFolder());
+    assertEquals(homeFolder().resolve("upload"), appConfiguration.getUpload().getFolder());
   }
 
   @Test
   public void upload_Sample() {
     Sample sample = sample();
     String name = sample.getName();
-    assertEquals(resolveHome(appConfiguration.getUploadFolder()).resolve(name),
-        appConfiguration.getUpload().folder(sample));
+    assertEquals(uploadFolder().resolve(name), appConfiguration.getUpload().folder(sample));
   }
 
   @Test
   public void upload_Dataset2019() {
     Dataset dataset = dataset();
     String name = dataset.getName();
-    assertEquals(resolveHome(appConfiguration.getUploadFolder()).resolve(name),
-        appConfiguration.getUpload().folder(dataset));
+    assertEquals(uploadFolder().resolve(name), appConfiguration.getUpload().folder(dataset));
   }
 
   @Test

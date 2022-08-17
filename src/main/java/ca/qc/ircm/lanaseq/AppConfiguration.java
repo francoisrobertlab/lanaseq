@@ -82,10 +82,6 @@ public class AppConfiguration {
    */
   private NetworkDrive<Collection<? extends DataWithFiles>> analysis;
   /**
-   * Analysis folder.
-   */
-  private Path analysisFolder;
-  /**
    * Use symbolic links for analysis instead of copying files.
    */
   private boolean analysisSymlinks;
@@ -97,10 +93,6 @@ public class AppConfiguration {
    * Upload network drive.
    */
   private NetworkDrive<DataWithFiles> upload;
-  /**
-   * Upload folder.
-   */
-  private Path uploadFolder;
   /**
    * Time that must elapse before an upload folder get deleted.
    */
@@ -141,18 +133,8 @@ public class AppConfiguration {
   @PostConstruct
   void initNetworkDrives() {
     home.subfolder = subfolder;
-    analysis = new NetworkDrive<>();
-    copy(home, analysis, analysisFolder.toString());
     analysis.subfolder = analysisSubfolder;
-    upload = new NetworkDrive<>();
-    copy(home, upload, uploadFolder.toString());
     upload.subfolder = uploadSubfolder;
-  }
-
-  private void copy(NetworkDrive<?> from, NetworkDrive<?> to, String subfolder) {
-    to.folder = from.folder.resolve(subfolder);
-    to.unixPath = from.unixPath + "/" + subfolder;
-    to.windowsPath = from.windowsPath + "\\" + subfolder;
   }
 
   public Path getLogFile() {
@@ -161,15 +143,6 @@ public class AppConfiguration {
 
   private Path resolveHome(Path subfolder) {
     return home.folder.resolve(subfolder);
-  }
-
-  /**
-   * Returns analysis folder.
-   * 
-   * @return analysis folder
-   */
-  public NetworkDrive<Collection<? extends DataWithFiles>> getAnalysis() {
-    return analysis;
   }
 
   private Path datasetAnalysisSubfolder(Collection<Dataset> datasets) {
@@ -219,15 +192,6 @@ public class AppConfiguration {
   }
 
   /**
-   * Returns upload folder.
-   *
-   * @return upload folder
-   */
-  public NetworkDrive<DataWithFiles> getUpload() {
-    return upload;
-  }
-
-  /**
    * Returns urlEnd with prefix that allows to access application from anywhere.
    * <p>
    * For example, to obtain the full URL <code>http://myserver.com/proview/myurl?param1=abc</code> ,
@@ -266,12 +230,12 @@ public class AppConfiguration {
     this.datasetFolder = datasetFolder;
   }
 
-  Path getUploadFolder() {
-    return uploadFolder;
+  public NetworkDrive<DataWithFiles> getUpload() {
+    return upload;
   }
 
-  void setUploadFolder(Path uploadFolder) {
-    this.uploadFolder = uploadFolder;
+  public void setUpload(NetworkDrive<DataWithFiles> upload) {
+    this.upload = upload;
   }
 
   public String getServerUrl() {
@@ -290,12 +254,12 @@ public class AppConfiguration {
     this.uploadDeleteAge = uploadDeleteAge;
   }
 
-  Path getAnalysisFolder() {
-    return analysisFolder;
+  public NetworkDrive<Collection<? extends DataWithFiles>> getAnalysis() {
+    return analysis;
   }
 
-  void setAnalysisFolder(Path analysisFolder) {
-    this.analysisFolder = analysisFolder;
+  public void setAnalysis(NetworkDrive<Collection<? extends DataWithFiles>> analysis) {
+    this.analysis = analysis;
   }
 
   public boolean isAnalysisSymlinks() {
