@@ -48,7 +48,7 @@ app:
     windowsPath: '${app.home.windowsPath}\analysis'
     unixPath: '${app.home.unixPath}/analysis'
   analysis-delete-age: PT48H
-  analysis-symlinks: true
+  analysis-symlinks: false
   upload:
     folder: ${app.home.folder}/upload
     windowsPath: '${app.home.windowsPath}\upload'
