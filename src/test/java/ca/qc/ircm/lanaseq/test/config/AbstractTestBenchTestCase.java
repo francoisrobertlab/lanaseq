@@ -217,23 +217,23 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     setFolder.invoke((AppConfiguration.NetworkDrive) getHome.invoke(configuration), home);
   }
 
-  protected void setAnalysis(Path home) throws NoSuchMethodException, SecurityException,
+  protected void setAnalysis(Path analysis) throws NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Method getAnalysis = AppConfiguration.class.getDeclaredMethod("getAnalysis");
     getAnalysis.setAccessible(true);
     Method setFolder =
         AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    setFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration), home);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration), analysis);
   }
 
-  protected void setUpload(Path home) throws NoSuchMethodException, SecurityException,
+  protected void setUpload(Path upload) throws NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
     getUpload.setAccessible(true);
     Method setFolder =
         AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    setFolder.invoke((AppConfiguration.NetworkDrive) getUpload.invoke(configuration), home);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getUpload.invoke(configuration), upload);
   }
 }
