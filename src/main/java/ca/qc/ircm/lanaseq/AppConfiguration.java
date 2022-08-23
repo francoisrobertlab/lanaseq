@@ -25,7 +25,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -69,6 +71,10 @@ public class AppConfiguration {
    * Application home folder.
    */
   private NetworkDrive<DataWithFiles> home;
+  /**
+   * Archive folders, if any.
+   */
+  private List<NetworkDrive<DataWithFiles>> archives;
   /**
    * Where sample files are stored.
    */
@@ -132,7 +138,11 @@ public class AppConfiguration {
    */
   @PostConstruct
   void initNetworkDrives() {
+    if (archives == null) {
+      archives = new ArrayList<>();
+    }
     home.subfolder = subfolder;
+    archives.forEach(archive -> archive.subfolder = subfolder);
     analysis.subfolder = analysisSubfolder;
     upload.subfolder = uploadSubfolder;
   }
@@ -212,6 +222,14 @@ public class AppConfiguration {
 
   void setHome(NetworkDrive<DataWithFiles> home) {
     this.home = home;
+  }
+
+  public List<NetworkDrive<DataWithFiles>> getArchives() {
+    return archives;
+  }
+
+  void setArchives(List<NetworkDrive<DataWithFiles>> archives) {
+    this.archives = archives;
   }
 
   Path getSampleFolder() {

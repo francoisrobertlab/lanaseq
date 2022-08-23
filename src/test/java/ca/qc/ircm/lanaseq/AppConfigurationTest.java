@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,18 @@ public class AppConfigurationTest {
     return datasets;
   }
 
+  private Path homeFolder() {
+    return appConfiguration.getHome().getFolder();
+  }
+
+  private Path analysisFolder() {
+    return appConfiguration.getHome().getFolder().resolve("analysis");
+  }
+
+  private Path uploadFolder() {
+    return appConfiguration.getHome().getFolder().resolve("upload");
+  }
+
   @Test
   public void getLogFile() {
     assertEquals(Paths.get(System.getProperty("user.dir"), "test.log"),
@@ -125,16 +138,18 @@ public class AppConfigurationTest {
     assertEquals("smb://lanaseq01/lanaseq", home.getUnixPath());
   }
 
-  private Path homeFolder() {
-    return appConfiguration.getHome().getFolder();
-  }
-
-  private Path analysisFolder() {
-    return appConfiguration.getHome().getFolder().resolve("analysis");
-  }
-
-  private Path uploadFolder() {
-    return appConfiguration.getHome().getFolder().resolve("upload");
+  @Test
+  public void getArchives() {
+    List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = appConfiguration.getArchives();
+    AppConfiguration.NetworkDrive<DataWithFiles> archive = archives.get(0);
+    assertEquals(homeFolder().resolve("archives"), archive.getFolder());
+    assertEquals("\\\\lanaseq01\\lanaseq\\archives", archive.getWindowsPath());
+    assertEquals("smb://lanaseq01/lanaseq/archives", archive.getUnixPath());
+    archive = archives.get(1);
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2"),
+        archive.getFolder());
+    assertEquals("\\\\lanaseq02\\lanaseq\\archives2", archive.getWindowsPath());
+    assertEquals("smb://lanaseq02/lanaseq/archives2", archive.getUnixPath());
   }
 
   @Test
@@ -230,8 +245,118 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void analysis_Folder() {
-    assertEquals(homeFolder().resolve("analysis"), appConfiguration.getAnalysis().getFolder());
+  public void archives_Sample2019() {
+    Sample sample = sample();
+    String name = sample.getName();
+    assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getSampleFolder())
+        .resolve("2019/" + name), appConfiguration.getArchives().get(0).folder(sample));
+    assertEquals(
+        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+            .resolve(appConfiguration.getSampleFolder()).resolve("2019/" + name),
+        appConfiguration.getArchives().get(1).folder(sample));
+  }
+
+  @Test
+  public void archives_Sample2020() {
+    Sample sample = new Sample();
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    sample.setAssay(Assay.MNASE_SEQ);
+    sample.setType(SampleType.INPUT);
+    sample.setTarget("polr2a");
+    sample.setStrain("yFR111");
+    sample.setDate(LocalDate.of(2020, 4, 10));
+    sample.generateName();
+    String name = sample.getName();
+    assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getSampleFolder())
+        .resolve("2020/" + name), appConfiguration.getArchives().get(0).folder(sample));
+    assertEquals(
+        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+            .resolve(appConfiguration.getSampleFolder()).resolve("2020/" + name),
+        appConfiguration.getArchives().get(1).folder(sample));
+  }
+
+  @Test
+  public void archives_Dataset2019() {
+    Dataset dataset = dataset();
+    String name = dataset.getName();
+    assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getDatasetFolder())
+        .resolve("2019/" + name), appConfiguration.getArchives().get(0).folder(dataset));
+    assertEquals(
+        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+            .resolve(appConfiguration.getDatasetFolder()).resolve("2019/" + name),
+        appConfiguration.getArchives().get(1).folder(dataset));
+  }
+
+  @Test
+  public void archives_Dataset2020() {
+    Dataset dataset = new Dataset();
+    dataset.setSamples(new ArrayList<>());
+    dataset.setDate(LocalDate.of(2020, 4, 10));
+    Sample sample = new Sample();
+    sample.setSampleId("my sample");
+    sample.setReplicate("my replicate");
+    sample.setAssay(Assay.MNASE_SEQ);
+    sample.setType(SampleType.INPUT);
+    sample.setTarget("polr2a");
+    sample.setStrain("yFR111");
+    dataset.getSamples().add(sample);
+    sample = new Sample();
+    sample.setSampleId("my sample2");
+    dataset.getSamples().add(sample);
+    dataset.generateName();
+    String name = dataset.getName();
+    assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getDatasetFolder())
+        .resolve("2020/" + name), appConfiguration.getArchives().get(0).folder(dataset));
+    assertEquals(
+        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+            .resolve(appConfiguration.getDatasetFolder()).resolve("2020/" + name),
+        appConfiguration.getArchives().get(1).folder(dataset));
+  }
+
+  @Test
+  public void archivesLabel_Sample() {
+    Sample sample = sample();
+    assertEquals("\\\\lanaseq01\\lanaseq\\archives\\sample\\2019\\" + sample.getName(),
+        appConfiguration.getArchives().get(0).label(sample, false));
+    assertEquals("\\\\lanaseq02\\lanaseq\\archives2\\sample\\2019\\" + sample.getName(),
+        appConfiguration.getArchives().get(1).label(sample, false));
+  }
+
+  @Test
+  public void archivesLabel_SampleUnix() {
+    Sample sample = sample();
+    assertEquals("smb://lanaseq01/lanaseq/archives/sample/2019/" + sample.getName(),
+        appConfiguration.getArchives().get(0).label(sample, true));
+    assertEquals("smb://lanaseq02/lanaseq/archives2/sample/2019/" + sample.getName(),
+        appConfiguration.getArchives().get(1).label(sample, true));
+  }
+
+  @Test
+  public void archivesLabel_Dataset() {
+    Dataset dataset = dataset();
+    assertEquals("\\\\lanaseq01\\lanaseq\\archives\\dataset\\2019\\" + dataset.getName(),
+        appConfiguration.getArchives().get(0).label(dataset, false));
+    assertEquals("\\\\lanaseq02\\lanaseq\\archives2\\dataset\\2019\\" + dataset.getName(),
+        appConfiguration.getArchives().get(1).label(dataset, false));
+  }
+
+  @Test
+  public void archivesLabel_DatasetUnix() {
+    Dataset dataset = dataset();
+    assertEquals("smb://lanaseq01/lanaseq/archives/dataset/2019/" + dataset.getName(),
+        appConfiguration.getArchives().get(0).label(dataset, true));
+    assertEquals("smb://lanaseq02/lanaseq/archives2/dataset/2019/" + dataset.getName(),
+        appConfiguration.getArchives().get(1).label(dataset, true));
+  }
+
+  @Test
+  public void getAnalysis() {
+    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysis =
+        appConfiguration.getAnalysis();
+    assertEquals(homeFolder().resolve("analysis"), analysis.getFolder());
+    assertEquals("\\\\lanaseq01\\lanaseq\\analysis", analysis.getWindowsPath());
+    assertEquals("smb://lanaseq01/lanaseq/analysis", analysis.getUnixPath());
   }
 
   @Test
@@ -390,8 +515,11 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void upload_Folder() {
-    assertEquals(homeFolder().resolve("upload"), appConfiguration.getUpload().getFolder());
+  public void getUpload() {
+    AppConfiguration.NetworkDrive<DataWithFiles> upload = appConfiguration.getUpload();
+    assertEquals(homeFolder().resolve("upload"), upload.getFolder());
+    assertEquals("\\\\lanaseq01\\lanaseq\\upload", upload.getWindowsPath());
+    assertEquals("smb://lanaseq01/lanaseq/upload", upload.getUnixPath());
   }
 
   @Test

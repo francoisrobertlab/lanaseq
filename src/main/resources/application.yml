@@ -107,6 +107,15 @@ spring:
     port: 30025
     host: localhost
 
+app:
+  archives:
+    - folder: ${app.home.folder}/archives
+      windowsPath: '${app.home.windowsPath}\archives'
+      unixPath: '${app.home.unixPath}/archives'
+    - folder: ${user.home}/lanaseq2/archives2
+      windowsPath: '\\lanaseq02\lanaseq\archives2'
+      unixPath: 'smb://lanaseq02/lanaseq/archives2'
+
 security:
   rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
 
