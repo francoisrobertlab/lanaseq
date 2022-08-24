@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -64,6 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,6 +124,13 @@ public class SampleServiceTest {
       return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
           : null;
     });
+    when(configuration.getHome().label(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean unix = i.getArgument(1);
+      String label =
+          "\\\\lanaseq01\\" + (sample != null && sample.getName() != null ? sample.getName() : "");
+      return unix ? FilenameUtils.separatorsToUnix(label) : label;
+    });
     List archives = new ArrayList();
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     archives.add(mock(AppConfiguration.NetworkDrive.class));
@@ -132,11 +141,25 @@ public class SampleServiceTest {
           ? temporaryFolder.resolve("archives").resolve(sample.getName())
           : null;
     });
+    when(configuration.getArchives().get(0).label(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean unix = i.getArgument(1);
+      String label = "\\\\lanaseq01\\archives\\"
+          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      return unix ? FilenameUtils.separatorsToUnix(label) : label;
+    });
     when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null
           ? temporaryFolder.resolve("archives2").resolve(sample.getName())
           : null;
+    });
+    when(configuration.getArchives().get(1).label(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean unix = i.getArgument(1);
+      String label = "\\\\lanaseq02\\archives2\\"
+          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
     when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
@@ -528,6 +551,89 @@ public class SampleServiceTest {
     List<Path> files = service.files(null);
 
     assertTrue(files.isEmpty());
+  }
+
+  @Test
+  public void folderLabels() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, false);
+
+    assertEquals(1, labels.size());
+    assertEquals("\\\\lanaseq01\\" + sample.getName(), labels.get(0));
+  }
+
+  @Test
+  public void folderLabels_Unix() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, true);
+
+    assertEquals(1, labels.size());
+    assertEquals("//lanaseq01/" + sample.getName(), labels.get(0));
+  }
+
+  @Test
+  public void folderLabels_Archives() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(1).folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, false);
+
+    assertEquals(3, labels.size());
+    assertEquals("\\\\lanaseq01\\" + sample.getName(), labels.get(0));
+    assertEquals("\\\\lanaseq01\\archives\\" + sample.getName(), labels.get(1));
+    assertEquals("\\\\lanaseq02\\archives2\\" + sample.getName(), labels.get(2));
+  }
+
+  @Test
+  public void folderLabels_Archives_Unix() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(1).folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, true);
+
+    assertEquals(3, labels.size());
+    assertEquals("//lanaseq01/" + sample.getName(), labels.get(0));
+    assertEquals("//lanaseq01/archives/" + sample.getName(), labels.get(1));
+    assertEquals("//lanaseq02/archives2/" + sample.getName(), labels.get(2));
+  }
+
+  @Test
+  public void folderLabels_FoldersNotExists() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+
+    List<String> labels = service.folderLabels(sample, false);
+
+    assertTrue(labels.isEmpty());
+  }
+
+  @Test
+  public void folderLabels_NullId() throws Throwable {
+    List<String> labels = service.folderLabels(new Sample(), false);
+
+    assertTrue(labels.isEmpty());
+  }
+
+  @Test
+  public void folderLabels_Null() throws Throwable {
+    List<String> labels = service.folderLabels(null, false);
+
+    assertTrue(labels.isEmpty());
   }
 
   @Test

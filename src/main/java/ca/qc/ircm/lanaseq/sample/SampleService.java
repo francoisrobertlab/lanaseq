@@ -176,6 +176,37 @@ public class SampleService {
   }
 
   /**
+   * Returns all sample's folder labels.
+   * <p>
+   * Only returns label for folders that exist.
+   * </p>
+   *
+   * @param sample
+   *          sample
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return all sample's folder labels
+   */
+  @PreAuthorize("hasPermission(#sample, 'read')")
+  public List<String> folderLabels(Sample sample, boolean unix) {
+    if (sample == null || sample.getId() == null) {
+      return new ArrayList<>();
+    }
+    List<String> labels = new ArrayList<>();
+    Path folder = configuration.getHome().folder(sample);
+    if (Files.exists(folder)) {
+      labels.add(configuration.getHome().label(sample, unix));
+    }
+    for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
+      folder = drive.folder(sample);
+      if (Files.exists(folder)) {
+        labels.add(drive.label(sample, unix));
+      }
+    }
+    return labels;
+  }
+
+  /**
    * Returns all sample's upload files.
    *
    * @param sample

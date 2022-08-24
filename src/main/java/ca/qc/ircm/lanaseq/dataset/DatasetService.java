@@ -183,6 +183,37 @@ public class DatasetService {
   }
 
   /**
+   * Returns all dataset's folder labels.
+   * <p>
+   * Only returns label for folders that exist.
+   * </p>
+   * 
+   * @param dataset
+   *          dataset
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return all dataset's folder labels
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public List<String> folderLabels(Dataset dataset, boolean unix) {
+    if (dataset == null || dataset.getId() == null) {
+      return new ArrayList<>();
+    }
+    List<String> labels = new ArrayList<>();
+    Path folder = configuration.getHome().folder(dataset);
+    if (Files.exists(folder)) {
+      labels.add(configuration.getHome().label(dataset, unix));
+    }
+    for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
+      folder = drive.folder(dataset);
+      if (Files.exists(folder)) {
+        labels.add(drive.label(dataset, unix));
+      }
+    }
+    return labels;
+  }
+
+  /**
    * Returns all dataset's upload files.
    *
    * @param dataset
