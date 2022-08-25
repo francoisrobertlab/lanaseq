@@ -55,6 +55,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
   private Path home;
+  private Path archive;
   private Path analysis;
   private Path upload;
   @Autowired
@@ -73,6 +74,19 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   }
 
   /**
+   * Saves archive folder to reset its value upon test completion.
+   */
+  @BeforeEach
+  public void saveArchiveFolder() throws Throwable {
+    Method getArchives = AppConfiguration.class.getDeclaredMethod("getArchives");
+    getArchives.setAccessible(true);
+    Method getFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("getFolder");
+    getFolder.setAccessible(true);
+    archive = (Path) getFolder
+        .invoke(((List<AppConfiguration.NetworkDrive>) getArchives.invoke(configuration)).get(0));
+  }
+
+  /**
    * Saves analysis folder to reset its value upon test completion.
    */
   @BeforeEach
@@ -81,7 +95,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     getAnalysis.setAccessible(true);
     Method getFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("getFolder");
     getFolder.setAccessible(true);
-    upload =
+    analysis =
         (Path) getFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration));
   }
 
@@ -104,6 +118,14 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   @AfterEach
   public void restoreHomeFolder() throws Throwable {
     setHome(home);
+  }
+
+  /**
+   * Restores archive folder's value.
+   */
+  @AfterEach
+  public void restoreArchiveFolder() throws Throwable {
+    setArchive(archive);
   }
 
   /**
@@ -217,23 +239,34 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     setFolder.invoke((AppConfiguration.NetworkDrive) getHome.invoke(configuration), home);
   }
 
-  protected void setAnalysis(Path home) throws NoSuchMethodException, SecurityException,
+  protected void setArchive(Path archive) throws NoSuchMethodException, SecurityException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method getArchives = AppConfiguration.class.getDeclaredMethod("getArchives");
+    getArchives.setAccessible(true);
+    Method setFolder =
+        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+    setFolder.setAccessible(true);
+    setFolder.invoke(
+        ((List<AppConfiguration.NetworkDrive>) getArchives.invoke(configuration)).get(0), archive);
+  }
+
+  protected void setAnalysis(Path analysis) throws NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Method getAnalysis = AppConfiguration.class.getDeclaredMethod("getAnalysis");
     getAnalysis.setAccessible(true);
     Method setFolder =
         AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    setFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration), home);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getAnalysis.invoke(configuration), analysis);
   }
 
-  protected void setUpload(Path home) throws NoSuchMethodException, SecurityException,
+  protected void setUpload(Path upload) throws NoSuchMethodException, SecurityException,
       IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Method getUpload = AppConfiguration.class.getDeclaredMethod("getUpload");
     getUpload.setAccessible(true);
     Method setFolder =
         AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
     setFolder.setAccessible(true);
-    setFolder.invoke((AppConfiguration.NetworkDrive) getUpload.invoke(configuration), home);
+    setFolder.invoke((AppConfiguration.NetworkDrive) getUpload.invoke(configuration), upload);
   }
 }
