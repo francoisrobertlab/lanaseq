@@ -64,6 +64,7 @@ public class SampleFilesDialog extends Dialog
   public static final String ID = "sample-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
+  public static final String FOLDERS = "folders";
   public static final String FILES = "files";
   public static final String FILENAME = "filename";
   public static final String FILENAME_REGEX = "[\\w-\\.]*";
@@ -77,6 +78,7 @@ public class SampleFilesDialog extends Dialog
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();
   protected Div message = new Div();
+  protected VerticalLayout folders = new VerticalLayout();
   protected Grid<EditableFile> files = new Grid<>();
   protected Column<EditableFile> filename;
   protected Column<EditableFile> download;
@@ -111,14 +113,20 @@ public class SampleFilesDialog extends Dialog
     setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
+    VerticalLayout messageAndFolders = new VerticalLayout(message, folders);
+    messageAndFolders.setSpacing(false);
+    messageAndFolders.setPadding(false);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
-    layout.add(header, message, files, buttonsLayout);
+    layout.add(header, messageAndFolders, files, buttonsLayout);
     buttonsLayout.add(upload, addLargeFiles);
     buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
     layout.setSizeFull();
     layout.expand(files);
     header.setId(id(HEADER));
     message.setId(id(MESSAGE));
+    folders.setId(id(FOLDERS));
+    folders.setPadding(false);
+    folders.setSpacing(false);
     files.setId(id(FILES));
     files.getEditor().addCloseListener(e -> presenter.rename(e.getItem()));
     files.addItemDoubleClickListener(e -> {
@@ -162,6 +170,7 @@ public class SampleFilesDialog extends Dialog
     button.addClassName(DELETE);
     button.setIcon(VaadinIcon.TRASH.create());
     button.addThemeVariants(ButtonVariant.LUMO_ERROR);
+    button.setEnabled(!presenter.isArchive(file));
     button.addClickListener(e -> presenter.deleteFile(file));
     return button;
   }

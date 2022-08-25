@@ -20,13 +20,14 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MAXIMUM_SMALL_FILES_COUNT;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MAXIMUM_SMALL_FILES_SIZE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ID;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MAXIMUM_SMALL_FILES_COUNT;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MAXIMUM_SMALL_FILES_SIZE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
@@ -137,6 +138,10 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
       return new StreamResource(efile.getFile().getName(), (output, session) -> {
       });
     });
+    when(presenter.isArchive(any())).thenAnswer(i -> {
+      EditableFile file = i.getArgument(0);
+      return files.contains(file.getFile()) && files.indexOf(file.getFile()) >= 2;
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -179,6 +184,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
+    assertEquals(id(FOLDERS), dialog.folders.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(UPLOAD), dialog.upload.getId().orElse(""));
@@ -265,6 +271,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
       Button button = buttonRenderer.createComponent(file);
       assertTrue(button.hasClassName(DELETE));
       assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
+      assertEquals(presenter.isArchive(file), !button.isEnabled());
       validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
       assertEquals("", button.getText());
       button.click();
