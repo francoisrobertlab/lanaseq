@@ -41,6 +41,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -68,6 +69,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
+    setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
     file1 = Paths.get(getClass().getResource("/sample/R1.fastq").toURI());
   }
 
@@ -82,10 +84,37 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.message()).isPresent());
+    assertTrue(optional(() -> dialog.folders()).isPresent());
     assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
     assertTrue(optional(() -> dialog.upload()).isPresent());
     assertTrue(optional(() -> dialog.addLargeFiles()).isPresent());
+  }
+
+  @Test
+  public void files() throws Throwable {
+    Dataset dataset = repository.findById(2L).get();
+    Path home = configuration.getHome().folder(dataset);
+    Files.createDirectories(home);
+    Path file1 = home.resolve("R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file1);
+    Path archive = configuration.getArchives().get(0).folder(dataset);
+    Files.createDirectories(archive);
+    Path file2 = archive.resolve("R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file2);
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    view.datasets().controlClick(3);
+    DatasetFilesDialogElement dialog = view.filesDialog();
+    assertEquals(2, dialog.folders().labels().size());
+    assertEquals(configuration.getHome().label(dataset, !SystemUtils.IS_OS_WINDOWS),
+        dialog.folders().labels().get(0).getText());
+    assertEquals(configuration.getArchives().get(0).label(dataset, !SystemUtils.IS_OS_WINDOWS),
+        dialog.folders().labels().get(1).getText());
+    assertEquals(2, dialog.files().getRowCount());
+    assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
+    assertEquals(file2.getFileName().toString(), dialog.files().filename(1));
   }
 
   @Test
@@ -130,7 +159,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
-    dialog.files().downloadButton(0).click();
+    dialog.files().download(0).click();
 
     // Wait for file to download.
     Thread.sleep(2000);

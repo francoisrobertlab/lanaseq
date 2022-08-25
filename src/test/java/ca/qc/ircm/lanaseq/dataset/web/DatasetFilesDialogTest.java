@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_COUNT;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MAXIMUM_SMALL_FILES_COUNT;
@@ -158,6 +159,10 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
       return new StreamResource(efile.getFile().getName(), (output, session) -> {
       });
     });
+    when(presenter.isArchive(any())).thenAnswer(i -> {
+      EditableFile file = i.getArgument(0);
+      return files.contains(file.getFile()) && files.indexOf(file.getFile()) >= 2;
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -213,6 +218,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
+    assertEquals(id(FOLDERS), dialog.folders.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
@@ -304,6 +310,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
       Button button = buttonRenderer.createComponent(efile);
       assertTrue(button.hasClassName(DELETE));
       assertTrue(button.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
+      assertEquals(presenter.isArchive(efile), !button.isEnabled());
       validateIcon(VaadinIcon.TRASH.create(), button.getIcon());
       assertEquals("", button.getText());
       button.click();
