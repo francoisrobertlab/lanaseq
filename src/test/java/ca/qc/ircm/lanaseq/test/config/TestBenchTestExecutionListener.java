@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -151,7 +153,12 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       if (downloadAnnotations != null) {
         HashMap<String, Object> chromePrefs = new HashMap<>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
-        chromePrefs.put("download.default_directory", downloadHome);
+        if (SystemUtils.IS_OS_WINDOWS) {
+          chromePrefs.put("download.default_directory",
+              FilenameUtils.separatorsToWindows(downloadHome));
+        } else {
+          chromePrefs.put("download.default_directory", downloadHome);
+        }
         options.setExperimentalOption("prefs", chromePrefs);
       } else {
         options.setHeadless(headless);

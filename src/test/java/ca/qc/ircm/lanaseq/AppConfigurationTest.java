@@ -506,7 +506,7 @@ public class AppConfigurationTest {
 
   @Test
   public void analysisSymlinks() {
-    assertEquals(true, appConfiguration.isAnalysisSymlinks());
+    assertEquals(false, appConfiguration.isAnalysisSymlinks());
   }
 
   @Test

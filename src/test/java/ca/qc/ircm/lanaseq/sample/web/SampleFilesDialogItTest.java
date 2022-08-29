@@ -71,6 +71,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
     setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
+    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
     file1 = Paths.get(getClass().getResource("/sample/R1.fastq").toURI());
   }
 
