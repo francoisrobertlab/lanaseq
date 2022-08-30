@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERR
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_IOEXCEPTION;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILE_RENAME_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.web.EditableFileProperties.FILENAME;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -36,6 +35,7 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -129,8 +130,10 @@ public class SampleFilesDialogPresenter {
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (sample != null) {
-        dialog.message
-            .setText(resources.message(MESSAGE, configuration.getHome().label(sample, unix)));
+        List<String> labels = service.folderLabels(sample, unix);
+        dialog.message.setText(resources.message(DatasetFilesDialog.MESSAGE, labels.size()));
+        dialog.folders.removeAll();
+        labels.forEach(label -> dialog.folders.add(new Span(label)));
       }
     });
   }
@@ -143,6 +146,10 @@ public class SampleFilesDialogPresenter {
   boolean isReadOnly() {
     return sample == null || !sample.isEditable()
         || !authorizationService.hasPermission(sample, Permission.WRITE);
+  }
+
+  boolean isArchive(EditableFile file) {
+    return !configuration.getHome().folder(sample).equals(file.getFile().toPath().getParent());
   }
 
   public void addSmallFile(String filename, InputStream inputStream) {

@@ -22,7 +22,9 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
 
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
@@ -30,11 +32,15 @@ import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialogElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.flow.component.html.testbench.SpanElement;
+import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.flow.component.upload.testbench.UploadElement;
 import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
+import java.util.List;
 import org.openqa.selenium.By;
 
 /**
@@ -44,6 +50,14 @@ import org.openqa.selenium.By;
 public class DatasetFilesDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
+  }
+
+  public DivElement message() {
+    return $(DivElement.class).id(id(MESSAGE));
+  }
+
+  public FoldersElement folders() {
+    return $(FoldersElement.class).id(id(FOLDERS));
   }
 
   public DatasetFilesGridElement files() {
@@ -74,5 +88,11 @@ public class DatasetFilesDialogElement extends DialogElement {
   public SampleFilesDialogElement sampleFilesDialog() {
     return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID)))
         .wrap(SampleFilesDialogElement.class);
+  }
+
+  public static class FoldersElement extends VerticalLayoutElement {
+    public List<SpanElement> labels() {
+      return $(SpanElement.class).all();
+    }
   }
 }

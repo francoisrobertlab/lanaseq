@@ -63,6 +63,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
@@ -85,6 +87,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -138,11 +141,9 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<File> files = new ArrayList<>();
-  private Path folder;
+  private List<String> labels = new ArrayList<>();
   private String folderLabelLinux = "lanaseq/upload";
   private String folderLabelWindows = "lanaseq\\upload";
-  private String folderNetworkLinux = "smb://lanaseq01/lanaseq";
-  private String folderNetworkWindows = "\\\\lanaseq01\\lanaseq";
   private String filename = "test file";
   private byte[] fileContent = new byte[5120];
   private Random random = new Random();
@@ -155,6 +156,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
+    dialog.folders = new VerticalLayout();
     dialog.files = new Grid<>();
     dialog.samples = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
@@ -168,13 +170,33 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(service.files(any()))
         .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
+    labels.add("\\\\lanaseq01\\lanaseq");
+    labels.add("\\\\lanaseq01\\archives");
+    labels.add("\\\\lanaseq02\\archives2");
+    when(service.folderLabels(any(), anyBoolean())).thenReturn(labels);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
-    when(configuration.getHome().folder(any(Dataset.class))).thenReturn(folder);
-    when(configuration.getHome().label(any(Dataset.class), anyBoolean())).then(i -> {
+    when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
-      boolean linux = i.getArgument(1);
-      return (linux ? folderLabelLinux : folderLabelWindows) + "/" + dataset.getName();
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.resolve(dataset.getName())
+          : null;
+    });
+    List archives = new ArrayList();
+    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getArchives()).thenReturn(archives);
+    when(configuration.getArchives().get(0).folder(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.resolve("archives").resolve(dataset.getName())
+          : null;
+    });
+    when(configuration.getArchives().get(1).folder(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.resolve("archives2").resolve(dataset.getName())
+          : null;
     });
     random.nextBytes(fileContent);
     presenter.init(dialog);
@@ -186,8 +208,13 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.getHome().label(dataset, false)),
-        dialog.message.getText());
+    verify(service).folderLabels(dataset, false);
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    IntStream.range(0, labels.size()).forEach(i -> {
+      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
+    });
   }
 
   @Test
@@ -195,8 +222,13 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Linux() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.getHome().label(dataset, true)),
-        dialog.message.getText());
+    verify(service).folderLabels(dataset, true);
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    IntStream.range(0, labels.size()).forEach(i -> {
+      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
+    });
   }
 
   @Test
@@ -204,8 +236,37 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Mac() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    assertEquals(resources.message(MESSAGE, configuration.getHome().label(dataset, true)),
-        dialog.message.getText());
+    verify(service).folderLabels(dataset, true);
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    IntStream.range(0, labels.size()).forEach(i -> {
+      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
+    });
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
+  public void labels_One() {
+    IntStream.range(1, labels.size()).forEach(i -> labels.remove(1));
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    verify(service).folderLabels(dataset, false);
+    assertEquals(resources.message(MESSAGE, 1), dialog.message.getText());
+    assertEquals(1, dialog.folders.getComponentCount());
+    assertTrue(dialog.folders.getComponentAt(0) instanceof Span);
+    assertEquals(labels.get(0), dialog.folders.getComponentAt(0).getElement().getText());
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
+  public void labels_None() {
+    labels.clear();
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    verify(service).folderLabels(dataset, false);
+    assertEquals(resources.message(MESSAGE, 0), dialog.message.getText());
+    assertEquals(0, dialog.folders.getComponentCount());
   }
 
   @Test
@@ -368,6 +429,24 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+  }
+
+  @Test
+  public void isArchive_False() throws Throwable {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    File file = configuration.getHome().folder(dataset).resolve("source.txt").toFile();
+    EditableFile efile = new EditableFile(file);
+    assertFalse(presenter.isArchive(efile));
+  }
+
+  @Test
+  public void isArchive_True() throws Throwable {
+    Dataset dataset = repository.findById(1L).get();
+    presenter.setDataset(dataset);
+    File file = configuration.getArchives().get(0).folder(dataset).resolve("source.txt").toFile();
+    EditableFile efile = new EditableFile(file);
+    assertTrue(presenter.isArchive(efile));
   }
 
   @Test

@@ -37,6 +37,7 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -51,6 +52,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -136,8 +138,10 @@ public class DatasetFilesDialogPresenter {
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (dataset != null) {
-        dialog.message
-            .setText(resources.message(MESSAGE, configuration.getHome().label(dataset, unix)));
+        List<String> labels = service.folderLabels(dataset, unix);
+        dialog.message.setText(resources.message(MESSAGE, labels.size()));
+        dialog.folders.removeAll();
+        labels.forEach(label -> dialog.folders.add(new Span(label)));
       }
     });
   }
@@ -150,6 +154,10 @@ public class DatasetFilesDialogPresenter {
   boolean isReadOnly() {
     return dataset == null || !dataset.isEditable()
         || !authorizationService.hasPermission(dataset, Permission.WRITE);
+  }
+
+  boolean isArchive(EditableFile file) {
+    return !configuration.getHome().folder(dataset).equals(file.getFile().toPath().getParent());
   }
 
   int fileCount(Sample sample) {

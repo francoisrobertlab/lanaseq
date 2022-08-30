@@ -33,8 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,6 +124,43 @@ public class SampleServiceTest {
       return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
           : null;
     });
+    when(configuration.getHome().label(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean unix = i.getArgument(1);
+      String label =
+          "\\\\lanaseq01\\" + (sample != null && sample.getName() != null ? sample.getName() : "");
+      return unix ? FilenameUtils.separatorsToUnix(label) : label;
+    });
+    List archives = new ArrayList();
+    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getArchives()).thenReturn(archives);
+    when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.resolve("archives").resolve(sample.getName())
+          : null;
+    });
+    when(configuration.getArchives().get(0).label(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean unix = i.getArgument(1);
+      String label = "\\\\lanaseq01\\archives\\"
+          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      return unix ? FilenameUtils.separatorsToUnix(label) : label;
+    });
+    when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.resolve("archives2").resolve(sample.getName())
+          : null;
+    });
+    when(configuration.getArchives().get(1).label(any(Sample.class), anyBoolean())).then(i -> {
+      Sample sample = i.getArgument(0);
+      boolean unix = i.getArgument(1);
+      String label = "\\\\lanaseq02\\archives2\\"
+          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      return unix ? FilenameUtils.separatorsToUnix(label) : label;
+    });
     when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
@@ -129,12 +169,6 @@ public class SampleServiceTest {
     });
     when(configuration.getUpload().getFolder()).then(i -> {
       return temporaryFolder.resolve("upload");
-    });
-    when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
-      Dataset dataset = i.getArgument(0);
-      return dataset != null && dataset.getName() != null
-          ? temporaryFolder.resolve(dataset.getName())
-          : null;
     });
   }
 
@@ -419,6 +453,93 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void files_Archives() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("sample_h_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    file = folder.resolve("sample_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve("sample_R2.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    file = folder.resolve(".deleted");
+    Files.createFile(file);
+    file = folder.resolve(".hiddenFile");
+    Files.createFile(file);
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(file, "dos:hidden", Boolean.TRUE);
+    }
+    folder = configuration.getArchives().get(1).folder(sample);
+    Files.createDirectories(folder);
+    file = folder.resolve("sample_a2_R1.fastq");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration.getHome(), times(2)).folder(sample);
+    verify(configuration.getArchives().get(0), times(2)).folder(sample);
+    verify(configuration.getArchives().get(1), times(2)).folder(sample);
+    assertEquals(4, files.size());
+    folder = configuration.getHome().folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_h_R1.fastq")));
+    folder = configuration.getArchives().get(0).folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
+    folder = configuration.getArchives().get(1).folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_a2_R1.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  public void files_ArchivesSameFilename() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("sample_R1.fastq"));
+    folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("sample_R1.fastq"));
+    folder = configuration.getArchives().get(1).folder(sample);
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("sample_R1.fastq"));
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration.getHome(), times(2)).folder(sample);
+    assertEquals(3, files.size());
+    folder = configuration.getHome().folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    folder = configuration.getArchives().get(0).folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    folder = configuration.getArchives().get(1).folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
+  public void files_ArchivesNotExists() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("sample_R1.fastq"));
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration.getHome(), times(2)).folder(sample);
+    assertEquals(1, files.size());
+    folder = configuration.getHome().folder(sample);
+    assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
   public void files_NullId() throws Throwable {
     List<Path> files = service.files(new Sample());
 
@@ -430,6 +551,89 @@ public class SampleServiceTest {
     List<Path> files = service.files(null);
 
     assertTrue(files.isEmpty());
+  }
+
+  @Test
+  public void folderLabels() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, false);
+
+    assertEquals(1, labels.size());
+    assertEquals("\\\\lanaseq01\\" + sample.getName(), labels.get(0));
+  }
+
+  @Test
+  public void folderLabels_Unix() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, true);
+
+    assertEquals(1, labels.size());
+    assertEquals("//lanaseq01/" + sample.getName(), labels.get(0));
+  }
+
+  @Test
+  public void folderLabels_Archives() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(1).folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, false);
+
+    assertEquals(3, labels.size());
+    assertEquals("\\\\lanaseq01\\" + sample.getName(), labels.get(0));
+    assertEquals("\\\\lanaseq01\\archives\\" + sample.getName(), labels.get(1));
+    assertEquals("\\\\lanaseq02\\archives2\\" + sample.getName(), labels.get(2));
+  }
+
+  @Test
+  public void folderLabels_Archives_Unix() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    folder = configuration.getArchives().get(1).folder(sample);
+    Files.createDirectories(folder);
+
+    List<String> labels = service.folderLabels(sample, true);
+
+    assertEquals(3, labels.size());
+    assertEquals("//lanaseq01/" + sample.getName(), labels.get(0));
+    assertEquals("//lanaseq01/archives/" + sample.getName(), labels.get(1));
+    assertEquals("//lanaseq02/archives2/" + sample.getName(), labels.get(2));
+  }
+
+  @Test
+  public void folderLabels_FoldersNotExists() throws Throwable {
+    Sample sample = repository.findById(1L).orElse(null);
+
+    List<String> labels = service.folderLabels(sample, false);
+
+    assertTrue(labels.isEmpty());
+  }
+
+  @Test
+  public void folderLabels_NullId() throws Throwable {
+    List<String> labels = service.folderLabels(new Sample(), false);
+
+    assertTrue(labels.isEmpty());
+  }
+
+  @Test
+  public void folderLabels_Null() throws Throwable {
+    List<String> labels = service.folderLabels(null, false);
+
+    assertTrue(labels.isEmpty());
   }
 
   @Test
@@ -470,6 +674,8 @@ public class SampleServiceTest {
 
     verify(configuration.getUpload(), times(2)).getFolder();
     verify(configuration.getUpload(), times(2)).folder(sample);
+    verify(configuration.getArchives().get(0), never()).folder(sample);
+    verify(configuration.getArchives().get(1), never()).folder(sample);
     assertEquals(3, files.size());
     assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
     assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
@@ -500,6 +706,8 @@ public class SampleServiceTest {
 
     verify(configuration.getUpload(), times(2)).getFolder();
     verify(configuration.getUpload()).folder(sample);
+    verify(configuration.getArchives().get(0), never()).folder(sample);
+    verify(configuration.getArchives().get(1), never()).folder(sample);
     assertEquals(1, files.size());
     assertTrue(files.contains(upload.resolve(sample.getName() + ".fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
@@ -528,6 +736,8 @@ public class SampleServiceTest {
 
     verify(configuration.getUpload()).getFolder();
     verify(configuration.getUpload(), times(2)).folder(sample);
+    verify(configuration.getArchives().get(0), never()).folder(sample);
+    verify(configuration.getArchives().get(1), never()).folder(sample);
     assertEquals(2, files.size());
     assertTrue(files.contains(folder.resolve("sample_R1.fastq")));
     assertTrue(files.contains(folder.resolve("sample_R2.fastq")));
@@ -1020,12 +1230,20 @@ public class SampleServiceTest {
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     Path beforeFolder = configuration.getHome().folder(sample);
+    Path beforeArchive1 = configuration.getArchives().get(0).folder(sample);
+    Path beforeArchive2 = configuration.getArchives().get(1).folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
         beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.createDirectories(beforeArchive1);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeArchive1.resolve("sample_a1_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.createDirectories(beforeArchive2);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeArchive2.resolve("sample_a2_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
 
     service.save(sample);
 
@@ -1043,6 +1261,18 @@ public class SampleServiceTest {
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
+    Path archive1 = configuration.getArchives().get(0).folder(sample);
+    assertTrue(Files.exists(archive1.resolve("sample_a1_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(archive1.resolve("sample_a1_R1.fastq")));
+    assertFalse(Files.exists(beforeArchive1));
+    Path archive2 = configuration.getArchives().get(1).folder(sample);
+    assertTrue(Files.exists(archive2.resolve("sample_a2_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(archive2.resolve("sample_a2_R1.fastq")));
+    assertFalse(Files.exists(beforeArchive2));
   }
 
   @Test
@@ -1057,6 +1287,8 @@ public class SampleServiceTest {
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     Path beforeFolder = configuration.getHome().folder(sample);
+    Path beforeArchive1 = configuration.getArchives().get(0).folder(sample);
+    Path beforeArchive2 = configuration.getArchives().get(1).folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -1064,6 +1296,12 @@ public class SampleServiceTest {
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
         beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
     sample.setDate(LocalDate.of(2020, 01, 12));
+    Files.createDirectories(beforeArchive1);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeArchive1.resolve("sample_a1_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
+    Files.createDirectories(beforeArchive2);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeArchive2.resolve("sample_a2_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
 
     service.save(sample);
 
@@ -1082,6 +1320,18 @@ public class SampleServiceTest {
         Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
+    Path archive1 = configuration.getArchives().get(0).folder(sample);
+    assertTrue(Files.exists(archive1.resolve("sample_a1_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(archive1.resolve("sample_a1_R1.fastq")));
+    assertFalse(Files.exists(beforeArchive1));
+    Path archive2 = configuration.getArchives().get(1).folder(sample);
+    assertTrue(Files.exists(archive2.resolve("sample_a2_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(archive2.resolve("sample_a2_R1.fastq")));
+    assertFalse(Files.exists(beforeArchive2));
   }
 
   @Test
@@ -1093,6 +1343,8 @@ public class SampleServiceTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     Path beforeFolder = configuration.getHome().folder(sample);
+    Path beforeArchive1 = configuration.getArchives().get(0).folder(sample);
+    Path beforeArchive2 = configuration.getArchives().get(1).folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
@@ -1110,6 +1362,24 @@ public class SampleServiceTest {
         beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq.md5"),
         ("c0f5c3b76104640e306fce3c669f300e  "
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+    Files.createDirectories(beforeArchive1);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeArchive1.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeArchive1.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq.md5"),
+        ("e254a11d5102c5555232c3d7d0a53a0b  "
+            + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
+                .getBytes(StandardCharsets.UTF_8));
+    Files.createDirectories(beforeArchive2);
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+        beforeArchive2.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.write(
+        beforeArchive2.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq.md5"),
+        ("e254a11d5102c5555232c3d7d0a53a0b  "
+            + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
                 .getBytes(StandardCharsets.UTF_8));
 
     service.save(sample);
@@ -1150,6 +1420,40 @@ public class SampleServiceTest {
             + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeFolder));
+    Path archive1 = configuration.getArchives().get(0).folder(sample);
+    assertTrue(Files.exists(archive1
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(archive1
+            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertTrue(Files.exists(archive1
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
+    md5Lines = Files.readAllLines(archive1
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq",
+        md5Lines.get(0));
+    assertFalse(Files.exists(beforeArchive1));
+    Path archive2 = configuration.getArchives().get(1).folder(sample);
+    assertTrue(Files.exists(archive2
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertArrayEquals(
+        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(archive2
+            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertTrue(Files.exists(archive2
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
+    md5Lines = Files.readAllLines(archive2
+        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
+    assertEquals(1, md5Lines.size());
+    assertEquals(
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq",
+        md5Lines.get(0));
+    assertFalse(Files.exists(beforeArchive2));
   }
 
   @Test
@@ -1166,6 +1470,8 @@ public class SampleServiceTest {
     service.saveFiles(sample, files);
 
     verify(configuration.getHome()).folder(sample);
+    verify(configuration.getArchives().get(0), never()).folder(sample);
+    verify(configuration.getArchives().get(1), never()).folder(sample);
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
@@ -1213,7 +1519,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void deleteFile_FullPath() throws Throwable {
+  public void deleteFile() throws Throwable {
     Sample sample = repository.findById(9L).get();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
@@ -1250,49 +1556,46 @@ public class SampleServiceTest {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(folder.resolve(file), FileTime.from(toInstant(modifiedTime)));
 
-    service.deleteFile(sample, file);
-
-    verify(configuration.getHome(), times(2)).folder(sample);
-    assertFalse(Files.exists(file));
-    Path deleted = folder.resolve(".deleted");
-    List<String> deletedLines = Files.readAllLines(deleted);
-    String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
-    assertEquals(3, deletedFileColumns.length);
-    assertEquals("test.txt", deletedFileColumns[0]);
-    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
-    LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
-    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
-    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+    assertThrows(IllegalArgumentException.class, () -> service.deleteFile(sample, file));
   }
 
   @Test
-  public void deleteFile_FullPathNotInSampleFolder() throws Throwable {
-    assertThrows(IllegalArgumentException.class, () -> {
-      Sample sample = repository.findById(9L).get();
-      Path file = temporaryFolder.resolve("test.txt");
-      Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
-          StandardCopyOption.REPLACE_EXISTING);
-      Files.setLastModifiedTime(file,
-          FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+  public void deleteFile_Archives() throws Throwable {
+    Sample sample = repository.findById(9L).get();
+    Path folder = configuration.getArchives().get(0).folder(sample);
+    Files.createDirectories(folder);
+    Path file = Paths.get("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
+        StandardCopyOption.REPLACE_EXISTING);
+    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
+    Files.setLastModifiedTime(folder.resolve(file), FileTime.from(toInstant(modifiedTime)));
 
-      service.deleteFile(sample, file);
-    });
+    assertThrows(IllegalArgumentException.class, () -> service.deleteFile(sample, file));
+  }
+
+  @Test
+  public void deleteFile_NotInSampleFolder() throws Throwable {
+    Sample sample = repository.findById(9L).get();
+    Path file = temporaryFolder.resolve("test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.setLastModifiedTime(file,
+        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+
+    assertThrows(IllegalArgumentException.class, () -> service.deleteFile(sample, file));
   }
 
   @Test
   public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
-    assertThrows(IllegalArgumentException.class, () -> {
-      Sample sample = repository.findById(9L).get();
-      Path folder = configuration.getHome().folder(sample);
-      Files.createDirectories(folder);
-      Path file = Paths.get("../test.txt");
-      Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
-          StandardCopyOption.REPLACE_EXISTING);
-      Files.setLastModifiedTime(file,
-          FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
+    Sample sample = repository.findById(9L).get();
+    Path folder = configuration.getHome().folder(sample);
+    Files.createDirectories(folder);
+    Path file = Paths.get("../test.txt");
+    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+    Files.setLastModifiedTime(file,
+        FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
 
-      service.deleteFile(sample, file);
-    });
+    assertThrows(IllegalArgumentException.class, () -> service.deleteFile(sample, file));
   }
 }

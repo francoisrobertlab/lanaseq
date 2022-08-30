@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.file.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.user.User;
@@ -161,14 +162,55 @@ public class DatasetService {
     if (dataset == null || dataset.getId() == null) {
       return new ArrayList<>();
     }
+    List<Path> files = new ArrayList<>();
     Path folder = configuration.getHome().folder(dataset);
-    try (Stream<Path> files = Files.list(folder)) {
-      return files.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
-          .filter(file -> !file.toFile().isHidden())
-          .collect(Collectors.toCollection(ArrayList::new));
+    try (Stream<Path> homeFiles = Files.list(folder)) {
+      homeFiles.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+          .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
     } catch (IOException e) {
+      // Ignore since folder probably does not exist.
+    }
+    for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
+      folder = drive.folder(dataset);
+      try (Stream<Path> archiveFiles = Files.list(folder)) {
+        archiveFiles.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+            .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+      } catch (IOException e) {
+        // Ignore since folder probably does not exist.
+      }
+    }
+    return files;
+  }
+
+  /**
+   * Returns all dataset's folder labels.
+   * <p>
+   * Only returns label for folders that exist.
+   * </p>
+   * 
+   * @param dataset
+   *          dataset
+   * @param unix
+   *          true if path elements should be separated by slashes instead of backslashes
+   * @return all dataset's folder labels
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public List<String> folderLabels(Dataset dataset, boolean unix) {
+    if (dataset == null || dataset.getId() == null) {
       return new ArrayList<>();
     }
+    List<String> labels = new ArrayList<>();
+    Path folder = configuration.getHome().folder(dataset);
+    if (Files.exists(folder)) {
+      labels.add(configuration.getHome().label(dataset, unix));
+    }
+    for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
+      folder = drive.folder(dataset);
+      if (Files.exists(folder)) {
+        labels.add(drive.label(dataset, unix));
+      }
+    }
+    return labels;
   }
 
   /**
@@ -268,12 +310,24 @@ public class DatasetService {
       dataset.setEditable(true);
     }
     Dataset old = old(dataset).orElse(null);
-    final String oldName = old != null ? old.getName() : null;
-    Path oldFolder = old != null ? configuration.getHome().folder(old) : null;
-    repository.save(dataset);
-    Path folder = configuration.getHome().folder(dataset);
-    Renamer.moveFolder(oldFolder, folder);
-    Renamer.renameFiles(oldName, dataset.getName(), folder);
+    if (old == null) {
+      repository.save(dataset);
+    } else {
+      final String oldName = old.getName();
+      Path oldFolder = configuration.getHome().folder(old);
+      List<Path> oldArchives = configuration.getArchives().stream().map(drive -> drive.folder(old))
+          .collect(Collectors.toList());
+      repository.save(dataset);
+      Path folder = configuration.getHome().folder(dataset);
+      Renamer.moveFolder(oldFolder, folder);
+      Renamer.renameFiles(oldName, dataset.getName(), folder);
+      for (int i = 0; i < configuration.getArchives().size(); i++) {
+        Path oldArchive = oldArchives.get(i);
+        Path archive = configuration.getArchives().get(i).folder(dataset);
+        Renamer.moveFolder(oldArchive, archive);
+        Renamer.renameFiles(oldName, dataset.getName(), archive);
+      }
+    }
   }
 
   @Transactional(TxType.REQUIRES_NEW)
@@ -347,9 +401,7 @@ public class DatasetService {
       throw new IllegalArgumentException("file " + file + " is empty");
     }
     Path folder = configuration.getHome().folder(dataset);
-    Path toDelete = folder.resolve(file);
-    Path toDeleteParent = toDelete.getParent();
-    if (toDeleteParent == null || !toDeleteParent.equals(folder)) {
+    if (!folder.equals(file.getParent())) {
       throw new IllegalArgumentException("file " + file + " not in folder " + folder);
     }
     Path deleted = folder.resolve(DELETED_FILENAME);
@@ -358,12 +410,11 @@ public class DatasetService {
       writer.write(filename.toString());
       writer.write("\t");
       DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-      writer.write(
-          formatter.format(toLocalDateTime(Files.getLastModifiedTime(toDelete).toInstant())));
+      writer.write(formatter.format(toLocalDateTime(Files.getLastModifiedTime(file).toInstant())));
       writer.write("\t");
       writer.write(formatter.format(LocalDateTime.now()));
       writer.write("\n");
-      Files.delete(toDelete);
+      Files.delete(file);
     } catch (IOException e) {
       throw new IllegalArgumentException("could not delete file " + file + " from folder " + folder,
           e);

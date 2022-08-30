@@ -44,6 +44,8 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
@@ -59,6 +61,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
@@ -78,6 +82,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -126,11 +131,9 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private AppResources resources = new AppResources(SampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<File> files = new ArrayList<>();
-  private Path folder;
+  private List<String> labels = new ArrayList<>();
   private String folderLabelLinux = "lanaseq/upload";
   private String folderLabelWindows = "lanaseq\\upload";
-  private String folderNetworkLinux = "smb://lanaseq01/lanaseq";
-  private String folderNetworkWindows = "\\\\lanaseq01\\lanaseq";
   private String filename = "test file";
   private byte[] fileContent = new byte[5120];
   private Random random = new Random();
@@ -143,6 +146,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog.header = new H3();
     dialog.message = new Div();
+    dialog.folders = new VerticalLayout();
     dialog.files = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
@@ -154,13 +158,33 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     when(dialog.getUI()).thenReturn(Optional.of(ui));
     when(service.files(any()))
         .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
+    labels.add("\\\\lanaseq01\\lanaseq");
+    labels.add("\\\\lanaseq01\\archives");
+    labels.add("\\\\lanaseq02\\archives2");
+    when(service.folderLabels(any(), anyBoolean())).thenReturn(labels);
     when(authorizationService.hasPermission(any(), any())).thenReturn(true);
     when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
-    when(configuration.getHome().folder(any(Sample.class))).thenReturn(folder);
-    when(configuration.getHome().label(any(Sample.class), anyBoolean())).then(i -> {
+    when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      return dataset != null && dataset.getName() != null
+          ? temporaryFolder.resolve(dataset.getName())
+          : null;
+    });
+    List archives = new ArrayList();
+    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getArchives()).thenReturn(archives);
+    when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      boolean linux = i.getArgument(1);
-      return (linux ? folderLabelLinux : folderLabelWindows) + "/" + sample.getName();
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.resolve("archives").resolve(sample.getName())
+          : null;
+    });
+    when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.resolve("archives2").resolve(sample.getName())
+          : null;
     });
     random.nextBytes(fileContent);
     presenter.init(dialog);
@@ -172,8 +196,14 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.getHome().label(sample, false)),
+    verify(service).folderLabels(sample, false);
+    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
         dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    IntStream.range(0, labels.size()).forEach(i -> {
+      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
+    });
   }
 
   @Test
@@ -181,8 +211,14 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Linux() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.getHome().label(sample, true)),
+    verify(service).folderLabels(sample, true);
+    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
         dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    IntStream.range(0, labels.size()).forEach(i -> {
+      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
+    });
   }
 
   @Test
@@ -190,8 +226,38 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   public void labels_Mac() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    assertEquals(resources.message(MESSAGE, configuration.getHome().label(sample, true)),
+    verify(service).folderLabels(sample, true);
+    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
         dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    IntStream.range(0, labels.size()).forEach(i -> {
+      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
+    });
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
+  public void labels_One() {
+    IntStream.range(1, labels.size()).forEach(i -> labels.remove(1));
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    verify(service).folderLabels(sample, false);
+    assertEquals(resources.message(MESSAGE, 1), dialog.message.getText());
+    assertEquals(1, dialog.folders.getComponentCount());
+    assertTrue(dialog.folders.getComponentAt(0) instanceof Span);
+    assertEquals(labels.get(0), dialog.folders.getComponentAt(0).getElement().getText());
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
+  public void labels_None() {
+    labels.clear();
+    Sample sample = repository.findById(1L).get();
+    presenter.setSample(sample);
+    verify(service).folderLabels(sample, false);
+    assertEquals(resources.message(MESSAGE, 0), dialog.message.getText());
+    assertEquals(0, dialog.folders.getComponentCount());
   }
 
   @Test
