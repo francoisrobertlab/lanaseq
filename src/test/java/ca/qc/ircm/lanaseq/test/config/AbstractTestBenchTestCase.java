@@ -41,7 +41,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,13 +219,6 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     } catch (Throwable e) {
       return Optional.empty();
     }
-  }
-
-  protected void uploadFile(WebElement uploader, Path file) {
-    logger.debug("Uploading file {} to uploader {} with class {}", file,
-        uploader.getAttribute("id"), uploader.getAttribute("class"));
-    logger.error("Not updated for Vaadin 10+");
-    throw new UnsupportedOperationException("Not updated for Vaadin 10+");
   }
 
   protected void setHome(Path home) throws NoSuchMethodException, SecurityException,
