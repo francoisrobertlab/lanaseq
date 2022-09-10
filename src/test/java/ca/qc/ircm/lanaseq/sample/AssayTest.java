@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.sample.Assay.CHEC_SEQ;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHEM_MAP;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_EXO;
 import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_SEQ;
+import static ca.qc.ircm.lanaseq.sample.Assay.MICRO_C;
 import static ca.qc.ircm.lanaseq.sample.Assay.MNASE_SEQ;
 import static ca.qc.ircm.lanaseq.sample.Assay.NET_SEQ;
 import static ca.qc.ircm.lanaseq.sample.Assay.RNA_SEQ;
@@ -50,23 +51,25 @@ public class AssayTest {
   public void getLabel_English() {
     Locale locale = Locale.ENGLISH;
     assertEquals("ChEC-seq", CHEC_SEQ.getLabel(locale));
+    assertEquals("Chem-Map", CHEM_MAP.getLabel(locale));
     assertEquals("ChIP-seq", CHIP_SEQ.getLabel(locale));
     assertEquals("ChIP-exo", CHIP_EXO.getLabel(locale));
+    assertEquals("Micro-C", MICRO_C.getLabel(locale));
     assertEquals("MNase-seq", MNASE_SEQ.getLabel(locale));
     assertEquals("NET-seq", NET_SEQ.getLabel(locale));
     assertEquals("RNA-seq", RNA_SEQ.getLabel(locale));
-    assertEquals("Chem-Map", CHEM_MAP.getLabel(locale));
   }
 
   @Test
   public void getLabel_French() {
     Locale locale = Locale.FRENCH;
     assertEquals("ChEC-seq", CHEC_SEQ.getLabel(locale));
+    assertEquals("Chem-Map", CHEM_MAP.getLabel(locale));
     assertEquals("ChIP-seq", CHIP_SEQ.getLabel(locale));
     assertEquals("ChIP-exo", CHIP_EXO.getLabel(locale));
+    assertEquals("Micro-C", MICRO_C.getLabel(locale));
     assertEquals("MNase-seq", MNASE_SEQ.getLabel(locale));
     assertEquals("NET-seq", NET_SEQ.getLabel(locale));
     assertEquals("RNA-seq", RNA_SEQ.getLabel(locale));
-    assertEquals("Chem-Map", CHEM_MAP.getLabel(locale));
   }
 }
