@@ -134,8 +134,8 @@ public class AppConfigurationTest {
   public void getHome() {
     AppConfiguration.NetworkDrive<DataWithFiles> home = appConfiguration.getHome();
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq"), home.getFolder());
-    assertEquals("\\\\lanaseq01\\lanaseq", home.getWindowsPath());
-    assertEquals("smb://lanaseq01/lanaseq", home.getUnixPath());
+    assertEquals("\\\\lanaseq01\\lanaseq", home.getWindowsLabel());
+    assertEquals("smb://lanaseq01/lanaseq", home.getUnixLabel());
   }
 
   @Test
@@ -143,13 +143,13 @@ public class AppConfigurationTest {
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = appConfiguration.getArchives();
     AppConfiguration.NetworkDrive<DataWithFiles> archive = archives.get(0);
     assertEquals(homeFolder().resolve("archives"), archive.getFolder());
-    assertEquals("\\\\lanaseq01\\lanaseq\\archives", archive.getWindowsPath());
-    assertEquals("smb://lanaseq01/lanaseq/archives", archive.getUnixPath());
+    assertEquals("\\\\lanaseq01\\lanaseq\\archives", archive.getWindowsLabel());
+    assertEquals("smb://lanaseq01/lanaseq/archives", archive.getUnixLabel());
     archive = archives.get(1);
     assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2"),
         archive.getFolder());
-    assertEquals("\\\\lanaseq02\\lanaseq\\archives2", archive.getWindowsPath());
-    assertEquals("smb://lanaseq02/lanaseq/archives2", archive.getUnixPath());
+    assertEquals("\\\\lanaseq02\\lanaseq\\archives2", archive.getWindowsLabel());
+    assertEquals("smb://lanaseq02/lanaseq/archives2", archive.getUnixLabel());
   }
 
   @Test
@@ -355,8 +355,8 @@ public class AppConfigurationTest {
     AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysis =
         appConfiguration.getAnalysis();
     assertEquals(homeFolder().resolve("analysis"), analysis.getFolder());
-    assertEquals("\\\\lanaseq01\\lanaseq\\analysis", analysis.getWindowsPath());
-    assertEquals("smb://lanaseq01/lanaseq/analysis", analysis.getUnixPath());
+    assertEquals("\\\\lanaseq01\\lanaseq\\analysis", analysis.getWindowsLabel());
+    assertEquals("smb://lanaseq01/lanaseq/analysis", analysis.getUnixLabel());
   }
 
   @Test
@@ -518,8 +518,8 @@ public class AppConfigurationTest {
   public void getUpload() {
     AppConfiguration.NetworkDrive<DataWithFiles> upload = appConfiguration.getUpload();
     assertEquals(homeFolder().resolve("upload"), upload.getFolder());
-    assertEquals("\\\\lanaseq01\\lanaseq\\upload", upload.getWindowsPath());
-    assertEquals("smb://lanaseq01/lanaseq/upload", upload.getUnixPath());
+    assertEquals("\\\\lanaseq01\\lanaseq\\upload", upload.getWindowsLabel());
+    assertEquals("smb://lanaseq01/lanaseq/upload", upload.getUnixLabel());
   }
 
   @Test

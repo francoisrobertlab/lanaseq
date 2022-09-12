@@ -39,20 +39,20 @@ spring:
 app:
   home:
     folder: ${user.home}/lanaseq
-    windowsPath: '\\lanaseq01\lanaseq'
-    unixPath: 'smb://lanaseq01/lanaseq'
+    windows-label: '\\lanaseq01\lanaseq'
+    unix-label: 'smb://lanaseq01/lanaseq'
   sample-folder: sample
   dataset-folder: dataset
   analysis:
     folder: ${app.home.folder}/analysis
-    windowsPath: '${app.home.windowsPath}\analysis'
-    unixPath: '${app.home.unixPath}/analysis'
+    windows-label: '${app.home.windows-label}\analysis'
+    unix-label: '${app.home.unix-label}/analysis'
   analysis-delete-age: PT48H
   analysis-symlinks: false
   upload:
     folder: ${app.home.folder}/upload
-    windowsPath: '${app.home.windowsPath}\upload'
-    unixPath: '${app.home.unixPath}/upload'
+    windows-label: '${app.home.windows-label}\upload'
+    unix-label: '${app.home.unix-label}/upload'
   upload-delete-age: PT6H
   serverUrl: http://localhost:8080
 
@@ -110,11 +110,11 @@ spring:
 app:
   archives:
     - folder: ${app.home.folder}/archives
-      windowsPath: '${app.home.windowsPath}\archives'
-      unixPath: '${app.home.unixPath}/archives'
+      windows-label: '${app.home.windows-label}\archives'
+      unix-label: '${app.home.unix-label}/archives'
     - folder: ${user.home}/lanaseq2/archives2
-      windowsPath: '\\lanaseq02\lanaseq\archives2'
-      unixPath: 'smb://lanaseq02/lanaseq/archives2'
+      windows-label: '\\lanaseq02\lanaseq\archives2'
+      unix-label: 'smb://lanaseq02/lanaseq/archives2'
 
 security:
   rememberMeKey: 'JfYMi0qUQVt8FObsZHW7'
@@ -143,8 +143,8 @@ spring:
 app:
   archives:
     - folder: ${app.home.folder}/archives
-      windowsPath: '${app.home.windowsPath}\archives'
-      unixPath: '${app.home.unixPath}/archives'
+      windows-label: '${app.home.windows-label}\archives'
+      unix-label: '${app.home.unix-label}/archives'
   serverUrl: http://localhost:${local.server.port}
 
 security:

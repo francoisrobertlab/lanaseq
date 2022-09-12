@@ -301,8 +301,8 @@ public class AppConfiguration {
    */
   public static class NetworkDrive<DF> {
     private Path folder;
-    private String windowsPath;
-    private String unixPath;
+    private String windowsLabel;
+    private String unixLabel;
     private Function<DF, Path> subfolder;
 
     /**
@@ -328,9 +328,9 @@ public class AppConfiguration {
     public String label(DF df, boolean unix) {
       Path subfolder = this.subfolder.apply(df);
       if (unix) {
-        return FilenameUtils.separatorsToUnix(unixPath + "/" + subfolder.toString());
+        return FilenameUtils.separatorsToUnix(unixLabel + "/" + subfolder.toString());
       } else {
-        return FilenameUtils.separatorsToWindows(windowsPath + "/" + subfolder.toString());
+        return FilenameUtils.separatorsToWindows(windowsLabel + "/" + subfolder.toString());
       }
     }
 
@@ -342,20 +342,20 @@ public class AppConfiguration {
       this.folder = folder;
     }
 
-    String getWindowsPath() {
-      return windowsPath;
+    String getWindowsLabel() {
+      return windowsLabel;
     }
 
-    void setWindowsPath(String windowsPath) {
-      this.windowsPath = windowsPath;
+    void setWindowsLabel(String windowsLabel) {
+      this.windowsLabel = windowsLabel;
     }
 
-    String getUnixPath() {
-      return unixPath;
+    String getUnixLabel() {
+      return unixLabel;
     }
 
-    void setUnixPath(String unixPath) {
-      this.unixPath = unixPath;
+    void setUnixLabel(String unixLabel) {
+      this.unixLabel = unixLabel;
     }
   }
 }
