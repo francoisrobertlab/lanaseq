@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.CREATE_FOLDER_EXCEPTION;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -73,15 +73,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
- * Tests for {@link ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialogPresenter}.
+ * Tests for {@link SamplesAnalysisDialogPresenter}.
  */
 @ServiceTestAnnotations
 @WithMockUser
-public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
+public class SamplesAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
-  private SampleAnalysisDialogPresenter presenter;
+  private SamplesAnalysisDialogPresenter presenter;
   @Mock
-  private SampleAnalysisDialog dialog;
+  private SamplesAnalysisDialog dialog;
   @MockBean
   private AnalysisService service;
   @MockBean
@@ -95,7 +95,7 @@ public class SampleAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private SampleRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(SampleAnalysisDialog.class, locale);
+  private AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
   private List<Sample> samples = new ArrayList<>();
 
   /**

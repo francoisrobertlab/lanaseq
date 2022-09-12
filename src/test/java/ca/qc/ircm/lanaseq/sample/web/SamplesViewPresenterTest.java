@@ -139,7 +139,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.analyze = new Button();
     view.dialog = mock(SampleDialog.class);
     view.filesDialog = mock(SampleFilesDialog.class);
-    view.analysisDialog = mock(SampleAnalysisDialog.class);
+    view.analysisDialog = mock(SamplesAnalysisDialog.class);
     samples = repository.findAll();
     when(service.all(any())).thenReturn(new ArrayList<>(samples));
     when(service.count(any())).thenReturn((long) samples.size());

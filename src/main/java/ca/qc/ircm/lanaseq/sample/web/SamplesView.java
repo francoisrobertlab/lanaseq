@@ -111,7 +111,7 @@ public class SamplesView extends VerticalLayout
   @Autowired
   protected SampleFilesDialog filesDialog;
   @Autowired
-  protected SampleAnalysisDialog analysisDialog;
+  protected SamplesAnalysisDialog analysisDialog;
   @Autowired
   private transient SamplesViewPresenter presenter;
 
@@ -119,7 +119,7 @@ public class SamplesView extends VerticalLayout
   }
 
   SamplesView(SamplesViewPresenter presenter, SampleDialog dialog, SampleFilesDialog filesDialog,
-      SampleAnalysisDialog analysisDialog) {
+      SamplesAnalysisDialog analysisDialog) {
     this.presenter = presenter;
     this.dialog = dialog;
     this.filesDialog = filesDialog;

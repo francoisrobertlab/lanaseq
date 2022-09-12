@@ -18,12 +18,12 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.CREATE_FOLDER;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.ERRORS;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.HEADER;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.ID;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.id;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ERRORS;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.HEADER;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ID;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,18 +47,18 @@ import org.mockito.Mock;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
- * Tests for {@link SampleAnalysisDialog}.
+ * Tests for {@link SamplesAnalysisDialog}.
  */
 @ServiceTestAnnotations
 @WithMockUser
-public class SampleAnalysisDialogTest extends AbstractKaribuTestCase {
-  private SampleAnalysisDialog dialog;
+public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
+  private SamplesAnalysisDialog dialog;
   @Mock
-  private SampleAnalysisDialogPresenter presenter;
+  private SamplesAnalysisDialogPresenter presenter;
   @Mock
   private Sample sample;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(SampleAnalysisDialog.class, locale);
+  private AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
 
   /**
    * Before test.
@@ -66,7 +66,7 @@ public class SampleAnalysisDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog = new SampleAnalysisDialog(presenter);
+    dialog = new SamplesAnalysisDialog(presenter);
     dialog.init();
   }
 
@@ -105,7 +105,7 @@ public class SampleAnalysisDialogTest extends AbstractKaribuTestCase {
   public void localeChange() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(SampleAnalysisDialog.class, locale);
+    final AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.header.getText());

@@ -18,11 +18,11 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.CREATE_FOLDER;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.ERRORS;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.HEADER;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.id;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ERRORS;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.HEADER;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
@@ -35,7 +35,7 @@ import com.vaadin.testbench.elementsbase.Element;
  * Web element for {@link AnalysisDialog}.
  */
 @Element("vaadin-dialog")
-public class SampleAnalysisDialogElement extends DialogElement {
+public class SamplesAnalysisDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }

@@ -44,7 +44,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SampleAnalysisDialog extends Dialog implements LocaleChangeObserver {
+public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserver {
   private static final long serialVersionUID = 3521519771905055445L;
   public static final String ID = "sample-analysis-dialog";
   public static final String HEADER = "header";
@@ -59,12 +59,12 @@ public class SampleAnalysisDialog extends Dialog implements LocaleChangeObserver
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   @Autowired
-  private transient SampleAnalysisDialogPresenter presenter;
+  private transient SamplesAnalysisDialogPresenter presenter;
 
-  public SampleAnalysisDialog() {
+  public SamplesAnalysisDialog() {
   }
 
-  SampleAnalysisDialog(SampleAnalysisDialogPresenter presenter) {
+  SamplesAnalysisDialog(SamplesAnalysisDialogPresenter presenter) {
     this.presenter = presenter;
   }
 
@@ -94,7 +94,7 @@ public class SampleAnalysisDialog extends Dialog implements LocaleChangeObserver
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(SampleAnalysisDialog.class, getLocale());
+    AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
     header.setText(resources.message(HEADER));
     message.setText(resources.message(MESSAGE));
     createFolder.setText(resources.message(CREATE_FOLDER));
@@ -107,7 +107,7 @@ public class SampleAnalysisDialog extends Dialog implements LocaleChangeObserver
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(SampleAnalysisDialog.class, getLocale());
+    final AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
     Collection<Sample> samples = presenter.getSamples();
     if (samples != null && samples.size() > 1) {
       header.setText(resources.message(HEADER, samples.size()));

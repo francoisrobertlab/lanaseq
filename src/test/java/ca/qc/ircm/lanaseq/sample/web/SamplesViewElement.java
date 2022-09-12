@@ -76,8 +76,8 @@ public class SamplesViewElement extends VerticalLayoutElement {
         .wrap(SampleFilesDialogElement.class);
   }
 
-  public SampleAnalysisDialogElement analyzeDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(SampleAnalysisDialog.ID)))
-        .wrap(SampleAnalysisDialogElement.class);
+  public SamplesAnalysisDialogElement analyzeDialog() {
+    return ((TestBenchElement) getDriver().findElement(By.id(SamplesAnalysisDialog.ID)))
+        .wrap(SamplesAnalysisDialogElement.class);
   }
 }

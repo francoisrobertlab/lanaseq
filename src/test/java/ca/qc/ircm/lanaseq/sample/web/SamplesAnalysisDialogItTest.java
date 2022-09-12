@@ -43,11 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
- * Integration tests for {@link SampleAnalysisDialog}.
+ * Integration tests for {@link SamplesAnalysisDialog}.
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
+public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @TempDir
   Path temporaryFolder;
   @Autowired
@@ -79,7 +79,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.samples().select(0);
     view.analyze().click();
-    SampleAnalysisDialogElement dialog = view.analyzeDialog();
+    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
     assertTrue(optional(() -> dialog.create()).isPresent());
@@ -100,7 +100,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).id(ID);
     view.samples().select(1);
     view.analyze().click();
-    SampleAnalysisDialogElement dialog = view.analyzeDialog();
+    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
 
     dialog.create().click();
     Thread.sleep(2000); // Wait for file copy.
@@ -148,7 +148,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     view.samples().select(view.samples().name(3).startsWith("JS1") ? 3 : 2);
     view.samples().select(1);
     view.analyze().click();
-    SampleAnalysisDialogElement dialog = view.analyzeDialog();
+    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
 
     dialog.create().click();
     Thread.sleep(2000); // Wait for file copy.
@@ -201,7 +201,7 @@ public class SampleAnalysisDialogItTest extends AbstractTestBenchTestCase {
     view.samples().select(1);
     view.samples().select(0);
     view.analyze().click();
-    SampleAnalysisDialogElement dialog = view.analyzeDialog();
+    SamplesAnalysisDialogElement dialog = view.analyzeDialog();
 
     dialog.create().click();
 

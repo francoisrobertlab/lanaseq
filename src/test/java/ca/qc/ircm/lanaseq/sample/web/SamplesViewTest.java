@@ -119,7 +119,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     ui.setLocale(locale);
     view = new SamplesView(presenter, new SampleDialog(), new SampleFilesDialog(),
-        new SampleAnalysisDialog());
+        new SamplesAnalysisDialog());
     view.init();
     samples = sampleRepository.findAll();
   }

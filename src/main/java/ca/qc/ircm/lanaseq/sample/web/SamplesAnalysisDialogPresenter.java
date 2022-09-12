@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.sample.web.SampleAnalysisDialog.CREATE_FOLDER_EXCEPTION;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -46,21 +46,23 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SampleAnalysisDialogPresenter {
-  private static final Logger logger = LoggerFactory.getLogger(SampleAnalysisDialogPresenter.class);
-  private SampleAnalysisDialog dialog;
+public class SamplesAnalysisDialogPresenter {
+  private static final Logger logger =
+      LoggerFactory.getLogger(SamplesAnalysisDialogPresenter.class);
+  private SamplesAnalysisDialog dialog;
   private Collection<Sample> samples;
   private Locale locale = Constants.DEFAULT_LOCALE;
   private AnalysisService service;
   private AppConfiguration configuration;
 
   @Autowired
-  protected SampleAnalysisDialogPresenter(AnalysisService service, AppConfiguration configuration) {
+  protected SamplesAnalysisDialogPresenter(AnalysisService service,
+      AppConfiguration configuration) {
     this.service = service;
     this.configuration = configuration;
   }
 
-  void init(SampleAnalysisDialog dialog) {
+  void init(SamplesAnalysisDialog dialog) {
     this.dialog = dialog;
     dialog.addOpenedChangeListener(e -> {
       if (e.isOpened() && samples != null) {
@@ -88,7 +90,7 @@ public class SampleAnalysisDialogPresenter {
   void createFolder() {
     if (validate()) {
       logger.debug("creating analysis folder for samples {}", samples);
-      AppResources resources = new AppResources(SampleAnalysisDialog.class, locale);
+      AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
       try {
         service.copySamplesResources(samples);
         boolean unix = dialog.getUI().map(ui -> {
