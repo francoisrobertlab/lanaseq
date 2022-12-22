@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.PASSWORD_CONFIRM;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -98,6 +99,15 @@ public class PasswordsFormTest extends AbstractViewTestCase {
     fillForm();
 
     assertEquals(password, form.getPassword());
+  }
+
+  @Test
+  public void getPassword_Empty() {
+    form.localeChange(mock(LocaleChangeEvent.class));
+    form.password.setValue("");
+    form.passwordConfirm.setValue("");
+
+    assertNull(form.getPassword());
   }
 
   @Test

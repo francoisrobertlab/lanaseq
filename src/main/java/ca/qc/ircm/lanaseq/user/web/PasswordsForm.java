@@ -89,7 +89,7 @@ public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
   }
 
   public String getPassword() {
-    return password.getValue();
+    return passwordBinder.getBean().getPassword();
   }
 
   public BinderValidationStatus<Passwords> validate() {
