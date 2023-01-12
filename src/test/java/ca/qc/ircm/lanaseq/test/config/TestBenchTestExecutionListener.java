@@ -22,6 +22,7 @@ import static org.junit.Assume.assumeTrue;
 
 import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.TestBenchTestCase;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
@@ -176,8 +177,9 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       return new FirefoxDriver(options);
     } else {
       try {
-        return (WebDriver) Class.forName(driverClass).newInstance();
-      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        return (WebDriver) Class.forName(driverClass).getDeclaredConstructor().newInstance();
+      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException
+          | NoSuchMethodException | InvocationTargetException e) {
         logger.error("Could not instantiate WebDriver class {}", driverClass);
         throw new IllegalStateException("Could not instantiate WebDriver class " + driverClass, e);
       }

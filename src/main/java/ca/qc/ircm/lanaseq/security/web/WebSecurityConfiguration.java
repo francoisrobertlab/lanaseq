@@ -224,7 +224,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     // Used for TestBench.
     try {
       Class<?> clazz = Class.forName("ca.qc.ircm.lanaseq.test.config.TestBenchSecurityFilter");
-      http.addFilterBefore((Filter) clazz.newInstance(), SecurityContextPersistenceFilter.class);
+      http.addFilterBefore((Filter) clazz.getDeclaredConstructor().newInstance(),
+          SecurityContextPersistenceFilter.class);
     } catch (ClassNotFoundException e) {
       // Ignore, not running unit tests.
     }
