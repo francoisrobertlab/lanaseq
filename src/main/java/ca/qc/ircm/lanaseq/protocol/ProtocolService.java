@@ -148,7 +148,7 @@ public class ProtocolService {
     if (protocol.getId() == null) {
       User user = authorizationService.getCurrentUser().orElse(null);
       protocol.setOwner(user);
-      protocol.setDate(now);
+      protocol.setCreationDate(now);
     } else {
       List<ProtocolFile> oldFiles = fileRepository.findByProtocolAndDeletedFalse(protocol);
       for (ProtocolFile file : oldFiles) {

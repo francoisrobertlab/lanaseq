@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.EDIT_BUTTON;
@@ -138,7 +138,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
     view.date = mock(Column.class);
-    when(view.protocols.addColumn(any(LocalDateTimeRenderer.class), eq(DATE)))
+    when(view.protocols.addColumn(any(LocalDateTimeRenderer.class), eq(CREATION_DATE)))
         .thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
@@ -193,8 +193,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name).setHeader(protocolResources.message(NAME));
     verify(view.name).setFooter(protocolResources.message(NAME));
-    verify(view.date).setHeader(protocolResources.message(DATE));
-    verify(view.date).setFooter(protocolResources.message(DATE));
+    verify(view.date).setHeader(protocolResources.message(CREATION_DATE));
+    verify(view.date).setFooter(protocolResources.message(CREATION_DATE));
     verify(view.owner).setHeader(protocolResources.message(OWNER));
     verify(view.owner).setFooter(protocolResources.message(OWNER));
     verify(view.edit).setHeader(webResources.message(EDIT));
@@ -220,8 +220,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(HEADER), view.header.getText());
     verify(view.name, atLeastOnce()).setHeader(protocolResources.message(NAME));
     verify(view.name, atLeastOnce()).setFooter(protocolResources.message(NAME));
-    verify(view.date, atLeastOnce()).setHeader(protocolResources.message(DATE));
-    verify(view.date, atLeastOnce()).setFooter(protocolResources.message(DATE));
+    verify(view.date, atLeastOnce()).setHeader(protocolResources.message(CREATION_DATE));
+    verify(view.date, atLeastOnce()).setFooter(protocolResources.message(CREATION_DATE));
     verify(view.owner, atLeastOnce()).setHeader(protocolResources.message(OWNER));
     verify(view.owner, atLeastOnce()).setFooter(protocolResources.message(OWNER));
     verify(view.edit, atLeastOnce()).setHeader(webResources.message(EDIT));
@@ -244,7 +244,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertEquals(4, view.protocols.getColumns().size());
     assertNotNull(view.protocols.getColumnByKey(NAME));
     assertTrue(view.name.isSortable());
-    assertNotNull(view.protocols.getColumnByKey(DATE));
+    assertNotNull(view.protocols.getColumnByKey(CREATION_DATE));
     assertTrue(view.date.isSortable());
     assertNotNull(view.protocols.getColumnByKey(OWNER));
     assertTrue(view.owner.isSortable());
@@ -269,10 +269,10 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
       assertEquals(protocol.getName(),
           ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
     }
-    verify(view.protocols).addColumn(localDateTimeRendererCaptor.capture(), eq(DATE));
+    verify(view.protocols).addColumn(localDateTimeRendererCaptor.capture(), eq(CREATION_DATE));
     LocalDateTimeRenderer<Protocol> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
     for (Protocol protocol : protocols) {
-      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(protocol.getDate()),
+      assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(protocol.getCreationDate()),
           getFormattedValue(localDateTimeRenderer, protocol));
     }
     verify(view.protocols).addColumn(valueProviderCaptor.capture(), eq(OWNER));

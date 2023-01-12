@@ -169,7 +169,7 @@ public class ProtocolFilterTest {
 
   private Protocol date(LocalDateTime date) {
     Protocol protocol = new Protocol();
-    protocol.setDate(date);
+    protocol.setCreationDate(date);
     return protocol;
   }
 

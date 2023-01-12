@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS protocol (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   owner_id bigint(20) NOT NULL,
-  date DATETIME NOT NULL,
+  creation_date DATETIME NOT NULL,
   note clob,
   PRIMARY KEY (id),
   CONSTRAINT protocolOwner_ibfk FOREIGN KEY (owner_id) REFERENCES users (id) ON UPDATE CASCADE

@@ -92,7 +92,7 @@ public class ProtocolServiceTest {
     assertEquals("FLAG", protocol.getName());
     assertEquals("First FLAG protocol", protocol.getNote());
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
   }
 
@@ -271,8 +271,8 @@ public class ProtocolServiceTest {
     assertEquals(protocol.getName(), database.getName());
     assertEquals(protocol.getNote(), database.getNote());
     assertEquals(currentUser.getId(), database.getOwner().getId());
-    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(protocol.getDate()));
-    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(protocol.getDate()));
+    assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(protocol.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(protocol.getCreationDate()));
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
     assertEquals(1, files.size());
     file = files.get(0);
@@ -315,7 +315,7 @@ public class ProtocolServiceTest {
     assertEquals("New name", protocol.getName());
     assertEquals("test note", protocol.getNote());
     assertEquals((Long) 3L, protocol.getOwner().getId());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
     assertEquals(2, files.size());
     file = files.get(0);

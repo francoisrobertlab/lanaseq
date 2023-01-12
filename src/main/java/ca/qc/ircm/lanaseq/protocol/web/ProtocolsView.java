@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.DATE;
+import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
@@ -118,10 +118,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     protocols.setId(PROTOCOLS);
     name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Protocol::getName));
-    date = protocols
-        .addColumn(new LocalDateTimeRenderer<>(Protocol::getDate, DateTimeFormatter.ISO_LOCAL_DATE),
-            DATE)
-        .setKey(DATE);
+    date = protocols.addColumn(
+        new LocalDateTimeRenderer<>(Protocol::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        CREATION_DATE).setKey(CREATION_DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     edit = protocols
@@ -167,7 +166,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     header.setText(resources.message(HEADER));
     String nameHeader = protocolResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String dateHeader = protocolResources.message(DATE);
+    String dateHeader = protocolResources.message(CREATION_DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = protocolResources.message(OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);

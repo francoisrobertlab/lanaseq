@@ -15,11 +15,11 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-INSERT INTO protocol (id,name,owner_id,date,note)
+INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('1', 'FLAG', '3', '2018-10-20 11:28:12', 'First FLAG protocol');
-INSERT INTO protocol (id,name,owner_id,date,note)
+INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('2', 'BioID', '5', '2018-11-18 9:31:14', null);
-INSERT INTO protocol (id,name,owner_id,date,note)
+INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('3', 'Histone FLAG', '2', '2018-10-20 9:58:12', null);
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,date)
 VALUES (1,1,'FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/FLAG_Protocol.docx'),0,'2018-10-20 11:28:12');

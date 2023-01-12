@@ -39,7 +39,7 @@ public class ProtocolFilter implements Predicate<Protocol> {
       test &= comparable(replaceNull(protocol.getName())).contains(comparable(nameContains));
     }
     if (dateRange != null) {
-      test &= dateRange.contains(protocol.getDate().toLocalDate());
+      test &= dateRange.contains(protocol.getCreationDate().toLocalDate());
     }
     if (ownerContains != null) {
       test &= comparable(replaceNull(protocol.getOwner().getEmail()))

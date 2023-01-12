@@ -115,8 +115,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertNotNull(protocol);
     assertNotNull(protocol.getId());
     assertEquals(name, protocol.getName());
-    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(protocol.getDate()));
-    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(protocol.getDate()));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(protocol.getCreationDate()));
+    assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(protocol.getCreationDate()));
     assertEquals((Long) 3L, protocol.getOwner().getId());
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
     assertEquals(2, files.size());
@@ -145,7 +145,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(resources.message(SAVED, name), notification.getText());
     Protocol protocol = repository.findById(1L).get();
     assertEquals(name, protocol.getName());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
     assertEquals(3, files.size());
@@ -178,7 +178,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Protocol protocol = repository.findById(1L).get();
     assertEquals("FLAG", protocol.getName());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
     assertEquals(1, files.size());

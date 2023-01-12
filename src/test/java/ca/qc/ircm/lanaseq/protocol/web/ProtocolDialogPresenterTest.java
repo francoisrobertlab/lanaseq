@@ -351,7 +351,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertNull(protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(note, protocol.getNote());
-    assertNull(protocol.getDate());
+    assertNull(protocol.getCreationDate());
     assertNull(protocol.getOwner());
     List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
     assertEquals(1, files.size());
@@ -376,7 +376,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals((Long) 1L, protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(note, protocol.getNote());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
     assertEquals(2, files.size());
@@ -408,7 +408,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals((Long) 1L, protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(note, protocol.getNote());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
     List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
     assertEquals(1, files.size());

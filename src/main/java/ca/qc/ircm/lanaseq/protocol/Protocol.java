@@ -62,7 +62,7 @@ public class Protocol implements Data, Owned, Serializable {
    * Creation date.
    */
   @Column
-  private LocalDateTime date;
+  private LocalDateTime creationDate;
   /**
    * Owner.
    */
@@ -117,12 +117,12 @@ public class Protocol implements Data, Owned, Serializable {
     this.owner = owner;
   }
 
-  public LocalDateTime getDate() {
-    return date;
+  public LocalDateTime getCreationDate() {
+    return creationDate;
   }
 
-  public void setDate(LocalDateTime date) {
-    this.date = date;
+  public void setCreationDate(LocalDateTime creationDate) {
+    this.creationDate = creationDate;
   }
 
   public String getNote() {
