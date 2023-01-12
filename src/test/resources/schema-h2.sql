@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS users (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   email varchar(255) NOT NULL,
   name varchar(255),
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS forgot_password (
   confirm_number varchar(100) NOT NULL,
   used tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  CONSTRAINT forgotpasswordUser_ibfk FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT forgotpasswordUser_ibfk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS protocol (
   id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS protocol (
   date DATETIME NOT NULL,
   note clob,
   PRIMARY KEY (id),
-  CONSTRAINT protocolOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+  CONSTRAINT protocolOwner_ibfk FOREIGN KEY (owner_id) REFERENCES users (id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS protocol_file (
   id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS dataset (
   note clob,
   PRIMARY KEY (id),
   UNIQUE (name),
-  CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+  CONSTRAINT datasetOwner_ibfk FOREIGN KEY (owner_id) REFERENCES users (id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS sample (
   id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS sample (
   note clob,
   PRIMARY KEY (id),
   UNIQUE (name),
-  CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES user (id) ON UPDATE CASCADE
+  CONSTRAINT sampleOwner_ibfk FOREIGN KEY (owner_id) REFERENCES users (id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS dataset_samples (
   id bigint(20) NOT NULL AUTO_INCREMENT,

@@ -28,14 +28,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 /**
  * User.
  */
 @Entity
+@Table(name = User.TABLE_NAME)
 @GeneratePropertyNames
 public class User implements Data, Owned, Serializable {
+  public static final String TABLE_NAME = "users";
   public static final long ROBOT_ID = 1;
   private static final long serialVersionUID = -3200958473089020837L;
   /**
