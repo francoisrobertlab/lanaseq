@@ -136,7 +136,7 @@ public class UserService {
     final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
     if (user.getId() == null) {
       user.setActive(true);
-      user.setDate(LocalDateTime.now());
+      user.setCreationDate(LocalDateTime.now());
     }
     if (password != null) {
       String hashedPassword = passwordEncoder.encode(password);

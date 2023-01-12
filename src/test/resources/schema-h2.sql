@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
   admin tinyint NOT NULL DEFAULT 0,
   expired_password tinyint NOT NULL DEFAULT 0,
   locale varchar(255),
-  date DATETIME NOT NULL,
+  creation_date DATETIME NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY email (email)
 );

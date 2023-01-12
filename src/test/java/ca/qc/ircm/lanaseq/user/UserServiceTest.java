@@ -21,8 +21,8 @@ import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -96,7 +96,7 @@ public class UserServiceTest {
     assertEquals(true, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
     assertNull(user.getLocale());
-    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getDate());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
 
@@ -331,7 +331,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
+    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService).reloadAuthorities();
@@ -361,7 +361,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(true, user.isExpiredPassword());
-    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
+    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
     verify(authorizationService, never()).reloadAuthorities();
@@ -419,7 +419,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getDate());
+    assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertNull(user.getLocale());
     verify(authorizationService).reloadAuthorities();
   }
@@ -446,7 +446,7 @@ public class UserServiceTest {
     assertEquals(false, user.isManager());
     assertEquals(false, user.isAdmin());
     assertEquals(false, user.isExpiredPassword());
-    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getDate());
+    assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getCreationDate());
     assertNull(user.getLocale());
     verify(authorizationService, never()).reloadAuthorities();
   }

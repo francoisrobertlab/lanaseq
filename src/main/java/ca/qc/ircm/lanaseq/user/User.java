@@ -108,7 +108,7 @@ public class User implements Data, Owned, Serializable {
    * Creation date.
    */
   @Column
-  private LocalDateTime date;
+  private LocalDateTime creationDate;
 
   public User() {
   }
@@ -255,11 +255,11 @@ public class User implements Data, Owned, Serializable {
     this.admin = admin;
   }
 
-  public LocalDateTime getDate() {
-    return date;
+  public LocalDateTime getCreationDate() {
+    return creationDate;
   }
 
-  public void setDate(LocalDateTime date) {
-    this.date = date;
+  public void setCreationDate(LocalDateTime creationDate) {
+    this.creationDate = creationDate;
   }
 }
