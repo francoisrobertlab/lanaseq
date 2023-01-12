@@ -79,7 +79,7 @@ public class ProtocolServiceTest {
   @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    currentUser = userRepository.getOne(3L);
+    currentUser = userRepository.findById(3L).get();
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
   }
 
