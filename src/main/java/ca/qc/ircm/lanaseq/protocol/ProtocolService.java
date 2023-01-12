@@ -162,7 +162,7 @@ public class ProtocolService {
     for (ProtocolFile file : files) {
       if (file.getId() == null) {
         file.setProtocol(protocol);
-        file.setDate(now);
+        file.setCreationDate(now);
       }
       fileRepository.save(file);
     }

@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS protocol_file (
   filename varchar(255) NOT NULL,
   content blob,
   deleted tinyint NOT NULL DEFAULT 0,
-  date DATETIME NOT NULL,
+  creation_date DATETIME NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT protocolfileProtocol_ibfk FOREIGN KEY (protocol_id) REFERENCES protocol (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

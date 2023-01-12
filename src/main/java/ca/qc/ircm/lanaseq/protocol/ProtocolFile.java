@@ -64,7 +64,7 @@ public class ProtocolFile implements Data, Serializable {
    * Creation date.
    */
   @Column
-  private LocalDateTime date;
+  private LocalDateTime creationDate;
   /**
    * Protocol.
    */
@@ -119,11 +119,11 @@ public class ProtocolFile implements Data, Serializable {
     this.deleted = deleted;
   }
 
-  public LocalDateTime getDate() {
-    return date;
+  public LocalDateTime getCreationDate() {
+    return creationDate;
   }
 
-  public void setDate(LocalDateTime date) {
-    this.date = date;
+  public void setCreationDate(LocalDateTime creationDate) {
+    this.creationDate = creationDate;
   }
 }

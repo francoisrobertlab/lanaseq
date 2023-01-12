@@ -91,7 +91,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
             Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI())),
         file.getContent());
     assertFalse(file.isDeleted());
-    assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getDate());
+    assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
   }
 
   @Test
