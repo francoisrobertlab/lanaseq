@@ -36,7 +36,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.opera.OperaDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +61,6 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   private static final String FIREFOX_DRIVER = FirefoxDriver.class.getName();
   private static final String CHROME_DRIVER = ChromeDriver.class.getName();
   @SuppressWarnings("unused")
-  private static final String OPERA_DRIVER = OperaDriver.class.getName();
   private static final String DEFAULT_DRIVER = CHROME_DRIVER;
   private static final Logger logger =
       LoggerFactory.getLogger(TestBenchTestExecutionListener.class);
