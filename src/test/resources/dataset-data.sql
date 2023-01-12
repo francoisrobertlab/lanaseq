@@ -29,21 +29,21 @@ INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),1,'2018-10-20 9:58:12');
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
 VALUES (4,3,'Histone Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),0,'2018-10-21 9:58:12');
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('1', 'MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020', '2018-10-20', '2', 1, '2018-10-20 13:28:12', 'robtools version 2');
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('2', 'ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022', '2018-10-22', '3', 1, '2018-10-22 9:48:20', null);
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('3', '20181112', '2018-11-12', '3', 1, '2018-11-12 11:53:09', null);
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('4', 'ChIPseq_IP_yBC102_R103S_BC1-BC2_20181118', '2018-11-18', '5', 1, '2018-11-18 9:31:14', null);
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('5', 'ChIPseq_IP_polr2b_yBC103_WT_BC1_20181118', '2018-12-05', '5', 0, '2018-12-05 9:28:23', null);
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('6', 'ChIPseq_Spt16_yFR101_G24D_JS1_20181208', '2018-12-08', '3', 1, '2018-12-08 10:28:23', null);
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('7', 'ChIPseq_Spt16_yFR101_G24D_JS3_20181211', '2018-12-11', '3', 1, '2018-12-11 10:28:23', null);
-INSERT INTO dataset (id,name,date,owner_id,editable,creation_date,note)
+INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('8', '20181211', '2018-10-19', '3', 1, '2018-12-12 10:30:10', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (1, 'FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:23', 'robtools version 2');
