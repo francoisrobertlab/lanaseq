@@ -120,7 +120,7 @@ public class Sample implements DataWithFiles, Owned, Serializable {
   /**
    * Date.
    */
-  @Column(nullable = false)
+  @Column(name = "experiment_date", nullable = false)
   private LocalDate date;
   /**
    * Time when sample was created.

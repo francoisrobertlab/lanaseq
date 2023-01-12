@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS sample (
   strain varchar(255) NOT NULL,
   strain_description varchar(255),
   treatment varchar(255),
-  date DATE NOT NULL,
+  experiment_date DATE NOT NULL,
   protocol_id bigint(20) NOT NULL,
   owner_id bigint(20) NOT NULL,
   editable tinyint NOT NULL DEFAULT 0,
