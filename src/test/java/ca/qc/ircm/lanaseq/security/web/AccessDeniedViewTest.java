@@ -26,22 +26,23 @@ import static ca.qc.ircm.lanaseq.security.web.AccessDeniedView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Tests for {@link AccessDeniedView}.
  */
 @NonTransactionalTestAnnotations
-public class AccessDeniedViewTest extends AbstractViewTestCase {
+@WithMockUser
+public class AccessDeniedViewTest extends AbstractKaribuTestCase {
   private AccessDeniedView view;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AccessDeniedView.class, locale);
@@ -49,7 +50,7 @@ public class AccessDeniedViewTest extends AbstractViewTestCase {
 
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view = new AccessDeniedView();
   }
 
@@ -74,7 +75,7 @@ public class AccessDeniedViewTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(AccessDeniedView.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MESSAGE), view.message.getText());

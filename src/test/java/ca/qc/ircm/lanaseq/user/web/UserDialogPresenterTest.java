@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -42,12 +42,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Tests for {@link UserDialogPresenter}.
  */
 @ServiceTestAnnotations
-public class UserDialogPresenterTest extends AbstractViewTestCase {
+@WithMockUser
+public class UserDialogPresenterTest extends AbstractKaribuTestCase {
   private UserDialogPresenter presenter;
   @Mock
   private UserDialog dialog;

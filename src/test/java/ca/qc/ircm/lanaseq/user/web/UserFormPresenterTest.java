@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -54,7 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Tests for {@link UserFormPresenter}.
  */
 @ServiceTestAnnotations
-public class UserFormPresenterTest extends AbstractViewTestCase {
+public class UserFormPresenterTest extends AbstractKaribuTestCase {
   private UserFormPresenter presenter;
   @Mock
   private UserForm form;

@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
@@ -46,12 +46,14 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 
 /**
  * Tests for {@link UseForgotPasswordViewPresenter}.
  */
 @ServiceTestAnnotations
-public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
+@WithAnonymousUser
+public class UseForgotPasswordViewPresenterTest extends AbstractKaribuTestCase {
   private UseForgotPasswordViewPresenter presenter;
   @Mock
   private UseForgotPasswordView view;
@@ -79,6 +81,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
     when(service.get(any(Long.class), any())).thenReturn(Optional.of(forgotPassword));
     presenter.init(view);
     presenter.localeChange(locale);
+    ui.navigate(UseForgotPasswordView.class);
   }
 
   @Test
@@ -102,7 +105,7 @@ public class UseForgotPasswordViewPresenterTest extends AbstractViewTestCase {
 
     verify(view.form).isValid();
     verify(service).updatePassword(eq(forgotPassword), eq(password));
-    verify(ui).navigate(SigninView.class);
+    assertCurrentView(SigninView.class);
     verify(view).showNotification(resources.message(SAVED));
   }
 

@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.web.component;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link UrlComponent}.
  */
 @NonTransactionalTestAnnotations
-public class UrlComponentTest extends AbstractViewTestCase {
+public class UrlComponentTest extends AbstractKaribuTestCase {
   private UrlComponentForTest urlComponent = new UrlComponentForTest();
 
   @Test

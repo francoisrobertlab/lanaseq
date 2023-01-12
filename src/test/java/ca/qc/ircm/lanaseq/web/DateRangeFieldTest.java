@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DateRangeField.Dates;
 import com.google.common.collect.Range;
@@ -54,7 +54,7 @@ import org.mockito.Mock;
  * Tests for {@link DateRangeField}.
  */
 @NonTransactionalTestAnnotations
-public class DateRangeFieldTest extends AbstractViewTestCase {
+public class DateRangeFieldTest extends AbstractKaribuTestCase {
   private DateRangeField dateRange;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
@@ -66,7 +66,7 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     dateRange = new DateRangeField();
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     dateRange.localeChange(localeChangeEvent);
@@ -94,7 +94,7 @@ public class DateRangeFieldTest extends AbstractViewTestCase {
   @Test
   public void localeChange() {
     locale = FRENCH;
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     dateRange.localeChange(localeChangeEvent);
     AppResources resources = new AppResources(DateRangeField.class, locale);

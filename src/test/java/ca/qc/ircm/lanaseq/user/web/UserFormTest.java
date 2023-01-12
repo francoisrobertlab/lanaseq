@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -44,7 +44,7 @@ import org.mockito.Mock;
  * Tests for {@link UserForm}.
  */
 @ServiceTestAnnotations
-public class UserFormTest extends AbstractViewTestCase {
+public class UserFormTest extends AbstractKaribuTestCase {
   private UserForm form;
   @Mock
   private UserFormPresenter presenter;
@@ -58,7 +58,7 @@ public class UserFormTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     form = new UserForm(presenter);
     form.init();
   }
@@ -92,7 +92,7 @@ public class UserFormTest extends AbstractViewTestCase {
     form.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources userResources = new AppResources(User.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     form.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(userResources.message(EMAIL), form.email.getLabel());
     assertEquals(userResources.message(NAME), form.name.getLabel());

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox.CustomValueSetEvent;
@@ -50,7 +50,7 @@ import org.mockito.Mock;
  * Tests for {@link TagsField}.
  */
 @NonTransactionalTestAnnotations
-public class TagsFieldTest extends AbstractViewTestCase {
+public class TagsFieldTest extends AbstractKaribuTestCase {
   private TagsField tagsField;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
@@ -62,7 +62,7 @@ public class TagsFieldTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     tagsField = new TagsField();
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     tagsField.localeChange(localeChangeEvent);

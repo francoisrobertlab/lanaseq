@@ -17,7 +17,13 @@
 
 package ca.qc.ircm.lanaseq.test.config;
 
+import static ca.qc.ircm.lanaseq.test.config.AnnotationFinder.findAnnotation;
+import static org.junit.Assert.assertEquals;
+
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.Route;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
@@ -32,5 +38,22 @@ public abstract class AbstractKaribuTestCase {
   @BeforeEach
   public void obtainUi() {
     ui = UI.getCurrent();
+  }
+
+  protected <C extends Component> void assertCurrentView(Class<C> view) {
+    Route route = findAnnotation(view, Route.class).orElseThrow(() -> new IllegalStateException(
+        "View " + view.getSimpleName() + " does not have a @Route annotation"));
+    assertEquals(route.value(), ui.getInternals().getActiveViewLocation().getPath());
+  }
+
+  protected <T, C extends Component & HasUrlParameter<T>> void assertCurrentView(Class<C> view,
+      T parameter) {
+    Route route = findAnnotation(view, Route.class).orElseThrow(() -> new IllegalStateException(
+        "View " + view.getSimpleName() + " does not have a @Route annotation"));
+    if (parameter == null) {
+      assertEquals(route.value(), ui.getInternals().getActiveViewLocation().getPath());
+    }
+    assertEquals(route.value() + "/" + parameter,
+        ui.getInternals().getActiveViewLocation().getPath());
   }
 }

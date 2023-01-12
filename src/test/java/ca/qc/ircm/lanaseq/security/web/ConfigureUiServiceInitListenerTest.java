@@ -19,66 +19,58 @@ package ca.qc.ircm.lanaseq.security.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
-import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterListener;
 import com.vaadin.flow.router.Location;
-import com.vaadin.flow.server.ServiceInitEvent;
-import com.vaadin.flow.server.UIInitEvent;
-import com.vaadin.flow.server.UIInitListener;
-import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.router.internal.AfterNavigationHandler;
+import com.vaadin.flow.router.internal.BeforeEnterHandler;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Tests for {@link ConfigureUiServiceInitListener}.
  */
-@NonTransactionalTestAnnotations
-public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
+@ServiceTestAnnotations
+@WithMockUser
+public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
+  private static final Logger logger =
+      LoggerFactory.getLogger(ConfigureUiServiceInitListenerTest.class);
   @Autowired
   private ConfigureUiServiceInitListener configurer;
   @MockBean
   private AuthorizationService authorizationService;
   @Mock
-  private ServiceInitEvent serviceInitEvent;
-  @Mock
-  private VaadinService vaadinService;
-  @Mock
-  private UIInitEvent uiInitEvent;
-  @Mock
-  private Registration registration;
+  private AfterNavigationListener navigationListener;
   @Mock
   private BeforeEnterEvent beforeEnterEvent;
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
   @Mock
   private Location location;
-  @Captor
-  private ArgumentCaptor<BeforeEnterListener> beforeEnterListenerCaptor;
-  @Captor
-  private ArgumentCaptor<AfterNavigationListener> afterNavigationListenerCaptor;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(ConfigureUiServiceInitListener.class, locale);
   private User user = new User(1L, "myuser");
@@ -89,15 +81,10 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   @BeforeEach
   public void beforeTest() {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
-    when(serviceInitEvent.getSource()).thenReturn(vaadinService);
-    when(vaadinService.addUIInitListener(any())).then(i -> {
-      UIInitListener listener = i.getArgument(0);
-      listener.uiInit(uiInitEvent);
-      return registration;
-    });
-    when(uiInitEvent.getUI()).thenReturn(ui);
-    when(ui.getLocale()).thenReturn(locale);
-    when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> ViewTest.class);
+    when(authorizationService.isAuthorized(AccessDeniedView.class)).thenReturn(true);
+    ui.setLocale(locale);
+    ui.addAfterNavigationListener(navigationListener);
+    when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> SamplesView.class);
     when(beforeEnterEvent.getUI()).thenReturn(ui);
     when(beforeEnterEvent.getLocation()).thenReturn(location);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
@@ -105,19 +92,14 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
   }
 
   private void doBeforeEnter() {
-    configurer.serviceInit(serviceInitEvent);
-    verify(vaadinService).addUIInitListener(any());
-    verify(ui).addBeforeEnterListener(beforeEnterListenerCaptor.capture());
-    BeforeEnterListener beforeEnterListener = beforeEnterListenerCaptor.getValue();
-    beforeEnterListener.beforeEnter(beforeEnterEvent);
+    List<BeforeEnterHandler> handlers = ui.getInternals().getListeners(BeforeEnterHandler.class);
+    handlers.get(0).beforeEnter(beforeEnterEvent);
   }
 
   private void doAfterNavigation() {
-    configurer.serviceInit(serviceInitEvent);
-    verify(vaadinService).addUIInitListener(any());
-    verify(ui).addAfterNavigationListener(afterNavigationListenerCaptor.capture());
-    AfterNavigationListener afterNavigationListener = afterNavigationListenerCaptor.getValue();
-    afterNavigationListener.afterNavigation(afterNavigationEvent);
+    List<AfterNavigationHandler> handlers =
+        ui.getInternals().getListeners(AfterNavigationHandler.class);
+    handlers.get(0).afterNavigation(afterNavigationEvent);
   }
 
   @Test
@@ -126,17 +108,17 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
 
     doBeforeEnter();
 
-    verify(authorizationService).isAuthorized(ViewTest.class);
+    verify(authorizationService, atLeastOnce()).isAuthorized(SamplesView.class);
   }
 
   @Test
   public void beforeEnter_NotAuthorized() {
     doBeforeEnter();
 
-    verify(authorizationService).isAuthorized(ViewTest.class);
-    verify(authorizationService).isAnonymous();
+    verify(authorizationService, atLeastOnce()).isAuthorized(SamplesView.class);
+    verify(authorizationService, atLeastOnce()).isAnonymous();
     String message = resources.message(AccessDeniedException.class.getSimpleName(), user.getEmail(),
-        ViewTest.class.getSimpleName());
+        SamplesView.class.getSimpleName());
     verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
   }
 
@@ -146,9 +128,8 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
 
     doBeforeEnter();
 
-    verify(ui).navigate(SigninView.class);
-    verify(authorizationService).isAuthorized(ViewTest.class);
-    verify(authorizationService).isAnonymous();
+    verify(authorizationService, atLeastOnce()).isAuthorized(SamplesView.class);
+    verify(authorizationService, atLeastOnce()).isAnonymous();
   }
 
   @Test
@@ -157,32 +138,30 @@ public class ConfigureUiServiceInitListenerTest extends AbstractViewTestCase {
 
     doAfterNavigation();
 
-    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(ui).navigate(PasswordView.class);
+    verify(authorizationService, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(navigationListener).afterNavigation(any());
+    assertCurrentView(PasswordView.class);
   }
 
   @Test
   public void afterNavigation_ForceChangePasswordAlreadyOnView() {
+    when(authorizationService.isAuthorized(any())).thenReturn(true);
     when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
     when(location.getPath()).thenReturn(PasswordView.VIEW_NAME);
 
     doAfterNavigation();
 
-    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(ui, never()).navigate(PasswordView.class);
+    verify(authorizationService, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(navigationListener, never()).afterNavigation(any());
   }
 
   @Test
   public void afterNavigation_NotForceChangePassword() {
+    when(authorizationService.isAuthorized(any())).thenReturn(true);
+
     doAfterNavigation();
 
-    verify(authorizationService).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(ui, never()).navigate(PasswordView.class);
-  }
-
-  /**
-   * Fake view for tests.
-   */
-  public static class ViewTest {
+    verify(authorizationService, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(navigationListener, never()).afterNavigation(any());
   }
 }

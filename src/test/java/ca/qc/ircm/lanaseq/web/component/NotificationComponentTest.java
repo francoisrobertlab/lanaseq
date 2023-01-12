@@ -19,8 +19,9 @@ package ca.qc.ircm.lanaseq.web.component;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import org.junit.jupiter.api.Test;
@@ -29,14 +30,14 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link NotificationComponent}.
  */
 @NonTransactionalTestAnnotations
-public class NotificationComponentTest extends AbstractViewTestCase {
+public class NotificationComponentTest extends AbstractKaribuTestCase {
   private NotificationComponentForTest notificationComponent = new NotificationComponentForTest();
 
   @Test
   public void showNotification_Text() {
     notificationComponent.showNotification("abc");
 
-    Notification notification = testOpenNotification();
+    Notification notification = NotificationsKt.getNotifications().get(0);
     validateNotificationText("abc", notification);
     validateNotificationDuration(NotificationComponent.DEFAULT_DURATION, notification);
     validateNotificationPosition(Position.BOTTOM_START, notification);
@@ -46,7 +47,7 @@ public class NotificationComponentTest extends AbstractViewTestCase {
   public void showNotification_TextDuration() {
     notificationComponent.showNotification("abc", 100);
 
-    Notification notification = testOpenNotification();
+    Notification notification = NotificationsKt.getNotifications().get(0);
     validateNotificationText("abc", notification);
     validateNotificationDuration(100, notification);
     validateNotificationPosition(Position.BOTTOM_START, notification);
@@ -56,7 +57,7 @@ public class NotificationComponentTest extends AbstractViewTestCase {
   public void showNotification_TextDurationPosition() {
     notificationComponent.showNotification("abc", 100, Position.TOP_END);
 
-    Notification notification = testOpenNotification();
+    Notification notification = NotificationsKt.getNotifications().get(0);
     validateNotificationText("abc", notification);
     validateNotificationDuration(100, notification);
     validateNotificationPosition(Position.TOP_END, notification);

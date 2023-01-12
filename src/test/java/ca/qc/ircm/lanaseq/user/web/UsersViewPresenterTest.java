@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -44,6 +44,7 @@ import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -63,12 +64,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Tests for {@link UsersViewPresenter}.
  */
 @ServiceTestAnnotations
-public class UsersViewPresenterTest extends AbstractViewTestCase {
+@WithMockUser
+public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   private UsersViewPresenter presenter;
   @Mock
   private UsersView view;
@@ -288,8 +291,10 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     view.users.select(user);
     presenter.switchUser();
     assertFalse(view.error.isVisible());
-    verify(page).executeJs("document.getElementById(\"" + SWITCH_USERNAME + "\").value = \""
-        + user.getEmail() + "\"; document.getElementById(\"" + SWITCH_USER_FORM + "\").submit()");
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> ("document.getElementById(\"" + SWITCH_USERNAME + "\").value = \""
+            + user.getEmail() + "\"; document.getElementById(\"" + SWITCH_USER_FORM
+            + "\").submit()").equals(i.getInvocation().getExpression())));
   }
 
   @Test
@@ -297,7 +302,8 @@ public class UsersViewPresenterTest extends AbstractViewTestCase {
     presenter.switchUser();
     assertEquals(resources.message(USERS_REQUIRED), view.error.getText());
     assertTrue(view.error.isVisible());
-    verify(page, never()).executeJs(any());
+    assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> i.getInvocation().getExpression().contains(SWITCH_USER_FORM)));
   }
 
   @Test

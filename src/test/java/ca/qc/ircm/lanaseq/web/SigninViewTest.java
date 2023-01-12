@@ -43,7 +43,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
@@ -61,12 +61,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 
 /**
  * Tests for {@link SigninView}.
  */
 @NonTransactionalTestAnnotations
-public class SigninViewTest extends AbstractViewTestCase {
+@WithAnonymousUser
+public class SigninViewTest extends AbstractKaribuTestCase {
   private SigninView view;
   @Autowired
   private SecurityConfiguration configuration;
@@ -91,7 +93,7 @@ public class SigninViewTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view = new SigninView(configuration, authorizationService);
     view.init();
     when(afterNavigationEvent.getLocation()).thenReturn(location);
@@ -180,7 +182,7 @@ public class SigninViewTest extends AbstractViewTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(SigninView.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
     assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
@@ -253,6 +255,6 @@ public class SigninViewTest extends AbstractViewTestCase {
   @Test
   public void forgotPassword() {
     view.fireForgotPasswordEvent();
-    verify(ui).navigate(ForgotPasswordView.class);
+    assertCurrentView(ForgotPasswordView.class);
   }
 }

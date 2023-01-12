@@ -30,11 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -49,7 +48,7 @@ import org.mockito.Mock;
  * Tests for {@link ProfileView}.
  */
 @ServiceTestAnnotations
-public class ProfileViewTest extends AbstractViewTestCase {
+public class ProfileViewTest extends AbstractKaribuTestCase {
   private ProfileView view;
   private UserForm form;
   @Mock
@@ -67,7 +66,7 @@ public class ProfileViewTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     form = new UserForm(formPresenter);
     view = new ProfileView(presenter, form);
     view.init();
@@ -101,7 +100,7 @@ public class ProfileViewTest extends AbstractViewTestCase {
     Locale locale = FRENCH;
     final AppResources resources = new AppResources(ProfileView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());

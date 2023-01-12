@@ -31,11 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -50,7 +49,7 @@ import org.mockito.Mock;
  * Tests for {@link UseForgotPasswordView}.
  */
 @ServiceTestAnnotations
-public class UseForgotPasswordViewTest extends AbstractViewTestCase {
+public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
   private UseForgotPasswordView view;
   @Mock
   private UseForgotPasswordViewPresenter presenter;
@@ -65,7 +64,7 @@ public class UseForgotPasswordViewTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view = new UseForgotPasswordView(presenter);
     view.init();
   }
@@ -100,7 +99,7 @@ public class UseForgotPasswordViewTest extends AbstractViewTestCase {
     Locale locale = FRENCH;
     final AppResources resources = new AppResources(UseForgotPasswordView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MESSAGE), view.message.getText());

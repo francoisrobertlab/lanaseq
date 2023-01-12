@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
@@ -42,12 +42,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Tests for {@link ProfileViewPresenter}.
  */
 @ServiceTestAnnotations
-public class ProfileViewPresenterTest extends AbstractViewTestCase {
+@WithMockUser
+public class ProfileViewPresenterTest extends AbstractKaribuTestCase {
   private ProfileViewPresenter presenter;
   @Mock
   private ProfileView view;
@@ -78,6 +80,7 @@ public class ProfileViewPresenterTest extends AbstractViewTestCase {
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     presenter.init(view);
     presenter.localeChange(locale);
+    ui.navigate(ProfileView.class);
   }
 
   @Test

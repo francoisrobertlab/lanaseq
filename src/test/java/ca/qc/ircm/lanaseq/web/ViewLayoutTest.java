@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SIGNOUT_URL;
 import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
@@ -44,30 +45,35 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.router.Location;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
  * Tests for {@link ViewLayout}.
  */
-@NonTransactionalTestAnnotations
-public class ViewLayoutTest extends AbstractViewTestCase {
+@ServiceTestAnnotations
+@WithMockUser
+public class ViewLayoutTest extends AbstractKaribuTestCase {
   private ViewLayout view;
   @Mock
   private AuthorizationService authorizationService;
+  @Mock
+  private AfterNavigationListener navigationListener;
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
   private Locale locale = Locale.ENGLISH;
@@ -79,10 +85,17 @@ public class ViewLayoutTest extends AbstractViewTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
+    ui.addAfterNavigationListener(navigationListener);
     view = new ViewLayout(authorizationService);
     when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
     view.init();
+  }
+
+  private void assertNoExecuteJs() {
+    assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> i.getInvocation().getExpression().contains(EXIT_SWITCH_USER_FORM)
+            || i.getInvocation().getExpression().contains(SIGNOUT_URL)));
   }
 
   @Test
@@ -119,7 +132,7 @@ public class ViewLayoutTest extends AbstractViewTestCase {
     view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(ViewLayout.class, locale);
-    when(ui.getLocale()).thenReturn(locale);
+    ui.setLocale(locale);
     view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(SAMPLES), view.samples.getLabel());
@@ -180,8 +193,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.datasets);
 
-    verify(ui).navigate(DatasetsView.VIEW_NAME);
-    verify(page, never()).executeJs(any());
+    verify(navigationListener).afterNavigation(any());
+    assertCurrentView(DatasetsView.class);
+    assertNoExecuteJs();
   }
 
   @Test
@@ -192,8 +206,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.datasets);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJs(any());
+    verify(navigationListener, never()).afterNavigation(any());
+    assertNoExecuteJs();
   }
 
   @Test
@@ -204,8 +218,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.samples);
 
-    verify(ui).navigate(SamplesView.VIEW_NAME);
-    verify(page, never()).executeJs(any());
+    verify(navigationListener).afterNavigation(any());
+    assertCurrentView(SamplesView.class);
+    assertNoExecuteJs();
   }
 
   @Test
@@ -216,8 +231,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.samples);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJs(any());
+    verify(navigationListener, never()).afterNavigation(any());
+    assertNoExecuteJs();
   }
 
   @Test
@@ -228,8 +243,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.protocols);
 
-    verify(ui).navigate(ProtocolsView.VIEW_NAME);
-    verify(page, never()).executeJs(any());
+    verify(navigationListener).afterNavigation(any());
+    assertCurrentView(ProtocolsView.class);
+    assertNoExecuteJs();
   }
 
   @Test
@@ -240,8 +256,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.protocols);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJs(any());
+    verify(navigationListener, never()).afterNavigation(any());
+    assertNoExecuteJs();
   }
 
   @Test
@@ -252,8 +268,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.profile);
 
-    verify(ui).navigate(ProfileView.VIEW_NAME);
-    verify(page, never()).executeJs(any());
+    verify(navigationListener).afterNavigation(any());
+    assertCurrentView(ProfileView.class);
+    assertNoExecuteJs();
   }
 
   @Test
@@ -264,8 +281,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.profile);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJs(any());
+    verify(navigationListener, never()).afterNavigation(any());
+    assertNoExecuteJs();
   }
 
   @Test
@@ -276,8 +293,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.users);
 
-    verify(ui).navigate(UsersView.VIEW_NAME);
-    verify(page, never()).executeJs(any());
+    verify(navigationListener).afterNavigation(any());
+    assertCurrentView(UsersView.class);
+    assertNoExecuteJs();
   }
 
   @Test
@@ -288,8 +306,8 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.users);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page, never()).executeJs(any());
+    verify(navigationListener, never()).afterNavigation(any());
+    assertNoExecuteJs();
   }
 
   @Test
@@ -300,9 +318,10 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.exitSwitchUser);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page).executeJs(
-        "document.getElementById(\"" + styleName(EXIT_SWITCH_USER_FORM, TAB) + "\").submit()");
+    verify(navigationListener, never()).afterNavigation(any());
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> i.getInvocation().getExpression().equals("document.getElementById(\""
+            + styleName(EXIT_SWITCH_USER_FORM, TAB) + "\").submit()")));
   }
 
   @Test
@@ -313,8 +332,9 @@ public class ViewLayoutTest extends AbstractViewTestCase {
 
     view.tabs.setSelectedTab(view.signout);
 
-    verify(ui, never()).navigate(any(String.class));
-    verify(page).executeJs("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
+    verify(navigationListener, never()).afterNavigation(any());
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
+        i -> i.getInvocation().getExpression().equals("location.assign('" + SIGNOUT_URL + "')")));
   }
 
   @Test

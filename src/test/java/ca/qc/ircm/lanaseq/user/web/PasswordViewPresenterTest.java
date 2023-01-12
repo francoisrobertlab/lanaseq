@@ -25,13 +25,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthorizationService;
-import ca.qc.ircm.lanaseq.test.config.AbstractViewTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
-import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -43,12 +43,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Tests for {@link PasswordViewPresenter}.
  */
 @ServiceTestAnnotations
-public class PasswordViewPresenterTest extends AbstractViewTestCase {
+@WithMockUser
+public class PasswordViewPresenterTest extends AbstractKaribuTestCase {
   private PasswordViewPresenter presenter;
   @Mock
   private PasswordView view;
@@ -84,6 +86,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     when(passwordsValidationStatus.isOk()).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);
+    ui.navigate(PasswordView.class);
   }
 
   @Test
@@ -100,7 +103,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     verify(service, never()).save(any());
-    verify(ui, never()).navigate(any(Class.class));
+    assertCurrentView(PasswordView.class);
   }
 
   @Test
@@ -110,7 +113,7 @@ public class PasswordViewPresenterTest extends AbstractViewTestCase {
     presenter.save();
 
     verify(service).save(password);
-    verify(ui).navigate(MainView.class);
+    assertCurrentView(DatasetsView.class);
     verify(view).showNotification(resources.message(SAVED));
   }
 }
