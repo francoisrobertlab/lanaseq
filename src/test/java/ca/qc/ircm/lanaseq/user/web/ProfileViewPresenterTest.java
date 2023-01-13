@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -56,7 +56,7 @@ public class ProfileViewPresenterTest extends AbstractKaribuTestCase {
   @Mock
   private UserService service;
   @Mock
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private User user;
   @Captor
@@ -71,13 +71,13 @@ public class ProfileViewPresenterTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    presenter = new ProfileViewPresenter(service, authorizationService);
+    presenter = new ProfileViewPresenter(service, authenticatedUser);
     view.header = new H2();
     view.form = mock(UserForm.class);
     view.buttonsLayout = new HorizontalLayout();
     view.save = new Button();
     when(service.get(any(Long.class))).thenReturn(Optional.of(user));
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     presenter.init(view);
     presenter.localeChange(locale);
     ui.navigate(ProfileView.class);

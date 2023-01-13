@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -45,19 +45,18 @@ public class SelectSampleDialogPresenter {
   private ListDataProvider<Sample> samplesDataProvider;
   private WebSampleFilter filter = new WebSampleFilter();
   private SampleService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
-  SelectSampleDialogPresenter(SampleService service, AuthorizationService authorizationService) {
+  SelectSampleDialogPresenter(SampleService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(SelectSampleDialog dialog) {
     this.dialog = dialog;
-    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      authorizationService.getCurrentUser()
-          .ifPresent(user -> dialog.ownerFilter.setValue(user.getEmail()));
+    if (!authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      authenticatedUser.getUser().ifPresent(user -> dialog.ownerFilter.setValue(user.getEmail()));
     }
     loadSamples();
   }

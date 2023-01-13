@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -62,7 +62,7 @@ public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
   @Autowired
   private ConfigureUiServiceInitListener configurer;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationListener navigationListener;
   @Mock
@@ -80,8 +80,8 @@ public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
-    when(authorizationService.isAuthorized(AccessDeniedView.class)).thenReturn(true);
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.isAuthorized(AccessDeniedView.class)).thenReturn(true);
     ui.setLocale(locale);
     ui.addAfterNavigationListener(navigationListener);
     when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> SamplesView.class);
@@ -104,19 +104,19 @@ public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
 
   @Test
   public void beforeEnter_Authorized() {
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
+    when(authenticatedUser.isAuthorized(any())).thenReturn(true);
 
     doBeforeEnter();
 
-    verify(authorizationService, atLeastOnce()).isAuthorized(SamplesView.class);
+    verify(authenticatedUser, atLeastOnce()).isAuthorized(SamplesView.class);
   }
 
   @Test
   public void beforeEnter_NotAuthorized() {
     doBeforeEnter();
 
-    verify(authorizationService, atLeastOnce()).isAuthorized(SamplesView.class);
-    verify(authorizationService, atLeastOnce()).isAnonymous();
+    verify(authenticatedUser, atLeastOnce()).isAuthorized(SamplesView.class);
+    verify(authenticatedUser, atLeastOnce()).isAnonymous();
     String message = resources.message(AccessDeniedException.class.getSimpleName(), user.getEmail(),
         SamplesView.class.getSimpleName());
     verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
@@ -124,44 +124,44 @@ public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
 
   @Test
   public void beforeEnter_NotAuthorizedAnonymous() {
-    when(authorizationService.isAnonymous()).thenReturn(true);
+    when(authenticatedUser.isAnonymous()).thenReturn(true);
 
     doBeforeEnter();
 
-    verify(authorizationService, atLeastOnce()).isAuthorized(SamplesView.class);
-    verify(authorizationService, atLeastOnce()).isAnonymous();
+    verify(authenticatedUser, atLeastOnce()).isAuthorized(SamplesView.class);
+    verify(authenticatedUser, atLeastOnce()).isAnonymous();
   }
 
   @Test
   public void afterNavigation_ForceChangePassword() {
-    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
+    when(authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
 
     doAfterNavigation();
 
-    verify(authorizationService, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(authenticatedUser, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(navigationListener).afterNavigation(any());
     assertCurrentView(PasswordView.class);
   }
 
   @Test
   public void afterNavigation_ForceChangePasswordAlreadyOnView() {
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
-    when(authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
+    when(authenticatedUser.isAuthorized(any())).thenReturn(true);
+    when(authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
     when(location.getPath()).thenReturn(PasswordView.VIEW_NAME);
 
     doAfterNavigation();
 
-    verify(authorizationService, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(authenticatedUser, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(navigationListener, never()).afterNavigation(any());
   }
 
   @Test
   public void afterNavigation_NotForceChangePassword() {
-    when(authorizationService.isAuthorized(any())).thenReturn(true);
+    when(authenticatedUser.isAuthorized(any())).thenReturn(true);
 
     doAfterNavigation();
 
-    verify(authorizationService, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
+    verify(authenticatedUser, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(navigationListener, never()).afterNavigation(any());
   }
 }

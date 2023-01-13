@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -41,20 +41,20 @@ public class ProfileViewPresenter {
   private ProfileView view;
   private Locale locale;
   private UserService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   protected ProfileViewPresenter() {
   }
 
   @Autowired
-  protected ProfileViewPresenter(UserService service, AuthorizationService authorizationService) {
+  protected ProfileViewPresenter(UserService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(ProfileView view) {
     this.view = view;
-    view.form.setUser(authorizationService.getCurrentUser().orElse(null));
+    view.form.setUser(authenticatedUser.getUser().orElse(null));
   }
 
   void localeChange(Locale locale) {

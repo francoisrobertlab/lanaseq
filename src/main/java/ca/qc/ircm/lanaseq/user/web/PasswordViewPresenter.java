@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.MainView;
@@ -44,15 +44,15 @@ public class PasswordViewPresenter {
   @Autowired
   private UserService service;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   private Locale locale;
 
   protected PasswordViewPresenter() {
   }
 
-  protected PasswordViewPresenter(UserService service, AuthorizationService authorizationService) {
+  protected PasswordViewPresenter(UserService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(PasswordView view) {
@@ -70,7 +70,7 @@ public class PasswordViewPresenter {
 
   void save() {
     if (validate()) {
-      User user = authorizationService.getCurrentUser().orElse(null);
+      User user = authenticatedUser.getUser().orElse(null);
       String password = view.passwords.getPassword();
       logger.debug("save new password for user {}", user);
       service.save(password);

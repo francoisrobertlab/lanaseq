@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.time.LocalDateTime;
@@ -62,7 +62,7 @@ public class UserServiceTest {
   @MockBean
   private PasswordEncoder passwordEncoder;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
   private String hashedPassword = "4k7GCUVUzV5zL74V867q";
@@ -161,7 +161,7 @@ public class UserServiceTest {
 
     assertEquals(true, exists);
 
-    verifyNoInteractions(authorizationService);
+    verifyNoInteractions(authenticatedUser);
   }
 
   @Test
@@ -170,7 +170,7 @@ public class UserServiceTest {
 
     assertEquals(false, exists);
 
-    verifyNoInteractions(authorizationService);
+    verifyNoInteractions(authenticatedUser);
   }
 
   @Test
@@ -183,7 +183,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void all() {
-    when(authorizationService.getCurrentUser()).thenReturn(repository.findById(3L));
+    when(authenticatedUser.getUser()).thenReturn(repository.findById(3L));
 
     List<User> users = service.all();
 
@@ -334,7 +334,7 @@ public class UserServiceTest {
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
-    verify(authorizationService).reloadAuthorities();
+    verify(authenticatedUser).reloadAuthorities();
   }
 
   @Test
@@ -364,7 +364,7 @@ public class UserServiceTest {
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
-    verify(authorizationService, never()).reloadAuthorities();
+    verify(authenticatedUser, never()).reloadAuthorities();
   }
 
   @Test
@@ -401,7 +401,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_Password() {
     User user = repository.findById(6L).get();
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
     service.save("newpassword");
 
@@ -421,14 +421,14 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertNull(user.getLocale());
-    verify(authorizationService).reloadAuthorities();
+    verify(authenticatedUser).reloadAuthorities();
   }
 
   @Test
   @WithMockUser
   public void save_PasswordNoAuthorityChange() {
     User user = repository.findById(3L).get();
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
     service.save("newpassword");
 
@@ -448,7 +448,7 @@ public class UserServiceTest {
     assertEquals(false, user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getCreationDate());
     assertNull(user.getLocale());
-    verify(authorizationService, never()).reloadAuthorities();
+    verify(authenticatedUser, never()).reloadAuthorities();
   }
 
   @Test
@@ -456,7 +456,7 @@ public class UserServiceTest {
   public void save_PasswordAnonymousDenied() {
     assertThrows(AccessDeniedException.class, () -> {
       User user = repository.findById(3L).get();
-      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+      when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
       service.save("new password");
     });
@@ -467,7 +467,7 @@ public class UserServiceTest {
   public void save_PasswordNull() {
     assertThrows(NullPointerException.class, () -> {
       User user = repository.findById(3L).get();
-      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+      when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
       service.save(null);
     });

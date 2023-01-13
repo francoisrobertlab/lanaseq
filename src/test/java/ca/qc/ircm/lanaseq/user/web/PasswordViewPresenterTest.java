@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -57,7 +57,7 @@ public class PasswordViewPresenterTest extends AbstractKaribuTestCase {
   @Mock
   private UserService service;
   @Mock
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private BinderValidationStatus<Passwords> passwordsValidationStatus;
   @Captor
@@ -76,12 +76,12 @@ public class PasswordViewPresenterTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    presenter = new PasswordViewPresenter(service, authorizationService);
+    presenter = new PasswordViewPresenter(service, authenticatedUser);
     view.header = new H2();
     view.passwords = mock(PasswordsForm.class);
     view.save = new Button();
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
     when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
     presenter.init(view);

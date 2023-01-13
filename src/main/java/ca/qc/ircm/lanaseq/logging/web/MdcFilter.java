@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.logging.web;
 
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,13 +35,13 @@ public class MdcFilter extends GenericFilterBean {
   public static final String BEAN_NAME = "MdcFilter";
   public static final String USER_CONTEXT_KEY = "user";
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   public MdcFilter() {
   }
 
-  protected MdcFilter(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
+  protected MdcFilter(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
   }
 
   @Override
@@ -58,7 +58,7 @@ public class MdcFilter extends GenericFilterBean {
   }
 
   private void setNdc(HttpServletRequest request) {
-    authorizationService.getCurrentUser().ifPresent(user -> MDC.put(USER_CONTEXT_KEY,
+    authenticatedUser.getUser().ifPresent(user -> MDC.put(USER_CONTEXT_KEY,
         user.getId() + ":" + user.getEmail().replaceFirst("@.*", "")));
   }
 

@@ -24,7 +24,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
@@ -83,13 +83,13 @@ public class ViewLayout extends VerticalLayout
   private Map<Tab, String> tabsHref = new HashMap<>();
   private String currentHref;
   @Autowired
-  private transient AuthorizationService authorizationService;
+  private transient AuthenticatedUser authenticatedUser;
 
   protected ViewLayout() {
   }
 
-  protected ViewLayout(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
+  protected ViewLayout(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
   }
 
   @PostConstruct
@@ -103,15 +103,15 @@ public class ViewLayout extends VerticalLayout
     tabs.add(datasets, samples, protocols, profile, users, exitSwitchUser, signout,
         exitSwitchUserForm);
     exitSwitchUser
-        .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+        .setVisible(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     exitSwitchUserForm
-        .setVisible(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+        .setVisible(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     datasets.setId(styleName(DATASETS, TAB));
     samples.setId(styleName(SAMPLES, TAB));
     protocols.setId(styleName(PROTOCOLS, TAB));
     profile.setId(styleName(PROFILE, TAB));
     users.setId(styleName(USERS, TAB));
-    users.setVisible(authorizationService.isAuthorized(UsersView.class));
+    users.setVisible(authenticatedUser.isAuthorized(UsersView.class));
     exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
     exitSwitchUserForm.setId(styleName(EXIT_SWITCH_USER_FORM, TAB));
     signout.setId(styleName(SIGNOUT, TAB));

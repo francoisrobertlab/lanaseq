@@ -26,7 +26,7 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.user.User;
@@ -50,19 +50,19 @@ public class UserFormPresenter {
   private Binder<User> binder = new BeanValidationBinder<>(User.class);
   private User user;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   protected UserFormPresenter() {
   }
 
-  protected UserFormPresenter(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
+  protected UserFormPresenter(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(UserForm form) {
     this.form = form;
-    form.admin.setVisible(authorizationService.hasRole(UserRole.ADMIN));
-    form.manager.setVisible(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
+    form.admin.setVisible(authenticatedUser.hasRole(UserRole.ADMIN));
+    form.manager.setVisible(authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
     setUser(null);
   }
 
@@ -80,7 +80,7 @@ public class UserFormPresenter {
 
   private void updateReadOnly() {
     boolean readOnly =
-        user.getId() != null && !authorizationService.hasPermission(user, Permission.WRITE);
+        user.getId() != null && !authenticatedUser.hasPermission(user, Permission.WRITE);
     binder.setReadOnly(readOnly);
     form.passwords.setVisible(!readOnly);
   }

@@ -50,7 +50,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
@@ -99,7 +99,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private ProtocolService service;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private ProtocolFile file;
   @Mock
@@ -142,7 +142,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.localeChange(locale);
     protocol = repository.findById(1L).get();
     random.nextBytes(fileContent);
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     when(service.files(any())).then(i -> {
       Protocol protocol = i.getArgument(0);
       if (protocol != null && protocol.getId() != null) {
@@ -468,7 +468,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void setProtocol_CannotWrite() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(false);
     presenter.setProtocol(protocol);
     assertEquals(protocol.getName(), dialog.name.getValue());
     assertEquals(protocol.getNote(), dialog.note.getValue());
@@ -487,7 +487,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void setProtocol_CannotWriteBeforeLocaleChange() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(false);
     presenter.setProtocol(protocol);
     presenter.localeChange(locale);
     assertEquals(protocol.getName(), dialog.name.getValue());

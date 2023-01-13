@@ -36,7 +36,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -78,7 +78,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private ProtocolService protocolService;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private DataProvider<Protocol, ?> dataProvider;
   @Captor
@@ -112,7 +112,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     protocols = protocolRepository.findAll();
     when(protocolService.all()).thenReturn(protocols);
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
     presenter.init(view);
     presenter.localeChange(locale);
   }
@@ -136,14 +136,14 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void visible_Manager() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     presenter.init(view);
     assertTrue(view.history.isVisible());
   }
 
   @Test
   public void visible_Admin() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     presenter.init(view);
     assertTrue(view.history.isVisible());
   }
@@ -151,18 +151,18 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void ownerFilter_User() {
     assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
-    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authenticatedUser).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void ownerFilter_ManagerOrAdmin() {
     view.ownerFilter.setValue("");
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
 
     presenter.init(view);
 
     assertEquals("", view.ownerFilter.getValue());
-    verify(authorizationService, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authenticatedUser, atLeastOnce()).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
@@ -241,7 +241,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void history() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     Protocol protocol = protocols.get(0);
     view.protocols.select(protocol);
     Protocol databaseProtocol = new Protocol();
@@ -264,7 +264,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void history_NoSelection() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     presenter.history();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(PROTOCOLS_REQUIRED), view.error.getText());
@@ -274,7 +274,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void history_MoreThanOneProtocolSelected() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     view.protocols.select(protocols.get(0));
     view.protocols.select(protocols.get(1));
     presenter.history();
@@ -295,13 +295,13 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void history_Protocol_WithRole() {
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     Protocol databaseProtocol = new Protocol();
     when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.history(protocol);
-    verify(authorizationService).hasAnyRole(UserRole.MANAGER, UserRole.ADMIN);
+    verify(authenticatedUser).hasAnyRole(UserRole.MANAGER, UserRole.ADMIN);
     verify(protocolService).get(2L);
     verify(view.historyDialog).setProtocol(databaseProtocol);
     verify(view.historyDialog).open();

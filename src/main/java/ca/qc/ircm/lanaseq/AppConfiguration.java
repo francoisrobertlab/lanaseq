@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -108,7 +108,7 @@ public class AppConfiguration {
    */
   private String serverUrl;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   /**
    * Location of files inside home folder.
    */
@@ -162,7 +162,7 @@ public class AppConfiguration {
     if (datasets.size() == 1) {
       return Paths.get(datasets.stream().findFirst().map(Dataset::getName).get());
     } else {
-      Optional<User> user = authorizationService.getCurrentUser();
+      Optional<User> user = authenticatedUser.getUser();
       Dataset dataset = datasets.iterator().next();
       Optional<Sample> sample =
           datasets.stream().flatMap(ds -> ds.getSamples().stream()).findFirst();
@@ -186,7 +186,7 @@ public class AppConfiguration {
     if (samples.size() == 1) {
       return Paths.get(samples.stream().findFirst().map(Sample::getName).get());
     } else {
-      Optional<User> user = authorizationService.getCurrentUser();
+      Optional<User> user = authenticatedUser.getUser();
       Sample sample = samples.iterator().next();
       StringBuilder builder = new StringBuilder();
       user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))

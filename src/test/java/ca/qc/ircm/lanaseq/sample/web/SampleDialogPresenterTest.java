@@ -41,7 +41,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
@@ -83,7 +83,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private ProtocolService protocolService;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Autowired
@@ -133,7 +133,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
   }
@@ -232,7 +232,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void setSample_CannotWrite() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(false);
     Sample sample = repository.findById(1L).get();
 
     presenter.setSample(sample);

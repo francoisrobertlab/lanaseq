@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.mail;
 
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.io.ByteStreams;
 import java.io.ByteArrayOutputStream;
@@ -48,17 +48,17 @@ public class MailService {
   @Autowired
   private MimeMessage templateMessage;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   protected MailService() {
   }
 
   protected MailService(MailConfiguration mailConfiguration, JavaMailSender mailSender,
-      MimeMessage templateMessage, AuthorizationService authorizationService) {
+      MimeMessage templateMessage, AuthenticatedUser authenticatedUser) {
     this.mailConfiguration = mailConfiguration;
     this.mailSender = mailSender;
     this.templateMessage = templateMessage;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   /**
@@ -132,7 +132,7 @@ public class MailService {
 
     StringBuilder message = new StringBuilder();
     message.append("User:");
-    message.append(authorizationService.getCurrentUser().map(User::getEmail).orElse("null"));
+    message.append(authenticatedUser.getUser().map(User::getEmail).orElse("null"));
     message.append("\n");
     message.append(error.getMessage());
     message.append("\n");

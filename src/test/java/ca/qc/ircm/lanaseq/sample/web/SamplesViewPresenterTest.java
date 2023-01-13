@@ -42,7 +42,7 @@ import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -92,7 +92,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetService datasetService;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private DataProvider<Sample, ?> dataProvider;
   @Captor
@@ -144,8 +144,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.all(any())).thenReturn(new ArrayList<>(samples));
     when(service.count(any())).thenReturn((long) samples.size());
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);
   }
@@ -165,16 +165,16 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void ownerFilter_User() {
     assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
-    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authenticatedUser).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void ownerFilter_ManagerOrAdmin() {
     view.ownerFilter.setValue("");
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     presenter.init(view);
     assertEquals("", view.ownerFilter.getValue());
-    verify(authorizationService, times(2)).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authenticatedUser, times(2)).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test

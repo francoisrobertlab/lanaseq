@@ -44,7 +44,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -71,7 +71,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 public class ViewLayoutTest extends AbstractKaribuTestCase {
   private ViewLayout view;
   @Mock
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationListener navigationListener;
   @Mock
@@ -87,8 +87,8 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     ui.setLocale(locale);
     ui.addAfterNavigationListener(navigationListener);
-    view = new ViewLayout(authorizationService);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    view = new ViewLayout(authenticatedUser);
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     view.init();
   }
 
@@ -158,7 +158,7 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void tabs_AllowUsersView() {
-    when(authorizationService.isAuthorized(UsersView.class)).thenReturn(true);
+    when(authenticatedUser.isAuthorized(UsersView.class)).thenReturn(true);
     view.init();
     assertTrue(view.datasets.isVisible());
     assertTrue(view.samples.isVisible());
@@ -172,8 +172,7 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void tabs_SwitchedUser() {
-    when(authorizationService.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
-        .thenReturn(true);
+    when(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)).thenReturn(true);
     view.init();
     assertTrue(view.datasets.isVisible());
     assertTrue(view.samples.isVisible());

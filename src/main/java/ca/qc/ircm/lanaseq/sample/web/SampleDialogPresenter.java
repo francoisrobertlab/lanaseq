@@ -39,7 +39,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -65,14 +65,14 @@ public class SampleDialogPresenter {
   private Locale locale;
   private SampleService service;
   private ProtocolService protocolService;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SampleDialogPresenter(SampleService service, ProtocolService protocolService,
-      AuthorizationService authorizationService) {
+      AuthenticatedUser authenticatedUser) {
     this.service = service;
     this.protocolService = protocolService;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(SampleDialog dialog) {
@@ -161,7 +161,7 @@ public class SampleDialogPresenter {
       sample.setDate(LocalDate.now());
     }
     binder.setBean(sample);
-    boolean readOnly = !authorizationService.hasPermission(sample, Permission.WRITE)
+    boolean readOnly = !authenticatedUser.hasPermission(sample, Permission.WRITE)
         || (sample.getId() != null && !sample.isEditable());
     binder.setReadOnly(readOnly);
     dialog.save.setVisible(!readOnly);

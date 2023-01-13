@@ -29,7 +29,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleFilter;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
@@ -61,21 +61,20 @@ public class SamplesViewPresenter {
   private Locale locale;
   private SampleService service;
   private DatasetService datasetService;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
   SamplesViewPresenter(SampleService service, DatasetService datasetService,
-      AuthorizationService authorizationService) {
+      AuthenticatedUser authenticatedUser) {
     this.service = service;
     this.datasetService = datasetService;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(SamplesView view) {
     this.view = view;
-    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      authorizationService.getCurrentUser()
-          .ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
+    if (!authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      authenticatedUser.getUser().ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
     loadSamples();
     view.dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());

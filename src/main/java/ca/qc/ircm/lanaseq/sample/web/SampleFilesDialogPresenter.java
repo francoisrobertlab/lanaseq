@@ -32,7 +32,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import com.vaadin.flow.component.html.Span;
@@ -75,7 +75,7 @@ public class SampleFilesDialogPresenter {
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
   private Locale locale;
   private SampleService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   private AppConfiguration configuration;
   /**
    * Currently authenticated user.
@@ -86,10 +86,10 @@ public class SampleFilesDialogPresenter {
   private Authentication authentication;
 
   @Autowired
-  protected SampleFilesDialogPresenter(SampleService service,
-      AuthorizationService authorizationService, AppConfiguration configuration) {
+  protected SampleFilesDialogPresenter(SampleService service, AuthenticatedUser authenticatedUser,
+      AppConfiguration configuration) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
     this.configuration = configuration;
   }
 
@@ -145,7 +145,7 @@ public class SampleFilesDialogPresenter {
 
   boolean isReadOnly() {
     return sample == null || !sample.isEditable()
-        || !authorizationService.hasPermission(sample, Permission.WRITE);
+        || !authenticatedUser.hasPermission(sample, Permission.WRITE);
   }
 
   boolean isArchive(EditableFile file) {

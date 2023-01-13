@@ -32,7 +32,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -67,12 +67,12 @@ public class ProtocolDialogPresenter {
       DataProvider.ofCollection(new ArrayList<>());
   private Locale locale;
   private ProtocolService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
-  ProtocolDialogPresenter(ProtocolService service, AuthorizationService authorizationService) {
+  ProtocolDialogPresenter(ProtocolService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(ProtocolDialog dialog) {
@@ -104,7 +104,7 @@ public class ProtocolDialogPresenter {
   private void setReadOnly() {
     boolean readOnly = false;
     if (binder.getBean() != null && binder.getBean().getId() != null) {
-      readOnly = !authorizationService.hasPermission(binder.getBean(), Permission.WRITE);
+      readOnly = !authenticatedUser.hasPermission(binder.getBean(), Permission.WRITE);
     }
     binder.setReadOnly(readOnly);
     dialog.upload.setVisible(!readOnly);

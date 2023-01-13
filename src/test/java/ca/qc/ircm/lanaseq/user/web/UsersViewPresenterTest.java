@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -78,7 +78,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   @Mock
   private UserService userService;
   @Mock
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private DataProvider<User, ?> dataProvider;
   @Captor
@@ -98,7 +98,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   @BeforeEach
   @SuppressWarnings("unchecked")
   public void beforeTest() {
-    presenter = new UsersViewPresenter(userService, authorizationService);
+    presenter = new UsersViewPresenter(userService, authenticatedUser);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
@@ -111,7 +111,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
     currentUser = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
     presenter.init(view);
     presenter.localeChange(locale);
   }
@@ -135,7 +135,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void users_Manager() {
-    when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
     presenter.init(view);
     verify(userService, times(2)).all();
     List<User> users = items(view.users);
@@ -154,8 +154,8 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void users_Admin() {
-    when(authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
-    when(authorizationService.hasRole(UserRole.ADMIN)).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)).thenReturn(true);
+    when(authenticatedUser.hasRole(UserRole.ADMIN)).thenReturn(true);
     presenter.init(view);
     verify(userService, times(2)).all();
     List<User> users = items(view.users);

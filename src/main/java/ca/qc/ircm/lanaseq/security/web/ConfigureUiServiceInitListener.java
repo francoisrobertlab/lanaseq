@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.security.web;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserAuthority;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
@@ -43,7 +43,7 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListener.class);
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Override
   public void serviceInit(ServiceInitEvent event) {
@@ -61,16 +61,15 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
    *          event
    */
   private void beforeEnter(BeforeEnterEvent event) {
-    if (!authorizationService.isAuthorized(event.getNavigationTarget())) {
-      if (authorizationService.isAnonymous()) {
+    if (!authenticatedUser.isAuthorized(event.getNavigationTarget())) {
+      if (authenticatedUser.isAnonymous()) {
         logger.debug("user is anonymous, redirect to {}", SigninView.class.getSimpleName());
         UI.getCurrent().navigate(SigninView.class);
       } else {
         UI ui = event.getUI();
         AppResources resources =
             new AppResources(ConfigureUiServiceInitListener.class, ui.getLocale());
-        String email =
-            authorizationService.getCurrentUser().map(User::getEmail).orElse("<anonymous>");
+        String email = authenticatedUser.getUser().map(User::getEmail).orElse("<anonymous>");
         String message = resources.message(AccessDeniedException.class.getSimpleName(), email,
             event.getNavigationTarget().getSimpleName());
         logger.info(message);
@@ -86,7 +85,7 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
    *          event
    */
   private void afterNavigation(AfterNavigationEvent event) {
-    if (authorizationService.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)
+    if (authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)
         && !event.getLocation().getPath().equals(PasswordView.VIEW_NAME)) {
       logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
           PasswordView.class.getSimpleName());

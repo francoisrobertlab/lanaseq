@@ -41,7 +41,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -83,7 +83,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private SampleService sampleService;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private DataProvider<Dataset, ?> dataProvider;
   @Captor
@@ -126,8 +126,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     datasets = repository.findAll();
     view.datasets.setItems(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     presenter.init(view);
     presenter.localeChange(locale);
   }

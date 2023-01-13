@@ -25,7 +25,7 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS_REQUIRED;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.UI;
@@ -50,7 +50,7 @@ public class UsersViewPresenter {
   @Autowired
   private UserService userService;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   private Locale locale;
   private ListDataProvider<User> usersDataProvider;
   private WebUserFilter filter = new WebUserFilter();
@@ -58,19 +58,19 @@ public class UsersViewPresenter {
   protected UsersViewPresenter() {
   }
 
-  protected UsersViewPresenter(UserService userService, AuthorizationService authorizationService) {
+  protected UsersViewPresenter(UserService userService, AuthenticatedUser authenticatedUser) {
     this.userService = userService;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(UsersView view) {
     this.view = view;
     loadUsers();
-    view.active.setVisible(authorizationService.hasAnyRole(ADMIN, MANAGER));
+    view.active.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
     view.error.setVisible(false);
-    view.add.setVisible(authorizationService.hasAnyRole(ADMIN, MANAGER));
-    view.switchUser.setVisible(authorizationService.hasRole(ADMIN));
-    view.switchUserForm.setVisible(authorizationService.hasRole(ADMIN));
+    view.add.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
+    view.switchUser.setVisible(authenticatedUser.hasRole(ADMIN));
+    view.switchUserForm.setVisible(authenticatedUser.hasRole(ADMIN));
     view.userDialog.addSavedListener(e -> loadUsers());
   }
 

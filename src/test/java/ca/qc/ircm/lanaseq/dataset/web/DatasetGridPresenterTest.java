@@ -30,7 +30,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -69,7 +69,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private ProtocolService protocolService;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private DataProvider<Dataset, ?> dataProvider;
   @Captor
@@ -95,8 +95,8 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
     when(service.all(any())).thenReturn(new ArrayList<>(datasets));
     when(service.count(any())).thenReturn((long) datasets.size());
     currentUser = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(currentUser));
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     presenter.init(grid);
   }
 
@@ -112,16 +112,16 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void ownerFilter_User() {
     assertEquals(currentUser.getEmail(), grid.ownerFilter.getValue());
-    verify(authorizationService).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authenticatedUser).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test
   public void ownerFilter_ManagerOrAdmin() {
     grid.ownerFilter.setValue("");
-    when(authorizationService.hasAnyRole(any())).thenReturn(true);
+    when(authenticatedUser.hasAnyRole(any())).thenReturn(true);
     presenter.init(grid);
     assertEquals("", grid.ownerFilter.getValue());
-    verify(authorizationService, times(2)).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    verify(authenticatedUser, times(2)).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 
   @Test

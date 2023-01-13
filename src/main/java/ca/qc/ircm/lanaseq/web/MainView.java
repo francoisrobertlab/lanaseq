@@ -21,7 +21,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -43,19 +43,19 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
   private static final long serialVersionUID = -8440231785563887343L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
   @Autowired
-  private transient AuthorizationService authorizationService;
+  private transient AuthenticatedUser authenticatedUser;
 
   public MainView() {
     logger.debug("main view");
   }
 
-  protected MainView(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
+  protected MainView(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
   }
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
-    if (authorizationService.hasRole(ADMIN)) {
+    if (authenticatedUser.hasRole(ADMIN)) {
       event.forwardTo(UsersView.class);
     } else {
       event.forwardTo(DatasetsView.class);

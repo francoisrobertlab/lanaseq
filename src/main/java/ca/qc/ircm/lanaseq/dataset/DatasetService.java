@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.file.Renamer;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class DatasetService {
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
   private AppConfiguration configuration;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   private JPAQueryFactory queryFactory;
 
   protected DatasetService() {
@@ -72,10 +72,10 @@ public class DatasetService {
 
   @Autowired
   protected DatasetService(DatasetRepository repository, AppConfiguration configuration,
-      AuthorizationService authorizationService, JPAQueryFactory queryFactory) {
+      AuthenticatedUser authenticatedUser, JPAQueryFactory queryFactory) {
     this.repository = repository;
     this.configuration = configuration;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
     this.queryFactory = queryFactory;
   }
 
@@ -303,7 +303,7 @@ public class DatasetService {
       throw new IllegalArgumentException("all dataset's samples must already be in database");
     }
     LocalDateTime now = LocalDateTime.now();
-    User user = authorizationService.getCurrentUser().orElse(null);
+    User user = authenticatedUser.getUser().orElse(null);
     if (dataset.getId() == null) {
       dataset.setOwner(user);
       dataset.setCreationDate(now);

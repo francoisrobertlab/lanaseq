@@ -48,7 +48,7 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SampleDialog;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -100,7 +100,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetService service;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private Sample sample;
   @Captor
@@ -154,7 +154,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.cancel = new Button();
     dialog.delete = new Button();
     dialog.selectSampleDialog = mock(SelectSampleDialog.class);
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     topTags.add("input");
     topTags.add("chip");
     when(service.topTags(anyInt())).thenReturn(topTags);
@@ -271,7 +271,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void setDataset_CannotWrite() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
     presenter.setDataset(dataset);

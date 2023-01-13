@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetFilter;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
@@ -43,7 +43,7 @@ import org.springframework.context.annotation.Scope;
 public class DatasetGridPresenter {
   private DatasetGrid grid;
   private DatasetService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   private DataProvider<Dataset, DatasetFilter> datasetsDataProvider;
   private WebDatasetFilter filter = new WebDatasetFilter();
 
@@ -51,18 +51,16 @@ public class DatasetGridPresenter {
   }
 
   @Autowired
-  protected DatasetGridPresenter(DatasetService service,
-      AuthorizationService authorizationService) {
+  protected DatasetGridPresenter(DatasetService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(DatasetGrid grid) {
     this.grid = grid;
     loadDataset();
-    if (!authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
-      authorizationService.getCurrentUser()
-          .ifPresent(user -> grid.ownerFilter.setValue(user.getEmail()));
+    if (!authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      authenticatedUser.getUser().ifPresent(user -> grid.ownerFilter.setValue(user.getEmail()));
     }
   }
 

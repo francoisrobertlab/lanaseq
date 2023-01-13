@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.user;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,16 +43,16 @@ public class UserService {
   @Autowired
   private PasswordEncoder passwordEncoder;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   protected UserService() {
   }
 
   protected UserService(UserRepository repository, PasswordEncoder passwordEncoder,
-      AuthorizationService authorizationService) {
+      AuthenticatedUser authenticatedUser) {
     this.repository = repository;
     this.passwordEncoder = passwordEncoder;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   /**
@@ -145,7 +145,7 @@ public class UserService {
     }
     repository.save(user);
     if (reloadAuthorities) {
-      authorizationService.reloadAuthorities();
+      authenticatedUser.reloadAuthorities();
     }
   }
 
@@ -161,14 +161,14 @@ public class UserService {
       throw new NullPointerException("password parameter cannot be null");
     }
 
-    authorizationService.getCurrentUser().ifPresent(user -> {
+    authenticatedUser.getUser().ifPresent(user -> {
       final boolean reloadAuthorities = user.isExpiredPassword();
       String hashedPassword = passwordEncoder.encode(password);
       user.setHashedPassword(hashedPassword);
       user.setExpiredPassword(false);
       repository.save(user);
       if (reloadAuthorities) {
-        authorizationService.reloadAuthorities();
+        authenticatedUser.reloadAuthorities();
       }
     });
   }

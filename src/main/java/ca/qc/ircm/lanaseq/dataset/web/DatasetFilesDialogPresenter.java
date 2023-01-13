@@ -34,7 +34,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import com.vaadin.flow.component.html.Span;
@@ -76,7 +76,7 @@ public class DatasetFilesDialogPresenter {
   private Locale locale;
   private DatasetService service;
   private SampleService sampleService;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   private AppConfiguration configuration;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
   /**
@@ -89,10 +89,10 @@ public class DatasetFilesDialogPresenter {
 
   @Autowired
   protected DatasetFilesDialogPresenter(DatasetService service, SampleService sampleService,
-      AuthorizationService authorizationService, AppConfiguration configuration) {
+      AuthenticatedUser authenticatedUser, AppConfiguration configuration) {
     this.service = service;
     this.sampleService = sampleService;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
     this.configuration = configuration;
   }
 
@@ -153,7 +153,7 @@ public class DatasetFilesDialogPresenter {
 
   boolean isReadOnly() {
     return dataset == null || !dataset.isEditable()
-        || !authorizationService.hasPermission(dataset, Permission.WRITE);
+        || !authenticatedUser.hasPermission(dataset, Permission.WRITE);
   }
 
   boolean isArchive(EditableFile file) {

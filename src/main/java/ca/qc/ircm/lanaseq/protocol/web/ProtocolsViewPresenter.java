@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -50,20 +50,19 @@ public class ProtocolsViewPresenter {
   private WebProtocolFilter filter = new WebProtocolFilter();
   private Locale locale;
   private ProtocolService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
-  ProtocolsViewPresenter(ProtocolService service, AuthorizationService authorizationService) {
+  ProtocolsViewPresenter(ProtocolService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(ProtocolsView view) {
     this.view = view;
-    boolean manager = authorizationService.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
+    boolean manager = authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
     if (!manager) {
-      authorizationService.getCurrentUser()
-          .ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
+      authenticatedUser.getUser().ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
     view.history.setVisible(manager);
     loadProtocols();
@@ -106,7 +105,7 @@ public class ProtocolsViewPresenter {
   }
 
   void history(Protocol protocol) {
-    if (authorizationService.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
+    if (authenticatedUser.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
       view.historyDialog.setProtocol(service.get(protocol.getId()).orElse(null));
       view.historyDialog.open();
     }

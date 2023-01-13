@@ -50,7 +50,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
@@ -116,7 +116,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private SampleService sampleService;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @MockBean
   private AppConfiguration configuration;
   @Captor
@@ -174,7 +174,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     labels.add("\\\\lanaseq01\\archives");
     labels.add("\\\\lanaseq02\\archives2");
     when(service.folderLabels(any(), anyBoolean())).thenReturn(labels);
-    when(authorizationService.hasPermission(any(), any())).thenReturn(true);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
@@ -309,7 +309,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void setDataset_CannotWrite() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
 
     presenter.setDataset(dataset);
@@ -523,7 +523,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void addLargeFiles_CannotWrite() {
-    when(authorizationService.hasPermission(any(), any())).thenReturn(false);
+    when(authenticatedUser.hasPermission(any(), any())).thenReturn(false);
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
 

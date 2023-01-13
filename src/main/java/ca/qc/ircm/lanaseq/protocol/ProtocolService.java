@@ -21,7 +21,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,16 +46,16 @@ public class ProtocolService {
   @Autowired
   private ProtocolFileRepository fileRepository;
   @Autowired
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   protected ProtocolService() {
   }
 
   protected ProtocolService(ProtocolRepository repository, ProtocolFileRepository fileRepository,
-      AuthorizationService authorizationService) {
+      AuthenticatedUser authenticatedUser) {
     this.repository = repository;
     this.fileRepository = fileRepository;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   /**
@@ -146,7 +146,7 @@ public class ProtocolService {
     }
     LocalDateTime now = LocalDateTime.now();
     if (protocol.getId() == null) {
-      User user = authorizationService.getCurrentUser().orElse(null);
+      User user = authenticatedUser.getUser().orElse(null);
       protocol.setOwner(user);
       protocol.setCreationDate(now);
     } else {

@@ -48,7 +48,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -106,7 +106,7 @@ public class DatasetServiceTest {
   @MockBean
   private AppConfiguration configuration;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
   @TempDir
@@ -225,7 +225,7 @@ public class DatasetServiceTest {
   @Test
   public void all() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
     List<Dataset> datasets = service.all();
 
@@ -785,7 +785,7 @@ public class DatasetServiceTest {
   @Test
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
     dataset.setTags(new HashSet<>());
     dataset.getTags().add("tag1");
@@ -822,7 +822,7 @@ public class DatasetServiceTest {
   @Test
   public void save_NewWithNewSample() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
     dataset.setTags(new HashSet<>());
     dataset.getTags().add("tag1");
@@ -853,7 +853,7 @@ public class DatasetServiceTest {
   @Test
   public void save_NewNoName() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
     dataset.setTags(new HashSet<>());
     dataset.getTags().add("tag1");
@@ -871,7 +871,7 @@ public class DatasetServiceTest {
   @Test
   public void save_Update() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     dataset.getTags().remove("rappa");
@@ -923,7 +923,7 @@ public class DatasetServiceTest {
   @Test
   public void save_UpdateWithNewSample() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     dataset.getTags().remove("rappa");
@@ -952,7 +952,7 @@ public class DatasetServiceTest {
   @Test
   public void save_UpdateMoveFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     Path beforeFolder = configuration.getHome().folder(dataset);
@@ -1022,7 +1022,7 @@ public class DatasetServiceTest {
           .resolve(String.valueOf(dataset.getDate().getYear())).resolve(dataset.getName()) : null;
     });
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     Path beforeFolder = configuration.getHome().folder(dataset);
@@ -1074,7 +1074,7 @@ public class DatasetServiceTest {
   @Test
   public void save_RenameFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
     Path beforeFolder = configuration.getHome().folder(dataset);
@@ -1200,7 +1200,7 @@ public class DatasetServiceTest {
   public void save_UpdateNotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
       User user = userRepository.findById(2L).orElse(null);
-      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+      when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
       Dataset dataset = repository.findById(5L).orElse(null);
       service.save(dataset);
     });
@@ -1209,7 +1209,7 @@ public class DatasetServiceTest {
   @Test
   public void save_NotEditableSample() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.setName("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020");
     dataset.getTags().remove("rappa");

@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.SmtpPortRandomizer;
 import ca.qc.ircm.lanaseq.user.User;
@@ -63,7 +63,7 @@ public class MailServiceTest {
   @Autowired
   private MimeMessage templateMessage;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Value("${spring.mail.port}")
   private int smtpPort;
   @RegisterExtension
@@ -204,7 +204,7 @@ public class MailServiceTest {
       error.printStackTrace(printWriter);
     }
     User user = new User(1L, "christian.poitras@ircm.qc.ca");
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
     mailService.sendError(error);
 

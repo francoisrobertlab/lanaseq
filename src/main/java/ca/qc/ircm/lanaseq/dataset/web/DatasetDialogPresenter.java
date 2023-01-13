@@ -32,7 +32,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -68,13 +68,12 @@ public class DatasetDialogPresenter {
   private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
   private List<Sample> samples = new ArrayList<>();
   private DatasetService service;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
-  protected DatasetDialogPresenter(DatasetService service,
-      AuthorizationService authorizationService) {
+  protected DatasetDialogPresenter(DatasetService service, AuthenticatedUser authenticatedUser) {
     this.service = service;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   void init(DatasetDialog dialog) {
@@ -123,7 +122,7 @@ public class DatasetDialogPresenter {
   }
 
   private boolean isReadOnly(Dataset dataset) {
-    return !authorizationService.hasPermission(dataset, Permission.WRITE)
+    return !authenticatedUser.hasPermission(dataset, Permission.WRITE)
         || (dataset.getId() != null && !dataset.isEditable());
   }
 

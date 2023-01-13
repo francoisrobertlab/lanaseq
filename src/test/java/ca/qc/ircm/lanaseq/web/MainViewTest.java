@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -38,13 +38,13 @@ import org.mockito.Mock;
 public class MainViewTest {
   private MainView view;
   @Mock
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private BeforeEnterEvent event;
 
   @BeforeEach
   public void beforeTest() {
-    view = new MainView(authorizationService);
+    view = new MainView(authenticatedUser);
   }
 
   @Test
@@ -56,7 +56,7 @@ public class MainViewTest {
 
   @Test
   public void beforeEnter_Admin() {
-    when(authorizationService.hasRole(ADMIN)).thenReturn(true);
+    when(authenticatedUser.hasRole(ADMIN)).thenReturn(true);
 
     view.beforeEnter(event);
 
@@ -65,7 +65,7 @@ public class MainViewTest {
 
   @Test
   public void beforeEnter_Manager() {
-    when(authorizationService.hasRole(MANAGER)).thenReturn(true);
+    when(authenticatedUser.hasRole(MANAGER)).thenReturn(true);
 
     view.beforeEnter(event);
 

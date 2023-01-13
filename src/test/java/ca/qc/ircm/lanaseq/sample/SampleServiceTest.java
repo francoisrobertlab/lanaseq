@@ -47,7 +47,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
@@ -108,7 +108,7 @@ public class SampleServiceTest {
   @MockBean
   private PermissionEvaluator permissionEvaluator;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @TempDir
   Path temporaryFolder;
 
@@ -1083,7 +1083,7 @@ public class SampleServiceTest {
   @Test
   public void save_New() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -1126,7 +1126,7 @@ public class SampleServiceTest {
   @Test
   public void save_NewNoName() {
     User user = userRepository.findById(3L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -1148,7 +1148,7 @@ public class SampleServiceTest {
   @Test
   public void save_Update() {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -1217,7 +1217,7 @@ public class SampleServiceTest {
   public void save_UpdateNotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
       User user = userRepository.findById(2L).orElse(null);
-      when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+      when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
       Sample sample = repository.findById(8L).orElse(null);
       service.save(sample);
     });
@@ -1226,7 +1226,7 @@ public class SampleServiceTest {
   @Test
   public void save_UpdateMoveFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     Path beforeFolder = configuration.getHome().folder(sample);
@@ -1283,7 +1283,7 @@ public class SampleServiceTest {
           .resolve(String.valueOf(sample.getDate().getYear())).resolve(sample.getName()) : null;
     });
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     Path beforeFolder = configuration.getHome().folder(sample);
@@ -1337,7 +1337,7 @@ public class SampleServiceTest {
   @Test
   public void save_RenameFiles() throws Throwable {
     User user = userRepository.findById(2L).orElse(null);
-    when(authorizationService.getCurrentUser()).thenReturn(Optional.of(user));
+    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = repository.findById(1L).orElse(null);
     detach(sample);
     sample.setSampleId("my sample");

@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
@@ -73,7 +73,7 @@ public class SigninViewTest extends AbstractKaribuTestCase {
   @Autowired
   private SecurityConfiguration configuration;
   @MockBean
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
   @Mock
@@ -94,7 +94,7 @@ public class SigninViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new SigninView(configuration, authorizationService);
+    view = new SigninView(configuration, authenticatedUser);
     view.init();
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     when(location.getQueryParameters()).thenReturn(queryParameters);
@@ -204,14 +204,14 @@ public class SigninViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void beforeEnter_Anonymous() {
-    when(authorizationService.isAnonymous()).thenReturn(true);
+    when(authenticatedUser.isAnonymous()).thenReturn(true);
     view.beforeEnter(beforeEnterEvent);
     verifyNoInteractions(beforeEnterEvent);
   }
 
   @Test
   public void beforeEnter_User() {
-    when(authorizationService.isAnonymous()).thenReturn(false);
+    when(authenticatedUser.isAnonymous()).thenReturn(false);
     view.beforeEnter(beforeEnterEvent);
     verify(beforeEnterEvent).forwardTo(MainView.class);
   }

@@ -24,7 +24,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.file.Renamer;
-import ca.qc.ircm.lanaseq.security.AuthorizationService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import java.io.IOException;
 import java.io.Writer;
@@ -61,15 +61,15 @@ public class SampleService {
   private SampleRepository repository;
   private DatasetRepository datasetRepository;
   private AppConfiguration configuration;
-  private AuthorizationService authorizationService;
+  private AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SampleService(SampleRepository repository, DatasetRepository datasetRepository,
-      AppConfiguration configuration, AuthorizationService authorizationService) {
+      AppConfiguration configuration, AuthenticatedUser authenticatedUser) {
     this.repository = repository;
     this.datasetRepository = datasetRepository;
     this.configuration = configuration;
-    this.authorizationService = authorizationService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   /**
@@ -307,7 +307,7 @@ public class SampleService {
       throw new NullPointerException("dataset's name cannot be null");
     }
     LocalDateTime now = LocalDateTime.now();
-    User user = authorizationService.getCurrentUser().orElse(null);
+    User user = authenticatedUser.getUser().orElse(null);
     if (sample.getId() == null) {
       sample.setOwner(user);
       sample.setCreationDate(now);
