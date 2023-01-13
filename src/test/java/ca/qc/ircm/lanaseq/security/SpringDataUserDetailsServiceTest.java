@@ -22,8 +22,8 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,9 +91,9 @@ public class SpringDataUserDetailsServiceTest {
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
     assertTrue(userDetails.isAccountNonLocked());
-    assertTrue(userDetails instanceof AuthenticatedUser);
-    AuthenticatedUser authenticatedUser = (AuthenticatedUser) userDetails;
-    assertEquals((Long) 2L, authenticatedUser.getId());
+    assertTrue(userDetails instanceof UserDetailsWithId);
+    UserDetailsWithId userDetailsWithId = (UserDetailsWithId) userDetails;
+    assertEquals((Long) 2L, userDetailsWithId.getId());
   }
 
   @Test

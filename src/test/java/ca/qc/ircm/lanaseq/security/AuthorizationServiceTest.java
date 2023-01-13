@@ -189,8 +189,8 @@ public class AuthorizationServiceTest {
     assertTrue(
         findAuthority(oldAuthentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
             .isPresent());
-    assertTrue(oldAuthentication.getPrincipal() instanceof AuthenticatedUser);
-    AuthenticatedUser user = (AuthenticatedUser) oldAuthentication.getPrincipal();
+    assertTrue(oldAuthentication.getPrincipal() instanceof UserDetailsWithId);
+    UserDetailsWithId user = (UserDetailsWithId) oldAuthentication.getPrincipal();
     assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getPassword());
     assertEquals((Long) 6L, user.getId());
@@ -216,8 +216,8 @@ public class AuthorizationServiceTest {
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
     assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
         .isPresent());
-    assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
-    user = (AuthenticatedUser) authentication.getPrincipal();
+    assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
+    user = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getPassword());
     assertEquals((Long) 6L, user.getId());
@@ -251,8 +251,8 @@ public class AuthorizationServiceTest {
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.ADMIN).isPresent());
     assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
         .isPresent());
-    assertTrue(authentication.getPrincipal() instanceof AuthenticatedUser);
-    AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
+    assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
+    UserDetailsWithId user = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals("lanaseq@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getPassword());
     assertEquals((Long) 1L, user.getId());

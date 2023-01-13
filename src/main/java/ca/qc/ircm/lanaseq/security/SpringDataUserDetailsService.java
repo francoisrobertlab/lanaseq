@@ -66,7 +66,7 @@ public class SpringDataUserDetailsService implements UserDetailsService {
       if (user.isExpiredPassword()) {
         authorities.add(new SimpleGrantedAuthority(FORCE_CHANGE_PASSWORD));
       }
-      return new AuthenticatedUser(user, authorities);
+      return new UserDetailsWithId(user, authorities);
     }
   }
 }

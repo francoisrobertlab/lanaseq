@@ -77,8 +77,8 @@ public class AuthorizationService {
    * @return current user or empty for anonymous
    */
   public Optional<User> getCurrentUser() {
-    return getUser().filter(user -> user instanceof AuthenticatedUser)
-        .map(user -> ((AuthenticatedUser) user))
+    return getUser().filter(user -> user instanceof UserDetailsWithId)
+        .map(user -> ((UserDetailsWithId) user))
         .map(user -> userRepository.findById(user.getId()).orElse(null));
   }
 

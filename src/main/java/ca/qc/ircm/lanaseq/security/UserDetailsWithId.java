@@ -25,7 +25,7 @@ import org.springframework.security.core.userdetails.User;
 /**
  * An authenticated user.
  */
-public class AuthenticatedUser extends User implements Data {
+public class UserDetailsWithId extends User implements Data {
   private static final long serialVersionUID = -5167464958438112402L;
   private final Long id;
 
@@ -48,7 +48,7 @@ public class AuthenticatedUser extends User implements Data {
    *           if a <code>null</code> value was passed either as a parameter or as an element in the
    *           <code>GrantedAuthority</code> collection
    */
-  public AuthenticatedUser(ca.qc.ircm.lanaseq.user.User user, boolean accountNonExpired,
+  public UserDetailsWithId(ca.qc.ircm.lanaseq.user.User user, boolean accountNonExpired,
       boolean credentialsNonExpired, boolean accountNonLocked,
       Collection<? extends GrantedAuthority> authorities) {
     super(user.getEmail(), user.getHashedPassword(), user.isActive(), accountNonExpired,
@@ -69,7 +69,7 @@ public class AuthenticatedUser extends User implements Data {
    *           if a <code>null</code> value was passed either as a parameter or as an element in the
    *           <code>GrantedAuthority</code> collection
    */
-  public AuthenticatedUser(ca.qc.ircm.lanaseq.user.User user,
+  public UserDetailsWithId(ca.qc.ircm.lanaseq.user.User user,
       Collection<? extends GrantedAuthority> authorities) {
     super(user.getEmail(), user.getHashedPassword(), authorities);
     id = user.getId();
