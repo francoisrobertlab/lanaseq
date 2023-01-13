@@ -21,6 +21,7 @@ INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('2', 'BioID', '5', '2018-11-18 9:31:14', null);
 INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('3', 'Histone FLAG', '2', '2018-10-20 9:58:12', null);
+ALTER TABLE protocol ALTER COLUMN id RESTART WITH 4;
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
 VALUES (1,1,'FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/FLAG_Protocol.docx'),0,'2018-10-20 11:28:12');
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
@@ -29,6 +30,7 @@ INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),1,'2018-10-20 9:58:12');
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
 VALUES (4,3,'Histone Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),0,'2018-10-21 9:58:12');
+ALTER TABLE protocol_file ALTER COLUMN id RESTART WITH 5;
 INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('1', 'MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020', '2018-10-20', '2', 1, '2018-10-20 13:28:12', 'robtools version 2');
 INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
@@ -45,6 +47,7 @@ INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,not
 VALUES ('7', 'ChIPseq_Spt16_yFR101_G24D_JS3_20181211', '2018-12-11', '3', 1, '2018-12-11 10:28:23', null);
 INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('8', '20181211', '2018-10-19', '3', 1, '2018-12-12 10:30:10', null);
+ALTER TABLE dataset ALTER COLUMN id RESTART WITH 9;
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (1, 'FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNASE_SEQ', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:23', 'robtools version 2');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
@@ -67,6 +70,7 @@ INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_
 VALUES (10, 'JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210', 'JS1', 'R1', 'CHIP_SEQ', null, 'Spt16', 'yFR101', 'G24D', null, '2018-12-10', '3', 3, 1, '2018-12-10 9:29:23', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (11, 'JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211', 'JS3', 'R1', 'CHIP_SEQ', null, 'Spt16', 'yFR101', 'G24D', null, '2018-12-11', '3', 3, 1, '2018-12-11 9:50:20', null);
+ALTER TABLE sample ALTER COLUMN id RESTART WITH 12;
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (1,1,0,1);
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
@@ -87,6 +91,7 @@ INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (9,6,0,4);
 INSERT INTO dataset_samples (id,dataset_id,samples_order,samples_id)
 VALUES (10,7,0,11);
+ALTER TABLE dataset_samples ALTER COLUMN id RESTART WITH 11;
 INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (1,1,'mnase');
 INSERT INTO dataset_tags (id,dataset_id,tags)
@@ -103,3 +108,4 @@ INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (7,2,'G24D');
 INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (8,7,'Spt16');
+ALTER TABLE dataset_tags ALTER COLUMN id RESTART WITH 9;
