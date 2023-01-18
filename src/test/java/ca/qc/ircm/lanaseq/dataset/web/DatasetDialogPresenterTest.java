@@ -867,7 +867,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(2, dataset.getSamples().size());
-    Sample expectedSample = sampleRepository.getById(4L);
+    Sample expectedSample = sampleRepository.findById(4L).get();
     Sample sample = dataset.getSamples().get(0);
     assertEquals(expectedSample.getSampleId(), sample.getSampleId());
     assertEquals(expectedSample.getReplicate(), sample.getReplicate());
@@ -880,7 +880,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(expectedSample.getTreatment(), sample.getTreatment());
     assertEquals(expectedSample.getNote(), sample.getNote());
     assertEquals(expectedSample.getDate(), sample.getDate());
-    expectedSample = sampleRepository.getById(5L);
+    expectedSample = sampleRepository.findById(5L).get();
     sample = dataset.getSamples().get(1);
     assertEquals(expectedSample.getSampleId(), sample.getSampleId());
     assertEquals(expectedSample.getReplicate(), sample.getReplicate());
