@@ -31,7 +31,6 @@ import org.springframework.core.Ordered;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.test.context.TestContext;
@@ -64,12 +63,11 @@ public class TestBenchSecurityFilter extends GenericFilterBean
     HttpServletResponse response = (HttpServletResponse) res;
     if (copyAuthenticationOnFilter && authentication != null) {
       logger.debug("set authentication {} in security context", authentication);
-      HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
-      SecurityContext securityContext = repo.loadContext(holder);
+      SecurityContext securityContext = repo.loadContext(request).get();
       securityContext.setAuthentication(authentication);
-      repo.saveContext(securityContext, holder.getRequest(), holder.getResponse());
+      repo.saveContext(securityContext, request, response);
       copyAuthenticationOnFilter = false;
-      filterChain.doFilter(holder.getRequest(), holder.getResponse());
+      filterChain.doFilter(request, response);
     } else {
       if (copyAuthenticationOnFilter && authentication == null) {
         logger.warn("authentication is null in test bench test");
