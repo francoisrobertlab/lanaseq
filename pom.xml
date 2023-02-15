@@ -60,7 +60,7 @@
     <!-- Dependencies -->
     <spring-boot.version>2.7.7</spring-boot.version>
     <vaadin.version>14.8.9</vaadin.version>
-    <generate-property-names.version>0.5</generate-property-names.version>
+    <generate-property-names.version>1.1</generate-property-names.version>
     <querydsl.version>5.0.0</querydsl.version>
     <guava.version>30.0-jre</guava.version>
     <commons-email.version>1.5</commons-email.version>
