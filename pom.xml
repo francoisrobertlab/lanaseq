@@ -90,6 +90,32 @@
     <migrations-maven-plugin.version>1.1.3</migrations-maven-plugin.version>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>Vaadin Directory</id>
+      <url>https://maven.vaadin.com/vaadin-addons</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -586,21 +612,6 @@
   </reporting>
 
   <profiles>
-    <profile>
-      <id>vaadin-repository</id>
-      <activation>
-        <property>
-          <name>vaadin-repository</name>
-          <value>!false</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>vaadin-addons</id>
-          <url>http://maven.vaadin.com/vaadin-addons</url>
-        </repository>
-      </repositories>
-    </profile>
     <profile>
       <id>production</id>
       <build>
