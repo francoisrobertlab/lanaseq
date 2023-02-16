@@ -20,10 +20,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>ca.qc.ircm</groupId>
-    <artifactId>parent</artifactId>
-    <version>10</version>
-    <relativePath>../parent/pom.xml</relativePath>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.7.7</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>lanaseq</artifactId>
@@ -33,6 +32,10 @@
   <packaging>war</packaging>
   <description>Location Analysis Net Application for High-throughput sequencing</description>
   <url>https://github.com/francoisrobertlab/lanaseq</url>
+  <organization>
+    <name>Institut de recherches cliniques de Montreal (IRCM)</name>
+    <url>http://www.ircm.qc.ca</url>
+  </organization>
   <licenses>
     <license>
       <name>GNU Affero General Public License</name>
@@ -40,6 +43,19 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <id>poitrac</id>
+      <name>Christian Poitras</name>
+      <email>christian.poitras@ircm.qc.ca</email>
+      <organization>IRCM</organization>
+      <organizationUrl>http://www.ircm.qc.ca</organizationUrl>
+      <timezone>-5</timezone>
+      <roles>
+        <role>Analyste en informatique</role>
+      </roles>
+    </developer>
+  </developers>
   <scm>
     <connection>scm:git:https://github.com/francoisrobertlab/lanaseq.git</connection>
     <developerConnection>scm:git:https://github.com/francoisrobertlab/lanaseq.git</developerConnection>
@@ -52,22 +68,24 @@
 
   <properties>
     <resource.delimiter>$[*]</resource.delimiter>
+    <java.version>11</java.version>
+    <start-class>ca.qc.ircm.proview.Main</start-class>
     <slow-tests.skip>false</slow-tests.skip>
-    <javac.version>11</javac.version>
-    <main-class>ca.qc.ircm.lanaseq.Main</main-class>
     <testbench.skip>false</testbench.skip>
     <testbench.maxAttempts>3</testbench.maxAttempts>
     <!-- Dependencies -->
-    <spring-boot.version>2.7.7</spring-boot.version>
     <vaadin.version>14.8.9</vaadin.version>
     <generate-property-names.version>1.1</generate-property-names.version>
-    <querydsl.version>5.0.0</querydsl.version>
     <guava.version>30.0-jre</guava.version>
     <commons-email.version>1.5</commons-email.version>
     <karibu-testing.version>1.3.0</karibu-testing.version>
     <greenmail.version>1.6.1</greenmail.version>
+    <selenium.version>3.141.59</selenium.version>
     <okhttp3.version>3.14.9</okhttp3.version>
-    <mariadb-java-client.version>2.7.7</mariadb-java-client.version>
+    <maven-site-plugin.version>3.9.1</maven-site-plugin.version>
+    <maven-project-info-reports-plugin.version>3.4.2</maven-project-info-reports-plugin.version>
+    <license-maven-plugin.version>4.1</license-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
     <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
     <migrations-maven-plugin.version>1.1.3</migrations-maven-plugin.version>
   </properties>
@@ -78,13 +96,6 @@
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-bom</artifactId>
         <version>${vaadin.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -396,24 +407,11 @@
             </systemPropertyVariables>
             <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
           </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-                <goal>verify</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <configuration>
-            <packagingExcludes>
-              %regex[WEB-INF/lib/slf4j-simple.*.jar],
-              %regex[WEB-INF/lib/tomcat.*.jar]
-            </packagingExcludes>
-          </configuration>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven-site-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>com.mysema.maven</groupId>
@@ -459,18 +457,9 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${spring-boot.version}</version>
           <configuration>
-            <mainClass>${main-class}</mainClass>
             <executable>true</executable>
           </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>repackage</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <groupId>org.mybatis.maven</groupId>
@@ -483,14 +472,18 @@
             <dependency>
               <groupId>org.mariadb.jdbc</groupId>
               <artifactId>mariadb-java-client</artifactId>
-              <version>${mariadb-java-client.version}</version>
+              <version>${mariadb.version}</version>
             </dependency>
           </dependencies>
         </plugin>
         <plugin>
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>
+          <version>${license-maven-plugin.version}</version>
           <configuration>
+            <properties>
+              <owner>${project.organization.name}</owner>
+            </properties>
             <headerDefinitions>
               <headerDefinition>src/license/javacomment_style.xml</headerDefinition>
             </headerDefinitions>
@@ -501,16 +494,21 @@
               <scss>JAVADOC_STYLE</scss>
               <ldif>SCRIPT_STYLE</ldif>
             </mapping>
-            <excludes>
-              <exclude>**/.*</exclude>
-              <exclude>**/LICENSE</exclude>
-              <exclude>**/*.txt</exclude>
-              <exclude>**/*.log*</exclude>
-              <exclude>**/*.fastq</exclude>
-              <exclude>node_modules/**</exclude>
-              <exclude>package*.json</exclude>
-              <exclude>webpack.*.js</exclude>
-            </excludes>
+            <licenseSets>
+              <licenseSet>
+                <header>license-header.txt</header>
+                <excludes>
+                  <exclude>**/.*</exclude>
+                  <exclude>**/LICENSE</exclude>
+                  <exclude>**/*.txt</exclude>
+                  <exclude>**/*.log*</exclude>
+                  <exclude>**/*.fastq</exclude>
+                  <exclude>node_modules/**</exclude>
+                  <exclude>package*.json</exclude>
+                  <exclude>webpack.*.js</exclude>
+                </excludes>
+              </licenseSet>
+            </licenseSets>
           </configuration>
           <executions>
             <execution>
@@ -538,8 +536,8 @@
         <artifactId>vaadin-maven-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>com.mysema.maven</groupId>
@@ -559,13 +557,30 @@
   <reporting>
     <plugins>
       <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>${maven-project-info-reports-plugin.version}</version>
+      </plugin>
+      <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report-only</report>
+            </reports>
+          </reportSet>
+        </reportSets>
         <configuration>
           <reportsDirectories>
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
           </reportsDirectories>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs-maven-plugin.version}</version>
       </plugin>
     </plugins>
   </reporting>
@@ -616,6 +631,18 @@
       </activation>
       <properties>
         <slow-tests.skip>true</slow-tests.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>site-quick</id>
+      <activation>
+        <property>
+          <name>quick</name>
+        </property>
+      </activation>
+      <properties>
+        <dependency.locations.enabled>false</dependency.locations.enabled>
+        <dependency.details.enabled>false</dependency.details.enabled>
       </properties>
     </profile>
   </profiles>
