@@ -81,7 +81,7 @@ vaadin:
 
 mail:
   enabled: true
-  from: proview@ircm.qc.ca
+  from: lanaseq@ircm.qc.ca
   to: christian.poitras@ircm.qc.ca
 
 logging:

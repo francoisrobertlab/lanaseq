@@ -17,14 +17,6 @@
 
 package ca.qc.ircm.lanaseq.mail;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.SmtpPortRandomizer;
@@ -32,14 +24,6 @@ import ca.qc.ircm.lanaseq.user.User;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Optional;
-import javax.annotation.PostConstruct;
-import javax.mail.Message.RecipientType;
-import javax.mail.Multipart;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -47,8 +31,21 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.mail.Message.RecipientType;
+import javax.mail.Multipart;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link MailService}.
@@ -59,9 +56,9 @@ public class MailServiceTest {
   @Autowired
   private MailService mailService;
   @Autowired
-  private MailConfiguration mailConfiguration;
+  private JavaMailSender mailSender;
   @Autowired
-  private MimeMessage templateMessage;
+  private MailConfiguration mailConfiguration;
   @MockBean
   private AuthenticatedUser authenticatedUser;
   @Value("${spring.mail.port}")
@@ -79,10 +76,12 @@ public class MailServiceTest {
   public void textEmail() throws Throwable {
     MimeMessageHelper email = mailService.textEmail();
 
-    assertNotSame(templateMessage, email.getMimeMessage());
-    assertEquals(templateMessage.getSubject(), email.getMimeMessage().getSubject());
-    assertArrayEquals(templateMessage.getFrom(), email.getMimeMessage().getFrom());
-    assertEquals(templateMessage.getContent(), email.getMimeMessage().getContent());
+    assertEquals("lanaseq", email.getMimeMessage().getSubject());
+    assertEquals(1, email.getMimeMessage().getFrom().length);
+    assertTrue(email.getMimeMessage().getFrom()[0] instanceof InternetAddress);
+    assertEquals("lanaseq@ircm.qc.ca",
+        ((InternetAddress) email.getMimeMessage().getFrom()[0]).getAddress());
+    assertEquals("", email.getMimeMessage().getContent());
   }
 
   @Test
@@ -90,9 +89,10 @@ public class MailServiceTest {
   public void htmlEmail() throws Throwable {
     MimeMessageHelper email = mailService.htmlEmail();
 
-    assertNotSame(templateMessage, email.getMimeMessage());
-    assertEquals(templateMessage.getSubject(), email.getMimeMessage().getSubject());
-    assertArrayEquals(templateMessage.getFrom(), email.getMimeMessage().getFrom());
+    assertEquals("lanaseq", email.getMimeMessage().getSubject());
+    assertTrue(email.getMimeMessage().getFrom()[0] instanceof InternetAddress);
+    assertEquals("lanaseq@ircm.qc.ca",
+        ((InternetAddress) email.getMimeMessage().getFrom()[0]).getAddress());
     assertTrue(email.getMimeMessage().getContent() instanceof Multipart);
     final MimeMessageParser mimeMessageParser =
         new MimeMessageParser(email.getMimeMessage()).parse();
@@ -106,7 +106,8 @@ public class MailServiceTest {
     String receiver = "liam.li@ircm.qc.ca";
     String subject = "test subject";
     String content = "text message";
-    MimeMessageHelper email = new MimeMessageHelper(new MimeMessage(templateMessage));
+    MimeMessageHelper email = new MimeMessageHelper(mailSender.createMimeMessage());
+    email.setFrom("lanaseq@ircm.qc.ca");
     email.addTo(receiver);
     email.setSubject(subject);
     email.setText(content);
@@ -138,7 +139,8 @@ public class MailServiceTest {
     String subject = "test subject";
     String textContent = "text message";
     String htmlContent = "<html><body>html message</body></html>";
-    MimeMessageHelper email = new MimeMessageHelper(new MimeMessage(templateMessage), true);
+    MimeMessageHelper email = new MimeMessageHelper(mailSender.createMimeMessage(), true);
+    email.setFrom("lanaseq@ircm.qc.ca");
     email.addTo(receiver);
     email.setSubject(subject);
     email.setText(textContent, htmlContent);
@@ -165,12 +167,52 @@ public class MailServiceTest {
   }
 
   @Test
+  @Timeout(10)
+  public void sendEmail_TwoHtmlAndText() throws Throwable {
+    String receiver = "liam.li@ircm.qc.ca";
+    String subject = "test subject";
+    String textContent = "text message";
+    String htmlContent = "<html><body>html message</body></html>";
+    MimeMessageHelper email = mailService.htmlEmail();
+    email.addTo(receiver);
+    email.setSubject(subject);
+    email.setText(textContent, htmlContent);
+    mailService.send(email);
+    email = mailService.htmlEmail();
+    email.addTo(receiver);
+    email.setSubject(subject);
+    email.setText(textContent, htmlContent);
+
+    mailService.send(email);
+
+    MimeMessage[] messages = greenMail.getReceivedMessages();
+    assertEquals(2, messages.length);
+    for (MimeMessage message : messages) {
+      assertEquals(subject, message.getSubject());
+      assertNotNull(message.getFrom());
+      assertEquals(1, message.getFrom().length);
+      assertEquals(new InternetAddress(mailConfiguration.getFrom()), message.getFrom()[0]);
+      assertNotNull(message.getRecipients(RecipientType.TO));
+      assertEquals(1, message.getRecipients(RecipientType.TO).length);
+      assertEquals(new InternetAddress(receiver), message.getRecipients(RecipientType.TO)[0]);
+      assertTrue(message.getRecipients(RecipientType.CC) == null
+          || message.getRecipients(RecipientType.CC).length == 0);
+      assertTrue(message.getRecipients(RecipientType.BCC) == null
+          || message.getRecipients(RecipientType.BCC).length == 0);
+      final MimeMessageParser mimeMessageParser = new MimeMessageParser(message).parse();
+      assertEquals(htmlContent, mimeMessageParser.getHtmlContent());
+      assertEquals(textContent, mimeMessageParser.getPlainContent());
+    }
+  }
+
+  @Test
   @Timeout(150)
   public void sendEmail_ErrorText() throws Throwable {
     String receiver = "liam.li@ircm.qc.ca";
     String subject = "test subject";
     String content = "text message";
-    MimeMessageHelper email = new MimeMessageHelper(new MimeMessage(templateMessage));
+    MimeMessageHelper email = new MimeMessageHelper(mailSender.createMimeMessage());
+    email.setFrom("lanaseq@ircm.qc.ca");
     email.addTo(receiver);
     email.setSubject(subject);
     email.setText(content);
@@ -186,7 +228,8 @@ public class MailServiceTest {
     String subject = "test subject";
     String textContent = "text message";
     String htmlContent = "<html><body>html message</body></html>";
-    MimeMessageHelper email = new MimeMessageHelper(new MimeMessage(templateMessage), true);
+    MimeMessageHelper email = new MimeMessageHelper(mailSender.createMimeMessage(), true);
+    email.setFrom("lanaseq@ircm.qc.ca");
     email.addTo(receiver);
     email.setSubject(subject);
     email.setText(textContent, htmlContent);

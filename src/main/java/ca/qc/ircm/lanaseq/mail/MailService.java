@@ -19,14 +19,6 @@ package ca.qc.ircm.lanaseq.mail;
 
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
-import com.google.common.io.ByteStreams;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +26,15 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Service class for sending emails.
@@ -46,18 +47,15 @@ public class MailService {
   @Autowired
   private JavaMailSender mailSender;
   @Autowired
-  private MimeMessage templateMessage;
-  @Autowired
   private AuthenticatedUser authenticatedUser;
 
   protected MailService() {
   }
 
   protected MailService(MailConfiguration mailConfiguration, JavaMailSender mailSender,
-      MimeMessage templateMessage, AuthenticatedUser authenticatedUser) {
+      AuthenticatedUser authenticatedUser) {
     this.mailConfiguration = mailConfiguration;
     this.mailSender = mailSender;
-    this.templateMessage = templateMessage;
     this.authenticatedUser = authenticatedUser;
   }
 
@@ -69,8 +67,12 @@ public class MailService {
    *           could not create email
    */
   public MimeMessageHelper textEmail() throws MessagingException {
-    MimeMessage message = new MimeMessage(templateMessage);
-    return new MimeMessageHelper(message);
+    MimeMessage message = mailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message);
+    helper.setFrom(mailConfiguration.getFrom());
+    helper.setSubject(mailConfiguration.getSubject());
+    helper.setText("");
+    return helper;
   }
 
   /**
@@ -81,8 +83,11 @@ public class MailService {
    *           could not create email
    */
   public MimeMessageHelper htmlEmail() throws MessagingException {
-    MimeMessage message = new MimeMessage(templateMessage);
-    return new MimeMessageHelper(message, true);
+    MimeMessage message = mailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true);
+    helper.setFrom(mailConfiguration.getFrom());
+    helper.setSubject(mailConfiguration.getSubject());
+    return helper;
   }
 
   /**
@@ -109,7 +114,7 @@ public class MailService {
     try {
       if (email.isMultipart()) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ByteStreams.copy(email.getMimeMultipart().getBodyPart(0).getInputStream(), output);
+        StreamUtils.copy(email.getMimeMultipart().getBodyPart(0).getInputStream(), output);
         return new String(output.toByteArray(), StandardCharsets.UTF_8);
       } else {
         return String.valueOf(email.getMimeMessage().getContent());

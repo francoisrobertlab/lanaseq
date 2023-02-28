@@ -17,16 +17,8 @@
 
 package ca.qc.ircm.lanaseq;
 
-import ca.qc.ircm.lanaseq.mail.MailConfiguration;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.thymeleaf.TemplateEngine;
@@ -40,11 +32,6 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 @EnableTransactionManagement
 @EnableScheduling
 public class SpringConfiguration {
-  @Autowired
-  private MailConfiguration mailConfiguration;
-  @Autowired
-  private JavaMailSender mailSender;
-
   /**
    * Creates Thymeleaf's template engine.
    *
@@ -56,37 +43,5 @@ public class SpringConfiguration {
     templateEngine.setTemplateResolver(new ClassLoaderTemplateResolver());
     templateEngine.setMessageResolver(new StandardMessageResolver());
     return templateEngine;
-  }
-
-  /**
-   * Template message.
-   *
-   * @return template message
-   * @throws MessagingException
-   *           could not create template message
-   */
-  @Bean
-  public MimeMessage templateMessage() throws MessagingException {
-    MimeMessage message = mailSender.createMimeMessage();
-    MimeMessageHelper helper = new MimeMessageHelper(message);
-    helper.setFrom(mailConfiguration.getFrom());
-    helper.setSubject(mailConfiguration.getSubject());
-    helper.setText("");
-    return message;
-  }
-
-  /**
-   * Template message.
-   *
-   * @return template message
-   * @throws MessagingException
-   *           could not create template message
-   */
-  @Bean
-  @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-  public MimeMessageHelper emailHelper() throws MessagingException {
-    MimeMessage message = new MimeMessage(templateMessage());
-    MimeMessageHelper helper = new MimeMessageHelper(message);
-    return helper;
   }
 }

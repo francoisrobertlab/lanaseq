@@ -17,12 +17,12 @@
 
 package ca.qc.ircm.lanaseq.mail;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link MailConfiguration}.
@@ -37,7 +37,7 @@ public class MailConfigurationTest {
   @Test
   public void defaultValues() {
     assertEquals(true, mailConfiguration.isEnabled());
-    assertEquals("proview@ircm.qc.ca", mailConfiguration.getFrom());
+    assertEquals("lanaseq@ircm.qc.ca", mailConfiguration.getFrom());
     assertEquals("christian.poitras@ircm.qc.ca", mailConfiguration.getTo());
     assertEquals("lanaseq", mailConfiguration.getSubject());
     assertEquals("localhost", mailSender.getHost());
