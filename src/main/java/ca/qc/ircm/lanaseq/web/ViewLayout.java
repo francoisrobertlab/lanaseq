@@ -54,7 +54,6 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
  * Main layout.
  */
 @JsModule("./styles/shared-styles.js")
-@Push(PushMode.MANUAL)
 public class ViewLayout extends VerticalLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver {
   public static final String ID = "view-layout";

@@ -188,6 +188,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Allow all flow internal requests.
         .requestMatchers(WebSecurityConfiguration::isVaadinInternalRequest).permitAll()
+            .regexMatchers("/offline-stub.html", "/sw-runtime-resources-precache.js").permitAll()
 
         // Allow all login failure URLs.
         .regexMatchers(SIGNIN_FAILURE_URL_PATTERN).permitAll()

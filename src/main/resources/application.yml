@@ -77,7 +77,6 @@ server:
 vaadin:
   productionMode: false
   closeIdleSessions: true
-  compatibilityMode: false
 
 mail:
   enabled: true
