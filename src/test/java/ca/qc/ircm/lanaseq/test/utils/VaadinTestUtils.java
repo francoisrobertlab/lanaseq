@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.test.utils;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.vaadin.flow.component.ClickEvent;
@@ -351,7 +352,6 @@ public class VaadinTestUtils {
   public static void validateEquals(UploadI18N expected, UploadI18N actual) {
     assertEquals(expected.getAddFiles().getOne(), actual.getAddFiles().getOne());
     assertEquals(expected.getAddFiles().getMany(), actual.getAddFiles().getMany());
-    assertEquals(expected.getCancel(), actual.getCancel());
     assertEquals(expected.getDropFiles().getOne(), actual.getDropFiles().getOne());
     assertEquals(expected.getDropFiles().getMany(), actual.getDropFiles().getMany());
     assertEquals(expected.getError().getFileIsTooBig(), actual.getError().getFileIsTooBig());
@@ -364,5 +364,7 @@ public class VaadinTestUtils {
         actual.getUploading().getRemainingTime().getPrefix());
     assertEquals(expected.getUploading().getStatus().getConnecting(),
         actual.getUploading().getStatus().getConnecting());
+    assertArrayEquals(expected.getUnits().getSize().toArray(),
+            actual.getUnits().getSize().toArray());
   }
 }
