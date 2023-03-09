@@ -332,8 +332,6 @@ public class VaadinTestUtils {
    */
   public static void validateEquals(DatePickerI18n expected, DatePickerI18n actual) {
     assertEquals(expected.getWeek(), actual.getWeek());
-    assertEquals(expected.getCalendar(), actual.getCalendar());
-    assertEquals(expected.getClear(), actual.getClear());
     assertEquals(expected.getToday(), actual.getToday());
     assertEquals(expected.getCancel(), actual.getCancel());
     assertEquals(expected.getFirstDayOfWeek(), actual.getFirstDayOfWeek());
