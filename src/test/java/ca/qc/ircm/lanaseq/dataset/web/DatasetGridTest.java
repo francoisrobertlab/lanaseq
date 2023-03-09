@@ -23,8 +23,9 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetGrid.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.EDIT_BUTTON;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -61,7 +62,9 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -97,7 +100,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<LocalDateRenderer<Dataset>> localDateRendererCaptor;
   @Captor
-  private ArgumentCaptor<TemplateRenderer<Dataset>> templateRendererCaptor;
+  private ArgumentCaptor<LitRenderer<Dataset>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Dataset>> comparatorCaptor;
   @Captor
@@ -171,7 +174,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     when(grid.owner.setHeader(any(String.class))).thenReturn(grid.owner);
     when(grid.owner.setFlexGrow(anyInt())).thenReturn(grid.owner);
     grid.edit = mock(Column.class);
-    doReturn(grid.edit).when(grid).addColumn(any(TemplateRenderer.class), eq(EDIT));
+    doReturn(grid.edit).when(grid).addColumn(any(LitRenderer.class), eq(EDIT));
     when(grid.edit.setKey(any())).thenReturn(grid.edit);
     when(grid.edit.setSortProperty(any())).thenReturn(grid.edit);
     when(grid.edit.setSortable(anyBoolean())).thenReturn(grid.edit);
@@ -319,12 +322,12 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
       assertEquals(dataset.getOwner().getEmail(),
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
-    verify(grid).addColumn(templateRendererCaptor.capture(), eq(EDIT));
-    TemplateRenderer<Dataset> templateRenderer = templateRendererCaptor.getValue();
+    verify(grid).addColumn(litRendererCaptor.capture(), eq(EDIT));
+    LitRenderer<Dataset> litRenderer = litRendererCaptor.getValue();
     for (Dataset dataset : datasets) {
-      assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
-      assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
-      templateRenderer.getEventHandlers().get("edit").accept(dataset);
+      assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
+      assertTrue(functions(litRenderer).containsKey("edit"));
+      functions(litRenderer).get("edit").accept(dataset, null);
       verify(editListener, atLeastOnce()).onComponentEvent(editEventCaptor.capture());
       assertEquals(dataset, editEventCaptor.getValue().getItem());
     }

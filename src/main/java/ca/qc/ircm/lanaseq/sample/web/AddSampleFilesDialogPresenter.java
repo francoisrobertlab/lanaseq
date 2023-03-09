@@ -135,7 +135,7 @@ public class AddSampleFilesDialogPresenter {
   void updateFiles() {
     existingFilenames =
         service.files(sample).stream().map(f -> f.toFile().getName()).collect(Collectors.toSet());
-    dialog.files.setItems(service.uploadFiles(sample).stream().map(file -> file.toFile()));
+    dialog.files.setItems(service.uploadFiles(sample).stream().map(file -> file.toFile()).collect(Collectors.toList()));
   }
 
   boolean exists(File file) {

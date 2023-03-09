@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +149,7 @@ public class DatasetFilesDialogPresenter {
 
   private void updateFiles() {
     dialog.files
-        .setItems(service.files(dataset).stream().map(file -> new EditableFile(file.toFile())));
+        .setItems(service.files(dataset).stream().map(file -> new EditableFile(file.toFile())).collect(Collectors.toList()));
   }
 
   boolean isReadOnly() {

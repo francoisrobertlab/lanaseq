@@ -34,6 +34,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -56,8 +57,8 @@ public class ProtocolHistoryDialog extends Dialog
   public static final String FILES = "files";
   public static final String RECOVER = "recover";
   public static final String RECOVER_BUTTON = "<vaadin-button class='" + RECOVER + "' theme='"
-      + ButtonVariant.LUMO_SUCCESS.getVariantName() + "' on-click='recoverFile'>"
-      + "<iron-icon icon='vaadin:ambulance' slot='prefix'></iron-icon>" + "</vaadin-button>";
+      + ButtonVariant.LUMO_SUCCESS.getVariantName() + "' @click='${recoverFile}'>"
+      + "<vaadin-icon icon='vaadin:ambulance' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String RECOVERED = "recovered";
   private static final long serialVersionUID = -7797831034001410430L;
   protected H3 header = new H3();
@@ -94,8 +95,8 @@ public class ProtocolHistoryDialog extends Dialog
         .setFlexGrow(10);
     recover =
         files
-            .addColumn(TemplateRenderer.<ProtocolFile>of(RECOVER_BUTTON)
-                .withEventHandler("recoverFile", file -> presenter.recoverFile(file)), RECOVER)
+            .addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
+                .withFunction("recoverFile", file -> presenter.recoverFile(file)), RECOVER)
             .setKey(RECOVER);
     presenter.init(this);
   }

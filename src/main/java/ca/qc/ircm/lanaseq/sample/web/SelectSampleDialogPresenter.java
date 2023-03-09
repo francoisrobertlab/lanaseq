@@ -66,7 +66,7 @@ public class SelectSampleDialogPresenter {
     ConfigurableFilterDataProvider<Sample, Void, SerializablePredicate<Sample>> dataProvider =
         samplesDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
   }
 
   void select(Sample sample) {

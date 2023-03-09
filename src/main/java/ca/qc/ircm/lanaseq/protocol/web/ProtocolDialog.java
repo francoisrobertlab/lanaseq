@@ -56,6 +56,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -83,8 +84,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final int MAXIMUM_FILES_SIZE = 20 * 1024 * 1024; // 20MB
   public static final int MAXIMUM_FILES_COUNT = 6;
   public static final String REMOVE_BUTTON = "<vaadin-button class='" + REMOVE + "' theme='"
-      + ButtonVariant.LUMO_ERROR.getVariantName() + "' on-click='removeFile'>"
-      + "<iron-icon icon='vaadin:trash' slot='prefix'></iron-icon>" + "</vaadin-button>";
+      + ButtonVariant.LUMO_ERROR.getVariantName() + "' @click='${removeFile}'>"
+      + "<vaadin-icon icon='vaadin:trash' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = -7797831034001410430L;
   protected H3 header = new H3();
@@ -139,8 +140,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
         .setFlexGrow(10);
     remove =
         files
-            .addColumn(TemplateRenderer.<ProtocolFile>of(REMOVE_BUTTON)
-                .withEventHandler("removeFile", file -> presenter.removeFile(file)), REMOVE)
+            .addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON)
+                .withFunction("removeFile", file -> presenter.removeFile(file)), REMOVE)
             .setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);

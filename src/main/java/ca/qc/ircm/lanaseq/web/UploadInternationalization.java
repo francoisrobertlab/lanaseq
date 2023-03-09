@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.FRENCH;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import com.vaadin.flow.component.upload.UploadI18N;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -54,7 +55,6 @@ public class UploadInternationalization {
     final AppResources resources = new AppResources(Constants.class, ENGLISH);
     return new UploadI18N()
         .setAddFiles(new UploadI18N.AddFiles().setOne("Add file...").setMany("Add files..."))
-        .setCancel(resources.message(CANCEL))
         .setDropFiles(
             new UploadI18N.DropFiles().setOne("Drop file here").setMany("Drop files here"))
         .setError(new UploadI18N.Error().setFileIsTooBig("The file is too big")
@@ -68,7 +68,9 @@ public class UploadInternationalization {
             .setRemainingTime(new UploadI18N.Uploading.RemainingTime().setPrefix("Remains: ")
                 .setUnknown("Unknown remaining time"))
             .setStatus(new UploadI18N.Uploading.Status().setConnecting("Connecting...")
-                .setHeld("Waiting...").setProcessing("Uploading...").setStalled("Stalled...")));
+                .setHeld("Waiting...").setProcessing("Uploading...").setStalled("Stalled...")))
+            .setUnits(new UploadI18N.Units()
+                    .setSize(Arrays.asList("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")));
   }
 
   /**
@@ -81,7 +83,6 @@ public class UploadInternationalization {
     return new UploadI18N()
         .setAddFiles(new UploadI18N.AddFiles()
             .setOne("Ajouter un fichier...").setMany("Ajouter fichiers..."))
-        .setCancel(resources.message(CANCEL))
         .setDropFiles(new UploadI18N.DropFiles().setOne("Déplacer un fichier ici")
             .setMany("Déplacer des fichiers ici"))
         .setError(new UploadI18N.Error().setFileIsTooBig("Le fichier est trop volumineux")
@@ -95,6 +96,8 @@ public class UploadInternationalization {
             .setRemainingTime(new UploadI18N.Uploading.RemainingTime().setPrefix("Il reste ")
                 .setUnknown("Temps restant inconnu"))
             .setStatus(new UploadI18N.Uploading.Status().setConnecting("Connexion...")
-                .setHeld("En attente...").setProcessing("En cours...").setStalled("Bloqué...")));
+                .setHeld("En attente...").setProcessing("En cours...").setStalled("Bloqué...")))
+            .setUnits(new UploadI18N.Units()
+                    .setSize(Arrays.asList("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")));
   }
 }

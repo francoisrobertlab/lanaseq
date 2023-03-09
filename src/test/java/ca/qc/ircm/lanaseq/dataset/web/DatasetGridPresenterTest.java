@@ -41,6 +41,7 @@ import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private AuthenticatedUser authenticatedUser;
   @Mock
-  private DataProvider<Dataset, ?> dataProvider;
+  private ListDataProvider<Dataset> dataProvider;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<DatasetDialog>>> savedListenerCaptor;
   @Captor
@@ -126,7 +127,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterName("test");
 
@@ -136,7 +137,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName_Empty() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterName("");
 
@@ -146,7 +147,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterTags() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterTags("test");
 
@@ -156,7 +157,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterTags_Empty() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterTags("");
 
@@ -166,7 +167,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterProtocol() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterProtocol("test");
 
@@ -176,7 +177,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterProtocol_Empty() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterProtocol("");
 
@@ -186,7 +187,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(2));
 
@@ -198,7 +199,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate_Null() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterDate(null);
 
@@ -208,7 +209,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterOwner("test");
 
@@ -218,7 +219,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner_Empty() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
 
     presenter.filterOwner("");
 
@@ -228,7 +229,7 @@ public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void refreshDatasets() {
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
     presenter.refreshDatasets();
     verify(dataProvider).refreshAll();
   }

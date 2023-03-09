@@ -44,6 +44,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -72,7 +73,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private AuthenticatedUser authenticatedUser;
   @Mock
-  private DataProvider<Sample, ?> dataProvider;
+  private ListDataProvider<Sample> dataProvider;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Captor
@@ -134,7 +135,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName() {
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
 
     presenter.filterName("test");
 
@@ -144,7 +145,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName_Empty() {
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
 
     presenter.filterName("");
 
@@ -154,7 +155,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate() {
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
 
     presenter.filterDate(range);
@@ -165,7 +166,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate_Null() {
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
 
     presenter.filterDate(null);
 
@@ -175,7 +176,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner() {
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
 
     presenter.filterOwner("test");
 
@@ -185,7 +186,7 @@ public class SelectSampleDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner_Empty() {
-    dialog.samples.setDataProvider(dataProvider);
+    dialog.samples.setItems(dataProvider);
 
     presenter.filterOwner("");
 

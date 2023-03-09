@@ -78,7 +78,7 @@ public class ProtocolsViewPresenter {
     ConfigurableFilterDataProvider<Protocol, Void, SerializablePredicate<Protocol>> dataProvider =
         protocolsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
   }
 
   void edit(Protocol protocol) {

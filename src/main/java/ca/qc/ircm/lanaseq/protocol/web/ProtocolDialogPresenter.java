@@ -77,7 +77,7 @@ public class ProtocolDialogPresenter {
 
   void init(ProtocolDialog dialog) {
     this.dialog = dialog;
-    dialog.files.setDataProvider(filesDataProvider);
+    dialog.files.setItems(filesDataProvider);
     localeChange(Constants.DEFAULT_LOCALE);
     setProtocol(null);
   }

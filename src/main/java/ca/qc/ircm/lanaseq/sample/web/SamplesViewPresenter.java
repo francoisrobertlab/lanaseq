@@ -102,7 +102,7 @@ public class SamplesViewPresenter {
     ConfigurableFilterDataProvider<Sample, Void, SampleFilter> dataProvider =
         samplesDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
   }
 
   void view(Sample sample) {

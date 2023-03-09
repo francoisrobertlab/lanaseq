@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVER_BUTTON;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.id;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,6 +50,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
@@ -78,7 +80,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentRenderer<Anchor, ProtocolFile>> anchorComponentRendererCaptor;
   @Captor
-  private ArgumentCaptor<TemplateRenderer<ProtocolFile>> templateRendererCaptor;
+  private ArgumentCaptor<LitRenderer<ProtocolFile>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<ProtocolFile>> comparatorCaptor;
   @Autowired
@@ -116,7 +118,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.recover = mock(Column.class);
-    when(dialog.files.addColumn(any(TemplateRenderer.class), eq(RECOVER)))
+    when(dialog.files.addColumn(any(LitRenderer.class), eq(RECOVER)))
         .thenReturn(dialog.recover);
     when(dialog.recover.setKey(any())).thenReturn(dialog.recover);
     when(dialog.recover.setHeader(any(String.class))).thenReturn(dialog.recover);
@@ -188,12 +190,12 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
       assertEquals(file.getFilename(),
           ((NormalizedComparator<ProtocolFile>) comparator).getConverter().apply(file));
     }
-    verify(dialog.files).addColumn(templateRendererCaptor.capture(), eq(RECOVER));
-    TemplateRenderer<ProtocolFile> templateRenderer = templateRendererCaptor.getValue();
+    verify(dialog.files).addColumn(litRendererCaptor.capture(), eq(RECOVER));
+    LitRenderer<ProtocolFile> litRenderer = litRendererCaptor.getValue();
     for (ProtocolFile file : protocolFiles) {
-      assertEquals(RECOVER_BUTTON, rendererTemplate(templateRenderer));
-      assertTrue(templateRenderer.getEventHandlers().containsKey("recoverFile"));
-      templateRenderer.getEventHandlers().get("recoverFile").accept(file);
+      assertEquals(RECOVER_BUTTON, rendererTemplate(litRenderer));
+      assertTrue(functions(litRenderer).containsKey("recoverFile"));
+      functions(litRenderer).get("recoverFile").accept(file, null);
       verify(presenter).recoverFile(file);
     }
   }
