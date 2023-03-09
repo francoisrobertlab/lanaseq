@@ -52,6 +52,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +81,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private AuthenticatedUser authenticatedUser;
   @Mock
-  private DataProvider<Protocol, ?> dataProvider;
+  private ListDataProvider<Protocol> dataProvider;
   @Captor
   private ArgumentCaptor<Protocol> protocolCaptor;
   @Captor
@@ -167,7 +168,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName() {
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
 
     presenter.filterName("test");
 
@@ -177,7 +178,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName_Empty() {
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
 
     presenter.filterName("");
 
@@ -187,7 +188,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate() {
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(5), LocalDate.now().minusDays(1));
 
@@ -199,7 +200,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate_Null() {
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
 
     presenter.filterDate(null);
 
@@ -209,7 +210,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner() {
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
 
     presenter.filterOwner("test");
 
@@ -219,7 +220,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner_Empty() {
-    view.protocols.setDataProvider(dataProvider);
+    view.protocols.setItems(dataProvider);
 
     presenter.filterOwner("");
 

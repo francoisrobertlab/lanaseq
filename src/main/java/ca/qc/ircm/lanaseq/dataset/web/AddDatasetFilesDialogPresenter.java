@@ -139,7 +139,7 @@ public class AddDatasetFilesDialogPresenter {
   void updateFiles() {
     existingFilenames = service.files(dataset).stream().map(file -> file.toFile().getName())
         .collect(Collectors.toSet());
-    dialog.files.setItems(service.uploadFiles(dataset).stream().map(file -> file.toFile()));
+    dialog.files.setItems(service.uploadFiles(dataset).stream().map(file -> file.toFile()).collect(Collectors.toList()));
   }
 
   boolean exists(File file) {

@@ -81,7 +81,7 @@ public class DatasetGridPresenter {
     ConfigurableFilterDataProvider<Dataset, Void, DatasetFilter> dataProvider =
         datasetsDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
-    grid.setDataProvider(dataProvider);
+    grid.setItems(dataProvider);
   }
 
   void refreshDatasets() {

@@ -79,7 +79,7 @@ public class UsersViewPresenter {
     ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
         usersDataProvider.withConfigurableFilter();
     dataProvider.setFilter(filter);
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
   }
 
   void localeChange(Locale locale) {

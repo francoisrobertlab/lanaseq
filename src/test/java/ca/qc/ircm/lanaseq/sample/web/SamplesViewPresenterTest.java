@@ -60,6 +60,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,7 +95,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @MockBean
   private AuthenticatedUser authenticatedUser;
   @Mock
-  private DataProvider<Sample, ?> dataProvider;
+  private ListDataProvider<Sample> dataProvider;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Captor
@@ -179,7 +180,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterName("test");
 
@@ -189,7 +190,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName_Empty() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterName("");
 
@@ -199,7 +200,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterProtocol() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterProtocol("test");
 
@@ -209,7 +210,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterProtocol_Empty() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterProtocol("");
 
@@ -219,7 +220,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
 
     presenter.filterDate(range);
@@ -230,7 +231,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterDate_Null() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterDate(null);
 
@@ -240,7 +241,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterOwner("test");
 
@@ -250,7 +251,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterOwner_Empty() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
 
     presenter.filterOwner("");
 
@@ -437,7 +438,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnSaved() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
     verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<SampleDialog>> savedListener = savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
@@ -447,7 +448,7 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnDeleted() {
-    view.samples.setDataProvider(dataProvider);
+    view.samples.setItems(dataProvider);
     verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
     ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener =
         deletedListenerCaptor.getValue();

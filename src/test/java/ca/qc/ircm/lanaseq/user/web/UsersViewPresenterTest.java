@@ -52,6 +52,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +81,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   @Mock
   private AuthenticatedUser authenticatedUser;
   @Mock
-  private DataProvider<User, ?> dataProvider;
+  private ListDataProvider<User> dataProvider;
   @Captor
   private ArgumentCaptor<User> userCaptor;
   @Captor
@@ -174,7 +175,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterEmail() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterEmail("test");
 
@@ -184,7 +185,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterEmail_Empty() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterEmail("");
 
@@ -194,7 +195,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterName("test");
 
@@ -204,7 +205,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterName_Empty() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterName("");
 
@@ -214,7 +215,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterActive_False() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterActive(false);
 
@@ -224,7 +225,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterActive_True() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterActive(true);
 
@@ -234,7 +235,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filterActive_Null() {
-    view.users.setDataProvider(dataProvider);
+    view.users.setItems(dataProvider);
 
     presenter.filterActive(null);
 

@@ -57,7 +57,7 @@ public class ProtocolHistoryDialogPresenter {
 
   void init(ProtocolHistoryDialog dialog) {
     this.dialog = dialog;
-    dialog.files.setDataProvider(filesDataProvider);
+    dialog.files.setItems(filesDataProvider);
   }
 
   void localeChange(Locale locale) {

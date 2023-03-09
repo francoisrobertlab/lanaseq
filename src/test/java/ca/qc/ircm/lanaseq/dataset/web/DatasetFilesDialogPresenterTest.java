@@ -617,7 +617,7 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.setDataset(dataset);
 
-    dialog.samples.setDataProvider(mock(DataProvider.class));
+    dialog.samples.setItems(mock(DataProvider.class));
     verify(dialog.sampleFilesDialog)
         .addOpenedChangeListener(openedSampleFilesListenerCaptor.capture());
     ComponentEventListener<OpenedChangeEvent<Dialog>> openedSampleFilesListener =
