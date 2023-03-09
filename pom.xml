@@ -76,7 +76,7 @@
     <!-- Dependencies -->
     <vaadin.version>14.8.9</vaadin.version>
     <generate-property-names.version>1.1</generate-property-names.version>
-    <guava.version>30.0-jre</guava.version>
+    <guava.version>31.1-jre</guava.version>
     <commons-email.version>1.5</commons-email.version>
     <karibu-testing.version>1.3.0</karibu-testing.version>
     <greenmail.version>1.6.1</greenmail.version>
