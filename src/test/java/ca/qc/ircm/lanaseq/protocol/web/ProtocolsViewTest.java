@@ -34,6 +34,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -64,6 +65,7 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
@@ -98,7 +100,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<LocalDateTimeRenderer<Protocol>> localDateTimeRendererCaptor;
   @Captor
-  private ArgumentCaptor<TemplateRenderer<Protocol>> templateRendererCaptor;
+  private ArgumentCaptor<LitRenderer<Protocol>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Protocol>> comparatorCaptor;
   @Autowired
@@ -152,7 +154,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
     view.edit = mock(Column.class);
-    when(view.protocols.addColumn(any(TemplateRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.protocols.addColumn(any(LitRenderer.class), eq(EDIT))).thenReturn(view.edit);
     when(view.edit.setKey(any())).thenReturn(view.edit);
     when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
     when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
@@ -287,12 +289,12 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
       assertEquals(protocol.getOwner().getEmail(),
           ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
     }
-    verify(view.protocols).addColumn(templateRendererCaptor.capture(), eq(EDIT));
-    TemplateRenderer<Protocol> templateRenderer = templateRendererCaptor.getValue();
+    verify(view.protocols).addColumn(litRendererCaptor.capture(), eq(EDIT));
+    LitRenderer<Protocol> litRenderer = litRendererCaptor.getValue();
     for (Protocol protocol : protocols) {
-      assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
-      assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
-      templateRenderer.getEventHandlers().get("edit").accept(protocol);
+      assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
+      assertTrue(functions(litRenderer).containsKey("edit"));
+      functions(litRenderer).get("edit").accept(protocol, null);
       verify(presenter).edit(protocol);
     }
   }

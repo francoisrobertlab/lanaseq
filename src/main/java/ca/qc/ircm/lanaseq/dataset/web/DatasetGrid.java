@@ -39,6 +39,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -60,8 +61,8 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   public static final String EDIT_BUTTON =
-      "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
-          + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
+      "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
+          + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   private static final long serialVersionUID = -3052158575710045415L;
   protected Column<Dataset> name;
   protected Column<Dataset> tags;
@@ -98,7 +99,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
-    edit = addColumn(TemplateRenderer.<Dataset>of(EDIT_BUTTON).withEventHandler("edit",
+    edit = addColumn(LitRenderer.<Dataset>of(EDIT_BUTTON).withFunction("edit",
         dataset -> fireEvent(new EditEvent(this, false, dataset))), EDIT).setKey(EDIT)
             .setSortable(false).setFlexGrow(0);
     edit.setVisible(false);

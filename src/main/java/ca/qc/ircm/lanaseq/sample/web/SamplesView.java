@@ -51,6 +51,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -86,8 +87,8 @@ public class SamplesView extends VerticalLayout
   public static final String SAMPLES_CANNOT_WRITE = property(SAMPLES, "cannotWrite");
   public static final String MERGE_ERROR = property(MERGE, "error");
   public static final String EDIT_BUTTON =
-      "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
-          + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
+      "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
+          + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   private static final long serialVersionUID = -6945706067250351889L;
   private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
   protected H2 header = new H2();
@@ -151,7 +152,7 @@ public class SamplesView extends VerticalLayout
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
     edit =
         samples
-            .addColumn(TemplateRenderer.<Sample>of(EDIT_BUTTON).withEventHandler("edit",
+            .addColumn(LitRenderer.<Sample>of(EDIT_BUTTON).withFunction("edit",
                 sample -> presenter.view(sample)), EDIT)
             .setKey(EDIT).setSortable(false).setFlexGrow(0);
     samples.sort(GridSortOrder.desc(date).build());

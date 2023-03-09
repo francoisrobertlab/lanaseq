@@ -35,6 +35,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.REMOVE_BUTTON;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -70,6 +71,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
@@ -100,7 +102,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<ComponentRenderer<Anchor, ProtocolFile>> anchorComponentRendererCaptor;
   @Captor
-  private ArgumentCaptor<TemplateRenderer<ProtocolFile>> templateRendererCaptor;
+  private ArgumentCaptor<LitRenderer<ProtocolFile>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<ProtocolFile>> comparatorCaptor;
   @Autowired
@@ -140,7 +142,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.remove = mock(Column.class);
-    when(dialog.files.addColumn(any(TemplateRenderer.class), eq(REMOVE))).thenReturn(dialog.remove);
+    when(dialog.files.addColumn(any(LitRenderer.class), eq(REMOVE))).thenReturn(dialog.remove);
     when(dialog.remove.setKey(any())).thenReturn(dialog.remove);
     when(dialog.remove.setHeader(any(String.class))).thenReturn(dialog.remove);
   }
@@ -254,12 +256,12 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
       assertEquals(file.getFilename(),
           ((NormalizedComparator<ProtocolFile>) comparator).getConverter().apply(file));
     }
-    verify(dialog.files).addColumn(templateRendererCaptor.capture(), eq(REMOVE));
-    TemplateRenderer<ProtocolFile> templateRenderer = templateRendererCaptor.getValue();
+    verify(dialog.files).addColumn(litRendererCaptor.capture(), eq(REMOVE));
+    LitRenderer<ProtocolFile> litRenderer = litRendererCaptor.getValue();
     for (ProtocolFile file : protocolFiles) {
-      assertEquals(REMOVE_BUTTON, rendererTemplate(templateRenderer));
-      assertTrue(templateRenderer.getEventHandlers().containsKey("removeFile"));
-      templateRenderer.getEventHandlers().get("removeFile").accept(file);
+      assertEquals(REMOVE_BUTTON, rendererTemplate(litRenderer));
+      assertTrue(functions(litRenderer).containsKey("removeFile"));
+      functions(litRenderer).get("removeFile").accept(file, null);
       verify(presenter).removeFile(file);
     }
   }

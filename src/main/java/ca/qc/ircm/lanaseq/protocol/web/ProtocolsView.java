@@ -46,6 +46,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -71,8 +72,8 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public static final String HEADER = "header";
   public static final String PROTOCOLS = "protocols";
   public static final String EDIT_BUTTON =
-      "<vaadin-button class='" + EDIT + "' theme='icon' on-click='edit'>"
-          + "<iron-icon icon='vaadin:edit' slot='prefix'></iron-icon>" + "</vaadin-button>";
+      "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
+          + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String HISTORY = "history";
   public static final String PROTOCOLS_REQUIRED = property(PROTOCOLS, "required");
   public static final String PROTOCOLS_MORE_THAN_ONE = property(PROTOCOLS, "moreThanOne");
@@ -124,7 +125,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     edit = protocols
-        .addColumn(TemplateRenderer.<Protocol>of(EDIT_BUTTON).withEventHandler("edit",
+        .addColumn(LitRenderer.<Protocol>of(EDIT_BUTTON).withFunction("edit",
             protocol -> presenter.edit(protocol)), EDIT)
         .setKey(EDIT).setSortable(false).setFlexGrow(0);
     protocols.addItemDoubleClickListener(e -> presenter.edit(e.getItem()));

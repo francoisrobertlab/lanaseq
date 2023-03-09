@@ -37,6 +37,7 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -68,6 +69,7 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
@@ -101,7 +103,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<LocalDateRenderer<Sample>> localDateRendererCaptor;
   @Captor
-  private ArgumentCaptor<TemplateRenderer<Sample>> templateRendererCaptor;
+  private ArgumentCaptor<LitRenderer<Sample>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Autowired
@@ -162,7 +164,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
     view.edit = mock(Column.class);
-    when(view.samples.addColumn(any(TemplateRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.samples.addColumn(any(LitRenderer.class), eq(EDIT))).thenReturn(view.edit);
     when(view.edit.setKey(any())).thenReturn(view.edit);
     when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
     when(view.edit.setSortProperty(any())).thenReturn(view.edit);
@@ -341,12 +343,12 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
       assertEquals(sample.getOwner().getEmail(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(view.samples).addColumn(templateRendererCaptor.capture(), eq(EDIT));
-    TemplateRenderer<Sample> templateRenderer = templateRendererCaptor.getValue();
+    verify(view.samples).addColumn(litRendererCaptor.capture(), eq(EDIT));
+    LitRenderer<Sample> litRenderer = litRendererCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(EDIT_BUTTON, rendererTemplate(templateRenderer));
-      assertTrue(templateRenderer.getEventHandlers().containsKey("edit"));
-      templateRenderer.getEventHandlers().get("edit").accept(sample);
+      assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
+      assertTrue(functions(litRenderer).containsKey("edit"));
+      functions(litRenderer).get("edit").accept(sample, null);
       verify(presenter).view(sample);
     }
   }

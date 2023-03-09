@@ -39,14 +39,18 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.BasicRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.function.SerializableBiConsumer;
 import com.vaadin.flow.function.ValueProvider;
+import elemental.json.JsonArray;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -176,11 +180,35 @@ public class VaadinTestUtils {
    */
   public static String rendererTemplate(Renderer<?> renderer) {
     try {
-      Field field = Renderer.class.getDeclaredField("template");
+      Field field;
+      if (renderer instanceof LitRenderer) {
+        field = LitRenderer.class.getDeclaredField("templateExpression");
+      } else {
+        field = Renderer.class.getDeclaredField("template");
+      }
       field.setAccessible(true);
       return (String) field.get(renderer);
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-        | IllegalAccessException e) {
+             | IllegalAccessException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Returns all registered functions of this renderer.
+   *
+   * @param renderer renderer
+   * @return all registered functions of this renderer
+   * @param <SOURCE>
+   */
+  public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, JsonArray>>
+  functions(LitRenderer renderer) {
+    try {
+      Field field = LitRenderer.class.getDeclaredField("clientCallables");
+      field.setAccessible(true);
+      return (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(renderer);
+    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
+             | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
