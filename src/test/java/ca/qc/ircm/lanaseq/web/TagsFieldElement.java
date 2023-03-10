@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.web;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.customfield.testbench.CustomFieldElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
  * Web element for {@link TagsField}.
  */
 @Element("vaadin-custom-field")
+@Attribute(name = "class", value = TagsField.CLASS_NAME)
 public class TagsFieldElement extends CustomFieldElement {
   public List<ButtonElement> tags() {
     return $(ButtonElement.class).all();

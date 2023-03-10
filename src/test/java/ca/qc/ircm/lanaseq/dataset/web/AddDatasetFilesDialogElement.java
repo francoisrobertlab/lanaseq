@@ -28,12 +28,14 @@ import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
 /**
  * Web element for {@link AddDatasetFilesDialog}.
  */
 @Element("vaadin-dialog")
+@Attribute(name = "id", value = AddDatasetFilesDialog.ID)
 public class AddDatasetFilesDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));

@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -68,7 +67,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
@@ -79,7 +78,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void fieldsExistence_Manager() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
@@ -89,7 +88,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void edit() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 
     view.protocols().edit(0).click();
 
@@ -100,7 +99,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void history() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 
     view.protocols().select(2);
     view.history().click();
@@ -111,7 +110,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void add() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 
     view.add().click();
 

@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SEPARATOR;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.VIEW_NAME;
@@ -77,7 +76,7 @@ public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    UseForgotPasswordViewElement view = $(UseForgotPasswordViewElement.class).id(ID);
+    UseForgotPasswordViewElement view = $(UseForgotPasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.message()).isPresent());
     assertTrue(optional(() -> view.passwordsForm()).isPresent());
@@ -87,7 +86,7 @@ public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    UseForgotPasswordViewElement view = $(UseForgotPasswordViewElement.class).id(ID);
+    UseForgotPasswordViewElement view = $(UseForgotPasswordViewElement.class).waitForFirst();
 
     view.passwordsForm().password().setValue(password);
     view.passwordsForm().passwordConfirm().setValue(password);

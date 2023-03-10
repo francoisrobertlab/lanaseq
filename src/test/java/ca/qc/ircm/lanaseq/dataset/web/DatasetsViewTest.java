@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
@@ -105,7 +104,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
-    assertEquals(DATASETS, view.datasets.getId().orElse(""));
+    assertEquals(DatasetGrid.ID, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(MERGE, view.merge.getId().orElse(""));

@@ -83,7 +83,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
@@ -97,7 +97,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void refresh_Files() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
@@ -118,7 +118,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();

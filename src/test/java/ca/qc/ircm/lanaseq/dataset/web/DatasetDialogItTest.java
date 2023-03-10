@@ -106,7 +106,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().edit(0).click();
     DatasetDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
@@ -140,7 +140,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(oldFolder);
     Path oldSampleFolder = configuration.getHome().folder(dataset.getSamples().get(0));
     Files.createDirectories(oldSampleFolder);
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().edit(3).click();
     DatasetDialogElement dialog = view.dialog();
     fill(dialog);
@@ -201,7 +201,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Disabled("Drag and drop function moves to random element instead of the right location")
   public void save_ReorderSamples() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().edit(3).click();
     DatasetDialogElement dialog = view.dialog();
     Actions dragAndDrop = new Actions(dialog.getDriver());
@@ -263,7 +263,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     Dataset dataset = repository.findById(2L).get();
     Path oldFolder = configuration.getHome().folder(dataset);
     Files.createDirectories(oldFolder);
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().edit(3).click();
     DatasetDialogElement dialog = view.dialog();
     dialog.addSample().click();
@@ -339,7 +339,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void cancel() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().edit(0).click();
     DatasetDialogElement dialog = view.dialog();
     fill(dialog);
@@ -393,7 +393,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     Dataset dataset = repository.findById(4L).get();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
     view.datasets().edit(1).click();
     DatasetDialogElement dialog = view.dialog();

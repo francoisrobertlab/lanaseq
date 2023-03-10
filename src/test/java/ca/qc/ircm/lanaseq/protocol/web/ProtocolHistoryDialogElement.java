@@ -17,26 +17,25 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.id;
 
-import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
 /**
  * Web element for {@link ProtocolHistoryDialog}.
  */
-@ServiceTestAnnotations
 @Element("vaadin-dialog")
+@Attribute(name = "id", value = ProtocolHistoryDialog.ID)
 public class ProtocolHistoryDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
   }
 
   public ProtocolHistoryFilesGridElement files() {
-    return $(ProtocolHistoryFilesGridElement.class).id(id(FILES));
+    return $(ProtocolHistoryFilesGridElement.class).first();
   }
 }

@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -55,7 +54,7 @@ public class ForgotPasswordView extends VerticalLayout
   private static final long serialVersionUID = 4760310643370830640L;
   private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordView.class);
   public static final String VIEW_NAME = "forgotpassword";
-  public static final String ID = styleName(VIEW_NAME, "view");
+  public static final String ID = "forgotpassword-view";
   public static final String SEPARATOR = "/";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";

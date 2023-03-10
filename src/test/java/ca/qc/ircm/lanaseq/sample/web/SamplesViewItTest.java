@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
@@ -79,7 +78,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
@@ -91,7 +90,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void viewFiles() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);
     assertTrue(view.filesDialog().isOpen());
   }
@@ -99,7 +98,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void edit() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().edit(0).click();
     assertTrue(view.dialog().isOpen());
   }
@@ -107,7 +106,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void add() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.add().click();
     assertTrue(view.dialog().isOpen());
   }
@@ -115,7 +114,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void merge() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(1);
     view.samples().select(view.samples().name(2).startsWith("JS2") ? 2 : 3);
 
@@ -145,7 +144,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void files() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
     view.files().click();
     assertTrue(view.filesDialog().isOpen());
@@ -154,7 +153,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void analyze() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
     view.analyze().click();
     assertTrue(view.analyzeDialog().isOpen());

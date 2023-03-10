@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import ca.qc.ircm.lanaseq.test.web.MultiSelectGridElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Keys;
@@ -28,6 +29,7 @@ import org.openqa.selenium.Keys;
  * Web element for {@link SamplesView} grid.
  */
 @Element("vaadin-grid")
+@Attribute(name = "id", value = SamplesView.SAMPLES)
 public class SamplesGridElement extends MultiSelectGridElement {
   private static final int NAME_COLUMN = 1;
   private static final int PROTOCOL_COLUMN = 2;

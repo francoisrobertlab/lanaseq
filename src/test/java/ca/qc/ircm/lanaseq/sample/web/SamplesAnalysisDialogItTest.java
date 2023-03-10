@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +75,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
     view.analyze().click();
     SamplesAnalysisDialogElement dialog = view.analyzeDialog();
@@ -97,7 +96,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq2 = sampleFolder.resolve(sample.getName() + "_R2.fastq");
     final byte[] fastq2Content = writeFile(fastq2);
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(1);
     view.analyze().click();
     SamplesAnalysisDialogElement dialog = view.analyzeDialog();
@@ -144,7 +143,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(view.samples().name(3).startsWith("JS1") ? 3 : 2);
     view.samples().select(1);
     view.analyze().click();
@@ -197,7 +196,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq3 = sample2Folder.resolve("a_R1.fastq");
     final byte[] fastq3Content = writeFile(fastq3);
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(1);
     view.samples().select(0);
     view.analyze().click();

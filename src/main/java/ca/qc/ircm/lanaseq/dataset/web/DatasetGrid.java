@@ -41,7 +41,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -60,6 +59,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
+  public static final String ID = "datasets-grid";
   public static final String EDIT_BUTTON =
       "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
           + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
@@ -87,6 +87,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
 
   @PostConstruct
   void init() {
+    setId(ID);
     name = addColumn(dataset -> dataset.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
     tags = addColumn(dataset -> dataset.getTags().stream().collect(Collectors.joining(", ")), TAGS)

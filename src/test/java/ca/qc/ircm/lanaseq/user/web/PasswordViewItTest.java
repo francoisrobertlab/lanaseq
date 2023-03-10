@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.user.web.PasswordView.ID;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +82,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    PasswordViewElement view = $(PasswordViewElement.class).id(ID);
+    PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
@@ -94,12 +93,12 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   @WithAnonymousUser
   public void sign_ForceChangePassword() throws Throwable {
     openView(SigninView.VIEW_NAME);
-    SigninViewElement signinView = $(SigninViewElement.class).id(SigninView.ID);
+    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
     signinView.getUsernameField().setValue("christian.poitras@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass1");
     signinView.getSubmitButton().click();
     assertEquals(viewUrl(PasswordView.VIEW_NAME), getDriver().getCurrentUrl());
-    PasswordViewElement view = $(PasswordViewElement.class).id(ID);
+    PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
@@ -110,7 +109,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   public void mainView() throws Throwable {
     openView(MainView.VIEW_NAME);
     assertEquals(viewUrl(PasswordView.VIEW_NAME), getDriver().getCurrentUrl());
-    PasswordViewElement view = $(PasswordViewElement.class).id(ID);
+    PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
@@ -121,7 +120,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   public void datasetsView() throws Throwable {
     openView(DatasetsView.VIEW_NAME);
     assertEquals(viewUrl(PasswordView.VIEW_NAME), getDriver().getCurrentUrl());
-    PasswordViewElement view = $(PasswordViewElement.class).id(ID);
+    PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
@@ -131,7 +130,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    PasswordViewElement view = $(PasswordViewElement.class).id(ID);
+    PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     view.passwords().password().setValue(password);
     view.passwords().passwordConfirm().setValue(password);
 

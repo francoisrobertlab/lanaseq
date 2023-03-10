@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,7 +55,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void fieldsExistence_User() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
@@ -70,7 +69,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void fieldsExistence_Manager() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
@@ -84,7 +83,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Admin() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
@@ -97,14 +96,14 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence_Runas() throws Throwable {
     openView(UsersView.VIEW_NAME);
-    SigninViewElement signinView = $(SigninViewElement.class).id(SigninView.ID);
+    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
     signinView.getUsernameField().setValue("lanaseq@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass2");
     signinView.getSubmitButton().click();
-    UsersViewElement usersView = $(UsersViewElement.class).id(UsersView.ID);
+    UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(1);
     usersView.switchUser().click();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
@@ -118,7 +117,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void datasets() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.datasets().click();
     assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
@@ -127,7 +126,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void samples() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.samples().click();
     assertEquals(viewUrl(SamplesView.VIEW_NAME), getDriver().getCurrentUrl());
   }
@@ -136,7 +135,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void protocols() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.protocols().click();
     assertEquals(viewUrl(ProtocolsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
@@ -145,7 +144,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void profile() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.profile().click();
     assertEquals(viewUrl(ProfileView.VIEW_NAME), getDriver().getCurrentUrl());
   }
@@ -154,7 +153,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void users() throws Throwable {
     open();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.users().click();
     assertEquals(viewUrl(UsersView.VIEW_NAME), getDriver().getCurrentUrl());
   }
@@ -162,14 +161,14 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @Test
   public void exitSwitchUser() throws Throwable {
     openView(UsersView.VIEW_NAME);
-    SigninViewElement signinView = $(SigninViewElement.class).id(SigninView.ID);
+    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
     signinView.getUsernameField().setValue("lanaseq@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass2");
     signinView.getSubmitButton().click();
-    UsersViewElement usersView = $(UsersViewElement.class).id(UsersView.ID);
+    UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(1);
     usersView.switchUser().click();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.exitSwitchUser().click();
     assertEquals(viewUrl(UsersView.VIEW_NAME), getDriver().getCurrentUrl());
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
@@ -178,11 +177,11 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @Test
   public void signout() throws Throwable {
     open();
-    SigninViewElement signinView = $(SigninViewElement.class).id(SigninView.ID);
+    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
     signinView.getUsernameField().setValue("jonh.smith@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass1");
     signinView.getSubmitButton().click();
-    ViewLayoutElement view = $(ViewLayoutElement.class).id(ID);
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.signout().click();
     assertEquals(viewUrl(SigninView.VIEW_NAME), getDriver().getCurrentUrl());
   }

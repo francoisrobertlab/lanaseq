@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.user.web.ProfileView.ID;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,7 +84,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence_User() throws Throwable {
     open();
-    ProfileViewElement view = $(ProfileViewElement.class).id(ID);
+    ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.form()).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
@@ -102,7 +101,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void fieldsExistence_Manager() throws Throwable {
     open();
-    ProfileViewElement view = $(ProfileViewElement.class).id(ID);
+    ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.form()).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
@@ -119,7 +118,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Admin() throws Throwable {
     open();
-    ProfileViewElement view = $(ProfileViewElement.class).id(ID);
+    ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.form()).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
@@ -135,7 +134,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    ProfileViewElement view = $(ProfileViewElement.class).id(ID);
+    ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     view.form().email().setValue(email);
     view.form().name().setValue(name);
     view.form().passwords().password().setValue(password);

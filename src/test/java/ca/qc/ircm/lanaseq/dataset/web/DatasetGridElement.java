@@ -21,6 +21,7 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Keys;
@@ -29,6 +30,7 @@ import org.openqa.selenium.Keys;
  * Web element for {@link DatasetGrid}.
  */
 @Element("vaadin-grid")
+@Attribute(name = "id", value = DatasetGrid.ID)
 public class DatasetGridElement extends GridElement {
   private static final int NAME_COLUMN = 0;
   private static final int PROTOCOL_COLUMN = 2;

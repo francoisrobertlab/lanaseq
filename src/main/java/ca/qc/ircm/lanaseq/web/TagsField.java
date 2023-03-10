@@ -58,8 +58,8 @@ public class TagsField extends CustomField<Set<String>> implements LocaleChangeO
    * Creates a tags field.
    */
   public TagsField() {
+    this.addClassName(CLASS_NAME);
     HorizontalLayout layout = new HorizontalLayout(tagsLayout, newTag);
-    layout.addClassName(CLASS_NAME);
     layout.setSpacing(false);
     tagsLayout.setSpacing(false);
     this.getElement().appendChild(layout.getElement());

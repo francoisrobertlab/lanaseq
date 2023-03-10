@@ -20,28 +20,27 @@ package ca.qc.ircm.lanaseq.protocol.web;
 import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 
-import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.testbench.TestBenchElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
 /**
  * Web element for {@link ProtocolsView}.
  */
-@ServiceTestAnnotations
 @Element("vaadin-vertical-layout")
+@Attribute(name = "id", value = ProtocolsView.ID)
 public class ProtocolsViewElement extends VerticalLayoutElement {
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }
 
   public ProtocolsGridElement protocols() {
-    return $(ProtocolsGridElement.class).id(PROTOCOLS);
+    return $(ProtocolsGridElement.class).first();
   }
 
   public ButtonElement add() {

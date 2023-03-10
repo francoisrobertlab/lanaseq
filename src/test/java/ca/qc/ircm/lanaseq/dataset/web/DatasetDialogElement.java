@@ -29,7 +29,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.GENERATE_NAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -51,6 +50,7 @@ import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.textfield.testbench.TextAreaElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.TestBenchElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
@@ -58,6 +58,7 @@ import org.openqa.selenium.By;
  * Web element for {@link DatasetDialog}.
  */
 @Element("vaadin-dialog")
+@Attribute(name = "id", value = DatasetDialog.ID)
 public class DatasetDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
@@ -112,7 +113,7 @@ public class DatasetDialogElement extends DialogElement {
   }
 
   public DatasetSamplesGridElement samples() {
-    return $(DatasetSamplesGridElement.class).id(id(SAMPLES));
+    return $(DatasetSamplesGridElement.class).first();
   }
 
   public ButtonElement addSample() {

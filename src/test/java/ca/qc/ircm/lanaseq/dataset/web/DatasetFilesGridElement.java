@@ -19,12 +19,14 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
 /**
  * Web element for {@link DatasetFilesDialog} files grid.
  */
 @Element("vaadin-grid")
+@Attribute(name = "id", value = DatasetFilesDialog.ID + "-" + DatasetFilesDialog.FILES)
 public class DatasetFilesGridElement extends GridElement {
   private static final int FILE_COLUMN = 0;
   private static final int DOWNLOAD_COLUMN = 1;

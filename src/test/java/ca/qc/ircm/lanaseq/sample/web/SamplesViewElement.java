@@ -23,13 +23,13 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ANALYZE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.testbench.TestBenchElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import org.openqa.selenium.By;
 
@@ -37,13 +37,14 @@ import org.openqa.selenium.By;
  * Web element for {@link SamplesView}.
  */
 @Element("vaadin-vertical-layout")
+@Attribute(name = "id", value = SamplesView.ID)
 public class SamplesViewElement extends VerticalLayoutElement {
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }
 
   public SamplesGridElement samples() {
-    return $(SamplesGridElement.class).id(SAMPLES);
+    return $(SamplesGridElement.class).first();
   }
 
   public DivElement error() {

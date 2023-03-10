@@ -83,7 +83,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
@@ -97,7 +97,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void refresh_Files() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
@@ -118,7 +118,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();

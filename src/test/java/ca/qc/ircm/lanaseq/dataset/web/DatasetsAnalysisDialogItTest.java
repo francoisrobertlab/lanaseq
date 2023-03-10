@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,7 +76,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
     view.analyze().click();
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
@@ -106,7 +105,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq4 = sample2Folder.resolve("a_R2.fastq");
     final byte[] fastq4Content = writeFile(fastq4);
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(3);
     view.analyze().click();
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
@@ -173,7 +172,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path fastq6 = sample3Folder.resolve(sample3.getName() + "_R2.fastq");
     final byte[] fastq6Content = writeFile(fastq6);
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(3);
     view.datasets().select(0);
     view.analyze().click();
@@ -226,7 +225,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   public void create_Error() throws Throwable {
     Dataset dataset = repository.findById(8L).get();
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(3);
     view.analyze().click();
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();

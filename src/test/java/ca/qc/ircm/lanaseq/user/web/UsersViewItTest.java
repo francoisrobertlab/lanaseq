@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -100,7 +99,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.users()).isPresent());
     assertFalse(optional(() -> view.switchFailed()).isPresent());
@@ -111,7 +110,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void edit() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
     view.users().edit(0).click();
 
@@ -121,7 +120,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void add() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
     view.add().click();
 
@@ -131,7 +130,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void switchUser() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().select(1);
 
     view.switchUser().click();
@@ -147,7 +146,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   @Disabled("Admins are allowed to switch to another admin right now")
   public void switchUser_Fail() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().select(0);
 
     view.switchUser().click();

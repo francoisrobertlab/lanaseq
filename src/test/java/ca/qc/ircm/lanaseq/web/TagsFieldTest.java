@@ -70,8 +70,7 @@ public class TagsFieldTest extends AbstractKaribuTestCase {
 
   @Test
   public void styles() {
-    assertTrue(
-        tagsField.getChildren().findFirst().get().getElement().getClassList().contains(CLASS_NAME));
+    assertTrue(tagsField.hasClassName(CLASS_NAME));
     tagsField.setValue(set("test", "test2"));
     for (int i = 0; i < 2; i++) {
       assertTrue(tagsField.tags.get(i).hasClassName(TAG));

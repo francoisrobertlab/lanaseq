@@ -60,7 +60,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(2);
     view.history().click();
     ProtocolHistoryDialogElement dialog = view.historyDialog();
@@ -71,7 +71,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void recover() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(2);
     view.history().click();
     ProtocolHistoryDialogElement dialog = view.historyDialog();
@@ -102,7 +102,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     Files.deleteIfExists(downloaded);
     Path source = Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI());
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(2);
     view.history().click();
     ProtocolHistoryDialogElement dialog = view.historyDialog();

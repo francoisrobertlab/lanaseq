@@ -29,7 +29,6 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER;
 import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
@@ -79,7 +78,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UsersView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
     AfterNavigationObserver, NotificationComponent {
   public static final String VIEW_NAME = "users";
-  public static final String ID = styleName(VIEW_NAME, "view");
+  public static final String ID = "users-view";
   public static final String HEADER = "header";
   public static final String USERS = "users";
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);

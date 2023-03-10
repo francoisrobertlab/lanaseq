@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -51,7 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UseForgotPasswordView extends VerticalLayout implements LocaleChangeObserver,
     HasUrlParameter<String>, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "useforgotpassword";
-  public static final String ID = styleName(VIEW_NAME, "view");
+  public static final String ID = "useforgotpassword-view";
   public static final String SEPARATOR = "/";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";

@@ -84,7 +84,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().edit(0).click();
     ProtocolDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
@@ -99,7 +99,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_New() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.add().click();
     ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
@@ -131,7 +131,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_Update() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().edit(0).click();
     ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
@@ -166,7 +166,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void cancel() throws Throwable {
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().edit(0).click();
     ProtocolDialogElement dialog = view.dialog();
     setFields(dialog);
@@ -198,7 +198,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     Files.deleteIfExists(downloaded);
     Path source = Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI());
     open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).id(ProtocolsView.ID);
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().edit(0).click();
     ProtocolDialogElement dialog = view.dialog();
     AnchorElement filename = dialog.files().filename(0);

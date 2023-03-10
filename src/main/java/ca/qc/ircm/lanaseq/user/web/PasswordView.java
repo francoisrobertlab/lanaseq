@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -50,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PasswordView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "password";
-  public static final String ID = styleName(VIEW_NAME, "view");
+  public static final String ID = "password-view";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = -8554355390432590290L;

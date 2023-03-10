@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
@@ -35,6 +34,7 @@ import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.flow.component.upload.testbench.UploadElement;
 import com.vaadin.testbench.TestBenchElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -43,6 +43,7 @@ import org.openqa.selenium.By;
  * Web element for {@link SampleFilesDialog}.
  */
 @Element("vaadin-dialog")
+@Attribute(name = "id", value = SampleFilesDialog.ID)
 public class SampleFilesDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
@@ -53,11 +54,11 @@ public class SampleFilesDialogElement extends DialogElement {
   }
 
   public FoldersElement folders() {
-    return $(FoldersElement.class).id(id(FOLDERS));
+    return $(FoldersElement.class).first();
   }
 
   public SampleFilesGridElement files() {
-    return $(SampleFilesGridElement.class).id(id(FILES));
+    return $(SampleFilesGridElement.class).first();
   }
 
   public TextFieldElement filenameEdit() {
@@ -77,6 +78,7 @@ public class SampleFilesDialogElement extends DialogElement {
         .wrap(AddSampleFilesDialogElement.class);
   }
 
+  @Attribute(name = "id", value = SampleFilesDialog.ID + "-" + FOLDERS)
   public static class FoldersElement extends VerticalLayoutElement {
     public List<SpanElement> labels() {
       return $(SpanElement.class).all();

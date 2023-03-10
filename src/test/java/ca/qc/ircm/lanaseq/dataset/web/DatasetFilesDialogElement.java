@@ -21,7 +21,6 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.MESSAGE;
@@ -39,6 +38,7 @@ import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.flow.component.upload.testbench.UploadElement;
 import com.vaadin.testbench.TestBenchElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -47,6 +47,7 @@ import org.openqa.selenium.By;
  * Web element for {@link DatasetFilesDialog}.
  */
 @Element("vaadin-dialog")
+@Attribute(name = "id", value = DatasetFilesDialog.ID)
 public class DatasetFilesDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
@@ -57,11 +58,11 @@ public class DatasetFilesDialogElement extends DialogElement {
   }
 
   public FoldersElement folders() {
-    return $(FoldersElement.class).id(id(FOLDERS));
+    return $(FoldersElement.class).first();
   }
 
   public DatasetFilesGridElement files() {
-    return $(DatasetFilesGridElement.class).id(id(FILES));
+    return $(DatasetFilesGridElement.class).first();
   }
 
   public GridElement samples() {
@@ -90,6 +91,7 @@ public class DatasetFilesDialogElement extends DialogElement {
         .wrap(SampleFilesDialogElement.class);
   }
 
+  @Attribute(name = "id", value = DatasetFilesDialog.ID + "-" + FOLDERS)
   public static class FoldersElement extends VerticalLayoutElement {
     public List<SpanElement> labels() {
       return $(SpanElement.class).all();

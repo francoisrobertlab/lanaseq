@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.ID;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,7 +64,7 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).id(ID);
+    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.message()).isPresent());
     assertTrue(optional(() -> view.email()).isPresent());
@@ -75,7 +74,7 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).id(ID);
+    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
     view.email().setValue(email);
     view.save().click();
 

@@ -81,7 +81,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
@@ -105,7 +105,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path file2 = archive.resolve("R2.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file2);
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
     assertEquals(2, dialog.folders().labels().size());
@@ -126,7 +126,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
@@ -156,7 +156,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
@@ -182,7 +182,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
@@ -205,7 +205,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void viewFiles_Sample() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
     dialog.samples().getCell(0, 0).doubleClick();
@@ -216,7 +216,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void upload() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
     Dataset dataset = repository.findById(2L).get();
@@ -236,7 +236,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void addLargeFiles() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 

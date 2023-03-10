@@ -18,7 +18,6 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -65,7 +64,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void fieldsExistence_Manager() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
     view.users().edit(1).click();
 
@@ -86,7 +85,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence_Admin() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
     view.users().edit(2).click();
 
@@ -107,7 +106,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().edit(2).click();
     UserDialogElement dialog = view.dialog();
     setFields(dialog);
@@ -130,7 +129,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_Fail() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().edit(2).click();
     UserDialogElement dialog = view.dialog();
     setFields(dialog);
@@ -153,7 +152,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void cancel() throws Throwable {
     open();
-    UsersViewElement view = $(UsersViewElement.class).id(ID);
+    UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().edit(2).click();
     UserDialogElement dialog = view.dialog();
     setFields(dialog);

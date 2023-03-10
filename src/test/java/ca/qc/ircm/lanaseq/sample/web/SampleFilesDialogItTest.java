@@ -82,7 +82,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);
     SampleFilesDialogElement dialog = view.filesDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
@@ -105,7 +105,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Path file2 = archive.resolve("R2.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file2);
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
     assertEquals(2, dialog.folders().labels().size());
@@ -126,7 +126,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Path file = folder.resolve("R1.fastq");
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
@@ -156,7 +156,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
@@ -182,7 +182,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
@@ -205,7 +205,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void upload() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
     Sample sample = repository.findById(10L).get();
@@ -225,7 +225,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void addLargeFiles() throws Throwable {
     open();
-    SamplesViewElement view = $(SamplesViewElement.class).id(SamplesView.ID);
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);
     SampleFilesDialogElement dialog = view.filesDialog();
 

@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -56,7 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DatasetsView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "datasets";
-  public static final String ID = styleName(VIEW_NAME, "view");
+  public static final String ID = "datasets-view";
   public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
   public static final String MERGE = "merge";
@@ -104,7 +103,6 @@ public class DatasetsView extends VerticalLayout
     add(header, datasets, error, new HorizontalLayout(merge, files, analyze));
     expand(datasets);
     header.setId(HEADER);
-    datasets.setId(DATASETS);
     datasets.setSelectionMode(SelectionMode.MULTI);
     datasets.addItemClickListener(e -> {
       if (e.isCtrlKey() || e.isMetaKey()) {

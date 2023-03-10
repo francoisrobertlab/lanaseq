@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
@@ -79,7 +78,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void fieldsExistence() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
@@ -89,7 +88,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void view_Files() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);
     assertTrue(view.filesDialog().isOpen());
   }
@@ -97,7 +96,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void edit() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().edit(0).click();
     assertTrue(view.dialog().isOpen());
   }
@@ -105,7 +104,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void merge() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
     view.datasets().select(3);
 
@@ -140,7 +139,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void files() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
     view.files().click();
     assertTrue(view.filesDialog().isOpen());
@@ -149,7 +148,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void analyze() throws Throwable {
     open();
-    DatasetsViewElement view = $(DatasetsViewElement.class).id(DatasetsView.ID);
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
     view.analyze().click();
     assertTrue(view.analyzeDialog().isOpen());

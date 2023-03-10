@@ -44,12 +44,14 @@ import com.vaadin.flow.component.html.testbench.H3Element;
 import com.vaadin.flow.component.select.testbench.SelectElement;
 import com.vaadin.flow.component.textfield.testbench.TextAreaElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
+import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
 /**
  * Web element for {@link SampleDialog}.
  */
 @Element("vaadin-dialog")
+@Attribute(name = "id", value = SampleDialog.ID)
 public class SampleDialogElement extends DialogElement {
   public H3Element header() {
     return $(H3Element.class).id(id(HEADER));
