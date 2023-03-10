@@ -35,6 +35,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -88,15 +89,15 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  private void fill(DatasetDialogElement dialog) {
+  private void fill(DatasetDialogElement dialog) throws InterruptedException {
     ButtonElement tag = dialog.tags().tag("G24D");
     if (tag != null) {
       tag.click();
     }
     dialog.namePrefix().setValue(namePrefix);
-    dialog.tags().newTag().setFilter(tag1);
+    dialog.tags().newTag().selectByText(tag1);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
-    dialog.tags().newTag().setFilter(tag2);
+    dialog.tags().newTag().selectByText(tag2);
     dialog.tags().newTag().sendKeys(Keys.ENTER);
     dialog.note().setValue(note);
     dialog.date().setDate(date);
@@ -131,6 +132,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  @Headless(false)
   public void save_Update() throws Throwable {
     open();
     Dataset dataset = repository.findById(2L).get();
