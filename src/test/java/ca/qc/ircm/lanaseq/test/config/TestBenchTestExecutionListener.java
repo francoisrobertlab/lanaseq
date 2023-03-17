@@ -149,6 +149,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
           findAnnotation(testContext.getTestClass(), testContext.getTestMethod(), Download.class)
               .orElse(null);
       ChromeOptions options = new ChromeOptions();
+      options.addArguments("--remote-allow-origins=*");
       if (downloadAnnotations != null) {
         HashMap<String, Object> chromePrefs = new HashMap<>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
