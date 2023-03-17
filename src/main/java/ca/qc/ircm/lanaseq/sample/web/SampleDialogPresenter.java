@@ -46,6 +46,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,7 @@ public class SampleDialogPresenter {
   void init(SampleDialog dialog) {
     this.dialog = dialog;
     dialog.protocol.setItems(protocolService.all());
+    dialog.assay.setItems(service.topAssays(50));
     dialog.error.setVisible(false);
     localeChange(Constants.DEFAULT_LOCALE);
     setSample(null);

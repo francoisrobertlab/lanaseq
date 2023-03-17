@@ -43,7 +43,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -833,7 +832,7 @@ public class DatasetServiceTest {
     Sample sample1 = new Sample();
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
-    sample1.setAssay(Assay.CHIP_SEQ);
+    sample1.setAssay("ChIP-seq");
     sample1.setType(SampleType.IMMUNO_PRECIPITATION);
     sample1.setTarget("my target");
     sample1.setStrain("yFR213");
@@ -881,7 +880,7 @@ public class DatasetServiceTest {
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
-    sample1.setAssay(Assay.CHIP_SEQ);
+    sample1.setAssay("ChIP-seq");
     sample1.setType(SampleType.INPUT);
     sample1.setTarget("my target");
     sample1.setStrain("yFR213");
@@ -933,7 +932,7 @@ public class DatasetServiceTest {
     Sample newSample = new Sample();
     newSample.setSampleId("new_sample");
     newSample.setReplicate("new_r");
-    newSample.setAssay(Assay.CHIP_SEQ);
+    newSample.setAssay("ChIP-seq");
     newSample.setType(SampleType.IMMUNO_PRECIPITATION);
     newSample.setTarget("my target");
     newSample.setStrain("yFR213");

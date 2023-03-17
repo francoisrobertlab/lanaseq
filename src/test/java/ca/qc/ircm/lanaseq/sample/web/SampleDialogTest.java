@@ -60,7 +60,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
@@ -70,6 +69,7 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.CancelEvent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -241,14 +241,14 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
       assertEquals(protocol.getName(), dialog.protocol.getItemLabelGenerator().apply(protocol));
     }
   }
-
   @Test
   public void assay() {
-    List<Assay> assays = items(dialog.assay);
-    assertArrayEquals(Assay.values(), assays.toArray(new Assay[0]));
-    for (Assay assay : assays) {
-      assertEquals(assay.getLabel(locale), dialog.assay.getItemLabelGenerator().apply(assay));
-    }
+    assertTrue(dialog.assay.isAllowCustomValue());
+    dialog.assay.setItems("Test", "Test2");
+    fireEvent(dialog.assay, new GeneratedVaadinComboBox.CustomValueSetEvent(dialog.assay,
+            false, "new_assay_type"));
+    assertEquals("new_assay_type", dialog.assay.getValue());
+    assertEquals("ChIP-chip", dialog.assay.getItemLabelGenerator().apply("ChIP-chip"));
   }
 
   @Test

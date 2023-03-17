@@ -20,8 +20,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
-import static ca.qc.ircm.lanaseq.sample.Assay.CHIP_SEQ;
-import static ca.qc.ircm.lanaseq.sample.Assay.MNASE_SEQ;
 import static ca.qc.ircm.lanaseq.sample.SampleType.IMMUNO_PRECIPITATION;
 import static ca.qc.ircm.lanaseq.sample.SampleType.INPUT;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
@@ -353,7 +351,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
 
     assertEquals("FLAG, Histone FLAG", dialog.protocol.getValue());
-    assertEquals(MNASE_SEQ.getLabel(locale) + ", " + CHIP_SEQ.getLabel(locale),
+    assertEquals("MNase-seq" + ", " + "ChIP-seq",
         dialog.assay.getValue());
     assertEquals(IMMUNO_PRECIPITATION.getLabel(locale) + ", " + INPUT.getLabel(locale),
         dialog.type.getValue());
@@ -378,7 +376,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
 
     assertEquals("FLAG", dialog.protocol.getValue());
-    assertEquals(MNASE_SEQ.getLabel(locale), dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertEquals(IMMUNO_PRECIPITATION.getLabel(locale), dialog.type.getValue());
     assertEquals("polr2a", dialog.target.getValue());
     assertEquals("yFR100", dialog.strain.getValue());

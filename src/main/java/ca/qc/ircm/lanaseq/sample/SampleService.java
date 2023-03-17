@@ -17,15 +17,19 @@
 
 package ca.qc.ircm.lanaseq.sample;
 
+import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.DataWithFiles;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.file.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -36,8 +40,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.transaction.Transactional;
@@ -45,6 +51,8 @@ import javax.transaction.Transactional.TxType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,14 +70,16 @@ public class SampleService {
   private DatasetRepository datasetRepository;
   private AppConfiguration configuration;
   private AuthenticatedUser authenticatedUser;
+  private JPAQueryFactory queryFactory;
 
   @Autowired
   protected SampleService(SampleRepository repository, DatasetRepository datasetRepository,
-      AppConfiguration configuration, AuthenticatedUser authenticatedUser) {
+      AppConfiguration configuration, AuthenticatedUser authenticatedUser, JPAQueryFactory queryFactory) {
     this.repository = repository;
     this.datasetRepository = datasetRepository;
     this.configuration = configuration;
     this.authenticatedUser = authenticatedUser;
+    this.queryFactory = queryFactory;
   }
 
   /**
@@ -240,6 +250,17 @@ public class SampleService {
     } catch (IOException e) {
       return new ArrayList<>();
     }
+  }
+
+  /**
+   * Returns most recent assays.
+   *
+   * @param limit
+   *          maximum number of assays to return
+   * @return most recent assays
+   */
+  public List<String> topAssays(int limit) {
+    return queryFactory.select(sample.assay).distinct().from(sample).orderBy(sample.id.desc()).limit(limit).fetch();
   }
 
   /**

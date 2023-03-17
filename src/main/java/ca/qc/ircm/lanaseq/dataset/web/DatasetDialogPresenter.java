@@ -259,7 +259,7 @@ public class DatasetDialogPresenter {
     dialog.protocol.setValue(samples.stream().map(Sample::getProtocol).filter(Objects::nonNull)
         .map(Protocol::getName).distinct().collect(Collectors.joining(", ")));
     dialog.assay.setValue(samples.stream().map(Sample::getAssay).filter(Objects::nonNull).distinct()
-        .map(assay -> assay.getLabel(locale)).collect(Collectors.joining(", ")));
+        .collect(Collectors.joining(", ")));
     dialog.type.setValue(samples.stream().map(Sample::getType).filter(Objects::nonNull).distinct()
         .map(type -> type.getLabel(locale)).collect(Collectors.joining(", ")));
     dialog.target.setValue(samples.stream().map(Sample::getTarget).filter(Objects::nonNull)

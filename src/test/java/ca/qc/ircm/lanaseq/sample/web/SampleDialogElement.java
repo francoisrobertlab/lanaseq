@@ -73,8 +73,8 @@ public class SampleDialogElement extends DialogElement {
     return $(ComboBoxElement.class).id(id(PROTOCOL));
   }
 
-  public SelectElement assay() {
-    return $(SelectElement.class).id(id(ASSAY));
+  public ComboBoxElement assay() {
+    return $(ComboBoxElement.class).id(id(ASSAY));
   }
 
   public SelectElement type() {

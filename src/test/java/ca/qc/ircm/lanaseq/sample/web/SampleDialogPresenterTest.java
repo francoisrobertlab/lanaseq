@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,7 +38,6 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -44,6 +45,7 @@ import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -90,14 +92,17 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   private SampleRepository repository;
   @Autowired
   private ProtocolRepository protocolRepository;
+  @Autowired
+  private JPAQueryFactory jpaQueryFactory;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
+  private List<String> assays;
   private String sampleId = "Test Sample";
   private String replicate = "Test Replicate";
   private Protocol protocol;
-  private Assay assay = Assay.CHIP_SEQ;
+  private String assay = "ChIP-seq";
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
   private String target = "polr3a";
   private String strain = "yFR20";
@@ -117,8 +122,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.sampleId = new TextField();
     dialog.replicate = new TextField();
     dialog.protocol = new ComboBox<>();
-    dialog.assay = new Select<>();
-    dialog.assay.setItems(Assay.values());
+    dialog.assay = new ComboBox<>();
     dialog.type = new Select<>();
     dialog.type.setItems(SampleType.values());
     dialog.target = new TextField();
@@ -133,6 +137,8 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     protocols = protocolRepository.findAll();
     protocol = protocolRepository.findById(1L).get();
     when(protocolService.all()).thenReturn(protocols);
+    assays = jpaQueryFactory.select(sample.assay).from(sample).fetch();
+    when(service.topAssays(anyInt())).thenReturn(assays);
     when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     presenter.init(dialog);
     presenter.localeChange(locale);
@@ -211,7 +217,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.replicate.isReadOnly());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertFalse(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
@@ -245,7 +251,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.replicate.isReadOnly());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
@@ -278,7 +284,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.replicate.isReadOnly());
     assertEquals((Long) 2L, dialog.protocol.getValue().getId());
     assertTrue(dialog.protocol.isReadOnly());
-    assertEquals(Assay.CHIP_SEQ, dialog.assay.getValue());
+    assertEquals("ChIP-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
@@ -312,7 +318,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.replicate.isReadOnly());
     assertEquals((Long) 1L, dialog.protocol.getValue().getId());
     assertFalse(dialog.protocol.isReadOnly());
-    assertEquals(Assay.MNASE_SEQ, dialog.assay.getValue());
+    assertEquals("MNase-seq", dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
@@ -383,6 +389,14 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals(this.protocols.size(), protocols.size());
     for (int i = 0; i < protocols.size(); i++) {
       assertEquals(this.protocols.get(i), protocols.get(i));
+    }
+  }
+  @Test
+  public void assays() {
+    List<String> assays = items(dialog.assay);
+    assertEquals(this.assays.size(), assays.size());
+    for (int i = 0; i < assays.size(); i++) {
+      assertEquals(this.assays.get(i), assays.get(i));
     }
   }
 
@@ -489,6 +503,22 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
+  }
+  @Test
+  public void save_AssayNew() {
+    fillForm();
+    dialog.assay.setValue("new_assay_type");
+
+    presenter.save();
+
+    BinderValidationStatus<Sample> status = presenter.validateSample();
+    assertTrue(status.isOk());
+    verify(service).save(sampleCaptor.capture());
+    assertEquals("new_assay_type", sampleCaptor.getValue().getAssay());
+    verify(service, never()).delete(any());
+    verify(dialog).showNotification(any());
+    verify(dialog).close();
+    verify(dialog).fireSavedEvent();
   }
 
   @Test
@@ -699,7 +729,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals("FR2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
+    assertEquals("MNase-seq", sample.getAssay());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
@@ -727,7 +757,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     assertEquals("FR2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
+    assertEquals("MNase-seq", sample.getAssay());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());

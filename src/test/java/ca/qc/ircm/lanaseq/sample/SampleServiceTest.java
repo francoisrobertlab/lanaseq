@@ -184,7 +184,7 @@ public class SampleServiceTest {
     assertEquals("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
     assertEquals("FR1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
-    assertEquals(Assay.MNASE_SEQ, sample.getAssay());
+    assertEquals("MNase-seq", sample.getAssay());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
@@ -757,6 +757,19 @@ public class SampleServiceTest {
 
     assertTrue(files.isEmpty());
   }
+  @Test
+  public void topAssays() {
+    List<String> assays = service.topAssays(2);
+    assertEquals(2, assays.size());
+    assertTrue(assays.contains("MNase-seq"));
+    assertTrue(assays.contains("ChIP-seq"));
+  }
+  @Test
+  public void topAssays_limit() {
+    List<String> assays = service.topAssays(1);
+    assertEquals(1, assays.size());
+    assertTrue(assays.contains("ChIP-seq"));
+  }
 
   @Test
   public void isDeletable_FalseNotEditable() {
@@ -853,10 +866,10 @@ public class SampleServiceTest {
   public void isMergable_AssayTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     samples.add(sample);
     sample = new Sample();
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -865,10 +878,10 @@ public class SampleServiceTest {
   public void isMergable_AssayFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     samples.add(sample);
     sample = new Sample();
-    sample.setAssay(Assay.CHIP_EXO);
+    sample.setAssay("ChIP-exo");
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -877,7 +890,7 @@ public class SampleServiceTest {
   public void isMergable_AssayOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     samples.add(sample);
     samples.add(new Sample());
     assertFalse(service.isMergable(samples));
@@ -1087,7 +1100,7 @@ public class SampleServiceTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
@@ -1105,7 +1118,7 @@ public class SampleServiceTest {
     sample = repository.findById(sample.getId()).orElse(null);
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
@@ -1130,7 +1143,7 @@ public class SampleServiceTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
@@ -1152,7 +1165,7 @@ public class SampleServiceTest {
     Sample sample = repository.findById(1L).orElse(null);
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     sample.setType(SampleType.INPUT);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
@@ -1169,7 +1182,7 @@ public class SampleServiceTest {
     sample = repository.findById(1L).orElse(null);
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertEquals(SampleType.INPUT, sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());

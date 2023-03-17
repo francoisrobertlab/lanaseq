@@ -80,8 +80,8 @@ public class Sample implements DataWithFiles, Owned, Serializable {
    * Assay.
    */
   @Column(nullable = false)
-  @Enumerated(STRING)
-  private Assay assay;
+  @Size(max = 255)
+  private String assay;
   /**
    * Type.
    */
@@ -173,7 +173,7 @@ public class Sample implements DataWithFiles, Owned, Serializable {
     StringBuilder builder = new StringBuilder();
     builder.append(sampleId != null ? sampleId + "_" : "");
     builder
-        .append(assay != null ? assay.getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_" : "");
+        .append(assay != null ? assay.replaceAll("[^\\w]", "") + "_" : "");
     builder.append(type != null ? type.getLabel(Locale.ENGLISH) + "_" : "");
     builder.append(target != null ? target + "_" : "");
     builder.append(strain != null ? strain + "_" : "");
@@ -234,11 +234,11 @@ public class Sample implements DataWithFiles, Owned, Serializable {
     this.owner = owner;
   }
 
-  public Assay getAssay() {
+  public String getAssay() {
     return assay;
   }
 
-  public void setAssay(Assay assay) {
+  public void setAssay(String assay) {
     this.assay = assay;
   }
 

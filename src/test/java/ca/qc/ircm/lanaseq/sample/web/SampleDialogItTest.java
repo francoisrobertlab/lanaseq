@@ -32,11 +32,11 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -49,6 +49,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
@@ -71,7 +72,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private AppConfiguration configuration;
   private Protocol protocol;
   private LocalDate date = LocalDate.of(2020, 07, 20);
-  private Assay assay = Assay.MNASE_SEQ;
+  private String assay = "RNA-seq";
   private SampleType type = SampleType.IMMUNO_PRECIPITATION;
   private String target = "polr3a";
   private String strain = "yFR20";
@@ -99,9 +100,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     dialog.sampleId().setValue(sampleId);
     dialog.replicate().setValue(replicate);
     dialog.protocol().selectByText(protocol.getName());
-    dialog.assay().openPopup(); // Causes delay to make unit test work.
-    dialog.assay().selectByText(assay.getLabel(currentLocale()));
-    dialog.assay().closePopup(); // Causes delay to make unit test work.
+    dialog.assay().clear();
+    dialog.assay().sendKeys(assay);
+    dialog.assay().sendKeys(Keys.TAB);
     dialog.type().openPopup(); // Causes delay to make unit test work.
     dialog.type().selectByText(type.getLabel(currentLocale()));
     dialog.type().closePopup(); // Causes delay to make unit test work.
@@ -113,7 +114,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private String name() {
-    return sampleId + "_" + assay.getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_"
+    return sampleId + "_" + assay.replaceAll("[^\\w]", "") + "_"
         + type.getLabel(Locale.ENGLISH) + "_" + target + "_" + strain + "_" + strainDescription
         + "_" + treatment + "_" + replicate;
   }
@@ -297,7 +298,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());

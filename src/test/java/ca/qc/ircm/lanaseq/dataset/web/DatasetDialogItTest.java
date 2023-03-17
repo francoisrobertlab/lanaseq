@@ -30,7 +30,6 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
@@ -168,7 +167,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals(3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -180,7 +179,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals(3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -234,7 +233,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -247,7 +246,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -294,7 +293,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -307,7 +306,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -320,7 +319,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -364,7 +363,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());
@@ -376,7 +375,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("JS2", sample.getSampleId());
     assertEquals("R2", sample.getReplicate());
     assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals(Assay.CHIP_SEQ, sample.getAssay());
+    assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
     assertEquals("Spt16", sample.getTarget());
     assertEquals("yFR101", sample.getStrain());

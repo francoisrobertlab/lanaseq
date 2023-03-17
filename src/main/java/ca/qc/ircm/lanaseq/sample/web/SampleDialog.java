@@ -41,7 +41,6 @@ import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI1
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -65,6 +64,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
@@ -93,7 +94,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField sampleId = new TextField();
   protected TextField replicate = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
-  protected Select<Assay> assay = new Select<>();
+  protected ComboBox<String> assay = new ComboBox<>();
   protected Select<SampleType> type = new Select<>();
   protected TextField target = new TextField();
   protected TextField strain = new TextField();
@@ -146,8 +147,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     protocol.setItemLabelGenerator(Protocol::getName);
     protocol.setPreventInvalidInput(true);
     assay.setId(id(ASSAY));
-    assay.setItemLabelGenerator(a -> a.getLabel(getLocale()));
-    assay.setItems(Assay.values());
+    assay.setAllowCustomValue(true);
+    assay.addCustomValueSetListener(e->assay.setValue(e.getDetail()));
     type.setId(id(TYPE));
     type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
     type.setItems(SampleType.values());

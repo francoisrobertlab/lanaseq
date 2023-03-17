@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.sample.Assay;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -52,7 +51,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
@@ -72,7 +71,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
@@ -98,7 +97,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("s1");
     sample.setReplicate("r1");
-    sample.setAssay(Assay.CHIP_SEQ);
+    sample.setAssay("ChIP-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("my target");
     sample.setStrain("yFR213");
@@ -175,7 +174,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.MNASE_SEQ);
+    sample.setAssay("MNase-seq");
     sample.setType(SampleType.INPUT);
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
@@ -202,7 +201,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.MNASE_SEQ);
+    sample.setAssay("MNase-seq");
     sample.setType(SampleType.INPUT);
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
@@ -261,7 +260,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.MNASE_SEQ);
+    sample.setAssay("MNase-seq");
     sample.setType(SampleType.INPUT);
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
@@ -296,7 +295,7 @@ public class AppConfigurationTest {
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
-    sample.setAssay(Assay.MNASE_SEQ);
+    sample.setAssay("MNase-seq");
     sample.setType(SampleType.INPUT);
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
@@ -370,7 +369,7 @@ public class AppConfigurationTest {
   public void analysis_Datasets() {
     Collection<Dataset> datasets = datasets();
     Path path = appConfiguration.getAnalysis().folder(datasets);
-    assertEquals(analysisFolder().resolve("jonh_CHIP_SEQ_20191208"), path);
+    assertEquals(analysisFolder().resolve("jonh_ChIPseq_20191208"), path);
   }
 
   @Test
@@ -393,7 +392,7 @@ public class AppConfigurationTest {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     Path path = appConfiguration.getAnalysis().folder(samples);
-    assertEquals(analysisFolder().resolve("jonh_CHIP_SEQ_20191208"), path);
+    assertEquals(analysisFolder().resolve("jonh_ChIPseq_20191208"), path);
   }
 
   @Test
@@ -415,14 +414,14 @@ public class AppConfigurationTest {
   @Test
   public void analysisLabel_Datasets() {
     Collection<Dataset> datasets = datasets();
-    assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
+    assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_ChIPseq_20191208",
         appConfiguration.getAnalysis().label(datasets, false));
   }
 
   @Test
   public void analysisLabel_DatasetsUnix() {
     Collection<Dataset> datasets = datasets();
-    assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_CHIP_SEQ_20191208",
+    assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_ChIPseq_20191208",
         appConfiguration.getAnalysis().label(datasets, true));
   }
 
@@ -460,7 +459,7 @@ public class AppConfigurationTest {
   public void analysisLabel_Samples() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
-    assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_CHIP_SEQ_20191208",
+    assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_ChIPseq_20191208",
         appConfiguration.getAnalysis().label(samples, false));
   }
 
@@ -468,7 +467,7 @@ public class AppConfigurationTest {
   public void analysisLabel_SamplesUnix() {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
-    assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_CHIP_SEQ_20191208",
+    assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_ChIPseq_20191208",
         appConfiguration.getAnalysis().label(samples, true));
   }
 

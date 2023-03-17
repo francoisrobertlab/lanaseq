@@ -169,7 +169,7 @@ public class AppConfiguration {
       StringBuilder builder = new StringBuilder();
       user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
           .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
-      sample.map(sa -> sa.getAssay()).ifPresent(assay -> builder.append("_" + assay));
+      sample.map(sa -> sa.getAssay()).ifPresent(assay -> builder.append("_" + assay.replaceAll("[^\\w]", "")));
       builder.append("_");
       builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(dataset.getDate()));
       if (builder.length() > 0) {
@@ -191,7 +191,7 @@ public class AppConfiguration {
       StringBuilder builder = new StringBuilder();
       user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
           .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
-      builder.append(sample.getAssay() != null ? "_" + sample.getAssay() : "");
+      builder.append(sample.getAssay() != null ? "_" + sample.getAssay().replaceAll("[^\\w]", "") : "");
       builder.append("_");
       builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(sample.getDate()));
       if (builder.length() > 0) {

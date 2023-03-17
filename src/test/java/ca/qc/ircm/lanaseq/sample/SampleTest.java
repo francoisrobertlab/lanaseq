@@ -31,7 +31,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -46,7 +46,7 @@ public class SampleTest {
   public void generateName_NullSampleId() {
     Sample sample = new Sample();
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -62,7 +62,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("F*R 1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -78,7 +78,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FÙR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -93,7 +93,7 @@ public class SampleTest {
   public void generateName_NullReplicate() {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -109,7 +109,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("#R 1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -125,7 +125,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1ï");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -156,7 +156,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -171,7 +171,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setStrain("yFR101");
     sample.setStrainDescription("G24D");
@@ -186,7 +186,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt 16 ?");
     sample.setStrain("yFR101");
@@ -202,7 +202,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Sptà16");
     sample.setStrain("yFR101");
@@ -218,7 +218,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setTreatment("IAA");
@@ -232,7 +232,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR 101$");
@@ -248,7 +248,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yâFR101");
@@ -264,7 +264,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrainDescription("G24D");
@@ -279,7 +279,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -294,7 +294,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -310,7 +310,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -326,7 +326,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -341,7 +341,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -357,7 +357,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");
@@ -373,7 +373,7 @@ public class SampleTest {
     Sample sample = new Sample();
     sample.setSampleId("FR1");
     sample.setReplicate("R1");
-    sample.setAssay(Assay.RNA_SEQ);
+    sample.setAssay("RNA-seq");
     sample.setType(SampleType.IMMUNO_PRECIPITATION);
     sample.setTarget("Spt16");
     sample.setStrain("yFR101");

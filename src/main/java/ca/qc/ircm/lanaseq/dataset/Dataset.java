@@ -124,7 +124,7 @@ public class Dataset implements DataWithFiles, Owned, Serializable {
     Sample first =
         samples != null ? samples.stream().findFirst().orElse(new Sample()) : new Sample();
     builder.append(first.getAssay() != null
-        ? first.getAssay().getLabel(Locale.ENGLISH).replaceAll("[^\\w]", "") + "_"
+        ? first.getAssay().replaceAll("[^\\w]", "") + "_"
         : "");
     builder.append(first.getType() != null ? first.getType().getLabel(Locale.ENGLISH) + "_" : "");
     builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
