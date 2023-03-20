@@ -478,6 +478,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
     assertEquals(resources.message(DELETE_MESSAGE, dataset.getName()),
         dialog.confirm.getElement().getProperty("message"));
   }
@@ -492,6 +494,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setDataset(dataset);
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
     assertEquals(resources.message(DELETE_MESSAGE, dataset.getName()),
         dialog.confirm.getElement().getProperty("message"));
   }

@@ -67,6 +67,7 @@ public class ProtocolsViewPresenter {
     view.history.setVisible(manager);
     loadProtocols();
     view.dialog.addSavedListener(e -> loadProtocols());
+    view.dialog.addDeletedListener(e -> loadProtocols());
   }
 
   void localeChange(Locale locale) {

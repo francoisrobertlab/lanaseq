@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.SAVED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -94,6 +95,26 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.files()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
+    assertFalse(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(() -> dialog.confirm()).isPresent());
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void fieldsExistence_Deletable() throws Throwable {
+    open();
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
+    view.protocols().edit(3).click();
+    ProtocolDialogElement dialog = view.dialog();
+    assertTrue(optional(() -> dialog.header()).isPresent());
+    assertTrue(optional(() -> dialog.name()).isPresent());
+    assertTrue(optional(() -> dialog.note()).isPresent());
+    assertTrue(optional(() -> dialog.upload()).isPresent());
+    assertTrue(optional(() -> dialog.files()).isPresent());
+    assertTrue(optional(() -> dialog.save()).isPresent());
+    assertTrue(optional(() -> dialog.cancel()).isPresent());
+    assertTrue(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(() -> dialog.confirm()).isPresent());
   }
 
   @Test
@@ -212,5 +233,27 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     } finally {
       Files.delete(downloaded);
     }
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void delete() throws Throwable {
+    open();
+    Protocol protocol = repository.findById(4L).get();
+    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
+    view.protocols().ownerFilter().setValue("francois.robert@ircm.qc.ca");
+    view.protocols().edit(1).click();
+    ProtocolDialogElement dialog = view.dialog();
+    final String name = protocol.getName();
+
+    TestTransaction.flagForCommit();
+    dialog.delete().click();
+    dialog.confirm().getConfirmButton().click();
+    TestTransaction.end();
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    AppResources resources = this.resources(ProtocolDialog.class);
+    assertEquals(resources.message(DELETED, name), notification.getText());
+    assertFalse(repository.findById(4L).isPresent());
   }
 }

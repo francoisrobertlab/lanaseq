@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample;
 
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.core.types.Predicate;
 import java.util.List;
@@ -34,6 +35,8 @@ public interface SampleRepository
   public boolean existsByName(String name);
 
   public List<Sample> findByOwner(User owner);
+
+  public boolean existsByProtocol(Protocol protocol);
 
   @Override
   @EntityGraph(attributePaths = { "protocol", "owner" })

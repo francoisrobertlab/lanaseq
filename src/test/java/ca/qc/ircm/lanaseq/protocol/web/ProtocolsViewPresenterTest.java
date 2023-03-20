@@ -42,6 +42,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -51,7 +52,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.List;
@@ -86,6 +86,9 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<Protocol> protocolCaptor;
   @Captor
   private ArgumentCaptor<ComponentEventListener<SavedEvent<ProtocolDialog>>> savedListenerCaptor;
+  @Captor
+  private ArgumentCaptor<
+      ComponentEventListener<DeletedEvent<ProtocolDialog>>> deletedListenerCaptor;
   @Autowired
   private ProtocolRepository protocolRepository;
   @Autowired
@@ -325,6 +328,16 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
+    verify(protocolService, times(2)).all();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void refreshProtocolsOnDeleted() {
+    verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
+    ComponentEventListener<DeletedEvent<ProtocolDialog>> deletedListener =
+        deletedListenerCaptor.getValue();
+    deletedListener.onComponentEvent(mock(DeletedEvent.class));
     verify(protocolService, times(2)).all();
   }
 }

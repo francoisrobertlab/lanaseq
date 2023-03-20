@@ -18,6 +18,8 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
@@ -36,11 +38,13 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -49,6 +53,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -57,7 +62,6 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
@@ -87,6 +91,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
       + ButtonVariant.LUMO_ERROR.getVariantName() + "' @click='${removeFile}'>"
       + "<vaadin-icon icon='vaadin:trash' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String SAVED = "saved";
+  public static final String DELETED = "deleted";
+  public static final String DELETE_HEADER = property(DELETE, "header");
+  public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = -7797831034001410430L;
   protected H3 header = new H3();
   protected TextField name = new TextField();
@@ -99,6 +106,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   protected Div filesError = new Div();
   protected Button save = new Button();
   protected Button cancel = new Button();
+  protected Button delete = new Button();
+  protected ConfirmDialog confirm = new ConfirmDialog();
   @Autowired
   private transient ProtocolDialogPresenter presenter;
 
@@ -120,8 +129,12 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     VerticalLayout layout = new VerticalLayout();
     add(layout);
     FormLayout form = new FormLayout(name, note);
-    HorizontalLayout buttonsLayout = new HorizontalLayout(save, cancel);
-    layout.add(header, form, upload, files, filesError, buttonsLayout);
+    HorizontalLayout endButtons = new HorizontalLayout(delete);
+    endButtons.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+    endButtons.setWidthFull();
+    HorizontalLayout buttonsLayout = new HorizontalLayout(save, cancel, endButtons);
+    buttonsLayout.setWidthFull();
+    layout.add(header, form, upload, files, filesError, buttonsLayout, confirm);
     layout.setSizeFull();
     layout.expand(files);
     header.setId(id(HEADER));
@@ -138,11 +151,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
         .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
         .setFlexGrow(10);
-    remove =
-        files
-            .addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON)
-                .withFunction("removeFile", file -> presenter.removeFile(file)), REMOVE)
-            .setKey(REMOVE);
+    remove = files.addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile",
+        file -> presenter.removeFile(file)), REMOVE).setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
     save.setId(id(SAVE));
@@ -152,6 +162,15 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
     cancel.addClickListener(e -> presenter.cancel());
+    delete.setId(id(DELETE));
+    delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+    delete.setIcon(VaadinIcon.TRASH.create());
+    delete.addClickListener(e -> confirm.open());
+    confirm.setId(id(CONFIRM));
+    confirm.setCancelable(true);
+    confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
+        + ButtonVariant.LUMO_PRIMARY.getVariantName());
+    confirm.addConfirmListener(e -> presenter.delete());
     presenter.init(this);
   }
 
@@ -169,6 +188,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     final AppResources protocolResources = new AppResources(Protocol.class, getLocale());
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
+    final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
     updateHeader();
     name.setLabel(protocolResources.message(NAME));
     note.setLabel(protocolResources.message(NOTE));
@@ -177,6 +197,10 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     remove.setHeader(webResources.message(REMOVE));
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
+    delete.setText(webResources.message(DELETE));
+    confirm.setHeader(resources.message(DELETE_HEADER));
+    confirm.setConfirmText(webResources.message(DELETE));
+    confirm.setCancelText(webResources.message(CANCEL));
     presenter.localeChange(getLocale());
   }
 
@@ -185,6 +209,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     Protocol protocol = presenter.getProtocol();
     if (protocol != null && protocol.getId() != null) {
       header.setText(resources.message(HEADER, 1, protocol.getName()));
+      confirm.setText(resources.message(DELETE_MESSAGE, protocol.getName()));
     } else {
       header.setText(resources.message(HEADER, 0));
     }
@@ -205,6 +230,23 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   void fireSavedEvent() {
     fireEvent(new SavedEvent<>(this, true));
+  }
+
+  /**
+   * Adds listener to be informed when a sample was saved.
+   *
+   * @param listener
+   *          listener
+   * @return listener registration
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Registration
+      addDeletedListener(ComponentEventListener<DeletedEvent<ProtocolDialog>> listener) {
+    return addListener((Class) DeletedEvent.class, listener);
+  }
+
+  void fireDeletedEvent() {
+    fireEvent(new DeletedEvent<>(this, true));
   }
 
   public Protocol getProtocol() {

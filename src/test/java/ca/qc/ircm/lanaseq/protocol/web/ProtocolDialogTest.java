@@ -18,6 +18,8 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
@@ -25,6 +27,8 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETE_HEADER;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_ERROR;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
@@ -61,9 +65,11 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
@@ -72,7 +78,6 @@ import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -99,6 +104,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   private ProtocolDialogPresenter presenter;
   @Mock
   private ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener;
+  @Mock
+  private ComponentEventListener<DeletedEvent<ProtocolDialog>> deletedListener;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Anchor, ProtocolFile>> anchorComponentRendererCaptor;
   @Captor
@@ -167,6 +174,15 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
+    assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
+    assertTrue(dialog.delete.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
+    validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
+    assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
+    assertEquals("true", dialog.confirm.getElement().getProperty("cancel"));
+    assertTrue(dialog.confirm.getElement().getProperty("confirmTheme")
+        .contains(ButtonVariant.LUMO_ERROR.getVariantName()));
+    assertTrue(dialog.confirm.getElement().getProperty("confirmTheme")
+        .contains(ButtonVariant.LUMO_PRIMARY.getVariantName()));
   }
 
   @Test
@@ -181,6 +197,13 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     validateEquals(englishUploadI18N(), dialog.upload.getI18n());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    assertEquals(webResources.message(DELETE), dialog.delete.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(webResources.message(DELETE),
+        dialog.confirm.getElement().getProperty("confirmText"));
+    assertEquals(webResources.message(CANCEL),
+        dialog.confirm.getElement().getProperty("cancelText"));
     verify(presenter).localeChange(locale);
   }
 
@@ -204,6 +227,13 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
+    assertEquals(webResources.message(DELETE), dialog.delete.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(webResources.message(DELETE),
+        dialog.confirm.getElement().getProperty("confirmText"));
+    assertEquals(webResources.message(CANCEL),
+        dialog.confirm.getElement().getProperty("cancelText"));
     verify(presenter).localeChange(locale);
   }
 
@@ -281,6 +311,20 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void deletedListener() {
+    dialog.addDeletedListener(deletedListener);
+    dialog.fireDeletedEvent();
+    verify(deletedListener).onComponentEvent(any());
+  }
+
+  @Test
+  public void deletedListener_Remove() {
+    dialog.addDeletedListener(deletedListener).remove();
+    dialog.fireDeletedEvent();
+    verify(deletedListener, never()).onComponentEvent(any());
+  }
+
+  @Test
   public void getProtocol() {
     when(presenter.getProtocol()).thenReturn(protocol);
     assertEquals(protocol, dialog.getProtocol());
@@ -309,6 +353,10 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setProtocol(protocol);
     assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(resources.message(DELETE_MESSAGE, protocol.getName()),
+        dialog.confirm.getElement().getProperty("message"));
   }
 
   @Test
@@ -321,6 +369,10 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setProtocol(protocol);
     assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(resources.message(DELETE_MESSAGE, protocol.getName()),
+        dialog.confirm.getElement().getProperty("message"));
   }
 
   @Test
@@ -342,5 +394,25 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   public void cancel() {
     clickButton(dialog.cancel);
     verify(presenter).cancel();
+  }
+
+  @Test
+  public void delete_Confirm() {
+    clickButton(dialog.delete);
+
+    assertTrue(dialog.confirm.isOpened());
+    ConfirmDialog.ConfirmEvent event = new ConfirmDialog.ConfirmEvent(dialog.confirm, false);
+    fireEvent(dialog.confirm, event);
+    verify(presenter).delete();
+  }
+
+  @Test
+  public void delete_Cancel() {
+    clickButton(dialog.delete);
+
+    assertTrue(dialog.confirm.isOpened());
+    ConfirmDialog.CancelEvent event = new ConfirmDialog.CancelEvent(dialog.confirm, false);
+    fireEvent(dialog.confirm, event);
+    verify(presenter, never()).delete();
   }
 }

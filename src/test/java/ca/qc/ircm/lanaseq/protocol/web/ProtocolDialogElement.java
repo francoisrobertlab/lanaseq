@@ -18,6 +18,8 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
+import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
+import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
@@ -27,6 +29,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
 import com.vaadin.flow.component.html.testbench.H3Element;
@@ -72,5 +75,13 @@ public class ProtocolDialogElement extends DialogElement {
 
   public ButtonElement cancel() {
     return $(ButtonElement.class).id(id(CANCEL));
+  }
+
+  public ButtonElement delete() {
+    return $(ButtonElement.class).id(id(DELETE));
+  }
+
+  public ConfirmDialogElement confirm() {
+    return $(ConfirmDialogElement.class).id(id(CONFIRM));
   }
 }

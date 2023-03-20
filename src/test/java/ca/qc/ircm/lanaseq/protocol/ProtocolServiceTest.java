@@ -134,10 +134,11 @@ public class ProtocolServiceTest {
   public void all() {
     List<Protocol> protocols = service.all();
 
-    assertEquals(3, protocols.size());
+    assertEquals(4, protocols.size());
     assertTrue(find(protocols, 1L).isPresent());
     assertTrue(find(protocols, 2L).isPresent());
     assertTrue(find(protocols, 3L).isPresent());
+    assertTrue(find(protocols, 4L).isPresent());
     for (Protocol protocol : protocols) {
       verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
     }
@@ -253,6 +254,22 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
+  public void isDeletable_False() {
+    Protocol protocol = repository.findById(1L).get();
+    assertFalse(service.isDeletable(protocol));
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
+  public void isDeletable_True() {
+    Protocol protocol = repository.findById(4L).get();
+    assertTrue(service.isDeletable(protocol));
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
+  }
+
+  @Test
+  @WithMockUser
   public void save_New() {
     Protocol protocol = new Protocol();
     protocol.setName("New protocol");
@@ -355,5 +372,26 @@ public class ProtocolServiceTest {
         file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
+  }
+
+  @Test
+  @WithMockUser
+  public void delete() {
+    Protocol protocol = repository.findById(4L).orElse(null);
+
+    service.delete(protocol);
+
+    repository.flush();
+    verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
+    assertFalse(repository.findById(4L).isPresent());
+  }
+
+  @Test
+  @WithMockUser
+  public void delete_LinkedToSample() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      Protocol protocol = repository.findById(1L).orElse(null);
+      service.delete(protocol);
+    });
   }
 }

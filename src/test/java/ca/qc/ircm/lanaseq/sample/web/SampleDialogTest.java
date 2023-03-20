@@ -241,12 +241,13 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
       assertEquals(protocol.getName(), dialog.protocol.getItemLabelGenerator().apply(protocol));
     }
   }
+
   @Test
   public void assay() {
     assertTrue(dialog.assay.isAllowCustomValue());
     dialog.assay.setItems("Test", "Test2");
-    fireEvent(dialog.assay, new GeneratedVaadinComboBox.CustomValueSetEvent(dialog.assay,
-            false, "new_assay_type"));
+    fireEvent(dialog.assay,
+        new GeneratedVaadinComboBox.CustomValueSetEvent(dialog.assay, false, "new_assay_type"));
     assertEquals("new_assay_type", dialog.assay.getValue());
     assertEquals("ChIP-chip", dialog.assay.getItemLabelGenerator().apply("ChIP-chip"));
   }
@@ -318,6 +319,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setSample(sample);
     assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
     assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
         dialog.confirm.getElement().getProperty("message"));
   }
@@ -332,6 +335,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
 
     verify(presenter).setSample(sample);
     assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(DELETE_HEADER),
+        dialog.confirm.getElement().getProperty("header"));
     assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
         dialog.confirm.getElement().getProperty("message"));
   }

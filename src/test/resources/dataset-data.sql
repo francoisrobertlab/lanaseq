@@ -21,7 +21,9 @@ INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('2', 'BioID', '5', '2018-11-18 9:31:14', null);
 INSERT INTO protocol (id,name,owner_id,creation_date,note)
 VALUES ('3', 'Histone FLAG', '2', '2018-10-20 9:58:12', null);
-ALTER TABLE protocol ALTER COLUMN id RESTART WITH 4;
+INSERT INTO protocol (id,name,owner_id,creation_date,note)
+VALUES ('4', 'Deletable protocol', '2', '2018-10-24 9:58:12', null);
+ALTER TABLE protocol ALTER COLUMN id RESTART WITH 5;
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
 VALUES (1,1,'FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/FLAG_Protocol.docx'),0,'2018-10-20 11:28:12');
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
@@ -30,7 +32,9 @@ INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date
 VALUES (3,3,'Histone FLAG Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),1,'2018-10-20 9:58:12');
 INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
 VALUES (4,3,'Histone Protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),0,'2018-10-21 9:58:12');
-ALTER TABLE protocol_file ALTER COLUMN id RESTART WITH 5;
+INSERT INTO protocol_file (id,protocol_id,filename,content,deleted,creation_date)
+VALUES (5,4,'Deletable protocol.docx',FILE_READ('$[project.build.testOutputDirectory]/protocol/Histone_FLAG_Protocol.docx'),0,'2018-10-21 9:58:12');
+ALTER TABLE protocol_file ALTER COLUMN id RESTART WITH 6;
 INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)
 VALUES ('1', 'MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020', '2018-10-20', '2', 1, '2018-10-20 13:28:12', 'robtools version 2');
 INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,note)

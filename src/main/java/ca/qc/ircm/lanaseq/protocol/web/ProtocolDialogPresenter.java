@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_IOEXCEPTION;
@@ -103,14 +104,16 @@ public class ProtocolDialogPresenter {
 
   private void setReadOnly() {
     boolean readOnly = false;
-    if (binder.getBean() != null && binder.getBean().getId() != null) {
-      readOnly = !authenticatedUser.hasPermission(binder.getBean(), Permission.WRITE);
+    Protocol protocol = binder.getBean();
+    if (protocol != null && protocol.getId() != null) {
+      readOnly = !authenticatedUser.hasPermission(protocol, Permission.WRITE);
     }
     binder.setReadOnly(readOnly);
     dialog.upload.setVisible(!readOnly);
     dialog.remove.setVisible(!readOnly);
     dialog.save.setVisible(!readOnly);
     dialog.cancel.setVisible(!readOnly);
+    dialog.delete.setVisible(!readOnly && service.isDeletable(protocol));
   }
 
   void addFile(String filename, InputStream input) {
@@ -167,6 +170,16 @@ public class ProtocolDialogPresenter {
       dialog.close();
       dialog.fireSavedEvent();
     }
+  }
+
+  void delete() {
+    Protocol protocol = binder.getBean();
+    logger.debug("delete protocol {}", protocol);
+    service.delete(protocol);
+    AppResources resources = new AppResources(ProtocolDialog.class, locale);
+    dialog.showNotification(resources.message(DELETED, protocol.getName()));
+    dialog.fireDeletedEvent();
+    dialog.close();
   }
 
   void cancel() {

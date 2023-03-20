@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
+import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import java.time.LocalDateTime;
@@ -46,15 +47,18 @@ public class ProtocolService {
   @Autowired
   private ProtocolFileRepository fileRepository;
   @Autowired
+  private SampleRepository sampleRepository;
+  @Autowired
   private AuthenticatedUser authenticatedUser;
 
   protected ProtocolService() {
   }
 
   protected ProtocolService(ProtocolRepository repository, ProtocolFileRepository fileRepository,
-      AuthenticatedUser authenticatedUser) {
+      SampleRepository sampleRepository, AuthenticatedUser authenticatedUser) {
     this.repository = repository;
     this.fileRepository = fileRepository;
+    this.sampleRepository = sampleRepository;
     this.authenticatedUser = authenticatedUser;
   }
 
@@ -132,6 +136,21 @@ public class ProtocolService {
   }
 
   /**
+   * Returns true if protocol can be deleted, false otherwise.
+   *
+   * @param protocol
+   *          protocol
+   * @return true if protocol can be deleted, false otherwise
+   */
+  @PreAuthorize("hasPermission(#protocol, 'read')")
+  public boolean isDeletable(Protocol protocol) {
+    if (protocol == null || protocol.getId() == null) {
+      return false;
+    }
+    return !sampleRepository.existsByProtocol(protocol);
+  }
+
+  /**
    * Saves protocol into database.
    *
    * @param protocol
@@ -178,5 +197,19 @@ public class ProtocolService {
   public void recover(ProtocolFile file) {
     file.setDeleted(false);
     fileRepository.save(file);
+  }
+
+  /**
+   * Deletes protocol.
+   *
+   * @param protocol
+   *          protocol
+   */
+  @PreAuthorize("hasPermission(#protocol, 'write')")
+  public void delete(Protocol protocol) {
+    if (!isDeletable(protocol)) {
+      throw new IllegalArgumentException("protocol cannot be deleted");
+    }
+    repository.delete(protocol);
   }
 }

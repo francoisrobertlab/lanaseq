@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.protocol.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_IOEXCEPTION;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_OVER_MAXIMUM;
@@ -138,6 +139,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.filesError = new Div();
     dialog.save = new Button();
     dialog.cancel = new Button();
+    dialog.delete = new Button();
     presenter.init(dialog);
     presenter.localeChange(locale);
     protocol = repository.findById(1L).get();
@@ -464,6 +466,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.remove.isVisible());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
   }
 
   @Test
@@ -483,6 +486,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.remove.isVisible());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
   }
 
   @Test
@@ -503,6 +507,27 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertFalse(dialog.remove.isVisible());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  public void setProtocol_Deletable() {
+    when(service.isDeletable(any())).thenReturn(true);
+    presenter.setProtocol(protocol);
+    assertEquals(protocol.getName(), dialog.name.getValue());
+    assertEquals(protocol.getNote(), dialog.note.getValue());
+    List<ProtocolFile> expectedFiles = fileRepository.findByProtocol(protocol);
+    List<ProtocolFile> files = items(dialog.files);
+    assertEquals(expectedFiles.size(), files.size());
+    for (int i = 0; i < expectedFiles.size(); i++) {
+      assertEquals(expectedFiles.get(i), files.get(i));
+    }
+    assertFalse(dialog.name.isReadOnly());
+    assertTrue(dialog.upload.isVisible());
+    assertTrue(dialog.remove.isVisible());
+    assertTrue(dialog.save.isVisible());
+    assertTrue(dialog.cancel.isVisible());
+    assertTrue(dialog.delete.isVisible());
   }
 
   @Test
@@ -516,6 +541,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.remove.isVisible());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
   }
 
   @Test
@@ -530,6 +556,7 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.remove.isVisible());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
   }
 
   @Test
@@ -550,5 +577,21 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(dialog.remove.isVisible());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
+    assertFalse(dialog.delete.isVisible());
+  }
+
+  @Test
+  public void delete() {
+    Protocol protocol = repository.findById(4L).get();
+    presenter.setProtocol(protocol);
+
+    presenter.delete();
+
+    verify(service, never()).save(any(), any());
+    verify(service).delete(protocol);
+    verify(dialog).close();
+    verify(dialog).showNotification(resources.message(DELETED, protocol.getName()));
+    verify(dialog, never()).fireSavedEvent();
+    verify(dialog).fireDeletedEvent();
   }
 }
