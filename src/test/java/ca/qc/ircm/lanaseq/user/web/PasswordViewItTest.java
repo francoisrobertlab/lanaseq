@@ -23,9 +23,9 @@ import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -33,7 +33,6 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
-import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,11 +61,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   public void security_Anonymous() throws Throwable {
     open();
 
-    Locale locale = currentLocale();
-    assertEquals(
-        new AppResources(SigninView.class, locale).message(TITLE,
-            new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
-        getDriver().getTitle());
+    $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
@@ -95,7 +90,6 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     signinView.getUsernameField().setValue("christian.poitras@ircm.qc.ca");
     signinView.getPasswordField().setValue("pass1");
     signinView.getSubmitButton().click();
-    assertEquals(viewUrl(PasswordView.VIEW_NAME), getDriver().getCurrentUrl());
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
@@ -106,7 +100,6 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void mainView() throws Throwable {
     openView(MainView.VIEW_NAME);
-    assertEquals(viewUrl(PasswordView.VIEW_NAME), getDriver().getCurrentUrl());
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
@@ -117,7 +110,6 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void datasetsView() throws Throwable {
     openView(DatasetsView.VIEW_NAME);
-    assertEquals(viewUrl(PasswordView.VIEW_NAME), getDriver().getCurrentUrl());
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
@@ -136,7 +128,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     view.save().click();
     TestTransaction.end();
 
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(DatasetsViewElement.class).waitForFirst();
     User user = repository.findById(6L).orElse(null);
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
   }

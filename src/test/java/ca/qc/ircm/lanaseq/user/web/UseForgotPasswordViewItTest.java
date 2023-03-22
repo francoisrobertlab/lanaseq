@@ -33,7 +33,7 @@ import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import ca.qc.ircm.lanaseq.web.SigninView;
+import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -101,6 +101,6 @@ public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
     User user = userRepository.findById(9L).orElse(null);
     entityManager.refresh(user);
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
-    assertEquals(viewUrl(SigninView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(SigninViewElement.class).waitForFirst();
   }
 }

@@ -32,10 +32,9 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import ca.qc.ircm.lanaseq.web.SigninView;
+import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDateTime;
-import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,11 +65,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void security_Anonymous() throws Throwable {
     open();
 
-    Locale locale = currentLocale();
-    assertEquals(
-        new AppResources(SigninView.class, locale).message(TITLE,
-            new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
-        getDriver().getTitle());
+    $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
@@ -154,6 +149,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
     assertEquals(LocalDateTime.of(2018, 12, 7, 15, 40, 12), user.getLastSignAttempt());
     assertEquals(null, user.getLocale());
-    assertEquals(viewUrl(ProfileView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(ProfileViewElement.class).waitForFirst();
   }
 }

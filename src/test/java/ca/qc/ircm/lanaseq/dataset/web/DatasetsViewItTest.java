@@ -33,12 +33,11 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import ca.qc.ircm.lanaseq.web.SigninView;
+import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -61,11 +60,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @WithAnonymousUser
   public void security_Anonymous() throws Throwable {
     open();
-    Locale locale = currentLocale();
-    assertEquals(
-        new AppResources(SigninView.class, locale).message(TITLE,
-            new AppResources(Constants.class, locale).message(APPLICATION_NAME)),
-        getDriver().getTitle());
+    $(SigninViewElement.class).waitForFirst();
   }
 
   @Test

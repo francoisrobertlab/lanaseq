@@ -18,16 +18,15 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
-import ca.qc.ircm.lanaseq.sample.web.SamplesView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
+import ca.qc.ircm.lanaseq.protocol.web.ProtocolsViewElement;
+import ca.qc.ircm.lanaseq.sample.web.SamplesViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.ProfileView;
+import ca.qc.ircm.lanaseq.user.web.ProfileViewElement;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   public void security_Anonymous() throws Throwable {
     open();
 
-    assertEquals(viewUrl(SigninView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
@@ -119,7 +118,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.datasets().click();
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(DatasetsViewElement.class).waitForFirst();
   }
 
   @Test
@@ -128,7 +127,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.samples().click();
-    assertEquals(viewUrl(SamplesView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(SamplesViewElement.class).waitForFirst();
   }
 
   @Test
@@ -137,7 +136,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.protocols().click();
-    assertEquals(viewUrl(ProtocolsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(ProtocolsViewElement.class).waitForFirst();
   }
 
   @Test
@@ -146,7 +145,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.profile().click();
-    assertEquals(viewUrl(ProfileView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(ProfileViewElement.class).waitForFirst();
   }
 
   @Test
@@ -155,7 +154,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.users().click();
-    assertEquals(viewUrl(UsersView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(UsersViewElement.class).waitForFirst();
   }
 
   @Test
@@ -170,7 +169,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     usersView.switchUser().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.exitSwitchUser().click();
-    assertEquals(viewUrl(UsersView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(UsersViewElement.class).waitForFirst();
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
   }
 
@@ -183,6 +182,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     signinView.getSubmitButton().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.signout().click();
-    assertEquals(viewUrl(SigninView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(SigninViewElement.class).waitForFirst();
   }
 }

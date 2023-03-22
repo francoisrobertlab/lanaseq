@@ -28,11 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
+import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -112,7 +113,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getUsernameField().setValue("jonh.smith@ircm.qc.ca");
     view.getPasswordField().setValue("pass1");
     view.getSubmitButton().click();
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(DatasetsViewElement.class).waitForFirst();
   }
 
   @Test
@@ -121,12 +122,13 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
     view.getForgotPasswordButton().click();
     assertEquals(viewUrl(ForgotPasswordView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(ForgotPasswordViewElement.class).waitForFirst();
   }
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void already_User() throws Throwable {
     open();
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(DatasetsViewElement.class).waitForFirst();
   }
 }

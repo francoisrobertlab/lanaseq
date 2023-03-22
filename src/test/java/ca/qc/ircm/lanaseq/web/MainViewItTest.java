@@ -18,12 +18,11 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.web.MainView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
+import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -43,14 +42,14 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   public void security_Anonymous() throws Throwable {
     open();
 
-    assertEquals(viewUrl(SigninView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
   public void userRedirected() throws Throwable {
     open();
 
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(DatasetsViewElement.class).waitForFirst();
   }
 
   @Test
@@ -58,7 +57,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   public void managerRedirected() throws Throwable {
     open();
 
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(DatasetsViewElement.class).waitForFirst();
   }
 
   @Test
@@ -66,6 +65,6 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   public void adminRedirected() throws Throwable {
     open();
 
-    assertEquals(viewUrl(UsersView.VIEW_NAME), getDriver().getCurrentUrl());
+    $(UsersViewElement.class).waitForFirst();
   }
 }
