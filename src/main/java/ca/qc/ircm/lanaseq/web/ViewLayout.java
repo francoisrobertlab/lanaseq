@@ -25,14 +25,12 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -40,7 +38,8 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.shared.communication.PushMode;
+import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.VaadinServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +47,9 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
@@ -136,10 +138,12 @@ public class ViewLayout extends VerticalLayout
 
   private void selectTab() {
     if (tabs.getSelectedTab() == signout) {
-      // Sign-out requires a request to be made outside of Vaadin.
-      logger.debug("redirect to sign out");
-      UI.getCurrent().getPage()
-          .executeJs("location.assign('" + WebSecurityConfiguration.SIGNOUT_URL + "')");
+      logger.debug("Sign out user {}", authenticatedUser);
+      UI.getCurrent().getPage().setLocation("/");
+      CompositeLogoutHandler logoutHandler = new CompositeLogoutHandler(
+          new CookieClearingLogoutHandler("remember-me"), new SecurityContextLogoutHandler());
+      logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(),
+          VaadinServletResponse.getCurrent().getHttpServletResponse(), null);
     } else if (tabs.getSelectedTab() == exitSwitchUser) {
       // Exit switch user requires a request to be made outside of Vaadin.
       logger.debug("redirect to exit switch user");

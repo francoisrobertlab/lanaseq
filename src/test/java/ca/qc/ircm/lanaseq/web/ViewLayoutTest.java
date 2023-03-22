@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SIGNOUT_URL;
 import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
@@ -33,6 +32,7 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.TABS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -60,6 +60,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
@@ -94,8 +95,7 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   private void assertNoExecuteJs() {
     assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
-        .anyMatch(i -> i.getInvocation().getExpression().contains(EXIT_SWITCH_USER_FORM)
-            || i.getInvocation().getExpression().contains(SIGNOUT_URL)));
+        .anyMatch(i -> i.getInvocation().getExpression().contains(EXIT_SWITCH_USER_FORM)));
   }
 
   @Test
@@ -332,8 +332,7 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
     view.tabs.setSelectedTab(view.signout);
 
     verify(navigationListener, never()).afterNavigation(any());
-    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
-        i -> i.getInvocation().getExpression().equals("location.assign('" + SIGNOUT_URL + "')")));
+    assertNull(SecurityContextHolder.getContext().getAuthentication());
   }
 
   @Test

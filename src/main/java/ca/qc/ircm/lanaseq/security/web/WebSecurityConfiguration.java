@@ -64,7 +64,6 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 @Configuration
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
-  public static final String SIGNOUT_URL = "/signout";
   public static final String SWITCH_USER_URL = "/switchUser";
   public static final String SWITCH_USERNAME_PARAMETER = "username";
   public static final String SWITCH_USER_EXIT_URL = "/switchUser/exit";
@@ -91,6 +90,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   private SecurityConfiguration configuration;
   @Autowired
   private LdapConfiguration ldapConfiguration;
+
+  static boolean isVaadinInternalRequest(HttpServletRequest request) {
+    final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
+    return parameterValue != null
+        && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
+  }
 
   /**
    * Returns password encoder that supports password upgrades.
@@ -188,7 +193,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Allow all flow internal requests.
         .requestMatchers(WebSecurityConfiguration::isVaadinInternalRequest).permitAll()
-            .regexMatchers("/offline-stub.html", "/sw-runtime-resources-precache.js").permitAll()
+        .regexMatchers("/offline-stub.html", "/sw-runtime-resources-precache.js").permitAll()
 
         // Allow all login failure URLs.
         .regexMatchers(SIGNIN_FAILURE_URL_PATTERN).permitAll()
@@ -215,9 +220,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Register the success handler that redirects users to the page they last tried
         // to access
         .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
-
-        // Configure logout
-        .and().logout().logoutUrl(SIGNOUT_URL).logoutSuccessUrl(SIGNOUT_SUCCESS_URL)
 
         // Remember me
         .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());
@@ -261,11 +263,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // (production mode) static resources
         "/frontend-es5/**", "/frontend-es6/**");
-  }
-
-  static boolean isVaadinInternalRequest(HttpServletRequest request) {
-    final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
-    return parameterValue != null
-        && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
   }
 }
