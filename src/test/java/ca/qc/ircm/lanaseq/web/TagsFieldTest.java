@@ -35,7 +35,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox.CustomValueSetEvent;
+import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
 import java.util.Locale;

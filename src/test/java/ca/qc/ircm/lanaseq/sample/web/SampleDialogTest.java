@@ -69,7 +69,7 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.GeneratedVaadinComboBox;
+import com.vaadin.flow.component.combobox.ComboBoxBase;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.CancelEvent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -247,7 +247,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.assay.isAllowCustomValue());
     dialog.assay.setItems("Test", "Test2");
     fireEvent(dialog.assay,
-        new GeneratedVaadinComboBox.CustomValueSetEvent(dialog.assay, false, "new_assay_type"));
+        new ComboBoxBase.CustomValueSetEvent(dialog.assay, false, "new_assay_type"));
     assertEquals("new_assay_type", dialog.assay.getValue());
     assertEquals("ChIP-chip", dialog.assay.getItemLabelGenerator().apply("ChIP-chip"));
   }
