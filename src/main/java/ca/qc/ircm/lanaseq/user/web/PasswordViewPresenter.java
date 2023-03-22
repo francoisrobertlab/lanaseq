@@ -17,9 +17,6 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
-
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
@@ -74,8 +71,6 @@ public class PasswordViewPresenter {
       String password = view.passwords.getPassword();
       logger.debug("save new password for user {}", user);
       service.save(password);
-      final AppResources resources = new AppResources(PasswordView.class, locale);
-      view.showNotification(resources.message(SAVED));
       UI.getCurrent().navigate(MainView.class);
     }
   }

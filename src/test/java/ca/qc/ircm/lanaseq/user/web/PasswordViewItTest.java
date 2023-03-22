@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.user.web.PasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,7 +33,6 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,11 +136,8 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     view.save().click();
     TestTransaction.end();
 
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(PasswordView.class);
-    assertEquals(resources.message(SAVED), notification.getText());
+    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
     User user = repository.findById(6L).orElse(null);
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
-    assertEquals(viewUrl(DatasetsView.VIEW_NAME), getDriver().getCurrentUrl());
   }
 }

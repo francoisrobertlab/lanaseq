@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.user.web.PasswordView.SAVED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -114,6 +113,5 @@ public class PasswordViewPresenterTest extends AbstractKaribuTestCase {
 
     verify(service).save(password);
     assertCurrentView(DatasetsView.class);
-    verify(view).showNotification(resources.message(SAVED));
   }
 }
