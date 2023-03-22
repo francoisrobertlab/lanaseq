@@ -36,7 +36,6 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
-import ca.qc.ircm.lanaseq.test.config.Headless;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -114,9 +113,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private String name() {
-    return sampleId + "_" + assay.replaceAll("[^\\w]", "") + "_"
-        + type.getLabel(Locale.ENGLISH) + "_" + target + "_" + strain + "_" + strainDescription
-        + "_" + treatment + "_" + replicate;
+    return sampleId + "_" + assay.replaceAll("[^\\w]", "") + "_" + type.getLabel(Locale.ENGLISH)
+        + "_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_" + replicate;
   }
 
   @Test
