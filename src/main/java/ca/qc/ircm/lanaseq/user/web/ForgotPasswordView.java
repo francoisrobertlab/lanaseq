@@ -40,6 +40,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,16 +50,17 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Forgot password view.
  */
 @Route(value = ForgotPasswordView.VIEW_NAME)
+@AnonymousAllowed
 public class ForgotPasswordView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent, UrlComponent {
-  private static final long serialVersionUID = 4760310643370830640L;
-  private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordView.class);
   public static final String VIEW_NAME = "forgotpassword";
   public static final String ID = "forgotpassword-view";
   public static final String SEPARATOR = "/";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
   public static final String SAVED = "saved";
+  private static final long serialVersionUID = 4760310643370830640L;
+  private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordView.class);
   protected H2 header = new H2();
   protected Div message = new Div();
   protected TextField email = new TextField();

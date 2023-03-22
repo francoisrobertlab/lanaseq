@@ -38,6 +38,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.WildcardParameter;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Use forgot password view.
  */
 @Route(value = UseForgotPasswordView.VIEW_NAME)
+@AnonymousAllowed
 public class UseForgotPasswordView extends VerticalLayout implements LocaleChangeObserver,
     HasUrlParameter<String>, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "useforgotpassword";

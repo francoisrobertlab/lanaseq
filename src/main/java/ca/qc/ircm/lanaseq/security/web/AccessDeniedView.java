@@ -36,6 +36,7 @@ import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.HasErrorParameter;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ import org.springframework.security.access.AccessDeniedException;
  * Access denied view.
  */
 @Route("accessdenied")
+@AnonymousAllowed
 public class AccessDeniedView extends Composite<VerticalLayout>
     implements HasErrorParameter<AccessDeniedException>, LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "accessdenied";

@@ -42,6 +42,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -53,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Sign in view.
  */
 @Route(value = SigninView.VIEW_NAME)
+@AnonymousAllowed
 @JsModule("./styles/shared-styles.js")
 public class SigninView extends LoginOverlay
     implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BeforeEnterObserver {
