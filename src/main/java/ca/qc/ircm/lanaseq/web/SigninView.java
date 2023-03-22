@@ -149,7 +149,7 @@ public class SigninView extends LoginOverlay
     } else if (parameters.containsKey(LOCKED)) {
       error = LOCKED;
       setError(true);
-    } else if (parameters.containsKey(FAIL)) {
+    } else if (parameters.containsKey(FAIL) || parameters.containsKey("error")) {
       error = FAIL;
       setError(true);
     }

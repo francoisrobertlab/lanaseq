@@ -123,6 +123,23 @@ public class SigninViewTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void labels_Error() {
+    parameters.put("error", null);
+    view.afterNavigation(afterNavigationEvent);
+    view.localeChange(mock(LocaleChangeEvent.class));
+    assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
+    assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
+    assertEquals(resources.message(ADDITIONAL_INFORMATION), view.i18n.getAdditionalInformation());
+    assertEquals(resources.message(FORM_TITLE), view.i18n.getForm().getTitle());
+    assertEquals(userResources.message(EMAIL), view.i18n.getForm().getUsername());
+    assertEquals(userResources.message(HASHED_PASSWORD), view.i18n.getForm().getPassword());
+    assertEquals(resources.message(SIGNIN), view.i18n.getForm().getSubmit());
+    assertEquals(resources.message(FORGOT_PASSWORD), view.i18n.getForm().getForgotPassword());
+    assertEquals(resources.message(property(FAIL, TITLE)), view.i18n.getErrorMessage().getTitle());
+    assertEquals(resources.message(FAIL), view.i18n.getErrorMessage().getMessage());
+  }
+
+  @Test
   public void labels_Fail() {
     parameters.put(FAIL, null);
     view.afterNavigation(afterNavigationEvent);
@@ -219,6 +236,15 @@ public class SigninViewTest extends AbstractKaribuTestCase {
   @Test
   public void afterNavigationEvent_NoError() {
     parameters.put(FAIL, null);
+
+    view.afterNavigation(afterNavigationEvent);
+
+    assertTrue(view.isError());
+  }
+
+  @Test
+  public void afterNavigationEvent_Error() {
+    parameters.put("error", null);
 
     view.afterNavigation(afterNavigationEvent);
 
