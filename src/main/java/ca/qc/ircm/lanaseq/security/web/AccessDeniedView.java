@@ -60,7 +60,7 @@ public class AccessDeniedView extends Composite<VerticalLayout>
   protected Button home = new Button();
 
   /**
-   * Creates a new access denied view.
+   * Creates new access denied view.
    */
   public AccessDeniedView() {
     logger.debug("access denied view");
