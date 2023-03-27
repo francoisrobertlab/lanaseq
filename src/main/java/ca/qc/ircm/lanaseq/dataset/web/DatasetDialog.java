@@ -80,6 +80,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -90,7 +91,6 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
-  private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
   public static final String NAME_PREFIX = "namePrefix";
@@ -102,6 +102,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
+  private static final long serialVersionUID = 3285639770914046262L;
   protected H3 header = new H3();
   protected TextField namePrefix = new TextField();
   protected Button generateName = new Button();
@@ -125,7 +126,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
   @Autowired
-  protected SelectSampleDialog selectSampleDialog;
+  protected ObjectFactory<SelectSampleDialog> selectSampleDialogFactory;
   @Autowired
   private transient DatasetDialogPresenter presenter;
   private Map<Sample, Label> sampleIdFields = new HashMap<>();
@@ -135,9 +136,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected DatasetDialog() {
   }
 
-  protected DatasetDialog(DatasetDialogPresenter presenter, SelectSampleDialog selectSampleDialog) {
+  protected DatasetDialog(DatasetDialogPresenter presenter,
+      ObjectFactory<SelectSampleDialog> selectSampleDialogFactory) {
     this.presenter = presenter;
-    this.selectSampleDialog = selectSampleDialog;
+    this.selectSampleDialogFactory = selectSampleDialogFactory;
   }
 
   public static String id(String baseId) {

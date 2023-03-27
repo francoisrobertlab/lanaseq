@@ -34,6 +34,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
@@ -101,12 +102,6 @@ public class DatasetFilesDialogPresenter {
     this.dialog = dialog;
     this.authentication = SecurityContextHolder.getContext().getAuthentication();
     dialog.files.getEditor().setBinder(fileBinder);
-    dialog.addFilesDialog.addSavedListener(e -> updateFiles());
-    dialog.sampleFilesDialog.addOpenedChangeListener(e -> {
-      if (!e.isOpened()) {
-        dialog.samples.getDataProvider().refreshAll();
-      }
-    });
     localeChange(Constants.DEFAULT_LOCALE);
   }
 
@@ -148,8 +143,8 @@ public class DatasetFilesDialogPresenter {
   }
 
   private void updateFiles() {
-    dialog.files
-        .setItems(service.files(dataset).stream().map(file -> new EditableFile(file.toFile())).collect(Collectors.toList()));
+    dialog.files.setItems(service.files(dataset).stream()
+        .map(file -> new EditableFile(file.toFile())).collect(Collectors.toList()));
   }
 
   boolean isReadOnly() {
@@ -166,8 +161,14 @@ public class DatasetFilesDialogPresenter {
   }
 
   void viewFiles(Sample sample) {
-    dialog.sampleFilesDialog.setSample(sample);
-    dialog.sampleFilesDialog.open();
+    SampleFilesDialog sampleFilesDialog = dialog.sampleFilesDialogFactory.getObject();
+    sampleFilesDialog.setSample(sample);
+    sampleFilesDialog.open();
+    sampleFilesDialog.addOpenedChangeListener(e -> {
+      if (!e.isOpened()) {
+        dialog.samples.getDataProvider().refreshAll();
+      }
+    });
   }
 
   public void addSmallFile(String filename, InputStream inputStream) {
@@ -197,7 +198,10 @@ public class DatasetFilesDialogPresenter {
 
   void addLargeFiles() {
     if (!isReadOnly()) {
-      dialog.addFilesDialog.open();
+      AddDatasetFilesDialog addFilesDialog = dialog.addFilesDialogFactory.getObject();
+      addFilesDialog.setDataset(dataset);
+      addFilesDialog.addSavedListener(e -> updateFiles());
+      addFilesDialog.open();
     }
   }
 
@@ -245,7 +249,6 @@ public class DatasetFilesDialogPresenter {
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
     dialog.samples.setItems(dataset.getSamples());
-    dialog.addFilesDialog.setDataset(dataset);
     updateMessage();
     updateFiles();
   }

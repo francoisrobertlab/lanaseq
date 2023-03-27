@@ -45,6 +45,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -75,11 +76,11 @@ public class DatasetsView extends VerticalLayout
   @Autowired
   protected DatasetGrid datasets;
   @Autowired
-  protected DatasetDialog dialog;
+  protected ObjectFactory<DatasetDialog> dialogFactory;
   @Autowired
-  protected DatasetFilesDialog filesDialog;
+  protected ObjectFactory<DatasetFilesDialog> filesDialogFactory;
   @Autowired
-  protected DatasetsAnalysisDialog analysisDialog;
+  protected ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory;
   @Autowired
   private transient DatasetsViewPresenter presenter;
 
@@ -87,12 +88,14 @@ public class DatasetsView extends VerticalLayout
   }
 
   protected DatasetsView(DatasetsViewPresenter presenter, DatasetGrid datasets,
-      DatasetDialog dialog, DatasetFilesDialog filesDialog, DatasetsAnalysisDialog analysisDialog) {
+      ObjectFactory<DatasetDialog> dialogFactory,
+      ObjectFactory<DatasetFilesDialog> filesDialogFactory,
+      ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory) {
     this.presenter = presenter;
     this.datasets = datasets;
-    this.dialog = dialog;
-    this.filesDialog = filesDialog;
-    this.analysisDialog = analysisDialog;
+    this.dialogFactory = dialogFactory;
+    this.filesDialogFactory = filesDialogFactory;
+    this.analysisDialogFactory = analysisDialogFactory;
   }
 
   @PostConstruct

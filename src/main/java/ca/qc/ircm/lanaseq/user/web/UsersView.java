@@ -68,6 +68,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -103,18 +104,18 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   protected Html switchUserForm = new Html(
       "<form action=\"" + SWITCH_USER_URL + "\" method=\"post\" style=\"display:none;\"></form>");
   protected Html switchUsername = new Html("<input name=\"" + SWITCH_USERNAME_PARAMETER + "\">");
-  private Map<User, Button> actives = new HashMap<>();
   @Autowired
-  protected UserDialog userDialog;
+  protected ObjectFactory<UserDialog> dialogFactory;
+  private Map<User, Button> actives = new HashMap<>();
   @Autowired
   private transient UsersViewPresenter presenter;
 
   public UsersView() {
   }
 
-  protected UsersView(UsersViewPresenter presenter, UserDialog userDialog) {
+  protected UsersView(UsersViewPresenter presenter, ObjectFactory<UserDialog> dialogFactory) {
     this.presenter = presenter;
-    this.userDialog = userDialog;
+    this.dialogFactory = dialogFactory;
   }
 
   @SuppressWarnings("unchecked")

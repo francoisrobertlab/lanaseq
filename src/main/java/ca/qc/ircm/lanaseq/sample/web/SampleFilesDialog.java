@@ -50,6 +50,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -88,16 +89,16 @@ public class SampleFilesDialog extends Dialog
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
   @Autowired
-  protected AddSampleFilesDialog addFilesDialog;
+  protected ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
   @Autowired
   private transient SampleFilesDialogPresenter presenter;
 
   protected SampleFilesDialog() {
   }
 
-  protected SampleFilesDialog(AddSampleFilesDialog addFilesDialog,
+  protected SampleFilesDialog(ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory,
       SampleFilesDialogPresenter presenter) {
-    this.addFilesDialog = addFilesDialog;
+    this.addFilesDialogFactory = addFilesDialogFactory;
     this.presenter = presenter;
   }
 

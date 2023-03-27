@@ -95,6 +95,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
@@ -107,6 +108,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 @ServiceTestAnnotations
 @WithMockUser
 public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private DatasetFilesDialogPresenter presenter;
   @Mock
@@ -119,6 +122,14 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private AuthenticatedUser authenticatedUser;
   @MockBean
   private AppConfiguration configuration;
+  @Autowired
+  private ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory;
+  @MockBean
+  private AddDatasetFilesDialog addFilesDialog;
+  @Autowired
+  private ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
+  @MockBean
+  private SampleFilesDialog sampleFilesDialog;
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;
   @Captor
@@ -133,8 +144,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private DatasetRepository repository;
   @Mock
   private VaadinSession session;
-  @TempDir
-  Path temporaryFolder;
   @Mock
   private Sample sample;
   private Locale locale = Locale.ENGLISH;
@@ -161,8 +170,8 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.samples = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
-    dialog.addFilesDialog = mock(AddDatasetFilesDialog.class);
-    dialog.sampleFilesDialog = mock(SampleFilesDialog.class);
+    dialog.addFilesDialogFactory = addFilesDialogFactory;
+    dialog.sampleFilesDialogFactory = sampleFilesDialogFactory;
     files.add(new File("dataset_R1.fastq"));
     files.add(new File("dataset_R2.fastq"));
     files.add(new File("dataset.bw"));
@@ -304,7 +313,6 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
     for (Sample sample : dataset.getSamples()) {
       assertTrue(samples.contains(sample));
     }
-    verify(dialog.addFilesDialog).setDataset(dataset);
   }
 
   @Test
@@ -460,8 +468,9 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void viewFiles() {
     presenter.viewFiles(sample);
-    verify(dialog.sampleFilesDialog).setSample(sample);
-    verify(dialog.sampleFilesDialog).open();
+    verify(sampleFilesDialog).setSample(sample);
+    verify(sampleFilesDialog).addOpenedChangeListener(any());
+    verify(sampleFilesDialog).open();
   }
 
   @Test
@@ -518,7 +527,9 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog).open();
+    verify(addFilesDialog).setDataset(dataset);
+    verify(addFilesDialog).addSavedListener(any());
+    verify(addFilesDialog).open();
   }
 
   @Test
@@ -529,7 +540,9 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog, never()).open();
+    verify(addFilesDialog, never()).setDataset(any());
+    verify(addFilesDialog, never()).addSavedListener(any());
+    verify(addFilesDialog, never()).open();
   }
 
   @Test
@@ -539,23 +552,28 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog, never()).open();
+    verify(addFilesDialog, never()).setDataset(any());
+    verify(addFilesDialog, never()).addSavedListener(any());
+    verify(addFilesDialog, never()).open();
   }
 
   @Test
   public void addLargeFiles_NoDataset() {
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog, never()).open();
+    verify(addFilesDialog, never()).setDataset(any());
+    verify(addFilesDialog, never()).addSavedListener(any());
+    verify(addFilesDialog, never()).open();
   }
 
   @Test
   public void addLargeFiles_Saved() {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
-    verify(dialog.addFilesDialog).addSavedListener(savedListenerCaptor.capture());
+    presenter.addLargeFiles();
+    verify(addFilesDialog).addSavedListener(savedListenerCaptor.capture());
 
-    savedListenerCaptor.getValue().onComponentEvent(new SavedEvent<>(dialog.addFilesDialog, false));
+    savedListenerCaptor.getValue().onComponentEvent(new SavedEvent<>(addFilesDialog, false));
 
     verify(service, atLeast(2)).files(dataset);
   }
@@ -614,12 +632,11 @@ public class DatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnSampleFilesDialogClose() {
     Dataset dataset = repository.findById(1L).get();
-
     presenter.setDataset(dataset);
-
     dialog.samples.setItems(mock(DataProvider.class));
-    verify(dialog.sampleFilesDialog)
-        .addOpenedChangeListener(openedSampleFilesListenerCaptor.capture());
+    presenter.viewFiles(sample);
+
+    verify(sampleFilesDialog).addOpenedChangeListener(openedSampleFilesListenerCaptor.capture());
     ComponentEventListener<OpenedChangeEvent<Dialog>> openedSampleFilesListener =
         openedSampleFilesListenerCaptor.getValue();
     OpenedChangeEvent<Dialog> event = mock(OpenedChangeEvent.class);

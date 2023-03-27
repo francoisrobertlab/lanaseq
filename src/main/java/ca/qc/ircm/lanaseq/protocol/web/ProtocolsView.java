@@ -57,6 +57,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -90,20 +91,20 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected Button add = new Button();
   protected Button history = new Button();
   @Autowired
-  protected ProtocolDialog dialog;
+  protected ObjectFactory<ProtocolDialog> dialogFactory;
   @Autowired
-  protected ProtocolHistoryDialog historyDialog;
+  protected ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
   @Autowired
   private transient ProtocolsViewPresenter presenter;
 
   public ProtocolsView() {
   }
 
-  ProtocolsView(ProtocolsViewPresenter presenter, ProtocolDialog dialog,
-      ProtocolHistoryDialog historyDialog) {
+  ProtocolsView(ProtocolsViewPresenter presenter, ObjectFactory<ProtocolDialog> dialogFactory,
+      ObjectFactory<ProtocolHistoryDialog> historyDialogFactory) {
     this.presenter = presenter;
-    this.dialog = dialog;
-    this.historyDialog = historyDialog;
+    this.dialogFactory = dialogFactory;
+    this.historyDialogFactory = historyDialogFactory;
   }
 
   @PostConstruct

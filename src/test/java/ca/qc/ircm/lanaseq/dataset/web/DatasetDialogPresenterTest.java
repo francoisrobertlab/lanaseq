@@ -81,6 +81,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -99,6 +100,10 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
   private DatasetService service;
   @MockBean
   private AuthenticatedUser authenticatedUser;
+  @Autowired
+  private ObjectFactory<SelectSampleDialog> selectSampleDialogFactory;
+  @MockBean
+  private SelectSampleDialog selectSampleDialog;
   @Mock
   private Sample sample;
   @Captor
@@ -151,7 +156,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.save = new Button();
     dialog.cancel = new Button();
     dialog.delete = new Button();
-    dialog.selectSampleDialog = mock(SelectSampleDialog.class);
+    dialog.selectSampleDialogFactory = selectSampleDialogFactory;
     when(authenticatedUser.hasPermission(any(), any())).thenReturn(true);
     topTags.add("input");
     topTags.add("chip");
@@ -351,8 +356,7 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
 
     assertEquals("FLAG, Histone FLAG", dialog.protocol.getValue());
-    assertEquals("MNase-seq" + ", " + "ChIP-seq",
-        dialog.assay.getValue());
+    assertEquals("MNase-seq" + ", " + "ChIP-seq", dialog.assay.getValue());
     assertEquals(IMMUNO_PRECIPITATION.getLabel(locale) + ", " + INPUT.getLabel(locale),
         dialog.type.getValue());
     assertEquals("polr2a, Spt16", dialog.target.getValue());
@@ -441,13 +445,13 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     dialog.namePrefix.setValue("test");
     dialog.date.setValue(LocalDate.of(2022, 05, 02));
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
+    verify(selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    verify(selectSampleDialog).open();
     ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
         selectListenerCaptor.getValue();
     Sample sample = sampleRepository.findById(4L).get();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    selectListener.onComponentEvent(new SelectedEvent<>(selectSampleDialog, false, sample));
     assertEquals("test", dialog.namePrefix.getValue());
 
     presenter.generateName();
@@ -460,12 +464,12 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
     assertEquals(3, items(dialog.samples).size());
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
+    verify(selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    verify(selectSampleDialog).open();
     ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
         selectListenerCaptor.getValue();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    selectListener.onComponentEvent(new SelectedEvent<>(selectSampleDialog, false, sample));
     List<Sample> samples = items(dialog.samples);
     assertEquals(4, samples.size());
     assertEquals(sample, samples.get(samples.size() - 1));
@@ -483,13 +487,13 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     Dataset dataset = repository.findById(1L).get();
     presenter.setDataset(dataset);
     assertEquals(3, items(dialog.samples).size());
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
+    verify(selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    verify(selectSampleDialog).open();
     ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
         selectListenerCaptor.getValue();
     Sample sample = sampleRepository.findById(4L).get();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    selectListener.onComponentEvent(new SelectedEvent<>(selectSampleDialog, false, sample));
     List<Sample> samples = items(dialog.samples);
     assertEquals(4, samples.size());
     assertEquals(sample, samples.get(samples.size() - 1));
@@ -508,12 +512,12 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     final Sample sample = dataset.getSamples().get(0);
     assertEquals(3, items(dialog.samples).size());
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
+    verify(selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    verify(selectSampleDialog).open();
     ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
         selectListenerCaptor.getValue();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    selectListener.onComponentEvent(new SelectedEvent<>(selectSampleDialog, false, sample));
     List<Sample> samples = items(dialog.samples);
     assertEquals(3, samples.size());
   }
@@ -526,12 +530,12 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     final Sample sample = sampleRepository.findById(1L).get();
 
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
+    verify(selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    verify(selectSampleDialog).open();
     ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
         selectListenerCaptor.getValue();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    selectListener.onComponentEvent(new SelectedEvent<>(selectSampleDialog, false, sample));
 
     List<Sample> samples = items(dialog.samples);
     assertEquals(2, samples.size());
@@ -545,12 +549,12 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     presenter.setDataset(dataset);
     final Sample sample = sampleRepository.findById(8L).get();
 
-    verify(dialog.selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
     presenter.addSample();
-    verify(dialog.selectSampleDialog).open();
+    verify(selectSampleDialog).addSelectedListener(selectListenerCaptor.capture());
+    verify(selectSampleDialog).open();
     ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> selectListener =
         selectListenerCaptor.getValue();
-    selectListener.onComponentEvent(new SelectedEvent<>(dialog.selectSampleDialog, false, sample));
+    selectListener.onComponentEvent(new SelectedEvent<>(selectSampleDialog, false, sample));
 
     List<Sample> samples = items(dialog.samples);
     assertEquals(4, samples.size());

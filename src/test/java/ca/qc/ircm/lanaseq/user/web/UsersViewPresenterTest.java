@@ -24,7 +24,6 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS_REQUIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -51,7 +50,6 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +62,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -80,6 +80,10 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   private UserService userService;
   @Mock
   private AuthenticatedUser authenticatedUser;
+  @Autowired
+  private ObjectFactory<UserDialog> dialogFactory;
+  @MockBean
+  private UserDialog dialog;
   @Mock
   private ListDataProvider<User> dataProvider;
   @Captor
@@ -108,7 +112,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     view.add = new Button();
     view.switchUser = new Button();
     view.switchUserForm = new Html("<form></form>");
-    view.userDialog = mock(UserDialog.class);
+    view.dialogFactory = dialogFactory;
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
     currentUser = userRepository.findById(2L).orElse(null);
@@ -256,14 +260,17 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     when(userService.get(any())).thenReturn(Optional.of(databaseUser));
     presenter.view(user);
     verify(userService).get(2L);
-    verify(view.userDialog).setUser(databaseUser);
-    verify(view.userDialog).open();
+    verify(dialog).setUser(databaseUser);
+    verify(dialog).addSavedListener(any());
+    verify(dialog).open();
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnUserSaved() {
-    verify(view.userDialog).addSavedListener(userSavedListenerCaptor.capture());
+    User user = mock(User.class);
+    presenter.view(user);
+    verify(dialog).addSavedListener(userSavedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<UserDialog>> savedListener =
         userSavedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
@@ -317,12 +324,9 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   public void add() {
     presenter.add();
-    verify(view.userDialog).setUser(userCaptor.capture());
-    User user = userCaptor.getValue();
-    assertNull(user.getId());
-    assertNull(user.getEmail());
-    assertNull(user.getName());
-    verify(view.userDialog).open();
+    verify(dialog).setUser(null);
+    verify(dialog).addSavedListener(any());
+    verify(dialog).open();
   }
 
   @Test

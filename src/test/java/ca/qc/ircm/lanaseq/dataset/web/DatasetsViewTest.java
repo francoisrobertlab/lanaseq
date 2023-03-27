@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -67,6 +68,12 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetGridPresenter datasetGridPresenter;
   private DatasetGrid datasetGrid;
+  @MockBean
+  private ObjectFactory<DatasetDialog> dialogFactory;
+  @MockBean
+  private ObjectFactory<DatasetFilesDialog> filesDialogFactory;
+  @MockBean
+  private ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory;
   @Autowired
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
@@ -82,8 +89,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     datasetGrid = new DatasetGrid(datasetGridPresenter);
     datasetGrid.init();
-    view = new DatasetsView(presenter, datasetGrid, new DatasetDialog(), new DatasetFilesDialog(),
-        new DatasetsAnalysisDialog());
+    view = new DatasetsView(presenter, datasetGrid, dialogFactory, filesDialogFactory,
+        analysisDialogFactory);
     view.init();
     view.datasets.protocol = view.datasets.addColumn(dataset -> dataset.getName());
     datasets = datasetRepository.findAll();

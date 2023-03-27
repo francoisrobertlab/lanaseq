@@ -63,6 +63,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -106,23 +107,24 @@ public class SamplesView extends VerticalLayout
   protected Button files = new Button();
   protected Button analyze = new Button();
   @Autowired
-  protected SampleDialog dialog;
+  protected ObjectFactory<SampleDialog> dialogFactory;
   @Autowired
-  protected SampleFilesDialog filesDialog;
+  protected ObjectFactory<SampleFilesDialog> filesDialogFactory;
   @Autowired
-  protected SamplesAnalysisDialog analysisDialog;
+  protected ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
   @Autowired
   private transient SamplesViewPresenter presenter;
 
   public SamplesView() {
   }
 
-  SamplesView(SamplesViewPresenter presenter, SampleDialog dialog, SampleFilesDialog filesDialog,
-      SamplesAnalysisDialog analysisDialog) {
+  SamplesView(SamplesViewPresenter presenter, ObjectFactory<SampleDialog> dialogFactory,
+      ObjectFactory<SampleFilesDialog> filesDialogFactory,
+      ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory) {
     this.presenter = presenter;
-    this.dialog = dialog;
-    this.filesDialog = filesDialog;
-    this.analysisDialog = analysisDialog;
+    this.dialogFactory = dialogFactory;
+    this.filesDialogFactory = filesDialogFactory;
+    this.analysisDialogFactory = analysisDialogFactory;
   }
 
   @PostConstruct

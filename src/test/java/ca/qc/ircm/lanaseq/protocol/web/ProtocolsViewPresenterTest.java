@@ -62,6 +62,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -80,6 +81,14 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   private ProtocolService protocolService;
   @MockBean
   private AuthenticatedUser authenticatedUser;
+  @Autowired
+  private ObjectFactory<ProtocolDialog> dialogFactory;
+  @MockBean
+  private ProtocolDialog dialog;
+  @Autowired
+  private ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
+  @MockBean
+  private ProtocolHistoryDialog historyDialog;
   @Mock
   private ListDataProvider<Protocol> dataProvider;
   @Captor
@@ -111,8 +120,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     view.error = new Div();
     view.add = new Button();
     view.history = new Button();
-    view.dialog = mock(ProtocolDialog.class);
-    view.historyDialog = mock(ProtocolHistoryDialog.class);
+    view.dialogFactory = dialogFactory;
+    view.historyDialogFactory = historyDialogFactory;
     protocols = protocolRepository.findAll();
     when(protocolService.all()).thenReturn(protocols);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -239,8 +248,10 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.edit(protocol);
     verify(protocolService).get(2L);
-    verify(view.dialog).setProtocol(databaseProtocol);
-    verify(view.dialog).open();
+    verify(dialog).setProtocol(databaseProtocol);
+    verify(dialog).addSavedListener(any());
+    verify(dialog).addDeletedListener(any());
+    verify(dialog).open();
   }
 
   @Test
@@ -252,8 +263,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     when(protocolService.get(any())).thenReturn(Optional.of(databaseProtocol));
     presenter.history();
     assertFalse(view.error.isVisible());
-    verify(view.historyDialog).setProtocol(databaseProtocol);
-    verify(view.historyDialog).open();
+    verify(historyDialog).setProtocol(databaseProtocol);
+    verify(historyDialog).open();
   }
 
   @Test
@@ -262,8 +273,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     view.protocols.select(protocol);
     presenter.history();
     assertFalse(view.error.isVisible());
-    verify(view.historyDialog, never()).setProtocol(any());
-    verify(view.historyDialog, never()).open();
+    verify(historyDialog, never()).setProtocol(any());
+    verify(historyDialog, never()).open();
   }
 
   @Test
@@ -272,8 +283,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     presenter.history();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(PROTOCOLS_REQUIRED), view.error.getText());
-    verify(view.historyDialog, never()).setProtocol(any());
-    verify(view.historyDialog, never()).open();
+    verify(historyDialog, never()).setProtocol(any());
+    verify(historyDialog, never()).open();
   }
 
   @Test
@@ -284,8 +295,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     presenter.history();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(PROTOCOLS_MORE_THAN_ONE), view.error.getText());
-    verify(view.historyDialog, never()).setProtocol(any());
-    verify(view.historyDialog, never()).open();
+    verify(historyDialog, never()).setProtocol(any());
+    verify(historyDialog, never()).open();
   }
 
   @Test
@@ -293,8 +304,8 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     Protocol protocol = new Protocol();
     protocol.setId(2L);
     presenter.history(protocol);
-    verify(view.historyDialog, never()).setProtocol(any());
-    verify(view.historyDialog, never()).open();
+    verify(historyDialog, never()).setProtocol(any());
+    verify(historyDialog, never()).open();
   }
 
   @Test
@@ -307,24 +318,30 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
     presenter.history(protocol);
     verify(authenticatedUser).hasAnyRole(UserRole.MANAGER, UserRole.ADMIN);
     verify(protocolService).get(2L);
-    verify(view.historyDialog).setProtocol(databaseProtocol);
-    verify(view.historyDialog).open();
+    verify(historyDialog).setProtocol(databaseProtocol);
+    verify(historyDialog).open();
   }
 
   @Test
   public void add() {
     presenter.add();
-    verify(view.dialog).setProtocol(protocolCaptor.capture());
+    verify(dialog).setProtocol(protocolCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
     assertNull(protocol.getId());
     assertNull(protocol.getName());
-    verify(view.dialog).open();
+    verify(dialog).addSavedListener(any());
+    verify(dialog).addDeletedListener(any());
+    verify(dialog).open();
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void refreshProtocolsOnSaved() {
-    verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
+    Protocol protocol = mock(Protocol.class);
+    when(protocolService.get(any())).thenReturn(Optional.of(protocol));
+    presenter.edit(protocol);
+
+    verify(dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
@@ -334,7 +351,11 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshProtocolsOnDeleted() {
-    verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
+    Protocol protocol = mock(Protocol.class);
+    when(protocolService.get(any())).thenReturn(Optional.of(protocol));
+    presenter.edit(protocol);
+
+    verify(dialog).addDeletedListener(deletedListenerCaptor.capture());
     ComponentEventListener<DeletedEvent<ProtocolDialog>> deletedListener =
         deletedListenerCaptor.getValue();
     deletedListener.onComponentEvent(mock(DeletedEvent.class));

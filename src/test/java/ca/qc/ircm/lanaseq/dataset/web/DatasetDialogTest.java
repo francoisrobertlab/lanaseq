@@ -110,6 +110,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
@@ -122,6 +123,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   private DatasetDialog dialog;
   @Mock
   private DatasetDialogPresenter presenter;
+  @Mock
+  private ObjectFactory<SelectSampleDialog> selectSampleDialogFactory;
   @Mock
   private Dataset dataset;
   @Mock
@@ -163,7 +166,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog = new DatasetDialog(presenter, new SelectSampleDialog());
+    dialog = new DatasetDialog(presenter, selectSampleDialogFactory);
     dialog.init();
     samples = sampleRepository.findAll();
     files.add(Paths.get("dataset", "dataset.png"));

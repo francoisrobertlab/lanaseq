@@ -71,7 +71,6 @@ public class UsersViewPresenter {
     view.add.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
     view.switchUser.setVisible(authenticatedUser.hasRole(ADMIN));
     view.switchUserForm.setVisible(authenticatedUser.hasRole(ADMIN));
-    view.userDialog.addSavedListener(e -> loadUsers());
   }
 
   private void loadUsers() {
@@ -107,8 +106,14 @@ public class UsersViewPresenter {
 
   void view(User user) {
     clearError();
-    view.userDialog.setUser(userService.get(user.getId()).orElse(null));
-    view.userDialog.open();
+    showDialog(userService.get(user.getId()).orElse(null));
+  }
+
+  private void showDialog(User user) {
+    UserDialog dialogFactory = view.dialogFactory.getObject();
+    dialogFactory.setUser(user);
+    dialogFactory.addSavedListener(e -> loadUsers());
+    dialogFactory.open();
   }
 
   void toggleActive(User user) {
@@ -133,8 +138,7 @@ public class UsersViewPresenter {
   }
 
   void add() {
-    view.userDialog.setUser(new User());
-    view.userDialog.open();
+    showDialog(null);
   }
 
   void showError(Map<String, List<String>> parameters) {

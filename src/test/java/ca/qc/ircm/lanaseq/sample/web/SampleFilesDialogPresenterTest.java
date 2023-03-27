@@ -90,6 +90,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
@@ -102,6 +103,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 @ServiceTestAnnotations
 @WithMockUser
 public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private SampleFilesDialogPresenter presenter;
   @Mock
@@ -114,6 +117,10 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private AuthenticatedUser authenticatedUser;
   @MockBean
   private AppConfiguration configuration;
+  @Autowired
+  private ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
+  @MockBean
+  private AddSampleFilesDialog addFilesDialog;
   @Captor
   private ArgumentCaptor<Sample> sampleCaptor;
   @Captor
@@ -125,8 +132,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private SampleRepository repository;
   @Mock
   private VaadinSession session;
-  @TempDir
-  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -150,7 +155,7 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     dialog.files = new Grid<>();
     dialog.delete = dialog.files.addColumn(file -> file);
     dialog.filenameEdit = new TextField();
-    dialog.addFilesDialog = mock(AddSampleFilesDialog.class);
+    dialog.addFilesDialogFactory = addFilesDialogFactory;
     files.add(new File("sample_R1.fastq"));
     files.add(new File("sample_R2.fastq"));
     files.add(new File("sample.bw"));
@@ -290,7 +295,6 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
     }
     assertTrue(dialog.delete.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
-    verify(dialog.addFilesDialog).setSample(sample);
   }
 
   @Test
@@ -461,7 +465,9 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog).open();
+    verify(addFilesDialog).setSample(sample);
+    verify(addFilesDialog).addSavedListener(any());
+    verify(addFilesDialog).open();
   }
 
   @Test
@@ -472,7 +478,9 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog, never()).open();
+    verify(addFilesDialog, never()).setSample(any());
+    verify(addFilesDialog, never()).addSavedListener(any());
+    verify(addFilesDialog, never()).open();
   }
 
   @Test
@@ -482,23 +490,28 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog, never()).open();
+    verify(addFilesDialog, never()).setSample(any());
+    verify(addFilesDialog, never()).addSavedListener(any());
+    verify(addFilesDialog, never()).open();
   }
 
   @Test
   public void add_NoSample() {
     presenter.addLargeFiles();
 
-    verify(dialog.addFilesDialog, never()).open();
+    verify(addFilesDialog, never()).setSample(any());
+    verify(addFilesDialog, never()).addSavedListener(any());
+    verify(addFilesDialog, never()).open();
   }
 
   @Test
   public void add_Saved() {
     Sample sample = repository.findById(1L).get();
     presenter.setSample(sample);
-    verify(dialog.addFilesDialog).addSavedListener(savedListenerCaptor.capture());
+    presenter.addLargeFiles();
+    verify(addFilesDialog).addSavedListener(savedListenerCaptor.capture());
 
-    savedListenerCaptor.getValue().onComponentEvent(new SavedEvent<>(dialog.addFilesDialog, false));
+    savedListenerCaptor.getValue().onComponentEvent(new SavedEvent<>(addFilesDialog, false));
 
     verify(service, atLeast(2)).files(sample);
   }

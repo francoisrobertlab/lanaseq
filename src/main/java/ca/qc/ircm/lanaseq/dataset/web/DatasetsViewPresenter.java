@@ -65,8 +65,6 @@ public class DatasetsViewPresenter {
 
   void init(DatasetsView view) {
     this.view = view;
-    view.dialog.addSavedListener(e -> view.datasets.refreshDatasets());
-    view.dialog.addDeletedListener(e -> view.datasets.refreshDatasets());
     clearError();
   }
 
@@ -80,8 +78,11 @@ public class DatasetsViewPresenter {
 
   void view(Dataset dataset) {
     clearError();
-    view.dialog.setDataset(service.get(dataset.getId()).orElse(null));
-    view.dialog.open();
+    DatasetDialog dialog = view.dialogFactory.getObject();
+    dialog.setDataset(service.get(dataset.getId()).orElse(null));
+    dialog.addSavedListener(e -> view.datasets.refreshDatasets());
+    dialog.addDeletedListener(e -> view.datasets.refreshDatasets());
+    dialog.open();
   }
 
   void viewFiles() {
@@ -103,8 +104,9 @@ public class DatasetsViewPresenter {
   }
 
   void viewFiles(Dataset dataset) {
-    view.filesDialog.setDataset(dataset);
-    view.filesDialog.open();
+    DatasetFilesDialog filesDialog = view.filesDialogFactory.getObject();
+    filesDialog.setDataset(dataset);
+    filesDialog.open();
   }
 
   void analyze() {
@@ -117,8 +119,9 @@ public class DatasetsViewPresenter {
     }
     view.error.setVisible(error);
     if (!error) {
-      view.analysisDialog.setDatasets(datasets);
-      view.analysisDialog.open();
+      DatasetsAnalysisDialog analysisDialog = view.analysisDialogFactory.getObject();
+      analysisDialog.setDatasets(datasets);
+      analysisDialog.open();
     }
   }
 

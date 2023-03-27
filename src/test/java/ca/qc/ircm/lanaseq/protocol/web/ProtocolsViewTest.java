@@ -67,7 +67,6 @@ import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -83,7 +82,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -95,6 +96,10 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   private ProtocolsView view;
   @Mock
   private ProtocolsViewPresenter presenter;
+  @MockBean
+  private ObjectFactory<ProtocolDialog> dialogFactory;
+  @MockBean
+  private ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
   @Captor
   private ArgumentCaptor<ValueProvider<Protocol, String>> valueProviderCaptor;
   @Captor
@@ -117,7 +122,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new ProtocolsView(presenter, new ProtocolDialog(), new ProtocolHistoryDialog());
+    view = new ProtocolsView(presenter, dialogFactory, historyDialogFactory);
     view.init();
     protocols = protocolRepository.findAll();
   }

@@ -71,7 +71,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
@@ -86,6 +85,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
@@ -98,6 +98,12 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   private SamplesView view;
   @Mock
   private SamplesViewPresenter presenter;
+  @Autowired
+  private ObjectFactory<SampleDialog> dialogFactory;
+  @Autowired
+  private ObjectFactory<SampleFilesDialog> filesDialogFactory;
+  @Autowired
+  private ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
   @Captor
@@ -120,8 +126,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new SamplesView(presenter, new SampleDialog(), new SampleFilesDialog(),
-        new SamplesAnalysisDialog());
+    view = new SamplesView(presenter, dialogFactory, filesDialogFactory, analysisDialogFactory);
     view.init();
     samples = sampleRepository.findAll();
   }

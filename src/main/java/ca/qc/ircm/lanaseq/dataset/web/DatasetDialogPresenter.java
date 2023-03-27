@@ -32,6 +32,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
@@ -79,7 +80,6 @@ public class DatasetDialogPresenter {
   void init(DatasetDialog dialog) {
     this.dialog = dialog;
     dialog.tags.setTagSuggestions(service.topTags(50));
-    dialog.selectSampleDialog.addSelectedListener(e -> addSample(e.getSelection()));
     dialog.error.setVisible(false);
     localeChange(Constants.DEFAULT_LOCALE);
     setDataset(null);
@@ -149,7 +149,9 @@ public class DatasetDialogPresenter {
   }
 
   void addSample() {
-    dialog.selectSampleDialog.open();
+    SelectSampleDialog selectSampleDialog = dialog.selectSampleDialogFactory.getObject();
+    selectSampleDialog.addSelectedListener(e -> addSample(e.getSelection()));
+    selectSampleDialog.open();
   }
 
   private void addSample(Sample sample) {

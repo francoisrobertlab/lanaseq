@@ -66,8 +66,6 @@ public class ProtocolsViewPresenter {
     }
     view.history.setVisible(manager);
     loadProtocols();
-    view.dialog.addSavedListener(e -> loadProtocols());
-    view.dialog.addDeletedListener(e -> loadProtocols());
   }
 
   void localeChange(Locale locale) {
@@ -83,8 +81,15 @@ public class ProtocolsViewPresenter {
   }
 
   void edit(Protocol protocol) {
-    view.dialog.setProtocol(service.get(protocol.getId()).orElse(null));
-    view.dialog.open();
+    showDialog(service.get(protocol.getId()).orElse(null));
+  }
+
+  private void showDialog(Protocol protocol) {
+    ProtocolDialog dialog = view.dialogFactory.getObject();
+    dialog.setProtocol(protocol);
+    dialog.addSavedListener(e -> loadProtocols());
+    dialog.addDeletedListener(e -> loadProtocols());
+    dialog.open();
   }
 
   void history() {
@@ -107,14 +112,14 @@ public class ProtocolsViewPresenter {
 
   void history(Protocol protocol) {
     if (authenticatedUser.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
-      view.historyDialog.setProtocol(service.get(protocol.getId()).orElse(null));
-      view.historyDialog.open();
+      ProtocolHistoryDialog historyDialog = view.historyDialogFactory.getObject();
+      historyDialog.setProtocol(service.get(protocol.getId()).orElse(null));
+      historyDialog.open();
     }
   }
 
   void add() {
-    view.dialog.setProtocol(new Protocol());
-    view.dialog.open();
+    showDialog(new Protocol());
   }
 
   void filterName(String value) {

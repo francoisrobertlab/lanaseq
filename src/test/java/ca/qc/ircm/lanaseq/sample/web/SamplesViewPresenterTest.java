@@ -59,7 +59,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -72,6 +71,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -94,6 +94,18 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   private DatasetService datasetService;
   @MockBean
   private AuthenticatedUser authenticatedUser;
+  @Autowired
+  private ObjectFactory<SampleDialog> dialogFactory;
+  @MockBean
+  private SampleDialog dialog;
+  @Autowired
+  private ObjectFactory<SampleFilesDialog> filesDialogFactory;
+  @MockBean
+  private SampleFilesDialog filesDialog;
+  @Autowired
+  private ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
+  @MockBean
+  private SamplesAnalysisDialog analysisDialog;
   @Mock
   private ListDataProvider<Sample> dataProvider;
   @Captor
@@ -138,9 +150,9 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.merge = new Button();
     view.files = new Button();
     view.analyze = new Button();
-    view.dialog = mock(SampleDialog.class);
-    view.filesDialog = mock(SampleFilesDialog.class);
-    view.analysisDialog = mock(SamplesAnalysisDialog.class);
+    view.dialogFactory = dialogFactory;
+    view.filesDialogFactory = filesDialogFactory;
+    view.analysisDialogFactory = analysisDialogFactory;
     samples = repository.findAll();
     when(service.all(any())).thenReturn(new ArrayList<>(samples));
     when(service.count(any())).thenReturn((long) samples.size());
@@ -267,8 +279,10 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     when(service.get(any())).thenReturn(Optional.of(databaseSample));
     presenter.view(sample);
     verify(service).get(2L);
-    verify(view.dialog).setSample(databaseSample);
-    verify(view.dialog).open();
+    verify(dialog).setSample(databaseSample);
+    verify(dialog).addSavedListener(any());
+    verify(dialog).addDeletedListener(any());
+    verify(dialog).open();
   }
 
   @Test
@@ -277,8 +291,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.samples.select(sample);
     presenter.viewFiles();
     assertFalse(view.error.isVisible());
-    verify(view.filesDialog).setSample(sample);
-    verify(view.filesDialog).open();
+    verify(filesDialog).setSample(sample);
+    verify(filesDialog).open();
   }
 
   @Test
@@ -286,8 +300,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
-    verify(view.filesDialog, never()).setSample(any());
-    verify(view.filesDialog, never()).open();
+    verify(filesDialog, never()).setSample(any());
+    verify(filesDialog, never()).open();
   }
 
   @Test
@@ -297,16 +311,16 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_MORE_THAN_ONE), view.error.getText());
-    verify(view.filesDialog, never()).setSample(any());
-    verify(view.filesDialog, never()).open();
+    verify(filesDialog, never()).setSample(any());
+    verify(filesDialog, never()).open();
   }
 
   @Test
   public void viewFiles_Sample() {
     Sample sample = samples.get(0);
     presenter.viewFiles(sample);
-    verify(view.filesDialog).setSample(sample);
-    verify(view.filesDialog).open();
+    verify(filesDialog).setSample(sample);
+    verify(filesDialog).open();
   }
 
   @Test
@@ -315,10 +329,10 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.samples.select(sample);
     presenter.analyze();
     assertFalse(view.error.isVisible());
-    verify(view.analysisDialog).setSamples(sampleListCaptor.capture());
+    verify(analysisDialog).setSamples(sampleListCaptor.capture());
     assertEquals(1, sampleListCaptor.getValue().size());
     assertTrue(sampleListCaptor.getValue().contains(sample));
-    verify(view.analysisDialog).open();
+    verify(analysisDialog).open();
   }
 
   @Test
@@ -326,8 +340,8 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     presenter.analyze();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
-    verify(view.analysisDialog, never()).setSample(any());
-    verify(view.analysisDialog, never()).open();
+    verify(analysisDialog, never()).setSample(any());
+    verify(analysisDialog, never()).open();
   }
 
   @Test
@@ -336,18 +350,20 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
     view.samples.select(samples.get(1));
     presenter.analyze();
     assertFalse(view.error.isVisible());
-    verify(view.analysisDialog).setSamples(sampleListCaptor.capture());
+    verify(analysisDialog).setSamples(sampleListCaptor.capture());
     assertEquals(2, sampleListCaptor.getValue().size());
     assertTrue(sampleListCaptor.getValue().contains(samples.get(0)));
     assertTrue(sampleListCaptor.getValue().contains(samples.get(1)));
-    verify(view.analysisDialog).open();
+    verify(analysisDialog).open();
   }
 
   @Test
   public void add() {
     presenter.add();
-    verify(view.dialog).setSample(null);
-    verify(view.dialog).open();
+    verify(dialog).setSample(null);
+    verify(dialog).addSavedListener(any());
+    verify(dialog).addDeletedListener(any());
+    verify(dialog).open();
   }
 
   @Test
@@ -438,8 +454,11 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnSaved() {
+    Sample sample = mock(Sample.class);
+    when(service.get(any())).thenReturn(Optional.of(sample));
+    presenter.view(sample);
     view.samples.setItems(dataProvider);
-    verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
+    verify(dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<SampleDialog>> savedListener = savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
     verify(dataProvider).refreshAll();
@@ -448,8 +467,11 @@ public class SamplesViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshSamplesOnDeleted() {
+    Sample sample = mock(Sample.class);
+    when(service.get(any())).thenReturn(Optional.of(sample));
+    presenter.view(sample);
     view.samples.setItems(dataProvider);
-    verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
+    verify(dialog).addDeletedListener(deletedListenerCaptor.capture());
     ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener =
         deletedListenerCaptor.getValue();
     deletedListener.onComponentEvent(mock(DeletedEvent.class));

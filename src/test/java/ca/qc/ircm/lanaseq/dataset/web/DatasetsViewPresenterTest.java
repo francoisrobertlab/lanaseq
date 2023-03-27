@@ -62,6 +62,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -84,6 +85,18 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   private SampleService sampleService;
   @MockBean
   private AuthenticatedUser authenticatedUser;
+  @Autowired
+  private ObjectFactory<DatasetDialog> dialogFactory;
+  @MockBean
+  private DatasetDialog dialog;
+  @Autowired
+  private ObjectFactory<DatasetFilesDialog> filesDialogFactory;
+  @MockBean
+  private DatasetFilesDialog filesDialog;
+  @Autowired
+  private ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory;
+  @MockBean
+  private DatasetsAnalysisDialog analysisDialog;
   @Mock
   private DataProvider<Dataset, ?> dataProvider;
   @Captor
@@ -120,9 +133,9 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.datasets = new DatasetGrid();
     view.datasets.setSelectionMode(SelectionMode.MULTI);
     view.error = new Div();
-    view.dialog = mock(DatasetDialog.class);
-    view.filesDialog = mock(DatasetFilesDialog.class);
-    view.analysisDialog = mock(DatasetsAnalysisDialog.class);
+    view.dialogFactory = dialogFactory;
+    view.filesDialogFactory = filesDialogFactory;
+    view.analysisDialogFactory = analysisDialogFactory;
     datasets = repository.findAll();
     view.datasets.setItems(datasets);
     currentUser = userRepository.findById(3L).orElse(null);
@@ -152,8 +165,10 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     when(service.get(any())).thenReturn(Optional.of(databaseDataset));
     presenter.view(dataset);
     verify(service).get(2L);
-    verify(view.dialog).setDataset(databaseDataset);
-    verify(view.dialog).open();
+    verify(dialog).setDataset(databaseDataset);
+    verify(dialog).addSavedListener(any());
+    verify(dialog).addDeletedListener(any());
+    verify(dialog).open();
   }
 
   @Test
@@ -162,8 +177,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.datasets.select(dataset);
     presenter.viewFiles();
     assertFalse(view.error.isVisible());
-    verify(view.filesDialog).setDataset(dataset);
-    verify(view.filesDialog).open();
+    verify(filesDialog).setDataset(dataset);
+    verify(filesDialog).open();
   }
 
   @Test
@@ -171,8 +186,8 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
-    verify(view.filesDialog, never()).setDataset(any());
-    verify(view.filesDialog, never()).open();
+    verify(filesDialog, never()).setDataset(any());
+    verify(filesDialog, never()).open();
   }
 
   @Test
@@ -182,16 +197,16 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     presenter.viewFiles();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_MORE_THAN_ONE), view.error.getText());
-    verify(view.filesDialog, never()).setDataset(any());
-    verify(view.filesDialog, never()).open();
+    verify(filesDialog, never()).setDataset(any());
+    verify(filesDialog, never()).open();
   }
 
   @Test
   public void viewFiles_Dataset() {
     Dataset dataset = datasets.get(0);
     presenter.viewFiles(dataset);
-    verify(view.filesDialog).setDataset(dataset);
-    verify(view.filesDialog).open();
+    verify(filesDialog).setDataset(dataset);
+    verify(filesDialog).open();
   }
 
   @Test
@@ -341,11 +356,11 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.datasets.select(dataset);
     presenter.analyze();
     assertFalse(view.error.isVisible());
-    verify(view.analysisDialog).setDatasets(datasetsCaptor.capture());
+    verify(analysisDialog).setDatasets(datasetsCaptor.capture());
     List<Dataset> datasets = datasetsCaptor.getValue();
     assertEquals(1, datasets.size());
     assertTrue(datasets.contains(dataset));
-    verify(view.analysisDialog).open();
+    verify(analysisDialog).open();
   }
 
   @Test
@@ -354,20 +369,20 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
     view.datasets.select(datasets.get(1));
     presenter.analyze();
     assertFalse(view.error.isVisible());
-    verify(view.analysisDialog).setDatasets(datasetsCaptor.capture());
+    verify(analysisDialog).setDatasets(datasetsCaptor.capture());
     List<Dataset> datasets = datasetsCaptor.getValue();
     assertEquals(2, datasets.size());
     assertTrue(datasets.contains(datasets.get(0)));
     assertTrue(datasets.contains(datasets.get(1)));
-    verify(view.analysisDialog).open();
+    verify(analysisDialog).open();
   }
 
   @Test
   public void analyze_NoSelection() {
     datasets.clear();
     presenter.analyze();
-    verify(view.analysisDialog, never()).setDatasets(any());
-    verify(view.analysisDialog, never()).open();
+    verify(analysisDialog, never()).setDatasets(any());
+    verify(analysisDialog, never()).open();
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
   }
@@ -384,8 +399,12 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnSaved() {
+    Dataset dataset = mock(Dataset.class);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
     view.datasets = mock(DatasetGrid.class);
-    verify(view.dialog).addSavedListener(savedListenerCaptor.capture());
+    presenter.view(dataset);
+
+    verify(dialog).addSavedListener(savedListenerCaptor.capture());
     ComponentEventListener<SavedEvent<DatasetDialog>> savedListener =
         savedListenerCaptor.getValue();
     savedListener.onComponentEvent(mock(SavedEvent.class));
@@ -395,8 +414,12 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @Test
   @SuppressWarnings("unchecked")
   public void refreshDatasetsOnDeleted() {
+    Dataset dataset = mock(Dataset.class);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
     view.datasets = mock(DatasetGrid.class);
-    verify(view.dialog).addDeletedListener(deletedListenerCaptor.capture());
+    presenter.view(dataset);
+
+    verify(dialog).addDeletedListener(deletedListenerCaptor.capture());
     ComponentEventListener<DeletedEvent<DatasetDialog>> deletedListener =
         deletedListenerCaptor.getValue();
     deletedListener.onComponentEvent(mock(DeletedEvent.class));

@@ -54,6 +54,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -96,9 +97,9 @@ public class DatasetFilesDialog extends Dialog
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
   @Autowired
-  protected AddDatasetFilesDialog addFilesDialog;
+  protected ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory;
   @Autowired
-  protected SampleFilesDialog sampleFilesDialog;
+  protected ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
   @Autowired
   private transient DatasetFilesDialogPresenter presenter;
 
@@ -106,9 +107,10 @@ public class DatasetFilesDialog extends Dialog
   }
 
   protected DatasetFilesDialog(DatasetFilesDialogPresenter presenter,
-      AddDatasetFilesDialog addFilesDialog, SampleFilesDialog sampleFilesDialog) {
-    this.addFilesDialog = addFilesDialog;
-    this.sampleFilesDialog = sampleFilesDialog;
+      ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory,
+      ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory) {
+    this.addFilesDialogFactory = addFilesDialogFactory;
+    this.sampleFilesDialogFactory = sampleFilesDialogFactory;
     this.presenter = presenter;
   }
 

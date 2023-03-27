@@ -77,8 +77,6 @@ public class SamplesViewPresenter {
       authenticatedUser.getUser().ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
     }
     loadSamples();
-    view.dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
-    view.dialog.addDeletedListener(e -> view.samples.getDataProvider().refreshAll());
   }
 
   void localeChange(Locale locale) {
@@ -106,13 +104,21 @@ public class SamplesViewPresenter {
   }
 
   void view(Sample sample) {
-    view.dialog.setSample(service.get(sample.getId()).orElse(null));
-    view.dialog.open();
+    showDialog(service.get(sample.getId()).orElse(null));
+  }
+
+  private void showDialog(Sample sample) {
+    SampleDialog dialog = view.dialogFactory.getObject();
+    dialog.setSample(sample);
+    dialog.addSavedListener(e -> view.samples.getDataProvider().refreshAll());
+    dialog.addDeletedListener(e -> view.samples.getDataProvider().refreshAll());
+    dialog.open();
   }
 
   void viewFiles(Sample sample) {
-    view.filesDialog.setSample(sample);
-    view.filesDialog.open();
+    SampleFilesDialog filesDialog = view.filesDialogFactory.getObject();
+    filesDialog.setSample(sample);
+    filesDialog.open();
   }
 
   void viewFiles() {
@@ -143,14 +149,14 @@ public class SamplesViewPresenter {
     }
     view.error.setVisible(error);
     if (!error) {
-      view.analysisDialog.setSamples(samples);
-      view.analysisDialog.open();
+      SamplesAnalysisDialog analysisDialog = view.analysisDialogFactory.getObject();
+      analysisDialog.setSamples(samples);
+      analysisDialog.open();
     }
   }
 
   void add() {
-    view.dialog.setSample(null);
-    view.dialog.open();
+    showDialog(null);
   }
 
   void merge() {

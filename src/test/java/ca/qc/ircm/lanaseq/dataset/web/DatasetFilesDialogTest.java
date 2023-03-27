@@ -95,6 +95,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -109,9 +110,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetFilesDialogPresenter presenter;
   @MockBean
-  private AddDatasetFilesDialog addFilesDialog;
+  private ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory;
   @MockBean
-  private SampleFilesDialog sampleFilesDialog;
+  private ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
   @Mock
   private Dataset dataset;
   @Captor
@@ -147,7 +148,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog = new DatasetFilesDialog(presenter, addFilesDialog, sampleFilesDialog);
+    dialog = new DatasetFilesDialog(presenter, addFilesDialogFactory, sampleFilesDialogFactory);
     dialog.init();
     files.add(new File("dataset", "dataset_R1.fastq"));
     files.add(new File("dataset", "dataset_R2.fastq"));

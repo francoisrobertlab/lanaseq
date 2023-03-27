@@ -98,7 +98,6 @@ public class SampleFilesDialogPresenter {
     this.dialog = dialog;
     this.authentication = SecurityContextHolder.getContext().getAuthentication();
     dialog.files.getEditor().setBinder(fileBinder);
-    dialog.addFilesDialog.addSavedListener(e -> updateFiles());
     localeChange(Constants.DEFAULT_LOCALE);
   }
 
@@ -140,8 +139,8 @@ public class SampleFilesDialogPresenter {
   }
 
   private void updateFiles() {
-    dialog.files
-        .setItems(service.files(sample).stream().map(file -> new EditableFile(file.toFile())).collect(Collectors.toList()));
+    dialog.files.setItems(service.files(sample).stream()
+        .map(file -> new EditableFile(file.toFile())).collect(Collectors.toList()));
   }
 
   boolean isReadOnly() {
@@ -180,7 +179,10 @@ public class SampleFilesDialogPresenter {
 
   void addLargeFiles() {
     if (!isReadOnly()) {
-      dialog.addFilesDialog.open();
+      AddSampleFilesDialog addFilesDialog = dialog.addFilesDialogFactory.getObject();
+      addFilesDialog.setSample(sample);
+      addFilesDialog.addSavedListener(e -> updateFiles());
+      addFilesDialog.open();
     }
   }
 
@@ -227,7 +229,6 @@ public class SampleFilesDialogPresenter {
     boolean readOnly = isReadOnly();
     fileBinder.setReadOnly(readOnly);
     dialog.delete.setVisible(!readOnly);
-    dialog.addFilesDialog.setSample(sample);
     updateMessage();
     updateFiles();
   }

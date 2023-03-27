@@ -85,6 +85,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -99,7 +100,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   @MockBean
   private SampleFilesDialogPresenter presenter;
   @MockBean
-  private AddSampleFilesDialog addFilesDialog;
+  private ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
   @Mock
   private Sample sample;
   @Captor
@@ -127,7 +128,7 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog = new SampleFilesDialog(addFilesDialog, presenter);
+    dialog = new SampleFilesDialog(addFilesDialogFactory, presenter);
     dialog.init();
     files.add(new File("sample", "sample_R1.fastq"));
     files.add(new File("sample", "sample_R2.fastq"));
