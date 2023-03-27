@@ -53,7 +53,6 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
@@ -215,11 +214,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Configure the login page.
         .and().formLogin().loginPage(SIGNIN_URL).permitAll()
-        .loginProcessingUrl(SIGNIN_PROCESSING_URL).failureHandler(authenticationFailureHandler())
-
-        // Register the success handler that redirects users to the page they last tried
-        // to access
-        .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+        .loginProcessingUrl(SIGNIN_PROCESSING_URL).successForwardUrl("/")
+        .failureHandler(authenticationFailureHandler())
 
         // Remember me
         .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());
