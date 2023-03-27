@@ -63,6 +63,7 @@ public class TestBenchSecurityFilter extends GenericFilterBean
     HttpServletResponse response = (HttpServletResponse) res;
     if (copyAuthenticationOnFilter && authentication != null) {
       logger.debug("set authentication {} in security context", authentication);
+      copyAuthenticationOnFilter = false;
       SecurityContext securityContext = repo.loadContext(request).get();
       securityContext.setAuthentication(authentication);
       repo.saveContext(securityContext, request, response);
