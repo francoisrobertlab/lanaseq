@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DateRangeField.Dates;
 import com.google.common.collect.Range;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -49,11 +49,13 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link DateRangeField}.
  */
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DateRangeFieldTest extends AbstractKaribuTestCase {
   private DateRangeField dateRange;
   @Mock

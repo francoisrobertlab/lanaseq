@@ -44,11 +44,13 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 
 /**
  * Tests for {@link UseForgotPasswordView}.
  */
 @ServiceTestAnnotations
+@WithAnonymousUser
 public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
   private UseForgotPasswordView view;
   @Mock

@@ -86,14 +86,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link AddSampleFilesDialog}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
+  @TempDir
+  Path temporaryFolder;
   private AddSampleFilesDialog dialog;
   @Mock
   private AddSampleFilesDialogPresenter presenter;
@@ -111,8 +113,6 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
   private ComponentEventListener<SavedEvent<AddSampleFilesDialog>> savedListener;
   @Autowired
   private SampleRepository sampleRepository;
-  @TempDir
-  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);

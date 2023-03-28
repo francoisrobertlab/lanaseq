@@ -48,11 +48,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link UserDialog}.
  */
 @ServiceTestAnnotations
+@WithUserDetails("lanaseq@ircm.qc.ca")
 public class UserDialogTest extends AbstractKaribuTestCase {
   private UserDialog dialog;
   private UserForm form;

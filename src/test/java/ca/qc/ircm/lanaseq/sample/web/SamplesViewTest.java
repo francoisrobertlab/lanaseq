@@ -87,13 +87,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link SamplesView}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewTest extends AbstractKaribuTestCase {
   private SamplesView view;
   @Mock

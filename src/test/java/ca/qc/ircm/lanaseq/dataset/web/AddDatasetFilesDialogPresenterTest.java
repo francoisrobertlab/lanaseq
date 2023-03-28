@@ -70,14 +70,16 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link AddDatasetFilesDialogPresenter}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private AddDatasetFilesDialogPresenter presenter;
   @Mock
@@ -97,8 +99,6 @@ public class AddDatasetFilesDialogPresenterTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<Command> commandCaptor;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
-  @TempDir
-  Path temporaryFolder;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
   private Path folder;

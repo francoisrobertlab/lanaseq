@@ -95,13 +95,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link SampleFilesDialogPresenter}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @TempDir
   Path temporaryFolder;

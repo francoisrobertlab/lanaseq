@@ -61,14 +61,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
  * Tests for {@link ViewLayout}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ViewLayoutTest extends AbstractKaribuTestCase {
   private ViewLayout view;
   @Mock

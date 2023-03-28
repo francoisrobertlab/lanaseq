@@ -21,13 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link UrlComponent}.
  */
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class UrlComponentTest extends AbstractKaribuTestCase {
   private UrlComponentForTest urlComponent = new UrlComponentForTest();
 

@@ -51,7 +51,6 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -64,13 +63,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link ProtocolHistoryDialog}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
   private ProtocolHistoryDialog dialog;
   @Mock
@@ -118,8 +117,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.recover = mock(Column.class);
-    when(dialog.files.addColumn(any(LitRenderer.class), eq(RECOVER)))
-        .thenReturn(dialog.recover);
+    when(dialog.files.addColumn(any(LitRenderer.class), eq(RECOVER))).thenReturn(dialog.recover);
     when(dialog.recover.setKey(any())).thenReturn(dialog.recover);
     when(dialog.recover.setHeader(any(String.class))).thenReturn(dialog.recover);
   }

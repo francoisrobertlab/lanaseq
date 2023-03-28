@@ -70,13 +70,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link DatasetsAnalysisDialogPresenter}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private DatasetsAnalysisDialogPresenter presenter;

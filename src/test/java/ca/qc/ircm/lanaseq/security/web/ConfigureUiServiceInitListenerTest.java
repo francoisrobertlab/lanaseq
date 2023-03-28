@@ -49,13 +49,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link ConfigureUiServiceInitListener}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListenerTest.class);

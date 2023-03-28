@@ -41,11 +41,13 @@ import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link PasswordsForm}.
  */
 @ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PasswordsFormTest extends AbstractKaribuTestCase {
   private PasswordsForm form;
   private Locale locale = Locale.ENGLISH;

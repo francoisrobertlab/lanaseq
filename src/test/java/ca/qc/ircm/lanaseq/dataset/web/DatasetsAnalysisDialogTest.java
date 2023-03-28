@@ -44,13 +44,13 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link DatasetsAnalysisDialog}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
   private DatasetsAnalysisDialog dialog;
   @Mock

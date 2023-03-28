@@ -90,11 +90,13 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link UsersView}.
  */
 @ServiceTestAnnotations
+@WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewTest extends AbstractKaribuTestCase {
   private UsersView view;
   @Mock

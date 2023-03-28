@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -45,11 +45,13 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link TagsField}.
  */
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class TagsFieldTest extends AbstractKaribuTestCase {
   private TagsField tagsField;
   @Mock

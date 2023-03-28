@@ -98,13 +98,13 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link DatasetFilesDialog}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   private DatasetFilesDialog dialog;
   @MockBean

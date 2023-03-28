@@ -30,18 +30,18 @@ import static org.mockito.Mockito.mock;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link AccessDeniedView}.
  */
-@NonTransactionalTestAnnotations
-@WithMockUser
+@ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AccessDeniedViewTest extends AbstractKaribuTestCase {
   private AccessDeniedView view;
   private Locale locale = Locale.ENGLISH;

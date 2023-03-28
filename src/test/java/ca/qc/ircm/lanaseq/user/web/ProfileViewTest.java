@@ -43,11 +43,13 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link ProfileView}.
  */
 @ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProfileViewTest extends AbstractKaribuTestCase {
   private ProfileView view;
   private UserForm form;

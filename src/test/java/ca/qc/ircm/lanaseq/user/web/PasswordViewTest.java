@@ -40,11 +40,13 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link PasswordView}.
  */
 @ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PasswordViewTest extends AbstractKaribuTestCase {
   private PasswordView view;
   @Mock

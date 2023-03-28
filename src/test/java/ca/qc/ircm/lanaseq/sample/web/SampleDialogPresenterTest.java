@@ -17,8 +17,8 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
@@ -68,13 +68,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link SampleDialogPresenter}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private SampleDialogPresenter presenter;
@@ -391,6 +391,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
       assertEquals(this.protocols.get(i), protocols.get(i));
     }
   }
+
   @Test
   public void assays() {
     List<String> assays = items(dialog.assay);
@@ -504,6 +505,7 @@ public class SampleDialogPresenterTest extends AbstractKaribuTestCase {
     verify(dialog, never()).close();
     verify(dialog, never()).fireSavedEvent();
   }
+
   @Test
   public void save_AssayNew() {
     fillForm();

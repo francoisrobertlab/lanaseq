@@ -20,16 +20,18 @@ package ca.qc.ircm.lanaseq.web.component;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
-import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link NotificationComponent}.
  */
-@NonTransactionalTestAnnotations
+@ServiceTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class NotificationComponentTest extends AbstractKaribuTestCase {
   private NotificationComponentForTest notificationComponent = new NotificationComponentForTest();
 

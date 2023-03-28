@@ -40,7 +40,6 @@ import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,13 +52,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link DatasetGridPresenter}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetGridPresenterTest extends AbstractKaribuTestCase {
   @Autowired
   private DatasetGridPresenter presenter;
