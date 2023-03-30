@@ -74,7 +74,7 @@ public class SampleFilesDialog extends Dialog
   public static final String ADD_LARGE_FILES = "addLargeFiles";
   public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");
   public static final String FILES_SUCCESS = property(FILES, "success");
-  public static final int MAXIMUM_SMALL_FILES_SIZE = 20 * 1024 * 1024; // 20MB
+  public static final int MAXIMUM_SMALL_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
   private static final long serialVersionUID = 166699830639260659L;
   protected H3 header = new H3();

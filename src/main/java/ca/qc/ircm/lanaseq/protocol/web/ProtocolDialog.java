@@ -85,7 +85,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final String FILES_REQUIRED = property(FILES, REQUIRED);
   public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");
   public static final String FILES_OVER_MAXIMUM = property(FILES, "overmaximum");
-  public static final int MAXIMUM_FILES_SIZE = 20 * 1024 * 1024; // 20MB
+  public static final int MAXIMUM_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_FILES_COUNT = 6;
   public static final String REMOVE_BUTTON = "<vaadin-button class='" + REMOVE + "' theme='"
       + ButtonVariant.LUMO_ERROR.getVariantName() + "' @click='${removeFile}'>"
