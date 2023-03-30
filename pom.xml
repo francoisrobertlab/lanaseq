@@ -17,7 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -69,7 +69,7 @@
   <properties>
     <resource.delimiter>$[*]</resource.delimiter>
     <java.version>11</java.version>
-    <start-class>ca.qc.ircm.proview.Main</start-class>
+    <start-class>ca.qc.ircm.lanaseq.Main</start-class>
     <slow-tests.skip>false</slow-tests.skip>
     <testbench.skip>false</testbench.skip>
     <testbench.maxAttempts>3</testbench.maxAttempts>
