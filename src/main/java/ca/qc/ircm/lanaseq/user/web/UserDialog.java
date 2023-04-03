@@ -31,7 +31,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -53,7 +52,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
   public static final String SAVED = "saved";
   private static final long serialVersionUID = 3285639770914046262L;
   protected UserForm form;
-  protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected Button cancel = new Button();
   private transient UserDialogPresenter presenter;
@@ -80,9 +78,9 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     VerticalLayout layout = new VerticalLayout();
     setWidth("700px");
     add(layout);
-    layout.add(form, buttonsLayout);
+    layout.add(form);
     layout.setSizeFull();
-    buttonsLayout.add(save, cancel);
+    getFooter().add(cancel, save);
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());

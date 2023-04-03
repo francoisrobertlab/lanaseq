@@ -32,7 +32,6 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +76,6 @@ public class UserDialogPresenterTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     presenter = new UserDialogPresenter(userService);
     dialog.form = mock(UserForm.class);
-    dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();
     dialog.cancel = new Button();
     currentUser = userRepository.findById(2L).orElse(null);

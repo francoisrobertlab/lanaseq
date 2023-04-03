@@ -232,6 +232,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
     assertEquals(id(DELETE), dialog.delete.getId().orElse(""));
+    assertEquals("auto", dialog.delete.getStyle().get("margin-inline-end"));
     assertTrue(dialog.delete.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
     validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));

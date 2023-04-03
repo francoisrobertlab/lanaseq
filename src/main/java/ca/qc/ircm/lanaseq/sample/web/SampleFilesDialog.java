@@ -38,8 +38,6 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -115,12 +113,10 @@ public class SampleFilesDialog extends Dialog
     VerticalLayout messageAndFolders = new VerticalLayout(message, folders);
     messageAndFolders.setSpacing(false);
     messageAndFolders.setPadding(false);
-    HorizontalLayout buttonsLayout = new HorizontalLayout();
-    layout.add(messageAndFolders, files, buttonsLayout);
-    buttonsLayout.add(upload, addLargeFiles);
-    buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+    layout.add(messageAndFolders, files);
     layout.setSizeFull();
     layout.expand(files);
+    getFooter().add(upload, addLargeFiles);
     message.setId(id(MESSAGE));
     folders.setId(id(FOLDERS));
     folders.setPadding(false);
@@ -143,7 +139,7 @@ public class SampleFilesDialog extends Dialog
     upload.setId(id(UPLOAD));
     upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
-    upload.setMaxHeight("2.5em"); // Hide name of uploaded files.
+    upload.setMaxHeight("5em"); // Hide name of uploaded files.
     upload.addSucceededListener(event -> presenter.addSmallFile(event.getFileName(),
         uploadBuffer.getInputStream(event.getFileName())));
     addLargeFiles.setId(id(ADD_LARGE_FILES));

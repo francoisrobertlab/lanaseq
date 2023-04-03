@@ -103,9 +103,10 @@ public class AddDatasetFilesDialog extends Dialog
     setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(message, files, error, save);
+    layout.add(message, files, error);
     layout.setSizeFull();
     layout.expand(files);
+    getFooter().add(save);
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
     filename =
