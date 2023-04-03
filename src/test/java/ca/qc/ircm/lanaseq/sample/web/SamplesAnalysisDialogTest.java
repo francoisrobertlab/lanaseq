@@ -28,6 +28,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Arrays;
@@ -80,6 +82,8 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(CREATE_FOLDER), dialog.createFolder.getId().orElse(""));
+    assertTrue(
+        dialog.createFolder.getThemeNames().contains(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
     assertEquals(id(ERRORS), dialog.errors.getId().orElse(""));
     assertEquals(dialog.errorsLayout.getElement(), dialog.errors.getElement().getChild(0));

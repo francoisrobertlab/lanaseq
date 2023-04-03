@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -80,6 +81,7 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
     layout.setSizeFull();
     message.setId(id(MESSAGE));
     createFolder.setId(id(CREATE_FOLDER));
+    createFolder.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     createFolder.addClickListener(e -> presenter.createFolder());
     confirm.setId(id(CONFIRM));
     confirm.addConfirmListener(e -> close());
