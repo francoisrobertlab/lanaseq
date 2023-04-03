@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ERRORS;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.id;
 
@@ -28,7 +27,7 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
-import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -38,8 +37,8 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-dialog")
 @Attribute(name = "id", value = SamplesAnalysisDialog.ID)
 public class SamplesAnalysisDialogElement extends DialogElement {
-  public H3Element header() {
-    return $(H3Element.class).id(id(HEADER));
+  public H2Element header() {
+    return $(H2Element.class).first();
   }
 
   public DivElement message() {

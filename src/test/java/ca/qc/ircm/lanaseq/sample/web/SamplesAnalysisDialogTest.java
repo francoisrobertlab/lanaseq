@@ -78,7 +78,6 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
-    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(CREATE_FOLDER), dialog.createFolder.getId().orElse(""));
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
@@ -89,7 +88,7 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
   @Test
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
     assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
@@ -108,7 +107,7 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
     assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
@@ -144,7 +143,7 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
     when(presenter.getSamples()).thenReturn(Collections.nCopies(1, sample));
     dialog.setSample(sample);
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
   }
 
   @Test
@@ -153,6 +152,6 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
         .thenReturn(Arrays.asList(mock(Sample.class), mock(Sample.class), mock(Sample.class)));
     dialog.setSample(sample);
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 3), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 3), dialog.getHeaderTitle());
   }
 }

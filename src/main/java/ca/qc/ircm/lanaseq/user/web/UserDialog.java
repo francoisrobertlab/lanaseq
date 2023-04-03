@@ -30,7 +30,6 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -49,11 +48,10 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
-  private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "user-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
-  protected H3 header = new H3();
+  private static final long serialVersionUID = 3285639770914046262L;
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
@@ -82,10 +80,9 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     VerticalLayout layout = new VerticalLayout();
     setWidth("700px");
     add(layout);
-    layout.add(header, form, buttonsLayout);
+    layout.add(form, buttonsLayout);
     layout.setSizeFull();
     buttonsLayout.add(save, cancel);
-    header.setId(id(HEADER));
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -108,9 +105,9 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
   private void updateHeader() {
     final AppResources resources = new AppResources(UserDialog.class, getLocale());
     if (form.getUser() != null && form.getUser().getId() != null) {
-      header.setText(resources.message(HEADER, 1, form.getUser().getName()));
+      setHeaderTitle(resources.message(HEADER, 1, form.getUser().getName()));
     } else {
-      header.setText(resources.message(HEADER, 0));
+      setHeaderTitle(resources.message(HEADER, 0));
     }
   }
 

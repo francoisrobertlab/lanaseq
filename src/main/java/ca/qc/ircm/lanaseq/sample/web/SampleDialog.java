@@ -56,7 +56,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -64,8 +63,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
@@ -89,7 +86,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = 166699830639260659L;
-  protected H3 header = new H3();
   protected DatePicker date = new DatePicker();
   protected TextField sampleId = new TextField();
   protected TextField replicate = new TextField();
@@ -137,9 +133,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, form, error, buttons, confirm);
+    layout.add(form, error, buttons, confirm);
     layout.setSizeFull();
-    header.setId(id(HEADER));
     date.setId(id(DATE));
     sampleId.setId(id(SAMPLE_ID));
     replicate.setId(id(REPLICATE));
@@ -148,7 +143,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     protocol.setPreventInvalidInput(true);
     assay.setId(id(ASSAY));
     assay.setAllowCustomValue(true);
-    assay.addCustomValueSetListener(e->assay.setValue(e.getDetail()));
+    assay.addCustomValueSetListener(e -> assay.setValue(e.getDetail()));
     type.setId(id(TYPE));
     type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
     type.setItems(SampleType.values());
@@ -183,7 +178,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     final AppResources resources = new AppResources(SampleDialog.class, getLocale());
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER, 0));
+    setHeaderTitle(resources.message(HEADER, 0));
     date.setLabel(sampleResources.message(DATE));
     date.setI18n(datePickerI18n(getLocale()));
     date.setLocale(Locale.CANADA);
@@ -216,10 +211,10 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     final AppResources resources = new AppResources(SampleDialog.class, getLocale());
     Sample sample = presenter.getSample();
     if (sample != null && sample.getName() != null) {
-      header.setText(resources.message(HEADER, 1, sample.getName()));
+      setHeaderTitle(resources.message(HEADER, 1, sample.getName()));
       confirm.setText(resources.message(DELETE_MESSAGE, sample.getName()));
     } else {
-      header.setText(resources.message(HEADER, 0));
+      setHeaderTitle(resources.message(HEADER, 0));
     }
   }
 

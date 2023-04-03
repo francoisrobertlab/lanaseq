@@ -63,7 +63,6 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -103,7 +102,6 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = 3285639770914046262L;
-  protected H3 header = new H3();
   protected TextField namePrefix = new TextField();
   protected Button generateName = new Button();
   protected TagsField tags = new TagsField();
@@ -168,9 +166,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     endButtons.setWidthFull();
     HorizontalLayout buttons = new HorizontalLayout(new HorizontalLayout(save, cancel), endButtons);
     buttons.setWidthFull();
-    layout.add(header, datasetForm, form, samples, error, buttons, confirm);
+    layout.add(datasetForm, form, samples, error, buttons, confirm);
     layout.setSizeFull();
-    header.setId(id(HEADER));
     namePrefix.setId(id(NAME_PREFIX));
     generateName.setId(id(GENERATE_NAME));
     generateName.addClickListener(e -> presenter.generateName());
@@ -287,10 +284,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
     Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getId() != null) {
-      header.setText(resources.message(HEADER, 1, dataset.getName()));
+      setHeaderTitle(resources.message(HEADER, 1, dataset.getName()));
       confirm.setText(resources.message(DELETE_MESSAGE, dataset.getName()));
     } else {
-      header.setText(resources.message(HEADER, 0));
+      setHeaderTitle(resources.message(HEADER, 0));
     }
   }
 

@@ -31,11 +31,9 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
@@ -61,7 +59,6 @@ public class ProtocolHistoryDialog extends Dialog
       + "<vaadin-icon icon='vaadin:ambulance' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String RECOVERED = "recovered";
   private static final long serialVersionUID = -7797831034001410430L;
-  protected H3 header = new H3();
   protected Grid<ProtocolFile> files = new Grid<>();
   protected Column<ProtocolFile> filename;
   protected Column<ProtocolFile> recover;
@@ -85,19 +82,15 @@ public class ProtocolHistoryDialog extends Dialog
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, files);
+    layout.add(files);
     layout.setSizeFull();
     layout.expand(files);
-    header.setId(id(HEADER));
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
         .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
         .setFlexGrow(10);
-    recover =
-        files
-            .addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
-                .withFunction("recoverFile", file -> presenter.recoverFile(file)), RECOVER)
-            .setKey(RECOVER);
+    recover = files.addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
+        .withFunction("recoverFile", file -> presenter.recoverFile(file)), RECOVER).setKey(RECOVER);
     presenter.init(this);
   }
 
@@ -123,7 +116,7 @@ public class ProtocolHistoryDialog extends Dialog
   private void updateHeader() {
     final AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
     Protocol protocol = presenter.getProtocol();
-    header.setText(resources.message(HEADER,
+    setHeaderTitle(resources.message(HEADER,
         protocol != null && protocol.getId() != null ? protocol.getName() : ""));
   }
 

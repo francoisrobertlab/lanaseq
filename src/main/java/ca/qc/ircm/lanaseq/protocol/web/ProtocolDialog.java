@@ -51,7 +51,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -95,7 +94,6 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = -7797831034001410430L;
-  protected H3 header = new H3();
   protected TextField name = new TextField();
   protected TextArea note = new TextArea();
   protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
@@ -134,10 +132,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     endButtons.setWidthFull();
     HorizontalLayout buttonsLayout = new HorizontalLayout(save, cancel, endButtons);
     buttonsLayout.setWidthFull();
-    layout.add(header, form, upload, files, filesError, buttonsLayout, confirm);
+    layout.add(form, upload, files, filesError, buttonsLayout, confirm);
     layout.setSizeFull();
     layout.expand(files);
-    header.setId(id(HEADER));
     name.setId(id(NAME));
     note.setId(id(NOTE));
     note.setHeight("10em");
@@ -208,10 +205,10 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
     Protocol protocol = presenter.getProtocol();
     if (protocol != null && protocol.getId() != null) {
-      header.setText(resources.message(HEADER, 1, protocol.getName()));
+      setHeaderTitle(resources.message(HEADER, 1, protocol.getName()));
       confirm.setText(resources.message(DELETE_MESSAGE, protocol.getName()));
     } else {
-      header.setText(resources.message(HEADER, 0));
+      setHeaderTitle(resources.message(HEADER, 0));
     }
   }
 

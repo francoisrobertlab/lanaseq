@@ -130,7 +130,6 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
-    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
   }
 
@@ -138,7 +137,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
   public void labels() {
     mockColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+    assertEquals(resources.message(HEADER, ""), dialog.getHeaderTitle());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
     verify(dialog.recover).setHeader(resources.message(RECOVER));
     verify(presenter).localeChange(locale);
@@ -154,7 +153,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+    assertEquals(resources.message(HEADER, ""), dialog.getHeaderTitle());
     verify(dialog.filename).setHeader(protocolFileResources.message(FILENAME));
     verify(dialog.recover).setHeader(resources.message(RECOVER));
     verify(presenter).localeChange(locale);
@@ -214,7 +213,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     dialog.setProtocol(protocol);
 
     verify(presenter).setProtocol(protocol);
-    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+    assertEquals(resources.message(HEADER, ""), dialog.getHeaderTitle());
   }
 
   @Test
@@ -226,7 +225,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     dialog.setProtocol(protocol);
 
     verify(presenter).setProtocol(protocol);
-    assertEquals(resources.message(HEADER, protocol.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
   }
 
   @Test
@@ -238,7 +237,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setProtocol(protocol);
-    assertEquals(resources.message(HEADER, protocol.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
   }
 
   @Test
@@ -247,6 +246,6 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     dialog.setProtocol(null);
 
     verify(presenter).setProtocol(null);
-    assertEquals(resources.message(HEADER, ""), dialog.header.getText());
+    assertEquals(resources.message(HEADER, ""), dialog.getHeaderTitle());
   }
 }

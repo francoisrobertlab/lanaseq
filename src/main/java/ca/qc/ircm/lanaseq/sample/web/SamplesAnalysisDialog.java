@@ -27,7 +27,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -45,14 +44,13 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserver {
-  private static final long serialVersionUID = 3521519771905055445L;
   public static final String ID = "sample-analysis-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
   public static final String CREATE_FOLDER = "createFolder";
   public static final String ERRORS = "errors";
   public static final String CREATE_FOLDER_EXCEPTION = property(CREATE_FOLDER, "exception");
-  protected H3 header = new H3();
+  private static final long serialVersionUID = 3521519771905055445L;
   protected Div message = new Div();
   protected Button createFolder = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
@@ -78,9 +76,8 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, message, createFolder, confirm, errors);
+    layout.add(message, createFolder, confirm, errors);
     layout.setSizeFull();
-    header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     createFolder.setId(id(CREATE_FOLDER));
     createFolder.addClickListener(e -> presenter.createFolder());
@@ -95,7 +92,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   @Override
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
-    header.setText(resources.message(HEADER));
+    setHeaderTitle(resources.message(HEADER));
     message.setText(resources.message(MESSAGE));
     createFolder.setText(resources.message(CREATE_FOLDER));
     confirm.setHeader(resources.message(CONFIRM));
@@ -110,9 +107,9 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     final AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
     Collection<Sample> samples = presenter.getSamples();
     if (samples != null && samples.size() > 1) {
-      header.setText(resources.message(HEADER, samples.size()));
+      setHeaderTitle(resources.message(HEADER, samples.size()));
     } else {
-      header.setText(resources.message(HEADER, samples.size(),
+      setHeaderTitle(resources.message(HEADER, samples.size(),
           samples.stream().findFirst().map(Sample::getName).orElse("")));
     }
   }

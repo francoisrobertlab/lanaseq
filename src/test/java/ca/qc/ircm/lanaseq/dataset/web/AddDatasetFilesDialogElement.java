@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.FILES;
-import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.id;
 
@@ -27,7 +26,7 @@ import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
-import com.vaadin.flow.component.html.testbench.H3Element;
+import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -37,8 +36,8 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-dialog")
 @Attribute(name = "id", value = AddDatasetFilesDialog.ID)
 public class AddDatasetFilesDialogElement extends DialogElement {
-  public H3Element header() {
-    return $(H3Element.class).id(id(HEADER));
+  public H2Element header() {
+    return $(H2Element.class).first();
   }
 
   public DivElement message() {

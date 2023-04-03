@@ -57,7 +57,6 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -128,7 +127,6 @@ public class ProtocolDialogPresenterTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    dialog.header = new H3();
     dialog.name = new TextField();
     dialog.note = new TextArea();
     dialog.uploadBuffer = new MultiFileMemoryBuffer();

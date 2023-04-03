@@ -50,7 +50,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.dialog.GeneratedVaadinDialog.OpenedChangeEvent;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.server.Command;
 import java.io.File;
 import java.nio.file.Files;
@@ -115,7 +114,6 @@ public class AddSampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
   @SuppressWarnings("unchecked")
   public void beforeTest() {
     ui.setLocale(locale);
-    dialog.header = new H3();
     dialog.message = new Div();
     dialog.files = new Grid<>();
     dialog.error = new Div();

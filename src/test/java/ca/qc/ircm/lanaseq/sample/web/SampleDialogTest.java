@@ -124,7 +124,6 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
-    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(DATE), dialog.date.getId().orElse(""));
     assertEquals(id(SAMPLE_ID), dialog.sampleId.getId().orElse(""));
     assertEquals(id(REPLICATE), dialog.replicate.getId().orElse(""));
@@ -157,7 +156,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
   public void labels() {
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
     validateEquals(englishDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
@@ -201,7 +200,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
     validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
@@ -305,7 +304,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
   }
 
   @Test
@@ -318,7 +317,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
     assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
@@ -334,7 +333,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     dialog.setSample(sample);
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
     assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
@@ -350,7 +349,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(presenter).setSample(sample);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
         dialog.confirm.getElement().getProperty("message"));
   }
@@ -361,7 +360,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     dialog.setSample(null);
 
     verify(presenter).setSample(null);
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
   }
 
   @Test

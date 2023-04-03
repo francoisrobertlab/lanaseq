@@ -78,7 +78,6 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
-    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(CREATE_FOLDER), dialog.createFolder.getId().orElse(""));
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
@@ -89,7 +88,7 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
   @Test
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
     assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
@@ -108,7 +107,7 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(DatasetsAnalysisDialog.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
     assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
@@ -144,7 +143,7 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
     when(presenter.getDatasets()).thenReturn(Collections.nCopies(1, dataset));
     dialog.setDataset(dataset);
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.getHeaderTitle());
   }
 
   @Test
@@ -153,6 +152,6 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
         .thenReturn(Arrays.asList(mock(Dataset.class), mock(Dataset.class), mock(Dataset.class)));
     dialog.setDataset(dataset);
     verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, 3), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 3), dialog.getHeaderTitle());
   }
 }

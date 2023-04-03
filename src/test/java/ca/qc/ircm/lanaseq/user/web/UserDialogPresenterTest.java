@@ -32,7 +32,6 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import java.util.Locale;
 import java.util.Optional;
@@ -77,7 +76,6 @@ public class UserDialogPresenterTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     presenter = new UserDialogPresenter(userService);
-    dialog.header = new H3();
     dialog.form = mock(UserForm.class);
     dialog.buttonsLayout = new HorizontalLayout();
     dialog.save = new Button();

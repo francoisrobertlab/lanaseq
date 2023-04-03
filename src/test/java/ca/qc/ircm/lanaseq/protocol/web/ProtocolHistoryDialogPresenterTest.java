@@ -38,7 +38,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.data.provider.DataProviderListener;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,7 +86,6 @@ public class ProtocolHistoryDialogPresenterTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    dialog.header = new H3();
     dialog.files = new Grid<>();
     dialog.filename = dialog.files.addColumn(file -> file.getId(), FILENAME);
     dialog.recover = dialog.files.addColumn(file -> file.getId(), RECOVER);

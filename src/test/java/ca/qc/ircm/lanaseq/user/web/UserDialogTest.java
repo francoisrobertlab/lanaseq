@@ -91,7 +91,6 @@ public class UserDialogTest extends AbstractKaribuTestCase {
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
-    assertEquals(id(HEADER), dialog.header.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     assertEquals(id(CANCEL), dialog.cancel.getId().orElse(""));
@@ -100,7 +99,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
   @Test
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -116,7 +115,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     verify(presenter).localeChange(locale);
@@ -152,7 +151,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.setUser(user);
 
     verify(userFormPresenter).setUser(user);
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
   }
 
   @Test
@@ -164,7 +163,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.setUser(user);
 
     verify(userFormPresenter).setUser(user);
-    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.getHeaderTitle());
   }
 
   @Test
@@ -176,7 +175,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.localeChange(mock(LocaleChangeEvent.class));
 
     verify(userFormPresenter).setUser(user);
-    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.getHeaderTitle());
   }
 
   @Test
@@ -185,7 +184,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.setUser(null);
 
     verify(userFormPresenter).setUser(null);
-    assertEquals(resources.message(HEADER, 0), dialog.header.getText());
+    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
   }
 
   @Test

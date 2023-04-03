@@ -37,7 +37,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -77,7 +76,6 @@ public class SampleFilesDialog extends Dialog
   public static final int MAXIMUM_SMALL_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
   private static final long serialVersionUID = 166699830639260659L;
-  protected H3 header = new H3();
   protected Div message = new Div();
   protected VerticalLayout folders = new VerticalLayout();
   protected Grid<EditableFile> files = new Grid<>();
@@ -118,12 +116,11 @@ public class SampleFilesDialog extends Dialog
     messageAndFolders.setSpacing(false);
     messageAndFolders.setPadding(false);
     HorizontalLayout buttonsLayout = new HorizontalLayout();
-    layout.add(header, messageAndFolders, files, buttonsLayout);
+    layout.add(messageAndFolders, files, buttonsLayout);
     buttonsLayout.add(upload, addLargeFiles);
     buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
     layout.setSizeFull();
     layout.expand(files);
-    header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     folders.setId(id(FOLDERS));
     folders.setPadding(false);
@@ -180,7 +177,7 @@ public class SampleFilesDialog extends Dialog
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER, 0));
+    setHeaderTitle(resources.message(HEADER, 0));
     message.setText("");
     message.setTitle("");
     filename.setHeader(resources.message(FILENAME));
@@ -196,9 +193,9 @@ public class SampleFilesDialog extends Dialog
     final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
     Sample sample = presenter.getSample();
     if (sample != null && sample.getName() != null) {
-      header.setText(resources.message(HEADER, sample.getName()));
+      setHeaderTitle(resources.message(HEADER, sample.getName()));
     } else {
-      header.setText(resources.message(HEADER));
+      setHeaderTitle(resources.message(HEADER));
     }
   }
 

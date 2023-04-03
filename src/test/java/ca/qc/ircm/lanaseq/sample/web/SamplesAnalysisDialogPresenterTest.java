@@ -50,7 +50,6 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.dialog.GeneratedVaadinDialog.OpenedChangeEvent;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.io.IOException;
@@ -107,7 +106,6 @@ public class SamplesAnalysisDialogPresenterTest extends AbstractKaribuTestCase {
     when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     samples.add(repository.findById(4L).get());
     samples.add(repository.findById(10L).get());
-    dialog.header = new H3();
     dialog.message = new Div();
     dialog.createFolder = new Button();
     dialog.confirm = mock(ConfirmDialog.class);

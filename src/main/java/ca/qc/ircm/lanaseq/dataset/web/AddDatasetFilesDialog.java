@@ -37,7 +37,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -74,7 +73,6 @@ public class AddDatasetFilesDialog extends Dialog
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
   private static final long serialVersionUID = 166699830639260659L;
-  protected H3 header = new H3();
   protected Div message = new Div();
   protected Grid<File> files = new Grid<>();
   protected Column<File> filename;
@@ -105,10 +103,9 @@ public class AddDatasetFilesDialog extends Dialog
     setResizable(true);
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    layout.add(header, message, files, error, save);
+    layout.add(message, files, error, save);
     layout.setSizeFull();
     layout.expand(files);
-    header.setId(id(HEADER));
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
     filename =
@@ -159,7 +156,7 @@ public class AddDatasetFilesDialog extends Dialog
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER, 0));
+    setHeaderTitle(resources.message(HEADER, 0));
     message.setText("");
     filename.setHeader(resources.message(FILENAME));
     if (size != null) {
@@ -181,9 +178,9 @@ public class AddDatasetFilesDialog extends Dialog
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
     Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getName() != null) {
-      header.setText(resources.message(HEADER, dataset.getName()));
+      setHeaderTitle(resources.message(HEADER, dataset.getName()));
     } else {
-      header.setText(resources.message(HEADER));
+      setHeaderTitle(resources.message(HEADER));
     }
   }
 
