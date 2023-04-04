@@ -142,9 +142,9 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.files = mock(Grid.class);
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(FILENAME)))
-        .thenReturn(dialog.filename);
+    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.filename);
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
+    when(dialog.filename.setSortProperty(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
@@ -270,7 +270,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog = new ProtocolDialog(presenter);
     mockColumns();
     dialog.init();
-    verify(dialog.files).addColumn(anchorComponentRendererCaptor.capture(), eq(FILENAME));
+    verify(dialog.files).addColumn(anchorComponentRendererCaptor.capture());
     ComponentRenderer<Anchor, ProtocolFile> anchorComponentRenderer =
         anchorComponentRendererCaptor.getValue();
     for (ProtocolFile file : protocolFiles) {

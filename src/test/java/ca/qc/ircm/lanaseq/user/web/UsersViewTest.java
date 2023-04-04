@@ -52,6 +52,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -148,14 +149,14 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     when(view.name.setSortable(anyBoolean())).thenReturn(view.name);
     when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
     view.active = mock(Column.class);
-    when(view.users.addColumn(any(ComponentRenderer.class), eq(ACTIVE))).thenReturn(view.active);
+    view.edit = mock(Column.class);
+    when(view.users.addColumn(any(ComponentRenderer.class))).thenReturn(view.active, view.edit);
     when(view.active.setKey(any())).thenReturn(view.active);
+    when(view.active.setSortProperty(any())).thenReturn(view.active);
     when(view.active.setComparator(any(Comparator.class))).thenReturn(view.active);
     when(view.active.setHeader(any(String.class))).thenReturn(view.active);
     when(view.active.setSortable(anyBoolean())).thenReturn(view.active);
     when(view.active.setFlexGrow(anyInt())).thenReturn(view.active);
-    view.edit = mock(Column.class);
-    when(view.users.addColumn(any(ComponentRenderer.class), eq(EDIT))).thenReturn(view.edit);
     when(view.edit.setKey(any())).thenReturn(view.edit);
     when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
     when(view.edit.setHeader(any(String.class))).thenReturn(view.edit);
@@ -315,8 +316,8 @@ public class UsersViewTest extends AbstractKaribuTestCase {
       assertEquals(user.getName(),
           ((NormalizedComparator<User>) comparator).getConverter().apply(user));
     }
-    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(ACTIVE));
-    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getValue();
+    verify(view.users, times(2)).addColumn(buttonRendererCaptor.capture());
+    ComponentRenderer<Button, User> buttonRenderer = buttonRendererCaptor.getAllValues().get(0);
     for (User user : users) {
       Button button = buttonRenderer.createComponent(user);
       assertTrue(button.hasClassName(ACTIVE));
@@ -341,8 +342,8 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     assertTrue(comparator.compare(active(false), active(false)) == 0);
     assertTrue(comparator.compare(active(true), active(true)) == 0);
     assertTrue(comparator.compare(active(true), active(false)) > 0);
-    verify(view.users).addColumn(buttonRendererCaptor.capture(), eq(EDIT));
-    buttonRenderer = buttonRendererCaptor.getValue();
+    verify(view.users, times(2)).addColumn(buttonRendererCaptor.capture());
+    buttonRenderer = buttonRendererCaptor.getAllValues().get(1);
     for (User user : users) {
       Button button = buttonRenderer.createComponent(user);
       assertTrue(button.hasClassName(EDIT));

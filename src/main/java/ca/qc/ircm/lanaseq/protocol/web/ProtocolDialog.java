@@ -139,9 +139,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     upload.addSucceededListener(event -> presenter.addFile(event.getFileName(),
         uploadBuffer.getInputStream(event.getFileName())));
     files.setId(id(FILES));
-    filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)), FILENAME)
-        .setKey(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
-        .setFlexGrow(10);
+    filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)))
+        .setKey(FILENAME).setSortProperty(FILENAME)
+        .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
     remove = files.addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile",
         file -> presenter.removeFile(file)), REMOVE).setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));

@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -156,9 +157,11 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.files = mock(Grid.class);
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(FILENAME)))
-        .thenReturn(dialog.filename);
+    dialog.overwrite = mock(Column.class);
+    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.filename,
+        dialog.overwrite);
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
+    when(dialog.filename.setSortProperty(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
@@ -167,9 +170,6 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.size.setKey(any())).thenReturn(dialog.size);
     when(dialog.size.setComparator(any(Comparator.class))).thenReturn(dialog.size);
     when(dialog.size.setHeader(any(String.class))).thenReturn(dialog.size);
-    dialog.overwrite = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(OVERWRITE)))
-        .thenReturn(dialog.overwrite);
     when(dialog.overwrite.setKey(any())).thenReturn(dialog.overwrite);
     when(dialog.overwrite.setSortable(anyBoolean())).thenReturn(dialog.overwrite);
     when(dialog.overwrite.setHeader(any(String.class))).thenReturn(dialog.overwrite);
@@ -241,11 +241,12 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
       File file = i.getArgument(0);
       return files.get(0).equals(file);
     });
+    dialog = new AddDatasetFilesDialog(presenter);
     mockColumns();
     dialog.init();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    verify(dialog.files).addColumn(spanRendererCaptor.capture(), eq(FILENAME));
-    ComponentRenderer<Span, File> spanRenderer = spanRendererCaptor.getValue();
+    verify(dialog.files, times(2)).addColumn(spanRendererCaptor.capture());
+    ComponentRenderer<Span, File> spanRenderer = spanRendererCaptor.getAllValues().get(0);
     for (File file : files) {
       Span span = spanRenderer.createComponent(file);
       assertEquals(file.getName(), span.getText());
@@ -266,8 +267,9 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
       assertEquals(resources.message(SIZE_VALUE, file.length() / 1048576),
           valueProvider.apply(file));
     }
-    verify(dialog.files).addColumn(checkboxRendererCaptor.capture(), eq(OVERWRITE));
-    ComponentRenderer<Checkbox, File> checkboxRenderer = checkboxRendererCaptor.getValue();
+    verify(dialog.files, times(2)).addColumn(checkboxRendererCaptor.capture());
+    ComponentRenderer<Checkbox, File> checkboxRenderer =
+        checkboxRendererCaptor.getAllValues().get(1);
     for (File file : files) {
       Checkbox checkbox = checkboxRenderer.createComponent(file);
       assertNotNull(checkbox);

@@ -184,9 +184,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
         .setKey(SampleProperties.NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getName()));
-    sampleRemove =
-        samples.addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)), REMOVE)
-            .setKey(REMOVE).setSortable(false);
+    sampleRemove = samples.addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)))
+        .setKey(REMOVE).setSortable(false);
     samples.setRowsDraggable(true);
     samples.addDragStartListener(e -> {
       draggedSample = e.getDraggedItems().get(0);
