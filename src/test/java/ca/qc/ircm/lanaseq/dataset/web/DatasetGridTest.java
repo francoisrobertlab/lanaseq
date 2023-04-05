@@ -42,6 +42,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -172,7 +173,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     when(grid.owner.setHeader(any(String.class))).thenReturn(grid.owner);
     when(grid.owner.setFlexGrow(anyInt())).thenReturn(grid.owner);
     grid.edit = mock(Column.class);
-    doReturn(grid.edit).when(grid).addColumn(any(LitRenderer.class), eq(EDIT));
+    doReturn(grid.edit).when(grid).addColumn(any(LitRenderer.class));
     when(grid.edit.setKey(any())).thenReturn(grid.edit);
     when(grid.edit.setSortProperty(any())).thenReturn(grid.edit);
     when(grid.edit.setSortable(anyBoolean())).thenReturn(grid.edit);
@@ -302,8 +303,8 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     for (Dataset dataset : datasets) {
       assertEquals(protocol(dataset).getName(), valueProvider.apply(dataset));
     }
-    verify(grid).addColumn(localDateRendererCaptor.capture());
-    LocalDateRenderer<Dataset> localDateRenderer = localDateRendererCaptor.getValue();
+    verify(grid, times(2)).addColumn(localDateRendererCaptor.capture());
+    LocalDateRenderer<Dataset> localDateRenderer = localDateRendererCaptor.getAllValues().get(0);
     for (Dataset dataset : datasets) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
           getFormattedValue(localDateRenderer, dataset));
@@ -320,8 +321,8 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
       assertEquals(dataset.getOwner().getEmail(),
           ((NormalizedComparator<Dataset>) comparator).getConverter().apply(dataset));
     }
-    verify(grid).addColumn(litRendererCaptor.capture(), eq(EDIT));
-    LitRenderer<Dataset> litRenderer = litRendererCaptor.getValue();
+    verify(grid, times(2)).addColumn(litRendererCaptor.capture());
+    LitRenderer<Dataset> litRenderer = litRendererCaptor.getAllValues().get(1);
     for (Dataset dataset : datasets) {
       assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
       assertTrue(functions(litRenderer).containsKey("edit"));

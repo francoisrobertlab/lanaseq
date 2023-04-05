@@ -101,8 +101,8 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
     edit = addColumn(LitRenderer.<Dataset>of(EDIT_BUTTON).withFunction("edit",
-        dataset -> fireEvent(new EditEvent(this, false, dataset))), EDIT).setKey(EDIT)
-            .setSortable(false).setFlexGrow(0);
+        dataset -> fireEvent(new EditEvent(this, false, dataset)))).setKey(EDIT).setSortable(false)
+            .setFlexGrow(0);
     edit.setVisible(false);
     sort(GridSortOrder.desc(date).build());
     appendHeaderRow(); // Headers.

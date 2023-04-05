@@ -90,7 +90,7 @@ public class ProtocolHistoryDialog extends Dialog
         .setKey(FILENAME).setSortProperty(FILENAME)
         .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
     recover = files.addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
-        .withFunction("recoverFile", file -> presenter.recoverFile(file)), RECOVER).setKey(RECOVER);
+        .withFunction("recoverFile", file -> presenter.recoverFile(file))).setKey(RECOVER);
     presenter.init(this);
   }
 

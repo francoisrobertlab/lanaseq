@@ -143,7 +143,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
         .setKey(FILENAME).setSortProperty(FILENAME)
         .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
     remove = files.addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile",
-        file -> presenter.removeFile(file)), REMOVE).setKey(REMOVE);
+        file -> presenter.removeFile(file))).setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
     save.setId(id(SAVE));
