@@ -27,7 +27,6 @@ import ca.qc.ircm.lanaseq.sample.web.SamplesViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ProfileViewElement;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -93,12 +92,10 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Runas() throws Throwable {
-    openView(UsersView.VIEW_NAME);
-    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
-    signinView.getUsernameField().setValue("lanaseq@ircm.qc.ca");
-    signinView.getPasswordField().setValue("pass2");
-    signinView.getSubmitButton().click();
+    open();
+    $(ViewLayoutElement.class).waitForFirst().users().click();
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(1);
     usersView.switchUser().click();
@@ -158,18 +155,16 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void exitSwitchUser() throws Throwable {
-    openView(UsersView.VIEW_NAME);
-    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
-    signinView.getUsernameField().setValue("lanaseq@ircm.qc.ca");
-    signinView.getPasswordField().setValue("pass2");
-    signinView.getSubmitButton().click();
+    open();
+    $(ViewLayoutElement.class).waitForFirst().users().click();
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(1);
     usersView.switchUser().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.exitSwitchUser().click();
-    $(UsersViewElement.class).waitForFirst();
+    $(DatasetsViewElement.class).waitForFirst();
     assertFalse(optional(() -> view.exitSwitchUser()).isPresent());
   }
 

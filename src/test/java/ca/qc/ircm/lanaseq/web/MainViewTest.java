@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +59,7 @@ public class MainViewTest {
 
     view.beforeEnter(event);
 
-    verify(event).forwardTo(UsersView.class);
+    verify(event).forwardTo(DatasetsView.class);
   }
 
   @Test

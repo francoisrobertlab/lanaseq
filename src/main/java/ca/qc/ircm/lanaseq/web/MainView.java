@@ -17,12 +17,10 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -55,10 +53,6 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
-    if (authenticatedUser.hasRole(ADMIN)) {
-      event.forwardTo(UsersView.class);
-    } else {
-      event.forwardTo(DatasetsView.class);
-    }
+    event.forwardTo(DatasetsView.class);
   }
 }

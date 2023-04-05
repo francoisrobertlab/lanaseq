@@ -22,7 +22,6 @@ import static ca.qc.ircm.lanaseq.web.MainView.VIEW_NAME;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -65,6 +64,6 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
   public void adminRedirected() throws Throwable {
     open();
 
-    $(UsersViewElement.class).waitForFirst();
+    $(DatasetsViewElement.class).waitForFirst();
   }
 }
