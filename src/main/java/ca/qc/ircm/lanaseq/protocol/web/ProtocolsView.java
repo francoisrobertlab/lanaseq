@@ -118,9 +118,8 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     protocols.setId(PROTOCOLS);
     name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Protocol::getName));
-    date = protocols.addColumn(
-        new LocalDateTimeRenderer<>(Protocol::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
-        CREATION_DATE).setKey(CREATION_DATE);
+    date = protocols.addColumn(new LocalDateTimeRenderer<>(Protocol::getCreationDate,
+        () -> DateTimeFormatter.ISO_LOCAL_DATE), CREATION_DATE).setKey(CREATION_DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     edit = protocols
