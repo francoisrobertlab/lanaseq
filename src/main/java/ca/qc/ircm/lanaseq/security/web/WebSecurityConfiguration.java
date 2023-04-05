@@ -54,7 +54,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 /**
  * Security configuration.
@@ -224,7 +224,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     try {
       Class<?> clazz = Class.forName("ca.qc.ircm.lanaseq.test.config.TestBenchSecurityFilter");
       http.addFilterBefore((Filter) clazz.getDeclaredConstructor().newInstance(),
-          SecurityContextPersistenceFilter.class);
+          SecurityContextHolderFilter.class);
     } catch (ClassNotFoundException e) {
       // Ignore, not running unit tests.
     }
