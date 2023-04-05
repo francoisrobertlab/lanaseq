@@ -157,7 +157,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     when(grid.protocol.setHeader(any(String.class))).thenReturn(grid.protocol);
     when(grid.protocol.setFlexGrow(anyInt())).thenReturn(grid.protocol);
     grid.date = mock(Column.class);
-    doReturn(grid.date).when(grid).addColumn(any(LocalDateRenderer.class), eq(DATE));
+    doReturn(grid.date).when(grid).addColumn(any(LocalDateRenderer.class));
     when(grid.date.setKey(any())).thenReturn(grid.date);
     when(grid.date.setSortProperty(any())).thenReturn(grid.date);
     when(grid.date.setSortable(anyBoolean())).thenReturn(grid.date);
@@ -302,7 +302,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     for (Dataset dataset : datasets) {
       assertEquals(protocol(dataset).getName(), valueProvider.apply(dataset));
     }
-    verify(grid).addColumn(localDateRendererCaptor.capture(), eq(DATE));
+    verify(grid).addColumn(localDateRendererCaptor.capture());
     LocalDateRenderer<Dataset> localDateRenderer = localDateRendererCaptor.getValue();
     for (Dataset dataset : datasets) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),

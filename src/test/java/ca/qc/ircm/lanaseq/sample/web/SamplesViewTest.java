@@ -153,7 +153,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     when(view.protocol.setFlexGrow(anyInt())).thenReturn(view.protocol);
     view.date = mock(Column.class);
-    when(view.samples.addColumn(any(LocalDateRenderer.class), eq(DATE))).thenReturn(view.date);
+    when(view.samples.addColumn(any(LocalDateRenderer.class))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
     when(view.date.setSortProperty(any())).thenReturn(view.date);
@@ -323,7 +323,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
       assertEquals(sample.getProtocol().getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(view.samples).addColumn(localDateRendererCaptor.capture(), eq(DATE));
+    verify(view.samples).addColumn(localDateRendererCaptor.capture());
     LocalDateRenderer<Sample> localDateRenderer = localDateRendererCaptor.getValue();
     for (Sample sample : samples) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),

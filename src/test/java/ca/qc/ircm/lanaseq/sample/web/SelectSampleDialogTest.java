@@ -111,8 +111,9 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
     when(dialog.name.setComparator(any(Comparator.class))).thenReturn(dialog.name);
     when(dialog.name.setHeader(any(String.class))).thenReturn(dialog.name);
     dialog.date = mock(Column.class);
-    when(dialog.samples.addColumn(any(BasicRenderer.class), eq(DATE))).thenReturn(dialog.date);
+    when(dialog.samples.addColumn(any(BasicRenderer.class))).thenReturn(dialog.date);
     when(dialog.date.setKey(any())).thenReturn(dialog.date);
+    when(dialog.date.setSortProperty(any())).thenReturn(dialog.date);
     when(dialog.date.setComparator(any(Comparator.class))).thenReturn(dialog.date);
     when(dialog.date.setHeader(any(String.class))).thenReturn(dialog.date);
     dialog.owner = mock(Column.class);
@@ -200,7 +201,7 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
       assertEquals(sample.getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(dialog.samples).addColumn(localDateRendererCaptor.capture(), eq(DATE));
+    verify(dialog.samples).addColumn(localDateRendererCaptor.capture());
     LocalDateRenderer<Sample> localDateTimeRenderer = localDateRendererCaptor.getValue();
     for (Sample sample : samples) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),

@@ -144,8 +144,7 @@ public class SamplesView extends VerticalLayout
         .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
         .setFlexGrow(1);
     date = samples
-        .addColumn(new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE),
-            DATE)
+        .addColumn(new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
         .setKey(DATE).setSortProperty(DATE).setComparator(Comparator.comparing(Sample::getDate))
         .setFlexGrow(1);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
