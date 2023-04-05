@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
@@ -37,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +45,7 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -72,6 +73,8 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 public class ViewLayoutTest extends AbstractKaribuTestCase {
   private ViewLayout view;
   @Mock
+  private SwitchUserService switchUserService;
+  @Mock
   private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationListener navigationListener;
@@ -88,7 +91,7 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     ui.setLocale(locale);
     ui.addAfterNavigationListener(navigationListener);
-    view = new ViewLayout(authenticatedUser);
+    view = new ViewLayout(switchUserService, authenticatedUser);
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     view.init();
   }
@@ -108,10 +111,6 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
     assertEquals(styleName(PROFILE, TAB), view.profile.getId().orElse(""));
     assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
-    assertEquals(styleName(EXIT_SWITCH_USER_FORM, TAB), view.exitSwitchUserForm.getId().orElse(""));
-    assertEquals(SWITCH_USER_EXIT_URL, view.exitSwitchUserForm.getElement().getAttribute("action"));
-    assertEquals("post", view.exitSwitchUserForm.getElement().getAttribute("method"));
-    assertEquals("none", view.exitSwitchUserForm.getElement().getStyle().get("display"));
     assertEquals(styleName(SIGNOUT, TAB), view.signout.getId().orElse(""));
   }
 
@@ -152,35 +151,6 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
-    assertFalse(view.exitSwitchUserForm.isVisible());
-    assertTrue(view.signout.isVisible());
-  }
-
-  @Test
-  public void tabs_AllowUsersView() {
-    when(authenticatedUser.isAuthorized(UsersView.class)).thenReturn(true);
-    view.init();
-    assertTrue(view.datasets.isVisible());
-    assertTrue(view.samples.isVisible());
-    assertTrue(view.protocols.isVisible());
-    assertTrue(view.profile.isVisible());
-    assertTrue(view.users.isVisible());
-    assertFalse(view.exitSwitchUser.isVisible());
-    assertFalse(view.exitSwitchUserForm.isVisible());
-    assertTrue(view.signout.isVisible());
-  }
-
-  @Test
-  public void tabs_SwitchedUser() {
-    when(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)).thenReturn(true);
-    view.init();
-    assertTrue(view.datasets.isVisible());
-    assertTrue(view.samples.isVisible());
-    assertTrue(view.protocols.isVisible());
-    assertTrue(view.profile.isVisible());
-    assertFalse(view.users.isVisible());
-    assertTrue(view.exitSwitchUser.isVisible());
-    assertTrue(view.exitSwitchUserForm.isVisible());
     assertTrue(view.signout.isVisible());
   }
 
@@ -311,16 +281,16 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void tabs_SelectExitSwitchUser() {
+    UI.getCurrent().navigate(ProfileView.class);
     Location location = new Location(DatasetsView.VIEW_NAME);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     view.afterNavigation(afterNavigationEvent);
 
     view.tabs.setSelectedTab(view.exitSwitchUser);
 
-    verify(navigationListener, never()).afterNavigation(any());
-    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
-        .anyMatch(i -> i.getInvocation().getExpression().equals("document.getElementById(\""
-            + styleName(EXIT_SWITCH_USER_FORM, TAB) + "\").submit()")));
+    verify(navigationListener, times(2)).afterNavigation(any());
+    verify(switchUserService).exitSwitchUser();
+    assertCurrentView(DatasetsView.class);
   }
 
   @Test
@@ -383,6 +353,35 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
     view.afterNavigation(afterNavigationEvent);
 
     assertEquals(view.users, view.tabs.getSelectedTab());
+  }
+
+  @Test
+  public void afterNavigation_NormalUser() {
+    Location location = new Location(DatasetsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+    assertFalse(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
+  }
+
+  @Test
+  public void afterNavigation_AllowUsersView() {
+    when(authenticatedUser.isAuthorized(UsersView.class)).thenReturn(true);
+    Location location = new Location(DatasetsView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+    assertTrue(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
+  }
+
+  @Test
+  public void afterNavigation_SwitchedUser() {
+    when(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)).thenReturn(true);
+    Location location = new Location(ProfileView.VIEW_NAME);
+    when(afterNavigationEvent.getLocation()).thenReturn(location);
+    view.afterNavigation(afterNavigationEvent);
+    assertFalse(view.users.isVisible());
+    assertTrue(view.exitSwitchUser.isVisible());
   }
 
   /**

@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_EXIT_URL;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppResources;
@@ -25,9 +24,9 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -79,17 +78,18 @@ public class ViewLayout extends VerticalLayout
   protected Tab users = new Tab();
   protected Tab exitSwitchUser = new Tab();
   protected Tab signout = new Tab();
-  protected Html exitSwitchUserForm = new Html("<form action=\"" + SWITCH_USER_EXIT_URL
-      + "\" method=\"post\" style=\"display:none;\"></form>");
   private Map<Tab, String> tabsHref = new HashMap<>();
   private String currentHref;
+  @Autowired
+  private transient SwitchUserService switchUserService;
   @Autowired
   private transient AuthenticatedUser authenticatedUser;
 
   protected ViewLayout() {
   }
 
-  protected ViewLayout(AuthenticatedUser authenticatedUser) {
+  protected ViewLayout(SwitchUserService switchUserService, AuthenticatedUser authenticatedUser) {
+    this.switchUserService = switchUserService;
     this.authenticatedUser = authenticatedUser;
   }
 
@@ -101,20 +101,15 @@ public class ViewLayout extends VerticalLayout
     setSpacing(false);
     add(tabs);
     tabs.setId(TABS);
-    tabs.add(datasets, samples, protocols, profile, users, exitSwitchUser, signout,
-        exitSwitchUserForm);
-    exitSwitchUser
-        .setVisible(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
-    exitSwitchUserForm
-        .setVisible(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+    tabs.add(datasets, samples, protocols, profile, users, exitSwitchUser, signout);
     datasets.setId(styleName(DATASETS, TAB));
     samples.setId(styleName(SAMPLES, TAB));
     protocols.setId(styleName(PROTOCOLS, TAB));
     profile.setId(styleName(PROFILE, TAB));
     users.setId(styleName(USERS, TAB));
-    users.setVisible(authenticatedUser.isAuthorized(UsersView.class));
+    users.setVisible(false);
     exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
-    exitSwitchUserForm.setId(styleName(EXIT_SWITCH_USER_FORM, TAB));
+    exitSwitchUser.setVisible(false);
     signout.setId(styleName(SIGNOUT, TAB));
     tabsHref.put(datasets, DatasetsView.VIEW_NAME);
     tabsHref.put(samples, SamplesView.VIEW_NAME);
@@ -145,10 +140,8 @@ public class ViewLayout extends VerticalLayout
       logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(),
           VaadinServletResponse.getCurrent().getHttpServletResponse(), null);
     } else if (tabs.getSelectedTab() == exitSwitchUser) {
-      // Exit switch user requires a request to be made outside of Vaadin.
-      logger.debug("redirect to exit switch user");
-      UI.getCurrent().getPage().executeJs(
-          "document.getElementById(\"" + styleName(EXIT_SWITCH_USER_FORM, TAB) + "\").submit()");
+      switchUserService.exitSwitchUser();
+      UI.getCurrent().navigate(MainView.class);
     } else {
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("navigate to {}", tabsHref.get(tabs.getSelectedTab()));
@@ -159,6 +152,9 @@ public class ViewLayout extends VerticalLayout
 
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
+    users.setVisible(authenticatedUser.isAuthorized(UsersView.class));
+    exitSwitchUser
+        .setVisible(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     currentHref = event.getLocation().getFirstSegment();
     Optional<Tab> currentTab = tabsHref.entrySet().stream()
         .filter(e -> e.getValue().equals(currentHref)).map(e -> e.getKey()).findFirst();

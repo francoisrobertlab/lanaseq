@@ -19,8 +19,6 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USERNAME;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS_REQUIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,7 +31,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -42,7 +42,6 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -51,6 +50,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.server.VaadinServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +76,8 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   private UsersViewPresenter presenter;
   @Mock
   private UsersView view;
+  @Mock
+  private SwitchUserService switchUserService;
   @Mock
   private UserService userService;
   @Mock
@@ -103,7 +105,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
   @BeforeEach
   @SuppressWarnings("unchecked")
   public void beforeTest() {
-    presenter = new UsersViewPresenter(userService, authenticatedUser);
+    presenter = new UsersViewPresenter(userService, switchUserService, authenticatedUser);
     view.header = new H2();
     view.users = new Grid<>();
     view.users.setSelectionMode(SelectionMode.MULTI);
@@ -111,7 +113,6 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     view.error = new Div();
     view.add = new Button();
     view.switchUser = new Button();
-    view.switchUserForm = new Html("<form></form>");
     view.dialogFactory = dialogFactory;
     users = userRepository.findAll();
     when(userService.all()).thenReturn(users);
@@ -135,7 +136,6 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     verify(view.active).setVisible(false);
     assertFalse(view.add.isVisible());
     assertFalse(view.switchUser.isVisible());
-    assertFalse(view.switchUserForm.isVisible());
   }
 
   @Test
@@ -154,7 +154,6 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     verify(view.active).setVisible(true);
     assertTrue(view.add.isVisible());
     assertFalse(view.switchUser.isVisible());
-    assertFalse(view.switchUserForm.isVisible());
   }
 
   @Test
@@ -174,7 +173,6 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     verify(view.active).setVisible(true);
     assertTrue(view.add.isVisible());
     assertTrue(view.switchUser.isVisible());
-    assertTrue(view.switchUserForm.isVisible());
   }
 
   @Test
@@ -295,23 +293,23 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void switchUser() throws Throwable {
+    UI.getCurrent().navigate(UsersView.class);
     User user = userRepository.findById(3L).orElse(null);
     view.users.select(user);
     presenter.switchUser();
     assertFalse(view.error.isVisible());
-    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
-        .anyMatch(i -> ("document.getElementById(\"" + SWITCH_USERNAME + "\").value = \""
-            + user.getEmail() + "\"; document.getElementById(\"" + SWITCH_USER_FORM
-            + "\").submit()").equals(i.getInvocation().getExpression())));
+    verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
+    assertCurrentView(DatasetsView.class);
   }
 
   @Test
   public void switchUser_EmptySelection() throws Throwable {
+    UI.getCurrent().navigate(UsersView.class);
     presenter.switchUser();
     assertEquals(resources.message(USERS_REQUIRED), view.error.getText());
     assertTrue(view.error.isVisible());
-    assertFalse(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
-        .anyMatch(i -> i.getInvocation().getExpression().contains(SWITCH_USER_FORM)));
+    verify(switchUserService, never()).switchUser(any(), any());
+    assertCurrentView(UsersView.class);
   }
 
   @Test

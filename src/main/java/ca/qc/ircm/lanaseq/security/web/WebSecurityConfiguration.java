@@ -17,8 +17,6 @@
 
 package ca.qc.ircm.lanaseq.security.web;
 
-import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
-
 import ca.qc.ircm.lanaseq.security.DaoAuthenticationProviderWithLdap;
 import ca.qc.ircm.lanaseq.security.LdapConfiguration;
 import ca.qc.ircm.lanaseq.security.LdapService;
@@ -26,7 +24,6 @@ import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
-import ca.qc.ircm.lanaseq.user.web.UsersView;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.server.HandlerHelper.RequestType;
@@ -52,7 +49,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 /**
@@ -62,9 +58,6 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 @Configuration
 public class WebSecurityConfiguration {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
-  public static final String SWITCH_USER_URL = "/switchUser";
-  public static final String SWITCH_USERNAME_PARAMETER = "username";
-  public static final String SWITCH_USER_EXIT_URL = "/switchUser/exit";
   private static final String SIGNIN_FAILURE_URL_PATTERN =
       Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
@@ -74,9 +67,6 @@ public class WebSecurityConfiguration {
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
   private static final String SIGNOUT_SUCCESS_URL = "/" + MainView.VIEW_NAME;
-  private static final String SWITCH_USER_FAILURE_URL =
-      "/" + UsersView.VIEW_NAME + "?" + UsersView.SWITCH_FAILED;
-  private static final String SWITCH_USER_TRAGET_URL = "/" + MainView.VIEW_NAME;
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
   @Autowired
   private UserDetailsService userDetailsService;
@@ -149,23 +139,6 @@ public class WebSecurityConfiguration {
   }
 
   /**
-   * Returns {@link SwitchUserFilter}.
-   *
-   * @return {@link SwitchUserFilter}
-   */
-  @Bean
-  public SwitchUserFilter switchUserFilter() {
-    SwitchUserFilter filter = new SwitchUserFilter();
-    filter.setUserDetailsService(userDetailsService);
-    filter.setSwitchUserUrl(SWITCH_USER_URL);
-    filter.setSwitchFailureUrl(SWITCH_USER_FAILURE_URL);
-    filter.setTargetUrl(SWITCH_USER_TRAGET_URL);
-    filter.setExitUserUrl(SWITCH_USER_EXIT_URL);
-    filter.setUsernameParameter(SWITCH_USERNAME_PARAMETER);
-    return filter;
-  }
-
-  /**
    * Require login to access internal pages and configure login form.
    */
   @Bean
@@ -189,10 +162,6 @@ public class WebSecurityConfiguration {
 
         // Allow test URLs.
         .regexMatchers("/testvaadinservice").permitAll()
-
-        // Only admins can switch users.
-        .antMatchers(SWITCH_USER_URL).hasAuthority(ADMIN).antMatchers(SWITCH_USER_EXIT_URL)
-        .authenticated()
 
         // Allow anonymous views.
         .antMatchers("/" + ForgotPasswordView.VIEW_NAME,

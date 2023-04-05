@@ -23,8 +23,6 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USERNAME_PARAMETER;
-import static ca.qc.ircm.lanaseq.security.web.WebSecurityConfiguration.SWITCH_USER_URL;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -37,8 +35,6 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USERNAME;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -185,15 +181,6 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
     assertEquals(SWITCH_USER, view.switchUser.getId().orElse(""));
-    assertEquals(SWITCH_USER_FORM, view.switchUserForm.getId().orElse(""));
-    assertEquals(SWITCH_USER_URL, view.switchUserForm.getElement().getAttribute("action"));
-    assertEquals("post", view.switchUserForm.getElement().getAttribute("method"));
-    assertEquals("none", view.switchUserForm.getElement().getStyle().get("display"));
-    assertEquals(1, view.switchUserForm.getElement().getChildCount());
-    assertEquals(view.switchUsername,
-        view.switchUserForm.getElement().getChild(0).getComponent().get());
-    assertEquals(SWITCH_USERNAME, view.switchUsername.getId().orElse(""));
-    assertEquals(SWITCH_USERNAME_PARAMETER, view.switchUsername.getElement().getAttribute("name"));
   }
 
   @Test

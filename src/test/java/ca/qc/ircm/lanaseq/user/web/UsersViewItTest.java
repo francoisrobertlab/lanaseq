@@ -30,6 +30,7 @@ import ca.qc.ircm.lanaseq.security.web.AccessDeniedViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
+import ca.qc.ircm.lanaseq.web.ViewLayoutElement;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -119,11 +120,14 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   public void switchUser() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().select(1);
+    view.users().select(2);
 
     view.switchUser().click();
 
     $(DatasetsViewElement.class).waitForFirst();
+    ViewLayoutElement viewLayout = $(ViewLayoutElement.class).waitForFirst();
+    assertTrue(viewLayout.exitSwitchUser().isDisplayed());
+    assertFalse(viewLayout.users().isDisplayed());
   }
 
   @Test
