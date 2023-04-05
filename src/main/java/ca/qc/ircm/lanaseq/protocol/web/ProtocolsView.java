@@ -118,15 +118,17 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     protocols.setId(PROTOCOLS);
     name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Protocol::getName));
-    date = protocols.addColumn(
-        new LocalDateTimeRenderer<>(Protocol::getCreationDate, DateTimeFormatter.ISO_LOCAL_DATE),
-        CREATION_DATE).setKey(CREATION_DATE);
+    date = protocols
+        .addColumn(new LocalDateTimeRenderer<>(Protocol::getCreationDate,
+            () -> DateTimeFormatter.ISO_LOCAL_DATE))
+        .setKey(CREATION_DATE).setSortProperty(CREATION_DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
-    edit = protocols
-        .addColumn(LitRenderer.<Protocol>of(EDIT_BUTTON).withFunction("edit",
-            protocol -> presenter.edit(protocol)), EDIT)
-        .setKey(EDIT).setSortable(false).setFlexGrow(0);
+    edit =
+        protocols
+            .addColumn(LitRenderer.<Protocol>of(EDIT_BUTTON).withFunction("edit",
+                protocol -> presenter.edit(protocol)))
+            .setKey(EDIT).setSortable(false).setFlexGrow(0);
     protocols.addItemDoubleClickListener(e -> presenter.edit(e.getItem()));
     protocols.addItemClickListener(e -> {
       if (e.isAltKey()) {

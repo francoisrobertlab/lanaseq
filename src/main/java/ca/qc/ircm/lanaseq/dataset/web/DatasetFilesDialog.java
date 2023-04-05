@@ -141,10 +141,10 @@ public class DatasetFilesDialog extends Dialog
     });
     filename =
         files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setFlexGrow(10);
-    download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)), DOWNLOAD)
+    download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)))
         .setKey(DOWNLOAD).setSortable(false);
-    delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file)), DELETE)
-        .setKey(DELETE).setSortable(false);
+    delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file))).setKey(DELETE)
+        .setSortable(false);
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());

@@ -42,26 +42,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 /**
  * Security configuration.
  */
 @EnableWebSecurity
 @Configuration
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   public static final String SWITCH_USER_URL = "/switchUser";
   public static final String SWITCH_USERNAME_PARAMETER = "username";
@@ -157,7 +156,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   public SwitchUserFilter switchUserFilter() {
     SwitchUserFilter filter = new SwitchUserFilter();
-    filter.setUserDetailsService(userDetailsService());
+    filter.setUserDetailsService(userDetailsService);
     filter.setSwitchUserUrl(SWITCH_USER_URL);
     filter.setSwitchFailureUrl(SWITCH_USER_FAILURE_URL);
     filter.setTargetUrl(SWITCH_USER_TRAGET_URL);
@@ -167,19 +166,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   /**
-   * Registers our UserDetailsService and the password encoder to be used on login attempts.
-   */
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    super.configure(auth);
-    auth.authenticationProvider(authenticationProvider()).userDetailsService(userDetailsService);
-  }
-
-  /**
    * Require login to access internal pages and configure login form.
    */
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // Not using Spring CSRF here to be able to use plain HTML for the login page
     http.csrf().disable()
 
@@ -224,18 +214,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     try {
       Class<?> clazz = Class.forName("ca.qc.ircm.lanaseq.test.config.TestBenchSecurityFilter");
       http.addFilterBefore((Filter) clazz.getDeclaredConstructor().newInstance(),
-          SecurityContextPersistenceFilter.class);
+          SecurityContextHolderFilter.class);
     } catch (ClassNotFoundException e) {
       // Ignore, not running unit tests.
     }
+
+    return http.build();
   }
 
   /**
    * Allows access to static resources, bypassing Spring security.
    */
-  @Override
-  public void configure(WebSecurity web) throws Exception {
-    web.ignoring().antMatchers(
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return (web) -> web.ignoring().antMatchers(
         // Vaadin Flow static resources
         "/VAADIN/**",
 

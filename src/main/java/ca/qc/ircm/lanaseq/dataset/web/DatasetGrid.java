@@ -95,14 +95,14 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setSortable(false).setFlexGrow(1);
     date =
-        addColumn(new LocalDateRenderer<>(Dataset::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
+        addColumn(new LocalDateRenderer<>(Dataset::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
             .setKey(DATE).setSortProperty(DATE).setFlexGrow(1);
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
     edit = addColumn(LitRenderer.<Dataset>of(EDIT_BUTTON).withFunction("edit",
-        dataset -> fireEvent(new EditEvent(this, false, dataset))), EDIT).setKey(EDIT)
-            .setSortable(false).setFlexGrow(0);
+        dataset -> fireEvent(new EditEvent(this, false, dataset)))).setKey(EDIT).setSortable(false)
+            .setFlexGrow(0);
     edit.setVisible(false);
     sort(GridSortOrder.desc(date).build());
     appendHeaderRow(); // Headers.

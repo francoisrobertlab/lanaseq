@@ -144,17 +144,15 @@ public class SamplesView extends VerticalLayout
         .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
         .setFlexGrow(1);
     date = samples
-        .addColumn(new LocalDateRenderer<>(Sample::getDate, DateTimeFormatter.ISO_LOCAL_DATE), DATE)
+        .addColumn(new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
         .setKey(DATE).setSortProperty(DATE).setComparator(Comparator.comparing(Sample::getDate))
         .setFlexGrow(1);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
-    edit =
-        samples
-            .addColumn(LitRenderer.<Sample>of(EDIT_BUTTON).withFunction("edit",
-                sample -> presenter.view(sample)), EDIT)
-            .setKey(EDIT).setSortable(false).setFlexGrow(0);
+    edit = samples.addColumn(
+        LitRenderer.<Sample>of(EDIT_BUTTON).withFunction("edit", sample -> presenter.view(sample)))
+        .setKey(EDIT).setSortable(false).setFlexGrow(0);
     samples.sort(GridSortOrder.desc(date).build());
     samples.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
     samples.addItemClickListener(e -> {

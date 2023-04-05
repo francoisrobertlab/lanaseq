@@ -48,6 +48,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -145,9 +146,9 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     when(view.name.setHeader(any(String.class))).thenReturn(view.name);
     when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
     view.date = mock(Column.class);
-    when(view.protocols.addColumn(any(LocalDateTimeRenderer.class), eq(CREATION_DATE)))
-        .thenReturn(view.date);
+    when(view.protocols.addColumn(any(LocalDateTimeRenderer.class))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
+    when(view.date.setSortProperty(any())).thenReturn(view.date);
     when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
     when(view.date.setHeader(any(String.class))).thenReturn(view.date);
     when(view.date.setFlexGrow(anyInt())).thenReturn(view.date);
@@ -159,7 +160,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
     view.edit = mock(Column.class);
-    when(view.protocols.addColumn(any(LitRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.protocols.addColumn(any(LitRenderer.class))).thenReturn(view.edit);
     when(view.edit.setKey(any())).thenReturn(view.edit);
     when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
     when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
@@ -276,8 +277,9 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
       assertEquals(protocol.getName(),
           ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
     }
-    verify(view.protocols).addColumn(localDateTimeRendererCaptor.capture(), eq(CREATION_DATE));
-    LocalDateTimeRenderer<Protocol> localDateTimeRenderer = localDateTimeRendererCaptor.getValue();
+    verify(view.protocols, times(2)).addColumn(localDateTimeRendererCaptor.capture());
+    LocalDateTimeRenderer<Protocol> localDateTimeRenderer =
+        localDateTimeRendererCaptor.getAllValues().get(0);
     for (Protocol protocol : protocols) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(protocol.getCreationDate()),
           getFormattedValue(localDateTimeRenderer, protocol));
@@ -294,8 +296,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
       assertEquals(protocol.getOwner().getEmail(),
           ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
     }
-    verify(view.protocols).addColumn(litRendererCaptor.capture(), eq(EDIT));
-    LitRenderer<Protocol> litRenderer = litRendererCaptor.getValue();
+    verify(view.protocols, times(2)).addColumn(litRendererCaptor.capture());
+    LitRenderer<Protocol> litRenderer = litRendererCaptor.getAllValues().get(1);
     for (Protocol protocol : protocols) {
       assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
       assertTrue(functions(litRenderer).containsKey("edit"));

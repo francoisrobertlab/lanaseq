@@ -31,8 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -110,14 +110,14 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     dialog.files = mock(Grid.class);
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(FILENAME)))
-        .thenReturn(dialog.filename);
+    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.filename);
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
+    when(dialog.filename.setSortProperty(any())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.recover = mock(Column.class);
-    when(dialog.files.addColumn(any(LitRenderer.class), eq(RECOVER))).thenReturn(dialog.recover);
+    when(dialog.files.addColumn(any(LitRenderer.class))).thenReturn(dialog.recover);
     when(dialog.recover.setKey(any())).thenReturn(dialog.recover);
     when(dialog.recover.setHeader(any(String.class))).thenReturn(dialog.recover);
   }
@@ -171,9 +171,9 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
   public void files_ColumnsValueProvider() {
     mockColumns();
     dialog.init();
-    verify(dialog.files).addColumn(anchorComponentRendererCaptor.capture(), eq(FILENAME));
+    verify(dialog.files, times(2)).addColumn(anchorComponentRendererCaptor.capture());
     ComponentRenderer<Anchor, ProtocolFile> anchorComponentRenderer =
-        anchorComponentRendererCaptor.getValue();
+        anchorComponentRendererCaptor.getAllValues().get(0);
     for (ProtocolFile file : protocolFiles) {
       Anchor anchor = anchorComponentRenderer.createComponent(file);
       assertEquals(file.getFilename(), anchor.getText());
@@ -187,8 +187,8 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
       assertEquals(file.getFilename(),
           ((NormalizedComparator<ProtocolFile>) comparator).getConverter().apply(file));
     }
-    verify(dialog.files).addColumn(litRendererCaptor.capture(), eq(RECOVER));
-    LitRenderer<ProtocolFile> litRenderer = litRendererCaptor.getValue();
+    verify(dialog.files, times(2)).addColumn(litRendererCaptor.capture());
+    LitRenderer<ProtocolFile> litRenderer = litRendererCaptor.getAllValues().get(1);
     for (ProtocolFile file : protocolFiles) {
       assertEquals(RECOVER_BUTTON, rendererTemplate(litRenderer));
       assertTrue(functions(litRenderer).containsKey("recoverFile"));

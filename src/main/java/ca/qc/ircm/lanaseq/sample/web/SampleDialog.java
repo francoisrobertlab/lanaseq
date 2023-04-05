@@ -134,7 +134,6 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     replicate.setId(id(REPLICATE));
     protocol.setId(id(PROTOCOL));
     protocol.setItemLabelGenerator(Protocol::getName);
-    protocol.setPreventInvalidInput(true);
     assay.setId(id(ASSAY));
     assay.setAllowCustomValue(true);
     assay.addCustomValueSetListener(e -> assay.setValue(e.getDetail()));

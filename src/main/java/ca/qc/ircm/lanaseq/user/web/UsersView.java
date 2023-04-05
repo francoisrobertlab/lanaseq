@@ -133,9 +133,10 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
         .setComparator(NormalizedComparator.of(User::getEmail));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(User::getName));
-    active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user)), ACTIVE)
-        .setKey(ACTIVE).setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
-    edit = users.addColumn(new ComponentRenderer<>(user -> editButton(user)), EDIT).setKey(EDIT)
+    active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user))).setKey(ACTIVE)
+        .setSortProperty(ACTIVE)
+        .setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
+    edit = users.addColumn(new ComponentRenderer<>(user -> editButton(user))).setKey(EDIT)
         .setSortable(false).setFlexGrow(0);
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();

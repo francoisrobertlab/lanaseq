@@ -49,6 +49,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -181,15 +182,12 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
     dialog.download = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DOWNLOAD)))
-        .thenReturn(dialog.download);
-    when(dialog.download.setKey(any())).thenReturn(dialog.download);
+    dialog.delete = mock(Column.class);
+    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.download);
+    when(dialog.download.setKey(any())).thenReturn(dialog.download, dialog.delete);
     when(dialog.download.setSortable(anyBoolean())).thenReturn(dialog.download);
     when(dialog.download.setComparator(any(Comparator.class))).thenReturn(dialog.download);
     when(dialog.download.setHeader(any(String.class))).thenReturn(dialog.download);
-    dialog.delete = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class), eq(DELETE)))
-        .thenReturn(dialog.delete);
     when(dialog.delete.setKey(any())).thenReturn(dialog.delete);
     when(dialog.delete.setSortable(anyBoolean())).thenReturn(dialog.delete);
     when(dialog.delete.setComparator(any(Comparator.class))).thenReturn(dialog.delete);
@@ -277,6 +275,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void files_ColumnsValueProvider() {
+    dialog = new DatasetFilesDialog(presenter, addFilesDialogFactory, sampleFilesDialogFactory);
     mockColumns();
     dialog.init();
     verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
@@ -286,8 +285,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
       assertEquals(efile.getFilename(), valueProvider.apply(efile));
     }
     verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
-    verify(dialog.files).addColumn(anchorRendererCaptor.capture(), eq(DOWNLOAD));
-    ComponentRenderer<Anchor, EditableFile> anchorRenderer = anchorRendererCaptor.getValue();
+    verify(dialog.files, times(2)).addColumn(anchorRendererCaptor.capture());
+    ComponentRenderer<Anchor, EditableFile> anchorRenderer =
+        anchorRendererCaptor.getAllValues().get(0);
     for (File file : files) {
       EditableFile efile = new EditableFile(file);
       Anchor anchor = anchorRenderer.createComponent(efile);
@@ -303,8 +303,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
       assertEquals("", button.getText());
       verify(presenter).download(efile);
     }
-    verify(dialog.files).addColumn(buttonRendererCaptor.capture(), eq(DELETE));
-    ComponentRenderer<Button, EditableFile> buttonRenderer = buttonRendererCaptor.getValue();
+    verify(dialog.files, times(2)).addColumn(buttonRendererCaptor.capture());
+    ComponentRenderer<Button, EditableFile> buttonRenderer =
+        buttonRendererCaptor.getAllValues().get(1);
     for (File file : files) {
       EditableFile efile = new EditableFile(file);
       Button button = buttonRenderer.createComponent(efile);

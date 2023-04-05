@@ -110,11 +110,11 @@ public class AddSampleFilesDialog extends Dialog
     getFooter().add(save);
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
-    filename =
-        files.addColumn(new ComponentRenderer<>(file -> filename(file)), FILENAME).setKey(FILENAME)
-            .setComparator(NormalizedComparator.of(file -> file.getName())).setFlexGrow(10);
-    overwrite = files.addColumn(new ComponentRenderer<>(file -> overwrite(file)), OVERWRITE)
-        .setKey(OVERWRITE).setSortable(false);
+    filename = files.addColumn(new ComponentRenderer<>(file -> filename(file))).setKey(FILENAME)
+        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(file -> file.getName()))
+        .setFlexGrow(10);
+    overwrite = files.addColumn(new ComponentRenderer<>(file -> overwrite(file))).setKey(OVERWRITE)
+        .setSortable(false);
     files.appendHeaderRow(); // Headers.
     HeaderRow headerRow = files.appendHeaderRow();
     headerRow.getCell(overwrite).setComponent(overwriteAll);

@@ -189,8 +189,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     when(dialog.sampleName.setHeader(any(String.class))).thenReturn(dialog.sampleName);
     when(dialog.sampleName.setFooter(any(String.class))).thenReturn(dialog.sampleName);
     dialog.sampleRemove = mock(Column.class);
-    when(dialog.samples.addColumn(any(ComponentRenderer.class), eq(REMOVE)))
-        .thenReturn(dialog.sampleRemove);
+    when(dialog.samples.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setKey(any())).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setSortable(anyBoolean())).thenReturn(dialog.sampleRemove);
     when(dialog.sampleRemove.setComparator(any(Comparator.class))).thenReturn(dialog.sampleRemove);
@@ -363,7 +362,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
       assertEquals(sample.getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(dialog.samples).addColumn(buttonRendererCaptor.capture(), eq(REMOVE));
+    verify(dialog.samples).addColumn(buttonRendererCaptor.capture());
     ComponentRenderer<Button, Sample> buttonRenderer = buttonRendererCaptor.getValue();
     for (Sample sample : samples) {
       Button button = buttonRenderer.createComponent(sample);

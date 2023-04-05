@@ -51,6 +51,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -153,7 +154,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
     when(view.protocol.setFlexGrow(anyInt())).thenReturn(view.protocol);
     view.date = mock(Column.class);
-    when(view.samples.addColumn(any(LocalDateRenderer.class), eq(DATE))).thenReturn(view.date);
+    when(view.samples.addColumn(any(LocalDateRenderer.class))).thenReturn(view.date);
     when(view.date.setKey(any())).thenReturn(view.date);
     when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
     when(view.date.setSortProperty(any())).thenReturn(view.date);
@@ -169,7 +170,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
     when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
     view.edit = mock(Column.class);
-    when(view.samples.addColumn(any(LitRenderer.class), eq(EDIT))).thenReturn(view.edit);
+    when(view.samples.addColumn(any(LitRenderer.class))).thenReturn(view.edit);
     when(view.edit.setKey(any())).thenReturn(view.edit);
     when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
     when(view.edit.setSortProperty(any())).thenReturn(view.edit);
@@ -323,8 +324,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
       assertEquals(sample.getProtocol().getName(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(view.samples).addColumn(localDateRendererCaptor.capture(), eq(DATE));
-    LocalDateRenderer<Sample> localDateRenderer = localDateRendererCaptor.getValue();
+    verify(view.samples, times(2)).addColumn(localDateRendererCaptor.capture());
+    LocalDateRenderer<Sample> localDateRenderer = localDateRendererCaptor.getAllValues().get(0);
     for (Sample sample : samples) {
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
           getFormattedValue(localDateRenderer, sample));
@@ -348,8 +349,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
       assertEquals(sample.getOwner().getEmail(),
           ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
     }
-    verify(view.samples).addColumn(litRendererCaptor.capture(), eq(EDIT));
-    LitRenderer<Sample> litRenderer = litRendererCaptor.getValue();
+    verify(view.samples, times(2)).addColumn(litRendererCaptor.capture());
+    LitRenderer<Sample> litRenderer = litRendererCaptor.getAllValues().get(1);
     for (Sample sample : samples) {
       assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
       assertTrue(functions(litRenderer).containsKey("edit"));
