@@ -163,7 +163,7 @@ public class ProtocolsViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void ownerFilter_User() {
-    assertEquals(currentUser.getEmail(), view.ownerFilter.getValue());
+    assertEquals("", view.ownerFilter.getValue());
     verify(authenticatedUser).hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
   }
 

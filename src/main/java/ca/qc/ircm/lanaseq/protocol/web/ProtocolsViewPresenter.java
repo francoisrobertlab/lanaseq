@@ -61,9 +61,6 @@ public class ProtocolsViewPresenter {
   void init(ProtocolsView view) {
     this.view = view;
     boolean manager = authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER);
-    if (!manager) {
-      authenticatedUser.getUser().ifPresent(user -> view.ownerFilter.setValue(user.getEmail()));
-    }
     view.history.setVisible(manager);
     loadProtocols();
   }
