@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_HTML;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.HEADER;
@@ -31,6 +32,8 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MAXIMUM_SMALL_FILE
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.properties;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.englishUploadI18N;
@@ -42,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,8 +73,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.server.StreamResource;
 import java.io.ByteArrayInputStream;
@@ -105,13 +108,15 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
   @Mock
   private Sample sample;
   @Captor
-  private ArgumentCaptor<ValueProvider<EditableFile, String>> valueProviderCaptor;
+  private ArgumentCaptor<LitRenderer<EditableFile>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Anchor, EditableFile>> anchorRendererCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, EditableFile>> buttonRendererCaptor;
   @Captor
   private ArgumentCaptor<EditorCloseListener<EditableFile>> closeListenerCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<EditableFile>> comparatorCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
@@ -131,9 +136,9 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog = new SampleFilesDialog(addFilesDialogFactory, presenter);
     dialog.init();
-    files.add(new File("sample", "sample_R1.fastq"));
-    files.add(new File("sample", "sample_R2.fastq"));
-    files.add(new File("sample", "sample.bw"));
+    files.add(new File("sample", "FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020_R1.fastq"));
+    files.add(new File("sample", "FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020_R2.fastq"));
+    files.add(new File("sample", "FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020.bw"));
     files.add(new File("sample", "sample.png"));
     when(presenter.download(any())).thenAnswer(i -> {
       EditableFile efile = i.getArgument(0);
@@ -153,17 +158,15 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
-        .thenReturn(dialog.filename);
+    dialog.download = mock(Column.class);
+    dialog.delete = mock(Column.class);
+    when(dialog.files.addColumn(any(Renderer.class))).thenReturn(dialog.filename, dialog.download,
+        dialog.delete);
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setSortable(anyBoolean())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(10)).thenReturn(dialog.filename);
-    dialog.download = mock(Column.class);
-    dialog.delete = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.download,
-        dialog.delete);
     when(dialog.download.setKey(any())).thenReturn(dialog.download);
     when(dialog.download.setSortable(anyBoolean())).thenReturn(dialog.download);
     when(dialog.download.setComparator(any(Comparator.class))).thenReturn(dialog.download);
@@ -237,18 +240,30 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void files_ColumnsValueProvider() {
+    Sample sample = sampleRepository.findById(2L).get();
+    when(presenter.getSample()).thenReturn(sample);
     mockColumns();
     dialog.init();
-    verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<EditableFile, String> valueProvider = valueProviderCaptor.getValue();
+    verify(dialog.files, times(3)).addColumn(litRendererCaptor.capture());
+    LitRenderer<EditableFile> litRenderer = litRendererCaptor.getAllValues().get(0);
     for (File path : files) {
       EditableFile file = new EditableFile(path);
-      assertEquals(file.getFilename(), valueProvider.apply(file));
+      assertEquals(FILENAME_HTML, rendererTemplate(litRenderer));
+      assertTrue(properties(litRenderer).containsKey("title"));
+      assertTrue(properties(litRenderer).containsKey("filename"));
+      assertEquals(file.getFilename(), properties(litRenderer).get("title").apply(file));
+      if (file.getFilename().contains(sample.getName())) {
+        String filename = file.getFilename().replaceAll(sample.getName(), "");
+        assertEquals("FR2_MNasese..._20181020" + filename,
+            properties(litRenderer).get("filename").apply(file));
+      } else {
+        assertEquals(file.getFilename(), properties(litRenderer).get("filename").apply(file));
+      }
     }
     verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
-    verify(dialog.files, times(2)).addColumn(anchorRendererCaptor.capture());
+    verify(dialog.files, times(3)).addColumn(anchorRendererCaptor.capture());
     ComponentRenderer<Anchor, EditableFile> anchorRenderer =
-        anchorRendererCaptor.getAllValues().get(0);
+        anchorRendererCaptor.getAllValues().get(1);
     for (File path : files) {
       EditableFile file = new EditableFile(path);
       Anchor anchor = anchorRenderer.createComponent(file);
@@ -264,9 +279,9 @@ public class SampleFilesDialogTest extends AbstractKaribuTestCase {
       assertEquals("", button.getText());
       verify(presenter).download(file);
     }
-    verify(dialog.files, times(2)).addColumn(buttonRendererCaptor.capture());
+    verify(dialog.files, times(3)).addColumn(buttonRendererCaptor.capture());
     ComponentRenderer<Button, EditableFile> buttonRenderer =
-        buttonRendererCaptor.getAllValues().get(1);
+        buttonRendererCaptor.getAllValues().get(2);
     for (File path : files) {
       EditableFile file = new EditableFile(path);
       Button button = buttonRenderer.createComponent(file);

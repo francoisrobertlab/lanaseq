@@ -190,7 +190,26 @@ public class VaadinTestUtils {
       field.setAccessible(true);
       return (String) field.get(renderer);
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-             | IllegalAccessException e) {
+        | IllegalAccessException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Returns all registered properties of this renderer.
+   *
+   * @param renderer
+   *          renderer
+   * @return all registered properties of this renderer
+   * @param <SOURCE>
+   */
+  public static <SOURCE> Map<String, ValueProvider<SOURCE, ?>> properties(LitRenderer renderer) {
+    try {
+      Field field = LitRenderer.class.getDeclaredField("valueProviders");
+      field.setAccessible(true);
+      return (Map<String, ValueProvider<SOURCE, ?>>) field.get(renderer);
+    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
+        | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -198,18 +217,19 @@ public class VaadinTestUtils {
   /**
    * Returns all registered functions of this renderer.
    *
-   * @param renderer renderer
+   * @param renderer
+   *          renderer
    * @return all registered functions of this renderer
    * @param <SOURCE>
    */
   public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, JsonArray>>
-  functions(LitRenderer renderer) {
+      functions(LitRenderer renderer) {
     try {
       Field field = LitRenderer.class.getDeclaredField("clientCallables");
       field.setAccessible(true);
       return (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(renderer);
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-             | IllegalAccessException e) {
+        | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -365,6 +385,6 @@ public class VaadinTestUtils {
     assertEquals(expected.getUploading().getStatus().getConnecting(),
         actual.getUploading().getStatus().getConnecting());
     assertArrayEquals(expected.getUnits().getSize().toArray(),
-            actual.getUnits().getSize().toArray());
+        actual.getUnits().getSize().toArray());
   }
 }

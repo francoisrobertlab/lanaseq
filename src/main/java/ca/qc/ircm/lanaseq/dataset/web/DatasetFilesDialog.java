@@ -47,9 +47,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.Comparator;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +81,7 @@ public class DatasetFilesDialog extends Dialog
   public static final String FILES_SUCCESS = property(FILES, "success");
   public static final int MAXIMUM_SMALL_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
+  public static final String FILENAME_HTML = "<span title='${item.title}'>${item.filename}</span>";
   private static final long serialVersionUID = 166699830639260659L;
   protected Div message = new Div();
   protected VerticalLayout folders = new VerticalLayout();
@@ -139,8 +143,12 @@ public class DatasetFilesDialog extends Dialog
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
     });
-    filename =
-        files.addColumn(file -> file.getFilename(), FILENAME).setKey(FILENAME).setFlexGrow(10);
+    filename = files
+        .addColumn(LitRenderer.<EditableFile>of(FILENAME_HTML)
+            .withProperty("filename", file -> shortFilename(file.getFilename()))
+            .withProperty("title", file -> file.getFilename()))
+        .setKey(FILENAME).setComparator(Comparator.comparing(EditableFile::getFilename))
+        .setFlexGrow(10);
     download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)))
         .setKey(DOWNLOAD).setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file))).setKey(DELETE)
@@ -162,6 +170,16 @@ public class DatasetFilesDialog extends Dialog
     addLargeFiles.setIcon(VaadinIcon.PLUS.create());
     addLargeFiles.addClickListener(e -> presenter.addLargeFiles());
     presenter.init(this);
+  }
+
+  private String shortFilename(String filename) {
+    String name = Optional.ofNullable(presenter.getDataset()).map(Dataset::getName).orElse("");
+    if (name.length() > 20 && filename.contains(name)) {
+      String start = name.substring(0, 11);
+      String end = name.substring(name.length() - 9);
+      filename = filename.replaceAll(name, start + "..." + end);
+    }
+    return filename;
   }
 
   private Anchor downloadButton(EditableFile file) {

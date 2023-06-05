@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_HTML;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_COUNT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FOLDERS;
@@ -35,6 +36,8 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.properties;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.englishUploadI18N;
@@ -79,6 +82,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -117,7 +122,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   @Mock
   private Dataset dataset;
   @Captor
-  private ArgumentCaptor<ValueProvider<EditableFile, String>> valueProviderCaptor;
+  private ArgumentCaptor<LitRenderer<EditableFile>> litRendererCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Anchor, EditableFile>> anchorRendererCaptor;
   @Captor
@@ -128,6 +133,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   private ArgumentCaptor<ValueProvider<Sample, String>> sampleNameProviderCaptor;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, Integer>> sampleFileCountProviderCaptor;
+  @Captor
+  private ArgumentCaptor<Comparator<EditableFile>> comparatorCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;
   @Mock
@@ -151,9 +158,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     ui.setLocale(locale);
     dialog = new DatasetFilesDialog(presenter, addFilesDialogFactory, sampleFilesDialogFactory);
     dialog.init();
-    files.add(new File("dataset", "dataset_R1.fastq"));
-    files.add(new File("dataset", "dataset_R2.fastq"));
-    files.add(new File("dataset", "dataset.bw"));
+    files.add(new File("dataset", "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022_R1.fastq"));
+    files.add(new File("dataset", "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022_R2.fastq"));
+    files.add(new File("dataset", "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022.bw"));
     files.add(new File("dataset", "dataset.png"));
     samples = sampleRepository.findAll();
     when(presenter.download(any())).thenAnswer(i -> {
@@ -167,6 +174,10 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     });
   }
 
+  private EditableFile editableFile(String filename) {
+    return new EditableFile(new File(filename));
+  }
+
   @SuppressWarnings("unchecked")
   private void mockColumns() {
     Element filesElement = dialog.files.getElement();
@@ -174,17 +185,16 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
     when(dialog.files.getElement()).thenReturn(filesElement);
     dialog.filename = mock(Column.class);
-    when(dialog.files.addColumn(any(ValueProvider.class), eq(FILENAME)))
-        .thenReturn(dialog.filename);
+    dialog.download = mock(Column.class);
+    dialog.delete = mock(Column.class);
+    when(dialog.files.addColumn(any(Renderer.class))).thenReturn(dialog.filename, dialog.download,
+        dialog.delete);
     when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
     when(dialog.filename.setSortable(anyBoolean())).thenReturn(dialog.filename);
     when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
     when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
     when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
-    dialog.download = mock(Column.class);
-    dialog.delete = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.download);
-    when(dialog.download.setKey(any())).thenReturn(dialog.download, dialog.delete);
+    when(dialog.download.setKey(any())).thenReturn(dialog.download);
     when(dialog.download.setSortable(anyBoolean())).thenReturn(dialog.download);
     when(dialog.download.setComparator(any(Comparator.class))).thenReturn(dialog.download);
     when(dialog.download.setHeader(any(String.class))).thenReturn(dialog.download);
@@ -275,19 +285,36 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void files_ColumnsValueProvider() {
+    Dataset dataset = repository.findById(2L).get();
+    when(presenter.getDataset()).thenReturn(dataset);
     dialog = new DatasetFilesDialog(presenter, addFilesDialogFactory, sampleFilesDialogFactory);
     mockColumns();
     dialog.init();
-    verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(FILENAME));
-    ValueProvider<EditableFile, String> valueProvider = valueProviderCaptor.getValue();
+    verify(dialog.files, times(3)).addColumn(litRendererCaptor.capture());
+    LitRenderer<EditableFile> litRenderer = litRendererCaptor.getAllValues().get(0);
     for (File file : files) {
       EditableFile efile = new EditableFile(file);
-      assertEquals(efile.getFilename(), valueProvider.apply(efile));
+      assertEquals(FILENAME_HTML, rendererTemplate(litRenderer));
+      assertTrue(properties(litRenderer).containsKey("title"));
+      assertTrue(properties(litRenderer).containsKey("filename"));
+      assertEquals(efile.getFilename(), properties(litRenderer).get("title").apply(efile));
+      if (efile.getFilename().contains(dataset.getName())) {
+        String filename = efile.getFilename().replaceAll(dataset.getName(), "");
+        assertEquals("ChIPseq_Spt..._20181022" + filename,
+            properties(litRenderer).get("filename").apply(efile));
+      } else {
+        assertEquals(efile.getFilename(), properties(litRenderer).get("filename").apply(efile));
+      }
     }
+    verify(dialog.filename).setComparator(comparatorCaptor.capture());
+    Comparator<EditableFile> comparator = comparatorCaptor.getValue();
+    assertTrue(comparator.compare(editableFile("R1.fastq"), editableFile("R2.fastq")) < 0);
+    assertTrue(comparator.compare(editableFile("R2.fastq"), editableFile("R1.fastq")) > 0);
+    assertTrue(comparator.compare(editableFile("R1.fastq"), editableFile("R1.fastq")) == 0);
     verify(dialog.filename).setEditorComponent(dialog.filenameEdit);
-    verify(dialog.files, times(2)).addColumn(anchorRendererCaptor.capture());
+    verify(dialog.files, times(3)).addColumn(anchorRendererCaptor.capture());
     ComponentRenderer<Anchor, EditableFile> anchorRenderer =
-        anchorRendererCaptor.getAllValues().get(0);
+        anchorRendererCaptor.getAllValues().get(1);
     for (File file : files) {
       EditableFile efile = new EditableFile(file);
       Anchor anchor = anchorRenderer.createComponent(efile);
@@ -303,9 +330,9 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
       assertEquals("", button.getText());
       verify(presenter).download(efile);
     }
-    verify(dialog.files, times(2)).addColumn(buttonRendererCaptor.capture());
+    verify(dialog.files, times(3)).addColumn(buttonRendererCaptor.capture());
     ComponentRenderer<Button, EditableFile> buttonRenderer =
-        buttonRendererCaptor.getAllValues().get(1);
+        buttonRendererCaptor.getAllValues().get(2);
     for (File file : files) {
       EditableFile efile = new EditableFile(file);
       Button button = buttonRenderer.createComponent(efile);
