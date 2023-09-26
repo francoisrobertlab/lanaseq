@@ -17,27 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.CANCEL;
-import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
-import static ca.qc.ircm.lanaseq.Constants.DELETE;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
-import static ca.qc.ircm.lanaseq.Constants.REMOVE;
-import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
-import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static ca.qc.ircm.lanaseq.text.Strings.styleName;
-import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
-
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -74,14 +53,24 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static ca.qc.ircm.lanaseq.Constants.*;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.*;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.*;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
+import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
 
 /**
  * Dataset dialog.
@@ -92,6 +81,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
   public static final String NAME_PREFIX = "namePrefix";
+  public static final String NAME_PREFIX_REGEX = "[\\w-\\.]*";
+  public static final String NAME_PREFIX_REGEX_ERROR = "namePrefix.regex";
   public static final String GENERATE_NAME = "generateName";
   public static final String ADD_NEW_SAMPLE = "addNewSample";
   public static final String ADD_SAMPLE = "addSample";

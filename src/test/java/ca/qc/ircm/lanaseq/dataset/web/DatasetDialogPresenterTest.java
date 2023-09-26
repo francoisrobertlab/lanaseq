@@ -17,25 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
-import static ca.qc.ircm.lanaseq.sample.SampleType.IMMUNO_PRECIPITATION;
-import static ca.qc.ircm.lanaseq.sample.SampleType.INPUT;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -65,16 +46,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -84,6 +55,25 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.*;
+import static ca.qc.ircm.lanaseq.sample.SampleType.IMMUNO_PRECIPITATION;
+import static ca.qc.ircm.lanaseq.sample.SampleType.INPUT;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for {@link DatasetDialogPresenter}.
@@ -740,6 +730,51 @@ public class DatasetDialogPresenterTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    verify(service, never()).save(any());
+    verify(dialog, never()).showNotification(any());
+    verify(dialog, never()).close();
+    verify(dialog, never()).fireSavedEvent();
+  }
+
+  @Test
+  public void save_NamePrefixInvalid() {
+    save_NamePrefixInvalid("MyDataset#Cool");
+    save_NamePrefixInvalid("MyDataset%Cool");
+    save_NamePrefixInvalid("MyDataset&Cool");
+    save_NamePrefixInvalid("MyDataset{Cool");
+    save_NamePrefixInvalid("MyDataset}Cool");
+    save_NamePrefixInvalid("MyDataset\\Cool");
+    save_NamePrefixInvalid("MyDataset<Cool");
+    save_NamePrefixInvalid("MyDataset>Cool");
+    save_NamePrefixInvalid("MyDataset*Cool");
+    save_NamePrefixInvalid("MyDataset?Cool");
+    save_NamePrefixInvalid("MyDataset/Cool");
+    save_NamePrefixInvalid("MyDataset Cool");
+    save_NamePrefixInvalid("MyDataset$Cool");
+    save_NamePrefixInvalid("MyDataset!Cool");
+    save_NamePrefixInvalid("MyDataset'Cool");
+    save_NamePrefixInvalid("MyDataset\"Cool");
+    save_NamePrefixInvalid("MyDataset:Cool");
+    save_NamePrefixInvalid("MyDataset@Cool");
+    save_NamePrefixInvalid("MyDataset+Cool");
+    save_NamePrefixInvalid("MyDataset`Cool");
+    save_NamePrefixInvalid("MyDataset|Cool");
+    save_NamePrefixInvalid("MyDataset=Cool");
+  }
+
+  private void save_NamePrefixInvalid(String namePrefix) {
+    fillForm();
+    dialog.namePrefix.setValue(namePrefix);
+
+    presenter.save();
+
+    BinderValidationStatus<Dataset> status = presenter.validateDataset();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, dialog.namePrefix);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(resources.message(NAME_PREFIX_REGEX_ERROR)), error.getMessage());
     verify(service, never()).save(any());
     verify(dialog, never()).showNotification(any());
     verify(dialog, never()).close();

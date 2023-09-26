@@ -17,15 +17,6 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
-
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -39,23 +30,25 @@ import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.*;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.*;
 
 /**
  * Dataset dialog.
@@ -94,10 +87,13 @@ public class DatasetDialogPresenter {
 
   void localeChange(Locale locale) {
     this.locale = locale;
+    final AppResources resources = new AppResources(DatasetDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     DateTimeFormatter dateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
     binder.forField(dialog.namePrefix).asRequired(webResources.message(REQUIRED))
         .withNullRepresentation("")
+        .withValidator(
+            new RegexpValidator(resources.message(NAME_PREFIX_REGEX_ERROR), NAME_PREFIX_REGEX))
         .withConverter(
             namePrefix -> namePrefix + dialog.date.getOptionalValue()
                 .map(date -> "_" + dateFormatter.format(date)).orElse(""),
