@@ -17,30 +17,6 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
-import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME_REGEX_ERROR;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_IOEXCEPTION;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
@@ -68,20 +44,6 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.StreamResourceWriter;
 import com.vaadin.flow.server.VaadinSession;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -95,6 +57,25 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithUserDetails;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.*;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for {@link SampleFilesDialogPresenter}.
@@ -350,7 +331,32 @@ public class SampleFilesDialogPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void filenameEdit_Invalid() throws Throwable {
-    dialog.filenameEdit.setValue("abc?.txt");
+    filenameEdit_Invalid("abc#.txt");
+    filenameEdit_Invalid("abc%.txt");
+    filenameEdit_Invalid("abc&.txt");
+    filenameEdit_Invalid("abc{.txt");
+    filenameEdit_Invalid("abc}.txt");
+    filenameEdit_Invalid("abc\\.txt");
+    filenameEdit_Invalid("abc<.txt");
+    filenameEdit_Invalid("abc>.txt");
+    filenameEdit_Invalid("abc*.txt");
+    filenameEdit_Invalid("abc?.txt");
+    filenameEdit_Invalid("abc/.txt");
+    filenameEdit_Invalid("abc .txt");
+    filenameEdit_Invalid("abc$.txt");
+    filenameEdit_Invalid("abc!.txt");
+    filenameEdit_Invalid("abc'.txt");
+    filenameEdit_Invalid("abc\".txt");
+    filenameEdit_Invalid("abc:.txt");
+    filenameEdit_Invalid("abc@.txt");
+    filenameEdit_Invalid("abc+.txt");
+    filenameEdit_Invalid("abc`.txt");
+    filenameEdit_Invalid("abc|.txt");
+    filenameEdit_Invalid("abc=.txt");
+  }
+
+  public void filenameEdit_Invalid(String filename) throws Throwable {
+    dialog.filenameEdit.setValue(filename);
 
     BinderValidationStatus<EditableFile> status = presenter.validateSampleFile();
     assertFalse(status.isOk());
