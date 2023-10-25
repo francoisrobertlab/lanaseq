@@ -74,7 +74,7 @@
     <testbench.skip>false</testbench.skip>
     <testbench.maxAttempts>3</testbench.maxAttempts>
     <!-- Dependencies -->
-    <vaadin.version>23.2.16</vaadin.version>
+    <vaadin.version>23.3.26</vaadin.version>
     <generate-property-names.version>1.1</generate-property-names.version>
     <guava.version>32.0.0-jre</guava.version>
     <commons-email.version>1.5</commons-email.version>
