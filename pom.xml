@@ -68,7 +68,7 @@
 
   <properties>
     <resource.delimiter>$[*]</resource.delimiter>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <start-class>ca.qc.ircm.lanaseq.Main</start-class>
     <slow-tests.skip>false</slow-tests.skip>
     <testbench.skip>false</testbench.skip>
