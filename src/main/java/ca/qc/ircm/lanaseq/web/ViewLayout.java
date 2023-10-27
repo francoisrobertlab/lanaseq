@@ -141,7 +141,7 @@ public class ViewLayout extends VerticalLayout
           VaadinServletResponse.getCurrent().getHttpServletResponse(), null);
     } else if (tabs.getSelectedTab() == exitSwitchUser) {
       switchUserService.exitSwitchUser();
-      UI.getCurrent().navigate(MainView.class);
+      UI.getCurrent().getPage().setLocation("/");
     } else {
       if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
         logger.debug("navigate to {}", tabsHref.get(tabs.getSelectedTab()));

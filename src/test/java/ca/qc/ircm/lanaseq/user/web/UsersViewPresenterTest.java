@@ -31,7 +31,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.security.UserRole;
@@ -299,7 +298,11 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     presenter.switchUser();
     assertFalse(view.error.isVisible());
     verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
-    assertCurrentView(DatasetsView.class);
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)")
+            .equals(i.getInvocation().getExpression())
+            && "/".equals(i.getInvocation().getParameters().get(0))
+            && "_self".equals(i.getInvocation().getParameters().get(1))));
   }
 
   @Test

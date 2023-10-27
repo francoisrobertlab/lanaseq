@@ -27,7 +27,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
-import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -135,7 +134,7 @@ public class UsersViewPresenter {
       view.error.setVisible(true);
     } else {
       switchUserService.switchUser(user, VaadinServletRequest.getCurrent());
-      UI.getCurrent().navigate(MainView.class);
+      UI.getCurrent().getPage().setLocation("/");
     }
   }
 

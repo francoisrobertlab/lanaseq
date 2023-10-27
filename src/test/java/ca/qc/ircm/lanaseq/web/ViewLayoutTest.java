@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -289,9 +288,13 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
     view.tabs.setSelectedTab(view.exitSwitchUser);
 
-    verify(navigationListener, times(2)).afterNavigation(any());
+    verify(navigationListener).afterNavigation(any());
     verify(switchUserService).exitSwitchUser();
-    assertCurrentView(DatasetsView.class);
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)")
+            .equals(i.getInvocation().getExpression())
+            && "/".equals(i.getInvocation().getParameters().get(0))
+            && "_self".equals(i.getInvocation().getParameters().get(1))));
   }
 
   @Test

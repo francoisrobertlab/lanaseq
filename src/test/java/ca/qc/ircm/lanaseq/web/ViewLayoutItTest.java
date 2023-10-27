@@ -166,8 +166,9 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     view.profile().click();
     view.exitSwitchUser().click();
     $(DatasetsViewElement.class).waitForFirst();
-    assertFalse(view.exitSwitchUser().isDisplayed());
-    assertTrue(view.users().isDisplayed());
+    ViewLayoutElement viewReload = $(ViewLayoutElement.class).waitForFirst();
+    assertFalse(optional(() -> viewReload.exitSwitchUser()).isPresent());
+    assertTrue(optional(() -> viewReload.users()).isPresent());
   }
 
   @Test
