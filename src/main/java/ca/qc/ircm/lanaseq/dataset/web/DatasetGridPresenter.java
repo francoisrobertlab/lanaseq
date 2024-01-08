@@ -24,10 +24,7 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
-import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.provider.CallbackDataProvider.CountCallback;
 import com.vaadin.flow.data.provider.CallbackDataProvider.FetchCallback;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
@@ -65,23 +62,13 @@ public class DatasetGridPresenter {
   }
 
   private void loadDataset() {
-    FetchCallback<Dataset, DatasetFilter> fetchCallback = query -> {
-      DatasetFilter filter = query.getFilter().orElse(new DatasetFilter());
+    FetchCallback<Dataset, Void> fetchCallback = query -> {
       filter.sort = VaadinSort.springDataSort(query.getSortOrders());
       filter.page = query.getOffset() / grid.getPageSize();
       filter.size = query.getLimit();
       return service.all(filter).stream();
     };
-    CountCallback<Dataset, DatasetFilter> countCallback = query -> {
-      DatasetFilter filter = query.getFilter().orElse(new DatasetFilter());
-      int count = (int) service.count(filter);
-      return count;
-    };
-    datasetsDataProvider = new CallbackDataProvider<>(fetchCallback, countCallback);
-    ConfigurableFilterDataProvider<Dataset, Void, DatasetFilter> dataProvider =
-        datasetsDataProvider.withConfigurableFilter();
-    dataProvider.setFilter(filter);
-    grid.setItems(dataProvider);
+    grid.setItems(fetchCallback);
   }
 
   void refreshDatasets() {
