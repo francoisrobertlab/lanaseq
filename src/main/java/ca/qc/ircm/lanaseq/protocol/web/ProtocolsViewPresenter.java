@@ -26,10 +26,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import com.google.common.collect.Range;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -70,11 +67,7 @@ public class ProtocolsViewPresenter {
   }
 
   private void loadProtocols() {
-    protocolsDataProvider = DataProvider.ofCollection(service.all());
-    ConfigurableFilterDataProvider<Protocol, Void, SerializablePredicate<Protocol>> dataProvider =
-        protocolsDataProvider.withConfigurableFilter();
-    dataProvider.setFilter(filter);
-    view.protocols.setItems(dataProvider);
+    view.protocols.setItems(service.all());
   }
 
   void edit(Protocol protocol) {
