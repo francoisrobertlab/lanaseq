@@ -28,9 +28,7 @@ import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.util.List;
@@ -77,11 +75,7 @@ public class UsersViewPresenter {
   }
 
   private void loadUsers() {
-    usersDataProvider = new ListDataProvider<>(userService.all());
-    ConfigurableFilterDataProvider<User, Void, SerializablePredicate<User>> dataProvider =
-        usersDataProvider.withConfigurableFilter();
-    dataProvider.setFilter(filter);
-    view.users.setItems(dataProvider);
+    view.users.setItems(userService.all());
   }
 
   void localeChange(Locale locale) {
