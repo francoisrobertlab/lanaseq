@@ -18,17 +18,12 @@
 package ca.qc.ircm.lanaseq.test.config;
 
 import static ca.qc.ircm.lanaseq.test.config.AnnotationFinder.findAnnotation;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.TestBenchTestCase;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.HashMap;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -49,16 +44,11 @@ import org.springframework.test.context.TestExecutionListener;
  */
 @Order(0)
 public class TestBenchTestExecutionListener implements TestExecutionListener, InjectDependencies {
-  @SuppressWarnings("checkstyle:linelength")
-  private static final String LICENSE_ERROR_MESSAGE =
-      "License for Vaadin TestBench not found. Skipping test class {0} .";
-  private static final String[] LICENSE_PATHS = new String[] { ".vaadin/proKey",
-      "vaadin.testbench.developer.license", ".vaadin.testbench.developer.license" };
-  private static final String LICENSE_SYSTEM_PROPERTY = "vaadin.testbench.developer.license";
   private static final String SKIP_TESTS_ERROR_MESSAGE = "TestBench tests are skipped";
   private static final String SKIP_TESTS_SYSTEM_PROPERTY = "testbench.skip";
   private static final String DRIVER_SYSTEM_PROPERTY = "testbench.driver";
   private static final String RETRIES_SYSTEM_PROPERTY = "testbench.retries";
+  @SuppressWarnings("unused")
   private static final String FIREFOX_DRIVER = FirefoxDriver.class.getName();
   private static final String CHROME_DRIVER = ChromeDriver.class.getName();
   @SuppressWarnings("unused")
@@ -73,20 +63,9 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
     injectDependencies(testContext.getApplicationContext());
     if (isTestBenchTest(testContext)) {
       if (isSkipTestBenchTests()) {
-        assumeTrue(SKIP_TESTS_ERROR_MESSAGE, false);
+        assumeTrue(false, SKIP_TESTS_ERROR_MESSAGE);
       }
 
-      boolean licenseFileExists = false;
-      for (String licencePath : LICENSE_PATHS) {
-        licenseFileExists |=
-            Files.exists(Paths.get(System.getProperty("user.home")).resolve(licencePath));
-      }
-      if (!licenseFileExists && System.getProperty(LICENSE_SYSTEM_PROPERTY) == null) {
-        String message =
-            MessageFormat.format(LICENSE_ERROR_MESSAGE, testContext.getTestClass().getName());
-        logger.info(message);
-        assumeTrue(message, false);
-      }
       setRetries();
     }
   }
@@ -153,12 +132,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       if (downloadAnnotations != null) {
         HashMap<String, Object> chromePrefs = new HashMap<>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
-        if (SystemUtils.IS_OS_WINDOWS) {
-          chromePrefs.put("download.default_directory",
-              FilenameUtils.separatorsToWindows(downloadHome));
-        } else {
-          chromePrefs.put("download.default_directory", downloadHome);
-        }
+        chromePrefs.put("download.default_directory", downloadHome);
         options.setExperimentalOption("prefs", chromePrefs);
       } else {
         options.setHeadless(headless);
