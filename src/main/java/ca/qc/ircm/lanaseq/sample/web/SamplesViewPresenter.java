@@ -33,10 +33,7 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
-import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.provider.CallbackDataProvider.CountCallback;
 import com.vaadin.flow.data.provider.CallbackDataProvider.FetchCallback;
-import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDate;
@@ -84,23 +81,13 @@ public class SamplesViewPresenter {
   }
 
   private void loadSamples() {
-    FetchCallback<Sample, SampleFilter> fetchCallback = query -> {
-      SampleFilter filter = query.getFilter().orElse(new SampleFilter());
+    FetchCallback<Sample, Void> fetchCallback = query -> {
       filter.sort = VaadinSort.springDataSort(query.getSortOrders());
       filter.page = query.getOffset() / view.samples.getPageSize();
       filter.size = query.getLimit();
       return service.all(filter).stream();
     };
-    CountCallback<Sample, SampleFilter> countCallback = query -> {
-      SampleFilter filter = query.getFilter().orElse(new SampleFilter());
-      int count = (int) service.count(filter);
-      return count;
-    };
-    samplesDataProvider = new CallbackDataProvider<>(fetchCallback, countCallback);
-    ConfigurableFilterDataProvider<Sample, Void, SampleFilter> dataProvider =
-        samplesDataProvider.withConfigurableFilter();
-    dataProvider.setFilter(filter);
-    view.samples.setItems(dataProvider);
+    view.samples.setItems(fetchCallback);
   }
 
   void view(Sample sample) {
