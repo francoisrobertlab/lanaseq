@@ -241,8 +241,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     open();
     Protocol protocol = repository.findById(4L).get();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    view.protocols().ownerFilter().setValue("francois.robert@ircm.qc.ca");
-    view.protocols().edit(1).click();
+    view.protocols().edit(3).click();
     ProtocolDialogElement dialog = view.dialog();
     final String name = protocol.getName();
 
