@@ -51,7 +51,7 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchTestCase.class);
-  @Value("http://localhost:${local.server.port}")
+  @Value("http://localhost:${local.server.port}${server.servlet.context-path:}")
   protected String baseUrl;
   private Path home;
   private Path archive;

@@ -292,6 +292,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
 
   @Test
   public void switchUser() throws Throwable {
+    when(view.getUrl(any())).thenReturn("/main");
     UI.getCurrent().navigate(UsersView.class);
     User user = userRepository.findById(3L).orElse(null);
     view.users.select(user);
@@ -301,7 +302,7 @@ public class UsersViewPresenterTest extends AbstractKaribuTestCase {
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
         .anyMatch(i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)")
             .equals(i.getInvocation().getExpression())
-            && "/".equals(i.getInvocation().getParameters().get(0))
+            && "/main".equals(i.getInvocation().getParameters().get(0))
             && "_self".equals(i.getInvocation().getParameters().get(1))));
   }
 

@@ -160,3 +160,13 @@ logging:
     name: test.log
 
 download-home: ${user.dir}/target/download
+
+---
+spring:
+  config:
+    activate:
+      on-profile: context-path
+
+server:
+  servlet:
+    context-path: /lanaseq-test

@@ -36,6 +36,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  * Integration tests for {@link ViewLayout}.
  */
 @TestBenchTestAnnotations
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   private void open() {
     openView(VIEW_NAME);
@@ -50,7 +51,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void fieldsExistence_User() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -110,7 +110,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void datasets() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -119,7 +118,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void samples() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -128,7 +126,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void protocols() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -137,7 +134,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void profile() throws Throwable {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -174,10 +170,6 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   @Test
   public void signout() throws Throwable {
     open();
-    SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
-    signinView.getUsernameField().setValue("jonh.smith@ircm.qc.ca");
-    signinView.getPasswordField().setValue("pass1");
-    signinView.getSubmitButton().click();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.signout().click();
     $(SigninViewElement.class).waitForFirst();

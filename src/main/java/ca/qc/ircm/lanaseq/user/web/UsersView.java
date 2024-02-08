@@ -37,6 +37,7 @@ import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -74,7 +75,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ MANAGER, ADMIN })
 public class UsersView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    AfterNavigationObserver, NotificationComponent {
+    AfterNavigationObserver, NotificationComponent, UrlComponent {
   public static final String VIEW_NAME = "users";
   public static final String ID = "users-view";
   public static final String HEADER = "header";
