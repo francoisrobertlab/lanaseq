@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 public class AuthenticatedUser {
   private static final Logger logger = LoggerFactory.getLogger(AuthenticatedUser.class);
   @Autowired
-  private UserRepository userRepository;
+  private UserRepository repository;
   @Autowired
   private UserDetailsService userDetailsService;
   @Autowired
@@ -53,9 +53,9 @@ public class AuthenticatedUser {
   protected AuthenticatedUser() {
   }
 
-  protected AuthenticatedUser(UserRepository userRepository, UserDetailsService userDetailsService,
+  protected AuthenticatedUser(UserRepository repository, UserDetailsService userDetailsService,
       RoleValidator roleValidator, PermissionEvaluator permissionEvaluator) {
-    this.userRepository = userRepository;
+    this.repository = repository;
     this.userDetailsService = userDetailsService;
     this.roleValidator = roleValidator;
     this.permissionEvaluator = permissionEvaluator;
@@ -76,9 +76,19 @@ public class AuthenticatedUser {
    * @return authenticated user or empty for anonymous
    */
   public Optional<User> getUser() {
-    return getUserDetails().filter(user -> user instanceof UserDetailsWithId)
-        .map(user -> ((UserDetailsWithId) user))
-        .map(user -> userRepository.findById(user.getId()).orElse(null));
+    Optional<UserDetails> optionalUserDetails = getUserDetails();
+    if (optionalUserDetails.isPresent()) {
+      UserDetails userDetails = optionalUserDetails.get();
+      if (userDetails instanceof UserDetailsWithId) {
+        return repository.findById(((UserDetailsWithId) userDetails).getId());
+      } else {
+        logger.warn("UserDetails {} is not an instanceof {}", userDetails,
+            UserDetailsWithId.class.getSimpleName());
+        return repository.findByEmail(userDetails.getUsername());
+      }
+    } else {
+      return Optional.empty();
+    }
   }
 
   /**

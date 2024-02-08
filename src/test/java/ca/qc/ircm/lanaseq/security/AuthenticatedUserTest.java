@@ -69,7 +69,7 @@ public class AuthenticatedUserTest {
   @Autowired
   private AuthenticatedUser authenticatedUser;
   @Autowired
-  private UserRepository userRepository;
+  private UserRepository repository;
   @Autowired
   private UserDetailsService userDetailsService;
   @MockBean
@@ -103,15 +103,34 @@ public class AuthenticatedUserTest {
 
   @Test
   @WithAnonymousUser
-  public void user_Anonymous() throws Throwable {
+  public void getUser_Anonymous() throws Throwable {
     assertTrue(!authenticatedUser.getUser().isPresent());
   }
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void user() throws Throwable {
+  public void getUser() throws Throwable {
     User user = authenticatedUser.getUser().orElse(null);
     assertNotNull(authenticatedUser.getUser());
+    assertEquals((Long) 1L, user.getId());
+  }
+
+  @Test
+  @WithMockUser("lanaseq@ircm.qc.ca")
+  public void getUser_NoId() throws Throwable {
+    User user = authenticatedUser.getUser().orElse(null);
+    assertNotNull(user);
+    assertEquals((Long) 1L, user.getId());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void getUser_UsernameMissmatchId() throws Throwable {
+    User user = repository.findById(1L).get();
+    user.setEmail("other_email@ircm.qc.ca");
+    repository.save(user);
+    user = authenticatedUser.getUser().orElse(null);
+    assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
   }
 
@@ -175,9 +194,9 @@ public class AuthenticatedUserTest {
   @Test
   @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void removeForceChangePasswordRole() throws Throwable {
-    userRepository.findById(6L).ifPresent(user -> {
+    repository.findById(6L).ifPresent(user -> {
       user.setExpiredPassword(false);
-      userRepository.save(user);
+      repository.save(user);
     });
     Authentication oldAuthentication = SecurityContextHolder.getContext().getAuthentication();
     assertEquals("christian.poitras@ircm.qc.ca", oldAuthentication.getName());
