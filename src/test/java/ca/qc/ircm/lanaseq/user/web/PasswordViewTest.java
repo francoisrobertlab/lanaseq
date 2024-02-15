@@ -20,26 +20,32 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -49,8 +55,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PasswordViewTest extends AbstractKaribuTestCase {
   private PasswordView view;
-  @Mock
-  private PasswordViewPresenter presenter;
+  @MockBean
+  private UserService service;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(PasswordView.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -61,13 +69,7 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    view = new PasswordView(presenter);
-    view.init();
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(view);
+    view = ui.navigate(PasswordView.class).get();
   }
 
   @Test
@@ -81,23 +83,18 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
   }
 
   @Test
   public void localeChange() {
-    view.localeChange(mock(LocaleChangeEvent.class));
-    verify(presenter).localeChange(locale);
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(PasswordView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -107,8 +104,37 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void passwords_Required() {
+    assertTrue(view.passwords.isRequired());
+  }
+
+  @Test
+  public void save_PasswordValidationFailed() {
+    view.passwords = mock(PasswordsForm.class);
+    BinderValidationStatus<Passwords> passwordsValidationStatus =
+        mock(BinderValidationStatus.class);
+    when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
+    when(passwordsValidationStatus.isOk()).thenReturn(false);
+
+    view.save();
+
+    verify(service, never()).save(any());
+    assertCurrentView(PasswordView.class);
+  }
+
+  @Test
   public void save() {
-    clickButton(view.save);
-    verify(presenter).save();
+    view.passwords = mock(PasswordsForm.class);
+    BinderValidationStatus<Passwords> passwordsValidationStatus =
+        mock(BinderValidationStatus.class);
+    when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
+    when(passwordsValidationStatus.isOk()).thenReturn(true);
+    String password = "test_password";
+    when(view.passwords.getPassword()).thenReturn(password);
+
+    view.save();
+
+    verify(service).save(password);
+    assertCurrentView(DatasetsView.class);
   }
 }

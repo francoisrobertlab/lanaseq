@@ -24,7 +24,12 @@ import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
+import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -56,14 +61,13 @@ public class PasswordView extends VerticalLayout
   protected H2 header = new H2();
   protected PasswordsForm passwords = new PasswordsForm();
   protected Button save = new Button();
+  private transient UserService service;
+  private transient AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient PasswordViewPresenter presenter;
-
-  protected PasswordView() {
-  }
-
-  protected PasswordView(PasswordViewPresenter presenter) {
-    this.presenter = presenter;
+  protected PasswordView(UserService service, AuthenticatedUser authenticatedUser) {
+    this.service = service;
+    this.authenticatedUser = authenticatedUser;
   }
 
   @PostConstruct
@@ -77,8 +81,8 @@ public class PasswordView extends VerticalLayout
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
-    presenter.init(this);
+    save.addClickListener(e -> save());
+    passwords.setRequired(true);
   }
 
   @Override
@@ -87,7 +91,6 @@ public class PasswordView extends VerticalLayout
     AppResources webResources = new AppResources(Constants.class, getLocale());
     header.setText(resources.message(HEADER));
     save.setText(webResources.message(SAVE));
-    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -95,5 +98,19 @@ public class PasswordView extends VerticalLayout
     AppResources resources = new AppResources(PasswordView.class, getLocale());
     AppResources webResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, webResources.message(APPLICATION_NAME));
+  }
+
+  private boolean validate() {
+    return passwords.validate().isOk();
+  }
+
+  void save() {
+    if (validate()) {
+      User user = authenticatedUser.getUser().orElse(null);
+      String password = passwords.getPassword();
+      logger.debug("save new password for user {}", user);
+      service.save(password);
+      UI.getCurrent().navigate(MainView.class);
+    }
   }
 }
