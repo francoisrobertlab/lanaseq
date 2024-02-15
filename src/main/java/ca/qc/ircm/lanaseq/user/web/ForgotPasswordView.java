@@ -18,15 +18,21 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
+import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -36,6 +42,10 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -66,11 +76,14 @@ public class ForgotPasswordView extends VerticalLayout
   protected TextField email = new TextField();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
-  private transient ForgotPasswordViewPresenter presenter;
+  private Binder<User> binder = new BeanValidationBinder<User>(User.class);
+  private transient ForgotPasswordService service;
+  private transient UserService userService;
 
   @Autowired
-  protected ForgotPasswordView(ForgotPasswordViewPresenter presenter) {
-    this.presenter = presenter;
+  protected ForgotPasswordView(ForgotPasswordService service, UserService userService) {
+    this.service = service;
+    this.userService = userService;
   }
 
   /**
@@ -90,8 +103,8 @@ public class ForgotPasswordView extends VerticalLayout
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
-    presenter.init(this);
+    save.addClickListener(e -> save());
+    binder.setBean(new User());
   }
 
   @Override
@@ -103,7 +116,8 @@ public class ForgotPasswordView extends VerticalLayout
     message.setText(resources.message(MESSAGE));
     email.setLabel(userResources.message(EMAIL));
     save.setText(webResources.message(SAVE));
-    presenter.localeChange(getLocale());
+    binder.forField(email).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL))).bind(EMAIL);
   }
 
   @Override
@@ -111,5 +125,27 @@ public class ForgotPasswordView extends VerticalLayout
     final AppResources resources = new AppResources(getClass(), getLocale());
     final AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+  }
+
+  BinderValidationStatus<User> validateUser() {
+    return binder.validate();
+  }
+
+  boolean validate() {
+    return validateUser().isOk();
+  }
+
+  void save() {
+    if (validate()) {
+      String email = this.email.getValue();
+      logger.debug("create new forgot password for user {}", email);
+      if (userService.exists(email)) {
+        service.insert(email, (fp, fplocale) -> getUrl(UseForgotPasswordView.VIEW_NAME) + "/"
+            + fp.getId() + UseForgotPasswordView.SEPARATOR + fp.getConfirmNumber());
+      }
+      final AppResources resources = new AppResources(ForgotPasswordView.class, getLocale());
+      showNotification(resources.message(SAVED, email));
+      UI.getCurrent().navigate(SigninView.class);
+    }
   }
 }
