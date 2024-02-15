@@ -24,6 +24,9 @@ import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
@@ -59,14 +62,13 @@ public class ProfileView extends VerticalLayout
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
-  private transient ProfileViewPresenter presenter;
-
-  protected ProfileView() {
-  }
+  private transient UserService service;
+  private transient AuthenticatedUser authenticatedUser;
 
   @Autowired
-  protected ProfileView(ProfileViewPresenter presenter, UserForm form) {
-    this.presenter = presenter;
+  protected ProfileView(UserService service, AuthenticatedUser authenticatedUser, UserForm form) {
+    this.service = service;
+    this.authenticatedUser = authenticatedUser;
     this.form = form;
   }
 
@@ -83,8 +85,8 @@ public class ProfileView extends VerticalLayout
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
-    presenter.init(this);
+    save.addClickListener(e -> save());
+    form.setUser(authenticatedUser.getUser().orElse(null));
   }
 
   @Override
@@ -93,7 +95,6 @@ public class ProfileView extends VerticalLayout
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     save.setText(webResources.message(SAVE));
     header.setText(resources.message(HEADER));
-    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -101,5 +102,16 @@ public class ProfileView extends VerticalLayout
     final AppResources resources = new AppResources(getClass(), getLocale());
     final AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+  }
+
+  void save() {
+    if (form.isValid()) {
+      User user = form.getUser();
+      String password = form.getPassword();
+      logger.debug("save user {}", user);
+      service.save(user, password);
+      final AppResources resources = new AppResources(ProfileView.class, getLocale());
+      showNotification(resources.message(SAVED, user.getEmail()));
+    }
   }
 }

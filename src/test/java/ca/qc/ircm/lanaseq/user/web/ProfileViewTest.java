@@ -22,27 +22,34 @@ import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.Constants.FRENCH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.ID;
+import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
+import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.router.BeforeEvent;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -52,13 +59,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProfileViewTest extends AbstractKaribuTestCase {
   private ProfileView view;
-  private UserForm form;
-  @Mock
-  private ProfileViewPresenter presenter;
-  @Mock
-  private UserFormPresenter formPresenter;
-  @Mock
-  private BeforeEvent beforeEvent;
+  @MockBean
+  private UserService service;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
   private Locale locale = ENGLISH;
   private AppResources resources = new AppResources(ProfileView.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -69,14 +73,7 @@ public class ProfileViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    form = new UserForm(formPresenter);
-    view = new ProfileView(presenter, form);
-    view.init();
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(view);
+    view = ui.navigate(ProfileView.class).get();
   }
 
   @Test
@@ -89,36 +86,55 @@ public class ProfileViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void localeChange() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = FRENCH;
     final AppResources resources = new AppResources(ProfileView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
-    verify(presenter).localeChange(locale);
-  }
-
-  @Test
-  public void save() {
-    clickButton(view.save);
-
-    verify(presenter).save();
   }
 
   @Test
   public void getPageTitle() {
     assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
         view.getPageTitle());
+  }
+
+  @Test
+  public void form_DefaultUser() {
+    assertEquals(authenticatedUser.getUser().get(), view.form.getUser());
+  }
+
+  @Test
+  public void save_Invalid() {
+    view.form = mock(UserForm.class);
+
+    view.save();
+
+    verify(view.form).isValid();
+    verify(service, never()).save(any(), any());
+  }
+
+  @Test
+  public void save() {
+    String password = "test_password";
+    User user = mock(User.class);
+    view.form = mock(UserForm.class);
+    when(view.form.isValid()).thenReturn(true);
+    when(view.form.getPassword()).thenReturn(password);
+    when(view.form.getUser()).thenReturn(user);
+
+    view.save();
+
+    verify(view.form).isValid();
+    verify(service).save(eq(user), eq(password));
+    NotificationsKt.expectNotifications(resources.message(SAVED));
   }
 }
