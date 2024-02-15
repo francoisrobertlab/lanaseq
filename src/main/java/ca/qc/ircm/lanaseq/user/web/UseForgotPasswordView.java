@@ -23,7 +23,11 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.user.ForgotPassword;
+import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
+import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
@@ -39,6 +43,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.WildcardParameter;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import java.util.Locale;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,11 +70,12 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
   protected PasswordsForm form = new PasswordsForm();
-  private transient UseForgotPasswordViewPresenter presenter;
+  private ForgotPassword forgotPassword;
+  private transient ForgotPasswordService service;
 
   @Autowired
-  protected UseForgotPasswordView(UseForgotPasswordViewPresenter presenter) {
-    this.presenter = presenter;
+  protected UseForgotPasswordView(ForgotPasswordService service) {
+    this.service = service;
   }
 
   /**
@@ -86,8 +92,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
-    presenter.init(this);
+    save.addClickListener(e -> save());
   }
 
   @Override
@@ -97,7 +102,6 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     header.setText(resources.message(HEADER));
     message.setText(resources.message(MESSAGE));
     save.setText(webResources.message(SAVE));
-    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -107,8 +111,55 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
   }
 
+  private boolean validateParameter(String parameter, Locale locale) {
+    final AppResources resources = new AppResources(UseForgotPasswordView.class, locale);
+    if (parameter == null) {
+      showNotification(resources.message(INVALID));
+      return false;
+    }
+
+    String[] parameters = parameter.split(SEPARATOR, -1);
+    boolean valid = true;
+    if (parameters.length < 2) {
+      valid = false;
+    } else {
+      try {
+        long id = Long.parseLong(parameters[0]);
+        String confirmNumber = parameters[1];
+        if (!service.get(id, confirmNumber).isPresent()) {
+          valid = false;
+        }
+      } catch (NumberFormatException e) {
+        valid = false;
+      }
+    }
+    if (!valid) {
+      showNotification(resources.message(INVALID));
+    }
+    return valid;
+  }
+
   @Override
   public void setParameter(BeforeEvent event, @WildcardParameter String parameter) {
-    presenter.setParameter(parameter, getLocale());
+    if (validateParameter(parameter, getLocale())) {
+      String[] parameters = parameter.split(SEPARATOR, -1);
+      long id = Long.parseLong(parameters[0]);
+      String confirmNumber = parameters[1];
+      forgotPassword = service.get(id, confirmNumber).orElse(null);
+    } else {
+      save.setEnabled(false);
+      form.setEnabled(false);
+    }
+  }
+
+  void save() {
+    if (form.isValid()) {
+      String password = form.getPassword();
+      logger.debug("save new password for user {}", forgotPassword.getUser());
+      service.updatePassword(forgotPassword, password);
+      final AppResources resources = new AppResources(UseForgotPasswordView.class, getLocale());
+      showNotification(resources.message(SAVED));
+      UI.getCurrent().navigate(SigninView.class);
+    }
   }
 }
