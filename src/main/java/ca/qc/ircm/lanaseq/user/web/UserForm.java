@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -24,10 +26,18 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.Permission;
+import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -49,14 +59,13 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   protected Checkbox admin = new Checkbox();
   protected Checkbox manager = new Checkbox();
   protected PasswordsForm passwords = new PasswordsForm();
+  private Binder<User> binder = new BeanValidationBinder<>(User.class);
+  private User user;
+  private transient AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient UserFormPresenter presenter;
-
-  protected UserForm() {
-  }
-
-  protected UserForm(UserFormPresenter presenter) {
-    this.presenter = presenter;
+  protected UserForm(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
   }
 
   public static String id(String baseId) {
@@ -73,33 +82,63 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
     email.setId(id(EMAIL));
     name.setId(id(NAME));
     admin.setId(id(ADMIN));
+    admin.setVisible(authenticatedUser.hasRole(UserRole.ADMIN));
     manager.setId(id(MANAGER));
-    presenter.init(this);
+    manager.setVisible(authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
     final AppResources userResources = new AppResources(User.class, getLocale());
+    final AppResources webResources = new AppResources(Constants.class, getLocale());
     email.setLabel(userResources.message(EMAIL));
     name.setLabel(userResources.message(NAME));
     admin.setLabel(userResources.message(ADMIN));
     manager.setLabel(userResources.message(MANAGER));
-    presenter.localeChange(getLocale());
+    binder.forField(email).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL))).bind(EMAIL);
+    binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .bind(NAME);
+    binder.forField(admin).bind(ADMIN);
+    binder.forField(manager).bind(MANAGER);
+    updateReadOnly();
   }
 
-  public boolean isValid() {
-    return presenter.isValid();
+  private void updateReadOnly() {
+    boolean readOnly =
+        user.getId() != null && !authenticatedUser.hasPermission(user, Permission.WRITE);
+    binder.setReadOnly(readOnly);
+    passwords.setVisible(!readOnly);
   }
 
-  public String getPassword() {
-    return presenter.getPassword();
+  BinderValidationStatus<User> validateUser() {
+    return binder.validate();
   }
 
-  public User getUser() {
-    return presenter.getUser();
+  boolean isValid() {
+    boolean valid = true;
+    valid = validateUser().isOk() && valid;
+    valid = passwords.validate().isOk() && valid;
+    return valid;
   }
 
-  public void setUser(User user) {
-    presenter.setUser(user);
+  String getPassword() {
+    return passwords.getPassword();
+  }
+
+  User getUser() {
+    return user;
+  }
+
+  void setUser(User user) {
+    if (user == null) {
+      user = new User();
+    }
+    this.user = user;
+    binder.setBean(user);
+    passwords.password.setValue("");
+    passwords.passwordConfirm.setValue("");
+    passwords.setRequired(user.getId() == null);
+    updateReadOnly();
   }
 }
