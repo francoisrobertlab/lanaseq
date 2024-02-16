@@ -19,12 +19,14 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.ID;
+import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -38,9 +40,13 @@ import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.github.mvysny.kaributesting.v10.LocatorJ;
+import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.Locale;
@@ -48,6 +54,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -57,13 +64,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UserDialogTest extends AbstractKaribuTestCase {
   private UserDialog dialog;
-  private UserForm form;
-  @Mock
-  private UserDialogPresenter presenter;
-  @Mock
-  private UserFormPresenter userFormPresenter;
-  @Mock
-  private User user;
+  @MockBean
+  private UserService userService;
   @Mock
   private ComponentEventListener<SavedEvent<UserDialog>> savedListener;
   @Autowired
@@ -78,14 +80,10 @@ public class UserDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    form = new UserForm(userFormPresenter);
-    dialog = new UserDialog(presenter, form);
-    dialog.init();
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(dialog);
+    UsersView view = ui.navigate(UsersView.class).get();
+    User user = userRepository.findById(2L).get();
+    doubleClickItem(view.users, user);
+    dialog = (UserDialog) LocatorJ._find(Dialog.class).get(0);
   }
 
   @Test
@@ -98,27 +96,22 @@ public class UserDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
     validateIcon(VaadinIcon.CLOSE.create(), dialog.cancel.getIcon());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void localeChange() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(UserDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -137,67 +130,107 @@ public class UserDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void getUser() {
-    when(userFormPresenter.getUser()).thenReturn(user);
+    User user = mock(User.class);
+    dialog.form = mock(UserForm.class);
+    when(dialog.form.getUser()).thenReturn(user);
     assertEquals(user, dialog.getUser());
-    verify(userFormPresenter).getUser();
+    verify(dialog.form).getUser();
   }
 
   @Test
   public void setUser_NewUser() {
     User user = new User();
-    when(userFormPresenter.getUser()).thenReturn(user);
+    dialog.form = mock(UserForm.class);
 
     dialog.localeChange(mock(LocaleChangeEvent.class));
     dialog.setUser(user);
 
-    verify(userFormPresenter).setUser(user);
+    verify(dialog.form).setUser(user);
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
   }
 
   @Test
   public void setUser_User() {
     User user = userRepository.findById(2L).get();
-    when(userFormPresenter.getUser()).thenReturn(user);
-
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setUser(user);
-
-    verify(userFormPresenter).setUser(user);
-    assertEquals(resources.message(HEADER, 1, user.getName()), dialog.getHeaderTitle());
-  }
-
-  @Test
-  public void setUser_UserBeforeLocaleChange() {
-    User user = userRepository.findById(2L).get();
-    when(userFormPresenter.getUser()).thenReturn(user);
+    dialog.form = mock(UserForm.class);
+    when(dialog.form.getUser()).thenReturn(user);
 
     dialog.setUser(user);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(userFormPresenter).setUser(user);
+    verify(dialog.form).setUser(user);
     assertEquals(resources.message(HEADER, 1, user.getName()), dialog.getHeaderTitle());
   }
 
   @Test
   public void setUser_Null() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
+    dialog.form = mock(UserForm.class);
+
     dialog.setUser(null);
 
-    verify(userFormPresenter).setUser(null);
+    verify(dialog.form).setUser(null);
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
   }
 
   @Test
-  public void save() {
-    clickButton(dialog.save);
+  public void save_ValidationFalse() {
+    dialog.form = mock(UserForm.class);
+    dialog.addSavedListener(savedListener);
 
-    verify(presenter).save();
+    dialog.save();
+
+    verify(userService, never()).save(any(), any());
+    NotificationsKt.expectNoNotifications();
+    assertTrue(dialog.isOpened());
+    verify(savedListener, never()).onComponentEvent(any());
   }
 
   @Test
-  public void cancel() {
-    clickButton(dialog.cancel);
+  public void save_ValidationTrue() {
+    User user = mock(User.class);
+    dialog.form = mock(UserForm.class);
+    when(dialog.form.isValid()).thenReturn(true);
+    when(dialog.form.getUser()).thenReturn(user);
+    String password = "test_password";
+    when(dialog.form.getPassword()).thenReturn(password);
+    String email = "test@ircm.qc.ca";
+    when(user.getEmail()).thenReturn(email);
+    dialog.addSavedListener(savedListener);
 
-    verify(presenter).cancel();
+    dialog.save();
+
+    verify(userService).save(user, password);
+    NotificationsKt.expectNotifications(resources.message(SAVED, email));
+    assertFalse(dialog.isOpened());
+    verify(savedListener).onComponentEvent(any());
+  }
+
+  @Test
+  public void save_ValidationTrueNullPassword() {
+    User user = mock(User.class);
+    dialog.form = mock(UserForm.class);
+    when(dialog.form.isValid()).thenReturn(true);
+    when(dialog.form.getUser()).thenReturn(user);
+    String email = "test@ircm.qc.ca";
+    when(user.getEmail()).thenReturn(email);
+    dialog.addSavedListener(savedListener);
+
+    dialog.save();
+
+    verify(userService).save(user, null);
+    NotificationsKt.expectNotifications(resources.message(SAVED, email));
+    assertFalse(dialog.isOpened());
+    verify(savedListener).onComponentEvent(any());
+  }
+
+  @Test
+  public void cancel_Close() {
+    dialog.addSavedListener(savedListener);
+
+    dialog.cancel();
+
+    verify(userService, never()).save(any(), any());
+    NotificationsKt.expectNoNotifications();
+    assertFalse(dialog.isOpened());
+    verify(savedListener, never()).onComponentEvent(any());
   }
 }

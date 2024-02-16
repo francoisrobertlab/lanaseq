@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -37,6 +38,8 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -51,17 +54,15 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
   private static final long serialVersionUID = 3285639770914046262L;
+  private static final Logger logger = LoggerFactory.getLogger(UserDialog.class);
   protected UserForm form;
   protected Button save = new Button();
   protected Button cancel = new Button();
-  private transient UserDialogPresenter presenter;
-
-  protected UserDialog() {
-  }
+  private transient UserService userService;
 
   @Autowired
-  protected UserDialog(UserDialogPresenter presenter, UserForm form) {
-    this.presenter = presenter;
+  protected UserDialog(UserService userService, UserForm form) {
+    this.userService = userService;
     this.form = form;
   }
 
@@ -84,11 +85,10 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
+    save.addClickListener(e -> save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
-    cancel.addClickListener(e -> presenter.cancel());
-    presenter.init(this);
+    cancel.addClickListener(e -> cancel());
   }
 
   @Override
@@ -97,7 +97,6 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     updateHeader();
     save.setText(webResources.message(SAVE));
     cancel.setText(webResources.message(CANCEL));
-    presenter.localeChange(getLocale());
   }
 
   private void updateHeader() {
@@ -107,6 +106,23 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     } else {
       setHeaderTitle(resources.message(HEADER, 0));
     }
+  }
+
+  void save() {
+    if (form.isValid()) {
+      User user = form.getUser();
+      String password = form.getPassword();
+      logger.debug("save user {}", user);
+      userService.save(user, password);
+      final AppResources resources = new AppResources(UserDialog.class, getLocale());
+      showNotification(resources.message(SAVED, user.getEmail()));
+      close();
+      fireSavedEvent();
+    }
+  }
+
+  void cancel() {
+    close();
   }
 
   /**
