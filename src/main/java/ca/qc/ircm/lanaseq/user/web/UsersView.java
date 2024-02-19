@@ -33,12 +33,17 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
+import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -55,10 +60,9 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -74,16 +78,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({ MANAGER, ADMIN })
-public class UsersView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    AfterNavigationObserver, NotificationComponent, UrlComponent {
+public class UsersView extends VerticalLayout
+    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent, UrlComponent {
   public static final String VIEW_NAME = "users";
   public static final String ID = "users-view";
   public static final String HEADER = "header";
   public static final String USERS = "users";
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);
   public static final String SWITCH_USER = "switchUser";
-  public static final String SWITCH_USER_FORM = "switchUserform";
-  public static final String SWITCH_USERNAME = "switchUsername";
   public static final String SWITCH_FAILED = "switchFailed";
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(UsersView.class);
@@ -99,17 +101,19 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button switchUser = new Button();
-  @Autowired
   protected ObjectFactory<UserDialog> dialogFactory;
+  private WebUserFilter filter = new WebUserFilter();
   private Map<User, Button> actives = new HashMap<>();
+  private transient UserService service;
+  private transient SwitchUserService switchUserService;
+  private transient AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient UsersViewPresenter presenter;
-
-  public UsersView() {
-  }
-
-  protected UsersView(UsersViewPresenter presenter, ObjectFactory<UserDialog> dialogFactory) {
-    this.presenter = presenter;
+  protected UsersView(UserService service, SwitchUserService switchUserService,
+      AuthenticatedUser authenticatedUser, ObjectFactory<UserDialog> dialogFactory) {
+    this.service = service;
+    this.switchUserService = switchUserService;
+    this.authenticatedUser = authenticatedUser;
     this.dialogFactory = dialogFactory;
   }
 
@@ -123,7 +127,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     expand(users);
     header.setId(HEADER);
     users.setId(USERS);
-    users.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    users.addItemDoubleClickListener(e -> view(e.getItem()));
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator(NormalizedComparator.of(User::getEmail));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
@@ -131,28 +135,32 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user))).setKey(ACTIVE)
         .setSortProperty(ACTIVE)
         .setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
+    active.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
     edit = users.addColumn(new ComponentRenderer<>(user -> editButton(user))).setKey(EDIT)
         .setSortable(false).setFlexGrow(0);
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();
     filtersRow.getCell(email).setComponent(emailFilter);
-    emailFilter.addValueChangeListener(e -> presenter.filterEmail(e.getValue()));
+    emailFilter.addValueChangeListener(e -> filterEmail(e.getValue()));
     emailFilter.setValueChangeMode(ValueChangeMode.EAGER);
     emailFilter.setSizeFull();
     filtersRow.getCell(name).setComponent(nameFilter);
-    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
+    nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
     filtersRow.getCell(active).setComponent(activeFilter);
     activeFilter.setItems(Optional.empty(), Optional.of(false), Optional.of(true));
-    activeFilter.addValueChangeListener(e -> presenter.filterActive(e.getValue().orElse(null)));
+    activeFilter.addValueChangeListener(e -> filterActive(e.getValue().orElse(null)));
     activeFilter.setSizeFull();
     error.setId(ERROR_TEXT);
+    error.setVisible(false);
     add.setId(ADD);
-    add.addClickListener(e -> presenter.add());
+    add.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
+    add.addClickListener(e -> add());
     switchUser.setId(SWITCH_USER);
-    switchUser.addClickListener(e -> presenter.switchUser());
-    presenter.init(this);
+    switchUser.setVisible(authenticatedUser.hasRole(ADMIN));
+    switchUser.addClickListener(e -> switchUser());
+    loadUsers();
   }
 
   private Button activeButton(User user) {
@@ -161,7 +169,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     actives.put(user, button);
     updateActiveButton(button, user);
     button.addClickListener(e -> {
-      presenter.toggleActive(user);
+      toggleActive(user);
       updateActiveButton(button, user);
     });
     return button;
@@ -172,7 +180,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     button.addClassName(EDIT);
     button.addThemeVariants(ButtonVariant.LUMO_ICON);
     button.setIcon(VaadinIcon.EDIT.create());
-    button.addClickListener(e -> presenter.view(user));
+    button.addClickListener(e -> view(user));
     return button;
   }
 
@@ -182,6 +190,10 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     button.setText(userResources.message(property(ACTIVE, user.isActive())));
     button
         .addThemeVariants(user.isActive() ? ButtonVariant.LUMO_SUCCESS : ButtonVariant.LUMO_ERROR);
+  }
+
+  private void loadUsers() {
+    users.setItems(service.all());
   }
 
   @Override
@@ -208,7 +220,6 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     add.setIcon(VaadinIcon.PLUS.create());
     switchUser.setText(resources.message(SWITCH_USER));
     switchUser.setIcon(VaadinIcon.BUG.create());
-    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -224,8 +235,61 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
     return resources.message(TITLE, webResources.message(APPLICATION_NAME));
   }
 
-  @Override
-  public void afterNavigation(AfterNavigationEvent event) {
-    presenter.showError(event.getLocation().getQueryParameters().getParameters());
+  void filterEmail(String value) {
+    filter.emailContains = value.isEmpty() ? null : value;
+    users.getDataProvider().refreshAll();
+  }
+
+  void filterName(String value) {
+    filter.nameContains = value.isEmpty() ? null : value;
+    users.getDataProvider().refreshAll();
+  }
+
+  void filterActive(Boolean value) {
+    filter.active = value;
+    users.getDataProvider().refreshAll();
+  }
+
+  private void clearError() {
+    error.setVisible(false);
+  }
+
+  void view(User user) {
+    clearError();
+    showDialog(service.get(user.getId()).orElse(null));
+  }
+
+  private void showDialog(User user) {
+    UserDialog dialog = dialogFactory.getObject();
+    dialog.setUser(user);
+    dialog.addSavedListener(e -> loadUsers());
+    dialog.open();
+  }
+
+  void toggleActive(User user) {
+    clearError();
+    user.setActive(!user.isActive());
+    service.save(user, null);
+  }
+
+  void switchUser() {
+    clearError();
+    User user = users.getSelectedItems().stream().findFirst().orElse(null);
+    if (user == null) {
+      AppResources resources = new AppResources(UsersView.class, getLocale());
+      error.setText(resources.message(USERS_REQUIRED));
+      error.setVisible(true);
+    } else {
+      switchUserService.switchUser(user, VaadinServletRequest.getCurrent());
+      UI.getCurrent().getPage().setLocation(getUrl(MainView.VIEW_NAME));
+    }
+  }
+
+  void add() {
+    showDialog(null);
+  }
+
+  WebUserFilter filter() {
+    return filter;
   }
 }
