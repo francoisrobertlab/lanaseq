@@ -25,19 +25,21 @@ import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE_ERROR;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SIZE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SIZE_VALUE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.id;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -46,28 +48,29 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import com.github.mvysny.kaributesting.v10.GridKt;
+import com.github.mvysny.kaributesting.v10.LocatorJ;
+import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.function.ValueProvider;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.data.provider.SortDirection;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -76,10 +79,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -87,6 +94,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -98,27 +106,31 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   @TempDir
   Path temporaryFolder;
   private AddDatasetFilesDialog dialog;
+  @MockBean
+  private DatasetService service;
+  @MockBean
+  private SampleService sampleService;
+  @MockBean
+  private AppConfiguration configuration;
   @Mock
-  private AddDatasetFilesDialogPresenter presenter;
-  @Mock
-  private Dataset dataset;
+  private Dialog.OpenedChangeEvent<Dialog> openedChangeEvent;
   @Captor
-  private ArgumentCaptor<ValueProvider<File, String>> valueProviderCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentRenderer<Span, File>> spanRendererCaptor;
-  @Captor
-  private ArgumentCaptor<ComponentRenderer<Checkbox, File>> checkboxRendererCaptor;
-  @Captor
-  private ArgumentCaptor<Comparator<File>> comparatorCaptor;
+  private ArgumentCaptor<
+      ComponentEventListener<Dialog.OpenedChangeEvent<Dialog>>> openedChangeListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<AddDatasetFilesDialog>> savedListener;
+  @Captor
+  private ArgumentCaptor<Collection<Path>> filesCaptor;
   @Autowired
   private DatasetRepository repository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
+  private Path folder;
   private List<File> files = new ArrayList<>();
   private Random random = new Random();
+  private String uploadLabelLinux = "lanaseq/upload";
+  private String uploadLabelWindows = "lanaseq\\upload";
 
   /**
    * Before test.
@@ -126,7 +138,6 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() throws Throwable {
     ui.setLocale(locale);
-    dialog = new AddDatasetFilesDialog(presenter);
     files.add(temporaryFolder.resolve("dataset_R1.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset_R2.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset.bw").toFile());
@@ -134,8 +145,38 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     for (File file : files) {
       writeFile(file.toPath(), random.nextInt(10) * 1024 ^ 2);
     }
-    dialog.init();
-    dialog.localeChange(mock(LocaleChangeEvent.class));
+    folder = temporaryFolder.resolve("dataset");
+    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().folder(any(Dataset.class)))
+        .thenReturn(temporaryFolder.resolve("home"));
+    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().folder(any(Dataset.class))).thenReturn(folder);
+    when(configuration.getUpload().label(any(Dataset.class), anyBoolean())).then(i -> {
+      Dataset dataset = i.getArgument(0);
+      boolean linux = i.getArgument(1);
+      return (linux ? uploadLabelLinux : uploadLabelWindows) + "/" + dataset.getName();
+    });
+    when(service.uploadFiles(any())).thenReturn(
+        files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    when(service.files(any())).thenReturn(
+        files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
+    DatasetsView view = ui.navigate(DatasetsView.class).get();
+    view.datasets.setItems(repository.findAll());
+    GridKt._clickItem(view.datasets, 1, 1, true, false, false, false);
+    DatasetFilesDialog filesDialog = LocatorJ._find(DatasetFilesDialog.class).get(0);
+    filesDialog.addLargeFiles.click();
+    dialog = LocatorJ._find(AddDatasetFilesDialog.class).get(0);
+  }
+
+  /**
+   * After test.
+   */
+  @After
+  public void afterTest() {
+    Thread thread = dialog.updateFilesThread();
+    if (thread != null) {
+      thread.interrupt();
+    }
   }
 
   private void writeFile(Path file, long size) throws IOException {
@@ -151,37 +192,8 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private void mockColumns() {
-    Element filesElement = dialog.files.getElement();
-    dialog.files = mock(Grid.class);
-    when(dialog.files.getElement()).thenReturn(filesElement);
-    dialog.filename = mock(Column.class);
-    dialog.overwrite = mock(Column.class);
-    when(dialog.files.addColumn(any(ComponentRenderer.class))).thenReturn(dialog.filename,
-        dialog.overwrite);
-    when(dialog.filename.setKey(any())).thenReturn(dialog.filename);
-    when(dialog.filename.setSortProperty(any())).thenReturn(dialog.filename);
-    when(dialog.filename.setComparator(any(Comparator.class))).thenReturn(dialog.filename);
-    when(dialog.filename.setHeader(any(String.class))).thenReturn(dialog.filename);
-    when(dialog.filename.setFlexGrow(anyInt())).thenReturn(dialog.filename);
-    dialog.size = mock(Column.class);
-    when(dialog.files.addColumn(any(ValueProvider.class), eq(SIZE))).thenReturn(dialog.size);
-    when(dialog.size.setKey(any())).thenReturn(dialog.size);
-    when(dialog.size.setComparator(any(Comparator.class))).thenReturn(dialog.size);
-    when(dialog.size.setHeader(any(String.class))).thenReturn(dialog.size);
-    when(dialog.overwrite.setKey(any())).thenReturn(dialog.overwrite);
-    when(dialog.overwrite.setSortable(anyBoolean())).thenReturn(dialog.overwrite);
-    when(dialog.overwrite.setHeader(any(String.class))).thenReturn(dialog.overwrite);
-    HeaderRow headerRow = mock(HeaderRow.class);
-    when(dialog.files.appendHeaderRow()).thenReturn(headerRow);
-    HeaderCell overwriteCell = mock(HeaderCell.class);
-    when(headerRow.getCell(dialog.overwrite)).thenReturn(overwriteCell);
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(dialog);
+  private File filename(String filename) {
+    return new File(filename);
   }
 
   @Test
@@ -195,36 +207,35 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels() {
-    mockColumns();
-    dialog.init();
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER), dialog.getHeaderTitle());
-    assertEquals("", dialog.message.getText());
-    verify(dialog.filename).setHeader(resources.message(FILENAME));
-    verify(dialog.size).setHeader(resources.message(SIZE));
-    verify(dialog.overwrite).setHeader(resources.message(OVERWRITE));
+    Dataset dataset = dialog.getDataset();
+    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
+        dialog.message.getText());
+    HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
+    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
+    assertEquals(resources.message(SIZE), headerRow.getCell(dialog.size).getText());
+    assertEquals(resources.message(OVERWRITE), headerRow.getCell(dialog.overwrite).getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
-    verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void localeChange() {
-    mockColumns();
-    dialog.init();
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(HEADER), dialog.getHeaderTitle());
-    assertEquals("", dialog.message.getText());
-    verify(dialog.filename).setHeader(resources.message(FILENAME));
-    verify(dialog.size).setHeader(resources.message(SIZE));
-    verify(dialog.overwrite).setHeader(resources.message(OVERWRITE));
+    Dataset dataset = dialog.getDataset();
+    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
+        dialog.message.getText());
+    HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
+    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
+    assertEquals(resources.message(SIZE), headerRow.getCell(dialog.size).getText());
+    assertEquals(resources.message(OVERWRITE), headerRow.getCell(dialog.overwrite).getText());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
-    verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
@@ -236,44 +247,30 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void files_ColumnsValueProvider() throws Throwable {
-    when(presenter.exists(any())).then(i -> {
-      File file = i.getArgument(0);
-      return files.get(0).equals(file);
-    });
-    dialog = new AddDatasetFilesDialog(presenter);
-    mockColumns();
-    dialog.init();
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    verify(dialog.files, times(2)).addColumn(spanRendererCaptor.capture());
-    ComponentRenderer<Span, File> spanRenderer = spanRendererCaptor.getAllValues().get(0);
-    for (File file : files) {
-      Span span = spanRenderer.createComponent(file);
+  public void files_ColumnsValueProvider() {
+    when(service.uploadFiles(any())).thenReturn(files.stream().map(File::toPath).toList());
+    when(service.files(any())).thenReturn(Collections.nCopies(1, files.get(0).toPath()));
+    dialog.updateFiles();
+    for (int i = 0; i < files.size(); i++) {
+      File file = files.get(i);
+      Span span = (Span) GridKt._getCellComponent(dialog.files, i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
-      if (presenter.exists(file)) {
-        assertTrue(span.hasClassName(ERROR_TEXT));
-      }
-    }
-    verify(dialog.filename).setComparator(comparatorCaptor.capture());
-    Comparator<File> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (File file : files) {
-      assertEquals(file.getName(),
-          ((NormalizedComparator<File>) comparator).getConverter().apply(file));
-    }
-    verify(dialog.files).addColumn(valueProviderCaptor.capture(), eq(SIZE));
-    ValueProvider<File, String> valueProvider = valueProviderCaptor.getValue();
-    for (File file : files) {
+      assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
       assertEquals(resources.message(SIZE_VALUE, file.length() / 1048576),
-          valueProvider.apply(file));
+          GridKt.getPresentationValue(dialog.size, file));
+      assertTrue(
+          GridKt._getCellComponent(dialog.files, i, dialog.overwrite.getKey()) instanceof Checkbox);
     }
-    verify(dialog.files, times(2)).addColumn(checkboxRendererCaptor.capture());
-    ComponentRenderer<Checkbox, File> checkboxRenderer =
-        checkboxRendererCaptor.getAllValues().get(1);
-    for (File file : files) {
-      Checkbox checkbox = checkboxRenderer.createComponent(file);
-      assertNotNull(checkbox);
-    }
+  }
+
+  @Test
+  public void files_FilenameColumnComparator() {
+    Comparator<File> comparator = dialog.filename.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(filename("éê"), filename("ee")));
+    assertTrue(comparator.compare(filename("a"), filename("e")) < 0);
+    assertTrue(comparator.compare(filename("a"), filename("é")) < 0);
+    assertTrue(comparator.compare(filename("e"), filename("a")) > 0);
+    assertTrue(comparator.compare(filename("é"), filename("a")) > 0);
   }
 
   @Test
@@ -337,75 +334,216 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     verify(savedListener, never()).onComponentEvent(any());
   }
 
+  private Path uploadFolder(Dataset dataset) {
+    return configuration.getUpload().folder(dataset);
+  }
+
+  @Test
+  public void createUploadFolder() {
+    assertTrue(Files.exists(uploadFolder(dialog.getDataset())));
+  }
+
+  @Test
+  public void keepUploadFolderOnClose() throws Throwable {
+    Dataset dataset = dialog.getDataset();
+    assertTrue(Files.exists(uploadFolder(dataset)));
+    Files.createFile(uploadFolder(dataset).resolve("test.txt"));
+    dialog.close();
+    assertTrue(Files.exists(uploadFolder(dataset)));
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
+  public void message_Windows() {
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, false)),
+        dialog.message.getText());
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
+  public void message_Linux() {
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
+        dialog.message.getText());
+  }
+
+  @Test
+  @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
+  public void message_Mac() {
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
+        dialog.message.getText());
+  }
+
   @Test
   public void getDataset() {
-    when(presenter.getDataset()).thenReturn(dataset);
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
     assertEquals(dataset, dialog.getDataset());
-    verify(presenter, atLeastOnce()).getDataset();
   }
 
   @Test
   public void setDataset_NewDataset() {
-    Dataset dataset = new Dataset();
-    when(presenter.getDataset()).thenReturn(dataset);
-
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setDataset(dataset);
-
-    verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER), dialog.getHeaderTitle());
-  }
-
-  @Test
-  public void setDataset_NewDatasetWithName() {
-    Dataset dataset = new Dataset();
-    dataset.setName("my dataset");
-    when(presenter.getDataset()).thenReturn(dataset);
-
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setDataset(dataset);
-
-    verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
+    assertThrows(IllegalArgumentException.class, () -> {
+      dialog.setDataset(new Dataset());
+    });
   }
 
   @Test
   public void setDataset_Dataset() {
-    Dataset dataset = repository.findById(2L).get();
-    when(presenter.getDataset()).thenReturn(dataset);
-
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setDataset(dataset);
-
-    verify(presenter).setDataset(dataset);
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-  }
-
-  @Test
-  public void setDataset_BeforeLocaleChange() {
-    Dataset dataset = repository.findById(2L).get();
-    when(presenter.getDataset()).thenReturn(dataset);
+    Dataset dataset = repository.findById(1L).get();
 
     dialog.setDataset(dataset);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
 
-    verify(presenter).setDataset(dataset);
+    verify(service, atLeastOnce()).uploadFiles(dataset);
+    List<File> files = items(dialog.files);
+    assertEquals(4, files.size());
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
   }
 
   @Test
   public void setDataset_Null() {
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    dialog.setDataset(null);
-
-    verify(presenter).setDataset(null);
-    assertEquals(resources.message(HEADER), dialog.getHeaderTitle());
+    assertThrows(NullPointerException.class, () -> {
+      dialog.setDataset(null);
+    });
   }
 
   @Test
-  public void save() {
-    clickButton(dialog.save);
+  public void updateFiles() {
+    when(service.uploadFiles(any())).thenReturn(
+        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList()),
+        files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    Dataset dataset = dialog.getDataset();
 
-    verify(presenter).save();
+    dialog.updateFiles();
+
+    verify(service, times(2)).uploadFiles(dataset);
+    List<File> files = items(dialog.files);
+    assertEquals(2, files.size());
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath()).toFile()));
+
+    dialog.updateFiles();
+
+    verify(service, times(3)).uploadFiles(dataset);
+    files = items(dialog.files);
+    assertEquals(4, files.size());
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(2).toPath()).toFile()));
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(3).toPath()).toFile()));
+  }
+
+  @Test
+  public void updateFiles_StopThreadOnClose() throws Throwable {
+    assertTrue(dialog.updateFilesThread().isDaemon());
+    Thread.sleep(500);
+    assertTrue(dialog.updateFilesThread().isAlive());
+    dialog.close();
+    Thread.sleep(500);
+    assertFalse(dialog.updateFilesThread().isAlive());
+  }
+
+  @Test
+  public void updateFiles_StopThreadOnInterrupt() throws Throwable {
+    assertTrue(dialog.updateFilesThread().isDaemon());
+    Thread.sleep(500);
+    assertTrue(dialog.updateFilesThread().isAlive());
+    dialog.updateFilesThread().interrupt();
+    Thread.sleep(500);
+    assertFalse(dialog.updateFilesThread().isAlive());
+  }
+
+  @Test
+  public void exists_False() {
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+    assertFalse(dialog.exists(files.get(2)));
+  }
+
+  @Test
+  public void exists_True() {
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+    assertTrue(dialog.exists(files.get(1)));
+  }
+
+  @Test
+  public void save_OverwriteNotAllowed() {
+    dialog.addSavedListener(savedListener);
+
+    dialog.save();
+
+    assertTrue(dialog.error.isVisible());
+    assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
+    verify(service, never()).saveFiles(any(), any());
+    NotificationsKt.expectNoNotifications();
+    verify(savedListener, never()).onComponentEvent(any());
+    assertTrue(dialog.isOpened());
+  }
+
+  @Test
+  public void save_OverwriteAllowed() {
+    dialog.addSavedListener(savedListener);
+    dialog.files.getListDataView().getItems().forEach(f -> dialog.overwrite(f));
+    Dataset dataset = dialog.getDataset();
+    dialog.overwriteAll.setValue(true);
+
+    dialog.save();
+
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture());
+    Collection<Path> files = filesCaptor.getValue();
+    assertEquals(4, files.size());
+    for (Path file : files) {
+      assertTrue(files.contains(uploadFolder(dataset).resolve(file)));
+    }
+    assertFalse(dialog.error.isVisible());
+    NotificationsKt.expectNotifications(resources.message(SAVED, 4, dataset.getName()));
+    verify(savedListener).onComponentEvent(any());
+    assertFalse(dialog.isOpened());
+  }
+
+  @Test
+  public void save() throws Throwable {
+    when(service.files(any())).thenReturn(new ArrayList<>());
+    when(service.uploadFiles(any())).thenReturn(files.subList(0, 2).stream()
+        .map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    dialog.addSavedListener(savedListener);
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+
+    dialog.save();
+
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture());
+    Collection<Path> files = filesCaptor.getValue();
+    assertEquals(2, files.size());
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath())));
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath())));
+    NotificationsKt.expectNotifications(resources.message(SAVED, 2, dataset.getName()));
+    verify(savedListener).onComponentEvent(any());
+    assertFalse(dialog.isOpened());
+  }
+
+  @Test
+  public void save_NoFiles() {
+    when(service.uploadFiles(any())).thenReturn(new ArrayList<>());
+    dialog.addSavedListener(savedListener);
+    Dataset dataset = repository.findById(1L).get();
+    dialog.setDataset(dataset);
+
+    dialog.save();
+
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture());
+    Collection<Path> files = filesCaptor.getValue();
+    assertEquals(0, files.size());
+    assertTrue(Files.exists(uploadFolder(dataset)));
+    NotificationsKt.expectNotifications(resources.message(SAVED, 0, dataset.getName()));
+    verify(savedListener).onComponentEvent(any());
+    assertFalse(dialog.isOpened());
   }
 }

@@ -22,13 +22,16 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -43,16 +46,29 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Add dataset files dialog.
@@ -73,6 +89,7 @@ public class AddDatasetFilesDialog extends Dialog
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
   private static final long serialVersionUID = 166699830639260659L;
+  private static final Logger logger = LoggerFactory.getLogger(AddDatasetFilesDialog.class);
   protected Div message = new Div();
   protected Grid<File> files = new Grid<>();
   protected Column<File> filename;
@@ -82,14 +99,16 @@ public class AddDatasetFilesDialog extends Dialog
   protected Div error = new Div();
   protected Button save = new Button();
   private Map<File, Checkbox> overwriteFields = new HashMap<>();
+  private Dataset dataset;
+  private Set<String> existingFilenames = new HashSet<>();
+  private Thread updateFilesThread;
+  private transient DatasetService service;
+  private transient AppConfiguration configuration;
+
   @Autowired
-  private transient AddDatasetFilesDialogPresenter presenter;
-
-  protected AddDatasetFilesDialog() {
-  }
-
-  protected AddDatasetFilesDialog(AddDatasetFilesDialogPresenter presenter) {
-    this.presenter = presenter;
+  protected AddDatasetFilesDialog(DatasetService service, AppConfiguration configuration) {
+    this.service = service;
+    this.configuration = configuration;
   }
 
   public static String id(String baseId) {
@@ -117,22 +136,37 @@ public class AddDatasetFilesDialog extends Dialog
     files.appendHeaderRow(); // Headers.
     HeaderRow headerRow = files.appendHeaderRow();
     headerRow.getCell(overwrite).setComponent(overwriteAll);
-    overwriteAll.addValueChangeListener(e -> {
-      if (e.isFromClient()) {
-        overwriteFields.values().stream().forEach(c -> c.setValue(e.getValue()));
-      }
-    });
+    overwriteAll.addValueChangeListener(
+        e -> overwriteFields.values().stream().forEach(c -> c.setValue(e.getValue())));
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
-    presenter.init(this);
+    save.addClickListener(e -> save());
+    addOpenedChangeListener(event -> {
+      if (event.isOpened()) {
+        if (updateFilesThread != null) {
+          updateFilesThread.interrupt();
+        }
+        updateFilesThread = createUpdateFilesThread();
+        updateFilesThread.start();
+      } else {
+        if (updateFilesThread != null) {
+          updateFilesThread.interrupt();
+          try {
+            updateFilesThread.join(5000);
+          } catch (InterruptedException e) {
+            // Assume interrupted.
+          }
+        }
+        files.setItems(new ArrayList<>());
+      }
+    });
   }
 
   private Span filename(File file) {
     Span span = new Span();
     span.setText(file.getName());
-    if (presenter.exists(file)) {
+    if (exists(file)) {
       span.addClassName(ERROR_TEXT);
     }
     return span;
@@ -153,7 +187,6 @@ public class AddDatasetFilesDialog extends Dialog
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
@@ -171,15 +204,21 @@ public class AddDatasetFilesDialog extends Dialog
     size.setHeader(resources.message(SIZE));
     overwrite.setHeader(resources.message(OVERWRITE));
     save.setText(webResources.message(SAVE));
-    presenter.localeChange(getLocale());
     updateHeader();
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
-    Dataset dataset = presenter.getDataset();
     if (dataset != null && dataset.getName() != null) {
       setHeaderTitle(resources.message(HEADER, dataset.getName()));
+      getUI().ifPresent(ui -> {
+        WebBrowser browser = ui.getSession().getBrowser();
+        boolean unix = browser.isMacOSX() || browser.isLinux();
+        if (dataset != null) {
+          message
+              .setText(resources.message(MESSAGE, configuration.getUpload().label(dataset, unix)));
+        }
+      });
     } else {
       setHeaderTitle(resources.message(HEADER));
     }
@@ -202,12 +241,104 @@ public class AddDatasetFilesDialog extends Dialog
     fireEvent(new SavedEvent<>(this, true));
   }
 
-  public Dataset getDataset() {
-    return presenter.getDataset();
+  private Thread createUpdateFilesThread() {
+    Runnable updateFilesRunnable = () -> {
+      logger.debug("start checking files in dataset upload folder {}", folder());
+      while (true) {
+        getUI().ifPresent(ui -> ui.access(() -> {
+          updateFiles();
+          try {
+            ui.push();
+          } catch (IllegalStateException | UIDetachedException e) {
+            return;
+          }
+        }));
+        try {
+          Thread.sleep(2000);
+        } catch (InterruptedException e) {
+          logger.debug("stop checking files in dataset upload folder {}", folder());
+          return;
+        }
+      }
+    };
+    DelegatingSecurityContextRunnable wrappedRunnable = new DelegatingSecurityContextRunnable(
+        updateFilesRunnable, SecurityContextHolder.getContext());
+    Thread thread = new Thread(wrappedRunnable);
+    thread.setDaemon(true);
+    return thread;
   }
 
-  public void setDataset(Dataset dataset) {
-    presenter.setDataset(dataset);
+  void updateFiles() {
+    existingFilenames = service.files(dataset).stream().map(file -> file.toFile().getName())
+        .collect(Collectors.toSet());
+    files.setItems(service.uploadFiles(dataset).stream().map(file -> file.toFile())
+        .collect(Collectors.toList()));
+  }
+
+  boolean exists(File file) {
+    return existingFilenames.contains(file.getName());
+  }
+
+  private Path folder() {
+    return dataset != null ? configuration.getUpload().folder(dataset) : null;
+  }
+
+  private boolean validate(Collection<Path> files) {
+    error.setVisible(false);
+    boolean anyExists =
+        files.stream().filter(file -> exists(file.toFile()) && !overwrite(file.toFile()).getValue())
+            .findAny().isPresent();
+    if (anyExists) {
+      final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
+      error.setVisible(true);
+      error.setText(resources.message(OVERWRITE_ERROR));
+    }
+    return !anyExists;
+  }
+
+  void save() {
+    Collection<Path> files = service.uploadFiles(dataset);
+    if (validate(files)) {
+      logger.debug("save new files {} for dataset {}", files, dataset);
+      service.saveFiles(dataset, files);
+      final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
+      showNotification(resources.message(SAVED, files.size(), dataset.getName()));
+      fireSavedEvent();
+      close();
+    }
+  }
+
+  Dataset getDataset() {
+    return dataset;
+  }
+
+  void setDataset(Dataset dataset) {
+    if (dataset == null) {
+      throw new NullPointerException("dataset cannot be null");
+    }
+    if (dataset.getId() == null) {
+      throw new IllegalArgumentException("dataset cannot be new");
+    }
+    this.dataset = dataset;
     updateHeader();
+    createFolder();
+    updateFiles();
+  }
+
+  private void createFolder() {
+    Path folder = folder();
+    if (folder != null) {
+      try {
+        logger.debug("creating upload folder {} for dataset {}", folder, dataset);
+        Files.createDirectories(folder);
+      } catch (IOException e) {
+        final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
+        showNotification(resources.message(CREATE_FOLDER_ERROR, folder));
+      }
+    }
+  }
+
+  Thread updateFilesThread() {
+    return updateFilesThread;
   }
 }
