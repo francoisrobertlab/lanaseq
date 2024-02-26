@@ -22,13 +22,16 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -43,16 +46,29 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Add sample files dialog.
@@ -73,6 +89,7 @@ public class AddSampleFilesDialog extends Dialog
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
   private static final long serialVersionUID = 166699830639260659L;
+  private static final Logger logger = LoggerFactory.getLogger(AddSampleFilesDialog.class);
   protected Div message = new Div();
   protected Grid<File> files = new Grid<>();
   protected Column<File> filename;
@@ -82,14 +99,16 @@ public class AddSampleFilesDialog extends Dialog
   protected Div error = new Div();
   protected Button save = new Button();
   private Map<File, Checkbox> overwriteFields = new HashMap<>();
+  private Sample sample;
+  private Set<String> existingFilenames = new HashSet<>();
+  private Thread updateFilesThread;
+  private transient SampleService service;
+  private transient AppConfiguration configuration;
+
   @Autowired
-  private transient AddSampleFilesDialogPresenter presenter;
-
-  protected AddSampleFilesDialog() {
-  }
-
-  protected AddSampleFilesDialog(AddSampleFilesDialogPresenter presenter) {
-    this.presenter = presenter;
+  protected AddSampleFilesDialog(SampleService service, AppConfiguration configuration) {
+    this.service = service;
+    this.configuration = configuration;
   }
 
   public static String id(String baseId) {
@@ -118,22 +137,38 @@ public class AddSampleFilesDialog extends Dialog
     files.appendHeaderRow(); // Headers.
     HeaderRow headerRow = files.appendHeaderRow();
     headerRow.getCell(overwrite).setComponent(overwriteAll);
-    overwriteAll.addValueChangeListener(e -> {
-      if (e.isFromClient()) {
-        overwriteFields.values().stream().forEach(c -> c.setValue(e.getValue()));
-      }
-    });
+    overwriteAll.addValueChangeListener(
+        e -> overwriteFields.values().stream().forEach(c -> c.setValue(e.getValue())));
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save(getLocale()));
-    presenter.init(this);
+    save.addClickListener(e -> save());
+    addOpenedChangeListener(event -> {
+      if (event.isOpened()) {
+        if (updateFilesThread != null) {
+          updateFilesThread.interrupt();
+        }
+        createFolder();
+        updateFilesThread = createUpdateFilesThread();
+        updateFilesThread.start();
+      } else {
+        if (updateFilesThread != null) {
+          updateFilesThread.interrupt();
+          try {
+            updateFilesThread.join(5000);
+          } catch (InterruptedException e) {
+            // Assume interrupted.
+          }
+        }
+        files.setItems(new ArrayList<>());
+      }
+    });
   }
 
   private Span filename(File file) {
     Span span = new Span();
     span.setText(file.getName());
-    if (presenter.exists(file)) {
+    if (exists(file)) {
       span.addClassName(ERROR_TEXT);
     }
     return span;
@@ -154,7 +189,6 @@ public class AddSampleFilesDialog extends Dialog
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
@@ -172,15 +206,21 @@ public class AddSampleFilesDialog extends Dialog
     size.setHeader(resources.message(SIZE));
     overwrite.setHeader(resources.message(OVERWRITE));
     save.setText(webResources.message(SAVE));
-    presenter.localeChange(getLocale());
     updateHeader();
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
-    Sample sample = presenter.getSample();
     if (sample != null && sample.getName() != null) {
       setHeaderTitle(resources.message(HEADER, sample.getName()));
+      getUI().ifPresent(ui -> {
+        WebBrowser browser = ui.getSession().getBrowser();
+        boolean unix = browser.isMacOSX() || browser.isLinux();
+        if (sample != null) {
+          message
+              .setText(resources.message(MESSAGE, configuration.getUpload().label(sample, unix)));
+        }
+      });
     } else {
       setHeaderTitle(resources.message(HEADER));
     }
@@ -203,12 +243,104 @@ public class AddSampleFilesDialog extends Dialog
     fireEvent(new SavedEvent<>(this, true));
   }
 
-  public Sample getSample() {
-    return presenter.getSample();
+  private Thread createUpdateFilesThread() {
+    Runnable updateFilesRunnable = () -> {
+      logger.debug("start checking files in sample upload folder {}", folder());
+      while (!Thread.currentThread().isInterrupted()) {
+        getUI().ifPresent(ui -> ui.access(() -> {
+          updateFiles();
+          try {
+            ui.push();
+          } catch (IllegalStateException | UIDetachedException e) {
+            return;
+          }
+        }));
+        try {
+          Thread.sleep(2000);
+        } catch (InterruptedException e) {
+          logger.debug("stop checking files in sample upload folder {}", folder());
+          Thread.currentThread().interrupt();
+        }
+      }
+    };
+    DelegatingSecurityContextRunnable wrappedRunnable = new DelegatingSecurityContextRunnable(
+        updateFilesRunnable, SecurityContextHolder.getContext());
+    Thread thread = new Thread(wrappedRunnable);
+    thread.setDaemon(true);
+    return thread;
   }
 
-  public void setSample(Sample sample) {
-    presenter.setSample(sample, getLocale());
+  void updateFiles() {
+    existingFilenames =
+        service.files(sample).stream().map(f -> f.toFile().getName()).collect(Collectors.toSet());
+    files.setItems(service.uploadFiles(sample).stream().map(file -> file.toFile())
+        .collect(Collectors.toList()));
+  }
+
+  boolean exists(File file) {
+    return existingFilenames.contains(file.getName());
+  }
+
+  private Path folder() {
+    return sample != null ? configuration.getUpload().folder(sample) : null;
+  }
+
+  private boolean validate(Collection<Path> files) {
+    error.setVisible(false);
+    boolean anyExists =
+        files.stream().filter(file -> exists(file.toFile()) && !overwrite(file.toFile()).getValue())
+            .findAny().isPresent();
+    if (anyExists) {
+      final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
+      error.setVisible(true);
+      error.setText(resources.message(OVERWRITE_ERROR));
+    }
+    return !anyExists;
+  }
+
+  void save() {
+    Collection<Path> files = service.uploadFiles(sample);
+    if (validate(files)) {
+      logger.debug("save new files {} for sample {}", files, sample);
+      service.saveFiles(sample, files);
+      final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
+      showNotification(resources.message(SAVED, files.size(), sample.getName()));
+      fireSavedEvent();
+      close();
+    }
+  }
+
+  Sample getSample() {
+    return sample;
+  }
+
+  void setSample(Sample sample) {
+    if (sample == null) {
+      throw new NullPointerException("sample cannot be null");
+    }
+    if (sample.getId() == null) {
+      throw new IllegalArgumentException("sample cannot be new");
+    }
+    this.sample = sample;
     updateHeader();
+    createFolder();
+    updateFiles();
+  }
+
+  private void createFolder() {
+    Path folder = folder();
+    if (folder != null) {
+      try {
+        logger.debug("creating upload folder {} for sample {}", folder, sample);
+        Files.createDirectories(folder);
+      } catch (IOException e) {
+        final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
+        showNotification(resources.message(CREATE_FOLDER_ERROR, folder));
+      }
+    }
+  }
+
+  Thread updateFilesThread() {
+    return updateFilesThread;
   }
 }
