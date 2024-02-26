@@ -247,14 +247,16 @@ public class AddSampleFilesDialog extends Dialog
     Runnable updateFilesRunnable = () -> {
       logger.debug("start checking files in sample upload folder {}", folder());
       while (!Thread.currentThread().isInterrupted()) {
-        getUI().ifPresent(ui -> ui.access(() -> {
-          updateFiles();
+        getUI().ifPresent(ui -> {
           try {
-            ui.push();
+            ui.access(() -> {
+              updateFiles();
+              ui.push();
+            });
           } catch (IllegalStateException | UIDetachedException e) {
             return;
           }
-        }));
+        });
         try {
           Thread.sleep(2000);
         } catch (InterruptedException e) {

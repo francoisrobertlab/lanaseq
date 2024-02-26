@@ -245,14 +245,16 @@ public class AddDatasetFilesDialog extends Dialog
     Runnable updateFilesRunnable = () -> {
       logger.debug("start checking files in dataset upload folder {}", folder());
       while (true) {
-        getUI().ifPresent(ui -> ui.access(() -> {
-          updateFiles();
+        getUI().ifPresent(ui -> {
           try {
-            ui.push();
+            ui.access(() -> {
+              updateFiles();
+              ui.push();
+            });
           } catch (IllegalStateException | UIDetachedException e) {
             return;
           }
-        }));
+        });
         try {
           Thread.sleep(2000);
         } catch (InterruptedException e) {
