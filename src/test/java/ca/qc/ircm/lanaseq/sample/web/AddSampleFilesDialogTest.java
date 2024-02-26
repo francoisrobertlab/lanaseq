@@ -185,6 +185,7 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels() {
     Sample sample = dialog.getSample();
     assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
@@ -198,6 +199,7 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
