@@ -36,8 +36,9 @@ public class ValidationLogger {
    */
   public static void logValidation(BinderValidationStatus<?> status) {
     status.getFieldValidationErrors().forEach(error -> {
+      Component field = ((Component) error.getField());
       logger.trace("Validation error {} for field {} with value {} in binder {}",
-          error.getMessage(), ((Component) error.getField()).getElement().getAttribute("class"),
+          error.getMessage(), field.getId().orElse(field.getElement().getAttribute("class")),
           error.getField().getValue(), status.getBinder().getBean());
     });
     status.getBeanValidationErrors().forEach(error -> {

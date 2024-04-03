@@ -22,7 +22,9 @@ import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.sample.Sample.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NOTE;
@@ -41,8 +43,12 @@ import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI1
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -61,12 +67,18 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.time.LocalDate;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -84,6 +96,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
   private static final long serialVersionUID = 166699830639260659L;
+  private static final Logger logger = LoggerFactory.getLogger(SampleDialog.class);
   protected DatePicker date = new DatePicker();
   protected TextField sampleId = new TextField();
   protected TextField replicate = new TextField();
@@ -100,14 +113,17 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected Button cancel = new Button();
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
+  private Binder<Sample> binder = new BeanValidationBinder<>(Sample.class);
+  private transient SampleService service;
+  private transient ProtocolService protocolService;
+  private transient AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient SampleDialogPresenter presenter;
-
-  protected SampleDialog() {
-  }
-
-  protected SampleDialog(SampleDialogPresenter presenter) {
-    this.presenter = presenter;
+  protected SampleDialog(SampleService service, ProtocolService protocolService,
+      AuthenticatedUser authenticatedUser) {
+    this.service = service;
+    this.protocolService = protocolService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   public static String id(String baseId) {
@@ -134,9 +150,11 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     replicate.setId(id(REPLICATE));
     protocol.setId(id(PROTOCOL));
     protocol.setItemLabelGenerator(Protocol::getName);
+    protocol.setItems(protocolService.all());
     assay.setId(id(ASSAY));
     assay.setAllowCustomValue(true);
     assay.addCustomValueSetListener(e -> assay.setValue(e.getDetail()));
+    assay.setItems(service.topAssays(50));
     type.setId(id(TYPE));
     type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
     type.setItems(SampleType.values());
@@ -147,13 +165,14 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     note.setId(id(NOTE));
     note.setHeight("10em");
     error.setId(id(ERROR_TEXT));
+    error.setVisible(false);
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
+    save.addClickListener(e -> save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
-    cancel.addClickListener(e -> presenter.cancel());
+    cancel.addClickListener(e -> cancel());
     delete.setId(id(DELETE));
     delete.getStyle().set("margin-inline-end", "auto");
     delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -163,8 +182,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     confirm.setCancelable(true);
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
-    confirm.addConfirmListener(e -> presenter.delete());
-    presenter.init(this);
+    confirm.addConfirmListener(e -> delete());
+    setSample(null);
   }
 
   @Override
@@ -172,6 +191,20 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     final AppResources resources = new AppResources(SampleDialog.class, getLocale());
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
+    binder.forField(date).asRequired(webResources.message(REQUIRED)).bind(DATE);
+    binder.forField(sampleId).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .bind(SAMPLE_ID);
+    binder.forField(replicate).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .bind(REPLICATE);
+    binder.forField(protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
+    binder.forField(assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
+    binder.forField(type).withNullRepresentation(SampleType.NULL).bind(TYPE);
+    binder.forField(target).withNullRepresentation("").bind(TARGET);
+    binder.forField(strain).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .bind(STRAIN);
+    binder.forField(strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
+    binder.forField(treatment).withNullRepresentation("").bind(TREATMENT);
+    binder.forField(note).withNullRepresentation("").bind(NOTE);
     setHeaderTitle(resources.message(HEADER, 0));
     date.setLabel(sampleResources.message(DATE));
     date.setI18n(datePickerI18n(getLocale()));
@@ -198,12 +231,11 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     confirm.setConfirmText(webResources.message(DELETE));
     confirm.setCancelText(webResources.message(CANCEL));
     updateHeader();
-    presenter.localeChange(getLocale());
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(SampleDialog.class, getLocale());
-    Sample sample = presenter.getSample();
+    Sample sample = binder.getBean();
     if (sample != null && sample.getName() != null) {
       setHeaderTitle(resources.message(HEADER, 1, sample.getName()));
       confirm.setText(resources.message(DELETE_MESSAGE, sample.getName()));
@@ -245,12 +277,71 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     fireEvent(new DeletedEvent<>(this, true));
   }
 
-  public Sample getSample() {
-    return presenter.getSample();
+  BinderValidationStatus<Sample> validateSample() {
+    return binder.validate();
   }
 
-  public void setSample(Sample sample) {
-    presenter.setSample(sample);
+  boolean validate() {
+    error.setVisible(false);
+    boolean valid = validateSample().isOk();
+    if (valid) {
+      Sample sample = binder.getBean();
+      if (service.exists(sample.getName()) && (sample.getId() == null || !sample.getName()
+          .equalsIgnoreCase(service.get(sample.getId()).map(Sample::getName).orElse("")))) {
+        valid = false;
+        AppResources sampleResources = new AppResources(Sample.class, getLocale());
+        error.setText(sampleResources.message(NAME_ALREADY_EXISTS, sample.getName()));
+        error.setVisible(true);
+      }
+    }
+    return valid;
+  }
+
+  void save() {
+    Sample sample = binder.getBean();
+    sample.generateName();
+    if (validate()) {
+      logger.debug("save sample {}", sample);
+      service.save(sample);
+      AppResources resources = new AppResources(SampleDialog.class, getLocale());
+      showNotification(resources.message(SAVED, sample.getName()));
+      fireSavedEvent();
+      close();
+    }
+  }
+
+  void cancel() {
+    close();
+  }
+
+  void delete() {
+    Sample sample = binder.getBean();
+    logger.debug("delete sample {}", sample);
+    service.delete(sample);
+    AppResources resources = new AppResources(SampleDialog.class, getLocale());
+    showNotification(resources.message(DELETED, sample.getName()));
+    fireDeletedEvent();
+    close();
+  }
+
+  Sample getSample() {
+    return binder.getBean();
+  }
+
+  void setSample(Sample sample) {
+    if (sample == null) {
+      sample = new Sample();
+    }
+    if (sample.getDate() == null) {
+      sample.setDate(LocalDate.now());
+    }
+    binder.setBean(sample);
+    boolean readOnly = !authenticatedUser.hasPermission(sample, Permission.WRITE)
+        || (sample.getId() != null && !sample.isEditable());
+    binder.setReadOnly(readOnly);
+    save.setVisible(!readOnly);
+    cancel.setVisible(!readOnly);
+    delete.setVisible(!readOnly && service.isDeletable(sample));
     updateHeader();
   }
 }
