@@ -17,16 +17,23 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
+import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
 
+import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.Key;
@@ -37,23 +44,45 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * Sample files dialog.
@@ -77,6 +106,7 @@ public class SampleFilesDialog extends Dialog
   public static final int MAXIMUM_SMALL_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
   public static final String FILENAME_HTML = "<span title='${item.title}'>${item.filename}</span>";
+  private static final Logger logger = LoggerFactory.getLogger(SampleFilesDialog.class);
   private static final long serialVersionUID = 166699830639260659L;
   protected Div message = new Div();
   protected VerticalLayout folders = new VerticalLayout();
@@ -88,18 +118,26 @@ public class SampleFilesDialog extends Dialog
   protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
-  @Autowired
   protected ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
-  @Autowired
-  private transient SampleFilesDialogPresenter presenter;
-
-  protected SampleFilesDialog() {
-  }
+  private Sample sample;
+  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
+  private SampleService service;
+  private AuthenticatedUser authenticatedUser;
+  private AppConfiguration configuration;
+  /**
+   * Currently authenticated user.
+   * <p>
+   * This is needed because Vaadin's upload does not contain authentication information.
+   * </p>
+   */
+  private Authentication authentication;
 
   protected SampleFilesDialog(ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory,
-      SampleFilesDialogPresenter presenter) {
+      SampleService service, AuthenticatedUser authenticatedUser, AppConfiguration configuration) {
     this.addFilesDialogFactory = addFilesDialogFactory;
-    this.presenter = presenter;
+    this.service = service;
+    this.authenticatedUser = authenticatedUser;
+    this.configuration = configuration;
   }
 
   public static String id(String baseId) {
@@ -108,6 +146,7 @@ public class SampleFilesDialog extends Dialog
 
   @PostConstruct
   void init() {
+    this.authentication = SecurityContextHolder.getContext().getAuthentication();
     setId(ID);
     setWidth("1000px");
     setHeight("700px");
@@ -126,11 +165,12 @@ public class SampleFilesDialog extends Dialog
     folders.setPadding(false);
     folders.setSpacing(false);
     files.setId(id(FILES));
-    files.getEditor().addCloseListener(e -> presenter.rename(e.getItem()));
+    files.getEditor().addCloseListener(e -> rename(e.getItem()));
     files.addItemDoubleClickListener(e -> {
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
     });
+    files.getEditor().setBinder(fileBinder);
     filename = files
         .addColumn(LitRenderer.<EditableFile>of(FILENAME_HTML)
             .withProperty("filename", file -> shortFilename(file.getFilename()))
@@ -148,16 +188,15 @@ public class SampleFilesDialog extends Dialog
     upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
     upload.setMaxHeight("5em"); // Hide name of uploaded files.
-    upload.addSucceededListener(event -> presenter.addSmallFile(event.getFileName(),
+    upload.addSucceededListener(event -> addSmallFile(event.getFileName(),
         uploadBuffer.getInputStream(event.getFileName())));
     addLargeFiles.setId(id(ADD_LARGE_FILES));
     addLargeFiles.setIcon(VaadinIcon.PLUS.create());
-    addLargeFiles.addClickListener(e -> presenter.addLargeFiles());
-    presenter.init(this);
+    addLargeFiles.addClickListener(e -> addLargeFiles());
   }
 
   private String shortFilename(String filename) {
-    String name = Optional.ofNullable(presenter.getSample()).map(Sample::getName).orElse("");
+    String name = Optional.ofNullable(getSample()).map(Sample::getName).orElse("");
     if (name.length() > 20 && filename.contains(name)) {
       String start = name.substring(0, 11);
       String end = name.substring(name.length() - 9);
@@ -170,7 +209,7 @@ public class SampleFilesDialog extends Dialog
     Anchor anchor = new Anchor();
     anchor.addClassName(DOWNLOAD);
     anchor.getElement().setAttribute("download", true);
-    anchor.setHref(presenter.download(file));
+    anchor.setHref(download(file));
     Button button = new Button();
     anchor.add(button);
     button.setIcon(VaadinIcon.DOWNLOAD.create());
@@ -182,8 +221,8 @@ public class SampleFilesDialog extends Dialog
     button.addClassName(DELETE);
     button.setIcon(VaadinIcon.TRASH.create());
     button.addThemeVariants(ButtonVariant.LUMO_ERROR);
-    button.setEnabled(!presenter.isArchive(file));
-    button.addClickListener(e -> presenter.deleteFile(file));
+    button.setEnabled(!isArchive(file));
+    button.addClickListener(e -> deleteFile(file));
     return button;
   }
 
@@ -191,6 +230,10 @@ public class SampleFilesDialog extends Dialog
   public void localeChange(LocaleChangeEvent event) {
     final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
+    fileBinder.forField(filenameEdit).asRequired(webResources.message(REQUIRED))
+        .withNullRepresentation("")
+        .withValidator(new RegexpValidator(resources.message(FILENAME_REGEX_ERROR), FILENAME_REGEX))
+        .withValidator(exists()).bind(FILENAME);
     setHeaderTitle(resources.message(HEADER, 0));
     message.setText("");
     message.setTitle("");
@@ -200,12 +243,24 @@ public class SampleFilesDialog extends Dialog
     addLargeFiles.setText(resources.message(ADD_LARGE_FILES));
     upload.setI18n(uploadI18N(getLocale()));
     updateHeader();
-    presenter.localeChange(getLocale());
+    updateMessage();
+  }
+
+  private Validator<String> exists() {
+    return (value, context) -> {
+      EditableFile item = files.getEditor().getItem();
+      if (value != null && item != null && !value.equals(item.getFile().getName())
+          && Files.exists(item.getFile().toPath().resolveSibling(value))) {
+        final AppResources webResources = new AppResources(Constants.class, getLocale());
+        return ValidationResult.error(webResources.message(ALREADY_EXISTS));
+      }
+      return ValidationResult.ok();
+    };
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
-    Sample sample = presenter.getSample();
+    Sample sample = getSample();
     if (sample != null && sample.getName() != null) {
       setHeaderTitle(resources.message(HEADER, sample.getName()));
     } else {
@@ -213,12 +268,113 @@ public class SampleFilesDialog extends Dialog
     }
   }
 
+  private void updateMessage() {
+    getUI().ifPresent(ui -> {
+      final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
+      WebBrowser browser = ui.getSession().getBrowser();
+      boolean unix = browser.isMacOSX() || browser.isLinux();
+      if (sample != null) {
+        List<String> labels = service.folderLabels(sample, unix);
+        message.setText(resources.message(DatasetFilesDialog.MESSAGE, labels.size()));
+        folders.removeAll();
+        labels.forEach(label -> folders.add(new Span(label)));
+      }
+    });
+  }
+
+  private void updateFiles() {
+    files.setItems(service.files(sample).stream().map(file -> new EditableFile(file.toFile()))
+        .collect(Collectors.toList()));
+  }
+
+  boolean isReadOnly() {
+    return sample == null || !sample.isEditable()
+        || !authenticatedUser.hasPermission(sample, Permission.WRITE);
+  }
+
+  boolean isArchive(EditableFile file) {
+    return !configuration.getHome().folder(sample).equals(file.getFile().toPath().getParent());
+  }
+
+  void addSmallFile(String filename, InputStream inputStream) {
+    logger.debug("saving file {} to dataset {}", filename, sample);
+    try {
+      SecurityContextHolder.getContext().setAuthentication(authentication); // Sets user for current thread.
+      AppResources resources = new AppResources(DatasetFilesDialog.class, getLocale());
+      try {
+        Path folder = Files.createTempDirectory("lanaseq-dataset-");
+        try {
+          Path file = folder.resolve(filename);
+          Files.copy(inputStream, file);
+          service.saveFiles(sample, Collections.nCopies(1, file));
+          showNotification(resources.message(FILES_SUCCESS, filename));
+        } finally {
+          FileSystemUtils.deleteRecursively(folder);
+        }
+      } catch (IOException | IllegalStateException e) {
+        showNotification(resources.message(FILES_IOEXCEPTION, filename));
+        return;
+      }
+      updateFiles();
+    } finally {
+      SecurityContextHolder.getContext().setAuthentication(null); // Unset user for current thread.
+    }
+  }
+
+  void addLargeFiles() {
+    if (!isReadOnly()) {
+      AddSampleFilesDialog addFilesDialog = addFilesDialogFactory.getObject();
+      addFilesDialog.setSample(sample);
+      addFilesDialog.addSavedListener(e -> updateFiles());
+      addFilesDialog.open();
+    }
+  }
+
+  void rename(EditableFile file) {
+    Path source = file.getFile().toPath();
+    Path target = source.resolveSibling(file.getFilename());
+    try {
+      logger.debug("rename file {} to {}", source, target);
+      Files.move(source, target);
+      updateFiles();
+    } catch (IOException e) {
+      logger.error("renaming of file {} to {} failed", source, target);
+      final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
+      showNotification(
+          resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
+    }
+  }
+
+  StreamResource download(EditableFile file) {
+    return new StreamResource(file.getFilename(), (output, session) -> {
+      Files.copy(file.getFile().toPath(), output);
+    });
+  }
+
+  void deleteFile(EditableFile file) {
+    File path = file.getFile();
+    logger.debug("delete file {}", path);
+    service.deleteFile(sample, path.toPath());
+    updateFiles();
+  }
+
+  BinderValidationStatus<EditableFile> validateSampleFile() {
+    return fileBinder.validate();
+  }
+
   public Sample getSample() {
-    return presenter.getSample();
+    return sample;
   }
 
   public void setSample(Sample sample) {
-    presenter.setSample(sample);
+    Objects.requireNonNull(sample);
+    Objects.requireNonNull(sample.getId());
+    this.sample = sample;
+    boolean readOnly = isReadOnly();
+    fileBinder.setReadOnly(readOnly);
+    delete.setVisible(!readOnly);
     updateHeader();
+    updateMessage();
+    updateFiles();
   }
 }
