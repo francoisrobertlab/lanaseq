@@ -206,6 +206,14 @@ public class DateRangeFieldTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void generateModelValue_Null() {
+    dateRange.from.setValue(null);
+    dateRange.to.setValue(null);
+    Range<LocalDate> range = dateRange.generateModelValue();
+    assertEquals(Range.all(), range);
+  }
+
+  @Test
   public void setPresentationValue_Empty() {
     dateRange.setPresentationValue(Range.all());
     assertNull(dateRange.from.getValue());
@@ -254,5 +262,12 @@ public class DateRangeFieldTest extends AbstractKaribuTestCase {
     dateRange.setPresentationValue(Range.singleton(date));
     assertEquals(date, dateRange.from.getValue());
     assertEquals(date, dateRange.to.getValue());
+  }
+
+  @Test
+  public void setPresentationValue_Null() {
+    dateRange.setPresentationValue(null);
+    assertNull(dateRange.from.getValue());
+    assertNull(dateRange.to.getValue());
   }
 }

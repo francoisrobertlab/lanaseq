@@ -121,6 +121,9 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
 
   @Override
   protected void setPresentationValue(Range<LocalDate> range) {
+    if (range == null) {
+      range = Range.all();
+    }
     from.setValue(range.hasLowerBound() ? range.lowerEndpoint() : null);
     to.setValue(range.hasUpperBound() ? range.upperEndpoint() : null);
   }
