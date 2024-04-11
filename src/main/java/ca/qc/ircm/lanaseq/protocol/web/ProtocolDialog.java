@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
@@ -36,6 +37,9 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -57,6 +61,11 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -64,10 +73,18 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * Protocols dialog.
@@ -91,6 +108,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
+  private static final Logger logger = LoggerFactory.getLogger(ProtocolDialog.class);
   private static final long serialVersionUID = -7797831034001410430L;
   protected TextField name = new TextField();
   protected TextArea note = new TextArea();
@@ -104,14 +122,14 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   protected Button cancel = new Button();
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
+  private Binder<Protocol> binder = new BeanValidationBinder<Protocol>(Protocol.class);
+  private transient ProtocolService service;
+  private transient AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient ProtocolDialogPresenter presenter;
-
-  public ProtocolDialog() {
-  }
-
-  ProtocolDialog(ProtocolDialogPresenter presenter) {
-    this.presenter = presenter;
+  ProtocolDialog(ProtocolService service, AuthenticatedUser authenticatedUser) {
+    this.service = service;
+    this.authenticatedUser = authenticatedUser;
   }
 
   public static String id(String baseId) {
@@ -136,23 +154,24 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     upload.setMaxFileSize(MAXIMUM_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_FILES_COUNT);
     upload.setMinHeight("2.5em");
-    upload.addSucceededListener(event -> presenter.addFile(event.getFileName(),
-        uploadBuffer.getInputStream(event.getFileName())));
+    upload.addSucceededListener(
+        event -> addFile(event.getFileName(), uploadBuffer.getInputStream(event.getFileName())));
+    upload.addFailedListener(event -> failedFile(event.getFileName()));
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)))
         .setKey(FILENAME).setSortProperty(FILENAME)
         .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
     remove = files.addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile",
-        file -> presenter.removeFile(file))).setKey(REMOVE);
+        file -> removeFile(file))).setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
-    save.addClickListener(e -> presenter.save());
+    save.addClickListener(e -> save());
     cancel.setId(id(CANCEL));
     cancel.setIcon(VaadinIcon.CLOSE.create());
-    cancel.addClickListener(e -> presenter.cancel());
+    cancel.addClickListener(e -> close());
     delete.setId(id(DELETE));
     delete.getStyle().set("margin-inline-end", "auto");
     delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -162,8 +181,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     confirm.setCancelable(true);
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
-    confirm.addConfirmListener(e -> presenter.delete());
-    presenter.init(this);
+    confirm.addConfirmListener(e -> delete());
+    setProtocol(null);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {
@@ -181,6 +200,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+    binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
+        .withValidator(nameExists()).bind(NAME);
+    binder.forField(note).withNullRepresentation("").bind(NOTE);
     updateHeader();
     name.setLabel(protocolResources.message(NAME));
     note.setLabel(protocolResources.message(NOTE));
@@ -193,12 +215,22 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     confirm.setHeader(resources.message(DELETE_HEADER));
     confirm.setConfirmText(webResources.message(DELETE));
     confirm.setCancelText(webResources.message(CANCEL));
-    presenter.localeChange(getLocale());
+  }
+
+  private Validator<String> nameExists() {
+    return (value, context) -> {
+      if (service.nameExists(value) && !service.get(binder.getBean().getId())
+          .map(pr -> value.equals(pr.getName())).orElse(false)) {
+        final AppResources resources = new AppResources(Constants.class, getLocale());
+        return ValidationResult.error(resources.message(ALREADY_EXISTS));
+      }
+      return ValidationResult.ok();
+    };
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
-    Protocol protocol = presenter.getProtocol();
+    Protocol protocol = binder.getBean();
     if (protocol != null && protocol.getId() != null) {
       setHeaderTitle(resources.message(HEADER, 1, protocol.getName()));
       confirm.setText(resources.message(DELETE_MESSAGE, protocol.getName()));
@@ -241,12 +273,100 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     fireEvent(new DeletedEvent<>(this, true));
   }
 
-  public Protocol getProtocol() {
-    return presenter.getProtocol();
+  private void setReadOnly() {
+    boolean readOnly = false;
+    Protocol protocol = binder.getBean();
+    if (protocol != null && protocol.getId() != null) {
+      readOnly = !authenticatedUser.hasPermission(protocol, Permission.WRITE);
+    }
+    binder.setReadOnly(readOnly);
+    upload.setVisible(!readOnly);
+    remove.setVisible(!readOnly);
+    save.setVisible(!readOnly);
+    cancel.setVisible(!readOnly);
+    delete.setVisible(!readOnly && service.isDeletable(protocol));
   }
 
-  public void setProtocol(Protocol protocol) {
-    presenter.setProtocol(protocol);
+  void failedFile(String filename) {
+    AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+    showNotification(resources.message(FILES_IOEXCEPTION, filename));
+  }
+
+  void addFile(String filename, InputStream input) {
+    logger.trace("received file {}", filename);
+    ProtocolFile file = new ProtocolFile();
+    file.setFilename(filename);
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    try {
+      FileCopyUtils.copy(input, output);
+    } catch (IOException e) {
+      failedFile(filename);
+      return;
+    }
+    file.setContent(output.toByteArray());
+    if (files.getListDataView().getItemCount() >= MAXIMUM_FILES_COUNT) {
+      AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+      showNotification(resources.message(FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT));
+      return;
+    }
+    files.getListDataView().addItem(file);
+  }
+
+  void removeFile(ProtocolFile file) {
+    files.getListDataView().removeItem(file);
+  }
+
+  BinderValidationStatus<Protocol> validateProtocol() {
+    return binder.validate();
+  }
+
+  boolean isValid() {
+    filesError.setVisible(false);
+    boolean valid = true;
+    valid = validateProtocol().isOk() && valid;
+    if (files.getListDataView().getItemCount() == 0) {
+      valid = false;
+      final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+      filesError.setVisible(true);
+      filesError.setText(resources.message(FILES_REQUIRED));
+    }
+    return valid;
+  }
+
+  void save() {
+    if (isValid()) {
+      Protocol protocol = binder.getBean();
+      logger.debug("save protocol {}", protocol);
+      List<ProtocolFile> files = this.files.getListDataView().getItems().toList();
+      service.save(protocol, new ArrayList<>(files));
+      final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+      showNotification(resources.message(SAVED, protocol.getName()));
+      close();
+      fireSavedEvent();
+    }
+  }
+
+  void delete() {
+    Protocol protocol = binder.getBean();
+    logger.debug("delete protocol {}", protocol);
+    service.delete(protocol);
+    AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
+    showNotification(resources.message(DELETED, protocol.getName()));
+    fireDeletedEvent();
+    close();
+  }
+
+  Protocol getProtocol() {
+    return binder.getBean();
+  }
+
+  void setProtocol(Protocol protocol) {
+    if (protocol == null) {
+      protocol = new Protocol();
+    }
+    binder.setBean(protocol);
+    files.setItems(service.files(protocol));
+    setReadOnly();
     updateHeader();
   }
 }
