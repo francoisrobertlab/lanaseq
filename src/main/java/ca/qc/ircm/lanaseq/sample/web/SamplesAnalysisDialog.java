@@ -67,8 +67,8 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   private List<Sample> samples;
-  private AnalysisService service;
-  private AppConfiguration configuration;
+  private transient AnalysisService service;
+  private transient AppConfiguration configuration;
 
   @Autowired
   protected SamplesAnalysisDialog(AnalysisService service, AppConfiguration configuration) {

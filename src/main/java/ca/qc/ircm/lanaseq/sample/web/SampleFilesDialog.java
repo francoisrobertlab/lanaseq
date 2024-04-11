@@ -121,9 +121,9 @@ public class SampleFilesDialog extends Dialog
   protected ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
   private Sample sample;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
-  private SampleService service;
-  private AuthenticatedUser authenticatedUser;
-  private AppConfiguration configuration;
+  private transient SampleService service;
+  private transient AuthenticatedUser authenticatedUser;
+  private transient AppConfiguration configuration;
   /**
    * Currently authenticated user.
    * <p>

@@ -37,7 +37,6 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleFilter;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
@@ -60,7 +59,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -125,11 +123,10 @@ public class SamplesView extends VerticalLayout
   protected ObjectFactory<SampleDialog> dialogFactory;
   protected ObjectFactory<SampleFilesDialog> filesDialogFactory;
   protected ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
-  private DataProvider<Sample, SampleFilter> samplesDataProvider;
   private WebSampleFilter filter = new WebSampleFilter();
-  private SampleService service;
-  private DatasetService datasetService;
-  private AuthenticatedUser authenticatedUser;
+  private transient SampleService service;
+  private transient DatasetService datasetService;
+  private transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SamplesView(ObjectFactory<SampleDialog> dialogFactory,
