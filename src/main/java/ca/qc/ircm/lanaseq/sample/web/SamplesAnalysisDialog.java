@@ -38,7 +38,6 @@ import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -67,7 +66,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   protected ConfirmDialog confirm = new ConfirmDialog();
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
-  private Collection<Sample> samples;
+  private List<Sample> samples;
   private AnalysisService service;
   private AppConfiguration configuration;
 
@@ -162,6 +161,10 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
         validate();
       }
     }
+  }
+
+  public List<Sample> getSamples() {
+    return samples;
   }
 
   public void setSample(Sample sample) {
