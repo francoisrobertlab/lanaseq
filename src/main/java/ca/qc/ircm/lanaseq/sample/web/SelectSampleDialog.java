@@ -26,14 +26,19 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.SelectedEvent;
+import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
@@ -42,9 +47,12 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -57,6 +65,7 @@ import org.springframework.context.annotation.Scope;
 public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   public static final String ID = "select-sample-dialog";
   public static final String SAMPLES = "samples";
+  private static final Logger logger = LoggerFactory.getLogger(SelectSampleDialog.class);
   private static final long serialVersionUID = -1701490833972618304L;
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
@@ -65,14 +74,14 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   protected TextField nameFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
+  private WebSampleFilter filter = new WebSampleFilter();
+  private transient SampleService service;
+  private transient AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient SelectSampleDialogPresenter presenter;
-
-  public SelectSampleDialog() {
-  }
-
-  SelectSampleDialog(SelectSampleDialogPresenter presenter) {
-    this.presenter = presenter;
+  SelectSampleDialog(SampleService service, AuthenticatedUser authenticatedUser) {
+    this.service = service;
+    this.authenticatedUser = authenticatedUser;
   }
 
   public static String id(String baseId) {
@@ -97,26 +106,35 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
     samples.addItemDoubleClickListener(e -> {
-      presenter.select(e.getItem());
+      select(e.getItem());
     });
     samples.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = samples.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
-    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
+    nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
     filtersRow.getCell(date).setComponent(dateFilter);
-    dateFilter.addValueChangeListener(e -> presenter.filterDate(e.getValue()));
+    dateFilter.addValueChangeListener(e -> filterDate(e.getValue()));
     dateFilter.setSizeFull();
     filtersRow.getCell(owner).setComponent(ownerFilter);
-    ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
+    ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
-    presenter.init(this);
+    if (!authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      authenticatedUser.getUser().ifPresent(user -> ownerFilter.setValue(user.getEmail()));
+    }
+    loadSamples();
+  }
+
+  private void loadSamples() {
+    GridListDataView<Sample> dataView = samples.setItems(service.all());
+    dataView.setFilter(filter::test);
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    logger.debug("localeChange called with locale {}", event.getLocale());
     final AppResources sampleResources = new AppResources(Sample.class, getLocale());
     final AppResources webResources = new AppResources(Constants.class, getLocale());
     String nameHeader = sampleResources.message(NAME);
@@ -144,5 +162,30 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
 
   void fireSelectedEvent(Sample sample) {
     fireEvent(new SelectedEvent<>(this, true, sample));
+  }
+
+  void select(Sample sample) {
+    logger.debug("selected sample {}", sample);
+    fireSelectedEvent(sample);
+    close();
+  }
+
+  void filterName(String value) {
+    filter.nameContains = value.isEmpty() ? null : value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  void filterDate(Range<LocalDate> value) {
+    filter.dateRange = value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  void filterOwner(String value) {
+    filter.ownerContains = value.isEmpty() ? null : value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  WebSampleFilter filter() {
+    return filter;
   }
 }

@@ -18,40 +18,50 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetDialog;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.web.SelectedEvent;
+import com.github.mvysny.kaributesting.v10.GridKt;
+import com.github.mvysny.kaributesting.v10.LocatorJ;
 import com.google.common.collect.Range;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
-import com.vaadin.flow.data.renderer.BasicRenderer;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.LocalDate;
@@ -65,6 +75,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -74,8 +85,12 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SelectSampleDialogTest extends AbstractKaribuTestCase {
   private SelectSampleDialog dialog;
+  @MockBean
+  private SampleService service;
   @Mock
-  private SelectSampleDialogPresenter presenter;
+  private ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> listener;
+  @Captor
+  private ArgumentCaptor<SelectedEvent<SelectSampleDialog, Sample>> selectedEventCaptor;
   @Captor
   private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
   @Captor
@@ -83,7 +98,9 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
   @Autowired
-  private SampleRepository sampleRepository;
+  private SampleRepository repository;
+  @Autowired
+  private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
   private AppResources sampleResources = new AppResources(Sample.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
@@ -94,46 +111,32 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
+    samples = repository.findAll();
+    when(service.all()).thenReturn(samples);
     ui.setLocale(locale);
-    dialog = new SelectSampleDialog(presenter);
-    dialog.init();
-    samples = sampleRepository.findAll();
+    ui.navigate(DatasetsView.class).get();
+    Grid<Dataset> datasetGrid = LocatorJ._find(Grid.class).get(0);
+    datasetGrid.setItems(datasetRepository.findAll());
+    GridKt._doubleClickItem(datasetGrid, 0);
+    DatasetDialog datasetDialog = LocatorJ._find(DatasetDialog.class).get(0);
+    Button addSample = LocatorJ
+        ._find(datasetDialog, Button.class, spec -> spec.withId(DatasetDialog.id(ADD_SAMPLE)))
+        .get(0);
+    addSample.click();
+    dialog = LocatorJ._find(SelectSampleDialog.class).get(0);
   }
 
-  @SuppressWarnings("unchecked")
-  private void mockColumns() {
-    Element samplesElement = dialog.samples.getElement();
-    dialog.samples = mock(Grid.class);
-    when(dialog.samples.getElement()).thenReturn(samplesElement);
-    dialog.name = mock(Column.class);
-    when(dialog.samples.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(dialog.name);
-    when(dialog.name.setKey(any())).thenReturn(dialog.name);
-    when(dialog.name.setComparator(any(Comparator.class))).thenReturn(dialog.name);
-    when(dialog.name.setHeader(any(String.class))).thenReturn(dialog.name);
-    dialog.date = mock(Column.class);
-    when(dialog.samples.addColumn(any(BasicRenderer.class))).thenReturn(dialog.date);
-    when(dialog.date.setKey(any())).thenReturn(dialog.date);
-    when(dialog.date.setSortProperty(any())).thenReturn(dialog.date);
-    when(dialog.date.setComparator(any(Comparator.class))).thenReturn(dialog.date);
-    when(dialog.date.setHeader(any(String.class))).thenReturn(dialog.date);
-    dialog.owner = mock(Column.class);
-    when(dialog.samples.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(dialog.owner);
-    when(dialog.owner.setKey(any())).thenReturn(dialog.owner);
-    when(dialog.owner.setComparator(any(Comparator.class))).thenReturn(dialog.owner);
-    when(dialog.owner.setHeader(any(String.class))).thenReturn(dialog.owner);
-    HeaderRow filtersRow = mock(HeaderRow.class);
-    when(dialog.samples.appendHeaderRow()).thenReturn(filtersRow);
-    HeaderCell nameFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(dialog.name)).thenReturn(nameFilterCell);
-    HeaderCell dateFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(dialog.date)).thenReturn(dateFilterCell);
-    HeaderCell ownerFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(dialog.owner)).thenReturn(ownerFilterCell);
+  private Sample name(String name) {
+    Sample sample = new Sample();
+    sample.setName(name);
+    return sample;
   }
 
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(dialog);
+  private Sample owner(String email) {
+    Sample sample = new Sample();
+    sample.setOwner(new User());
+    sample.getOwner().setEmail(email);
+    return sample;
   }
 
   @Test
@@ -144,34 +147,25 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    mockColumns();
     dialog.localeChange(mock(LocaleChangeEvent.class));
-    verify(dialog.name).setHeader(sampleResources.message(NAME));
-    verify(dialog.name).setFooter(sampleResources.message(NAME));
-    verify(dialog.date).setHeader(sampleResources.message(DATE));
-    verify(dialog.date).setFooter(sampleResources.message(DATE));
-    verify(dialog.owner).setHeader(sampleResources.message(OWNER));
-    verify(dialog.owner).setFooter(sampleResources.message(OWNER));
+    HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
+    assertEquals(sampleResources.message(NAME), headerRow.getCell(dialog.name).getText());
+    assertEquals(sampleResources.message(DATE), headerRow.getCell(dialog.date).getText());
+    assertEquals(sampleResources.message(OWNER), headerRow.getCell(dialog.owner).getText());
     assertEquals(webResources.message(ALL), dialog.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), dialog.ownerFilter.getPlaceholder());
   }
 
   @Test
   public void localeChange() {
-    mockColumns();
-    dialog.init();
-    dialog.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    dialog.localeChange(mock(LocaleChangeEvent.class));
-    verify(dialog.name, atLeastOnce()).setHeader(sampleResources.message(NAME));
-    verify(dialog.name, atLeastOnce()).setFooter(sampleResources.message(NAME));
-    verify(dialog.date, atLeastOnce()).setHeader(sampleResources.message(DATE));
-    verify(dialog.date, atLeastOnce()).setFooter(sampleResources.message(DATE));
-    verify(dialog.owner).setHeader(sampleResources.message(OWNER));
-    verify(dialog.owner).setFooter(sampleResources.message(OWNER));
+    HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
+    assertEquals(sampleResources.message(NAME), headerRow.getCell(dialog.name).getText());
+    assertEquals(sampleResources.message(DATE), headerRow.getCell(dialog.date).getText());
+    assertEquals(sampleResources.message(OWNER), headerRow.getCell(dialog.owner).getText());
     assertEquals(webResources.message(ALL), dialog.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), dialog.ownerFilter.getPlaceholder());
   }
@@ -183,78 +177,142 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
     assertNotNull(dialog.samples.getColumnByKey(DATE));
     assertNotNull(dialog.samples.getColumnByKey(OWNER));
     assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
+    List<Sample> samples = items(dialog.samples);
+    verify(service).all();
+    assertEquals(this.samples.size(), samples.size());
+    for (Sample sample : this.samples) {
+      assertTrue(samples.contains(sample), () -> sample.toString());
+    }
+    assertEquals(4, dialog.samples.getListDataView().getItemCount());
+    samples = dialog.samples.getListDataView().getItems().toList();
+    assertFalse(find(samples, 1L).isPresent());
+    assertTrue(find(samples, 4L).isPresent());
+    assertTrue(find(samples, 5L).isPresent());
+    assertTrue(find(samples, 10L).isPresent());
+    assertTrue(find(samples, 11L).isPresent());
   }
 
   @Test
   public void samples_ColumnsValueProvider() {
-    mockColumns();
-    dialog.init();
-    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(sample.getName(), valueProvider.apply(sample));
-    }
-    verify(dialog.name).setComparator(comparatorCaptor.capture());
-    Comparator<Sample> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Sample sample : samples) {
-      assertEquals(sample.getName(),
-          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
-    }
-    verify(dialog.samples).addColumn(localDateRendererCaptor.capture());
-    LocalDateRenderer<Sample> localDateTimeRenderer = localDateRendererCaptor.getValue();
-    for (Sample sample : samples) {
+      assertEquals(sample.getName(), GridKt.getPresentationValue(dialog.name, sample));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
-          getFormattedValue(localDateTimeRenderer, sample));
+          GridKt.getPresentationValue(dialog.date, sample));
+      assertEquals(sample.getOwner().getEmail(), GridKt.getPresentationValue(dialog.owner, sample));
     }
-    verify(dialog.date).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    LocalDate firstDate = samples.get(0).getDate();
-    for (Sample sample : samples) {
-      assertEquals(firstDate.compareTo(sample.getDate()),
-          comparator.compare(samples.get(0), sample));
-    }
-    verify(dialog.samples).addColumn(valueProviderCaptor.capture(), eq(OWNER));
-    valueProvider = valueProviderCaptor.getValue();
-    for (Sample sample : samples) {
-      assertEquals(sample.getOwner().getEmail(), valueProvider.apply(sample));
-    }
-    verify(dialog.owner).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Sample sample : samples) {
-      assertEquals(sample.getOwner().getEmail(),
-          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
-    }
+  }
+
+  @Test
+  public void samples_NameColumnComparator() {
+    Comparator<Sample> comparator = dialog.name.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(name("éê"), name("ee")));
+    assertTrue(comparator.compare(name("a"), name("e")) < 0);
+    assertTrue(comparator.compare(name("a"), name("é")) < 0);
+    assertTrue(comparator.compare(name("e"), name("a")) > 0);
+    assertTrue(comparator.compare(name("é"), name("a")) > 0);
+  }
+
+  @Test
+  public void samples_OwnerColumnComparator() {
+    Comparator<Sample> comparator = dialog.owner.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(owner("éê"), owner("ee")));
+    assertTrue(comparator.compare(owner("a"), owner("e")) < 0);
+    assertTrue(comparator.compare(owner("a"), owner("é")) < 0);
+    assertTrue(comparator.compare(owner("e"), owner("a")) > 0);
+    assertTrue(comparator.compare(owner("é"), owner("a")) > 0);
+  }
+
+  @Test
+  public void ownerFilter_User() {
+    assertEquals("jonh.smith@ircm.qc.ca", dialog.ownerFilter.getValue());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void ownerFilter_Manager() {
+    assertEquals("", dialog.ownerFilter.getValue());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void ownerFilter_Admin() {
+    assertEquals("", dialog.ownerFilter.getValue());
   }
 
   @Test
   public void select() {
+    dialog.addSelectedListener(listener);
+
     Sample sample = samples.get(0);
     doubleClickItem(dialog.samples, sample);
 
-    verify(presenter).select(sample);
+    verify(listener).onComponentEvent(selectedEventCaptor.capture());
+    assertEquals(sample, selectedEventCaptor.getValue().getSelection());
+    assertFalse(dialog.isOpened());
   }
 
   @Test
   public void filterName() {
+    dialog.samples.setItems(mock(DataProvider.class));
+
     dialog.nameFilter.setValue("test");
 
-    verify(presenter).filterName("test");
+    assertEquals("test", dialog.filter().nameContains);
+    verify(dialog.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterName_Empty() {
+    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.nameFilter.setValue("test");
+
+    dialog.nameFilter.setValue("");
+
+    assertNull(dialog.filter().nameContains);
+    verify(dialog.samples.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterDate() {
+    dialog.samples.setItems(mock(DataProvider.class));
+    Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
+
+    dialog.dateFilter.setValue(range);
+
+    assertEquals(range, dialog.filter().dateRange);
+    verify(dialog.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterDate_Empty() {
+    dialog.samples.setItems(mock(DataProvider.class));
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     dialog.dateFilter.setValue(range);
 
-    verify(presenter).filterDate(range);
+    dialog.dateFilter.setValue(null);
+
+    assertEquals(null, dialog.filter().dateRange);
+    verify(dialog.samples.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterOwner() {
+    dialog.samples.setItems(mock(DataProvider.class));
+
     dialog.ownerFilter.setValue("test");
 
-    verify(presenter).filterOwner("test");
+    assertEquals("test", dialog.filter().ownerContains);
+    verify(dialog.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterOwner_Empty() {
+    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.ownerFilter.setValue("test");
+
+    dialog.ownerFilter.setValue("");
+
+    assertEquals(null, dialog.filter().ownerContains);
+    verify(dialog.samples.getDataProvider(), times(2)).refreshAll();
   }
 }
