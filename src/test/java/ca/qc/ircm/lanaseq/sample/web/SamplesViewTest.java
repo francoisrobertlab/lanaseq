@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
@@ -33,61 +34,68 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
+import ca.qc.ircm.lanaseq.user.User;
+import com.github.mvysny.kaributesting.v10.GridKt;
+import com.github.mvysny.kaributesting.v10.LocatorJ;
+import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.google.common.collect.Range;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.function.ValueProvider;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -97,27 +105,20 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewTest extends AbstractKaribuTestCase {
   private SamplesView view;
-  @Mock
-  private SamplesViewPresenter presenter;
-  @Autowired
-  private ObjectFactory<SampleDialog> dialogFactory;
-  @Autowired
-  private ObjectFactory<SampleFilesDialog> filesDialogFactory;
-  @Autowired
-  private ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
+  @MockBean
+  private SampleService service;
+  @MockBean
+  private DatasetService datasetService;
   @Captor
-  private ArgumentCaptor<ValueProvider<Sample, String>> valueProviderCaptor;
+  private ArgumentCaptor<Collection<Sample>> samplesCaptor;
   @Captor
-  private ArgumentCaptor<LocalDateRenderer<Sample>> localDateRendererCaptor;
-  @Captor
-  private ArgumentCaptor<LitRenderer<Sample>> litRendererCaptor;
-  @Captor
-  private ArgumentCaptor<Comparator<Sample>> comparatorCaptor;
+  private ArgumentCaptor<Dataset> datasetCaptor;
   @Autowired
-  private SampleRepository sampleRepository;
+  private SampleRepository repository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(SamplesView.class, locale);
   private AppResources sampleResources = new AppResources(Sample.class, locale);
+  private AppResources datasetResources = new AppResources(Dataset.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Sample> samples;
 
@@ -126,72 +127,30 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
+    samples = repository.findAll();
+    when(service.all(any())).thenReturn(samples);
     ui.setLocale(locale);
-    view = new SamplesView(presenter, dialogFactory, filesDialogFactory, analysisDialogFactory);
-    view.init();
-    samples = sampleRepository.findAll();
+    view = ui.navigate(SamplesView.class).get();
   }
 
-  @SuppressWarnings("unchecked")
-  private void mockColumns() {
-    Element samplesElement = view.samples.getElement();
-    view.samples = mock(Grid.class);
-    when(view.samples.getElement()).thenReturn(samplesElement);
-    view.name = mock(Column.class);
-    when(view.samples.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
-    when(view.name.setKey(any())).thenReturn(view.name);
-    when(view.name.setSortable(anyBoolean())).thenReturn(view.name);
-    when(view.name.setSortProperty(any())).thenReturn(view.name);
-    when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
-    when(view.name.setHeader(any(String.class))).thenReturn(view.name);
-    when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
-    view.protocol = mock(Column.class);
-    when(view.samples.addColumn(any(ValueProvider.class), eq(PROTOCOL))).thenReturn(view.protocol);
-    when(view.protocol.setKey(any())).thenReturn(view.protocol);
-    when(view.protocol.setSortable(anyBoolean())).thenReturn(view.protocol);
-    when(view.protocol.setSortProperty(any())).thenReturn(view.protocol);
-    when(view.protocol.setComparator(any(Comparator.class))).thenReturn(view.protocol);
-    when(view.protocol.setHeader(any(String.class))).thenReturn(view.protocol);
-    when(view.protocol.setFlexGrow(anyInt())).thenReturn(view.protocol);
-    view.date = mock(Column.class);
-    when(view.samples.addColumn(any(LocalDateRenderer.class))).thenReturn(view.date);
-    when(view.date.setKey(any())).thenReturn(view.date);
-    when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
-    when(view.date.setSortProperty(any())).thenReturn(view.date);
-    when(view.date.setComparator(any(Comparator.class))).thenReturn(view.date);
-    when(view.date.setHeader(any(String.class))).thenReturn(view.date);
-    when(view.date.setFlexGrow(anyInt())).thenReturn(view.date);
-    view.owner = mock(Column.class);
-    when(view.samples.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
-    when(view.owner.setKey(any())).thenReturn(view.owner);
-    when(view.owner.setSortable(anyBoolean())).thenReturn(view.owner);
-    when(view.owner.setSortProperty(any())).thenReturn(view.owner);
-    when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
-    when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
-    when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
-    view.edit = mock(Column.class);
-    when(view.samples.addColumn(any(LitRenderer.class))).thenReturn(view.edit);
-    when(view.edit.setKey(any())).thenReturn(view.edit);
-    when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
-    when(view.edit.setSortProperty(any())).thenReturn(view.edit);
-    when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
-    when(view.edit.setHeader(any(String.class))).thenReturn(view.edit);
-    when(view.edit.setFlexGrow(anyInt())).thenReturn(view.edit);
-    HeaderRow filtersRow = mock(HeaderRow.class);
-    when(view.samples.appendHeaderRow()).thenReturn(filtersRow);
-    HeaderCell nameFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
-    HeaderCell protocolFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.protocol)).thenReturn(protocolFilterCell);
-    HeaderCell dateFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.date)).thenReturn(dateFilterCell);
-    HeaderCell ownerFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.owner)).thenReturn(ownerFilterCell);
+  private Sample name(String name) {
+    Sample sample = new Sample();
+    sample.setName(name);
+    return sample;
   }
 
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(view);
+  private Sample protocol(String name) {
+    Sample sample = new Sample();
+    sample.setProtocol(new Protocol());
+    sample.getProtocol().setName(name);
+    return sample;
+  }
+
+  private Sample owner(String email) {
+    Sample sample = new Sample();
+    sample.setOwner(new User());
+    sample.getOwner().setEmail(email);
+    return sample;
   }
 
   @Test
@@ -212,19 +171,19 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    mockColumns();
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    verify(view.name).setHeader(sampleResources.message(NAME));
-    verify(view.name).setFooter(sampleResources.message(NAME));
-    verify(view.protocol).setHeader(sampleResources.message(PROTOCOL));
-    verify(view.protocol).setFooter(sampleResources.message(PROTOCOL));
-    verify(view.date).setHeader(sampleResources.message(DATE));
-    verify(view.date).setFooter(sampleResources.message(DATE));
-    verify(view.owner).setHeader(sampleResources.message(OWNER));
-    verify(view.owner).setFooter(sampleResources.message(OWNER));
-    verify(view.edit).setHeader(webResources.message(EDIT));
-    verify(view.edit).setFooter(webResources.message(EDIT));
+    HeaderRow headerRow = view.samples.getHeaderRows().get(0);
+    FooterRow footerRow = view.samples.getFooterRows().get(0);
+    assertEquals(sampleResources.message(NAME), headerRow.getCell(view.name).getText());
+    assertEquals(sampleResources.message(NAME), footerRow.getCell(view.name).getText());
+    assertEquals(sampleResources.message(PROTOCOL), headerRow.getCell(view.protocol).getText());
+    assertEquals(sampleResources.message(PROTOCOL), footerRow.getCell(view.protocol).getText());
+    assertEquals(sampleResources.message(DATE), headerRow.getCell(view.date).getText());
+    assertEquals(sampleResources.message(DATE), footerRow.getCell(view.date).getText());
+    assertEquals(sampleResources.message(OWNER), headerRow.getCell(view.owner).getText());
+    assertEquals(sampleResources.message(OWNER), footerRow.getCell(view.owner).getText());
+    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
+    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
@@ -232,31 +191,28 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
     assertEquals(resources.message(ANALYZE), view.analyze.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void localeChange() {
-    mockColumns();
-    view.init();
-    view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(SamplesView.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    verify(view.name, atLeastOnce()).setHeader(sampleResources.message(NAME));
-    verify(view.name, atLeastOnce()).setFooter(sampleResources.message(NAME));
-    verify(view.protocol).setHeader(sampleResources.message(PROTOCOL));
-    verify(view.protocol).setFooter(sampleResources.message(PROTOCOL));
-    verify(view.date, atLeastOnce()).setHeader(sampleResources.message(DATE));
-    verify(view.date, atLeastOnce()).setFooter(sampleResources.message(DATE));
-    verify(view.owner, atLeastOnce()).setHeader(sampleResources.message(OWNER));
-    verify(view.owner, atLeastOnce()).setFooter(sampleResources.message(OWNER));
-    verify(view.edit).setHeader(webResources.message(EDIT));
-    verify(view.edit).setFooter(webResources.message(EDIT));
+    HeaderRow headerRow = view.samples.getHeaderRows().get(0);
+    FooterRow footerRow = view.samples.getFooterRows().get(0);
+    assertEquals(sampleResources.message(NAME), headerRow.getCell(view.name).getText());
+    assertEquals(sampleResources.message(NAME), footerRow.getCell(view.name).getText());
+    assertEquals(sampleResources.message(PROTOCOL), headerRow.getCell(view.protocol).getText());
+    assertEquals(sampleResources.message(PROTOCOL), footerRow.getCell(view.protocol).getText());
+    assertEquals(sampleResources.message(DATE), headerRow.getCell(view.date).getText());
+    assertEquals(sampleResources.message(DATE), footerRow.getCell(view.date).getText());
+    assertEquals(sampleResources.message(OWNER), headerRow.getCell(view.owner).getText());
+    assertEquals(sampleResources.message(OWNER), footerRow.getCell(view.owner).getText());
+    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
+    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
@@ -264,7 +220,6 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
     assertEquals(resources.message(ANALYZE), view.analyze.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -294,77 +249,124 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
     assertTrue(view.owner.isSortable());
+    List<Sample> samples = items(view.samples);
+    verify(service).all(view.filter());
+    assertEquals(this.samples.size(), samples.size());
+    for (Sample sample : this.samples) {
+      assertTrue(samples.contains(sample), () -> sample.toString());
+    }
+    assertEquals(0, view.samples.getSelectedItems().size());
+    samples.forEach(dataset -> view.samples.select(dataset));
+    assertEquals(samples.size(), view.samples.getSelectedItems().size());
   }
 
   @Test
   public void samples_ColumnsValueProvider() {
-    mockColumns();
-    view.init();
-    verify(view.samples).addColumn(valueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<Sample, String> valueProvider = valueProviderCaptor.getValue();
     for (Sample sample : samples) {
-      assertEquals(sample.getName(), valueProvider.apply(sample));
-    }
-    verify(view.name).setComparator(comparatorCaptor.capture());
-    Comparator<Sample> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Sample sample : samples) {
-      assertEquals(sample.getName(),
-          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
-    }
-    verify(view.samples).addColumn(valueProviderCaptor.capture(), eq(PROTOCOL));
-    valueProvider = valueProviderCaptor.getValue();
-    for (Sample sample : samples) {
-      assertEquals(sample.getProtocol().getName(), valueProvider.apply(sample));
-    }
-    verify(view.protocol).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Sample sample : samples) {
+      assertEquals(sample.getName(), GridKt.getPresentationValue(view.name, sample));
       assertEquals(sample.getProtocol().getName(),
-          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
-    }
-    verify(view.samples, times(2)).addColumn(localDateRendererCaptor.capture());
-    LocalDateRenderer<Sample> localDateRenderer = localDateRendererCaptor.getAllValues().get(0);
-    for (Sample sample : samples) {
+          GridKt.getPresentationValue(view.protocol, sample));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
-          getFormattedValue(localDateRenderer, sample));
+          GridKt.getPresentationValue(view.date, sample));
+      assertEquals(sample.getOwner().getEmail(), GridKt.getPresentationValue(view.owner, sample));
+      Renderer<Sample> editRawRenderer = view.samples.getColumnByKey(EDIT).getRenderer();
+      assertTrue(editRawRenderer instanceof LitRenderer<Sample>);
+      LitRenderer<Sample> editRenderer = (LitRenderer<Sample>) editRawRenderer;
+      assertEquals(EDIT_BUTTON, rendererTemplate(editRenderer));
+      assertTrue(functions(editRenderer).containsKey("edit"));
+      when(service.get(any())).thenReturn(Optional.of(sample));
+      functions(editRenderer).get("edit").accept(sample, null);
+      verify(service).get(sample.getId());
+      SampleDialog sampleDialog = LocatorJ._find(SampleDialog.class).get(0);
+      assertEquals(sample, sampleDialog.getSample());
+      sampleDialog.close();
     }
-    verify(view.date).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    LocalDate firstDate = samples.get(0).getDate();
-    for (Sample sample : samples) {
-      assertEquals(firstDate.compareTo(sample.getDate()),
-          comparator.compare(samples.get(0), sample));
-    }
-    verify(view.samples).addColumn(valueProviderCaptor.capture(), eq(OWNER));
-    valueProvider = valueProviderCaptor.getValue();
-    for (Sample sample : samples) {
-      assertEquals(sample.getOwner().getEmail(), valueProvider.apply(sample));
-    }
-    verify(view.owner).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Sample sample : samples) {
-      assertEquals(sample.getOwner().getEmail(),
-          ((NormalizedComparator<Sample>) comparator).getConverter().apply(sample));
-    }
-    verify(view.samples, times(2)).addColumn(litRendererCaptor.capture());
-    LitRenderer<Sample> litRenderer = litRendererCaptor.getAllValues().get(1);
-    for (Sample sample : samples) {
-      assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
-      assertTrue(functions(litRenderer).containsKey("edit"));
-      functions(litRenderer).get("edit").accept(sample, null);
-      verify(presenter).view(sample);
-    }
+  }
+
+  @Test
+  public void samples_NameColumnComparator() {
+    Comparator<Sample> comparator = view.name.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(name("éê"), name("ee")));
+    assertTrue(comparator.compare(name("a"), name("e")) < 0);
+    assertTrue(comparator.compare(name("a"), name("é")) < 0);
+    assertTrue(comparator.compare(name("e"), name("a")) > 0);
+    assertTrue(comparator.compare(name("é"), name("a")) > 0);
+  }
+
+  @Test
+  public void samples_ProtocolColumnComparator() {
+    Comparator<Sample> comparator = view.protocol.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(protocol("éê"), protocol("ee")));
+    assertTrue(comparator.compare(protocol("a"), protocol("e")) < 0);
+    assertTrue(comparator.compare(protocol("a"), protocol("é")) < 0);
+    assertTrue(comparator.compare(protocol("e"), protocol("a")) > 0);
+    assertTrue(comparator.compare(protocol("é"), protocol("a")) > 0);
+  }
+
+  @Test
+  public void samples_OwnerColumnComparator() {
+    Comparator<Sample> comparator = view.owner.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(owner("éê"), owner("ee")));
+    assertTrue(comparator.compare(owner("a"), owner("e")) < 0);
+    assertTrue(comparator.compare(owner("a"), owner("é")) < 0);
+    assertTrue(comparator.compare(owner("e"), owner("a")) > 0);
+    assertTrue(comparator.compare(owner("é"), owner("a")) > 0);
+  }
+
+  @Test
+  public void ownerFilter_User() {
+    assertEquals("jonh.smith@ircm.qc.ca", view.filter().ownerContains);
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void ownerFilter_Manager() {
+    assertNull(view.filter().ownerContains);
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void ownerFilter_Admin() {
+    assertNull(view.filter().ownerContains);
   }
 
   @Test
   public void view() {
     Sample sample = samples.get(0);
+    when(service.get(any())).thenReturn(Optional.of(sample));
+
     doubleClickItem(view.samples, sample);
 
-    verify(presenter).view(sample);
+    verify(service).get(sample.getId());
+    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertEquals(sample, dialog.getSample());
+  }
+
+  @Test
+  public void view_RefreshOnSave() {
+    Sample sample = samples.get(0);
+    when(service.get(any())).thenReturn(Optional.of(sample));
+    view.samples.setItems(mock(DataProvider.class));
+
+    doubleClickItem(view.samples, sample);
+
+    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    dialog.fireSavedEvent();
+    verify(view.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void view_RefreshOnDelete() {
+    Sample sample = samples.get(0);
+    when(service.get(any())).thenReturn(Optional.of(sample));
+    view.samples.setItems(mock(DataProvider.class));
+
+    doubleClickItem(view.samples, sample);
+
+    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    dialog.fireDeletedEvent();
+    verify(view.samples.getDataProvider()).refreshAll();
   }
 
   @Test
@@ -372,7 +374,9 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     Sample sample = samples.get(0);
     clickItem(view.samples, sample, view.name, true, false, false, false);
 
-    verify(presenter).viewFiles(sample);
+    SampleFilesDialog dialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertEquals(sample, dialog.getSample());
   }
 
   @Test
@@ -380,59 +384,291 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     Sample sample = samples.get(0);
     clickItem(view.samples, sample, view.name, false, false, false, true);
 
-    verify(presenter).viewFiles(sample);
+    SampleFilesDialog dialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertEquals(sample, dialog.getSample());
   }
 
   @Test
   public void filterName() {
+    view.samples.setItems(mock(DataProvider.class));
+
     view.nameFilter.setValue("test");
 
-    verify(presenter).filterName("test");
+    assertEquals("test", view.filter().nameContains);
+    verify(view.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterName_Empty() {
+    view.samples.setItems(mock(DataProvider.class));
+    view.nameFilter.setValue("test");
+
+    view.nameFilter.setValue("");
+
+    assertNull(view.filter().nameContains);
+    verify(view.samples.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterProtocol() {
+    view.samples.setItems(mock(DataProvider.class));
+
     view.protocolFilter.setValue("test");
 
-    verify(presenter).filterProtocol("test");
+    assertEquals("test", view.filter().protocolContains);
+    verify(view.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterProtocol_Empty() {
+    view.samples.setItems(mock(DataProvider.class));
+    view.protocolFilter.setValue("test");
+
+    view.protocolFilter.setValue("");
+
+    assertNull(view.filter().protocolContains);
+    verify(view.samples.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterDate() {
+    view.samples.setItems(mock(DataProvider.class));
+
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     view.dateFilter.setValue(range);
 
-    verify(presenter).filterDate(range);
+    assertEquals(range, view.filter().dateRange);
+    verify(view.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterDate_Empty() {
+    view.samples.setItems(mock(DataProvider.class));
+    Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
+    view.dateFilter.setValue(range);
+
+    view.dateFilter.setValue(null);
+
+    assertNull(view.filter().dateRange);
+    verify(view.samples.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterOwner() {
+    view.samples.setItems(mock(DataProvider.class));
+
     view.ownerFilter.setValue("test");
 
-    verify(presenter).filterOwner("test");
+    assertEquals("test", view.filter().ownerContains);
+    verify(view.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterOwner_Empty() {
+    view.samples.setItems(mock(DataProvider.class));
+    view.ownerFilter.setValue("test");
+
+    view.ownerFilter.setValue("");
+
+    assertNull(view.filter().ownerContains);
+    verify(view.samples.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void add() {
     clickButton(view.add);
-    verify(presenter).add();
+
+    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertNull(dialog.getSample().getId());
+  }
+
+  @Test
+  public void add_RefreshOnSave() {
+    view.samples.setItems(mock(DataProvider.class));
+
+    clickButton(view.add);
+
+    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    dialog.fireSavedEvent();
+    verify(view.samples.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void add_RefreshOnDelete() {
+    view.samples.setItems(mock(DataProvider.class));
+
+    clickButton(view.add);
+
+    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    dialog.fireDeletedEvent();
+    verify(view.samples.getDataProvider()).refreshAll();
   }
 
   @Test
   public void merge() {
+    when(service.isMergable(any())).thenReturn(true);
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+
     clickButton(view.merge);
-    verify(presenter).merge();
+
+    assertFalse(view.error.isVisible());
+    verify(service).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
+    assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
+    verify(datasetService).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertTrue(dataset.getTags().isEmpty());
+    assertEquals(2, dataset.getSamples().size());
+    assertEquals(samples.get(0), dataset.getSamples().get(0));
+    assertEquals(samples.get(1), dataset.getSamples().get(1));
+    assertEquals(samples.get(0).getDate(), dataset.getDate());
+    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_SortById() {
+    when(service.isMergable(any())).thenReturn(true);
+    view.samples.select(samples.get(1));
+    view.samples.select(samples.get(0));
+
+    clickButton(view.merge);
+
+    assertFalse(view.error.isVisible());
+    verify(service).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
+    assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
+    verify(datasetService).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertTrue(dataset.getTags().isEmpty());
+    assertEquals(2, dataset.getSamples().size());
+    assertEquals(samples.get(0), dataset.getSamples().get(0));
+    assertEquals(samples.get(1), dataset.getSamples().get(1));
+    assertEquals(samples.get(0).getDate(), dataset.getDate());
+    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_NoSelection() {
+    clickButton(view.merge);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    verify(service, never()).isMergable(any());
+    verify(datasetService, never()).save(any());
+    NotificationsKt.expectNoNotifications();
+  }
+
+  @Test
+  public void merge_NotMergeable() {
+    when(service.isMergable(any())).thenReturn(false);
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+
+    clickButton(view.merge);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(MERGE_ERROR), view.error.getText());
+    verify(service).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
+    assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
+    verify(datasetService, never()).save(any());
+    NotificationsKt.expectNoNotifications();
+  }
+
+  @Test
+  public void merge_NameExists() {
+    when(service.isMergable(any())).thenReturn(true);
+    when(datasetService.exists(any())).thenReturn(true);
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+
+    clickButton(view.merge);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(datasetResources.message(NAME_ALREADY_EXISTS,
+        "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"), view.error.getText());
+    verify(datasetService).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020");
+    verify(datasetService, never()).save(any());
+    NotificationsKt.expectNoNotifications();
   }
 
   @Test
   public void files() {
+    Sample sample = samples.get(0);
+    view.samples.select(sample);
+
     clickButton(view.files);
-    verify(presenter).viewFiles();
+
+    assertFalse(view.error.isVisible());
+    SampleFilesDialog dialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertEquals(sample, dialog.getSample());
+  }
+
+  @Test
+  public void files_NoSelection() {
+    clickButton(view.files);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    assertTrue(LocatorJ._find(SampleFilesDialog.class).isEmpty());
+  }
+
+  @Test
+  public void files_MultipleSamplesSelected() {
+    view.samples.select(samples.get(0));
+    view.samples.select(samples.get(1));
+
+    clickButton(view.files);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(SAMPLES_MORE_THAN_ONE), view.error.getText());
+    assertTrue(LocatorJ._find(SampleFilesDialog.class).isEmpty());
   }
 
   @Test
   public void analyze() {
+    Sample sample = samples.get(0);
+    view.samples.select(sample);
+
     clickButton(view.analyze);
-    verify(presenter).analyze();
+
+    assertFalse(view.error.isVisible());
+    SamplesAnalysisDialog dialog = LocatorJ._find(SamplesAnalysisDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertEquals(1, dialog.getSamples().size());
+    assertTrue(dialog.getSamples().contains(sample));
+  }
+
+  @Test
+  public void analyze_NoSelection() {
+    clickButton(view.analyze);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    assertTrue(LocatorJ._find(SamplesAnalysisDialog.class).isEmpty());
+  }
+
+  @Test
+  public void analyze_MultipleSamples() {
+    List<Sample> samples = this.samples.subList(0, 2);
+    samples.forEach(sample -> view.samples.select(sample));
+
+    clickButton(view.analyze);
+
+    assertFalse(view.error.isVisible());
+    SamplesAnalysisDialog dialog = LocatorJ._find(SamplesAnalysisDialog.class).get(0);
+    assertTrue(dialog.isOpened());
+    assertEquals(2, dialog.getSamples().size());
+    assertTrue(dialog.getSamples().contains(samples.get(0)));
+    assertTrue(dialog.getSamples().contains(samples.get(1)));
   }
 }

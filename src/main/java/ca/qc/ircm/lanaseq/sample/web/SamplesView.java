@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
@@ -33,11 +34,19 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleFilter;
+import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
+import ca.qc.ircm.lanaseq.web.VaadinSort;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import com.google.common.collect.Range;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -50,6 +59,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -57,8 +68,13 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
@@ -106,25 +122,26 @@ public class SamplesView extends VerticalLayout
   protected Button merge = new Button();
   protected Button files = new Button();
   protected Button analyze = new Button();
-  @Autowired
   protected ObjectFactory<SampleDialog> dialogFactory;
-  @Autowired
   protected ObjectFactory<SampleFilesDialog> filesDialogFactory;
-  @Autowired
   protected ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
+  private DataProvider<Sample, SampleFilter> samplesDataProvider;
+  private WebSampleFilter filter = new WebSampleFilter();
+  private SampleService service;
+  private DatasetService datasetService;
+  private AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient SamplesViewPresenter presenter;
-
-  public SamplesView() {
-  }
-
-  SamplesView(SamplesViewPresenter presenter, ObjectFactory<SampleDialog> dialogFactory,
+  protected SamplesView(ObjectFactory<SampleDialog> dialogFactory,
       ObjectFactory<SampleFilesDialog> filesDialogFactory,
-      ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory) {
-    this.presenter = presenter;
+      ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory, SampleService service,
+      DatasetService datasetService, AuthenticatedUser authenticatedUser) {
     this.dialogFactory = dialogFactory;
     this.filesDialogFactory = filesDialogFactory;
     this.analysisDialogFactory = analysisDialogFactory;
+    this.service = service;
+    this.datasetService = datasetService;
+    this.authenticatedUser = authenticatedUser;
   }
 
   @PostConstruct
@@ -150,31 +167,31 @@ public class SamplesView extends VerticalLayout
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
-    edit = samples.addColumn(
-        LitRenderer.<Sample>of(EDIT_BUTTON).withFunction("edit", sample -> presenter.view(sample)))
+    edit = samples
+        .addColumn(LitRenderer.<Sample>of(EDIT_BUTTON).withFunction("edit", sample -> view(sample)))
         .setKey(EDIT).setSortable(false).setFlexGrow(0);
     samples.sort(GridSortOrder.desc(date).build());
-    samples.addItemDoubleClickListener(e -> presenter.view(e.getItem()));
+    samples.addItemDoubleClickListener(e -> view(e.getItem()));
     samples.addItemClickListener(e -> {
       if (e.isCtrlKey() || e.isMetaKey()) {
-        presenter.viewFiles(e.getItem());
+        viewFiles(e.getItem());
       }
     });
     samples.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = samples.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
-    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
+    nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
-    protocolFilter.addValueChangeListener(e -> presenter.filterProtocol(e.getValue()));
+    protocolFilter.addValueChangeListener(e -> filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
     protocolFilter.setSizeFull();
     filtersRow.getCell(date).setComponent(dateFilter);
-    dateFilter.addValueChangeListener(e -> presenter.filterDate(e.getValue()));
+    dateFilter.addValueChangeListener(e -> filterDate(e.getValue()));
     dateFilter.setSizeFull();
     filtersRow.getCell(owner).setComponent(ownerFilter);
-    ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
+    ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
     error.setId(ERROR_TEXT);
@@ -182,16 +199,19 @@ public class SamplesView extends VerticalLayout
     error.setVisible(false);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
-    add.addClickListener(e -> presenter.add());
+    add.addClickListener(e -> add());
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
-    merge.addClickListener(e -> presenter.merge());
+    merge.addClickListener(e -> merge());
     files.setId(FILES);
     files.setIcon(VaadinIcon.FILE_O.create());
-    files.addClickListener(e -> presenter.viewFiles());
+    files.addClickListener(e -> viewFiles());
     analyze.setId(ANALYZE);
-    analyze.addClickListener(e -> presenter.analyze());
-    presenter.init(this);
+    analyze.addClickListener(e -> analyze());
+    if (!authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
+      authenticatedUser.getUser().ifPresent(user -> ownerFilter.setValue(user.getEmail()));
+    }
+    loadSamples();
   }
 
   @Override
@@ -217,7 +237,6 @@ public class SamplesView extends VerticalLayout
     merge.setText(resources.message(MERGE));
     files.setText(resources.message(FILES));
     analyze.setText(resources.message(ANALYZE));
-    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -225,5 +244,125 @@ public class SamplesView extends VerticalLayout
     AppResources resources = new AppResources(SamplesView.class, getLocale());
     AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+  }
+
+  private void loadSamples() {
+    CallbackDataProvider.FetchCallback<Sample, Void> fetchCallback = query -> {
+      filter.sort = VaadinSort.springDataSort(query.getSortOrders());
+      filter.page = query.getOffset() / samples.getPageSize();
+      filter.size = query.getLimit();
+      return service.all(filter).stream();
+    };
+    samples.setItems(fetchCallback);
+  }
+
+  void view(Sample sample) {
+    showDialog(service.get(sample.getId()).orElse(null));
+  }
+
+  private void showDialog(Sample sample) {
+    SampleDialog dialog = dialogFactory.getObject();
+    dialog.setSample(sample);
+    dialog.addSavedListener(e -> samples.getDataProvider().refreshAll());
+    dialog.addDeletedListener(e -> samples.getDataProvider().refreshAll());
+    dialog.open();
+  }
+
+  void viewFiles(Sample sample) {
+    SampleFilesDialog filesDialog = filesDialogFactory.getObject();
+    filesDialog.setSample(sample);
+    filesDialog.open();
+  }
+
+  void viewFiles() {
+    List<Sample> samples = new ArrayList<>(this.samples.getSelectedItems());
+    AppResources resources = new AppResources(SamplesView.class, getLocale());
+    boolean error = false;
+    if (samples.isEmpty()) {
+      this.error.setText(resources.message(SAMPLES_REQUIRED));
+      error = true;
+    } else if (samples.size() > 1) {
+      this.error.setText(resources.message(SAMPLES_MORE_THAN_ONE));
+      error = true;
+    }
+    this.error.setVisible(error);
+    if (!error) {
+      Sample sample = samples.iterator().next();
+      viewFiles(sample);
+    }
+  }
+
+  void analyze() {
+    List<Sample> samples = new ArrayList<>(this.samples.getSelectedItems());
+    AppResources resources = new AppResources(SamplesView.class, getLocale());
+    boolean error = false;
+    if (samples.isEmpty()) {
+      this.error.setText(resources.message(SAMPLES_REQUIRED));
+      error = true;
+    }
+    this.error.setVisible(error);
+    if (!error) {
+      SamplesAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
+      analysisDialog.setSamples(samples);
+      analysisDialog.open();
+    }
+  }
+
+  void add() {
+    showDialog(null);
+  }
+
+  void merge() {
+    List<Sample> samples = this.samples.getSelectedItems().stream()
+        .sorted(Comparator.comparing(Sample::getId)).collect(Collectors.toList());
+    AppResources resources = new AppResources(SamplesView.class, getLocale());
+    boolean error = false;
+    if (samples.isEmpty()) {
+      this.error.setText(resources.message(SAMPLES_REQUIRED));
+      error = true;
+    } else if (!service.isMergable(samples)) {
+      this.error.setText(resources.message(MERGE_ERROR));
+      error = true;
+    }
+    this.error.setVisible(error);
+    if (!error) {
+      Dataset dataset = new Dataset();
+      dataset.setSamples(samples);
+      dataset.setTags(new HashSet<>());
+      dataset.setDate(samples.get(0).getDate());
+      dataset.generateName();
+      if (datasetService.exists(dataset.getName())) {
+        AppResources datasetResources = new AppResources(Dataset.class, getLocale());
+        this.error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));
+        this.error.setVisible(true);
+      } else {
+        datasetService.save(dataset);
+        showNotification(resources.message(MERGED, dataset.getName()));
+      }
+    }
+  }
+
+  void filterName(String value) {
+    filter.nameContains = value.isEmpty() ? null : value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  void filterProtocol(String value) {
+    filter.protocolContains = value.isEmpty() ? null : value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  void filterDate(Range<LocalDate> value) {
+    filter.dateRange = value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  void filterOwner(String value) {
+    filter.ownerContains = value.isEmpty() ? null : value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  WebSampleFilter filter() {
+    return filter;
   }
 }
