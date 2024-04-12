@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -38,7 +39,10 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.util.Objects;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -58,18 +62,17 @@ public class ProtocolHistoryDialog extends Dialog
       + ButtonVariant.LUMO_SUCCESS.getVariantName() + "' @click='${recoverFile}'>"
       + "<vaadin-icon icon='vaadin:ambulance' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String RECOVERED = "recovered";
+  private static final Logger logger = LoggerFactory.getLogger(ProtocolHistoryDialog.class);
   private static final long serialVersionUID = -7797831034001410430L;
   protected Grid<ProtocolFile> files = new Grid<>();
   protected Column<ProtocolFile> filename;
   protected Column<ProtocolFile> recover;
+  private Protocol protocol;
+  private transient ProtocolService service;
+
   @Autowired
-  private transient ProtocolHistoryDialogPresenter presenter;
-
-  public ProtocolHistoryDialog() {
-  }
-
-  ProtocolHistoryDialog(ProtocolHistoryDialogPresenter presenter) {
-    this.presenter = presenter;
+  protected ProtocolHistoryDialog(ProtocolService service) {
+    this.service = service;
   }
 
   public static String id(String baseId) {
@@ -90,8 +93,7 @@ public class ProtocolHistoryDialog extends Dialog
         .setKey(FILENAME).setSortProperty(FILENAME)
         .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
     recover = files.addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
-        .withFunction("recoverFile", file -> presenter.recoverFile(file))).setKey(RECOVER);
-    presenter.init(this);
+        .withFunction("recoverFile", file -> recoverFile(file))).setKey(RECOVER);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {
@@ -110,22 +112,32 @@ public class ProtocolHistoryDialog extends Dialog
     updateHeader();
     filename.setHeader(protocolFileResources.message(FILENAME));
     recover.setHeader(resources.message(RECOVER));
-    presenter.localeChange(getLocale());
   }
 
   private void updateHeader() {
     final AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
-    Protocol protocol = presenter.getProtocol();
+    Protocol protocol = getProtocol();
     setHeaderTitle(resources.message(HEADER,
         protocol != null && protocol.getId() != null ? protocol.getName() : ""));
   }
 
+  void recoverFile(ProtocolFile file) {
+    logger.debug("save recovered protocol files for protocol {}", protocol);
+    service.recover(file);
+    final AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
+    showNotification(resources.message(RECOVERED, file.getFilename()));
+    files.getListDataView().removeItem(file);
+    files.getListDataView().refreshAll();
+  }
+
   public Protocol getProtocol() {
-    return presenter.getProtocol();
+    return protocol;
   }
 
   public void setProtocol(Protocol protocol) {
-    presenter.setProtocol(protocol);
+    Objects.requireNonNull(protocol);
+    this.protocol = protocol;
+    files.setItems(service.deletedFiles(protocol));
     updateHeader();
   }
 }
