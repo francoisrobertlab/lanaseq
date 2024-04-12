@@ -716,7 +716,6 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(pairedPaths, secondUnpairedPaths,
         new ArrayList<>());
     service.validateSamples(samples, locale, errorHandler);
-    System.out.println();
     verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(2).getName()));
     verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
     verifyNoMoreInteractions(errorHandler);

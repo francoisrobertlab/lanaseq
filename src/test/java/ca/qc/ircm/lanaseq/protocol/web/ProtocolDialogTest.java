@@ -320,7 +320,6 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   public void files_ColumnsValueProvider() {
     dialog.files.setItems(new ArrayList<>(protocolFiles));
     for (int i = 0; i < protocolFiles.size(); i++) {
-      System.out.println(i);
       ProtocolFile file = protocolFiles.get(i);
       ComponentRenderer<Anchor, ProtocolFile> filenameRenderer =
           (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
