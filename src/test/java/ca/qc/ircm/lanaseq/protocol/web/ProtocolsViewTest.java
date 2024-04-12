@@ -31,22 +31,19 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.getFormattedValue;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -56,34 +53,32 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
-import com.github.mvysny.kaributesting.v10.MockVaadin;
+import ca.qc.ircm.lanaseq.user.User;
+import com.github.mvysny.kaributesting.v10.GridKt;
+import com.github.mvysny.kaributesting.v10.LocatorJ;
 import com.google.common.collect.Range;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.ValueProvider;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import org.junit.After;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -95,12 +90,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolsViewTest extends AbstractKaribuTestCase {
   private ProtocolsView view;
-  @Mock
-  private ProtocolsViewPresenter presenter;
   @MockBean
-  private ObjectFactory<ProtocolDialog> dialogFactory;
-  @MockBean
-  private ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
+  private ProtocolService service;
   @Captor
   private ArgumentCaptor<ValueProvider<Protocol, String>> valueProviderCaptor;
   @Captor
@@ -110,7 +101,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   @Captor
   private ArgumentCaptor<Comparator<Protocol>> comparatorCaptor;
   @Autowired
-  private ProtocolRepository protocolRepository;
+  private ProtocolRepository repository;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(ProtocolsView.class, locale);
   private AppResources protocolResources = new AppResources(Protocol.class, locale);
@@ -122,63 +113,25 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
+    protocols = repository.findAll();
+    when(service.all()).thenReturn(protocols);
+    when(service.get(any())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     ui.setLocale(locale);
-    view = new ProtocolsView(presenter, dialogFactory, historyDialogFactory);
-    view.init();
-    protocols = protocolRepository.findAll();
+    view = ui.navigate(ProtocolsView.class).get();
   }
 
-  @After
-  public void afterTest() {
-    MockVaadin.tearDown();
+  private Protocol name(String name) {
+    Protocol protocol = new Protocol();
+    protocol.setName(name);
+    return protocol;
   }
 
-  @SuppressWarnings("unchecked")
-  private void mockColumns() {
-    Element protocolsElement = view.protocols.getElement();
-    view.protocols = mock(Grid.class);
-    when(view.protocols.getElement()).thenReturn(protocolsElement);
-    view.name = mock(Column.class);
-    when(view.protocols.addColumn(any(ValueProvider.class), eq(NAME))).thenReturn(view.name);
-    when(view.name.setKey(any())).thenReturn(view.name);
-    when(view.name.setSortable(anyBoolean())).thenReturn(view.name);
-    when(view.name.setComparator(any(Comparator.class))).thenReturn(view.name);
-    when(view.name.setHeader(any(String.class))).thenReturn(view.name);
-    when(view.name.setFlexGrow(anyInt())).thenReturn(view.name);
-    view.date = mock(Column.class);
-    when(view.protocols.addColumn(any(LocalDateTimeRenderer.class))).thenReturn(view.date);
-    when(view.date.setKey(any())).thenReturn(view.date);
-    when(view.date.setSortProperty(any())).thenReturn(view.date);
-    when(view.date.setSortable(anyBoolean())).thenReturn(view.date);
-    when(view.date.setHeader(any(String.class))).thenReturn(view.date);
-    when(view.date.setFlexGrow(anyInt())).thenReturn(view.date);
-    view.owner = mock(Column.class);
-    when(view.protocols.addColumn(any(ValueProvider.class), eq(OWNER))).thenReturn(view.owner);
-    when(view.owner.setKey(any())).thenReturn(view.owner);
-    when(view.owner.setSortable(anyBoolean())).thenReturn(view.owner);
-    when(view.owner.setComparator(any(Comparator.class))).thenReturn(view.owner);
-    when(view.owner.setHeader(any(String.class))).thenReturn(view.owner);
-    when(view.owner.setFlexGrow(anyInt())).thenReturn(view.owner);
-    view.edit = mock(Column.class);
-    when(view.protocols.addColumn(any(LitRenderer.class))).thenReturn(view.edit);
-    when(view.edit.setKey(any())).thenReturn(view.edit);
-    when(view.edit.setSortable(anyBoolean())).thenReturn(view.edit);
-    when(view.edit.setComparator(any(Comparator.class))).thenReturn(view.edit);
-    when(view.edit.setHeader(any(String.class))).thenReturn(view.edit);
-    when(view.edit.setFlexGrow(anyInt())).thenReturn(view.edit);
-    HeaderRow filtersRow = mock(HeaderRow.class);
-    when(view.protocols.appendHeaderRow()).thenReturn(filtersRow);
-    HeaderCell nameFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.name)).thenReturn(nameFilterCell);
-    HeaderCell dateFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.date)).thenReturn(dateFilterCell);
-    HeaderCell ownerFilterCell = mock(HeaderCell.class);
-    when(filtersRow.getCell(view.owner)).thenReturn(ownerFilterCell);
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(view);
+  private Protocol owner(String email) {
+    Protocol protocol = new Protocol();
+    protocol.setOwner(new User());
+    protocol.getOwner().setEmail(email);
+    return protocol;
   }
 
   @Test
@@ -196,49 +149,45 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    mockColumns();
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    verify(view.name).setHeader(protocolResources.message(NAME));
-    verify(view.name).setFooter(protocolResources.message(NAME));
-    verify(view.date).setHeader(protocolResources.message(CREATION_DATE));
-    verify(view.date).setFooter(protocolResources.message(CREATION_DATE));
-    verify(view.owner).setHeader(protocolResources.message(OWNER));
-    verify(view.owner).setFooter(protocolResources.message(OWNER));
-    verify(view.edit).setHeader(webResources.message(EDIT));
-    verify(view.edit).setFooter(webResources.message(EDIT));
+    HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
+    FooterRow footerRow = view.protocols.getFooterRows().get(0);
+    assertEquals(protocolResources.message(NAME), headerRow.getCell(view.name).getText());
+    assertEquals(protocolResources.message(NAME), footerRow.getCell(view.name).getText());
+    assertEquals(protocolResources.message(CREATION_DATE), headerRow.getCell(view.date).getText());
+    assertEquals(protocolResources.message(CREATION_DATE), footerRow.getCell(view.date).getText());
+    assertEquals(protocolResources.message(OWNER), headerRow.getCell(view.owner).getText());
+    assertEquals(protocolResources.message(OWNER), footerRow.getCell(view.owner).getText());
+    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
+    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(HISTORY), view.history.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
   public void localeChange() {
-    mockColumns();
-    view.init();
-    view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(ProtocolsView.class, locale);
     final AppResources protocolResources = new AppResources(Protocol.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
-    verify(view.name, atLeastOnce()).setHeader(protocolResources.message(NAME));
-    verify(view.name, atLeastOnce()).setFooter(protocolResources.message(NAME));
-    verify(view.date, atLeastOnce()).setHeader(protocolResources.message(CREATION_DATE));
-    verify(view.date, atLeastOnce()).setFooter(protocolResources.message(CREATION_DATE));
-    verify(view.owner, atLeastOnce()).setHeader(protocolResources.message(OWNER));
-    verify(view.owner, atLeastOnce()).setFooter(protocolResources.message(OWNER));
-    verify(view.edit, atLeastOnce()).setHeader(webResources.message(EDIT));
-    verify(view.edit, atLeastOnce()).setFooter(webResources.message(EDIT));
+    HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
+    FooterRow footerRow = view.protocols.getFooterRows().get(0);
+    assertEquals(protocolResources.message(NAME), headerRow.getCell(view.name).getText());
+    assertEquals(protocolResources.message(NAME), footerRow.getCell(view.name).getText());
+    assertEquals(protocolResources.message(CREATION_DATE), headerRow.getCell(view.date).getText());
+    assertEquals(protocolResources.message(CREATION_DATE), footerRow.getCell(view.date).getText());
+    assertEquals(protocolResources.message(OWNER), headerRow.getCell(view.owner).getText());
+    assertEquals(protocolResources.message(OWNER), footerRow.getCell(view.owner).getText());
+    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
+    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
     assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
     assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
     assertEquals(webResources.message(ADD), view.add.getText());
     assertEquals(resources.message(HISTORY), view.history.getText());
-    verify(presenter).localeChange(locale);
   }
 
   @Test
@@ -259,101 +208,280 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     assertNotNull(view.protocols.getColumnByKey(EDIT));
     assertFalse(view.edit.isSortable());
     assertTrue(view.protocols.getSelectionModel() instanceof SelectionModel.Single);
+    List<Protocol> protocols = items(view.protocols);
+    verify(service).all();
+    assertEquals(this.protocols.size(), protocols.size());
+    for (Protocol protocol : this.protocols) {
+      assertTrue(protocols.contains(protocol), () -> protocol.toString());
+    }
+    view.ownerFilter.setValue("jonh.smith@ircm.qc.ca");
+    assertEquals(1, view.protocols.getListDataView().getItemCount());
+    protocols = view.protocols.getListDataView().getItems().toList();
+    assertTrue(find(protocols, 1L).isPresent());
+    assertFalse(find(protocols, 2L).isPresent());
   }
 
   @Test
   public void protocols_ColumnsValueProvider() {
-    mockColumns();
-    view.init();
-    verify(view.protocols).addColumn(valueProviderCaptor.capture(), eq(NAME));
-    ValueProvider<Protocol, String> valueProvider = valueProviderCaptor.getValue();
     for (Protocol protocol : protocols) {
-      assertEquals(protocol.getName(), valueProvider.apply(protocol));
-    }
-    verify(view.name).setComparator(comparatorCaptor.capture());
-    Comparator<Protocol> comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Protocol protocol : protocols) {
-      assertEquals(protocol.getName(),
-          ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
-    }
-    verify(view.protocols, times(2)).addColumn(localDateTimeRendererCaptor.capture());
-    LocalDateTimeRenderer<Protocol> localDateTimeRenderer =
-        localDateTimeRendererCaptor.getAllValues().get(0);
-    for (Protocol protocol : protocols) {
+      assertEquals(protocol.getName(), GridKt.getPresentationValue(view.name, protocol));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(protocol.getCreationDate()),
-          getFormattedValue(localDateTimeRenderer, protocol));
-    }
-    verify(view.protocols).addColumn(valueProviderCaptor.capture(), eq(OWNER));
-    valueProvider = valueProviderCaptor.getValue();
-    for (Protocol protocol : protocols) {
-      assertEquals(protocol.getOwner().getEmail(), valueProvider.apply(protocol));
-    }
-    verify(view.owner).setComparator(comparatorCaptor.capture());
-    comparator = comparatorCaptor.getValue();
-    assertTrue(comparator instanceof NormalizedComparator);
-    for (Protocol protocol : protocols) {
+          GridKt.getPresentationValue(view.date, protocol));
       assertEquals(protocol.getOwner().getEmail(),
-          ((NormalizedComparator<Protocol>) comparator).getConverter().apply(protocol));
-    }
-    verify(view.protocols, times(2)).addColumn(litRendererCaptor.capture());
-    LitRenderer<Protocol> litRenderer = litRendererCaptor.getAllValues().get(1);
-    for (Protocol protocol : protocols) {
-      assertEquals(EDIT_BUTTON, rendererTemplate(litRenderer));
-      assertTrue(functions(litRenderer).containsKey("edit"));
-      functions(litRenderer).get("edit").accept(protocol, null);
-      verify(presenter).edit(protocol);
+          GridKt.getPresentationValue(view.owner, protocol));
+      LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
+      assertEquals(EDIT_BUTTON, rendererTemplate(editRenderer));
+      assertTrue(functions(editRenderer).containsKey("edit"));
+      assertNotNull(functions(editRenderer).get("edit"));
     }
   }
 
   @Test
-  public void doubleClick() {
-    Protocol protocol = protocols.get(0);
-    doubleClickItem(view.protocols, protocol);
-
-    verify(presenter).edit(protocol);
+  public void protocols_NameColumnComparator() {
+    Comparator<Protocol> comparator = view.name.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(name("éê"), name("ee")));
+    assertTrue(comparator.compare(name("a"), name("e")) < 0);
+    assertTrue(comparator.compare(name("a"), name("é")) < 0);
+    assertTrue(comparator.compare(name("e"), name("a")) > 0);
+    assertTrue(comparator.compare(name("é"), name("a")) > 0);
   }
 
   @Test
-  public void altClick() {
-    Protocol protocol = protocols.get(0);
-    clickItem(view.protocols, protocol, view.name, false, false, true, false);
+  public void protocols_OwnerColumnComparator() {
+    Comparator<Protocol> comparator = view.owner.getComparator(SortDirection.ASCENDING);
+    assertEquals(0, comparator.compare(owner("éê"), owner("ee")));
+    assertTrue(comparator.compare(owner("a"), owner("e")) < 0);
+    assertTrue(comparator.compare(owner("a"), owner("é")) < 0);
+    assertTrue(comparator.compare(owner("e"), owner("a")) > 0);
+    assertTrue(comparator.compare(owner("é"), owner("a")) > 0);
+  }
 
-    verify(presenter).history(protocol);
+  @Test
+  public void protocols_EditAndSave() {
+    Protocol protocol = repository.findById(1L).get();
+    LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
+
+    functions(editRenderer).get("edit").accept(protocol, null);
+
+    verify(service).get(protocol.getId());
+    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+    dialog.fireSavedEvent();
+    verify(service, times(2)).all();
+  }
+
+  @Test
+  public void protocols_EditAndDelete() {
+    Protocol protocol = repository.findById(1L).get();
+    LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
+
+    functions(editRenderer).get("edit").accept(protocol, null);
+
+    verify(service).get(protocol.getId());
+    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+    dialog.fireDeletedEvent();
+    verify(service, times(2)).all();
+  }
+
+  @Test
+  public void ownerFilter_User() {
+    assertEquals("", view.ownerFilter.getValue());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void ownerFilter_Manager() {
+    assertEquals("", view.ownerFilter.getValue());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void ownerFilter_Admin() {
+    assertEquals("", view.ownerFilter.getValue());
+  }
+
+  @Test
+  public void doubleClick_Save() {
+    Protocol protocol = repository.findById(1L).get();
+
+    GridKt._doubleClickItem(view.protocols, 0);
+
+    verify(service).get(protocol.getId());
+    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+    dialog.fireSavedEvent();
+    verify(service, times(2)).all();
+  }
+
+  @Test
+  public void doubleClick_Delete() {
+    Protocol protocol = repository.findById(1L).get();
+
+    GridKt._doubleClickItem(view.protocols, 0);
+
+    verify(service).get(protocol.getId());
+    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+    dialog.fireDeletedEvent();
+    verify(service, times(2)).all();
+  }
+
+  @Test
+  public void altClick_User() {
+    GridKt._clickItem(view.protocols, 0, 0, false, false, true, false);
+
+    assertTrue(LocatorJ._find(ProtocolHistoryDialog.class).isEmpty());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void altClick_Manager() {
+    Protocol protocol = repository.findById(1L).get();
+
+    GridKt._clickItem(view.protocols, 0, 0, false, false, true, false);
+
+    verify(service).get(protocol.getId());
+    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void altClick_Admin() {
+    Protocol protocol = repository.findById(1L).get();
+
+    GridKt._clickItem(view.protocols, 0, 0, false, false, true, false);
+
+    verify(service).get(protocol.getId());
+    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
   }
 
   @Test
   public void filterName() {
+    view.protocols.setItems(mock(DataProvider.class));
+
     view.nameFilter.setValue("test");
 
-    verify(presenter).filterName("test");
+    assertEquals("test", view.filter().nameContains);
+    verify(view.protocols.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterName_Empty() {
+    view.protocols.setItems(mock(DataProvider.class));
+    view.nameFilter.setValue("test");
+
+    view.nameFilter.setValue("");
+
+    assertNull(view.filter().nameContains);
+    verify(view.protocols.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterRange() {
+    view.protocols.setItems(mock(DataProvider.class));
+
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
     view.dateFilter.setValue(range);
 
-    verify(presenter).filterDate(range);
+    assertEquals(range, view.filter().dateRange);
+    verify(view.protocols.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterRange_Empty() {
+    view.protocols.setItems(mock(DataProvider.class));
+    Range<LocalDate> range =
+        Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
+    view.dateFilter.setValue(range);
+
+    view.dateFilter.setValue(null);
+
+    assertNull(view.filter().dateRange);
+    verify(view.protocols.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void filterOwner() {
+    view.protocols.setItems(mock(DataProvider.class));
+
     view.ownerFilter.setValue("test");
 
-    verify(presenter).filterOwner("test");
+    assertEquals("test", view.filter().ownerContains);
+    verify(view.protocols.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void filterOwner_Empty() {
+    view.protocols.setItems(mock(DataProvider.class));
+    view.ownerFilter.setValue("test");
+
+    view.ownerFilter.setValue("");
+
+    assertNull(view.filter().ownerContains);
+    verify(view.protocols.getDataProvider(), times(2)).refreshAll();
   }
 
   @Test
   public void add() {
     clickButton(view.add);
-    verify(presenter).add();
+
+    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    assertNull(dialog.getProtocol().getId());
+    dialog.fireSavedEvent();
+    verify(service, times(2)).all();
   }
 
   @Test
-  public void history() {
+  public void history_User() {
+    Protocol protocol = repository.findById(1L).get();
+    view.protocols.select(protocol);
+    assertFalse(view.history.isVisible());
+
     clickButton(view.history);
-    verify(presenter).history();
+
+    assertFalse(view.error.isVisible());
+    assertTrue(LocatorJ._find(ProtocolHistoryDialog.class).isEmpty());
+  }
+
+  @Test
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void history_Manager() {
+    Protocol protocol = repository.findById(1L).get();
+    view.protocols.select(protocol);
+
+    clickButton(view.history);
+
+    verify(service).get(protocol.getId());
+    assertFalse(view.error.isVisible());
+    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void history_Admin() {
+    Protocol protocol = repository.findById(1L).get();
+    view.protocols.select(protocol);
+
+    clickButton(view.history);
+
+    verify(service).get(protocol.getId());
+    assertFalse(view.error.isVisible());
+    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    assertEquals(protocol, dialog.getProtocol());
+  }
+
+  @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void history_NoSelection() {
+    clickButton(view.history);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(PROTOCOLS_REQUIRED), view.error.getText());
+    assertTrue(LocatorJ._find(ProtocolHistoryDialog.class).isEmpty());
   }
 }

@@ -32,13 +32,18 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
+import com.google.common.collect.Range;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -52,7 +57,10 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
@@ -90,21 +98,20 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button history = new Button();
-  @Autowired
   protected ObjectFactory<ProtocolDialog> dialogFactory;
-  @Autowired
   protected ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
+  private WebProtocolFilter filter = new WebProtocolFilter();
+  private ProtocolService service;
+  private AuthenticatedUser authenticatedUser;
+
   @Autowired
-  private transient ProtocolsViewPresenter presenter;
-
-  public ProtocolsView() {
-  }
-
-  ProtocolsView(ProtocolsViewPresenter presenter, ObjectFactory<ProtocolDialog> dialogFactory,
-      ObjectFactory<ProtocolHistoryDialog> historyDialogFactory) {
-    this.presenter = presenter;
+  protected ProtocolsView(ObjectFactory<ProtocolDialog> dialogFactory,
+      ObjectFactory<ProtocolHistoryDialog> historyDialogFactory, ProtocolService service,
+      AuthenticatedUser authenticatedUser) {
     this.dialogFactory = dialogFactory;
     this.historyDialogFactory = historyDialogFactory;
+    this.service = service;
+    this.authenticatedUser = authenticatedUser;
   }
 
   @PostConstruct
@@ -124,28 +131,27 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
         .setKey(CREATION_DATE).setSortProperty(CREATION_DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
-    edit =
-        protocols
-            .addColumn(LitRenderer.<Protocol>of(EDIT_BUTTON).withFunction("edit",
-                protocol -> presenter.edit(protocol)))
-            .setKey(EDIT).setSortable(false).setFlexGrow(0);
-    protocols.addItemDoubleClickListener(e -> presenter.edit(e.getItem()));
+    edit = protocols
+        .addColumn(
+            LitRenderer.<Protocol>of(EDIT_BUTTON).withFunction("edit", protocol -> edit(protocol)))
+        .setKey(EDIT).setSortable(false).setFlexGrow(0);
+    protocols.addItemDoubleClickListener(e -> edit(e.getItem()));
     protocols.addItemClickListener(e -> {
       if (e.isAltKey()) {
-        presenter.history(e.getItem());
+        history(e.getItem());
       }
     });
     protocols.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = protocols.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
-    nameFilter.addValueChangeListener(e -> presenter.filterName(e.getValue()));
+    nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
     filtersRow.getCell(date).setComponent(dateFilter);
-    dateFilter.addValueChangeListener(e -> presenter.filterDate(e.getValue()));
+    dateFilter.addValueChangeListener(e -> filterDate(e.getValue()));
     dateFilter.setSizeFull();
     filtersRow.getCell(owner).setComponent(ownerFilter);
-    ownerFilter.addValueChangeListener(e -> presenter.filterOwner(e.getValue()));
+    ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
     error.setId(ERROR_TEXT);
@@ -153,11 +159,17 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     error.setVisible(false);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
-    add.addClickListener(e -> presenter.add());
+    add.addClickListener(e -> add());
     history.setId(HISTORY);
     history.setIcon(VaadinIcon.ARCHIVE.create());
-    history.addClickListener(e -> presenter.history());
-    presenter.init(this);
+    history.addClickListener(e -> history());
+    history.setVisible(authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER));
+    loadProtocols();
+  }
+
+  private void loadProtocols() {
+    GridListDataView dataView = protocols.setItems(service.all());
+    dataView.setFilter(filter);
   }
 
   @Override
@@ -178,7 +190,6 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
     history.setText(resources.message(HISTORY));
-    presenter.localeChange(getLocale());
   }
 
   @Override
@@ -186,5 +197,66 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     AppResources resources = new AppResources(ProtocolsView.class, getLocale());
     AppResources generalResources = new AppResources(Constants.class, getLocale());
     return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+  }
+
+  void edit(Protocol protocol) {
+    showDialog(service.get(protocol.getId()).orElse(null));
+  }
+
+  private void showDialog(Protocol protocol) {
+    ProtocolDialog dialog = dialogFactory.getObject();
+    dialog.setProtocol(protocol);
+    dialog.addSavedListener(e -> loadProtocols());
+    dialog.addDeletedListener(e -> loadProtocols());
+    dialog.open();
+  }
+
+  void history() {
+    List<Protocol> protocols = new ArrayList<>(this.protocols.getSelectedItems());
+    AppResources resources = new AppResources(ProtocolsView.class, getLocale());
+    boolean error = false;
+    if (protocols.isEmpty()) {
+      this.error.setText(resources.message(PROTOCOLS_REQUIRED));
+      error = true;
+    } else if (protocols.size() > 1) {
+      this.error.setText(resources.message(PROTOCOLS_MORE_THAN_ONE));
+      error = true;
+    }
+    this.error.setVisible(error);
+    if (!error) {
+      Protocol protocol = protocols.iterator().next();
+      history(protocol);
+    }
+  }
+
+  void history(Protocol protocol) {
+    if (authenticatedUser.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
+      ProtocolHistoryDialog historyDialog = historyDialogFactory.getObject();
+      historyDialog.setProtocol(service.get(protocol.getId()).orElse(null));
+      historyDialog.open();
+    }
+  }
+
+  void add() {
+    showDialog(new Protocol());
+  }
+
+  void filterName(String value) {
+    filter.nameContains = value.isEmpty() ? null : value;
+    protocols.getDataProvider().refreshAll();
+  }
+
+  void filterDate(Range<LocalDate> value) {
+    filter.dateRange = value;
+    protocols.getDataProvider().refreshAll();
+  }
+
+  void filterOwner(String value) {
+    filter.ownerContains = value.isEmpty() ? null : value;
+    protocols.getDataProvider().refreshAll();
+  }
+
+  WebProtocolFilter filter() {
+    return filter;
   }
 }
