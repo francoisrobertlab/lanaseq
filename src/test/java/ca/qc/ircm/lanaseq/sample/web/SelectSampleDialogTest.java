@@ -117,7 +117,7 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
     ui.navigate(DatasetsView.class).get();
     Grid<Dataset> datasetGrid = LocatorJ._find(Grid.class).get(0);
     datasetGrid.setItems(datasetRepository.findAll());
-    GridKt._doubleClickItem(datasetGrid, 0);
+    GridKt._doubleClickItem(datasetGrid, 1);
     DatasetDialog datasetDialog = LocatorJ._find(DatasetDialog.class).get(0);
     Button addSample = LocatorJ
         ._find(datasetDialog, Button.class, spec -> spec.withId(DatasetDialog.id(ADD_SAMPLE)))
