@@ -136,6 +136,16 @@ public class TagsFieldTest extends AbstractKaribuTestCase {
   }
 
   @Test
+  public void getTagSuggestions() {
+    assertTrue(tagsField.getTagSuggestions().isEmpty());
+    tagsField.setTagSuggestions(list("input", "chip"));
+    List<String> suggestions = tagsField.getTagSuggestions();
+    assertEquals(2, suggestions.size());
+    assertTrue(suggestions.contains("input"));
+    assertTrue(suggestions.contains("chip"));
+  }
+
+  @Test
   public void setTagSuggestions() {
     List<String> items = items(tagsField.newTag);
     assertTrue(items.isEmpty());

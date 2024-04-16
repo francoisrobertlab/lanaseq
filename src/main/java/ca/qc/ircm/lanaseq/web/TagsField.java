@@ -86,6 +86,10 @@ public class TagsField extends CustomField<Set<String>> implements LocaleChangeO
     validator = new RegexpValidator(resources.message(NEW_TAG_REGEX_ERROR), NEW_TAG_REGEX);
   }
 
+  public List<String> getTagSuggestions() {
+    return newTag.getListDataView().getItems().toList();
+  }
+
   public void setTagSuggestions(List<String> suggestions) {
     newTag.setItems(suggestions);
   }
