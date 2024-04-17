@@ -130,7 +130,7 @@ public class DatasetsViewPresenterTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     view.header = new H2();
-    view.datasets = new DatasetGrid();
+    view.datasets = new DatasetGrid(service, authenticatedUser);
     view.datasets.setSelectionMode(SelectionMode.MULTI);
     view.error = new Div();
     view.dialogFactory = dialogFactory;

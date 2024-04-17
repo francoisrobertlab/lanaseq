@@ -40,7 +40,9 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.EditEvent;
@@ -66,7 +68,9 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @MockBean
   private DatasetsViewPresenter presenter;
   @MockBean
-  private DatasetGridPresenter datasetGridPresenter;
+  private DatasetService service;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
   private DatasetGrid datasetGrid;
   @MockBean
   private ObjectFactory<DatasetDialog> dialogFactory;
@@ -87,7 +91,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     ui.setLocale(locale);
-    datasetGrid = new DatasetGrid(datasetGridPresenter);
+    datasetGrid = new DatasetGrid(service, authenticatedUser);
     datasetGrid.init();
     view = new DatasetsView(presenter, datasetGrid, dialogFactory, filesDialogFactory,
         analysisDialogFactory);
