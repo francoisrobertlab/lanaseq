@@ -286,7 +286,7 @@ public class SamplesAnalysisDialogTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void getSample() {
+  public void getSamples() {
     List<Sample> samples = dialog.getSamples();
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
