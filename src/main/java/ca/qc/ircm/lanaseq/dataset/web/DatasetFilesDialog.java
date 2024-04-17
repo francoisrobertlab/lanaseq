@@ -131,17 +131,17 @@ public class DatasetFilesDialog extends Dialog
   protected ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
   private Dataset dataset;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
-  private DatasetService service;
-  private SampleService sampleService;
-  private AuthenticatedUser authenticatedUser;
-  private AppConfiguration configuration;
+  private transient DatasetService service;
+  private transient SampleService sampleService;
+  private transient AuthenticatedUser authenticatedUser;
+  private transient AppConfiguration configuration;
   /**
    * Currently authenticated user.
    * <p>
    * This is needed because Vaadin's upload does not contain authentication information.
    * </p>
    */
-  private Authentication authentication;
+  private transient Authentication authentication;
 
   protected DatasetFilesDialog() {
   }
