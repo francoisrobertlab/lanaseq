@@ -20,40 +20,56 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
-import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.EditEvent;
+import com.github.mvysny.kaributesting.v10.LocatorJ;
+import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.selection.SelectionModel;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectFactory;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -66,23 +82,21 @@ import org.springframework.security.test.context.support.WithUserDetails;
 public class DatasetsViewTest extends AbstractKaribuTestCase {
   private DatasetsView view;
   @MockBean
-  private DatasetsViewPresenter presenter;
-  @MockBean
   private DatasetService service;
-  @Autowired
-  private AuthenticatedUser authenticatedUser;
-  private DatasetGrid datasetGrid;
   @MockBean
-  private ObjectFactory<DatasetDialog> dialogFactory;
-  @MockBean
-  private ObjectFactory<DatasetFilesDialog> filesDialogFactory;
-  @MockBean
-  private ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory;
+  private SampleService sampleService;
+  @Captor
+  private ArgumentCaptor<Dataset> datasetCaptor;
+  @Captor
+  private ArgumentCaptor<List<Sample>> samplesCaptor;
   @Autowired
   private DatasetRepository datasetRepository;
+  @Autowired
+  private EntityManager entityManager;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(DatasetsView.class, locale);
   private AppResources webResources = new AppResources(Constants.class, locale);
+  private AppResources datasetResources = new AppResources(Dataset.class, locale);
   private List<Dataset> datasets;
 
   /**
@@ -90,25 +104,10 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    datasetGrid = new DatasetGrid(service, authenticatedUser);
-    datasetGrid.init();
-    view = new DatasetsView(presenter, datasetGrid, dialogFactory, filesDialogFactory,
-        analysisDialogFactory);
-    view.init();
-    view.datasets.protocol = view.datasets.addColumn(dataset -> dataset.getName());
     datasets = datasetRepository.findAll();
-  }
-
-  private Protocol protocol(Dataset dataset) {
-    return dataset.getSamples() != null
-        ? dataset.getSamples().stream().findFirst().map(s -> s.getProtocol()).orElse(new Protocol())
-        : new Protocol();
-  }
-
-  @Test
-  public void presenter_Init() {
-    verify(presenter).init(view);
+    when(service.all(any())).thenReturn(datasets);
+    ui.setLocale(locale);
+    view = ui.navigate(DatasetsView.class).get();
   }
 
   @Test
@@ -127,27 +126,21 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
     assertEquals(resources.message(ANALYZE), view.analyze.getText());
-    verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
   public void localeChange() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetsView.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
     assertEquals(resources.message(ANALYZE), view.analyze.getText());
-    verify(presenter, atLeastOnce()).localeChange(locale);
   }
 
   @Test
@@ -162,51 +155,318 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   }
 
   @Test
-  public void view() {
+  public void datasets_View() {
     Dataset dataset = datasets.get(0);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
+
     doubleClickItem(view.datasets, dataset);
 
-    verify(presenter).view(dataset);
+    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    assertEquals(dataset, dialog.getDataset());
+    verify(service).get(dataset.getId());
   }
 
   @Test
-  public void addFiles_Control() {
+  public void datasets_View_RefreshOnSave() {
     Dataset dataset = datasets.get(0);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
+
+    doubleClickItem(view.datasets, dataset);
+
+    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    view.datasets.setItems(mock(DataProvider.class));
+    dialog.fireSavedEvent();
+    verify(view.datasets.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void datasets_View_RefreshOnDelete() {
+    Dataset dataset = datasets.get(0);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
+
+    doubleClickItem(view.datasets, dataset);
+
+    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    view.datasets.setItems(mock(DataProvider.class));
+    dialog.fireDeletedEvent();
+    verify(view.datasets.getDataProvider()).refreshAll();
+  }
+
+  @Test
+  public void datasets_AddFiles_Control() {
+    Dataset dataset = datasets.get(0);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
+
     clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
 
-    verify(presenter).viewFiles(dataset);
+    DatasetFilesDialog dialog = LocatorJ._get(DatasetFilesDialog.class);
+    assertEquals(dataset, dialog.getDataset());
   }
 
   @Test
-  public void addFiles_Meta() {
+  public void datasets_AddFiles_Meta() {
     Dataset dataset = datasets.get(0);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
+
     clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
 
-    verify(presenter).viewFiles(dataset);
+    DatasetFilesDialog dialog = LocatorJ._get(DatasetFilesDialog.class);
+    assertEquals(dataset, dialog.getDataset());
   }
 
   @Test
-  public void edit() {
+  public void datasets_Edit() {
     Dataset dataset = datasets.get(0);
+    when(service.get(any())).thenReturn(Optional.of(dataset));
+
     fireEvent(view.datasets, new EditEvent<>(view.datasets, false, dataset));
-    verify(presenter).view(dataset);
+
+    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    assertEquals(dataset, dialog.getDataset());
+    verify(service).get(dataset.getId());
   }
 
   @Test
   public void merge() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+
     clickButton(view.merge);
-    verify(presenter).merge();
+
+    assertFalse(view.error.isVisible());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(5, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertEquals(4, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(5, dataset.getSamples().size());
+    assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
+    assertEquals((Long) 3L, dataset.getSamples().get(2).getId());
+    assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
+    assertEquals(datasets.get(0).getDate(), dataset.getDate());
+    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_RefreshAfter() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+    view.datasets = spy(view.datasets);
+
+    clickButton(view.merge);
+
+    verify(view.datasets).refreshDatasets();
+  }
+
+  @Test
+  public void merge_SortById() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    view.datasets.select(datasets.get(1));
+    view.datasets.select(datasets.get(0));
+
+    clickButton(view.merge);
+
+    assertFalse(view.error.isVisible());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(5, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertEquals(4, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("mnase"));
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(5, dataset.getSamples().size());
+    assertEquals((Long) 1L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 2L, dataset.getSamples().get(1).getId());
+    assertEquals((Long) 3L, dataset.getSamples().get(2).getId());
+    assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
+    assertEquals(datasets.get(0).getDate(), dataset.getDate());
+    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_NoSamples() {
+    clickButton(view.merge);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+    verify(sampleService, never()).isMergable(any());
+    verify(service, never()).save(any());
+    NotificationsKt.expectNoNotifications();
+  }
+
+  @Test
+  public void merge_DuplicatedSample() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    Dataset dataset1 = find(datasets, 2L).get();
+    Dataset dataset2 = find(datasets, 6L).get();
+    dataset1.getSamples();
+    dataset1.getSamples().forEach(sample -> entityManager.detach(sample));
+    dataset2.getSamples();
+    dataset2.getSamples().forEach(sample -> entityManager.detach(sample));
+    view.datasets.select(dataset1);
+    view.datasets.select(dataset2);
+
+    clickButton(view.merge);
+
+    assertFalse(view.error.isVisible());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(2, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertNull(dataset.getId());
+    assertEquals(3, dataset.getTags().size());
+    assertTrue(dataset.getTags().contains("ip"));
+    assertTrue(dataset.getTags().contains("chipseq"));
+    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(2, dataset.getSamples().size());
+    assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
+    assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
+    assertEquals(dataset1.getDate(), dataset.getDate());
+    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+  }
+
+  @Test
+  public void merge_NotMergeable() {
+    when(sampleService.isMergable(any())).thenReturn(false);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+
+    clickButton(view.merge);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(MERGE_ERROR), view.error.getText());
+    verify(sampleService).isMergable(samplesCaptor.capture());
+    assertEquals(5, samplesCaptor.getValue().size());
+    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    verify(service, never()).save(any());
+    NotificationsKt.expectNoNotifications();
+  }
+
+  @Test
+  public void merge_NameExists() {
+    when(sampleService.isMergable(any())).thenReturn(true);
+    when(service.exists(any())).thenReturn(true);
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+
+    clickButton(view.merge);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(
+        datasetResources.message(NAME_ALREADY_EXISTS,
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
+        view.error.getText());
+    verify(service).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
+    verify(service, never()).save(any());
+    NotificationsKt.expectNoNotifications();
   }
 
   @Test
   public void files() {
+    Dataset dataset = datasets.get(0);
+    view.datasets.select(dataset);
+
     clickButton(view.files);
-    verify(presenter).viewFiles();
+
+    assertFalse(view.error.isVisible());
+    DatasetFilesDialog dialog = LocatorJ._get(DatasetFilesDialog.class);
+    assertEquals(dataset, dialog.getDataset());
   }
 
   @Test
-  public void analyze() {
+  public void files_NoSelection() {
+    clickButton(view.files);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+    assertTrue(LocatorJ._find(DatasetFilesDialog.class).isEmpty());
+  }
+
+  @Test
+  public void files_MoreThanOneDatasetSelected() {
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+
+    clickButton(view.files);
+
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(DATASETS_MORE_THAN_ONE), view.error.getText());
+    assertTrue(LocatorJ._find(DatasetFilesDialog.class).isEmpty());
+  }
+
+  @Test
+  public void analyze_One() {
+    Dataset dataset = datasets.get(0);
+    view.datasets.select(dataset);
+
     clickButton(view.analyze);
-    verify(presenter).analyze();
+
+    assertFalse(view.error.isVisible());
+    DatasetsAnalysisDialog dialog = LocatorJ._get(DatasetsAnalysisDialog.class);
+    List<Dataset> datasets = dialog.getDatasets();
+    assertEquals(1, datasets.size());
+    assertTrue(datasets.contains(dataset));
+  }
+
+  @Test
+  public void analyze_Many() {
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+
+    clickButton(view.analyze);
+
+    assertFalse(view.error.isVisible());
+    DatasetsAnalysisDialog dialog = LocatorJ._get(DatasetsAnalysisDialog.class);
+    List<Dataset> datasets = dialog.getDatasets();
+    assertEquals(2, datasets.size());
+    assertTrue(datasets.contains(datasets.get(0)));
+    assertTrue(datasets.contains(datasets.get(1)));
+  }
+
+  @Test
+  public void analyze_NoSelection() {
+    clickButton(view.analyze);
+
+    assertTrue(LocatorJ._find(DatasetsAnalysisDialog.class).isEmpty());
+    assertTrue(view.error.isVisible());
+    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+  }
+
+  @Test
+  public void analyze_ClearError() {
+    clickButton(view.analyze);
+    assertTrue(view.error.isVisible());
+    view.datasets.select(datasets.get(0));
+    clickButton(view.analyze);
+    assertFalse(view.error.isVisible());
   }
 }
