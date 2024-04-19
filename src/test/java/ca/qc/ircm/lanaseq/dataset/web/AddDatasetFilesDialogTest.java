@@ -55,22 +55,22 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.testbench.unit.MetaKeys;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +102,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
+public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @TempDir
   Path temporaryFolder;
   private AddDatasetFilesDialog dialog;
@@ -137,7 +137,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() throws Throwable {
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     files.add(temporaryFolder.resolve("dataset_R1.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset_R2.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset.bw").toFile());
@@ -160,12 +160,12 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     when(service.files(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
-    DatasetsView view = ui.navigate(DatasetsView.class).get();
+    DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
-    GridKt._clickItem(view.datasets, 1, 1, true, false, false, false);
-    DatasetFilesDialog filesDialog = LocatorJ._find(DatasetFilesDialog.class).get(0);
+    test(view.datasets).clickRow(1, new MetaKeys().ctrl());
+    DatasetFilesDialog filesDialog = $(DatasetFilesDialog.class).first();
     filesDialog.addLargeFiles.click();
-    dialog = LocatorJ._find(AddDatasetFilesDialog.class).get(0);
+    dialog = $(AddDatasetFilesDialog.class).first();
   }
 
   /**
@@ -226,7 +226,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     Dataset dataset = dialog.getDataset();
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
@@ -253,13 +253,13 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     dialog.updateFiles();
     for (int i = 0; i < files.size(); i++) {
       File file = files.get(i);
-      Span span = (Span) GridKt._getCellComponent(dialog.files, i, dialog.filename.getKey());
+      Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
       assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
       assertEquals(resources.message(SIZE_VALUE, file.length() / 1048576),
-          GridKt.getPresentationValue(dialog.size, file));
+          test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
       assertTrue(
-          GridKt._getCellComponent(dialog.files, i, dialog.overwrite.getKey()) instanceof Checkbox);
+          test(dialog.files).getCellComponent(i, dialog.overwrite.getKey()) instanceof Checkbox);
     }
   }
 
@@ -482,7 +482,7 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.error.isVisible());
     assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
     verify(service, never()).saveFiles(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     assertTrue(dialog.isOpened());
   }
@@ -503,7 +503,8 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
       assertTrue(files.contains(uploadFolder(dataset).resolve(file)));
     }
     assertFalse(dialog.error.isVisible());
-    NotificationsKt.expectNotifications(resources.message(SAVED, 4, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, 4, dataset.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -524,7 +525,8 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath())));
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath())));
-    NotificationsKt.expectNotifications(resources.message(SAVED, 2, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, 2, dataset.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -542,7 +544,8 @@ public class AddDatasetFilesDialogTest extends AbstractKaribuTestCase {
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(0, files.size());
     assertTrue(Files.exists(uploadFolder(dataset)));
-    NotificationsKt.expectNotifications(resources.message(SAVED, 0, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, 0, dataset.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }

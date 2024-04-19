@@ -48,13 +48,13 @@ import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,7 +74,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
+public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   private DatasetsAnalysisDialog dialog;
   @MockBean
   private AnalysisService service;
@@ -94,12 +94,12 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
     when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     datasets.add(repository.findById(6L).get());
     datasets.add(repository.findById(7L).get());
-    ui.setLocale(locale);
-    DatasetsView view = ui.navigate(DatasetsView.class).get();
+    UI.getCurrent().setLocale(locale);
+    DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
     datasets.forEach(sample -> view.datasets.select(sample));
     view.analyze.click();
-    dialog = LocatorJ._find(DatasetsAnalysisDialog.class).get(0);
+    dialog = $(DatasetsAnalysisDialog.class).first();
   }
 
   @Test
@@ -131,7 +131,7 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetsAnalysisDialog.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER, datasets.size()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE), dialog.message.getText());
     assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
@@ -149,7 +149,7 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
     verify(service, atLeastOnce()).validateDatasets(eq(datasets), eq(locale), any());
     assertEquals(0, dialog.errorsLayout.getComponentCount());
     assertFalse(dialog.errors.isOpened());
-    assertTrue(LocatorJ._find(ConfirmDialog.class).isEmpty());
+    assertFalse($(ConfirmDialog.class).exists());
     assertTrue(dialog.createFolder.isEnabled());
   }
 
@@ -169,8 +169,8 @@ public class DatasetsAnalysisDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.errorsLayout.getComponentAt(1) instanceof Span);
     assertEquals("error2", ((Span) dialog.errorsLayout.getComponentAt(1)).getText());
     assertTrue(dialog.errors.isOpened());
-    assertEquals(1, LocatorJ._find(ConfirmDialog.class).size());
-    ConfirmDialog confirmDialog = LocatorJ._find(ConfirmDialog.class).get(0);
+    assertEquals(1, $(ConfirmDialog.class).all().size());
+    ConfirmDialog confirmDialog = $(ConfirmDialog.class).first();
     assertEquals(dialog.errors, confirmDialog);
     assertFalse(dialog.createFolder.isEnabled());
   }

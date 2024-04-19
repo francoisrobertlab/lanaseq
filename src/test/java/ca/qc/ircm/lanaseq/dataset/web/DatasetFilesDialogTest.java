@@ -77,15 +77,11 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
-import com.github.mvysny.kaributesting.v10.UploadKt;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -96,6 +92,7 @@ import com.vaadin.flow.component.grid.editor.EditorImpl;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -104,6 +101,8 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.StreamResourceWriter;
+import com.vaadin.testbench.unit.MetaKeys;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -139,7 +138,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
+public class DatasetFilesDialogTest extends SpringUIUnitTest {
   @TempDir
   Path temporaryFolder;
   private DatasetFilesDialog dialog;
@@ -208,11 +207,11 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     random.nextBytes(fileContent);
 
-    ui.setLocale(locale);
-    DatasetsView view = ui.navigate(DatasetsView.class).get();
+    UI.getCurrent().setLocale(locale);
+    DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
-    GridKt._clickItem(view.datasets, 1, 0, true, false, false, false);
-    dialog = LocatorJ._find(DatasetFilesDialog.class).get(0);
+    test(view.datasets).clickRow(1, new MetaKeys().ctrl());
+    dialog = $(DatasetFilesDialog.class).first();
   }
 
   private EditableFile editableFile(String filename) {
@@ -265,7 +264,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     Dataset dataset = dialog.getDataset();
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
@@ -390,7 +389,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
         assertEquals(file.getFilename(), properties(filenameRenderer).get("filename").apply(file));
       }
       Anchor downloadAnchor =
-          (Anchor) GridKt._getCellComponent(dialog.files, i, dialog.download.getKey());
+          (Anchor) test(dialog.files).getCellComponent(i, dialog.download.getKey());
       assertTrue(downloadAnchor.hasClassName(DOWNLOAD));
       assertTrue(downloadAnchor.getElement().hasAttribute("download"));
       assertEquals("", downloadAnchor.getElement().getAttribute("download"));
@@ -401,8 +400,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
       Button downloadButton = (Button) downloadAnchorChild;
       validateIcon(VaadinIcon.DOWNLOAD.create(), downloadButton.getIcon());
       assertEquals("", downloadButton.getText());
-      Button deleteButton =
-          (Button) GridKt._getCellComponent(dialog.files, i, dialog.delete.getKey());
+      Button deleteButton = (Button) test(dialog.files).getCellComponent(i, dialog.delete.getKey());
       assertTrue(deleteButton.hasClassName(DELETE));
       assertTrue(deleteButton.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
       assertEquals(i < files.size() - 1, deleteButton.isEnabled(), path.toString());
@@ -423,8 +421,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   public void files_DeleteButton() {
     Dataset dataset = dialog.getDataset();
     File path = files.get(0);
-    Button deleteButton =
-        (Button) GridKt._getCellComponent(dialog.files, 0, dialog.delete.getKey());
+    Button deleteButton = (Button) test(dialog.files).getCellComponent(0, dialog.delete.getKey());
     clickButton(deleteButton);
     verify(service).deleteFile(dataset, path.toPath());
     verify(service, atLeast(2)).files(dataset);
@@ -571,10 +568,13 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
         return files;
       }
     });
-    for (Sample sample : samples) {
-      assertEquals(sample.getName(), GridKt.getPresentationValue(dialog.name, sample));
-      assertEquals(String.valueOf(samples.indexOf(sample)),
-          GridKt.getPresentationValue(dialog.fileCount, sample));
+    dialog.samples.setItems(samples);
+    for (int i = 0; i < samples.size(); i++) {
+      Sample sample = samples.get(i);
+      assertEquals(sample.getName(),
+          test(dialog.samples).getCellText(i, dialog.samples.getColumns().indexOf(dialog.name)));
+      assertEquals(String.valueOf(samples.indexOf(sample)), test(dialog.samples).getCellText(i,
+          dialog.samples.getColumns().indexOf(dialog.fileCount)));
       verify(sampleService, atLeastOnce()).files(sample);
     }
   }
@@ -593,7 +593,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   public void samples_ViewFiles() {
     Sample sample = dialog.getDataset().getSamples().get(0);
     doubleClickItem(dialog.samples, sample);
-    SampleFilesDialog sampleFilesDialog = LocatorJ._get(SampleFilesDialog.class);
+    SampleFilesDialog sampleFilesDialog = $(SampleFilesDialog.class).first();
     assertEquals(sample, sampleFilesDialog.getSample());
   }
 
@@ -601,7 +601,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
   public void samples_ViewFiles_RefreshOnClose() {
     Sample sample = dialog.getDataset().getSamples().get(0);
     doubleClickItem(dialog.samples, sample);
-    SampleFilesDialog sampleFilesDialog = LocatorJ._get(SampleFilesDialog.class);
+    SampleFilesDialog sampleFilesDialog = $(SampleFilesDialog.class).first();
     assertEquals(sample, sampleFilesDialog.getSample());
     dialog.samples.setItems(mock(DataProvider.class));
     sampleFilesDialog.close();
@@ -630,7 +630,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     }).when(service).saveFiles(any(), any());
     SecurityContextHolder.getContext().setAuthentication(null);
 
-    UploadKt._upload(dialog.upload, filename, mimeType, fileContent);
+    test(dialog.upload).upload(filename, mimeType, fileContent);
 
     assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
@@ -638,7 +638,8 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     Path file = filesCaptor.getValue().stream().findFirst().get();
     assertEquals(filename, file.getFileName().toString());
     assertArrayEquals(fileContent, Files.readAllBytes(tempFile));
-    NotificationsKt.expectNotifications(resources.message(FILES_SUCCESS, filename));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(FILES_SUCCESS, filename), test(notification).getText());
     assertFalse(Files.exists(file));
     assertFalse(Files.exists(file.getParent()));
   }
@@ -651,13 +652,14 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     doThrow(new IllegalStateException("test")).when(service).saveFiles(any(), any());
     SecurityContextHolder.getContext().setAuthentication(null);
 
-    UploadKt._upload(dialog.upload, filename, mimeType, fileContent);
+    test(dialog.upload).upload(filename, mimeType, fileContent);
 
     assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(dataset), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().get();
-    NotificationsKt.expectNotifications(resources.message(FILES_IOEXCEPTION, filename));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(FILES_IOEXCEPTION, filename), test(notification).getText());
     assertFalse(Files.exists(file));
     assertFalse(Files.exists(file.getParent()));
   }
@@ -760,7 +762,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
 
     dialog.addLargeFiles.click();
 
-    AddDatasetFilesDialog largeFilesDialog = LocatorJ._find(AddDatasetFilesDialog.class).get(0);
+    AddDatasetFilesDialog largeFilesDialog = $(AddDatasetFilesDialog.class).first();
     assertEquals(dataset, largeFilesDialog.getDataset());
     largeFilesDialog.fireSavedEvent();
     verify(service, atLeast(2)).files(dataset);
@@ -777,7 +779,7 @@ public class DatasetFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals("source.txt", resource.getName());
     StreamResourceWriter writer = resource.getWriter();
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    writer.accept(output, ui.getSession());
+    writer.accept(output, UI.getCurrent().getSession());
     assertArrayEquals(fileContent, output.toByteArray());
   }
 }

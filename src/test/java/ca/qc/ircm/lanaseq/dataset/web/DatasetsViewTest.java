@@ -54,14 +54,14 @@ import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.EditEvent;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.selection.SelectionModel;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -79,7 +79,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetsViewTest extends AbstractKaribuTestCase {
+public class DatasetsViewTest extends SpringUIUnitTest {
   private DatasetsView view;
   @MockBean
   private DatasetService service;
@@ -106,8 +106,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     datasets = datasetRepository.findAll();
     when(service.all(any())).thenReturn(datasets);
-    ui.setLocale(locale);
-    view = ui.navigate(DatasetsView.class).get();
+    UI.getCurrent().setLocale(locale);
+    view = navigate(DatasetsView.class);
   }
 
   @Test
@@ -136,7 +136,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetsView.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MERGE), view.merge.getText());
     assertEquals(resources.message(FILES), view.files.getText());
@@ -161,7 +161,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     doubleClickItem(view.datasets, dataset);
 
-    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    DatasetDialog dialog = $(DatasetDialog.class).first();
     assertEquals(dataset, dialog.getDataset());
     verify(service).get(dataset.getId());
   }
@@ -173,7 +173,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     doubleClickItem(view.datasets, dataset);
 
-    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    DatasetDialog dialog = $(DatasetDialog.class).first();
     view.datasets.setItems(mock(DataProvider.class));
     dialog.fireSavedEvent();
     verify(view.datasets.getDataProvider()).refreshAll();
@@ -186,7 +186,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     doubleClickItem(view.datasets, dataset);
 
-    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    DatasetDialog dialog = $(DatasetDialog.class).first();
     view.datasets.setItems(mock(DataProvider.class));
     dialog.fireDeletedEvent();
     verify(view.datasets.getDataProvider()).refreshAll();
@@ -199,7 +199,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
 
-    DatasetFilesDialog dialog = LocatorJ._get(DatasetFilesDialog.class);
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
     assertEquals(dataset, dialog.getDataset());
   }
 
@@ -210,7 +210,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
 
-    DatasetFilesDialog dialog = LocatorJ._get(DatasetFilesDialog.class);
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
     assertEquals(dataset, dialog.getDataset());
   }
 
@@ -221,7 +221,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     fireEvent(view.datasets, new EditEvent<>(view.datasets, false, dataset));
 
-    DatasetDialog dialog = LocatorJ._get(DatasetDialog.class);
+    DatasetDialog dialog = $(DatasetDialog.class).first();
     assertEquals(dataset, dialog.getDataset());
     verify(service).get(dataset.getId());
   }
@@ -257,7 +257,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
-    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
   }
 
   @Test
@@ -303,7 +304,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals((Long) 4L, dataset.getSamples().get(3).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
-    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
   }
 
   @Test
@@ -314,7 +316,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
     verify(sampleService, never()).isMergable(any());
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -347,7 +349,8 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
     assertEquals(dataset1.getDate(), dataset.getDate());
-    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
   }
 
   @Test
@@ -368,7 +371,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
     assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -387,7 +390,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
         view.error.getText());
     verify(service).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -398,7 +401,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     clickButton(view.files);
 
     assertFalse(view.error.isVisible());
-    DatasetFilesDialog dialog = LocatorJ._get(DatasetFilesDialog.class);
+    DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
     assertEquals(dataset, dialog.getDataset());
   }
 
@@ -408,7 +411,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
-    assertTrue(LocatorJ._find(DatasetFilesDialog.class).isEmpty());
+    assertFalse($(DatasetFilesDialog.class).exists());
   }
 
   @Test
@@ -420,7 +423,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_MORE_THAN_ONE), view.error.getText());
-    assertTrue(LocatorJ._find(DatasetFilesDialog.class).isEmpty());
+    assertFalse($(DatasetFilesDialog.class).exists());
   }
 
   @Test
@@ -431,7 +434,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     clickButton(view.analyze);
 
     assertFalse(view.error.isVisible());
-    DatasetsAnalysisDialog dialog = LocatorJ._get(DatasetsAnalysisDialog.class);
+    DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
     List<Dataset> datasets = dialog.getDatasets();
     assertEquals(1, datasets.size());
     assertTrue(datasets.contains(dataset));
@@ -445,7 +448,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
     clickButton(view.analyze);
 
     assertFalse(view.error.isVisible());
-    DatasetsAnalysisDialog dialog = LocatorJ._get(DatasetsAnalysisDialog.class);
+    DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
     List<Dataset> datasets = dialog.getDatasets();
     assertEquals(2, datasets.size());
     assertTrue(datasets.contains(datasets.get(0)));
@@ -456,7 +459,7 @@ public class DatasetsViewTest extends AbstractKaribuTestCase {
   public void analyze_NoSelection() {
     clickButton(view.analyze);
 
-    assertTrue(LocatorJ._find(DatasetsAnalysisDialog.class).isEmpty());
+    assertFalse($(DatasetsAnalysisDialog.class).exists());
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
   }

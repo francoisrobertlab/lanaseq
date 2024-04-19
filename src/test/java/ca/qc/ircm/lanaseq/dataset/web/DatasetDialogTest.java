@@ -28,6 +28,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.GENERATE_NAME;
@@ -78,14 +79,11 @@ import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -99,11 +97,13 @@ import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import elemental.json.impl.JsonUtil;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -129,7 +129,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetDialogTest extends AbstractKaribuTestCase {
+public class DatasetDialogTest extends SpringUIUnitTest {
   private DatasetDialog dialog;
   @MockBean
   private DatasetService service;
@@ -170,11 +170,11 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     topTags.add("input");
     topTags.add("chip");
     when(service.topTags(anyInt())).thenReturn(topTags);
-    ui.setLocale(locale);
-    DatasetsView view = ui.navigate(DatasetsView.class).get();
+    UI.getCurrent().setLocale(locale);
+    DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
-    GridKt._doubleClickItem(view.datasets, 1);
-    dialog = LocatorJ._find(DatasetDialog.class).get(0);
+    test(view.datasets).doubleClickRow(1);
+    dialog = $(DatasetDialog.class).first();
   }
 
   private Sample name(String name) {
@@ -264,7 +264,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     final AppResources datasetResources = new AppResources(Dataset.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER, 1, dialog.getDataset().getName()),
         dialog.getHeaderTitle());
     assertEquals(resources.message(NAME_PREFIX), dialog.namePrefix.getLabel());
@@ -323,8 +323,11 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void samples_ColumnsValueProvider() {
-    for (Sample sample : samples) {
-      assertEquals(sample.getName(), GridKt.getPresentationValue(dialog.sampleName, sample));
+    dialog.samples.setItems(samples);
+    for (int i = 0; i < samples.size(); i++) {
+      Sample sample = samples.get(i);
+      assertEquals(sample.getName(), test(dialog.samples).getCellText(i,
+          dialog.samples.getColumns().indexOf(dialog.sampleName)));
       ComponentRenderer<Button, Sample> buttonRenderer =
           (ComponentRenderer<Button, Sample>) dialog.sampleRemove.getRenderer();
       Button button = buttonRenderer.createComponent(sample);
@@ -735,14 +738,14 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   public void addSample() {
     clickButton(dialog.addSample);
 
-    Grid<Sample> selectSampleDialogGrid = LocatorJ._get(Grid.class,
-        spec -> spec.withId(SelectSampleDialog.id(SelectSampleDialog.SAMPLES)));
+    Grid<Sample> selectSampleDialogGrid =
+        $(Grid.class).id(SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
         GridSortOrder.desc(selectSampleDialogGrid.getColumnByKey(SampleProperties.DATE)).build());
     TextField ownerFilter = (TextField) selectSampleDialogGrid.getHeaderRows().get(1)
         .getCell(selectSampleDialogGrid.getColumnByKey(SampleProperties.OWNER)).getComponent();
     ownerFilter.setValue("");
-    GridKt._doubleClickItem(selectSampleDialogGrid, 2);
+    test(selectSampleDialogGrid).doubleClickRow(2);
 
     assertEquals(3, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
@@ -762,11 +765,11 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
   public void addSample_AlreadyInDataset() {
     clickButton(dialog.addSample);
 
-    Grid<Sample> selectSampleDialogGrid = LocatorJ._get(Grid.class,
-        spec -> spec.withId(SelectSampleDialog.id(SelectSampleDialog.SAMPLES)));
+    Grid<Sample> selectSampleDialogGrid =
+        $(Grid.class).id(SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
         GridSortOrder.desc(selectSampleDialogGrid.getColumnByKey(SampleProperties.DATE)).build());
-    GridKt._doubleClickItem(selectSampleDialogGrid, 3);
+    test(selectSampleDialogGrid).doubleClickRow(3);
 
     assertEquals(2, dialog.samples.getListDataView().getItemCount());
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
@@ -790,7 +793,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -836,7 +839,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(resources.message(NAME_PREFIX_REGEX_ERROR)), error.getMessage());
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -854,7 +857,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertTrue(dataset.getTags().isEmpty());
-    NotificationsKt.expectNotifications(resources.message(SAVED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, dataset.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -871,7 +875,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    NotificationsKt.expectNotifications(resources.message(SAVED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, dataset.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -892,7 +897,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -909,7 +914,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
 
     verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -927,7 +932,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     verify(service).exists("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022");
     verify(service, atLeastOnce()).get(2L);
     verify(service).save(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, dataset.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -949,7 +955,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(0, dataset.getSamples().size());
-    NotificationsKt.expectNotifications(resources.message(SAVED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, dataset.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -998,7 +1005,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     assertEquals(expectedSample.getTreatment(), sample.getTreatment());
     assertEquals(expectedSample.getNote(), sample.getNote());
     assertEquals(expectedSample.getDate(), sample.getDate());
-    NotificationsKt.expectNotifications(resources.message(SAVED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, dataset.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -1010,7 +1018,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
 
     clickButton(dialog.cancel);
 
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertFalse(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -1030,9 +1038,8 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any());
     verify(service).delete(dataset);
     assertFalse(dialog.isOpened());
-    // TODO Fix next line with UI unit test from Vaadin.
-    //Should be: NotificationsKt.expectNotifications(resources.message(DELETED, dataset.getName()));
-    NotificationsKt.expectNoNotifications();
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(DELETED, dataset.getName()), test(notification).getText());
     verify(deletedListener).onComponentEvent(any());
   }
 
@@ -1049,7 +1056,7 @@ public class DatasetDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any());
     verify(service, never()).delete(dataset);
     assertTrue(dialog.isOpened());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     verify(deletedListener, never()).onComponentEvent(any());
   }
 }

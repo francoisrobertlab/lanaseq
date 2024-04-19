@@ -49,14 +49,12 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.EditEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -64,6 +62,7 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.shared.Registration;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -85,7 +84,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetGridTest extends AbstractKaribuTestCase {
+public class DatasetGridTest extends SpringUIUnitTest {
   private DatasetGrid grid;
   @MockBean
   private DatasetService service;
@@ -110,9 +109,9 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     datasets = repository.findAll();
     when(service.all(any())).thenReturn(datasets);
-    ui.setLocale(locale);
-    ui.navigate(DatasetsView.class).get();
-    grid = LocatorJ._get(DatasetGrid.class);
+    UI.getCurrent().setLocale(locale);
+    navigate(DatasetsView.class);
+    grid = $(DatasetGrid.class).first();
   }
 
   private Optional<Protocol> protocol(Dataset dataset) {
@@ -167,7 +166,7 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
     final AppResources datasetResources = new AppResources(Dataset.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     HeaderRow headerRow = grid.getHeaderRows().get(0);
     FooterRow footerRow = grid.getFooterRows().get(0);
     assertEquals(datasetResources.message(NAME), headerRow.getCell(grid.name).getText());
@@ -221,15 +220,19 @@ public class DatasetGridTest extends AbstractKaribuTestCase {
 
   @Test
   public void datasets_ColumnsValueProvider() {
-    for (Dataset dataset : datasets) {
-      assertEquals(dataset.getName(), GridKt.getPresentationValue(grid.name, dataset));
+    grid.setItems(datasets);
+    for (int i = 0; i < datasets.size(); i++) {
+      Dataset dataset = datasets.get(i);
+      assertEquals(dataset.getName(),
+          test(grid).getCellText(i, grid.getColumns().indexOf(grid.name)));
       assertEquals(dataset.getTags().stream().collect(Collectors.joining(", ")),
-          GridKt.getPresentationValue(grid.tags, dataset));
+          test(grid).getCellText(i, grid.getColumns().indexOf(grid.tags)));
       assertEquals(protocol(dataset).map(Protocol::getName).orElse(""),
-          GridKt.getPresentationValue(grid.protocol, dataset));
+          test(grid).getCellText(i, grid.getColumns().indexOf(grid.protocol)));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
-          GridKt.getPresentationValue(grid.date, dataset));
-      assertEquals(dataset.getOwner().getEmail(), GridKt.getPresentationValue(grid.owner, dataset));
+          test(grid).getCellText(i, grid.getColumns().indexOf(grid.date)));
+      assertEquals(dataset.getOwner().getEmail(),
+          test(grid).getCellText(i, grid.getColumns().indexOf(grid.owner)));
       LitRenderer<Dataset> editRenderer = (LitRenderer<Dataset>) grid.edit.getRenderer();
       assertEquals(EDIT_BUTTON, rendererTemplate(editRenderer));
       assertTrue(functions(editRenderer).containsKey("edit"));
