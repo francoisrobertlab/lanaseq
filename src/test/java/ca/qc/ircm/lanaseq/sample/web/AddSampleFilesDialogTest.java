@@ -53,21 +53,21 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.testbench.unit.MetaKeys;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +98,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
+public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @TempDir
   Path temporaryFolder;
   private AddSampleFilesDialog dialog;
@@ -148,13 +148,13 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     when(service.files(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
-    ui.setLocale(locale);
-    SamplesView view = ui.navigate(SamplesView.class).get();
+    UI.getCurrent().setLocale(locale);
+    SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
-    GridKt._clickItem(view.samples, 1, 1, true, false, false, false);
-    SampleFilesDialog filesDialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    test(view.samples).clickRow(1, new MetaKeys().ctrl());
+    SampleFilesDialog filesDialog = $(SampleFilesDialog.class).first();
     filesDialog.addLargeFiles.click();
-    dialog = LocatorJ._find(AddSampleFilesDialog.class).get(0);
+    dialog = $(AddSampleFilesDialog.class).first();
   }
 
   private void writeFile(Path file, long size) throws IOException {
@@ -204,7 +204,7 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     Sample sample = dialog.getSample();
     assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
@@ -231,13 +231,13 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     dialog.updateFiles();
     for (int i = 0; i < files.size(); i++) {
       File file = files.get(i);
-      Span span = (Span) GridKt._getCellComponent(dialog.files, i, dialog.filename.getKey());
+      Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
       assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
       assertEquals(resources.message(AddSampleFilesDialog.SIZE_VALUE, file.length() / 1048576),
-          GridKt.getPresentationValue(dialog.size, file));
+          test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
       assertTrue(
-          GridKt._getCellComponent(dialog.files, i, dialog.overwrite.getKey()) instanceof Checkbox);
+          test(dialog.files).getCellComponent(i, dialog.overwrite.getKey()) instanceof Checkbox);
     }
   }
 
@@ -460,7 +460,7 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     assertTrue(dialog.error.isVisible());
     assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
     verify(service, never()).saveFiles(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     assertTrue(dialog.isOpened());
   }
@@ -481,7 +481,8 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
       assertTrue(files.contains(uploadFolder(sample).resolve(file)));
     }
     assertFalse(dialog.error.isVisible());
-    NotificationsKt.expectNotifications(resources.message(SAVED, 4, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, 4, sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -502,7 +503,8 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     assertEquals(2, files.size());
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath())));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath())));
-    NotificationsKt.expectNotifications(resources.message(SAVED, 2, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, 2, sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -520,7 +522,8 @@ public class AddSampleFilesDialogTest extends AbstractKaribuTestCase {
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(0, files.size());
     assertTrue(Files.exists(uploadFolder(sample)));
-    NotificationsKt.expectNotifications(resources.message(SAVED, 0, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, 0, sample.getName()), test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }

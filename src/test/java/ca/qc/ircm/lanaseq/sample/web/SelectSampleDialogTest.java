@@ -47,14 +47,12 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SelectedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -64,6 +62,8 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -83,7 +83,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SelectSampleDialogTest extends AbstractKaribuTestCase {
+public class SelectSampleDialogTest extends SpringUIUnitTest {
   private SelectSampleDialog dialog;
   @MockBean
   private SampleService service;
@@ -110,20 +110,25 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
    * Before test.
    */
   @BeforeEach
-  public void beforeTest() {
+  public void beforeTest() throws Exception {
     samples = repository.findAll();
     when(service.all()).thenReturn(samples);
-    ui.setLocale(locale);
-    ui.navigate(DatasetsView.class).get();
-    Grid<Dataset> datasetGrid = LocatorJ._find(Grid.class).get(0);
+    UI.getCurrent().setLocale(locale);
+    navigate(DatasetsView.class);
+    Grid<Dataset> datasetGrid = $(Grid.class).first();
     datasetGrid.setItems(datasetRepository.findAll());
-    GridKt._doubleClickItem(datasetGrid, 1);
-    DatasetDialog datasetDialog = LocatorJ._find(DatasetDialog.class).get(0);
-    Button addSample = LocatorJ
-        ._find(datasetDialog, Button.class, spec -> spec.withId(DatasetDialog.id(ADD_SAMPLE)))
-        .get(0);
-    addSample.click();
-    dialog = LocatorJ._find(SelectSampleDialog.class).get(0);
+    test(datasetGrid).doubleClickRow(1);
+    if ($(Button.class).withId(DatasetDialog.id(ADD_SAMPLE)).exists()) {
+      Button addSample = $(Button.class).id(DatasetDialog.id(ADD_SAMPLE));
+      addSample.click();
+    } else {
+      // Invoke method DatasetDialog.addSample() directly since UI testing is bugged and does not show button.
+      DatasetDialog datasetDialog = $(DatasetDialog.class).first();
+      Method addSampleMethod = DatasetDialog.class.getDeclaredMethod("addSample");
+      addSampleMethod.setAccessible(true);
+      addSampleMethod.invoke(datasetDialog);
+    }
+    dialog = $(SelectSampleDialog.class).first();
   }
 
   private Sample name(String name) {
@@ -161,7 +166,7 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
     assertEquals(sampleResources.message(NAME), headerRow.getCell(dialog.name).getText());
     assertEquals(sampleResources.message(DATE), headerRow.getCell(dialog.date).getText());
@@ -194,11 +199,15 @@ public class SelectSampleDialogTest extends AbstractKaribuTestCase {
 
   @Test
   public void samples_ColumnsValueProvider() {
-    for (Sample sample : samples) {
-      assertEquals(sample.getName(), GridKt.getPresentationValue(dialog.name, sample));
+    dialog.samples.setItems(samples);
+    for (int i = 0; i < samples.size(); i++) {
+      Sample sample = samples.get(i);
+      assertEquals(sample.getName(),
+          test(dialog.samples).getCellText(i, dialog.samples.getColumns().indexOf(dialog.name)));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
-          GridKt.getPresentationValue(dialog.date, sample));
-      assertEquals(sample.getOwner().getEmail(), GridKt.getPresentationValue(dialog.owner, sample));
+          test(dialog.samples).getCellText(i, dialog.samples.getColumns().indexOf(dialog.date)));
+      assertEquals(sample.getOwner().getEmail(),
+          test(dialog.samples).getCellText(i, dialog.samples.getColumns().indexOf(dialog.owner)));
     }
   }
 

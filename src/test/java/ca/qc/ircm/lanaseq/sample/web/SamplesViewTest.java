@@ -40,7 +40,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.SAMPLES_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -67,22 +66,22 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.google.common.collect.Range;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionModel;
+import com.vaadin.testbench.unit.MetaKeys;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -103,7 +102,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SamplesViewTest extends AbstractKaribuTestCase {
+public class SamplesViewTest extends SpringUIUnitTest {
   private SamplesView view;
   @MockBean
   private SampleService service;
@@ -129,8 +128,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void beforeTest() {
     samples = repository.findAll();
     when(service.all(any())).thenReturn(samples);
-    ui.setLocale(locale);
-    view = ui.navigate(SamplesView.class).get();
+    UI.getCurrent().setLocale(locale);
+    view = navigate(SamplesView.class);
   }
 
   private Sample name(String name) {
@@ -199,7 +198,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(SamplesView.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     HeaderRow headerRow = view.samples.getHeaderRows().get(0);
     FooterRow footerRow = view.samples.getFooterRows().get(0);
@@ -262,13 +261,18 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void samples_ColumnsValueProvider() {
-    for (Sample sample : samples) {
-      assertEquals(sample.getName(), GridKt.getPresentationValue(view.name, sample));
+    view.samples.setItems(samples);
+    samples = view.samples.getListDataView().getItems().toList();
+    for (int i = 0; i < samples.size(); i++) {
+      Sample sample = samples.get(i);
+      assertEquals(sample.getName(),
+          test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.name)));
       assertEquals(sample.getProtocol().getName(),
-          GridKt.getPresentationValue(view.protocol, sample));
+          test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.protocol)));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
-          GridKt.getPresentationValue(view.date, sample));
-      assertEquals(sample.getOwner().getEmail(), GridKt.getPresentationValue(view.owner, sample));
+          test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.date)));
+      assertEquals(sample.getOwner().getEmail(),
+          test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.owner)));
       Renderer<Sample> editRawRenderer = view.samples.getColumnByKey(EDIT).getRenderer();
       assertTrue(editRawRenderer instanceof LitRenderer<Sample>);
       LitRenderer<Sample> editRenderer = (LitRenderer<Sample>) editRawRenderer;
@@ -277,7 +281,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
       when(service.get(any())).thenReturn(Optional.of(sample));
       functions(editRenderer).get("edit").accept(sample, null);
       verify(service).get(sample.getId());
-      SampleDialog sampleDialog = LocatorJ._find(SampleDialog.class).get(0);
+      SampleDialog sampleDialog = $(SampleDialog.class).first();
       assertEquals(sample, sampleDialog.getSample());
       sampleDialog.close();
     }
@@ -338,7 +342,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     doubleClickItem(view.samples, sample);
 
     verify(service).get(sample.getId());
-    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(sample, dialog.getSample());
   }
@@ -351,7 +355,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     doubleClickItem(view.samples, sample);
 
-    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    SampleDialog dialog = $(SampleDialog.class).first();
     dialog.fireSavedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -364,27 +368,29 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     doubleClickItem(view.samples, sample);
 
-    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    SampleDialog dialog = $(SampleDialog.class).first();
     dialog.fireDeletedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
 
   @Test
   public void viewFiles_Control() {
-    Sample sample = samples.get(0);
-    clickItem(view.samples, sample, view.name, true, false, false, false);
+    view.samples.setItems(samples);
+    Sample sample = view.samples.getListDataView().getItems().findFirst().get();
+    test(view.samples).clickRow(0, new MetaKeys().ctrl());
 
-    SampleFilesDialog dialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(sample, dialog.getSample());
   }
 
   @Test
   public void addFiles_Meta() {
-    Sample sample = samples.get(0);
-    clickItem(view.samples, sample, view.name, false, false, false, true);
+    view.samples.setItems(samples);
+    Sample sample = view.samples.getListDataView().getItems().findFirst().get();
+    test(view.samples).clickRow(0, new MetaKeys().meta());
 
-    SampleFilesDialog dialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(sample, dialog.getSample());
   }
@@ -479,7 +485,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
   public void add() {
     clickButton(view.add);
 
-    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
     assertNull(dialog.getSample().getId());
   }
@@ -490,7 +496,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     clickButton(view.add);
 
-    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    SampleDialog dialog = $(SampleDialog.class).first();
     dialog.fireSavedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -501,7 +507,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     clickButton(view.add);
 
-    SampleDialog dialog = LocatorJ._find(SampleDialog.class).get(0);
+    SampleDialog dialog = $(SampleDialog.class).first();
     dialog.fireDeletedEvent();
     verify(view.samples.getDataProvider()).refreshAll();
   }
@@ -527,7 +533,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(samples.get(0), dataset.getSamples().get(0));
     assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
-    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
   }
 
   @Test
@@ -551,7 +558,8 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(samples.get(0), dataset.getSamples().get(0));
     assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
-    NotificationsKt.expectNotifications(resources.message(MERGED, dataset.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
   }
 
   @Test
@@ -562,7 +570,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
     verify(service, never()).isMergable(any());
     verify(datasetService, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -580,7 +588,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
     assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
     verify(datasetService, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -597,7 +605,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
         "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"), view.error.getText());
     verify(datasetService).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020");
     verify(datasetService, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -608,7 +616,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     clickButton(view.files);
 
     assertFalse(view.error.isVisible());
-    SampleFilesDialog dialog = LocatorJ._find(SampleFilesDialog.class).get(0);
+    SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(sample, dialog.getSample());
   }
@@ -619,7 +627,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
-    assertTrue(LocatorJ._find(SampleFilesDialog.class).isEmpty());
+    assertFalse($(SampleFilesDialog.class).exists());
   }
 
   @Test
@@ -631,7 +639,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_MORE_THAN_ONE), view.error.getText());
-    assertTrue(LocatorJ._find(SampleFilesDialog.class).isEmpty());
+    assertFalse($(SampleFilesDialog.class).exists());
   }
 
   @Test
@@ -642,7 +650,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     clickButton(view.analyze);
 
     assertFalse(view.error.isVisible());
-    SamplesAnalysisDialog dialog = LocatorJ._find(SamplesAnalysisDialog.class).get(0);
+    SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(1, dialog.getSamples().size());
     assertTrue(dialog.getSamples().contains(sample));
@@ -654,7 +662,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
-    assertTrue(LocatorJ._find(SamplesAnalysisDialog.class).isEmpty());
+    assertFalse($(SamplesAnalysisDialog.class).exists());
   }
 
   @Test
@@ -665,7 +673,7 @@ public class SamplesViewTest extends AbstractKaribuTestCase {
     clickButton(view.analyze);
 
     assertFalse(view.error.isVisible());
-    SamplesAnalysisDialog dialog = LocatorJ._find(SamplesAnalysisDialog.class).get(0);
+    SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(2, dialog.getSamples().size());
     assertTrue(dialog.getSamples().contains(samples.get(0)));

@@ -36,6 +36,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.HEADER;
@@ -72,23 +73,22 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.validation.ValidationLogger;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBoxBase;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.CancelEvent;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -109,7 +109,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleDialogTest extends AbstractKaribuTestCase {
+public class SampleDialogTest extends SpringUIUnitTest {
   private SampleDialog dialog;
   @MockBean
   private SampleService service;
@@ -156,11 +156,11 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     when(service.topAssays(anyInt())).thenReturn(topAssays);
     when(protocolService.all()).thenReturn(protocolRepository.findAll());
     protocol = protocolRepository.findById(1L).get();
-    ui.setLocale(locale);
-    SamplesView view = ui.navigate(SamplesView.class).get();
+    UI.getCurrent().setLocale(locale);
+    SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
-    GridKt._doubleClickItem(view.samples, 1, 1, false, false, false, false);
-    dialog = LocatorJ._find(SampleDialog.class).get(0);
+    test(view.samples).doubleClickRow(1);
+    dialog = $(SampleDialog.class).first();
   }
 
   private void fillForm() {
@@ -251,7 +251,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(SampleDialog.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
     validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
@@ -596,7 +596,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -620,7 +620,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -644,7 +644,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -668,7 +668,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -692,7 +692,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -713,7 +713,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     Sample sample = sampleCaptor.getValue();
     assertEquals("new_assay_type", sample.getAssay());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -734,7 +735,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getType());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -755,7 +757,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getTarget());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -779,7 +782,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -801,7 +804,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getStrainDescription());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -822,7 +826,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     Sample sample = sampleCaptor.getValue();
     assertNull(sample.getTreatment());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -842,7 +847,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     verify(service).save(sampleCaptor.capture());
     Sample sample = sampleCaptor.getValue();
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -862,7 +868,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
             + treatment + "_" + replicate + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
                 .replaceAll("[^\\w-]", ""));
     verify(service, never()).save(any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -882,7 +888,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     verify(service).exists("FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
     verify(service).get(2L);
     verify(service).save(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -910,7 +917,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(treatment, sample.getTreatment());
     assertEquals(note, sample.getNote());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -940,7 +948,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     assertEquals(treatment, sample.getTreatment());
     assertEquals(note, sample.getNote());
     verify(service, never()).delete(any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, sample.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -959,7 +968,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse(dialog.isOpened());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
   }
@@ -980,9 +989,8 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any());
     verify(service).delete(sample);
     assertFalse(dialog.isOpened());
-    // TODO Fix next line with UI unit test from Vaadin.
-    //Should be: NotificationsKt.expectNotifications(resources.message(DELETED, sample.getName()));
-    NotificationsKt.expectNoNotifications();
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(DELETED, sample.getName()), test(notification).getText());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener).onComponentEvent(any());
   }
@@ -1003,7 +1011,7 @@ public class SampleDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertTrue(dialog.isOpened());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
   }
