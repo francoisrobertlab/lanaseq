@@ -54,12 +54,10 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
 import com.google.common.collect.Range;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -69,6 +67,8 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.function.ValueProvider;
+import com.vaadin.testbench.unit.MetaKeys;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -88,7 +88,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolsViewTest extends AbstractKaribuTestCase {
+public class ProtocolsViewTest extends SpringUIUnitTest {
   private ProtocolsView view;
   @MockBean
   private ProtocolService service;
@@ -117,8 +117,8 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     when(service.all()).thenReturn(protocols);
     when(service.get(any())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
-    ui.setLocale(locale);
-    view = ui.navigate(ProtocolsView.class).get();
+    UI.getCurrent().setLocale(locale);
+    view = navigate(ProtocolsView.class);
   }
 
   private Protocol name(String name) {
@@ -172,7 +172,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(ProtocolsView.class, locale);
     final AppResources protocolResources = new AppResources(Protocol.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
     FooterRow footerRow = view.protocols.getFooterRows().get(0);
@@ -223,12 +223,14 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void protocols_ColumnsValueProvider() {
-    for (Protocol protocol : protocols) {
-      assertEquals(protocol.getName(), GridKt.getPresentationValue(view.name, protocol));
+    for (int i = 0; i < protocols.size(); i++) {
+      Protocol protocol = protocols.get(i);
+      assertEquals(protocol.getName(),
+          test(view.protocols).getCellText(i, view.protocols.getColumns().indexOf(view.name)));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(protocol.getCreationDate()),
-          GridKt.getPresentationValue(view.date, protocol));
+          test(view.protocols).getCellText(i, view.protocols.getColumns().indexOf(view.date)));
       assertEquals(protocol.getOwner().getEmail(),
-          GridKt.getPresentationValue(view.owner, protocol));
+          test(view.protocols).getCellText(i, view.protocols.getColumns().indexOf(view.owner)));
       LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
       assertEquals(EDIT_BUTTON, rendererTemplate(editRenderer));
       assertTrue(functions(editRenderer).containsKey("edit"));
@@ -264,7 +266,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     functions(editRenderer).get("edit").accept(protocol, null);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    ProtocolDialog dialog = $(ProtocolDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -278,7 +280,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     functions(editRenderer).get("edit").accept(protocol, null);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    ProtocolDialog dialog = $(ProtocolDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
     dialog.fireDeletedEvent();
     verify(service, times(2)).all();
@@ -305,10 +307,10 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   public void doubleClick_Save() {
     Protocol protocol = repository.findById(1L).get();
 
-    GridKt._doubleClickItem(view.protocols, 0);
+    test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    ProtocolDialog dialog = $(ProtocolDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -318,10 +320,10 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   public void doubleClick_Delete() {
     Protocol protocol = repository.findById(1L).get();
 
-    GridKt._doubleClickItem(view.protocols, 0);
+    test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
-    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    ProtocolDialog dialog = $(ProtocolDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
     dialog.fireDeletedEvent();
     verify(service, times(2)).all();
@@ -329,9 +331,9 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void altClick_User() {
-    GridKt._clickItem(view.protocols, 0, 0, false, false, true, false);
+    test(view.protocols).clickRow(0, new MetaKeys().alt());
 
-    assertTrue(LocatorJ._find(ProtocolHistoryDialog.class).isEmpty());
+    assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 
   @Test
@@ -339,10 +341,10 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   public void altClick_Manager() {
     Protocol protocol = repository.findById(1L).get();
 
-    GridKt._clickItem(view.protocols, 0, 0, false, false, true, false);
+    test(view.protocols).clickRow(0, new MetaKeys().alt());
 
     verify(service).get(protocol.getId());
-    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
   }
 
@@ -351,10 +353,10 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   public void altClick_Admin() {
     Protocol protocol = repository.findById(1L).get();
 
-    GridKt._clickItem(view.protocols, 0, 0, false, false, true, false);
+    test(view.protocols).clickRow(0, new MetaKeys().alt());
 
     verify(service).get(protocol.getId());
-    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
   }
 
@@ -429,7 +431,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
   public void add() {
     clickButton(view.add);
 
-    ProtocolDialog dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    ProtocolDialog dialog = $(ProtocolDialog.class).first();
     assertNull(dialog.getProtocol().getId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -444,7 +446,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
     clickButton(view.history);
 
     assertFalse(view.error.isVisible());
-    assertTrue(LocatorJ._find(ProtocolHistoryDialog.class).isEmpty());
+    assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 
   @Test
@@ -457,7 +459,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
     verify(service).get(protocol.getId());
     assertFalse(view.error.isVisible());
-    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
   }
 
@@ -471,7 +473,7 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
     verify(service).get(protocol.getId());
     assertFalse(view.error.isVisible());
-    ProtocolHistoryDialog dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
     assertEquals(protocol, dialog.getProtocol());
   }
 
@@ -482,6 +484,6 @@ public class ProtocolsViewTest extends AbstractKaribuTestCase {
 
     assertTrue(view.error.isVisible());
     assertEquals(resources.message(PROTOCOLS_REQUIRED), view.error.getText());
-    assertTrue(LocatorJ._find(ProtocolHistoryDialog.class).isEmpty());
+    assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 }

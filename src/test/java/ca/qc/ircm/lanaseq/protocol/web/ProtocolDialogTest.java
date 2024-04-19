@@ -29,6 +29,7 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
+import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
@@ -72,27 +73,24 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
-import com.github.mvysny.kaributesting.v10.UploadKt;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
-import java.io.IOException;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -117,7 +115,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolDialogTest extends AbstractKaribuTestCase {
+public class ProtocolDialogTest extends SpringUIUnitTest {
   private ProtocolDialog dialog;
   @MockBean
   private ProtocolService service;
@@ -160,10 +158,10 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
           : new ArrayList<>();
     });
     random.nextBytes(fileContent);
-    ui.setLocale(locale);
-    ProtocolsView view = ui.navigate(ProtocolsView.class).get();
-    GridKt._doubleClickItem(view.protocols, 0);
-    dialog = LocatorJ._find(ProtocolDialog.class).get(0);
+    UI.getCurrent().setLocale(locale);
+    ProtocolsView view = navigate(ProtocolsView.class);
+    test(view.protocols).doubleClickRow(0);
+    dialog = $(ProtocolDialog.class).first();
   }
 
   private void fillFields() {
@@ -236,7 +234,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     final AppResources protocolResources = new AppResources(Protocol.class, locale);
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER, 1, dialog.getProtocol().getName()),
         dialog.getHeaderTitle());
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
@@ -267,9 +265,9 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   public void upload_File() {
     String mimeType = "text/plain";
 
-    UploadKt._upload(dialog.upload, filename, mimeType, fileContent);
+    test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     List<ProtocolFile> files = items(dialog.files);
     assertEquals(2, files.size());
     ProtocolFile file = files.get(1);
@@ -281,9 +279,10 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   public void upload_Fail() {
     String mimeType = "text/plain";
 
-    UploadKt._uploadFail(dialog.upload, filename, mimeType, new IOException("test"));
+    test(dialog.upload).uploadFailed(filename, mimeType);
 
-    NotificationsKt.expectNotifications(resources.message(FILES_IOEXCEPTION, filename));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(FILES_IOEXCEPTION, filename), test(notification).getText());
     List<ProtocolFile> files = items(dialog.files);
     assertEquals(1, files.size());
   }
@@ -292,14 +291,16 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
   public void upload_OverMaximum() {
     String mimeType = "text/plain";
 
-    UploadKt._upload(dialog.upload, filename + "1", mimeType, fileContent);
-    UploadKt._upload(dialog.upload, filename + "2", mimeType, fileContent);
-    UploadKt._upload(dialog.upload, filename + "3", mimeType, fileContent);
-    UploadKt._upload(dialog.upload, filename + "4", mimeType, fileContent);
-    UploadKt._upload(dialog.upload, filename + "5", mimeType, fileContent);
-    UploadKt._upload(dialog.upload, filename + "6", mimeType, fileContent);
+    test(dialog.upload).upload(filename + "1", mimeType, fileContent);
+    test(dialog.upload).upload(filename + "2", mimeType, fileContent);
+    test(dialog.upload).upload(filename + "3", mimeType, fileContent);
+    test(dialog.upload).upload(filename + "4", mimeType, fileContent);
+    test(dialog.upload).upload(filename + "5", mimeType, fileContent);
+    test(dialog.upload).upload(filename + "6", mimeType, fileContent);
 
-    NotificationsKt.expectNotifications(resources.message(FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT),
+        test(notification).getText());
     assertEquals(MAXIMUM_FILES_COUNT, items(dialog.files).size());
     assertEquals(filename + "1", items(dialog.files).get(1).getFilename());
     assertEquals(filename + "2", items(dialog.files).get(2).getFilename());
@@ -534,7 +535,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
     verify(service, never()).save(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -557,7 +558,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
     verify(service, atLeastOnce()).nameExists(name);
     verify(service, never()).save(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -577,7 +578,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     verify(service, atLeastOnce()).nameExists(protocol.getName());
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service).save(any(), any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, protocol.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -601,7 +603,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     verify(service, atLeastOnce()).nameExists(name);
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service, never()).save(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -618,7 +620,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     BinderValidationStatus<Protocol> status = dialog.validateProtocol();
     assertTrue(status.isOk());
     verify(service).save(any(), any());
-    NotificationsKt.expectNotifications(resources.message(SAVED, protocol.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -634,7 +637,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     dialog.filesError.setVisible(true);
     assertEquals(resources.message(FILES_REQUIRED), dialog.filesError.getText());
     verify(service, never()).save(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -672,7 +675,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertNull(file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(fileContent, file.getContent());
-    NotificationsKt.expectNotifications(resources.message(SAVED, protocol.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -703,7 +707,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertNull(file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
-    NotificationsKt.expectNotifications(resources.message(SAVED, protocol.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -730,7 +735,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     assertNull(file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
-    NotificationsKt.expectNotifications(resources.message(SAVED, protocol.getName()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -754,9 +760,8 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any(), any());
     verify(service).delete(protocol);
     assertFalse(dialog.isOpened());
-    // TODO Fix next line with UI unit test from Vaadin.
-    //NotificationsKt.expectNotifications(resources.message(DELETED, protocol.getName()));
-    NotificationsKt.expectNoNotifications();
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(DELETED, protocol.getName()), test(notification).getText());
     verify(deletedListener).onComponentEvent(any());
   }
 
@@ -772,7 +777,7 @@ public class ProtocolDialogTest extends AbstractKaribuTestCase {
     verify(service, never()).save(any(), any());
     verify(service, never()).delete(any());
     assertTrue(dialog.isOpened());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     verify(deletedListener, never()).onComponentEvent(any());
   }
 }

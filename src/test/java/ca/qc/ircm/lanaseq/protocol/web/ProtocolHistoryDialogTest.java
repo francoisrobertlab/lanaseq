@@ -42,19 +42,19 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
+import com.vaadin.testbench.unit.MetaKeys;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -72,7 +72,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
+public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   private ProtocolHistoryDialog dialog;
   @MockBean
   private ProtocolService service;
@@ -104,10 +104,10 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
         return new ArrayList<>();
       }
     });
-    ui.setLocale(locale);
-    ProtocolsView view = ui.navigate(ProtocolsView.class).get();
-    GridKt._clickItem(view.protocols, 2, 0, false, false, true, false);
-    dialog = LocatorJ._find(ProtocolHistoryDialog.class).get(0);
+    UI.getCurrent().setLocale(locale);
+    ProtocolsView view = navigate(ProtocolsView.class);
+    test(view.protocols).clickRow(2, new MetaKeys().alt());
+    dialog = $(ProtocolHistoryDialog.class).first();
   }
 
   private ProtocolFile filename(String filename) {
@@ -137,7 +137,7 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(ProtocolHistoryDialog.class, locale);
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER, dialog.getProtocol().getName()),
         dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
@@ -178,7 +178,8 @@ public class ProtocolHistoryDialogTest extends AbstractKaribuTestCase {
         (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
     functions(recoverRenderer).get("recoverFile").accept(file, null);
     verify(service).recover(file);
-    NotificationsKt.expectNotifications(resources.message(RECOVERED, file.getFilename()));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(RECOVERED, file.getFilename()), test(notification).getText());
     dialog.showNotification(resources.message(RECOVERED, file.getFilename()));
     assertTrue(items(dialog.files).isEmpty());
   }
