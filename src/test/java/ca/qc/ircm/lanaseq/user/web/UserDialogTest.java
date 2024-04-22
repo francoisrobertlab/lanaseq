@@ -36,19 +36,18 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UserDialogTest extends AbstractKaribuTestCase {
+public class UserDialogTest extends SpringUIUnitTest {
   private UserDialog dialog;
   @MockBean
   private UserService userService;
@@ -79,11 +78,11 @@ public class UserDialogTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    UsersView view = ui.navigate(UsersView.class).get();
+    UI.getCurrent().setLocale(locale);
+    UsersView view = navigate(UsersView.class);
     User user = userRepository.findById(2L).get();
     doubleClickItem(view.users, user);
-    dialog = (UserDialog) LocatorJ._find(Dialog.class).get(0);
+    dialog = $(UserDialog.class).first();
   }
 
   @Test
@@ -108,7 +107,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(UserDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals(webResources.message(SAVE), dialog.save.getText());
     assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
@@ -179,7 +178,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.save();
 
     verify(userService, never()).save(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }
@@ -199,7 +198,8 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.save();
 
     verify(userService).save(user, password);
-    NotificationsKt.expectNotifications(resources.message(SAVED, email));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, email), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -217,7 +217,8 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.save();
 
     verify(userService).save(user, null);
-    NotificationsKt.expectNotifications(resources.message(SAVED, email));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, email), test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -229,7 +230,7 @@ public class UserDialogTest extends AbstractKaribuTestCase {
     dialog.cancel();
 
     verify(userService, never()).save(any(), any());
-    NotificationsKt.expectNoNotifications();
+    assertFalse($(Notification.class).exists());
     assertFalse(dialog.isOpened());
     verify(savedListener, never()).onComponentEvent(any());
   }

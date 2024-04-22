@@ -38,13 +38,14 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProfileViewTest extends AbstractKaribuTestCase {
+public class ProfileViewTest extends SpringUIUnitTest {
   private ProfileView view;
   @MockBean
   private UserService service;
@@ -72,8 +73,8 @@ public class ProfileViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    view = ui.navigate(ProfileView.class).get();
+    UI.getCurrent().setLocale(locale);
+    view = navigate(ProfileView.class);
   }
 
   @Test
@@ -96,7 +97,7 @@ public class ProfileViewTest extends AbstractKaribuTestCase {
     Locale locale = FRENCH;
     final AppResources resources = new AppResources(ProfileView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
   }
@@ -135,6 +136,7 @@ public class ProfileViewTest extends AbstractKaribuTestCase {
 
     verify(view.form).isValid();
     verify(service).save(eq(user), eq(password));
-    NotificationsKt.expectNotifications(resources.message(SAVED));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED), test(notification).getText());
   }
 }

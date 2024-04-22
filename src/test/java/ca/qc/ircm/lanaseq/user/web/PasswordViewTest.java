@@ -35,12 +35,13 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.UserService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PasswordViewTest extends AbstractKaribuTestCase {
+public class PasswordViewTest extends SpringUIUnitTest {
   private PasswordView view;
   @MockBean
   private UserService service;
@@ -68,8 +69,8 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    view = ui.navigate(PasswordView.class).get();
+    UI.getCurrent().setLocale(locale);
+    view = navigate(PasswordView.class);
   }
 
   @Test
@@ -92,7 +93,7 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(PasswordView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
   }
@@ -119,7 +120,7 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
     view.save();
 
     verify(service, never()).save(any());
-    assertCurrentView(PasswordView.class);
+    assertTrue($(PasswordView.class).exists());
   }
 
   @Test
@@ -135,6 +136,6 @@ public class PasswordViewTest extends AbstractKaribuTestCase {
     view.save();
 
     verify(service).save(password);
-    assertCurrentView(DatasetsView.class);
+    assertTrue($(DatasetsView.class).exists());
   }
 }

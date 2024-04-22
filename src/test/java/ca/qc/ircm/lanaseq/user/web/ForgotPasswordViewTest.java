@@ -42,7 +42,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
@@ -50,11 +49,13 @@ import ca.qc.ircm.lanaseq.user.ForgotPasswordWebContext;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +70,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @ServiceTestAnnotations
 @WithAnonymousUser
-public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
+public class ForgotPasswordViewTest extends SpringUIUnitTest {
   private ForgotPasswordView view;
   @MockBean
   private ForgotPasswordService service;
@@ -87,8 +88,8 @@ public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    view = ui.navigate(ForgotPasswordView.class).get();
+    UI.getCurrent().setLocale(locale);
+    view = navigate(ForgotPasswordView.class);
   }
 
   @Test
@@ -116,7 +117,7 @@ public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(ForgotPasswordView.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MESSAGE), view.message.getText());
     assertEquals(userResources.message(EMAIL), view.email.getLabel());
@@ -142,8 +143,8 @@ public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
-    assertCurrentView(ForgotPasswordView.class);
-    NotificationsKt.expectNoNotifications();
+    assertTrue($(ForgotPasswordView.class).exists());
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -160,8 +161,8 @@ public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(INVALID_EMAIL)), error.getMessage());
     verify(service, never()).insert(any(), any());
-    assertCurrentView(ForgotPasswordView.class);
-    NotificationsKt.expectNoNotifications();
+    assertTrue($(ForgotPasswordView.class).exists());
+    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -173,8 +174,9 @@ public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
 
     verify(userService).exists(email);
     verify(service, never()).insert(any(), any());
-    assertCurrentView(SigninView.class);
-    NotificationsKt.expectNotifications(resources.message(SAVED, email));
+    assertTrue($(SigninView.class).exists());
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, email), test(notification).getText());
   }
 
   @Test
@@ -194,7 +196,8 @@ public class ForgotPasswordViewTest extends AbstractKaribuTestCase {
     String url = webContext.getChangeForgottenPasswordUrl(forgotPassword, locale);
     assertEquals("/" + UseForgotPasswordView.VIEW_NAME + "/" + forgotPassword.getId()
         + UseForgotPasswordView.SEPARATOR + forgotPassword.getConfirmNumber(), url);
-    assertCurrentView(SigninView.class);
-    NotificationsKt.expectNotifications(resources.message(SAVED, email));
+    assertTrue($(SigninView.class).exists());
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, email), test(notification).getText());
   }
 }

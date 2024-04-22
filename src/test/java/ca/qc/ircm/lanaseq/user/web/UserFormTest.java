@@ -37,14 +37,14 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +59,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class UserFormTest extends AbstractKaribuTestCase {
+public class UserFormTest extends SpringUIUnitTest {
   private UserForm form;
   @Autowired
   private UserRepository repository;
@@ -77,9 +77,9 @@ public class UserFormTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    ui.navigate(ProfileView.class).get();
-    form = LocatorJ._find(UserForm.class).get(0);
+    UI.getCurrent().setLocale(locale);
+    navigate(ProfileView.class);
+    form = $(UserForm.class).first();
   }
 
   private void fillForm() {
@@ -118,7 +118,7 @@ public class UserFormTest extends AbstractKaribuTestCase {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     final AppResources userResources = new AppResources(User.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(userResources.message(EMAIL), form.email.getLabel());
     assertEquals(userResources.message(NAME), form.name.getLabel());
     assertEquals(userResources.message(ADMIN), form.admin.getLabel());

@@ -53,14 +53,11 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import com.github.mvysny.kaributesting.v10.GridKt;
-import com.github.mvysny.kaributesting.v10.LocatorJ;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -74,6 +71,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -91,7 +89,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UsersViewTest extends AbstractKaribuTestCase {
+public class UsersViewTest extends SpringUIUnitTest {
   private UsersView view;
   @MockBean
   private UserService service;
@@ -114,10 +112,10 @@ public class UsersViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     users = repository.findAll();
     when(service.all()).thenReturn(users);
-    view = ui.navigate(UsersView.class).get();
+    view = navigate(UsersView.class);
   }
 
   private User email(String email) {
@@ -181,7 +179,7 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     final AppResources resources = new AppResources(UsersView.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     HeaderRow headerRow = view.users.getHeaderRows().get(0);
     FooterRow footerRow = view.users.getFooterRows().get(0);
@@ -264,10 +262,10 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     for (int i = 0; i < users.size(); i++) {
       User user = users.get(i);
       assertEquals(user.getEmail() != null ? user.getEmail() : "",
-          GridKt.getPresentationValue(view.email, user));
+          test(view.users).getCellText(i, view.users.getColumns().indexOf(view.email)));
       assertEquals(user.getName() != null ? user.getName() : "",
-          GridKt.getPresentationValue(view.name, user));
-      Button activeButton = (Button) GridKt._getCellComponent(view.users, i, view.active.getKey());
+          test(view.users).getCellText(i, view.users.getColumns().indexOf(view.name)));
+      Button activeButton = (Button) test(view.users).getCellComponent(i, view.active.getKey());
       assertTrue(activeButton.hasClassName(ACTIVE));
       assertTrue(
           activeButton.hasThemeName(user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
@@ -287,13 +285,13 @@ public class UsersViewTest extends AbstractKaribuTestCase {
           activeButton.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
           activeButton.getIcon());
-      Button editButton = (Button) GridKt._getCellComponent(view.users, i, view.edit.getKey());
+      Button editButton = (Button) test(view.users).getCellComponent(i, view.edit.getKey());
       assertTrue(editButton.hasClassName(EDIT));
       assertTrue(editButton.hasThemeName(ButtonVariant.LUMO_ICON.getVariantName()));
       validateIcon(VaadinIcon.EDIT.create(), editButton.getIcon());
       clickButton(editButton);
-      assertEquals(1, LocatorJ._find(UserDialog.class).size());
-      UserDialog dialog = LocatorJ._find(UserDialog.class).get(0);
+      assertEquals(1, $(UserDialog.class).all().size());
+      UserDialog dialog = $(UserDialog.class).first();
       assertEquals(user, dialog.getUser());
       dialog.close();
     }
@@ -336,7 +334,7 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     doubleClickItem(view.users, user);
 
     verify(service).get(user.getId());
-    UserDialog dialog = LocatorJ._find(UserDialog.class).get(0);
+    UserDialog dialog = $(UserDialog.class).first();
     assertEquals(user, dialog.getUser());
     assertTrue(dialog.isOpened());
   }
@@ -346,7 +344,7 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     User user = mock(User.class);
     when(service.get(any())).thenReturn(Optional.of(user));
     view.view(user);
-    UserDialog dialog = LocatorJ._find(UserDialog.class).get(0);
+    UserDialog dialog = $(UserDialog.class).first();
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }
@@ -472,8 +470,8 @@ public class UsersViewTest extends AbstractKaribuTestCase {
   public void add() {
     clickButton(view.add);
 
-    assertEquals(1, LocatorJ._find(UserDialog.class).size());
-    UserDialog dialog = LocatorJ._find(UserDialog.class).get(0);
+    assertEquals(1, $(UserDialog.class).all().size());
+    UserDialog dialog = $(UserDialog.class).first();
     assertNull(dialog.getUser().getId());
   }
 
@@ -498,7 +496,7 @@ public class UsersViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(USERS_REQUIRED), view.error.getText());
     assertTrue(view.error.isVisible());
     verify(switchUserService, never()).switchUser(any(), any());
-    assertCurrentView(UsersView.class);
+    assertTrue($(UsersView.class).exists());
   }
 
   @Test

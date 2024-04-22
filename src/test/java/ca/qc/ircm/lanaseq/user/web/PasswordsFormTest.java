@@ -32,11 +32,12 @@ import static org.mockito.Mockito.mock;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PasswordsFormTest extends AbstractKaribuTestCase {
+public class PasswordsFormTest extends SpringUIUnitTest {
   private PasswordsForm form;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(PasswordsForm.class, locale);
@@ -60,7 +61,7 @@ public class PasswordsFormTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     form = new PasswordsForm();
   }
 
@@ -88,7 +89,7 @@ public class PasswordsFormTest extends AbstractKaribuTestCase {
     form.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(PasswordsForm.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     form.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(PASSWORD), form.password.getLabel());
     assertEquals(resources.message(PASSWORD_CONFIRM), form.passwordConfirm.getLabel());

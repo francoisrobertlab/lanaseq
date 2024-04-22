@@ -42,14 +42,15 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +64,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @ServiceTestAnnotations
 @WithAnonymousUser
-public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
+public class UseForgotPasswordViewTest extends SpringUIUnitTest {
   private UseForgotPasswordView view;
   @MockBean
   private ForgotPasswordService service;
@@ -79,9 +80,9 @@ public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
   @BeforeEach
   public void beforeTest() {
     when(service.get(any(), any())).thenReturn(Optional.of(forgotPassword));
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     String parameter = "2/b";
-    view = ui.navigate(UseForgotPasswordView.class, parameter).get();
+    view = navigate(UseForgotPasswordView.class, parameter);
   }
 
   @Test
@@ -106,7 +107,7 @@ public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
     Locale locale = FRENCH;
     final AppResources resources = new AppResources(UseForgotPasswordView.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.header.getText());
     assertEquals(resources.message(MESSAGE), view.message.getText());
     assertEquals(webResources.message(SAVE), view.save.getText());
@@ -139,14 +140,15 @@ public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
 
     verify(view.form).isValid();
     verify(service).updatePassword(eq(forgotPassword), eq(password));
-    assertCurrentView(SigninView.class);
-    NotificationsKt.expectNotifications(resources.message(SAVED));
+    assertTrue($(SigninView.class).exists());
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED), test(notification).getText());
   }
 
   @Test
   public void setParameter() {
     String parameter = "34925/feafet23ts";
-    view = ui.navigate(UseForgotPasswordView.class, parameter).get();
+    view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, atLeastOnce()).get(34925L, "feafet23ts");
     assertTrue(view.save.isEnabled());
     assertTrue(view.form.isEnabled());
@@ -155,9 +157,10 @@ public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
   @Test
   public void setParameter_IdNotNumber() {
     String parameter = "A434GS";
-    view = ui.navigate(UseForgotPasswordView.class, parameter).get();
+    view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, times(2)).get(any(), any());
-    NotificationsKt.expectNotifications(resources.message(INVALID));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
@@ -166,9 +169,10 @@ public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
   public void setParameter_MissingConfirm() {
     view.form = mock(PasswordsForm.class);
     String parameter = "34925";
-    view = ui.navigate(UseForgotPasswordView.class, parameter).get();
+    view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, times(2)).get(any(), any());
-    NotificationsKt.expectNotifications(resources.message(INVALID));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
@@ -177,18 +181,20 @@ public class UseForgotPasswordViewTest extends AbstractKaribuTestCase {
   public void setParameter_NullForgotPassword() {
     when(service.get(any(Long.class), any())).thenReturn(Optional.empty());
     String parameter = "34925/feafet23ts";
-    view = ui.navigate(UseForgotPasswordView.class, parameter).get();
+    view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, atLeastOnce()).get(34925L, "feafet23ts");
-    NotificationsKt.expectNotifications(resources.message(INVALID));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
 
   @Test
   public void setParameter_Null() {
-    view = ui.navigate(UseForgotPasswordView.class).get();
+    view = navigate(UseForgotPasswordView.class);
     verify(service, times(2)).get(any(), any());
-    NotificationsKt.expectNotifications(resources.message(INVALID));
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
