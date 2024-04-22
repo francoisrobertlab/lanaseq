@@ -17,38 +17,41 @@
 
 package ca.qc.ircm.lanaseq.security.web;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
-import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.security.UserAuthority;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
+import ca.qc.ircm.lanaseq.user.web.UsersView;
+import ca.qc.ircm.lanaseq.web.SigninView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.internal.AfterNavigationHandler;
 import com.vaadin.flow.router.internal.BeforeEnterHandler;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -56,19 +59,17 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
+public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListenerTest.class);
-  @Autowired
-  private ConfigureUiServiceInitListener configurer;
-  @MockBean
-  private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationListener navigationListener;
   @Mock
   private BeforeEnterEvent beforeEnterEvent;
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
+  @Captor
+  private ArgumentCaptor<AfterNavigationEvent> afterNavigationEventCaptor;
   @Mock
   private Location location;
   private Locale locale = Locale.ENGLISH;
@@ -80,88 +81,78 @@ public class ConfigureUiServiceInitListenerTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-    when(authenticatedUser.isAuthorized(AccessDeniedView.class)).thenReturn(true);
-    ui.setLocale(locale);
-    ui.addAfterNavigationListener(navigationListener);
+    UI.getCurrent().setLocale(locale);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
     when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> SamplesView.class);
-    when(beforeEnterEvent.getUI()).thenReturn(ui);
+    when(beforeEnterEvent.getUI()).thenReturn(UI.getCurrent());
     when(beforeEnterEvent.getLocation()).thenReturn(location);
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     when(location.getPath()).thenReturn("");
   }
 
   private void doBeforeEnter() {
-    List<BeforeEnterHandler> handlers = ui.getInternals().getListeners(BeforeEnterHandler.class);
+    List<BeforeEnterHandler> handlers =
+        UI.getCurrent().getInternals().getListeners(BeforeEnterHandler.class);
     handlers.get(0).beforeEnter(beforeEnterEvent);
   }
 
   private void doAfterNavigation() {
     List<AfterNavigationHandler> handlers =
-        ui.getInternals().getListeners(AfterNavigationHandler.class);
+        UI.getCurrent().getInternals().getListeners(AfterNavigationHandler.class);
     handlers.get(0).afterNavigation(afterNavigationEvent);
   }
 
   @Test
   public void beforeEnter_Authorized() {
-    when(authenticatedUser.isAuthorized(any())).thenReturn(true);
-
     doBeforeEnter();
 
-    verify(authenticatedUser, atLeastOnce()).isAuthorized(SamplesView.class);
+    assertTrue($(DatasetsView.class).exists());
   }
 
   @Test
   public void beforeEnter_NotAuthorized() {
+    when(beforeEnterEvent.getNavigationTarget()).thenAnswer(i -> UsersView.class);
+
     doBeforeEnter();
 
-    verify(authenticatedUser, atLeastOnce()).isAuthorized(SamplesView.class);
-    verify(authenticatedUser, atLeastOnce()).isAnonymous();
-    String message = resources.message(AccessDeniedException.class.getSimpleName(), user.getEmail(),
-        SamplesView.class.getSimpleName());
+    String message = resources.message(AccessDeniedException.class.getSimpleName(),
+        "jonh.smith@ircm.qc.ca", UsersView.class.getSimpleName());
     verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
   }
 
   @Test
+  @WithAnonymousUser
   public void beforeEnter_NotAuthorizedAnonymous() {
-    when(authenticatedUser.isAnonymous()).thenReturn(true);
-
     doBeforeEnter();
 
-    verify(authenticatedUser, atLeastOnce()).isAuthorized(SamplesView.class);
-    verify(authenticatedUser, atLeastOnce()).isAnonymous();
+    verify(navigationListener).afterNavigation(afterNavigationEventCaptor.capture());
+    AfterNavigationEvent afterNavigationEvent = afterNavigationEventCaptor.getValue();
+    assertEquals(SigninView.VIEW_NAME, afterNavigationEvent.getLocation().getPath());
   }
 
   @Test
+  @WithUserDetails("christian.poitras@ircm.qc.ca")
   public void afterNavigation_ForceChangePassword() {
-    when(authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
-
     doAfterNavigation();
 
-    verify(authenticatedUser, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
-    verify(navigationListener).afterNavigation(any());
-    assertCurrentView(PasswordView.class);
+    verify(navigationListener).afterNavigation(afterNavigationEventCaptor.capture());
+    AfterNavigationEvent afterNavigationEvent = afterNavigationEventCaptor.getValue();
+    assertEquals(PasswordView.VIEW_NAME, afterNavigationEvent.getLocation().getPath());
   }
 
   @Test
   public void afterNavigation_ForceChangePasswordAlreadyOnView() {
-    when(authenticatedUser.isAuthorized(any())).thenReturn(true);
-    when(authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)).thenReturn(true);
     when(location.getPath()).thenReturn(PasswordView.VIEW_NAME);
 
     doAfterNavigation();
 
-    verify(authenticatedUser, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(navigationListener, never()).afterNavigation(any());
   }
 
   @Test
   public void afterNavigation_NotForceChangePassword() {
-    when(authenticatedUser.isAuthorized(any())).thenReturn(true);
-
     doAfterNavigation();
 
-    verify(authenticatedUser, atLeastOnce()).hasRole(UserAuthority.FORCE_CHANGE_PASSWORD);
     verify(navigationListener, never()).afterNavigation(any());
   }
 }
