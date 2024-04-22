@@ -19,7 +19,6 @@ package ca.qc.ircm.lanaseq.mail;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -30,15 +29,19 @@ import ca.qc.ircm.lanaseq.user.User;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import org.apache.commons.mail.util.MimeMessageParser;
+import javax.mail.internet.MimePart;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -73,33 +76,72 @@ public class MailServiceTest {
     greenMail = new GreenMailExtension(new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP));
   }
 
+  private Optional<String> plainContent(MimePart part) throws MessagingException, IOException {
+    if (part.isMimeType("text/plain") && part.getContent() instanceof String) {
+      return Optional.of(part.getContent().toString());
+    } else if (part.getContent() instanceof Multipart) {
+      Multipart mp = (Multipart) part.getContent();
+      return (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
+        try {
+          return plainContent((MimeBodyPart) mp.getBodyPart(i));
+        } catch (MessagingException | IOException e) {
+          return Optional.empty();
+        }
+      }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private Optional<String> htmlContent(MimePart part) throws MessagingException, IOException {
+    if (part.isMimeType("text/html")
+        || part.getDataHandler().getContentType().startsWith("text/html")) {
+      return Optional.of(part.getContent().toString());
+    } else if (part.getContent() instanceof Multipart) {
+      Multipart mp = (Multipart) part.getContent();
+      return (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
+        try {
+          return htmlContent((MimeBodyPart) mp.getBodyPart(i));
+        } catch (MessagingException | IOException e) {
+          return Optional.empty();
+        }
+      }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+    } else {
+      return Optional.empty();
+    }
+  }
+
   @Test
   @Timeout(150)
   public void textEmail() throws Throwable {
+    String content = "text message";
     MimeMessageHelper email = mailService.textEmail();
+    email.setText(content);
 
-    assertEquals("lanaseq", email.getMimeMessage().getSubject());
-    assertEquals(1, email.getMimeMessage().getFrom().length);
-    assertTrue(email.getMimeMessage().getFrom()[0] instanceof InternetAddress);
-    assertEquals("lanaseq@ircm.qc.ca",
-        ((InternetAddress) email.getMimeMessage().getFrom()[0]).getAddress());
-    assertEquals("", email.getMimeMessage().getContent());
+    MimeMessage message = email.getMimeMessage();
+    assertEquals("lanaseq", message.getSubject());
+    assertEquals(1, message.getFrom().length);
+    assertTrue(message.getFrom()[0] instanceof InternetAddress);
+    assertEquals("lanaseq@ircm.qc.ca", ((InternetAddress) message.getFrom()[0]).getAddress());
+    assertEquals(content, plainContent(message).orElse(""));
   }
 
   @Test
   @Timeout(150)
   public void htmlEmail() throws Throwable {
+    String textContent = "text message";
+    String htmlContent = "<html><body>html message</body></html>";
     MimeMessageHelper email = mailService.htmlEmail();
+    email.setText(textContent, htmlContent);
 
-    assertEquals("lanaseq", email.getMimeMessage().getSubject());
-    assertTrue(email.getMimeMessage().getFrom()[0] instanceof InternetAddress);
-    assertEquals("lanaseq@ircm.qc.ca",
-        ((InternetAddress) email.getMimeMessage().getFrom()[0]).getAddress());
-    assertTrue(email.getMimeMessage().getContent() instanceof Multipart);
-    final MimeMessageParser mimeMessageParser =
-        new MimeMessageParser(email.getMimeMessage()).parse();
-    assertNull(mimeMessageParser.getHtmlContent());
-    assertNull(mimeMessageParser.getPlainContent());
+    MimeMessage message = email.getMimeMessage();
+    assertEquals("lanaseq", message.getSubject());
+    assertEquals(1, message.getFrom().length);
+    assertTrue(message.getFrom()[0] instanceof InternetAddress);
+    assertEquals("lanaseq@ircm.qc.ca", ((InternetAddress) message.getFrom()[0]).getAddress());
+    assertTrue(message.getContent() instanceof Multipart);
+    assertEquals(htmlContent, htmlContent(message).orElse(""));
+    assertEquals(textContent, plainContent(message).orElse(""));
   }
 
   @Test
@@ -163,9 +205,8 @@ public class MailServiceTest {
         || message.getRecipients(RecipientType.CC).length == 0);
     assertTrue(message.getRecipients(RecipientType.BCC) == null
         || message.getRecipients(RecipientType.BCC).length == 0);
-    final MimeMessageParser mimeMessageParser = new MimeMessageParser(message).parse();
-    assertEquals(htmlContent, mimeMessageParser.getHtmlContent());
-    assertEquals(textContent, mimeMessageParser.getPlainContent());
+    assertEquals(htmlContent, htmlContent(message).orElse(""));
+    assertEquals(textContent, plainContent(message).orElse(""));
   }
 
   @Test
@@ -201,9 +242,8 @@ public class MailServiceTest {
           || message.getRecipients(RecipientType.CC).length == 0);
       assertTrue(message.getRecipients(RecipientType.BCC) == null
           || message.getRecipients(RecipientType.BCC).length == 0);
-      final MimeMessageParser mimeMessageParser = new MimeMessageParser(message).parse();
-      assertEquals(htmlContent, mimeMessageParser.getHtmlContent());
-      assertEquals(textContent, mimeMessageParser.getPlainContent());
+      assertEquals(htmlContent, htmlContent(message).orElse(""));
+      assertEquals(textContent, plainContent(message).orElse(""));
     }
   }
 
