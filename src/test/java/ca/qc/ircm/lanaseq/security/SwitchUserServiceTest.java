@@ -22,8 +22,10 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -44,6 +46,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -111,6 +114,11 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
     assertEquals(1L, previousUserDetails.getId());
     assertEquals("lanaseq@ircm.qc.ca", previousUserDetails.getUsername());
     assertTrue(previousAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(ADMIN)));
+    assertNotNull(VaadinServletRequest.getCurrent().getWrappedSession(true)
+        .getAttribute(SPRING_SECURITY_CONTEXT_KEY));
+    SecurityContext sessionContext = (SecurityContext) VaadinServletRequest.getCurrent()
+        .getWrappedSession(true).getAttribute(SPRING_SECURITY_CONTEXT_KEY);
+    assertSame(authentication, sessionContext.getAuthentication());
   }
 
   @Test
@@ -150,17 +158,23 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   public void exitSwitchUser() {
     User user = repository.findById(3L).get();
     service.switchUser(user, VaadinServletRequest.getCurrent());
-    service.exitSwitchUser();
+    service.exitSwitchUser(VaadinServletRequest.getCurrent());
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
     UserDetailsWithId userDetails = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals(1L, userDetails.getId());
     assertEquals("lanaseq@ircm.qc.ca", userDetails.getUsername());
     assertTrue(authentication.getAuthorities().contains(new SimpleGrantedAuthority(ADMIN)));
+    assertNotNull(VaadinServletRequest.getCurrent().getWrappedSession(true)
+        .getAttribute(SPRING_SECURITY_CONTEXT_KEY));
+    SecurityContext sessionContext = (SecurityContext) VaadinServletRequest.getCurrent()
+        .getWrappedSession(true).getAttribute(SPRING_SECURITY_CONTEXT_KEY);
+    assertSame(authentication, sessionContext.getAuthentication());
   }
 
   @Test
   public void exitSwitchUser_NotSwitched() {
-    assertThrows(AuthenticationCredentialsNotFoundException.class, () -> service.exitSwitchUser());
+    assertThrows(AuthenticationCredentialsNotFoundException.class,
+        () -> service.exitSwitchUser(VaadinServletRequest.getCurrent()));
   }
 }

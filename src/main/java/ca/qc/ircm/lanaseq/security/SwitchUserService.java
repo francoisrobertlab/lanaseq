@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.security;
 
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 import ca.qc.ircm.lanaseq.user.User;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +94,8 @@ public class SwitchUserService {
     SecurityContext context = SecurityContextHolder.createEmptyContext();
     context.setAuthentication(targetUser);
     SecurityContextHolder.setContext(context);
+    HttpSession session = request.getSession(true);
+    session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     logger.debug("set SecurityContextHolder to {}", targetUser);
   }
 
@@ -132,14 +136,19 @@ public class SwitchUserService {
 
   /**
    * Exits switch user.
+   * 
+   * @param request
+   *          HTTP request
    */
-  public void exitSwitchUser() {
+  public void exitSwitchUser(HttpServletRequest request) {
     // get the original authentication object (if exists)
     Authentication originalUser = attemptExitUser();
     // update the current context back to the original user
     SecurityContext context = SecurityContextHolder.createEmptyContext();
     context.setAuthentication(originalUser);
     SecurityContextHolder.setContext(context);
+    HttpSession session = request.getSession(true);
+    session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     logger.debug("Set SecurityContextHolder to {}", originalUser);
   }
 
