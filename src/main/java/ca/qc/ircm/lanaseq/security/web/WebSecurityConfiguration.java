@@ -22,15 +22,12 @@ import ca.qc.ircm.lanaseq.security.LdapConfiguration;
 import ca.qc.ircm.lanaseq.security.LdapService;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.UserRepository;
-import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
-import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
-import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.server.HandlerHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
+import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
@@ -40,13 +37,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
@@ -56,17 +52,13 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
  */
 @EnableWebSecurity
 @Configuration
-public class WebSecurityConfiguration {
+public class WebSecurityConfiguration extends VaadinWebSecurity {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
-  private static final String SIGNIN_FAILURE_URL_PATTERN =
-      Pattern.quote(SIGNIN_PROCESSING_URL) + "\\?.*";
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.FAIL;
   private static final String SIGNIN_LOCKED_URL = SIGNIN_PROCESSING_URL + "?" + SigninView.LOCKED;
   private static final String SIGNIN_DISABLED_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
-  private static final String SIGNIN_URL = SIGNIN_PROCESSING_URL;
-  private static final String SIGNOUT_SUCCESS_URL = "/" + MainView.VIEW_NAME;
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
   @Autowired
   private UserDetailsService userDetailsService;
@@ -141,43 +133,18 @@ public class WebSecurityConfiguration {
   /**
    * Require login to access internal pages and configure login form.
    */
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    // Not using Spring CSRF here to be able to use plain HTML for the login page
-    http.csrf().disable()
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    // Configure the login page.
+    http.formLogin(login -> login.failureHandler(authenticationFailureHandler()));
+    // Remember me
+    http.rememberMe(
+        rememberMe -> rememberMe.alwaysRemember(true).key(configuration.getRememberMeKey()));
 
-        // Register our CustomRequestCache, that saves unauthorized access attempts, so
-        // the user is redirected after login.
-        .requestCache().requestCache(new SkipVaadinRequestCache())
+    super.configure(http);
 
-        // Restrict access to our application.
-        .and().authorizeRequests()
-
-        // Allow all flow internal requests.
-        .requestMatchers(WebSecurityConfiguration::isVaadinInternalRequest).permitAll()
-        .regexMatchers("/offline-stub.html", "/sw-runtime-resources-precache.js").permitAll()
-
-        // Allow all login failure URLs.
-        .regexMatchers(SIGNIN_FAILURE_URL_PATTERN).permitAll()
-
-        // Allow test URLs.
-        .regexMatchers("/testvaadinservice").permitAll()
-
-        // Allow anonymous views.
-        .antMatchers("/" + ForgotPasswordView.VIEW_NAME,
-            "/" + UseForgotPasswordView.VIEW_NAME + "/**")
-        .permitAll()
-
-        // Allow all requests by logged in users.
-        .anyRequest().authenticated()
-
-        // Configure the login page.
-        .and().formLogin().loginPage(SIGNIN_URL).permitAll()
-        .loginProcessingUrl(SIGNIN_PROCESSING_URL).successForwardUrl("/")
-        .failureHandler(authenticationFailureHandler())
-
-        // Remember me
-        .and().rememberMe().alwaysRemember(true).key(configuration.getRememberMeKey());
+    // Configure the login page.
+    setLoginView(http, SigninView.class);
 
     // Used for TestBench.
     try {
@@ -187,38 +154,13 @@ public class WebSecurityConfiguration {
     } catch (ClassNotFoundException e) {
       // Ignore, not running unit tests.
     }
-
-    return http.build();
   }
 
   /**
    * Allows access to static resources, bypassing Spring security.
    */
-  @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring().antMatchers(
-        // Vaadin Flow static resources
-        "/VAADIN/**",
-
-        // the standard favicon URI
-        "/favicon.ico",
-
-        // web application manifest
-        "/manifest.json", "/sw.js", "/offline-page.html",
-
-        // icons and images
-        "/icons/**", "/images/**",
-
-        // (development mode) static resources
-        "/frontend/**",
-
-        // (development mode) webjars
-        "/webjars/**",
-
-        // (development mode) H2 debugging console
-        "/h2-console/**",
-
-        // (production mode) static resources
-        "/frontend-es5/**", "/frontend-es6/**");
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    super.configure(web);
   }
 }
