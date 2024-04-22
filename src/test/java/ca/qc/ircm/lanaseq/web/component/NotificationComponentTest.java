@@ -19,11 +19,10 @@ package ca.qc.ircm.lanaseq.web.component;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import com.github.mvysny.kaributesting.v10.NotificationsKt;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -32,49 +31,37 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class NotificationComponentTest extends AbstractKaribuTestCase {
+public class NotificationComponentTest extends SpringUIUnitTest {
   private NotificationComponentForTest notificationComponent = new NotificationComponentForTest();
 
   @Test
   public void showNotification_Text() {
     notificationComponent.showNotification("abc");
 
-    Notification notification = NotificationsKt.getNotifications().get(0);
-    validateNotificationText("abc", notification);
-    validateNotificationDuration(NotificationComponent.DEFAULT_DURATION, notification);
-    validateNotificationPosition(Position.BOTTOM_START, notification);
+    Notification notification = $(Notification.class).first();
+    assertEquals("abc", test(notification).getText());
+    assertEquals(NotificationComponent.DEFAULT_DURATION, notification.getDuration());
+    assertEquals(Position.BOTTOM_START, notification.getPosition());
   }
 
   @Test
   public void showNotification_TextDuration() {
     notificationComponent.showNotification("abc", 100);
 
-    Notification notification = NotificationsKt.getNotifications().get(0);
-    validateNotificationText("abc", notification);
-    validateNotificationDuration(100, notification);
-    validateNotificationPosition(Position.BOTTOM_START, notification);
+    Notification notification = $(Notification.class).first();
+    assertEquals("abc", test(notification).getText());
+    assertEquals(100, notification.getDuration());
+    assertEquals(Position.BOTTOM_START, notification.getPosition());
   }
 
   @Test
   public void showNotification_TextDurationPosition() {
     notificationComponent.showNotification("abc", 100, Position.TOP_END);
 
-    Notification notification = NotificationsKt.getNotifications().get(0);
-    validateNotificationText("abc", notification);
-    validateNotificationDuration(100, notification);
-    validateNotificationPosition(Position.TOP_END, notification);
-  }
-
-  private void validateNotificationText(String expectedText, Notification notification) {
-    assertEquals(expectedText, notification.getElement().getChild(0).getProperty("innerHTML"));
-  }
-
-  private void validateNotificationDuration(int duration, Notification notification) {
-    assertEquals(duration, Integer.parseInt(notification.getElement().getProperty("duration")));
-  }
-
-  private void validateNotificationPosition(Position position, Notification notification) {
-    assertEquals(position.getClientName(), notification.getElement().getProperty("position"));
+    Notification notification = $(Notification.class).first();
+    assertEquals("abc", test(notification).getText());
+    assertEquals(100, notification.getDuration());
+    assertEquals(Position.TOP_END, notification.getPosition());
   }
 
   private class NotificationComponentForTest implements NotificationComponent {
