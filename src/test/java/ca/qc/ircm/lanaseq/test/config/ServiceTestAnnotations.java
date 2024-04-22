@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @WebAppConfiguration
 @TestExecutionListeners(
     value = { InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
+        FixSecurityContextHolderStrategyExecutionListener.class,
         UiUnitTestExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional

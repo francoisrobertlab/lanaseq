@@ -36,7 +36,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(
-    value = { VaadinLicenseExecutionListener.class, UiUnitTestExecutionListener.class },
+    value = { VaadinLicenseExecutionListener.class,
+        FixSecurityContextHolderStrategyExecutionListener.class,
+        UiUnitTestExecutionListener.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 public @interface NonTransactionalTestAnnotations {
 

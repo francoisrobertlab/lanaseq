@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("integration-test")
 @TestExecutionListeners(
     value = { InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
+        FixSecurityContextHolderStrategyExecutionListener.class,
         TestBenchTestExecutionListener.class, TestBenchSecurityFilter.class },
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Headless
