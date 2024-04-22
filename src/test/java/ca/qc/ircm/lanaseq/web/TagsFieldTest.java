@@ -32,11 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -52,7 +53,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class TagsFieldTest extends AbstractKaribuTestCase {
+public class TagsFieldTest extends SpringUIUnitTest {
   private TagsField tagsField;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
@@ -64,7 +65,7 @@ public class TagsFieldTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     tagsField = new TagsField();
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     tagsField.localeChange(localeChangeEvent);

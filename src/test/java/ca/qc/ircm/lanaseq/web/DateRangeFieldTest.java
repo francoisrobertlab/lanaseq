@@ -36,13 +36,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DateRangeField.Dates;
 import com.google.common.collect.Range;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
@@ -56,7 +57,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DateRangeFieldTest extends AbstractKaribuTestCase {
+public class DateRangeFieldTest extends SpringUIUnitTest {
   private DateRangeField dateRange;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
@@ -68,7 +69,7 @@ public class DateRangeFieldTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     dateRange = new DateRangeField();
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     dateRange.localeChange(localeChangeEvent);
@@ -96,7 +97,7 @@ public class DateRangeFieldTest extends AbstractKaribuTestCase {
   @Test
   public void localeChange() {
     locale = FRENCH;
-    ui.setLocale(locale);
+    UI.getCurrent().setLocale(locale);
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     dateRange.localeChange(localeChangeEvent);
     AppResources resources = new AppResources(DateRangeField.class, locale);

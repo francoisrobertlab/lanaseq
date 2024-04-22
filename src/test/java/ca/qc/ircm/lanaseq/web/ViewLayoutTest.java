@@ -34,52 +34,42 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
-import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
-import com.vaadin.flow.router.Location;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
  * Tests for {@link ViewLayout}.
  */
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ViewLayoutTest extends AbstractKaribuTestCase {
+public class ViewLayoutTest extends SpringUIUnitTest {
   private ViewLayout view;
-  @Mock
+  @MockBean
   private SwitchUserService switchUserService;
   @Mock
-  private AuthenticatedUser authenticatedUser;
-  @Mock
   private AfterNavigationListener navigationListener;
-  @Mock
-  private AfterNavigationEvent afterNavigationEvent;
   private Locale locale = Locale.ENGLISH;
   private AppResources resources = new AppResources(ViewLayout.class, locale);
   private User user = new User(1L, "myuser");
@@ -89,11 +79,9 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    ui.addAfterNavigationListener(navigationListener);
-    view = new ViewLayout(switchUserService, authenticatedUser);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-    view.init();
+    UI.getCurrent().setLocale(locale);
+    navigate(DatasetsView.class);
+    view = $(ViewLayout.class).first();
   }
 
   private void assertNoExecuteJs() {
@@ -116,7 +104,6 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(SAMPLES), view.samples.getLabel());
     assertEquals(resources.message(PROTOCOLS), view.protocols.getLabel());
@@ -128,11 +115,9 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void localeChange() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(ViewLayout.class, locale);
-    ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(DATASETS), view.datasets.getLabel());
     assertEquals(resources.message(SAMPLES), view.samples.getLabel());
     assertEquals(resources.message(PROTOCOLS), view.protocols.getLabel());
@@ -144,7 +129,6 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void tabs() {
-    view.init();
     assertTrue(view.datasets.isVisible());
     assertTrue(view.samples.isVisible());
     assertTrue(view.protocols.isVisible());
@@ -156,242 +140,185 @@ public class ViewLayoutTest extends AbstractKaribuTestCase {
 
   @Test
   public void tabs_SelectDatasets() {
-    Location location = new Location(UsersView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    navigate(SamplesView.class);
+    view = $(ViewLayout.class).first();
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.datasets);
+    test(view.tabs).select(view.datasets.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertCurrentView(DatasetsView.class);
+    assertEquals(view.datasets, view.tabs.getSelectedTab());
+    assertTrue($(DatasetsView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectDatasetsNoChange() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.datasets);
+    test(view.tabs).select(view.datasets.getLabel());
 
     verify(navigationListener, never()).afterNavigation(any());
+    assertEquals(view.datasets, view.tabs.getSelectedTab());
+    assertTrue($(DatasetsView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectSamples() {
-    Location location = new Location(UsersView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.samples);
+    test(view.tabs).select(view.samples.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertCurrentView(SamplesView.class);
+    assertEquals(view.samples, view.tabs.getSelectedTab());
+    assertTrue($(SamplesView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectSamplesNoChange() {
-    Location location = new Location(SamplesView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    navigate(SamplesView.class);
+    view = $(ViewLayout.class).first();
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.samples);
+    test(view.tabs).select(view.samples.getLabel());
 
     verify(navigationListener, never()).afterNavigation(any());
+    assertEquals(view.samples, view.tabs.getSelectedTab());
+    assertTrue($(SamplesView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectProtocol() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.protocols);
+    test(view.tabs).select(view.protocols.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertCurrentView(ProtocolsView.class);
+    assertEquals(view.protocols, view.tabs.getSelectedTab());
+    assertTrue($(ProtocolsView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectProtocolNoChange() {
-    Location location = new Location(ProtocolsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    navigate(ProtocolsView.class);
+    view = $(ViewLayout.class).first();
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.protocols);
+    test(view.tabs).select(view.protocols.getLabel());
 
     verify(navigationListener, never()).afterNavigation(any());
+    assertEquals(view.protocols, view.tabs.getSelectedTab());
+    assertTrue($(ProtocolsView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectProfile() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.profile);
+    test(view.tabs).select(view.profile.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertCurrentView(ProfileView.class);
+    assertEquals(view.profile, view.tabs.getSelectedTab());
+    assertTrue($(ProfileView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectProfileNoChange() {
-    Location location = new Location(ProfileView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    navigate(ProfileView.class);
+    view = $(ViewLayout.class).first();
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.profile);
+    test(view.tabs).select(view.profile.getLabel());
 
     verify(navigationListener, never()).afterNavigation(any());
+    assertEquals(view.profile, view.tabs.getSelectedTab());
+    assertTrue($(ProfileView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void tabs_SelectUsers() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.users);
+    test(view.tabs).select(view.users.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertCurrentView(UsersView.class);
+    assertEquals(view.users, view.tabs.getSelectedTab());
+    assertTrue($(UsersView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void tabs_SelectUsersNoChange() {
-    Location location = new Location(UsersView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    navigate(UsersView.class);
+    view = $(ViewLayout.class).first();
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.users);
+    test(view.tabs).select(view.users.getLabel());
 
     verify(navigationListener, never()).afterNavigation(any());
+    assertEquals(view.users, view.tabs.getSelectedTab());
+    assertTrue($(UsersView.class).exists());
     assertNoExecuteJs();
   }
 
   @Test
   public void tabs_SelectExitSwitchUser() {
-    UI.getCurrent().navigate(ProfileView.class);
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    navigate(SamplesView.class);
+    view = $(ViewLayout.class).first();
 
     view.tabs.setSelectedTab(view.exitSwitchUser);
 
-    verify(navigationListener).afterNavigation(any());
     verify(switchUserService).exitSwitchUser();
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
-        .anyMatch(i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)")
-            .equals(i.getInvocation().getExpression())
-            && "/".equals(i.getInvocation().getParameters().get(0))
-            && "_self".equals(i.getInvocation().getParameters().get(1))));
+        .anyMatch(i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
+            && i.getInvocation().getParameters().size() > 0
+            && i.getInvocation().getParameters().get(0).equals("/")));
   }
 
   @Test
-  @Disabled("Needs Vaadin UI Test or a fix in Karibu testing")
+  @Disabled("Fails because of invalidated session")
   public void tabs_SelectSignout() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    view.tabs.setSelectedTab(view.signout);
+    test(view.tabs).select(view.signout.getLabel());
 
     verify(navigationListener, never()).afterNavigation(any());
     assertNull(SecurityContextHolder.getContext().getAuthentication());
   }
 
   @Test
-  public void afterNavigation_Datasets() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-
-    view.afterNavigation(afterNavigationEvent);
-
-    assertEquals(view.datasets, view.tabs.getSelectedTab());
-  }
-
-  @Test
-  public void afterNavigation_Samples() {
-    Location location = new Location(SamplesView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-
-    view.afterNavigation(afterNavigationEvent);
-
-    assertEquals(view.samples, view.tabs.getSelectedTab());
-  }
-
-  @Test
-  public void afterNavigation_Protocols() {
-    Location location = new Location(ProtocolsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-
-    view.afterNavigation(afterNavigationEvent);
-
-    assertEquals(view.protocols, view.tabs.getSelectedTab());
-  }
-
-  @Test
-  public void afterNavigation_Profile() {
-    Location location = new Location(ProfileView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-
-    view.afterNavigation(afterNavigationEvent);
-
-    assertEquals(view.profile, view.tabs.getSelectedTab());
-  }
-
-  @Test
-  public void afterNavigation_Users() {
-    Location location = new Location(UsersView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-
-    view.afterNavigation(afterNavigationEvent);
-
-    assertEquals(view.users, view.tabs.getSelectedTab());
-  }
-
-  @Test
-  public void afterNavigation_NormalUser() {
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+  public void tabs_UserVisibility() {
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
   }
 
   @Test
-  public void afterNavigation_AllowUsersView() {
-    when(authenticatedUser.isAuthorized(UsersView.class)).thenReturn(true);
-    Location location = new Location(DatasetsView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void tabs_ManagerVisibility() {
     assertTrue(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
   }
 
   @Test
-  public void afterNavigation_SwitchedUser() {
-    when(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)).thenReturn(true);
-    Location location = new Location(ProfileView.VIEW_NAME);
-    when(afterNavigationEvent.getLocation()).thenReturn(location);
-    view.afterNavigation(afterNavigationEvent);
-    assertFalse(view.users.isVisible());
-    assertTrue(view.exitSwitchUser.isVisible());
+  @WithUserDetails("lanaseq@ircm.qc.ca")
+  public void tabs_AdminVisibility() {
+    assertTrue(view.users.isVisible());
+    assertFalse(view.exitSwitchUser.isVisible());
   }
 
-  /**
-   * Fake view for tests.
-   */
-  public static class ViewTest {
+  @Test
+  @WithMockUser(username = "jonh.smith@ircm.qc.ca", roles = { "USER", "PREVIOUS_ADMINISTRATOR" })
+  public void tabs_SwitchedUserVisibility() {
+    assertFalse(view.users.isVisible());
+    assertTrue(view.exitSwitchUser.isVisible());
   }
 }

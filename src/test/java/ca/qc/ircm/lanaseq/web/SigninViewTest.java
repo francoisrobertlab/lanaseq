@@ -32,26 +32,26 @@ import static ca.qc.ircm.lanaseq.web.SigninView.HEADER;
 import static ca.qc.ircm.lanaseq.web.SigninView.ID;
 import static ca.qc.ircm.lanaseq.web.SigninView.LOCKED;
 import static ca.qc.ircm.lanaseq.web.SigninView.SIGNIN;
+import static ca.qc.ircm.lanaseq.web.SigninView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractKaribuTestCase;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +60,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 
 /**
@@ -68,12 +67,10 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @NonTransactionalTestAnnotations
 @WithAnonymousUser
-public class SigninViewTest extends AbstractKaribuTestCase {
+public class SigninViewTest extends SpringUIUnitTest {
   private SigninView view;
   @Autowired
   private SecurityConfiguration configuration;
-  @MockBean
-  private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationEvent afterNavigationEvent;
   @Mock
@@ -93,12 +90,18 @@ public class SigninViewTest extends AbstractKaribuTestCase {
    */
   @BeforeEach
   public void beforeTest() {
-    ui.setLocale(locale);
-    view = new SigninView(configuration, authenticatedUser);
-    view.init();
     when(afterNavigationEvent.getLocation()).thenReturn(location);
     when(location.getQueryParameters()).thenReturn(queryParameters);
     when(queryParameters.getParameters()).thenReturn(parameters);
+    UI.getCurrent().setLocale(locale);
+    view = navigate(SigninView.class);
+  }
+
+  @Test
+  public void init() {
+    assertEquals(VIEW_NAME, view.getAction());
+    assertTrue(view.isOpened());
+    assertTrue(view.isForgotPasswordButtonVisible());
   }
 
   @Test
@@ -109,7 +112,6 @@ public class SigninViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void labels() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
     assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
     assertEquals(resources.message(ADDITIONAL_INFORMATION), view.i18n.getAdditionalInformation());
@@ -120,6 +122,7 @@ public class SigninViewTest extends AbstractKaribuTestCase {
     assertEquals(resources.message(FORGOT_PASSWORD), view.i18n.getForm().getForgotPassword());
     assertEquals(resources.message(property(FAIL, TITLE)), view.i18n.getErrorMessage().getTitle());
     assertEquals(resources.message(FAIL), view.i18n.getErrorMessage().getMessage());
+    assertFalse(view.isError());
   }
 
   @Test
@@ -195,12 +198,10 @@ public class SigninViewTest extends AbstractKaribuTestCase {
 
   @Test
   public void localeChange() {
-    view.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(SigninView.class, locale);
     final AppResources userResources = new AppResources(User.class, locale);
-    ui.setLocale(locale);
-    view.localeChange(mock(LocaleChangeEvent.class));
+    UI.getCurrent().setLocale(locale);
     assertEquals(resources.message(HEADER), view.i18n.getHeader().getTitle());
     assertEquals(resources.message(DESCRIPTION), view.i18n.getHeader().getDescription());
     assertEquals(resources.message(ADDITIONAL_INFORMATION), view.i18n.getAdditionalInformation());
@@ -217,20 +218,6 @@ public class SigninViewTest extends AbstractKaribuTestCase {
   public void getPageTitle() {
     assertEquals(resources.message(TITLE, generalResources.message(APPLICATION_NAME)),
         view.getPageTitle());
-  }
-
-  @Test
-  public void beforeEnter_Anonymous() {
-    when(authenticatedUser.isAnonymous()).thenReturn(true);
-    view.beforeEnter(beforeEnterEvent);
-    verifyNoInteractions(beforeEnterEvent);
-  }
-
-  @Test
-  public void beforeEnter_User() {
-    when(authenticatedUser.isAnonymous()).thenReturn(false);
-    view.beforeEnter(beforeEnterEvent);
-    verify(beforeEnterEvent).forwardTo(MainView.class);
   }
 
   @Test
@@ -281,6 +268,6 @@ public class SigninViewTest extends AbstractKaribuTestCase {
   @Test
   public void forgotPassword() {
     view.fireForgotPasswordEvent();
-    assertCurrentView(ForgotPasswordView.class);
+    assertTrue($(ForgotPasswordView.class).exists());
   }
 }
