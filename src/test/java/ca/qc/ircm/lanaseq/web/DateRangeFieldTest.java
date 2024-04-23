@@ -40,6 +40,8 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DateRangeField.Dates;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
+import com.vaadin.flow.component.datepicker.DatePickerVariant;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -270,5 +272,39 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     dateRange.setPresentationValue(null);
     assertNull(dateRange.from.getValue());
     assertNull(dateRange.to.getValue());
+  }
+
+  @Test
+  public void addThemeVariants() {
+    dateRange.from.getThemeNames().forEach(theme -> dateRange.from.removeThemeName(theme));
+    dateRange.to.getThemeNames().forEach(theme -> dateRange.to.removeThemeName(theme));
+    assertTrue(dateRange.from.getThemeNames().isEmpty());
+    assertTrue(dateRange.to.getThemeNames().isEmpty());
+    assertFalse(dateRange.from.hasThemeName(DatePickerVariant.LUMO_SMALL.getVariantName()));
+    assertFalse(dateRange.to.hasThemeName(DatePickerVariant.LUMO_SMALL.getVariantName()));
+    assertFalse(
+        dateRange.from.hasThemeName(DatePickerVariant.LUMO_HELPER_ABOVE_FIELD.getVariantName()));
+    assertFalse(
+        dateRange.to.hasThemeName(DatePickerVariant.LUMO_HELPER_ABOVE_FIELD.getVariantName()));
+    dateRange.addThemeVariants(CustomFieldVariant.LUMO_SMALL,
+        CustomFieldVariant.LUMO_HELPER_ABOVE_FIELD, CustomFieldVariant.LUMO_WHITESPACE);
+    assertEquals(2, dateRange.from.getThemeNames().size());
+    assertEquals(2, dateRange.to.getThemeNames().size());
+    assertTrue(dateRange.from.hasThemeName(DatePickerVariant.LUMO_SMALL.getVariantName()));
+    assertTrue(dateRange.to.hasThemeName(DatePickerVariant.LUMO_SMALL.getVariantName()));
+    assertTrue(
+        dateRange.from.hasThemeName(DatePickerVariant.LUMO_HELPER_ABOVE_FIELD.getVariantName()));
+    assertTrue(
+        dateRange.to.hasThemeName(DatePickerVariant.LUMO_HELPER_ABOVE_FIELD.getVariantName()));
+  }
+
+  @Test
+  public void removeThemeVariants() {
+    dateRange.addThemeVariants(CustomFieldVariant.LUMO_SMALL,
+        CustomFieldVariant.LUMO_HELPER_ABOVE_FIELD, CustomFieldVariant.LUMO_WHITESPACE);
+    dateRange.removeThemeVariants(CustomFieldVariant.LUMO_SMALL,
+        CustomFieldVariant.LUMO_HELPER_ABOVE_FIELD, CustomFieldVariant.LUMO_WHITESPACE);
+    assertTrue(dateRange.from.getThemeNames().isEmpty());
+    assertTrue(dateRange.to.getThemeNames().isEmpty());
   }
 }

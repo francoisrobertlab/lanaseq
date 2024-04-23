@@ -24,7 +24,9 @@ import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI1
 import ca.qc.ircm.lanaseq.AppResources;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.customfield.CustomField;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.datepicker.DatePickerVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -36,6 +38,9 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Date range.
@@ -126,6 +131,32 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
     }
     from.setValue(range.hasLowerBound() ? range.lowerEndpoint() : null);
     to.setValue(range.hasUpperBound() ? range.upperEndpoint() : null);
+  }
+
+  private DatePickerVariant[] datePickerVariants(CustomFieldVariant[] variants) {
+    Set<String> datePickerVariantNames = Stream.of(DatePickerVariant.values())
+        .map(DatePickerVariant::name).collect(Collectors.toSet());
+    DatePickerVariant[] datePickerVariants =
+        Stream.of(variants).filter(variant -> datePickerVariantNames.contains(variant.name()))
+            .map(variant -> DatePickerVariant.valueOf(variant.name()))
+            .toArray(DatePickerVariant[]::new);
+    return datePickerVariants;
+  }
+
+  @Override
+  public void addThemeVariants(CustomFieldVariant... variants) {
+    super.addThemeVariants(variants);
+    DatePickerVariant[] datePickerVariants = datePickerVariants(variants);
+    from.addThemeVariants(datePickerVariants);
+    to.addThemeVariants(datePickerVariants);
+  }
+
+  @Override
+  public void removeThemeVariants(CustomFieldVariant... variants) {
+    super.removeThemeVariants(variants);
+    DatePickerVariant[] datePickerVariants = datePickerVariants(variants);
+    from.removeThemeVariants(datePickerVariants);
+    to.removeThemeVariants(datePickerVariants);
   }
 
   /**
