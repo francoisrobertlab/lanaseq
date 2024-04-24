@@ -23,14 +23,10 @@ import ca.qc.ircm.lanaseq.security.LdapService;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.vaadin.flow.server.HandlerHelper.RequestType;
-import com.vaadin.flow.shared.ApplicationConstants;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import jakarta.servlet.Filter;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,12 +71,6 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
   private LdapConfiguration ldapConfiguration;
   @Autowired
   private PermissionEvaluator permissionEvaluator;
-
-  static boolean isVaadinInternalRequest(HttpServletRequest request) {
-    final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
-    return parameterValue != null
-        && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
-  }
 
   /**
    * Returns password encoder that supports password upgrades.
