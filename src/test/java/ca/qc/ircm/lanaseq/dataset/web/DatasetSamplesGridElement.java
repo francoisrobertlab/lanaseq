@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
-import com.vaadin.flow.component.html.testbench.LabelElement;
+import com.vaadin.flow.component.html.testbench.NativeLabelElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -33,12 +33,12 @@ public class DatasetSamplesGridElement extends GridElement {
   private static final int REPLICATE_COLUMN = 1;
   private static final int REMOVE_COLUMN = 3;
 
-  public LabelElement sampleId(int row) {
-    return getCell(row, SAMPLE_ID_COLUMN).$(LabelElement.class).first();
+  public NativeLabelElement sampleId(int row) {
+    return getCell(row, SAMPLE_ID_COLUMN).$(NativeLabelElement.class).first();
   }
 
-  public LabelElement replicate(int row) {
-    return getCell(row, REPLICATE_COLUMN).$(LabelElement.class).first();
+  public NativeLabelElement replicate(int row) {
+    return getCell(row, REPLICATE_COLUMN).$(NativeLabelElement.class).first();
   }
 
   public ButtonElement remove(int row) {
