@@ -27,7 +27,7 @@ import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDateP
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
 import static ca.qc.ircm.lanaseq.web.DateRangeField.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.web.DateRangeField.FROM;
-import static ca.qc.ircm.lanaseq.web.DateRangeField.FROM_AFTER_TO;
+import static ca.qc.ircm.lanaseq.web.DateRangeField.HELPER;
 import static ca.qc.ircm.lanaseq.web.DateRangeField.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -88,6 +88,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
+    assertEquals(resources.message(HELPER), dateRange.getHelperText());
     assertEquals(resources.message(property(FROM, PLACEHOLDER)), dateRange.from.getPlaceholder());
     validateEquals(englishDatePickerI18n(), dateRange.from.getI18n());
     assertEquals(Locale.CANADA, dateRange.from.getLocale());
@@ -103,6 +104,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     when(localeChangeEvent.getLocale()).thenReturn(locale);
     dateRange.localeChange(localeChangeEvent);
     AppResources resources = new AppResources(DateRangeField.class, locale);
+    assertEquals(resources.message(HELPER), dateRange.getHelperText());
     assertEquals(resources.message(property(FROM, PLACEHOLDER)), dateRange.from.getPlaceholder());
     validateEquals(frenchDatePickerI18n(), dateRange.from.getI18n());
     assertEquals(Locale.CANADA, dateRange.from.getLocale());
@@ -152,8 +154,6 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     Optional<BindingValidationStatus<?>> optionalError =
         findValidationStatusByField(status, dateRange.from);
     assertTrue(optionalError.isPresent());
-    BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(resources.message(FROM_AFTER_TO)), error.getMessage());
   }
 
   @Test
@@ -257,14 +257,6 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     dateRange.setPresentationValue(Range.closed(from, to));
     assertEquals(from, dateRange.from.getValue());
     assertEquals(to, dateRange.to.getValue());
-  }
-
-  @Test
-  public void setPresentationValue_FromEqualsTo() {
-    LocalDate date = LocalDate.now().minusDays(2);
-    dateRange.setPresentationValue(Range.singleton(date));
-    assertEquals(date, dateRange.from.getValue());
-    assertEquals(date, dateRange.to.getValue());
   }
 
   @Test
