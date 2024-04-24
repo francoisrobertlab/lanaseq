@@ -171,7 +171,7 @@ public class AuthenticatedUserTest {
   @Test
   @WithMockUser
   public void hasAnyRole_True() throws Throwable {
-    when(roleValidator.hasAnyRole(any())).thenReturn(true);
+    when(roleValidator.hasAnyRole(any(String[].class))).thenReturn(true);
     assertTrue(authenticatedUser.hasAnyRole(DEFAULT_ROLE, MANAGER));
     verify(roleValidator).hasAnyRole(DEFAULT_ROLE, MANAGER);
   }
@@ -186,7 +186,7 @@ public class AuthenticatedUserTest {
   @Test
   @WithMockUser
   public void hasAllRoles_True() throws Throwable {
-    when(roleValidator.hasAllRoles(any())).thenReturn(true);
+    when(roleValidator.hasAllRoles(any(String[].class))).thenReturn(true);
     assertTrue(authenticatedUser.hasAllRoles(DEFAULT_ROLE, MANAGER));
     verify(roleValidator).hasAllRoles(DEFAULT_ROLE, MANAGER);
   }
@@ -342,7 +342,7 @@ public class AuthenticatedUserTest {
   @Test
   @WithMockUser(authorities = { MANAGER })
   public void isAuthorized_ManagerOrAdminRole_True() throws Throwable {
-    when(roleValidator.hasAnyRole(any())).thenReturn(true);
+    when(roleValidator.hasAnyRole(any(String[].class))).thenReturn(true);
     assertTrue(authenticatedUser.isAuthorized(ManagerOrAdminRoleTest.class));
     verify(roleValidator).hasAnyRole(MANAGER, ADMIN);
   }
