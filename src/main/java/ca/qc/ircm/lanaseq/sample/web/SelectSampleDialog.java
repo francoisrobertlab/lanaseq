@@ -34,6 +34,7 @@ import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.SelectedEvent;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -117,6 +118,7 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
     filtersRow.getCell(date).setComponent(dateFilter);
     dateFilter.addValueChangeListener(e -> filterDate(e.getValue()));
     dateFilter.setSizeFull();
+    dateFilter.addThemeVariants(CustomFieldVariant.LUMO_SMALL);
     filtersRow.getCell(owner).setComponent(ownerFilter);
     ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);

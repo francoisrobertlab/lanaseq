@@ -40,6 +40,7 @@ import ca.qc.ircm.lanaseq.web.EditEvent;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -129,6 +130,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     filtersRow.getCell(date).setComponent(dateFilter);
     dateFilter.addValueChangeListener(e -> filterDate(e.getValue()));
     dateFilter.setSizeFull();
+    dateFilter.addThemeVariants(CustomFieldVariant.LUMO_SMALL);
     filtersRow.getCell(owner).setComponent(ownerFilter);
     ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);

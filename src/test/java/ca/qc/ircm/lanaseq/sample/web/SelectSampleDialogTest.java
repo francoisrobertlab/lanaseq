@@ -54,6 +54,7 @@ import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -148,6 +149,8 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
+    assertTrue(
+        dialog.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
   }
 
   @Test

@@ -47,6 +47,7 @@ import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -187,6 +188,7 @@ public class SamplesView extends VerticalLayout
     filtersRow.getCell(date).setComponent(dateFilter);
     dateFilter.addValueChangeListener(e -> filterDate(e.getValue()));
     dateFilter.setSizeFull();
+    dateFilter.addThemeVariants(CustomFieldVariant.LUMO_SMALL);
     filtersRow.getCell(owner).setComponent(ownerFilter);
     ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);

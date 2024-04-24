@@ -70,6 +70,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -157,6 +158,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAMPLES, view.samples.getId().orElse(""));
+    assertTrue(
+        view.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(ADD, view.add.getId().orElse(""));

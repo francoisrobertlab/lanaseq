@@ -55,6 +55,7 @@ import ca.qc.ircm.lanaseq.web.EditEvent;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -136,6 +137,8 @@ public class DatasetGridTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(DatasetGrid.ID, grid.getId().orElse(""));
+    assertTrue(
+        grid.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
   }
 
   @Test
