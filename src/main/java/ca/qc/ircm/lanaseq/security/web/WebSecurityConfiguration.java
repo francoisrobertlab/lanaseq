@@ -23,17 +23,16 @@ import ca.qc.ircm.lanaseq.security.LdapService;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import com.vaadin.flow.server.HandlerHelper.RequestType;
-import com.vaadin.flow.shared.ApplicationConstants;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import jakarta.servlet.Filter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
-import javax.servlet.Filter;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -70,12 +69,8 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
   private SecurityConfiguration configuration;
   @Autowired
   private LdapConfiguration ldapConfiguration;
-
-  static boolean isVaadinInternalRequest(HttpServletRequest request) {
-    final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
-    return parameterValue != null
-        && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
-  }
+  @Autowired
+  private PermissionEvaluator permissionEvaluator;
 
   /**
    * Returns password encoder that supports password upgrades.
@@ -111,6 +106,14 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     authenticationProvider.setLdapConfiguration(ldapConfiguration);
     authenticationProvider.setSecurityConfiguration(configuration);
     return authenticationProvider;
+  }
+
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+    DefaultMethodSecurityExpressionHandler expressionHandler =
+        new DefaultMethodSecurityExpressionHandler();
+    expressionHandler.setPermissionEvaluator(permissionEvaluator);
+    return expressionHandler;
   }
 
   /**

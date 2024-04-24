@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static javax.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -27,6 +27,16 @@ import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,16 +44,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
-import javax.validation.constraints.Size;
 
 /**
  * Dataset or group of samples.
@@ -123,9 +123,7 @@ public class Dataset implements DataWithFiles, Owned, Serializable {
     StringBuilder builder = new StringBuilder();
     Sample first =
         samples != null ? samples.stream().findFirst().orElse(new Sample()) : new Sample();
-    builder.append(first.getAssay() != null
-        ? first.getAssay().replaceAll("[^\\w]", "") + "_"
-        : "");
+    builder.append(first.getAssay() != null ? first.getAssay().replaceAll("[^\\w]", "") + "_" : "");
     builder.append(first.getType() != null ? first.getType().getLabel(Locale.ENGLISH) + "_" : "");
     builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
     builder.append(first.getStrain() != null ? first.getStrain() + "_" : "");

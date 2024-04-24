@@ -21,7 +21,7 @@ import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 /**
  * Security configuration.
@@ -29,7 +29,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
   public static final String PREFIX = "security";
   private int lockAttemps;

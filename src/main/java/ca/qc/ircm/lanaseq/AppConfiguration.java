@@ -21,6 +21,7 @@ import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
+import jakarta.annotation.PostConstruct;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import javax.annotation.PostConstruct;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -169,7 +169,8 @@ public class AppConfiguration {
       StringBuilder builder = new StringBuilder();
       user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
           .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
-      sample.map(sa -> sa.getAssay()).ifPresent(assay -> builder.append("_" + assay.replaceAll("[^\\w]", "")));
+      sample.map(sa -> sa.getAssay())
+          .ifPresent(assay -> builder.append("_" + assay.replaceAll("[^\\w]", "")));
       builder.append("_");
       builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(dataset.getDate()));
       if (builder.length() > 0) {
@@ -191,7 +192,8 @@ public class AppConfiguration {
       StringBuilder builder = new StringBuilder();
       user.map(User::getEmail).map(email -> Pattern.compile("(\\w+)").matcher(email))
           .filter(match -> match.find()).ifPresent(match -> builder.append("_" + match.group(1)));
-      builder.append(sample.getAssay() != null ? "_" + sample.getAssay().replaceAll("[^\\w]", "") : "");
+      builder.append(
+          sample.getAssay() != null ? "_" + sample.getAssay().replaceAll("[^\\w]", "") : "");
       builder.append("_");
       builder.append(DateTimeFormatter.ofPattern("yyyyMMdd").format(sample.getDate()));
       if (builder.length() > 0) {

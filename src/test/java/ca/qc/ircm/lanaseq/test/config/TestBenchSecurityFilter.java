@@ -18,13 +18,13 @@
 package ca.qc.ircm.lanaseq.test.config;
 
 import com.vaadin.testbench.TestBenchTestCase;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -64,7 +64,7 @@ public class TestBenchSecurityFilter extends GenericFilterBean
     if (copyAuthenticationOnFilter && authentication != null) {
       logger.debug("set authentication {} in security context", authentication);
       copyAuthenticationOnFilter = false;
-      SecurityContext securityContext = repo.loadContext(request).get();
+      SecurityContext securityContext = repo.loadDeferredContext(request).get();
       securityContext.setAuthentication(authentication);
       repo.saveContext(securityContext, request, response);
       copyAuthenticationOnFilter = false;

@@ -32,8 +32,6 @@ import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import java.time.LocalDate;
@@ -49,7 +47,7 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
   public static final String CLASS_NAME = "date-range";
   public static final String FROM = "from";
   public static final String TO = "to";
-  public static final String FROM_AFTER_TO = "fromAfterTo";
+  public static final String HELPER = "helper";
   private static final long serialVersionUID = -4145468405854590525L;
   protected FormLayout layout = new FormLayout();
   protected DatePicker from = new DatePicker();
@@ -77,24 +75,15 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
   @Override
   public void localeChange(LocaleChangeEvent event) {
     AppResources resources = new AppResources(DateRangeField.class, getLocale());
+    setHelperText(resources.message(HELPER));
     from.setI18n(datePickerI18n(getLocale()));
     from.setLocale(Locale.CANADA); // ISO format.
     from.setPlaceholder(resources.message(property(FROM, PLACEHOLDER)));
     to.setI18n(datePickerI18n(getLocale()));
     to.setPlaceholder(resources.message(property(TO, PLACEHOLDER)));
     to.setLocale(Locale.CANADA); // ISO format.
-    binder.forField(from).withValidator(fromBeforeTo(getLocale())).bind(TO);
+    binder.forField(from).bind(TO);
     binder.forField(to).bind(FROM);
-  }
-
-  private Validator<LocalDate> fromBeforeTo(Locale locale) {
-    return (value, context) -> {
-      if (value != null && to.getValue() != null && value.isAfter(to.getValue())) {
-        final AppResources resources = new AppResources(DateRangeField.class, locale);
-        return ValidationResult.error(resources.message(FROM_AFTER_TO));
-      }
-      return ValidationResult.ok();
-    };
   }
 
   BinderValidationStatus<Dates> validateDates() {

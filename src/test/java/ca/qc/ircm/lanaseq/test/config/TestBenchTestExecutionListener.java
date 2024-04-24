@@ -134,8 +134,8 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
         chromePrefs.put("profile.default_content_settings.popups", 0);
         chromePrefs.put("download.default_directory", downloadHome);
         options.setExperimentalOption("prefs", chromePrefs);
-      } else {
-        options.setHeadless(headless);
+      } else if (headless) {
+        options.addArguments("--headless");
       }
       return new ChromeDriver(options);
     } else if (driverClass.equals(FIREFOX_DRIVER)) {
@@ -148,7 +148,9 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       profile.setPreference("pdfjs.disabled", true);
       FirefoxOptions options = new FirefoxOptions();
       options.setProfile(profile);
-      options.setHeadless(headless);
+      if (headless) {
+        options.addArguments("--headless");
+      }
       return new FirefoxDriver(options);
     } else {
       try {
