@@ -198,7 +198,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.delete.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
     validateIcon(VaadinIcon.TRASH.create(), dialog.delete.getIcon());
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
-    assertEquals("true", dialog.confirm.getElement().getProperty("cancel"));
+    assertEquals("true", dialog.confirm.getElement().getProperty("cancelButtonVisible"));
     assertTrue(dialog.confirm.getElement().getProperty("confirmTheme")
         .contains(ButtonVariant.LUMO_ERROR.getVariantName()));
     assertTrue(dialog.confirm.getElement().getProperty("confirmTheme")
