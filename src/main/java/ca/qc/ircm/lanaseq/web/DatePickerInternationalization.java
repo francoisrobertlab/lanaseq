@@ -48,8 +48,7 @@ public class DatePickerInternationalization {
    * @return {@link DatePickerI18n} for English
    */
   public static DatePickerI18n englishDatePickerI18n() {
-    return new DatePickerI18n().setWeek("Week")
-        .setToday("Today").setCancel("Cancel").setFirstDayOfWeek(0)
+    return new DatePickerI18n().setToday("Today").setCancel("Cancel").setFirstDayOfWeek(0)
         .setMonthNames(Arrays.asList("January", "February", "March", "April", "May", "June", "July",
             "August", "September", "October", "November", "December"))
         .setWeekdays(Arrays.asList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
@@ -63,8 +62,7 @@ public class DatePickerInternationalization {
    * @return {@link DatePickerI18n} for French
    */
   public static DatePickerI18n frenchDatePickerI18n() {
-    return new DatePickerI18n().setWeek("Semaine")
-        .setToday("Aujourd'hui").setCancel("Annuler").setFirstDayOfWeek(0)
+    return new DatePickerI18n().setToday("Aujourd'hui").setCancel("Annuler").setFirstDayOfWeek(0)
         .setMonthNames(Arrays.asList("Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
             "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"))
         .setWeekdays(

@@ -51,6 +51,7 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import jakarta.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +65,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityManager;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -757,6 +757,7 @@ public class SampleServiceTest {
 
     assertTrue(files.isEmpty());
   }
+
   @Test
   public void topAssays() {
     List<String> assays = service.topAssays(2);
@@ -764,6 +765,7 @@ public class SampleServiceTest {
     assertTrue(assays.contains("MNase-seq"));
     assertTrue(assays.contains("ChIP-seq"));
   }
+
   @Test
   public void topAssays_limit() {
     List<String> assays = service.topAssays(1);

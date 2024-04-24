@@ -19,8 +19,8 @@ package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static javax.persistence.EnumType.STRING;
-import static javax.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.DatasetProperties;
@@ -29,19 +29,19 @@ import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
 
 /**
  * Sample.
@@ -172,8 +172,7 @@ public class Sample implements DataWithFiles, Owned, Serializable {
   public void generateName() {
     StringBuilder builder = new StringBuilder();
     builder.append(sampleId != null ? sampleId + "_" : "");
-    builder
-        .append(assay != null ? assay.replaceAll("[^\\w]", "") + "_" : "");
+    builder.append(assay != null ? assay.replaceAll("[^\\w]", "") + "_" : "");
     builder.append(type != null ? type.getLabel(Locale.ENGLISH) + "_" : "");
     builder.append(target != null ? target + "_" : "");
     builder.append(strain != null ? strain + "_" : "");

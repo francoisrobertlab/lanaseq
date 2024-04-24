@@ -113,10 +113,10 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @MockBean
   private AppConfiguration configuration;
   @Mock
-  private Dialog.OpenedChangeEvent<Dialog> openedChangeEvent;
+  private Dialog.OpenedChangeEvent openedChangeEvent;
   @Captor
   private ArgumentCaptor<
-      ComponentEventListener<Dialog.OpenedChangeEvent<Dialog>>> openedChangeListenerCaptor;
+      ComponentEventListener<Dialog.OpenedChangeEvent>> openedChangeListenerCaptor;
   @Mock
   private ComponentEventListener<SavedEvent<AddDatasetFilesDialog>> savedListener;
   @Captor
