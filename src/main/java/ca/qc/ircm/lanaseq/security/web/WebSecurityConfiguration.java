@@ -34,6 +34,9 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -70,6 +73,8 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
   private SecurityConfiguration configuration;
   @Autowired
   private LdapConfiguration ldapConfiguration;
+  @Autowired
+  private PermissionEvaluator permissionEvaluator;
 
   static boolean isVaadinInternalRequest(HttpServletRequest request) {
     final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
@@ -111,6 +116,14 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     authenticationProvider.setLdapConfiguration(ldapConfiguration);
     authenticationProvider.setSecurityConfiguration(configuration);
     return authenticationProvider;
+  }
+
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+    DefaultMethodSecurityExpressionHandler expressionHandler =
+        new DefaultMethodSecurityExpressionHandler();
+    expressionHandler.setPermissionEvaluator(permissionEvaluator);
+    return expressionHandler;
   }
 
   /**
