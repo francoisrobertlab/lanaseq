@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_HTML;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
@@ -303,8 +304,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   public void folderLabels_Linux() {
     Dataset dataset = dialog.getDataset();
     verify(service).folderLabels(dataset, true);
-    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
-        dialog.message.getText());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
       assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
@@ -333,7 +333,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Dataset dataset = dialog.getDataset();
     dialog.setDataset(dataset);
     verify(service, times(2)).folderLabels(dataset, false);
-    assertEquals(resources.message(SampleFilesDialog.MESSAGE, 1), dialog.message.getText());
+    assertEquals(resources.message(MESSAGE, 1), dialog.message.getText());
     assertEquals(1, dialog.folders.getComponentCount());
     assertTrue(dialog.folders.getComponentAt(0) instanceof Span);
     assertEquals(labels.get(0), dialog.folders.getComponentAt(0).getElement().getText());
@@ -346,7 +346,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Dataset dataset = dialog.getDataset();
     dialog.setDataset(dataset);
     verify(service, times(2)).folderLabels(dataset, false);
-    assertEquals(resources.message(SampleFilesDialog.MESSAGE, 0), dialog.message.getText());
+    assertEquals(resources.message(MESSAGE, 0), dialog.message.getText());
     assertEquals(0, dialog.folders.getComponentCount());
   }
 
@@ -377,7 +377,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
           dialog.files.getColumnByKey(SampleFilesDialog.FILENAME).getRenderer();
       assertTrue(filenameRawRenderer instanceof LitRenderer<EditableFile>);
       LitRenderer<EditableFile> filenameRenderer = (LitRenderer<EditableFile>) filenameRawRenderer;
-      assertEquals(SampleFilesDialog.FILENAME_HTML, rendererTemplate(filenameRenderer));
+      assertEquals(FILENAME_HTML, rendererTemplate(filenameRenderer));
       assertTrue(properties(filenameRenderer).containsKey("title"));
       assertTrue(properties(filenameRenderer).containsKey("filename"));
       assertEquals(file.getFilename(), properties(filenameRenderer).get("title").apply(file));

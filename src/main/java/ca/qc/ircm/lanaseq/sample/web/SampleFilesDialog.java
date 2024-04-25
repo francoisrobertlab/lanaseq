@@ -287,11 +287,6 @@ public class SampleFilesDialog extends Dialog
         .collect(Collectors.toList()));
   }
 
-  boolean isReadOnly() {
-    return sample == null || !sample.isEditable()
-        || !authenticatedUser.hasPermission(sample, Permission.WRITE);
-  }
-
   boolean isArchive(EditableFile file) {
     return !configuration.getHome().folder(sample).equals(file.getFile().toPath().getParent());
   }
@@ -322,12 +317,10 @@ public class SampleFilesDialog extends Dialog
   }
 
   void addLargeFiles() {
-    if (!isReadOnly()) {
-      AddSampleFilesDialog addFilesDialog = addFilesDialogFactory.getObject();
-      addFilesDialog.setSample(sample);
-      addFilesDialog.addSavedListener(e -> updateFiles());
-      addFilesDialog.open();
-    }
+    AddSampleFilesDialog addFilesDialog = addFilesDialogFactory.getObject();
+    addFilesDialog.setSample(sample);
+    addFilesDialog.addSavedListener(e -> updateFiles());
+    addFilesDialog.open();
   }
 
   void rename(EditableFile file) {
@@ -370,9 +363,12 @@ public class SampleFilesDialog extends Dialog
     Objects.requireNonNull(sample);
     Objects.requireNonNull(sample.getId());
     this.sample = sample;
-    boolean readOnly = isReadOnly();
+    boolean readOnly = sample == null || !sample.isEditable()
+        || !authenticatedUser.hasPermission(sample, Permission.WRITE);
     fileBinder.setReadOnly(readOnly);
     delete.setVisible(!readOnly);
+    upload.setVisible(!readOnly);
+    addLargeFiles.setVisible(!readOnly);
     updateHeader();
     updateMessage();
     updateFiles();

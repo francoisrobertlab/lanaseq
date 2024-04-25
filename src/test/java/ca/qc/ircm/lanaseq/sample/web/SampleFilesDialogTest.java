@@ -92,6 +92,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -219,6 +220,10 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     dialog = $(SampleFilesDialog.class).first();
   }
 
+  private EditableFile editableFile(String filename) {
+    return new EditableFile(new File(filename));
+  }
+
   @Test
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
@@ -235,6 +240,11 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   public void labels() {
     Sample sample = dialog.getSample();
     assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    for (int i = 0; i < labels.size(); i++) {
+      assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
+    }
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
     assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
     assertEquals(webResources.message(DOWNLOAD), headerRow.getCell(dialog.download).getText());
@@ -251,69 +261,17 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     UI.getCurrent().setLocale(locale);
     Sample sample = dialog.getSample();
     assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    for (int i = 0; i < labels.size(); i++) {
+      assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
+    }
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
     assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
     assertEquals(webResources.message(DOWNLOAD), headerRow.getCell(dialog.download).getText());
     assertEquals(webResources.message(DELETE), headerRow.getCell(dialog.delete).getText());
     validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
     assertEquals(resources.message(ADD_LARGE_FILES), dialog.addLargeFiles.getText());
-  }
-
-  @Test
-  public void files() {
-    assertEquals(3, dialog.files.getColumns().size());
-    assertNotNull(dialog.files.getColumnByKey(FILENAME));
-    assertTrue(dialog.files.getColumnByKey(FILENAME).isSortable());
-    assertNotNull(dialog.files.getColumnByKey(DOWNLOAD));
-    assertFalse(dialog.files.getColumnByKey(DOWNLOAD).isSortable());
-    assertNotNull(dialog.files.getColumnByKey(DELETE));
-    assertFalse(dialog.files.getColumnByKey(DELETE).isSortable());
-  }
-
-  @Test
-  public void files_ColumnsValueProvider() {
-    Sample sample = repository.findById(4L).get();
-    dialog.setSample(sample);
-    for (int i = 0; i < files.size(); i++) {
-      File path = files.get(i);
-      EditableFile file = new EditableFile(path);
-      Renderer<EditableFile> filenameRawRenderer =
-          dialog.files.getColumnByKey(FILENAME).getRenderer();
-      assertTrue(filenameRawRenderer instanceof LitRenderer<EditableFile>);
-      LitRenderer<EditableFile> filenameRenderer = (LitRenderer<EditableFile>) filenameRawRenderer;
-      assertEquals(FILENAME_HTML, rendererTemplate(filenameRenderer));
-      assertTrue(properties(filenameRenderer).containsKey("title"));
-      assertTrue(properties(filenameRenderer).containsKey("filename"));
-      assertEquals(file.getFilename(), properties(filenameRenderer).get("title").apply(file));
-      if (file.getFilename().contains(sample.getName())) {
-        String filename = file.getFilename().replaceAll(sample.getName(), "");
-        assertEquals("FR2_MNasese..._20181020" + filename,
-            properties(filenameRenderer).get("filename").apply(file));
-      } else {
-        assertEquals(file.getFilename(), properties(filenameRenderer).get("filename").apply(file));
-      }
-      Anchor downloadAnchor =
-          (Anchor) test(dialog.files).getCellComponent(i, dialog.download.getKey());
-      assertTrue(downloadAnchor.hasClassName(DOWNLOAD));
-      assertTrue(downloadAnchor.getElement().hasAttribute("download"));
-      assertEquals("", downloadAnchor.getElement().getAttribute("download"));
-      assertNotEquals("", downloadAnchor.getHref());
-      assertEquals(1, downloadAnchor.getChildren().toArray().length);
-      Component downloadAnchorChild = downloadAnchor.getChildren().findFirst().get();
-      assertTrue(downloadAnchorChild instanceof Button);
-      Button downloadButton = (Button) downloadAnchorChild;
-      validateIcon(VaadinIcon.DOWNLOAD.create(), downloadButton.getIcon());
-      assertEquals("", downloadButton.getText());
-      Button deleteButton = (Button) test(dialog.files).getCellComponent(i, dialog.delete.getKey());
-      assertTrue(deleteButton.hasClassName(DELETE));
-      assertTrue(deleteButton.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
-      assertEquals(i < files.size() - 1, deleteButton.isEnabled(), path.toString());
-      validateIcon(VaadinIcon.TRASH.create(), deleteButton.getIcon());
-      assertEquals("", deleteButton.getText());
-      clickButton(deleteButton);
-      verify(service).deleteFile(sample, path.toPath());
-      verify(service, atLeast(2)).files(sample);
-    }
   }
 
   @Test
@@ -337,8 +295,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Sample sample = repository.findById(1L).get();
     dialog.setSample(sample);
     verify(service).folderLabels(sample, true);
-    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
-        dialog.message.getText());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
       assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
@@ -383,6 +340,83 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     verify(service).folderLabels(sample, false);
     assertEquals(resources.message(MESSAGE, 0), dialog.message.getText());
     assertEquals(0, dialog.folders.getComponentCount());
+  }
+
+  @Test
+  public void files() {
+    assertEquals(3, dialog.files.getColumns().size());
+    assertNotNull(dialog.files.getColumnByKey(FILENAME));
+    assertTrue(dialog.files.getColumnByKey(FILENAME).isSortable());
+    assertNotNull(dialog.files.getColumnByKey(DOWNLOAD));
+    assertFalse(dialog.files.getColumnByKey(DOWNLOAD).isSortable());
+    assertNotNull(dialog.files.getColumnByKey(DELETE));
+    assertFalse(dialog.files.getColumnByKey(DELETE).isSortable());
+    List<EditableFile> files = dialog.files.getListDataView().getItems().toList();
+    assertEquals(this.files.size(), files.size());
+    for (File file : this.files) {
+      assertTrue(files.stream().anyMatch(ef -> ef.getFile().equals(file)));
+    }
+  }
+
+  @Test
+  public void files_ColumnsValueProvider() {
+    Sample sample = repository.findById(4L).get();
+    dialog.setSample(sample);
+    for (int i = 0; i < files.size(); i++) {
+      File path = files.get(i);
+      EditableFile file = new EditableFile(path);
+      Renderer<EditableFile> filenameRawRenderer =
+          dialog.files.getColumnByKey(FILENAME).getRenderer();
+      assertTrue(filenameRawRenderer instanceof LitRenderer<EditableFile>);
+      LitRenderer<EditableFile> filenameRenderer = (LitRenderer<EditableFile>) filenameRawRenderer;
+      assertEquals(FILENAME_HTML, rendererTemplate(filenameRenderer));
+      assertTrue(properties(filenameRenderer).containsKey("title"));
+      assertTrue(properties(filenameRenderer).containsKey("filename"));
+      assertEquals(file.getFilename(), properties(filenameRenderer).get("title").apply(file));
+      if (file.getFilename().contains(sample.getName())) {
+        String filename = file.getFilename().replaceAll(sample.getName(), "");
+        assertEquals("FR2_MNasese..._20181020" + filename,
+            properties(filenameRenderer).get("filename").apply(file));
+      } else {
+        assertEquals(file.getFilename(), properties(filenameRenderer).get("filename").apply(file));
+      }
+      Anchor downloadAnchor =
+          (Anchor) test(dialog.files).getCellComponent(i, dialog.download.getKey());
+      assertTrue(downloadAnchor.hasClassName(DOWNLOAD));
+      assertTrue(downloadAnchor.getElement().hasAttribute("download"));
+      assertEquals("", downloadAnchor.getElement().getAttribute("download"));
+      assertNotEquals("", downloadAnchor.getHref());
+      assertEquals(1, downloadAnchor.getChildren().toArray().length);
+      Component downloadAnchorChild = downloadAnchor.getChildren().findFirst().get();
+      assertTrue(downloadAnchorChild instanceof Button);
+      Button downloadButton = (Button) downloadAnchorChild;
+      validateIcon(VaadinIcon.DOWNLOAD.create(), downloadButton.getIcon());
+      assertEquals("", downloadButton.getText());
+      Button deleteButton = (Button) test(dialog.files).getCellComponent(i, dialog.delete.getKey());
+      assertTrue(deleteButton.hasClassName(DELETE));
+      assertTrue(deleteButton.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
+      assertEquals(i < files.size() - 1, deleteButton.isEnabled(), path.toString());
+      validateIcon(VaadinIcon.TRASH.create(), deleteButton.getIcon());
+      assertEquals("", deleteButton.getText());
+    }
+  }
+
+  @Test
+  public void files_FilenameColumnComparator() {
+    Comparator<EditableFile> comparator = dialog.filename.getComparator(SortDirection.ASCENDING);
+    assertTrue(comparator.compare(editableFile("a"), editableFile("a")) == 0);
+    assertTrue(comparator.compare(editableFile("a"), editableFile("e")) < 0);
+    assertTrue(comparator.compare(editableFile("e"), editableFile("a")) > 0);
+  }
+
+  @Test
+  public void files_DeleteButton() {
+    Sample sample = dialog.getSample();
+    File path = files.get(0);
+    Button deleteButton = (Button) test(dialog.files).getCellComponent(0, dialog.delete.getKey());
+    clickButton(deleteButton);
+    verify(service).deleteFile(sample, path.toPath());
+    verify(service, atLeast(2)).files(sample);
   }
 
   @Test
@@ -559,16 +593,13 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void getSample() {
-    Sample sample = repository.findById(10L).get();
-    assertEquals(sample, dialog.getSample());
+    assertEquals(10L, dialog.getSample().getId());
   }
 
   @Test
   public void setSample_NewSample() {
     assertThrows(NullPointerException.class, () -> {
-      Sample sample = new Sample();
-
-      dialog.setSample(sample);
+      dialog.setSample(new Sample());
     });
   }
 
@@ -578,15 +609,22 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     dialog.setSample(sample);
 
+    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    for (int i = 0; i < labels.size(); i++) {
+      assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
+    }
     verify(service, atLeastOnce()).files(sample);
     List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
     for (EditableFile file : files) {
       assertTrue(this.files.contains(file.getFile()));
     }
-    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
     assertTrue(dialog.delete.isVisible());
     assertFalse(dialog.filenameEdit.isReadOnly());
+    assertTrue(dialog.upload.isVisible());
+    assertTrue(dialog.addLargeFiles.isVisible());
   }
 
   @Test
@@ -595,15 +633,22 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     dialog.setSample(sample);
 
+    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    for (int i = 0; i < labels.size(); i++) {
+      assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
+    }
     verify(service).files(sample);
     List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
     for (EditableFile file : files) {
       assertTrue(this.files.contains(file.getFile()));
     }
-    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
+    assertFalse(dialog.upload.isVisible());
+    assertFalse(dialog.addLargeFiles.isVisible());
   }
 
   @Test
@@ -613,15 +658,22 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     dialog.setSample(sample);
 
+    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(labels.size(), dialog.folders.getComponentCount());
+    for (int i = 0; i < labels.size(); i++) {
+      assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
+    }
     verify(service).files(sample);
     List<EditableFile> files = items(dialog.files);
     assertEquals(this.files.size(), files.size());
     for (EditableFile file : files) {
       assertTrue(this.files.contains(file.getFile()));
     }
-    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
     assertFalse(dialog.delete.isVisible());
     assertTrue(dialog.filenameEdit.isReadOnly());
+    assertFalse(dialog.upload.isVisible());
+    assertFalse(dialog.addLargeFiles.isVisible());
   }
 
   @Test
@@ -642,26 +694,6 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     assertEquals(sample, largeFilesDialog.getSample());
     largeFilesDialog.fireSavedEvent();
     verify(service, atLeast(2)).files(sample);
-  }
-
-  @Test
-  public void addLargeFiles_CannotWrite() {
-    Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
-
-    dialog.addLargeFiles.click();
-
-    assertFalse($(AddSampleFilesDialog.class).exists());
-  }
-
-  @Test
-  public void addLargeFiles_NotEditable() {
-    Sample sample = repository.findById(8L).get();
-    dialog.setSample(sample);
-
-    dialog.addLargeFiles.click();
-
-    assertFalse($(AddSampleFilesDialog.class).exists());
   }
 
   @Test
