@@ -101,7 +101,7 @@ public class AddSampleFilesDialog extends Dialog
   private Map<File, Checkbox> overwriteFields = new HashMap<>();
   private Sample sample;
   private Set<String> existingFilenames = new HashSet<>();
-  private Thread updateFilesThread;
+  private transient Thread updateFilesThread;
   private transient SampleService service;
   private transient AppConfiguration configuration;
 

@@ -101,7 +101,7 @@ public class AddDatasetFilesDialog extends Dialog
   private Map<File, Checkbox> overwriteFields = new HashMap<>();
   private Dataset dataset;
   private Set<String> existingFilenames = new HashSet<>();
-  private Thread updateFilesThread;
+  private transient Thread updateFilesThread;
   private transient DatasetService service;
   private transient AppConfiguration configuration;
 

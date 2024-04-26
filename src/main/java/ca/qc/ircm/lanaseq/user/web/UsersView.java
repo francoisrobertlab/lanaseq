@@ -101,7 +101,7 @@ public class UsersView extends VerticalLayout
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button switchUser = new Button();
-  protected ObjectFactory<UserDialog> dialogFactory;
+  protected transient ObjectFactory<UserDialog> dialogFactory;
   private WebUserFilter filter = new WebUserFilter();
   private Map<User, Button> actives = new HashMap<>();
   private transient UserService service;

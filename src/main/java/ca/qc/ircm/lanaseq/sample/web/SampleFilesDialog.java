@@ -118,7 +118,7 @@ public class SampleFilesDialog extends Dialog
   protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
-  protected ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
+  protected transient ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
   private Sample sample;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
   private transient SampleService service;
