@@ -47,7 +47,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.security.web.authentication.switchuser.AuthenticationSwitchUserEvent;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 /**
  * Switch user service.
@@ -70,7 +69,6 @@ public class SwitchUserService {
   @Autowired
   public SwitchUserService(UserDetailsService userDetailsService,
       ApplicationEventPublisher eventPublisher) {
-    this.userDetailsChecker = userDetailsChecker;
     this.userDetailsService = userDetailsService;
     this.eventPublisher = eventPublisher;
   }
@@ -192,12 +190,14 @@ public class SwitchUserService {
   }
 
   public void setUserDetailsChecker(UserDetailsChecker userDetailsChecker) {
+    Objects.requireNonNull(userDetailsChecker, "userDetailsChecker parameter cannot be null");
     this.userDetailsChecker = userDetailsChecker;
   }
 
   public void setAuthenticationDetailsSource(
       AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
-    Assert.notNull(authenticationDetailsSource, "AuthenticationDetailsSource required");
+    Objects.requireNonNull(userDetailsChecker,
+        "authenticationDetailsSource parameter cannot be null");
     this.authenticationDetailsSource = authenticationDetailsSource;
   }
 }
