@@ -19,49 +19,12 @@ package ca.qc.ircm.lanaseq.security;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 /**
  * Security configuration.
  */
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
-@EnableMethodSecurity(securedEnabled = true)
-public class SecurityConfiguration {
+public record SecurityConfiguration(int lockAttemps, Duration lockDuration, int disableSignAttemps,
+    String rememberMeKey) {
   public static final String PREFIX = "security";
-  private int lockAttemps;
-  private Duration lockDuration;
-  private int disableSignAttemps;
-  private String rememberMeKey;
-
-  public int getLockAttemps() {
-    return lockAttemps;
-  }
-
-  public void setLockAttemps(int lockAttemps) {
-    this.lockAttemps = lockAttemps;
-  }
-
-  public Duration getLockDuration() {
-    return lockDuration;
-  }
-
-  public void setLockDuration(Duration lockDuration) {
-    this.lockDuration = lockDuration;
-  }
-
-  public int getDisableSignAttemps() {
-    return disableSignAttemps;
-  }
-
-  public void setDisableSignAttemps(int disableSignAttemps) {
-    this.disableSignAttemps = disableSignAttemps;
-  }
-
-  public String getRememberMeKey() {
-    return rememberMeKey;
-  }
-
-  public void setRememberMeKey(String rememberMeKey) {
-    this.rememberMeKey = rememberMeKey;
-  }
 }

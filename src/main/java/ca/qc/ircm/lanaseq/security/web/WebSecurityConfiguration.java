@@ -35,6 +35,7 @@ import org.springframework.security.access.expression.method.DefaultMethodSecuri
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -49,8 +50,9 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 /**
  * Security configuration.
  */
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class WebSecurityConfiguration extends VaadinWebSecurity {
   public static final String SIGNIN_PROCESSING_URL = "/" + SigninView.VIEW_NAME;
   private static final String SIGNIN_DEFAULT_FAILURE_URL =
@@ -136,7 +138,7 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     http.formLogin(login -> login.failureHandler(authenticationFailureHandler()));
     // Remember me
     http.rememberMe(
-        rememberMe -> rememberMe.alwaysRemember(true).key(configuration.getRememberMeKey()));
+        rememberMe -> rememberMe.alwaysRemember(true).key(configuration.rememberMeKey()));
 
     super.configure(http);
 

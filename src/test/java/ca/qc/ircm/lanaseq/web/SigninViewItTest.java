@@ -102,7 +102,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
       view.getSubmitButton().click();
     }
     assertEquals(new AppResources(SigninView.class, currentLocale()).message(LOCKED,
-        configuration.getLockDuration().getSeconds() / 60), view.getErrorMessage());
+        configuration.lockDuration().getSeconds() / 60), view.getErrorMessage());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
