@@ -86,9 +86,9 @@ public class DatasetsView extends VerticalLayout
   protected Button files = new Button();
   protected Button analyze = new Button();
   protected DatasetGrid datasets;
-  protected transient ObjectFactory<DatasetDialog> dialogFactory;
-  protected transient ObjectFactory<DatasetFilesDialog> filesDialogFactory;
-  protected transient ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory;
+  private transient ObjectFactory<DatasetDialog> dialogFactory;
+  private transient ObjectFactory<DatasetFilesDialog> filesDialogFactory;
+  private transient ObjectFactory<DatasetsAnalysisDialog> analysisDialogFactory;
   private transient DatasetService service;
   private transient SampleService sampleService;
 

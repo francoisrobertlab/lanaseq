@@ -127,10 +127,10 @@ public class DatasetFilesDialog extends Dialog
   protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
-  protected transient ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory;
-  protected transient ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
   private Dataset dataset;
   private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
+  private transient ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory;
+  private transient ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
   private transient DatasetService service;
   private transient SampleService sampleService;
   private transient AuthenticatedUser authenticatedUser;

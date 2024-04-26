@@ -99,9 +99,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected Div error = new Div();
   protected Button add = new Button();
   protected Button history = new Button();
-  protected transient ObjectFactory<ProtocolDialog> dialogFactory;
-  protected transient ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
   private WebProtocolFilter filter = new WebProtocolFilter();
+  private transient ObjectFactory<ProtocolDialog> dialogFactory;
+  private transient ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
   private transient ProtocolService service;
   private transient AuthenticatedUser authenticatedUser;
 
