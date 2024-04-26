@@ -21,7 +21,6 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,8 +29,11 @@ import org.springframework.security.core.userdetails.UserDetails;
  * Implements common methods to use for {@link PermissionEvaluator} implementations.
  */
 public abstract class AbstractPermissionEvaluator implements PermissionEvaluator {
-  @Autowired
   private UserRepository userRepository;
+
+  protected AbstractPermissionEvaluator(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   protected Optional<UserDetails> getUserDetails(Authentication authentication) {
     return Optional.ofNullable(authentication)

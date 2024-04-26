@@ -41,18 +41,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticatedUser {
   private static final Logger logger = LoggerFactory.getLogger(AuthenticatedUser.class);
-  @Autowired
   private UserRepository repository;
-  @Autowired
   private UserDetailsService userDetailsService;
-  @Autowired
   private RoleValidator roleValidator;
-  @Autowired
   private PermissionEvaluator permissionEvaluator;
 
-  protected AuthenticatedUser() {
-  }
-
+  @Autowired
   protected AuthenticatedUser(UserRepository repository, UserDetailsService userDetailsService,
       RoleValidator roleValidator, PermissionEvaluator permissionEvaluator) {
     this.repository = repository;

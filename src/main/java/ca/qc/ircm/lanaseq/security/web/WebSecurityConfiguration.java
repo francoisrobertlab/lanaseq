@@ -59,17 +59,11 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
   private static final String SIGNIN_DISABLED_URL =
       SIGNIN_PROCESSING_URL + "?" + SigninView.DISABLED;
   private static final String PASSWORD_ENCRYPTION = "bcrypt";
-  @Autowired
   private UserDetailsService userDetailsService;
-  @Autowired
   private UserRepository userRepository;
-  @Autowired
   private LdapService ldapService;
-  @Autowired
   private SecurityConfiguration configuration;
-  @Autowired
   private LdapConfiguration ldapConfiguration;
-  @Autowired
   private PermissionEvaluator permissionEvaluator;
 
   /**
@@ -165,5 +159,35 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
   @Override
   public void configure(WebSecurity web) throws Exception {
     super.configure(web);
+  }
+
+  @Autowired
+  public void setUserDetailsService(UserDetailsService userDetailsService) {
+    this.userDetailsService = userDetailsService;
+  }
+
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
+
+  @Autowired
+  public void setLdapService(LdapService ldapService) {
+    this.ldapService = ldapService;
+  }
+
+  @Autowired
+  public void setConfiguration(SecurityConfiguration configuration) {
+    this.configuration = configuration;
+  }
+
+  @Autowired
+  public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
+    this.ldapConfiguration = ldapConfiguration;
+  }
+
+  @Autowired
+  public void setPermissionEvaluator(PermissionEvaluator permissionEvaluator) {
+    this.permissionEvaluator = permissionEvaluator;
   }
 }

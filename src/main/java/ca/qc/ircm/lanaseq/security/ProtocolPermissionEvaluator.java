@@ -25,6 +25,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
@@ -36,10 +37,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
-  @Autowired
   private ProtocolRepository repository;
-  @Autowired
   private RoleValidator roleValidator;
+
+  @Autowired
+  protected ProtocolPermissionEvaluator(UserRepository userRepository,
+      ProtocolRepository repository, RoleValidator roleValidator) {
+    super(userRepository);
+    this.repository = repository;
+    this.roleValidator = roleValidator;
+  }
 
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,

@@ -38,14 +38,21 @@ import org.springframework.stereotype.Component;
 @Primary
 public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   private static Logger logger = LoggerFactory.getLogger(PermissionEvaluatorDelegator.class);
-  @Autowired
   private UserPermissionEvaluator userPermissionEvaluator;
-  @Autowired
   private DatasetPermissionEvaluator datasetPermissionEvaluator;
-  @Autowired
   private ProtocolPermissionEvaluator protocolPermissionEvaluator;
-  @Autowired
   private SamplePermissionEvaluator samplePermissionEvaluator;
+
+  @Autowired
+  protected PermissionEvaluatorDelegator(UserPermissionEvaluator userPermissionEvaluator,
+      DatasetPermissionEvaluator datasetPermissionEvaluator,
+      ProtocolPermissionEvaluator protocolPermissionEvaluator,
+      SamplePermissionEvaluator samplePermissionEvaluator) {
+    this.userPermissionEvaluator = userPermissionEvaluator;
+    this.datasetPermissionEvaluator = datasetPermissionEvaluator;
+    this.protocolPermissionEvaluator = protocolPermissionEvaluator;
+    this.samplePermissionEvaluator = samplePermissionEvaluator;
+  }
 
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,

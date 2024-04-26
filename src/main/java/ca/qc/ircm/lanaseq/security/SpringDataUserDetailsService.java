@@ -39,12 +39,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SpringDataUserDetailsService implements UserDetailsService {
-  @Autowired
   private UserRepository userRepository;
 
-  protected SpringDataUserDetailsService() {
-  }
-
+  @Autowired
   protected SpringDataUserDetailsService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }

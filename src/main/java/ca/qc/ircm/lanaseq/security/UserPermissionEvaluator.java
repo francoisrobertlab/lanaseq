@@ -39,10 +39,16 @@ import org.springframework.stereotype.Component;
 public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(UserPermissionEvaluator.class);
-  @Autowired
   private UserRepository repository;
-  @Autowired
   private RoleValidator roleValidator;
+
+  @Autowired
+  protected UserPermissionEvaluator(UserRepository userRepository, UserRepository repository,
+      RoleValidator roleValidator) {
+    super(userRepository);
+    this.repository = repository;
+    this.roleValidator = roleValidator;
+  }
 
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,

@@ -36,15 +36,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LdapService {
   private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
-  @Autowired
   private LdapTemplate ldapTemplate;
-  @Autowired
   private LdapConfiguration ldapConfiguration;
 
-  protected LdapService() {
-  }
-
-  public LdapService(LdapTemplate ldapTemplate, LdapConfiguration ldapConfiguration) {
+  @Autowired
+  protected LdapService(LdapTemplate ldapTemplate, LdapConfiguration ldapConfiguration) {
     this.ldapTemplate = ldapTemplate;
     this.ldapConfiguration = ldapConfiguration;
   }
