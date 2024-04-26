@@ -82,6 +82,7 @@ mail:
   enabled: true
   from: lanaseq@ircm.qc.ca
   to: christian.poitras@ircm.qc.ca
+  subject: ${spring.application.name}
 
 logging:
   file:

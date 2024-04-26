@@ -68,8 +68,8 @@ public class MailService {
   public MimeMessageHelper textEmail() throws MessagingException {
     MimeMessage message = mailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message);
-    helper.setFrom(mailConfiguration.getFrom());
-    helper.setSubject(mailConfiguration.getSubject());
+    helper.setFrom(mailConfiguration.from());
+    helper.setSubject(mailConfiguration.subject());
     helper.setText("");
     return helper;
   }
@@ -84,8 +84,8 @@ public class MailService {
   public MimeMessageHelper htmlEmail() throws MessagingException {
     MimeMessage message = mailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true);
-    helper.setFrom(mailConfiguration.getFrom());
-    helper.setSubject(mailConfiguration.getSubject());
+    helper.setFrom(mailConfiguration.from());
+    helper.setSubject(mailConfiguration.subject());
     return helper;
   }
 
@@ -98,7 +98,7 @@ public class MailService {
    *           could not send email
    */
   public void send(MimeMessageHelper email) throws MessagingException {
-    if (!mailConfiguration.isEnabled()) {
+    if (!mailConfiguration.enabled()) {
       return;
     }
 
@@ -130,7 +130,7 @@ public class MailService {
    *          error to send
    */
   public void sendError(Throwable error) {
-    if (!mailConfiguration.isEnabled()) {
+    if (!mailConfiguration.enabled()) {
       return;
     }
 
@@ -145,7 +145,7 @@ public class MailService {
     message.append(stringWriter.toString());
     try {
       MimeMessageHelper email = textEmail();
-      email.setTo(mailConfiguration.getTo());
+      email.setTo(mailConfiguration.to());
       email.setText(message.toString());
       send(email);
     } catch (MessagingException e) {
