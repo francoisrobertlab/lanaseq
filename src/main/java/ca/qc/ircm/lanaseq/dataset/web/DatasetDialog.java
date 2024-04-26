@@ -405,6 +405,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       switch (dropLocation) {
         case ABOVE -> samples.getListDataView().addItemBefore(dragged, drop);
         case BELOW -> samples.getListDataView().addItemAfter(dragged, drop);
+        default -> {
+          //Do nothing.
+        }
       }
       updateSamplesFields();
     }
