@@ -66,7 +66,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   protected ConfirmDialog confirm = new ConfirmDialog();
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
-  private List<Sample> samples;
+  private List<Sample> samples = new ArrayList<>();
   private transient AnalysisService service;
   private transient AppConfiguration configuration;
 
@@ -119,7 +119,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
 
   private void updateHeader() {
     final AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
-    if (samples != null && samples.size() > 1) {
+    if (samples.size() > 1) {
       setHeaderTitle(resources.message(HEADER, samples.size()));
     } else {
       setHeaderTitle(resources.message(HEADER, samples.size(),
@@ -173,7 +173,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   }
 
   public void setSamples(List<Sample> samples) {
-    this.samples = samples;
+    this.samples = samples != null ? samples : new ArrayList<>();
     updateHeader();
   }
 }

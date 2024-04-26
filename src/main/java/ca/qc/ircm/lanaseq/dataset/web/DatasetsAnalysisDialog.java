@@ -39,7 +39,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -67,7 +66,7 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
   protected ConfirmDialog confirm = new ConfirmDialog();
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
-  private List<Dataset> datasets;
+  private List<Dataset> datasets = new ArrayList<>();
   private transient AnalysisService service;
   private transient AppConfiguration configuration;
 
@@ -120,8 +119,7 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
 
   private void updateHeader() {
     final AppResources resources = new AppResources(DatasetsAnalysisDialog.class, getLocale());
-    Collection<Dataset> datasets = getDatasets();
-    if (datasets != null && datasets.size() > 1) {
+    if (datasets.size() > 1) {
       setHeaderTitle(resources.message(HEADER, datasets.size()));
     } else {
       setHeaderTitle(resources.message(HEADER, datasets.size(),
@@ -175,7 +173,7 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
   }
 
   public void setDatasets(List<Dataset> datasets) {
-    this.datasets = datasets;
+    this.datasets = datasets != null ? datasets : new ArrayList<>();
     updateHeader();
   }
 }
