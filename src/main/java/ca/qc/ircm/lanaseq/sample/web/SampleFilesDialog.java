@@ -363,8 +363,8 @@ public class SampleFilesDialog extends Dialog
     Objects.requireNonNull(sample);
     Objects.requireNonNull(sample.getId());
     this.sample = sample;
-    boolean readOnly = sample == null || !sample.isEditable()
-        || !authenticatedUser.hasPermission(sample, Permission.WRITE);
+    boolean readOnly =
+        !sample.isEditable() || !authenticatedUser.hasPermission(sample, Permission.WRITE);
     fileBinder.setReadOnly(readOnly);
     delete.setVisible(!readOnly);
     upload.setVisible(!readOnly);

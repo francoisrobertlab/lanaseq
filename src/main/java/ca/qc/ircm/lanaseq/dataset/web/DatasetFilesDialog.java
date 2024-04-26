@@ -405,8 +405,8 @@ public class DatasetFilesDialog extends Dialog
     Objects.requireNonNull(dataset);
     Objects.requireNonNull(dataset.getId());
     this.dataset = dataset;
-    boolean readOnly = dataset == null || !dataset.isEditable()
-        || !authenticatedUser.hasPermission(dataset, Permission.WRITE);
+    boolean readOnly =
+        !dataset.isEditable() || !authenticatedUser.hasPermission(dataset, Permission.WRITE);
     fileBinder.setReadOnly(readOnly);
     delete.setVisible(!readOnly);
     samples.setItems(dataset.getSamples());
