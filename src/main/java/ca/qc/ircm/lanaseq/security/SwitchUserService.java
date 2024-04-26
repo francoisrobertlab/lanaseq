@@ -45,7 +45,6 @@ import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.switchuser.AuthenticationSwitchUserEvent;
-import org.springframework.security.web.authentication.switchuser.SwitchUserAuthorityChanger;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -64,7 +63,6 @@ public class SwitchUserService {
   private String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
   private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource =
       new WebAuthenticationDetailsSource();
-  private SwitchUserAuthorityChanger switchUserAuthorityChanger;
   private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
   private UserDetailsService userDetailsService;
   private ApplicationEventPublisher eventPublisher;
