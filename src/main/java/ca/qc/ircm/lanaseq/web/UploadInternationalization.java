@@ -17,12 +17,8 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.Constants.CANCEL;
-import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.Constants.FRENCH;
 
-import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.Constants;
 import com.vaadin.flow.component.upload.UploadI18N;
 import java.util.Arrays;
 import java.util.Locale;
@@ -52,7 +48,6 @@ public class UploadInternationalization {
    * @return {@link UploadI18N} for English
    */
   public static UploadI18N englishUploadI18N() {
-    final AppResources resources = new AppResources(Constants.class, ENGLISH);
     return new UploadI18N()
         .setAddFiles(new UploadI18N.AddFiles().setOne("Add file...").setMany("Add files..."))
         .setDropFiles(
@@ -64,13 +59,13 @@ public class UploadInternationalization {
             .setError(
                 new UploadI18N.Uploading.Error().setForbidden("You are not allowed to upload files")
                     .setServerUnavailable("The server is unavailable")
-                    .setUnexpectedServerError("An unexpected error occured on server"))
+                    .setUnexpectedServerError("An unexpected error occurred on server"))
             .setRemainingTime(new UploadI18N.Uploading.RemainingTime().setPrefix("Remains: ")
                 .setUnknown("Unknown remaining time"))
             .setStatus(new UploadI18N.Uploading.Status().setConnecting("Connecting...")
                 .setHeld("Waiting...").setProcessing("Uploading...").setStalled("Stalled...")))
-            .setUnits(new UploadI18N.Units()
-                    .setSize(Arrays.asList("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")));
+        .setUnits(new UploadI18N.Units()
+            .setSize(Arrays.asList("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")));
   }
 
   /**
@@ -79,10 +74,9 @@ public class UploadInternationalization {
    * @return {@link UploadI18N} for French
    */
   public static UploadI18N frenchUploadI18N() {
-    final AppResources resources = new AppResources(Constants.class, FRENCH);
     return new UploadI18N()
-        .setAddFiles(new UploadI18N.AddFiles()
-            .setOne("Ajouter un fichier...").setMany("Ajouter fichiers..."))
+        .setAddFiles(new UploadI18N.AddFiles().setOne("Ajouter un fichier...")
+            .setMany("Ajouter fichiers..."))
         .setDropFiles(new UploadI18N.DropFiles().setOne("Déplacer un fichier ici")
             .setMany("Déplacer des fichiers ici"))
         .setError(new UploadI18N.Error().setFileIsTooBig("Le fichier est trop volumineux")
@@ -92,12 +86,12 @@ public class UploadInternationalization {
             .setError(new UploadI18N.Uploading.Error()
                 .setForbidden("Vous n'avez pas la permission de télécharger des fichiers")
                 .setServerUnavailable("Le serveur n'est pas disponible")
-                .setUnexpectedServerError("Erreur inatendu lors du téléchargement"))
+                .setUnexpectedServerError("Erreur inattendu lors du téléchargement"))
             .setRemainingTime(new UploadI18N.Uploading.RemainingTime().setPrefix("Il reste ")
                 .setUnknown("Temps restant inconnu"))
             .setStatus(new UploadI18N.Uploading.Status().setConnecting("Connexion...")
                 .setHeld("En attente...").setProcessing("En cours...").setStalled("Bloqué...")))
-            .setUnits(new UploadI18N.Units()
-                    .setSize(Arrays.asList("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")));
+        .setUnits(new UploadI18N.Units()
+            .setSize(Arrays.asList("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")));
   }
 }
