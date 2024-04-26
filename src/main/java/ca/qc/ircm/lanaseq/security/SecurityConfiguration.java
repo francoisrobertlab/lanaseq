@@ -19,15 +19,11 @@ package ca.qc.ircm.lanaseq.security;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 /**
  * Security configuration.
  */
-@Configuration
-@EnableConfigurationProperties
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {

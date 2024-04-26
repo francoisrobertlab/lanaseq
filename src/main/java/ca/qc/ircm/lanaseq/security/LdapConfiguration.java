@@ -18,14 +18,10 @@
 package ca.qc.ircm.lanaseq.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * LDAP configuration.
  */
-@Configuration
-@EnableConfigurationProperties
 @ConfigurationProperties(prefix = LdapConfiguration.PREFIX)
 public class LdapConfiguration {
   public static final String PREFIX = "ldap";
