@@ -23,42 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * LDAP configuration.
  */
 @ConfigurationProperties(prefix = LdapConfiguration.PREFIX)
-public class LdapConfiguration {
+public record LdapConfiguration(boolean enabled, String idAttribute, String mailAttribute,
+    String objectClass) {
   public static final String PREFIX = "ldap";
-  private boolean enabled;
-  private String idAttribute;
-  private String mailAttribute;
-  private String objectClass;
-
-  public String getIdAttribute() {
-    return idAttribute;
-  }
-
-  public void setIdAttribute(String idAttribute) {
-    this.idAttribute = idAttribute;
-  }
-
-  public String getMailAttribute() {
-    return mailAttribute;
-  }
-
-  public void setMailAttribute(String mailAttribute) {
-    this.mailAttribute = mailAttribute;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public String getObjectClass() {
-    return objectClass;
-  }
-
-  public void setObjectClass(String objectClass) {
-    this.objectClass = objectClass;
-  }
 }

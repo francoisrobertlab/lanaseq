@@ -62,7 +62,7 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
       logger.debug("user {} authenticated successfully", username);
     } catch (BadCredentialsException e) {
       // Try LDAP, if available.
-      if (authentication.getCredentials() != null && ldapConfiguration.isEnabled()
+      if (authentication.getCredentials() != null && ldapConfiguration.enabled()
           && isLdapPasswordValid(userDetails, authentication.getCredentials().toString())) {
         // User is valid.
         resetSignAttemps(user);

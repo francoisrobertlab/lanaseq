@@ -56,7 +56,7 @@ public class LdapService {
    */
   public boolean isPasswordValid(String username, String password) {
     try {
-      LdapQuery query = query().where(ldapConfiguration.getIdAttribute()).is(username);
+      LdapQuery query = query().where(ldapConfiguration.idAttribute()).is(username);
       ldapTemplate.authenticate(query, password);
       logger.debug("Valid LDAP password for user [{}]", username);
       return true;
@@ -74,14 +74,14 @@ public class LdapService {
    * @return user's email from LDAP or null if user does not exists
    */
   public Optional<String> getEmail(String username) {
-    ContainerCriteria builder = query().attributes(ldapConfiguration.getMailAttribute())
-        .where(ldapConfiguration.getIdAttribute()).is(username);
-    if (ldapConfiguration.getObjectClass() != null) {
-      builder = builder.and("objectclass").is(ldapConfiguration.getObjectClass());
+    ContainerCriteria builder = query().attributes(ldapConfiguration.mailAttribute())
+        .where(ldapConfiguration.idAttribute()).is(username);
+    if (ldapConfiguration.objectClass() != null) {
+      builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
     }
     LdapQuery query = builder;
     AttributesMapper<String> mapper =
-        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getMailAttribute())).map(attr -> {
+        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.mailAttribute())).map(attr -> {
           try {
             return attr.get();
           } catch (NamingException e) {
@@ -102,14 +102,14 @@ public class LdapService {
    * @return user's username on LDAP or null if user does not exists
    */
   public Optional<String> getUsername(String email) {
-    ContainerCriteria builder = query().attributes(ldapConfiguration.getIdAttribute())
-        .where(ldapConfiguration.getMailAttribute()).is(email);
-    if (ldapConfiguration.getObjectClass() != null) {
-      builder = builder.and("objectclass").is(ldapConfiguration.getObjectClass());
+    ContainerCriteria builder = query().attributes(ldapConfiguration.idAttribute())
+        .where(ldapConfiguration.mailAttribute()).is(email);
+    if (ldapConfiguration.objectClass() != null) {
+      builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
     }
     LdapQuery query = builder;
     AttributesMapper<String> mapper =
-        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.getIdAttribute())).map(attr -> {
+        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.idAttribute())).map(attr -> {
           try {
             return attr.get();
           } catch (NamingException e) {

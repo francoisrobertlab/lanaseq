@@ -98,7 +98,7 @@ public class DaoAuthenticationProviderWithLdapTest {
 
   @Test
   public void authenticate_LdapSuccess() throws Throwable {
-    when(ldapConfiguration.isEnabled()).thenReturn(true);
+    when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.of("frobert"));
     when(ldapService.isPasswordValid(any(), any())).thenReturn(true);
 
@@ -116,7 +116,7 @@ public class DaoAuthenticationProviderWithLdapTest {
 
   @Test
   public void authenticate_LdapFail() throws Throwable {
-    when(ldapConfiguration.isEnabled()).thenReturn(true);
+    when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.of("frobert"));
 
     Authentication authentication =
@@ -138,7 +138,7 @@ public class DaoAuthenticationProviderWithLdapTest {
 
   @Test
   public void authenticate_LdapFailPasswordEncoderSuccess() throws Throwable {
-    when(ldapConfiguration.isEnabled()).thenReturn(true);
+    when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.of("frobert"));
 
     Authentication authentication =
@@ -153,7 +153,7 @@ public class DaoAuthenticationProviderWithLdapTest {
 
   @Test
   public void authenticate_NotAnLdapUser() throws Throwable {
-    when(ldapConfiguration.isEnabled()).thenReturn(true);
+    when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.empty());
 
     Authentication authentication =
