@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.dataset;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
+import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -27,6 +28,7 @@ import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -50,6 +52,9 @@ import java.util.Set;
  */
 @Entity
 @GeneratePropertyNames
+@SuppressFBWarnings(
+    value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
+    justification = ENTITY_EI_EXPOSE_REP)
 public class Dataset implements DataWithFiles, Owned, Serializable {
   public static final String NAME_ALREADY_EXISTS = property(DatasetProperties.NAME, ALREADY_EXISTS);
   private static final long serialVersionUID = -8296884268335212959L;
