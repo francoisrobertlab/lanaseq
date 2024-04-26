@@ -110,32 +110,16 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
     userRepository.save(user);
   }
 
-  public UserRepository getUserRepository() {
-    return userRepository;
-  }
-
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
-  }
-
-  public LdapService getLdapService() {
-    return ldapService;
   }
 
   public void setLdapService(LdapService ldapService) {
     this.ldapService = ldapService;
   }
 
-  public LdapConfiguration getLdapConfiguration() {
-    return ldapConfiguration;
-  }
-
   public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
     this.ldapConfiguration = ldapConfiguration;
-  }
-
-  public SecurityConfiguration getSecurityConfiguration() {
-    return securityConfiguration;
   }
 
   public void setSecurityConfiguration(SecurityConfiguration securityConfiguration) {
