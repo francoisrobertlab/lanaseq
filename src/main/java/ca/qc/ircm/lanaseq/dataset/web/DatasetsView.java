@@ -192,7 +192,7 @@ public class DatasetsView extends VerticalLayout
 
   void viewFiles(Dataset dataset) {
     DatasetFilesDialog filesDialog = filesDialogFactory.getObject();
-    filesDialog.setDataset(dataset);
+    filesDialog.setDatasetId(dataset.getId());
     filesDialog.open();
   }
 

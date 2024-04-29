@@ -90,7 +90,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Captor
   private ArgumentCaptor<List<Sample>> samplesCaptor;
   @Autowired
-  private DatasetRepository datasetRepository;
+  private DatasetRepository repository;
   @Autowired
   private EntityManager entityManager;
   private Locale locale = Locale.ENGLISH;
@@ -104,7 +104,9 @@ public class DatasetsViewTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
-    datasets = datasetRepository.findAll();
+    when(service.get(any())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    datasets = repository.findAll();
     when(service.all(any())).thenReturn(datasets);
     UI.getCurrent().setLocale(locale);
     view = navigate(DatasetsView.class);
@@ -200,7 +202,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
 
     DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
-    assertEquals(dataset, dialog.getDataset());
+    assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
   @Test
@@ -211,7 +213,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
 
     DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
-    assertEquals(dataset, dialog.getDataset());
+    assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
   @Test
@@ -402,7 +404,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     assertFalse(view.error.isVisible());
     DatasetFilesDialog dialog = $(DatasetFilesDialog.class).first();
-    assertEquals(dataset, dialog.getDataset());
+    assertEquals(dataset.getId(), dialog.getDatasetId());
   }
 
   @Test

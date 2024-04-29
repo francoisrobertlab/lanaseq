@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -137,7 +138,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() throws Throwable {
-    UI.getCurrent().setLocale(locale);
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     files.add(temporaryFolder.resolve("dataset_R1.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset_R2.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset.bw").toFile());
@@ -160,6 +161,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     when(service.files(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
+    UI.getCurrent().setLocale(locale);
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
     test(view.datasets).clickRow(1, new MetaKeys().ctrl());
