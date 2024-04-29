@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.LdapOperations;
 import org.springframework.ldap.query.ContainerCriteria;
 import org.springframework.ldap.query.LdapQuery;
 import org.springframework.stereotype.Component;
@@ -36,12 +36,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class LdapService {
   private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
-  private LdapTemplate ldapTemplate;
+  private LdapOperations ldapOperations;
   private LdapConfiguration ldapConfiguration;
 
   @Autowired
-  protected LdapService(LdapTemplate ldapTemplate, LdapConfiguration ldapConfiguration) {
-    this.ldapTemplate = ldapTemplate;
+  protected LdapService(LdapOperations ldapOperations, LdapConfiguration ldapConfiguration) {
+    this.ldapOperations = ldapOperations;
     this.ldapConfiguration = ldapConfiguration;
   }
 
@@ -57,7 +57,7 @@ public class LdapService {
   public boolean isPasswordValid(String username, String password) {
     try {
       LdapQuery query = query().where(ldapConfiguration.idAttribute()).is(username);
-      ldapTemplate.authenticate(query, password);
+      ldapOperations.authenticate(query, password);
       logger.debug("Valid LDAP password for user [{}]", username);
       return true;
     } catch (Exception e) {
@@ -89,7 +89,7 @@ public class LdapService {
           }
         }).map(value -> value.toString()).orElse(null);
     Optional<String> email =
-        ldapTemplate.search(query, mapper).stream().filter(value -> value != null).findFirst();
+        ldapOperations.search(query, mapper).stream().filter(value -> value != null).findFirst();
     logger.debug("Found LDAP email {} for user [{}]", email, username);
     return email;
   }
@@ -117,7 +117,7 @@ public class LdapService {
           }
         }).map(value -> value.toString()).orElse(null);
     Optional<String> username =
-        ldapTemplate.search(query, mapper).stream().filter(value -> value != null).findFirst();
+        ldapOperations.search(query, mapper).stream().filter(value -> value != null).findFirst();
     logger.debug("Found LDAP username {} for user [{}]", username, email);
     return username;
   }
