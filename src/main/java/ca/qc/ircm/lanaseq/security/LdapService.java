@@ -17,8 +17,10 @@
 
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.FindbugsExplanations.SPRING_BOOT_EI_EXPOSE_REP;
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import javax.naming.NamingException;
 import org.slf4j.Logger;
@@ -40,6 +42,7 @@ public class LdapService {
   private LdapConfiguration ldapConfiguration;
 
   @Autowired
+  @SuppressFBWarnings(value = { "EI_EXPOSE_REP2" }, justification = SPRING_BOOT_EI_EXPOSE_REP)
   protected LdapService(LdapOperations ldapOperations, LdapConfiguration ldapConfiguration) {
     this.ldapOperations = ldapOperations;
     this.ldapConfiguration = ldapConfiguration;
