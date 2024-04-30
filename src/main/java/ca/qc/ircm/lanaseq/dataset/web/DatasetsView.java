@@ -207,7 +207,8 @@ public class DatasetsView extends VerticalLayout
     this.error.setVisible(error);
     if (!error) {
       DatasetsAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
-      analysisDialog.setDatasets(datasets);
+      analysisDialog
+          .setDatasetIds(datasets.stream().map(Dataset::getId).collect(Collectors.toList()));
       analysisDialog.open();
     }
   }

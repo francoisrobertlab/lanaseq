@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -437,9 +438,9 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     assertFalse(view.error.isVisible());
     DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
-    List<Dataset> datasets = dialog.getDatasets();
-    assertEquals(1, datasets.size());
-    assertTrue(datasets.contains(dataset));
+    List<Long> datasetIds = dialog.getDatasetIds();
+    assertEquals(1, datasetIds.size());
+    assertTrue(datasetIds.contains(dataset.getId()));
   }
 
   @Test
@@ -451,10 +452,10 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     assertFalse(view.error.isVisible());
     DatasetsAnalysisDialog dialog = $(DatasetsAnalysisDialog.class).first();
-    List<Dataset> datasets = dialog.getDatasets();
-    assertEquals(2, datasets.size());
-    assertTrue(datasets.contains(datasets.get(0)));
-    assertTrue(datasets.contains(datasets.get(1)));
+    List<Long> datasetIds = dialog.getDatasetIds();
+    assertEquals(2, datasetIds.size());
+    assertTrue(datasetIds.contains(datasets.get(0).getId()));
+    assertTrue(datasetIds.contains(datasets.get(1).getId()));
   }
 
   @Test

@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
@@ -47,6 +48,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
@@ -60,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,7 +80,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   private DatasetsAnalysisDialog dialog;
   @MockBean
-  private AnalysisService service;
+  private DatasetService service;
+  @MockBean
+  private AnalysisService analysisService;
   @MockBean
   private AppConfiguration configuration;
   @Autowired
@@ -91,6 +96,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     datasets.add(repository.findById(6L).get());
     datasets.add(repository.findById(7L).get());
@@ -146,7 +153,7 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   @Test
   public void validate_Success() {
     dialog.validate();
-    verify(service, atLeastOnce()).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService, atLeastOnce()).validateDatasets(eq(datasets), eq(locale), any());
     assertEquals(0, dialog.errorsLayout.getComponentCount());
     assertFalse(dialog.errors.isOpened());
     assertFalse($(ConfirmDialog.class).exists());
@@ -160,9 +167,9 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
       errorHandler.accept("error1");
       errorHandler.accept("error2");
       return null;
-    }).when(service).validateDatasets(any(Collection.class), any(), any());
+    }).when(analysisService).validateDatasets(any(Collection.class), any(), any());
     dialog.validate();
-    verify(service, atLeastOnce()).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService, atLeastOnce()).validateDatasets(eq(datasets), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
     assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
@@ -177,10 +184,10 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void validate_OnOpen() {
-    verify(service, times(1)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService, times(1)).validateDatasets(eq(datasets), eq(locale), any());
     dialog.close();
     dialog.open();
-    verify(service, times(2)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService, times(2)).validateDatasets(eq(datasets), eq(locale), any());
   }
 
   @Test
@@ -189,8 +196,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
     String folder = "test/dataset";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
-    verify(service).copyDatasetsResources(datasets);
+    verify(analysisService, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService).copyDatasetsResources(datasets);
     verify(configuration.getAnalysis()).label(datasets, false);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -205,8 +212,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
     String folder = "test/dataset";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
-    verify(service).copyDatasetsResources(datasets);
+    verify(analysisService, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService).copyDatasetsResources(datasets);
     verify(configuration.getAnalysis()).label(datasets, true);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -221,8 +228,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
     String folder = "test/dataset";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
-    verify(service).copyDatasetsResources(datasets);
+    verify(analysisService, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService).copyDatasetsResources(datasets);
     verify(configuration.getAnalysis()).label(datasets, true);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -233,10 +240,11 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createFolder_IoException() throws Throwable {
-    doThrow(new IOException("test")).when(service).copyDatasetsResources(any(Collection.class));
+    doThrow(new IOException("test")).when(analysisService)
+        .copyDatasetsResources(any(Collection.class));
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
-    verify(service).copyDatasetsResources(datasets);
+    verify(analysisService, atLeast(2)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService).copyDatasetsResources(datasets);
     assertFalse(dialog.confirm.isOpened());
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
@@ -248,7 +256,7 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createFolder_IllegalArgumentException() throws Throwable {
-    doThrow(new IllegalArgumentException("test")).when(service)
+    doThrow(new IllegalArgumentException("test")).when(analysisService)
         .copyDatasetsResources(any(Collection.class));
     doAnswer(new Answer<Void>() {
       private int calls = 0;
@@ -262,10 +270,10 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
         }
         return null;
       }
-    }).when(service).validateDatasets(any(Collection.class), any(), any());
+    }).when(analysisService).validateDatasets(any(Collection.class), any(), any());
     dialog.createFolder.click();
-    verify(service, atLeast(3)).validateDatasets(eq(datasets), eq(locale), any());
-    verify(service).copyDatasetsResources(datasets);
+    verify(analysisService, atLeast(3)).validateDatasets(eq(datasets), eq(locale), any());
+    verify(analysisService).copyDatasetsResources(datasets);
     assertFalse(dialog.confirm.isOpened());
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
@@ -287,30 +295,30 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void getDatasets() {
-    List<Dataset> datasets = dialog.getDatasets();
-    assertEquals(this.datasets.size(), datasets.size());
+  public void getDatasetIds() {
+    List<Long> datasetIds = dialog.getDatasetIds();
+    assertEquals(this.datasets.size(), datasetIds.size());
     for (Dataset dataset : this.datasets) {
-      assertTrue(datasets.contains(dataset));
+      assertTrue(datasetIds.contains(dataset.getId()));
     }
   }
 
   @Test
-  public void setDataset() {
+  public void setDatasetId() {
     Dataset dataset = repository.findById(6L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(6L);
     assertEquals(resources.message(SamplesAnalysisDialog.HEADER, 1, dataset.getName()),
         dialog.getHeaderTitle());
   }
 
   @Test
-  public void setDatasets() {
-    List<Dataset> datasets = new ArrayList<>();
-    datasets.add(repository.findById(2L).get());
-    datasets.add(repository.findById(6L).get());
-    datasets.add(repository.findById(7L).get());
-    dialog.setDatasets(datasets);
-    assertEquals(resources.message(SamplesAnalysisDialog.HEADER, datasets.size()),
+  public void setDatasetIds() {
+    List<Long> ids = new ArrayList<>();
+    ids.add(2L);
+    ids.add(6L);
+    ids.add(7L);
+    dialog.setDatasetIds(ids);
+    assertEquals(resources.message(SamplesAnalysisDialog.HEADER, ids.size()),
         dialog.getHeaderTitle());
   }
 }
