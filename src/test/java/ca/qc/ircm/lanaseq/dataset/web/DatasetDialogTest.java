@@ -226,8 +226,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER, 1, dialog.getDataset().getName()),
-        dialog.getHeaderTitle());
+    Dataset dataset = service.get(2L).get();
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(NAME_PREFIX), dialog.namePrefix.getLabel());
     assertEquals(resources.message(GENERATE_NAME), dialog.generateName.getText());
     assertEquals(datasetResources.message(TAGS), dialog.tags.getLabel());
@@ -259,14 +259,14 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   @Test
   public void localeChange() {
+    Dataset dataset = service.get(2L).get();
     Locale locale = Locale.FRENCH;
     final AppResources resources = new AppResources(DatasetDialog.class, locale);
     final AppResources datasetResources = new AppResources(Dataset.class, locale);
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER, 1, dialog.getDataset().getName()),
-        dialog.getHeaderTitle());
+    assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(NAME_PREFIX), dialog.namePrefix.getLabel());
     assertEquals(resources.message(GENERATE_NAME), dialog.generateName.getText());
     assertEquals(datasetResources.message(TAGS), dialog.tags.getLabel());
@@ -314,7 +314,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.sampleRemove.isSortable());
     assertTrue(dialog.samples.getSelectionModel() instanceof GridNoneSelectionModel);
     assertTrue(dialog.samples.isRowsDraggable());
-    Dataset dataset = dialog.getDataset();
+    Dataset dataset = service.get(2L).get();
     assertEquals(dataset.getSamples().size(), dialog.samples.getListDataView().getItemCount());
     for (Sample sample : dataset.getSamples()) {
       assertTrue(dialog.samples.getListDataView().contains(sample));
@@ -354,7 +354,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.strain.setValue("yFR101, yBC201");
     dialog.strainDescription.setValue("G24D, WT");
     dialog.treatment.setValue("1, 2");
-    Sample sample = dialog.getDataset().getSamples().get(0);
+    Dataset dataset = service.get(2L).get();
+    Sample sample = dataset.getSamples().get(0);
     ComponentRenderer<Button, Sample> buttonRenderer =
         (ComponentRenderer<Button, Sample>) dialog.sampleRemove.getRenderer();
     Button button = buttonRenderer.createComponent(sample);
@@ -478,45 +479,15 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void getDataset() {
-    assertEquals(2L, dialog.getDataset().getId());
+  public void getDatasetId() {
+    assertEquals(2L, dialog.getDatasetId());
   }
 
   @Test
-  public void setDataset_NewDataset() {
-    Dataset dataset = new Dataset();
-
-    dialog.setDataset(dataset);
-
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
-    assertEquals("", dialog.namePrefix.getValue());
-    assertFalse(dialog.namePrefix.isReadOnly());
-    assertTrue(dialog.generateName.isVisible());
-    assertFalse(dialog.tags.isReadOnly());
-    assertTrue(dialog.protocol.isReadOnly());
-    assertTrue(dialog.assay.isReadOnly());
-    assertTrue(dialog.type.isReadOnly());
-    assertTrue(dialog.target.isReadOnly());
-    assertTrue(dialog.strain.isReadOnly());
-    assertTrue(dialog.strainDescription.isReadOnly());
-    assertTrue(dialog.treatment.isReadOnly());
-    assertTrue(LocalDate.now().isEqual(dialog.date.getValue()));
-    assertFalse(dialog.date.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertEquals(0, dialog.samples.getListDataView().getItemCount());
-    assertTrue(dialog.sampleRemove.isVisible());
-    assertTrue(dialog.addSample.isVisible());
-    assertTrue(dialog.save.isVisible());
-    assertTrue(dialog.cancel.isVisible());
-    assertTrue(dialog.delete.isVisible());
-  }
-
-  @Test
-  public void setDataset_Dataset() {
+  public void setDatasetId_Dataset() {
     Dataset dataset = repository.findById(2L).get();
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(2L);
 
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -550,19 +521,19 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setDataset_NoPrefix() {
+  public void setDatasetId_NoPrefix() {
     Dataset dataset = repository.findById(3L).get();
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(3L);
 
     assertEquals("", dialog.namePrefix.getValue());
   }
 
   @Test
-  public void setDataset_CannotWrite() {
+  public void setDatasetId_CannotWrite() {
     Dataset dataset = repository.findById(4L).get();
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(4L);
 
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -597,10 +568,10 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void setDataset_NotEditable() {
+  public void setDatasetId_NotEditable() {
     Dataset dataset = repository.findById(5L).get();
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(5L);
 
     assertEquals(resources.message(HEADER, 1, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -633,14 +604,14 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setDataset_SampleWithDifferentFields() {
+  public void setDatasetId_SampleWithDifferentFields() {
     Dataset dataset = repository.findById(1L).get();
     Sample sample = sampleRepository.findById(4L).get();
     sample.setType(SampleType.INPUT);
     sample.setTreatment("Heat shock");
     dataset.getSamples().add(sample);
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     assertEquals("FLAG, Histone FLAG", dialog.protocol.getValue());
     assertEquals("MNase-seq" + ", " + "ChIP-seq", dialog.assay.getValue());
@@ -653,7 +624,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setDataset_SampleWithEmtpyFields() {
+  public void setDatasetId_SampleWithEmtpyFields() {
     Dataset dataset = repository.findById(1L).get();
     Sample sample = dataset.getSamples().get(0);
     sample.setProtocol(null);
@@ -664,7 +635,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     sample.setStrainDescription(null);
     sample.setTreatment(null);
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     assertEquals("FLAG", dialog.protocol.getValue());
     assertEquals("MNase-seq", dialog.assay.getValue());
@@ -676,8 +647,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setDataset_Null() {
-    dialog.setDataset(null);
+  public void setDatasetId_Null() {
+    dialog.setDatasetId(null);
 
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals("", dialog.namePrefix.getValue());
@@ -905,10 +876,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NameExists() {
     dialog.addSavedListener(savedListener);
-    Dataset dataset = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(repository.findById(1L));
-    dialog.setDataset(dataset);
+    when(service.get(any())).thenReturn(repository.findById(2L), repository.findById(1L));
+    dialog.setDatasetId(2L);
 
     clickButton(dialog.save);
 
@@ -925,7 +895,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     Dataset dataset = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
     when(service.get(any())).thenReturn(Optional.of(dataset));
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(2L);
 
     clickButton(dialog.save);
 
@@ -941,7 +911,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NewDataset() {
     dialog.addSavedListener(savedListener);
-    dialog.setDataset(new Dataset());
+    dialog.setDatasetId(null);
     fillForm();
 
     clickButton(dialog.save);
@@ -965,7 +935,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void save_UpdateDataset() {
     dialog.addSavedListener(savedListener);
     Dataset dataset = repository.findById(2L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(2L);
     fillForm();
 
     clickButton(dialog.save);
@@ -1028,7 +998,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void delete_Confirm() {
     dialog.addDeletedListener(deletedListener);
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     clickButton(dialog.delete);
 
@@ -1046,7 +1016,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void delete_Cancel() {
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     clickButton(dialog.delete);
 

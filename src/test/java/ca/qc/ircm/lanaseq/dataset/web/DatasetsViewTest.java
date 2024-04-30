@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -165,7 +164,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     doubleClickItem(view.datasets, dataset);
 
     DatasetDialog dialog = $(DatasetDialog.class).first();
-    assertEquals(dataset, dialog.getDataset());
+    assertEquals(dataset.getId(), dialog.getDatasetId());
     verify(service).get(dataset.getId());
   }
 
@@ -225,7 +224,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     fireEvent(view.datasets, new EditEvent<>(view.datasets, false, dataset));
 
     DatasetDialog dialog = $(DatasetDialog.class).first();
-    assertEquals(dataset, dialog.getDataset());
+    assertEquals(dataset.getId(), dialog.getDatasetId());
     verify(service).get(dataset.getId());
   }
 

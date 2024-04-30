@@ -166,7 +166,7 @@ public class DatasetsView extends VerticalLayout
   void view(Dataset dataset) {
     clearError();
     DatasetDialog dialog = dialogFactory.getObject();
-    dialog.setDataset(service.get(dataset.getId()).orElse(null));
+    dialog.setDatasetId(dataset.getId());
     dialog.addSavedListener(e -> datasets.refreshDatasets());
     dialog.addDeletedListener(e -> datasets.refreshDatasets());
     dialog.open();
