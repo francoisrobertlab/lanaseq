@@ -285,7 +285,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
       functions(editRenderer).get("edit").accept(sample, null);
       verify(service).get(sample.getId());
       SampleDialog sampleDialog = $(SampleDialog.class).first();
-      assertEquals(sample, sampleDialog.getSample());
+      assertEquals(sample.getId(), sampleDialog.getSampleId());
       sampleDialog.close();
     }
   }
@@ -347,7 +347,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     verify(service).get(sample.getId());
     SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -490,7 +490,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertNull(dialog.getSample().getId());
+    assertNull(dialog.getSampleId());
   }
 
   @Test
