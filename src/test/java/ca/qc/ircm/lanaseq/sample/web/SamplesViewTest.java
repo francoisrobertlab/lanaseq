@@ -52,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -127,6 +128,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     samples = repository.findAll();
     when(service.all(any())).thenReturn(samples);
     UI.getCurrent().setLocale(locale);
@@ -384,7 +387,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -395,7 +398,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -621,7 +624,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertFalse(view.error.isVisible());
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test

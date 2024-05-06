@@ -269,7 +269,7 @@ public class SamplesView extends VerticalLayout
 
   void viewFiles(Sample sample) {
     SampleFilesDialog filesDialog = filesDialogFactory.getObject();
-    filesDialog.setSample(sample);
+    filesDialog.setSampleId(sample.getId());
     filesDialog.open();
   }
 

@@ -72,7 +72,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -196,7 +195,7 @@ public class SampleFilesDialog extends Dialog
   }
 
   private String shortFilename(String filename) {
-    String name = Optional.ofNullable(getSample()).map(Sample::getName).orElse("");
+    String name = Optional.ofNullable(sample).map(Sample::getName).orElse("");
     if (name.length() > 20 && filename.contains(name)) {
       String start = name.substring(0, 11);
       String end = name.substring(name.length() - 9);
@@ -260,7 +259,6 @@ public class SampleFilesDialog extends Dialog
 
   private void updateHeader() {
     final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
-    Sample sample = getSample();
     if (sample != null && sample.getName() != null) {
       setHeaderTitle(resources.message(HEADER, sample.getName()));
     } else {
@@ -355,14 +353,12 @@ public class SampleFilesDialog extends Dialog
     return fileBinder.validate();
   }
 
-  public Sample getSample() {
-    return sample;
+  public Long getSampleId() {
+    return sample.getId();
   }
 
-  public void setSample(Sample sample) {
-    Objects.requireNonNull(sample);
-    Objects.requireNonNull(sample.getId());
-    this.sample = sample;
+  public void setSampleId(Long id) {
+    sample = service.get(id).orElseThrow();
     boolean readOnly =
         !sample.isEditable() || !authenticatedUser.hasPermission(sample, Permission.WRITE);
     fileBinder.setReadOnly(readOnly);

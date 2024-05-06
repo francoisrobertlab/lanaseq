@@ -322,7 +322,7 @@ public class DatasetFilesDialog extends Dialog
 
   void viewFiles(Sample sample) {
     SampleFilesDialog sampleFilesDialog = sampleFilesDialogFactory.getObject();
-    sampleFilesDialog.setSample(sample);
+    sampleFilesDialog.setSampleId(sample.getId());
     sampleFilesDialog.open();
     sampleFilesDialog.addOpenedChangeListener(e -> {
       if (!e.isOpened()) {

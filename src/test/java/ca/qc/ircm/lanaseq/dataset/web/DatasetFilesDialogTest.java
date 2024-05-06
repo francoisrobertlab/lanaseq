@@ -174,6 +174,9 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   public void beforeTest() {
     when(service.get(anyLong())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(sampleService.get(anyLong()))
+        .then(i -> i.getArgument(0) != null ? sampleRepository.findById(i.getArgument(0))
+            : Optional.empty());
     Dataset defaultDataset = repository.findById(2L).get();
     files.add(
         new File(defaultDataset.getName(), "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022_R1.fastq"));
@@ -599,7 +602,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Sample sample = dataset.getSamples().get(0);
     doubleClickItem(dialog.samples, sample);
     SampleFilesDialog sampleFilesDialog = $(SampleFilesDialog.class).first();
-    assertEquals(sample, sampleFilesDialog.getSample());
+    assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
   }
 
   @Test
@@ -608,7 +611,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Sample sample = dataset.getSamples().get(0);
     doubleClickItem(dialog.samples, sample);
     SampleFilesDialog sampleFilesDialog = $(SampleFilesDialog.class).first();
-    assertEquals(sample, sampleFilesDialog.getSample());
+    assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
     dialog.samples.setItems(mock(DataProvider.class));
     sampleFilesDialog.close();
     verify(dialog.samples.getDataProvider()).refreshAll();
