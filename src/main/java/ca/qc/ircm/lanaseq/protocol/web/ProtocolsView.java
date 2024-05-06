@@ -234,7 +234,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   void history(Protocol protocol) {
     if (authenticatedUser.hasAnyRole(UserRole.MANAGER, UserRole.ADMIN)) {
       ProtocolHistoryDialog historyDialog = historyDialogFactory.getObject();
-      historyDialog.setProtocol(service.get(protocol.getId()).orElse(null));
+      historyDialog.setProtocolId(protocol.getId());
       historyDialog.open();
     }
   }

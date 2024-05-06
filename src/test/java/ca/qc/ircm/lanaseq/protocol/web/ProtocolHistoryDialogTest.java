@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -124,8 +125,8 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER, dialog.getProtocol().getName()),
-        dialog.getHeaderTitle());
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
     assertEquals(protocolFileResources.message(FILENAME),
         headerRow.getCell(dialog.filename).getText());
@@ -138,8 +139,8 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
     final AppResources resources = new AppResources(ProtocolHistoryDialog.class, locale);
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER, dialog.getProtocol().getName()),
-        dialog.getHeaderTitle());
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
     assertEquals(protocolFileResources.message(FILENAME),
         headerRow.getCell(dialog.filename).getText());
@@ -195,25 +196,15 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void getProtocol() {
-    assertEquals(3L, dialog.getProtocol().getId());
+  public void getProtocolId() {
+    assertEquals(3L, dialog.getProtocolId());
   }
 
   @Test
-  public void setProtocol_NewProtocol() {
-    Protocol protocol = new Protocol();
-
-    dialog.setProtocol(protocol);
-
-    assertEquals(resources.message(HEADER, ""), dialog.getHeaderTitle());
-    assertEquals(0, dialog.files.getListDataView().getItemCount());
-  }
-
-  @Test
-  public void setProtocol_Protocol() {
+  public void setProtocolId_Protocol() {
     Protocol protocol = repository.findById(3L).get();
 
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(3L);
 
     assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(1, dialog.files.getListDataView().getItemCount());
@@ -223,7 +214,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   public void setProtocol_NoFiles() {
     Protocol protocol = repository.findById(2L).get();
 
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(2L);
 
     assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(0, dialog.files.getListDataView().getItemCount());
@@ -231,8 +222,8 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocol_Null() {
-    assertThrows(NullPointerException.class, () -> {
-      dialog.setProtocol(null);
+    assertThrows(NoSuchElementException.class, () -> {
+      dialog.setProtocolId(null);
     });
   }
 }
