@@ -310,18 +310,12 @@ public class AddDatasetFilesDialog extends Dialog
     }
   }
 
-  Dataset getDataset() {
-    return dataset;
+  Long getDatasetId() {
+    return dataset.getId();
   }
 
-  void setDataset(Dataset dataset) {
-    if (dataset == null) {
-      throw new NullPointerException("dataset cannot be null");
-    }
-    if (dataset.getId() == null) {
-      throw new IllegalArgumentException("dataset cannot be new");
-    }
-    this.dataset = dataset;
+  void setDatasetId(Long id) {
+    dataset = service.get(id).orElseThrow();
     updateHeader();
     createFolder();
     updateFiles();

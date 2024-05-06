@@ -358,7 +358,7 @@ public class DatasetFilesDialog extends Dialog
 
   void addLargeFiles() {
     AddDatasetFilesDialog addFilesDialog = addFilesDialogFactory.getObject();
-    addFilesDialog.setDataset(dataset);
+    addFilesDialog.setDatasetId(dataset.getId());
     addFilesDialog.addSavedListener(e -> updateFiles());
     addFilesDialog.open();
   }

@@ -172,7 +172,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
-    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     Dataset defaultDataset = repository.findById(2L).get();
     files.add(
         new File(defaultDataset.getName(), "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022_R1.fastq"));
@@ -761,7 +762,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     dialog.addLargeFiles.click();
 
     AddDatasetFilesDialog largeFilesDialog = $(AddDatasetFilesDialog.class).first();
-    assertEquals(dataset, largeFilesDialog.getDataset());
+    assertEquals(dataset.getId(), largeFilesDialog.getDatasetId());
     largeFilesDialog.fireSavedEvent();
     verify(service, atLeast(2)).files(dataset);
   }
