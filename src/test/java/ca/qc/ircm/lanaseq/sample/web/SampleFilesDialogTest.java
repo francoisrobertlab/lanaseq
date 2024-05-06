@@ -55,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
@@ -173,6 +174,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     Sample defaultSample = repository.findById(4L).get();
     files.add(new File(defaultSample.getName(),
         "FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020_R1.fastq"));
@@ -688,7 +691,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     dialog.addLargeFiles.click();
 
     AddSampleFilesDialog largeFilesDialog = $(AddSampleFilesDialog.class).first();
-    assertEquals(sample, largeFilesDialog.getSample());
+    assertEquals(sample.getId(), largeFilesDialog.getSampleId());
     largeFilesDialog.fireSavedEvent();
     verify(service, atLeast(2)).files(sample);
   }

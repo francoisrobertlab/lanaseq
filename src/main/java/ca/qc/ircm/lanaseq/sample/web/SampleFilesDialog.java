@@ -318,7 +318,7 @@ public class SampleFilesDialog extends Dialog
 
   void addLargeFiles() {
     AddSampleFilesDialog addFilesDialog = addFilesDialogFactory.getObject();
-    addFilesDialog.setSample(sample);
+    addFilesDialog.setSampleId(sample.getId());
     addFilesDialog.addSavedListener(e -> updateFiles());
     addFilesDialog.open();
   }
