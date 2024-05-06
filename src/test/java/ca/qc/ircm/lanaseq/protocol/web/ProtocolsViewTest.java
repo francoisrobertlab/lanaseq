@@ -270,7 +270,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
     verify(service).get(protocol.getId());
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertEquals(protocol, dialog.getProtocol());
+    assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }
@@ -284,7 +284,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
     verify(service).get(protocol.getId());
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertEquals(protocol, dialog.getProtocol());
+    assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireDeletedEvent();
     verify(service, times(2)).all();
   }
@@ -314,7 +314,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
     verify(service).get(protocol.getId());
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertEquals(protocol, dialog.getProtocol());
+    assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }
@@ -327,7 +327,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
     verify(service).get(protocol.getId());
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertEquals(protocol, dialog.getProtocol());
+    assertEquals(protocol.getId(), dialog.getProtocolId());
     dialog.fireDeletedEvent();
     verify(service, times(2)).all();
   }
@@ -435,7 +435,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     clickButton(view.add);
 
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertNull(dialog.getProtocol().getId());
+    assertNull(dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }

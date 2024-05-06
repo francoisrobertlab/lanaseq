@@ -182,7 +182,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> delete());
-    setProtocol(null);
+    setProtocolId(null);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {
@@ -356,14 +356,12 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     close();
   }
 
-  Protocol getProtocol() {
-    return binder.getBean();
+  Long getProtocolId() {
+    return binder.getBean().getId();
   }
 
-  void setProtocol(Protocol protocol) {
-    if (protocol == null) {
-      protocol = new Protocol();
-    }
+  void setProtocolId(Long id) {
+    Protocol protocol = id != null ? service.get(id).orElseThrow() : new Protocol();
     binder.setBean(protocol);
     files.setItems(service.files(protocol));
     setReadOnly();

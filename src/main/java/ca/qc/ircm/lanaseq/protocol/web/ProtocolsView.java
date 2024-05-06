@@ -202,12 +202,12 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   }
 
   void edit(Protocol protocol) {
-    showDialog(service.get(protocol.getId()).orElse(null));
+    showDialog(protocol);
   }
 
   private void showDialog(Protocol protocol) {
     ProtocolDialog dialog = dialogFactory.getObject();
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(protocol.getId());
     dialog.addSavedListener(e -> loadProtocols());
     dialog.addDeletedListener(e -> loadProtocols());
     dialog.open();
