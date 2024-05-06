@@ -25,6 +25,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -41,6 +42,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,12 +70,15 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   private List<Sample> samples = new ArrayList<>();
-  private transient AnalysisService service;
+  private transient SampleService service;
+  private transient AnalysisService analysisService;
   private transient AppConfiguration configuration;
 
   @Autowired
-  protected SamplesAnalysisDialog(AnalysisService service, AppConfiguration configuration) {
+  protected SamplesAnalysisDialog(SampleService service, AnalysisService analysisService,
+      AppConfiguration configuration) {
     this.service = service;
+    this.analysisService = analysisService;
     this.configuration = configuration;
   }
 
@@ -129,7 +135,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
 
   boolean validate() {
     List<String> errors = new ArrayList<>();
-    service.validateSamples(samples, getLocale(), error -> errors.add(error));
+    analysisService.validateSamples(samples, getLocale(), error -> errors.add(error));
     if (!errors.isEmpty()) {
       errorsLayout.removeAll();
       errors.forEach(error -> errorsLayout.add(new Span(error)));
@@ -144,7 +150,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
       logger.debug("creating analysis folder for samples {}", samples);
       AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
       try {
-        service.copySamplesResources(samples);
+        analysisService.copySamplesResources(samples);
         boolean unix = getUI().map(ui -> {
           WebBrowser browser = ui.getSession().getBrowser();
           return browser.isMacOSX() || browser.isLinux();
@@ -163,17 +169,19 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     }
   }
 
-  public List<Sample> getSamples() {
-    return samples;
+  public List<Long> getSampleIds() {
+    return samples.stream().map(Sample::getId).collect(Collectors.toList());
   }
 
-  public void setSample(Sample sample) {
-    this.samples = Collections.nCopies(1, sample);
+  public void setSampleId(Long id) {
+    this.samples = Collections.nCopies(1, service.get(id).orElseThrow());
     updateHeader();
   }
 
-  public void setSamples(List<Sample> samples) {
-    this.samples = samples != null ? samples : new ArrayList<>();
+  public void setSampleIds(List<Long> ids) {
+    Objects.requireNonNull(ids, "ids parameter cannot be null");
+    this.samples =
+        ids.stream().map(id -> service.get(id).orElseThrow()).collect(Collectors.toList());
     updateHeader();
   }
 }

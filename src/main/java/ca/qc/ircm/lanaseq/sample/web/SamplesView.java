@@ -302,7 +302,7 @@ public class SamplesView extends VerticalLayout
     this.error.setVisible(error);
     if (!error) {
       SamplesAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
-      analysisDialog.setSamples(samples);
+      analysisDialog.setSampleIds(samples.stream().map(Sample::getId).collect(Collectors.toList()));
       analysisDialog.open();
     }
   }

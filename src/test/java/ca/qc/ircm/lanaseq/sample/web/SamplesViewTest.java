@@ -658,8 +658,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertFalse(view.error.isVisible());
     SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(1, dialog.getSamples().size());
-    assertTrue(dialog.getSamples().contains(sample));
+    assertEquals(1, dialog.getSampleIds().size());
+    assertTrue(dialog.getSampleIds().contains(sample.getId()));
   }
 
   @Test
@@ -681,8 +681,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertFalse(view.error.isVisible());
     SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(2, dialog.getSamples().size());
-    assertTrue(dialog.getSamples().contains(samples.get(0)));
-    assertTrue(dialog.getSamples().contains(samples.get(1)));
+    assertEquals(2, dialog.getSampleIds().size());
+    assertTrue(dialog.getSampleIds().contains(samples.get(0).getId()));
+    assertTrue(dialog.getSampleIds().contains(samples.get(1).getId()));
   }
 }
