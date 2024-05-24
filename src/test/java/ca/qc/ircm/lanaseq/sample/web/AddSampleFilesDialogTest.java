@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -81,6 +82,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,6 +129,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() throws Throwable {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     files.add(temporaryFolder.resolve("sample_R1.fastq").toFile());
     files.add(temporaryFolder.resolve("sample_R2.fastq").toFile());
     files.add(temporaryFolder.resolve("sample.bw").toFile());
@@ -187,7 +192,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @Test
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels() {
-    Sample sample = dialog.getSample();
+    Sample sample = repository.findById(dialog.getSampleId()).get();
     assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
         dialog.message.getText());
@@ -205,7 +210,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    Sample sample = dialog.getSample();
+    Sample sample = repository.findById(dialog.getSampleId()).get();
     assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
         dialog.message.getText());
@@ -318,12 +323,13 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createUploadFolder() {
-    assertTrue(Files.exists(uploadFolder(dialog.getSample())));
+    Sample sample = repository.findById(dialog.getSampleId()).get();
+    assertTrue(Files.exists(uploadFolder(sample)));
   }
 
   @Test
   public void keepUploadFolderOnClose() throws Throwable {
-    Sample sample = dialog.getSample();
+    Sample sample = repository.findById(dialog.getSampleId()).get();
     assertTrue(Files.exists(uploadFolder(sample)));
     Files.createFile(uploadFolder(sample).resolve("test.txt"));
     dialog.close();
@@ -334,7 +340,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void message_Windows() {
     Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, false)),
         dialog.message.getText());
   }
@@ -343,7 +349,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void message_Linux() {
     Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
         dialog.message.getText());
   }
@@ -352,30 +358,21 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void message_Mac() {
     Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
         dialog.message.getText());
   }
 
   @Test
-  public void getSample() {
-    Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
-    assertEquals(sample, dialog.getSample());
+  public void getSampleId() {
+    assertEquals(10L, dialog.getSampleId());
   }
 
   @Test
-  public void setSample_NewSample() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      dialog.setSample(new Sample());
-    });
-  }
-
-  @Test
-  public void setSample_Sample() {
+  public void setSampleId() {
     Sample sample = repository.findById(2L).get();
 
-    dialog.setSample(sample);
+    dialog.setSampleId(2L);
 
     verify(service, atLeastOnce()).uploadFiles(sample);
     List<File> files = items(dialog.files);
@@ -384,9 +381,9 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setSample_Null() {
-    assertThrows(NullPointerException.class, () -> {
-      dialog.setSample(null);
+  public void setSampleId_Null() {
+    assertThrows(NoSuchElementException.class, () -> {
+      dialog.setSampleId(null);
     });
   }
 
@@ -396,7 +393,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
             .collect(Collectors.toList()),
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
-    Sample sample = dialog.getSample();
+    Sample sample = repository.findById(dialog.getSampleId()).get();
 
     dialog.updateFiles();
 
@@ -439,15 +436,13 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void exists_False() {
-    Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
     assertFalse(dialog.exists(files.get(2)));
   }
 
   @Test
   public void exists_True() {
-    Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
     assertTrue(dialog.exists(files.get(1)));
   }
 
@@ -469,7 +464,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   public void save_OverwriteAllowed() {
     dialog.addSavedListener(savedListener);
     dialog.files.getListDataView().getItems().forEach(f -> dialog.overwrite(f));
-    Sample sample = dialog.getSample();
+    Sample sample = repository.findById(dialog.getSampleId()).get();
     dialog.overwriteAll.setValue(true);
 
     dialog.save();
@@ -494,7 +489,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
         .map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     dialog.addSavedListener(savedListener);
     Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
 
     dialog.save();
 
@@ -514,7 +509,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     when(service.uploadFiles(any())).thenReturn(new ArrayList<>());
     dialog.addSavedListener(savedListener);
     Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(1L);
 
     dialog.save();
 

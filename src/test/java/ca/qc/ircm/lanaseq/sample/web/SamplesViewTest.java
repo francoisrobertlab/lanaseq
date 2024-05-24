@@ -52,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -127,6 +128,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     samples = repository.findAll();
     when(service.all(any())).thenReturn(samples);
     UI.getCurrent().setLocale(locale);
@@ -285,7 +288,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
       functions(editRenderer).get("edit").accept(sample, null);
       verify(service).get(sample.getId());
       SampleDialog sampleDialog = $(SampleDialog.class).first();
-      assertEquals(sample, sampleDialog.getSample());
+      assertEquals(sample.getId(), sampleDialog.getSampleId());
       sampleDialog.close();
     }
   }
@@ -347,7 +350,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     verify(service).get(sample.getId());
     SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -384,7 +387,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -395,7 +398,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -490,7 +493,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertNull(dialog.getSample().getId());
+    assertNull(dialog.getSampleId());
   }
 
   @Test
@@ -621,7 +624,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertFalse(view.error.isVisible());
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(sample, dialog.getSample());
+    assertEquals(sample.getId(), dialog.getSampleId());
   }
 
   @Test
@@ -655,8 +658,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertFalse(view.error.isVisible());
     SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(1, dialog.getSamples().size());
-    assertTrue(dialog.getSamples().contains(sample));
+    assertEquals(1, dialog.getSampleIds().size());
+    assertTrue(dialog.getSampleIds().contains(sample.getId()));
   }
 
   @Test
@@ -678,8 +681,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertFalse(view.error.isVisible());
     SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertEquals(2, dialog.getSamples().size());
-    assertTrue(dialog.getSamples().contains(samples.get(0)));
-    assertTrue(dialog.getSamples().contains(samples.get(1)));
+    assertEquals(2, dialog.getSampleIds().size());
+    assertTrue(dialog.getSampleIds().contains(samples.get(0).getId()));
+    assertTrue(dialog.getSampleIds().contains(samples.get(1).getId()));
   }
 }

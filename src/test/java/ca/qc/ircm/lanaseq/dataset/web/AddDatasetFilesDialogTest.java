@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -84,6 +85,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.Collectors;
 import org.junit.After;
@@ -137,7 +139,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() throws Throwable {
-    UI.getCurrent().setLocale(locale);
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     files.add(temporaryFolder.resolve("dataset_R1.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset_R2.fastq").toFile());
     files.add(temporaryFolder.resolve("dataset.bw").toFile());
@@ -160,6 +162,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     when(service.files(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
+    UI.getCurrent().setLocale(locale);
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
     test(view.datasets).clickRow(1, new MetaKeys().ctrl());
@@ -209,7 +212,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @Test
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels() {
-    Dataset dataset = dialog.getDataset();
+    Dataset dataset = repository.findById(dialog.getDatasetId()).get();
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
         dialog.message.getText());
@@ -227,7 +230,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    Dataset dataset = dialog.getDataset();
+    Dataset dataset = repository.findById(dialog.getDatasetId()).get();
     assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
         dialog.message.getText());
@@ -340,12 +343,13 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createUploadFolder() {
-    assertTrue(Files.exists(uploadFolder(dialog.getDataset())));
+    Dataset dataset = repository.findById(dialog.getDatasetId()).get();
+    assertTrue(Files.exists(uploadFolder(dataset)));
   }
 
   @Test
   public void keepUploadFolderOnClose() throws Throwable {
-    Dataset dataset = dialog.getDataset();
+    Dataset dataset = repository.findById(dialog.getDatasetId()).get();
     assertTrue(Files.exists(uploadFolder(dataset)));
     Files.createFile(uploadFolder(dataset).resolve("test.txt"));
     dialog.close();
@@ -356,7 +360,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void message_Windows() {
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, false)),
         dialog.message.getText());
   }
@@ -365,7 +369,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void message_Linux() {
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
         dialog.message.getText());
   }
@@ -374,30 +378,21 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void message_Mac() {
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
     assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
         dialog.message.getText());
   }
 
   @Test
-  public void getDataset() {
-    Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
-    assertEquals(dataset, dialog.getDataset());
+  public void getDatasetId() {
+    assertEquals(2L, dialog.getDatasetId());
   }
 
   @Test
-  public void setDataset_NewDataset() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      dialog.setDataset(new Dataset());
-    });
-  }
-
-  @Test
-  public void setDataset_Dataset() {
+  public void setDatasetId() {
     Dataset dataset = repository.findById(1L).get();
 
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     verify(service, atLeastOnce()).uploadFiles(dataset);
     List<File> files = items(dialog.files);
@@ -406,9 +401,9 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setDataset_Null() {
-    assertThrows(NullPointerException.class, () -> {
-      dialog.setDataset(null);
+  public void setDatasetId_Null() {
+    assertThrows(NoSuchElementException.class, () -> {
+      dialog.setDatasetId(null);
     });
   }
 
@@ -418,7 +413,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
             .collect(Collectors.toList()),
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
-    Dataset dataset = dialog.getDataset();
+    Dataset dataset = repository.findById(dialog.getDatasetId()).get();
 
     dialog.updateFiles();
 
@@ -461,15 +456,13 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void exists_False() {
-    Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
     assertFalse(dialog.exists(files.get(2)));
   }
 
   @Test
   public void exists_True() {
-    Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
     assertTrue(dialog.exists(files.get(1)));
   }
 
@@ -491,7 +484,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   public void save_OverwriteAllowed() {
     dialog.addSavedListener(savedListener);
     dialog.files.getListDataView().getItems().forEach(f -> dialog.overwrite(f));
-    Dataset dataset = dialog.getDataset();
+    Dataset dataset = repository.findById(dialog.getDatasetId()).get();
     dialog.overwriteAll.setValue(true);
 
     dialog.save();
@@ -516,7 +509,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
         .map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     dialog.addSavedListener(savedListener);
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     dialog.save();
 
@@ -536,7 +529,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     when(service.uploadFiles(any())).thenReturn(new ArrayList<>());
     dialog.addSavedListener(savedListener);
     Dataset dataset = repository.findById(1L).get();
-    dialog.setDataset(dataset);
+    dialog.setDatasetId(1L);
 
     dialog.save();
 

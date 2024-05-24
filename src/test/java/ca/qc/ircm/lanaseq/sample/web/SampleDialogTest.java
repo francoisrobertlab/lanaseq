@@ -56,9 +56,12 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,6 +96,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -151,6 +155,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     when(service.all(any())).thenReturn(repository.findAll());
     topAssays = jpaQueryFactory.select(sample.assay).from(sample).fetch();
     when(service.topAssays(anyInt())).thenReturn(topAssays);
@@ -212,7 +218,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
+    Sample sample = repository.findById(dialog.getSampleId()).get();
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
     validateEquals(englishDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
@@ -252,7 +259,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     final AppResources sampleResources = new AppResources(Sample.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
+    Sample sample = repository.findById(dialog.getSampleId()).get();
+    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
     validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
@@ -369,65 +377,15 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void getSample() {
-    Sample sample = repository.findById(1L).get();
-    dialog.setSample(sample);
-    assertEquals(sample, dialog.getSample());
+  public void getSampleId() {
+    assertEquals(10L, dialog.getSampleId());
   }
 
   @Test
-  public void setSample_NewSample() {
-    Sample sample = new Sample();
-    dialog.setSample(sample);
-
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
-    assertTrue(LocalDate.now().minusDays(2).isBefore(dialog.date.getValue())
-        && LocalDate.now().plusDays(1).isAfter(dialog.date.getValue()));
-    assertFalse(dialog.date.isReadOnly());
-    assertEquals("", dialog.sampleId.getValue());
-    assertFalse(dialog.sampleId.isReadOnly());
-    assertEquals("", dialog.replicate.getValue());
-    assertFalse(dialog.replicate.isReadOnly());
-    assertNull(dialog.protocol.getValue());
-    assertFalse(dialog.protocol.isReadOnly());
-    assertNull(dialog.assay.getValue());
-    assertFalse(dialog.assay.isReadOnly());
-    assertEquals(SampleType.NULL, dialog.type.getValue());
-    assertFalse(dialog.type.isReadOnly());
-    assertEquals("", dialog.target.getValue());
-    assertFalse(dialog.target.isReadOnly());
-    assertEquals("", dialog.strain.getValue());
-    assertFalse(dialog.strain.isReadOnly());
-    assertEquals("", dialog.strainDescription.getValue());
-    assertFalse(dialog.strainDescription.isReadOnly());
-    assertEquals("", dialog.treatment.getValue());
-    assertFalse(dialog.treatment.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertTrue(dialog.save.isVisible());
-    assertTrue(dialog.cancel.isVisible());
-    assertFalse(dialog.delete.isVisible());
-  }
-
-  @Test
-  public void setSample_NewSampleWithName() {
-    Sample sample = new Sample();
-    sample.setName("my sample");
-
-    dialog.setSample(sample);
-
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
-        dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
-        dialog.confirm.getElement().getProperty("message"));
-  }
-
-  @Test
-  public void setSample_Sample() {
+  public void setSampleId() {
     Sample sample = repository.findById(4L).get();
 
-    dialog.setSample(sample);
+    dialog.setSampleId(4L);
 
     assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -462,10 +420,10 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setSample_ReadOnly() {
+  public void setSampleId_ReadOnly() {
     Sample sample = repository.findById(2L).get();
 
-    dialog.setSample(sample);
+    dialog.setSampleId(2L);
 
     assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -501,10 +459,10 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void setSample_NotEditable() {
+  public void setSampleId_NotEditable() {
     Sample sample = repository.findById(8L).get();
 
-    dialog.setSample(sample);
+    dialog.setSampleId(8L);
 
     assertEquals(LocalDate.of(2018, 12, 5), dialog.date.getValue());
     assertTrue(dialog.date.isReadOnly());
@@ -534,11 +492,11 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setSample_DeletableSample() {
+  public void setSampleId_DeletableSample() {
     when(service.isDeletable(any())).thenReturn(true);
     Sample sample = repository.findById(4L).get();
 
-    dialog.setSample(sample);
+    dialog.setSampleId(4L);
 
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -546,8 +504,13 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setSample_Null() {
-    dialog.setSample(null);
+  public void setSampleId_Empty() {
+    assertThrows(NoSuchElementException.class, () -> dialog.setSampleId(200L));
+  }
+
+  @Test
+  public void setSampleId_Null() {
+    dialog.setSampleId(null);
 
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertTrue(LocalDate.now().minusDays(2).isBefore(dialog.date.getValue())
@@ -856,6 +819,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExists() {
+    when(service.get(anyLong())).thenReturn(Optional.empty());
     when(service.exists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
@@ -881,12 +845,12 @@ public class SampleDialogTest extends SpringUIUnitTest {
     when(service.get(any())).thenReturn(Optional.of(sample));
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
-    dialog.setSample(sample);
+    dialog.setSampleId(sample.getId());
 
     clickButton(dialog.save);
 
     verify(service).exists("FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020");
-    verify(service).get(2L);
+    verify(service, atLeastOnce()).get(2L);
     verify(service).save(any());
     Notification notification = $(Notification.class).first();
     assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
@@ -927,7 +891,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void save_UpdateSample() {
     Sample sample = repository.findById(4L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
     fillForm();
@@ -958,7 +922,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void cancel() {
     Sample sample = repository.findById(4L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
     fillForm();
@@ -977,7 +941,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void delete_Confirm() {
     when(service.isDeletable(any())).thenReturn(true);
     Sample sample = repository.findById(4L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
 
@@ -999,7 +963,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void delete_Cancel() {
     when(service.isDeletable(any())).thenReturn(true);
     Sample sample = repository.findById(4L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
 

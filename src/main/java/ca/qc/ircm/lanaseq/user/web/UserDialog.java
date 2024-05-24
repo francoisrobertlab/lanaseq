@@ -38,6 +38,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,17 +142,18 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     fireEvent(new SavedEvent<>(this, true));
   }
 
-  public User getUser() {
-    return form.getUser();
+  public Long getUserId() {
+    return Optional.ofNullable(form.getUser()).map(User::getId).orElse(null);
   }
 
   /**
-   * Sets user.
+   * Sets user's id.
    *
-   * @param user
-   *          user
+   * @param id
+   *          user id
    */
-  public void setUser(User user) {
+  public void setUserId(Long id) {
+    User user = id != null ? userService.get(id).orElseThrow() : null;
     form.setUser(user);
     updateHeader();
   }

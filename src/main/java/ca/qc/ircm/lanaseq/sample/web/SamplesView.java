@@ -256,12 +256,12 @@ public class SamplesView extends VerticalLayout
   }
 
   void view(Sample sample) {
-    showDialog(service.get(sample.getId()).orElse(null));
+    showDialog(sample);
   }
 
   private void showDialog(Sample sample) {
     SampleDialog dialog = dialogFactory.getObject();
-    dialog.setSample(sample);
+    dialog.setSampleId(sample != null ? sample.getId() : null);
     dialog.addSavedListener(e -> samples.getDataProvider().refreshAll());
     dialog.addDeletedListener(e -> samples.getDataProvider().refreshAll());
     dialog.open();
@@ -269,7 +269,7 @@ public class SamplesView extends VerticalLayout
 
   void viewFiles(Sample sample) {
     SampleFilesDialog filesDialog = filesDialogFactory.getObject();
-    filesDialog.setSample(sample);
+    filesDialog.setSampleId(sample.getId());
     filesDialog.open();
   }
 
@@ -302,7 +302,7 @@ public class SamplesView extends VerticalLayout
     this.error.setVisible(error);
     if (!error) {
       SamplesAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
-      analysisDialog.setSamples(samples);
+      analysisDialog.setSampleIds(samples.stream().map(Sample::getId).collect(Collectors.toList()));
       analysisDialog.open();
     }
   }

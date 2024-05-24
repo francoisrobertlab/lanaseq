@@ -76,7 +76,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -220,7 +219,7 @@ public class DatasetFilesDialog extends Dialog
   }
 
   private String shortFilename(String filename) {
-    String name = Optional.ofNullable(getDataset()).map(Dataset::getName).orElse("");
+    String name = Optional.ofNullable(dataset).map(Dataset::getName).orElse("");
     if (name.length() > 20 && filename.contains(name)) {
       String start = name.substring(0, 11);
       String end = name.substring(name.length() - 9);
@@ -287,7 +286,6 @@ public class DatasetFilesDialog extends Dialog
 
   private void updateHeader() {
     final AppResources resources = new AppResources(DatasetFilesDialog.class, getLocale());
-    Dataset dataset = getDataset();
     if (dataset != null && dataset.getName() != null) {
       setHeaderTitle(resources.message(HEADER, dataset.getName()));
     } else {
@@ -324,7 +322,7 @@ public class DatasetFilesDialog extends Dialog
 
   void viewFiles(Sample sample) {
     SampleFilesDialog sampleFilesDialog = sampleFilesDialogFactory.getObject();
-    sampleFilesDialog.setSample(sample);
+    sampleFilesDialog.setSampleId(sample.getId());
     sampleFilesDialog.open();
     sampleFilesDialog.addOpenedChangeListener(e -> {
       if (!e.isOpened()) {
@@ -360,7 +358,7 @@ public class DatasetFilesDialog extends Dialog
 
   void addLargeFiles() {
     AddDatasetFilesDialog addFilesDialog = addFilesDialogFactory.getObject();
-    addFilesDialog.setDataset(dataset);
+    addFilesDialog.setDatasetId(dataset.getId());
     addFilesDialog.addSavedListener(e -> updateFiles());
     addFilesDialog.open();
   }
@@ -397,14 +395,12 @@ public class DatasetFilesDialog extends Dialog
     return fileBinder.validate();
   }
 
-  public Dataset getDataset() {
-    return dataset;
+  public Long getDatasetId() {
+    return dataset.getId();
   }
 
-  public void setDataset(Dataset dataset) {
-    Objects.requireNonNull(dataset);
-    Objects.requireNonNull(dataset.getId());
-    this.dataset = dataset;
+  public void setDatasetId(Long id) {
+    dataset = service.get(id).orElseThrow();
     boolean readOnly =
         !dataset.isEditable() || !authenticatedUser.hasPermission(dataset, Permission.WRITE);
     fileBinder.setReadOnly(readOnly);

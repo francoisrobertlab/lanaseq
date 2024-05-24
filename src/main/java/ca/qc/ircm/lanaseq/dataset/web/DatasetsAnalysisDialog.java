@@ -25,6 +25,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -41,6 +42,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,12 +70,15 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
   protected ConfirmDialog errors = new ConfirmDialog();
   protected VerticalLayout errorsLayout = new VerticalLayout();
   private List<Dataset> datasets = new ArrayList<>();
-  private transient AnalysisService service;
+  private transient DatasetService service;
+  private transient AnalysisService analysisService;
   private transient AppConfiguration configuration;
 
   @Autowired
-  protected DatasetsAnalysisDialog(AnalysisService service, AppConfiguration configuration) {
+  protected DatasetsAnalysisDialog(DatasetService service, AnalysisService analysisService,
+      AppConfiguration configuration) {
     this.service = service;
+    this.analysisService = analysisService;
     this.configuration = configuration;
   }
 
@@ -129,7 +135,7 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
 
   boolean validate() {
     List<String> errors = new ArrayList<>();
-    service.validateDatasets(datasets, getLocale(), error -> errors.add(error));
+    analysisService.validateDatasets(datasets, getLocale(), error -> errors.add(error));
     if (!errors.isEmpty()) {
       errorsLayout.removeAll();
       errors.forEach(error -> errorsLayout.add(new Span(error)));
@@ -144,7 +150,7 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
       logger.debug("creating analysis folder for datasets {}", datasets);
       AppResources resources = new AppResources(DatasetsAnalysisDialog.class, getLocale());
       try {
-        service.copyDatasetsResources(datasets);
+        analysisService.copyDatasetsResources(datasets);
         boolean unix = getUI().map(ui -> {
           WebBrowser browser = ui.getSession().getBrowser();
           return browser.isMacOSX() || browser.isLinux();
@@ -163,17 +169,19 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
     }
   }
 
-  public List<Dataset> getDatasets() {
-    return datasets;
+  public List<Long> getDatasetIds() {
+    return datasets.stream().map(Dataset::getId).collect(Collectors.toList());
   }
 
-  public void setDataset(Dataset dataset) {
-    this.datasets = Collections.nCopies(1, dataset);
+  public void setDatasetId(Long id) {
+    this.datasets = Collections.nCopies(1, service.get(id).orElseThrow());
     updateHeader();
   }
 
-  public void setDatasets(List<Dataset> datasets) {
-    this.datasets = datasets != null ? datasets : new ArrayList<>();
+  public void setDatasetIds(List<Long> ids) {
+    Objects.requireNonNull(ids, "ids parameter cannot be null");
+    this.datasets =
+        ids.stream().map(id -> service.get(id).orElseThrow()).collect(Collectors.toList());
     updateHeader();
   }
 }

@@ -292,7 +292,7 @@ public class UsersViewTest extends SpringUIUnitTest {
       clickButton(editButton);
       assertEquals(1, $(UserDialog.class).all().size());
       UserDialog dialog = $(UserDialog.class).first();
-      assertEquals(user, dialog.getUser());
+      assertEquals(user.getId(), dialog.getUserId());
       dialog.close();
     }
   }
@@ -335,7 +335,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
     verify(service).get(user.getId());
     UserDialog dialog = $(UserDialog.class).first();
-    assertEquals(user, dialog.getUser());
+    assertEquals(user.getId(), dialog.getUserId());
     assertTrue(dialog.isOpened());
   }
 
@@ -472,7 +472,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
     assertEquals(1, $(UserDialog.class).all().size());
     UserDialog dialog = $(UserDialog.class).first();
-    assertNull(dialog.getUser().getId());
+    assertNull(dialog.getUserId());
   }
 
   @Test
@@ -501,8 +501,10 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void permissions_ErrorThenView() {
+    User user = users.get(1);
+    when(service.get(any())).thenReturn(Optional.of(user));
     view.switchUser();
-    view.view(users.get(1));
+    view.view(user);
     assertFalse(view.error.isVisible());
   }
 }

@@ -108,6 +108,8 @@ public class DatasetGridTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(any())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     datasets = repository.findAll();
     when(service.all(any())).thenReturn(datasets);
     UI.getCurrent().setLocale(locale);

@@ -183,7 +183,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> delete());
-    setSample(null);
+    setSampleId(null);
   }
 
   @Override
@@ -324,14 +324,12 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     close();
   }
 
-  Sample getSample() {
-    return binder.getBean();
+  Long getSampleId() {
+    return binder.getBean().getId();
   }
 
-  void setSample(Sample sample) {
-    if (sample == null) {
-      sample = new Sample();
-    }
+  void setSampleId(Long id) {
+    Sample sample = id != null ? service.get(id).orElseThrow() : new Sample();
     if (sample.getDate() == null) {
       sample.setDate(LocalDate.now());
     }

@@ -166,7 +166,7 @@ public class DatasetsView extends VerticalLayout
   void view(Dataset dataset) {
     clearError();
     DatasetDialog dialog = dialogFactory.getObject();
-    dialog.setDataset(service.get(dataset.getId()).orElse(null));
+    dialog.setDatasetId(dataset.getId());
     dialog.addSavedListener(e -> datasets.refreshDatasets());
     dialog.addDeletedListener(e -> datasets.refreshDatasets());
     dialog.open();
@@ -192,7 +192,7 @@ public class DatasetsView extends VerticalLayout
 
   void viewFiles(Dataset dataset) {
     DatasetFilesDialog filesDialog = filesDialogFactory.getObject();
-    filesDialog.setDataset(dataset);
+    filesDialog.setDatasetId(dataset.getId());
     filesDialog.open();
   }
 
@@ -207,7 +207,8 @@ public class DatasetsView extends VerticalLayout
     this.error.setVisible(error);
     if (!error) {
       DatasetsAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
-      analysisDialog.setDatasets(datasets);
+      analysisDialog
+          .setDatasetIds(datasets.stream().map(Dataset::getId).collect(Collectors.toList()));
       analysisDialog.open();
     }
   }

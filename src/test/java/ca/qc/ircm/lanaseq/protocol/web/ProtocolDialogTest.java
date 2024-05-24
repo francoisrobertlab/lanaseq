@@ -207,8 +207,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER, 1, dialog.getProtocol().getName()),
-        dialog.getHeaderTitle());
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
     assertEquals(protocolResources.message(NOTE), dialog.note.getLabel());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
@@ -235,8 +235,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER, 1, dialog.getProtocol().getName()),
-        dialog.getHeaderTitle());
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
     assertEquals(protocolResources.message(NOTE), dialog.note.getLabel());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
@@ -376,32 +376,15 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void getProtocol() {
-    assertEquals(1L, dialog.getProtocol().getId());
+  public void getProtocolId() {
+    assertEquals(1L, dialog.getProtocolId());
   }
 
   @Test
-  public void setProtocol_NewProtocol() {
-    dialog.setProtocol(new Protocol());
-
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
-    assertEquals("", dialog.name.getValue());
-    assertFalse(dialog.name.isReadOnly());
-    assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.note.isReadOnly());
-    assertTrue(dialog.upload.isVisible());
-    assertTrue(dialog.remove.isVisible());
-    assertTrue(dialog.save.isVisible());
-    assertTrue(dialog.cancel.isVisible());
-    assertFalse(dialog.delete.isVisible());
-    assertEquals(0, items(dialog.files).size());
-  }
-
-  @Test
-  public void setProtocol_Protocol() {
+  public void setProtocolId() {
     Protocol protocol = repository.findById(1L).get();
 
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(1L);
 
     assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -424,10 +407,10 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setProtocol_ReadOnly() {
+  public void setProtocolId_ReadOnly() {
     Protocol protocol = repository.findById(2L).get();
 
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(2L);
 
     assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -450,11 +433,11 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setProtocol_Deletable() {
+  public void setProtocolId_Deletable() {
     when(service.isDeletable(any())).thenReturn(true);
     Protocol protocol = repository.findById(1L).get();
 
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(1L);
 
     assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -477,10 +460,10 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setProtocol_DeletedFiles() {
+  public void setProtocolId_DeletedFiles() {
     Protocol protocol = repository.findById(3L).get();
 
-    dialog.setProtocol(protocol);
+    dialog.setProtocolId(3L);
 
     assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
     assertEquals(resources.message(DELETE_HEADER),
@@ -503,8 +486,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setProtocol_Null() {
-    dialog.setProtocol(null);
+  public void setProtocolId_Null() {
+    dialog.setProtocolId(null);
 
     assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
     assertEquals("", dialog.name.getValue());
@@ -544,7 +527,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   public void save_NameExistsNewProtocol() {
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
-    dialog.setProtocol(new Protocol());
+    dialog.setProtocolId(null);
     fillFields();
 
     clickButton(dialog.save);
@@ -565,7 +548,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExistsSameProtocol() {
-    Protocol protocol = dialog.getProtocol();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
     fillFields();
@@ -586,7 +569,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExistsDifferentProtocol() {
-    Protocol protocol = dialog.getProtocol();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
     fillFields();
@@ -610,7 +593,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_EmptyNote() {
-    Protocol protocol = dialog.getProtocol();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
     dialog.addSavedListener(savedListener);
     fillFields();
     dialog.note.setValue("");
@@ -657,7 +640,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NewProtocol() {
     dialog.addSavedListener(savedListener);
-    dialog.setProtocol(new Protocol());
+    dialog.setProtocolId(null);
     fillFields();
 
     clickButton(dialog.save);
@@ -749,7 +732,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void delete_Confirm() {
-    Protocol protocol = dialog.getProtocol();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
     dialog.addDeletedListener(deletedListener);
 
     clickButton(dialog.delete);

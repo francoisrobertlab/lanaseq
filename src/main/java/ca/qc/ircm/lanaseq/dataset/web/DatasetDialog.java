@@ -254,7 +254,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     confirm.addConfirmListener(e -> delete());
     tags.setTagSuggestions(service.topTags(50));
     error.setVisible(false);
-    setDataset(null);
+    setDatasetId(null);
   }
 
   Button sampleDelete(Sample sample) {
@@ -325,7 +325,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
 
   private void updateHeader() {
     final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
-    Dataset dataset = getDataset();
+    Dataset dataset = binder.getBean();
     if (dataset != null && dataset.getId() != null) {
       setHeaderTitle(resources.message(HEADER, 1, dataset.getName()));
       confirm.setText(resources.message(DELETE_MESSAGE, dataset.getName()));
@@ -456,11 +456,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     close();
   }
 
-  public Dataset getDataset() {
-    return binder.getBean();
+  public Long getDatasetId() {
+    return binder.getBean().getId();
   }
 
-  void setDataset(Dataset dataset) {
+  public void setDatasetId(Long id) {
+    Dataset dataset = id != null ? service.get(id).orElseThrow() : new Dataset();
     if (dataset == null) {
       dataset = new Dataset();
     }

@@ -312,18 +312,12 @@ public class AddSampleFilesDialog extends Dialog
     }
   }
 
-  Sample getSample() {
-    return sample;
+  Long getSampleId() {
+    return sample.getId();
   }
 
-  void setSample(Sample sample) {
-    if (sample == null) {
-      throw new NullPointerException("sample cannot be null");
-    }
-    if (sample.getId() == null) {
-      throw new IllegalArgumentException("sample cannot be new");
-    }
-    this.sample = sample;
+  void setSampleId(Long id) {
+    sample = service.get(id).orElseThrow();
     updateHeader();
     createFolder();
     updateFiles();

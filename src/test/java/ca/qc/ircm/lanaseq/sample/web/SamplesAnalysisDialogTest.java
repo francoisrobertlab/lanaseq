@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
@@ -47,6 +48,7 @@ import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
+import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import com.vaadin.flow.component.UI;
@@ -59,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +79,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   private SamplesAnalysisDialog dialog;
   @MockBean
-  private AnalysisService service;
+  private SampleService service;
+  @MockBean
+  private AnalysisService analysisService;
   @MockBean
   private AppConfiguration configuration;
   @Autowired
@@ -90,6 +95,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
+    when(service.get(anyLong())).then(
+        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     samples.add(repository.findById(10L).get());
     samples.add(repository.findById(11L).get());
@@ -145,7 +152,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   @Test
   public void validate_Success() {
     dialog.validate();
-    verify(service, atLeastOnce()).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService, atLeastOnce()).validateSamples(eq(samples), eq(locale), any());
     assertEquals(0, dialog.errorsLayout.getComponentCount());
     assertFalse(dialog.errors.isOpened());
     assertFalse($(ConfirmDialog.class).exists());
@@ -159,9 +166,9 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
       errorHandler.accept("error1");
       errorHandler.accept("error2");
       return null;
-    }).when(service).validateSamples(any(Collection.class), any(), any());
+    }).when(analysisService).validateSamples(any(Collection.class), any(), any());
     dialog.validate();
-    verify(service, atLeastOnce()).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService, atLeastOnce()).validateSamples(eq(samples), eq(locale), any());
     assertEquals(2, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
     assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
@@ -176,10 +183,10 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void validate_OnOpen() {
-    verify(service, times(1)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService, times(1)).validateSamples(eq(samples), eq(locale), any());
     dialog.close();
     dialog.open();
-    verify(service, times(2)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService, times(2)).validateSamples(eq(samples), eq(locale), any());
   }
 
   @Test
@@ -188,8 +195,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     String folder = "test/sample";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(service).copySamplesResources(samples);
+    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService).copySamplesResources(samples);
     verify(configuration.getAnalysis()).label(samples, false);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -204,8 +211,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     String folder = "test/sample";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(service).copySamplesResources(samples);
+    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService).copySamplesResources(samples);
     verify(configuration.getAnalysis()).label(samples, true);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -220,8 +227,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     String folder = "test/sample";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(service).copySamplesResources(samples);
+    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService).copySamplesResources(samples);
     verify(configuration.getAnalysis()).label(samples, true);
     assertEquals(resources.message(property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -232,10 +239,11 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createFolder_IoException() throws Throwable {
-    doThrow(new IOException("test")).when(service).copySamplesResources(any(Collection.class));
+    doThrow(new IOException("test")).when(analysisService)
+        .copySamplesResources(any(Collection.class));
     dialog.createFolder.click();
-    verify(service, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(service).copySamplesResources(samples);
+    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService).copySamplesResources(samples);
     assertFalse(dialog.confirm.isOpened());
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
@@ -247,7 +255,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createFolder_IllegalArgumentException() throws Throwable {
-    doThrow(new IllegalArgumentException("test")).when(service)
+    doThrow(new IllegalArgumentException("test")).when(analysisService)
         .copySamplesResources(any(Collection.class));
     doAnswer(new Answer<Void>() {
       private int calls = 0;
@@ -261,10 +269,10 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
         }
         return null;
       }
-    }).when(service).validateSamples(any(Collection.class), any(), any());
+    }).when(analysisService).validateSamples(any(Collection.class), any(), any());
     dialog.createFolder.click();
-    verify(service, atLeast(3)).validateSamples(eq(samples), eq(locale), any());
-    verify(service).copySamplesResources(samples);
+    verify(analysisService, atLeast(3)).validateSamples(eq(samples), eq(locale), any());
+    verify(analysisService).copySamplesResources(samples);
     assertFalse(dialog.confirm.isOpened());
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
@@ -286,28 +294,28 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void getSamples() {
-    List<Sample> samples = dialog.getSamples();
+  public void getSampleIds() {
+    List<Long> samples = dialog.getSampleIds();
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
-      assertTrue(samples.contains(sample));
+      assertTrue(samples.contains(sample.getId()));
     }
   }
 
   @Test
-  public void setSample() {
+  public void setSampleId() {
     Sample sample = repository.findById(10L).get();
-    dialog.setSample(sample);
+    dialog.setSampleId(10L);
     assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
   }
 
   @Test
-  public void setDatasets() {
-    List<Sample> samples = new ArrayList<>();
-    samples.add(repository.findById(4L).get());
-    samples.add(repository.findById(5L).get());
-    samples.add(repository.findById(10L).get());
-    dialog.setSamples(samples);
-    assertEquals(resources.message(HEADER, samples.size()), dialog.getHeaderTitle());
+  public void setSampleIds() {
+    List<Long> ids = new ArrayList<>();
+    ids.add(4L);
+    ids.add(5L);
+    ids.add(10L);
+    dialog.setSampleIds(ids);
+    assertEquals(resources.message(HEADER, ids.size()), dialog.getHeaderTitle());
   }
 }

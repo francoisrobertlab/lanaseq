@@ -40,7 +40,6 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +115,6 @@ public class ProtocolHistoryDialog extends Dialog
 
   private void updateHeader() {
     final AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
-    Protocol protocol = getProtocol();
     setHeaderTitle(resources.message(HEADER,
         protocol != null && protocol.getId() != null ? protocol.getName() : ""));
   }
@@ -130,13 +128,12 @@ public class ProtocolHistoryDialog extends Dialog
     files.getListDataView().refreshAll();
   }
 
-  public Protocol getProtocol() {
-    return protocol;
+  public Long getProtocolId() {
+    return protocol.getId();
   }
 
-  public void setProtocol(Protocol protocol) {
-    Objects.requireNonNull(protocol);
-    this.protocol = protocol;
+  public void setProtocolId(Long id) {
+    protocol = service.get(id).orElseThrow();
     files.setItems(service.deletedFiles(protocol));
     updateHeader();
   }
