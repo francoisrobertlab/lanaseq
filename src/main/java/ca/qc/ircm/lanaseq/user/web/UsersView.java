@@ -256,12 +256,12 @@ public class UsersView extends VerticalLayout
 
   void view(User user) {
     clearError();
-    showDialog(service.get(user.getId()).orElse(null));
+    showDialog(user.getId());
   }
 
-  private void showDialog(User user) {
+  private void showDialog(Long id) {
     UserDialog dialog = dialogFactory.getObject();
-    dialog.setUser(user);
+    dialog.setUserId(id);
     dialog.addSavedListener(e -> loadUsers());
     dialog.open();
   }
