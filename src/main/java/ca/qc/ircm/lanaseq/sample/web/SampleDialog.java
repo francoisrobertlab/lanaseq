@@ -138,10 +138,11 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     add(layout);
     FormLayout sampleForm = new FormLayout(date, sampleId, replicate, protocol, assay, type);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
-    FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment, note);
+    FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment);
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
-    FormLayout form = new FormLayout(sampleForm, strainForm);
+    FormLayout form = new FormLayout(sampleForm, strainForm, note);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
+    form.setColspan(note, 2);
     layout.add(form, error, confirm);
     layout.setSizeFull();
     getFooter().add(delete, cancel, save);
@@ -163,7 +164,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     strainDescription.setId(id(STRAIN_DESCRIPTION));
     treatment.setId(id(TREATMENT));
     note.setId(id(NOTE));
-    note.setHeight("10em");
+    note.setHeight("6em");
     error.setId(id(ERROR_TEXT));
     error.setVisible(false);
     save.setId(id(SAVE));
