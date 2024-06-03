@@ -35,7 +35,6 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +45,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -88,15 +86,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void fill(DatasetDialogElement dialog) throws InterruptedException {
-    ButtonElement tag = dialog.tags().tag("G24D");
-    if (tag != null) {
-      tag.click();
-    }
+    dialog.tags().deselectByText("G24D");
     dialog.namePrefix().setValue(namePrefix);
-    dialog.tags().newTag().selectByText(tag1);
-    dialog.tags().newTag().sendKeys(Keys.ENTER);
-    dialog.tags().newTag().selectByText(tag2);
-    dialog.tags().newTag().sendKeys(Keys.ENTER);
+    dialog.tags().selectByText(tag1);
+    dialog.tags().selectByText(tag2);
     dialog.note().setValue(note);
     dialog.date().setDate(date);
   }

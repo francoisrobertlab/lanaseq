@@ -252,7 +252,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> delete());
-    tags.setTagSuggestions(service.topTags(50));
+    tags.setSuggestions(service.topTags(50));
     error.setVisible(false);
     setDatasetId(null);
   }

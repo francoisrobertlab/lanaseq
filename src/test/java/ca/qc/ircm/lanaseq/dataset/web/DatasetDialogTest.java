@@ -298,7 +298,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   @Test
   public void tags() {
-    List<String> tags = dialog.tags.getTagSuggestions();
+    List<String> tags = dialog.tags.getSuggestions();
     assertEquals(topTags.size(), tags.size());
     for (String tag : topTags) {
       assertTrue(tags.contains(tag));
