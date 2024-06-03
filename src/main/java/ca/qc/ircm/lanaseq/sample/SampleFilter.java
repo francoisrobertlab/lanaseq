@@ -38,6 +38,7 @@ import org.springframework.data.domain.Sort.Direction;
  */
 public class SampleFilter implements Predicate<Sample> {
   public String nameContains;
+  public String tagsContains;
   public String protocolContains;
   public Range<LocalDate> dateRange;
   public String ownerContains;
@@ -50,6 +51,10 @@ public class SampleFilter implements Predicate<Sample> {
     boolean test = true;
     if (nameContains != null) {
       test &= comparable(replaceNull(sample.getName())).contains(comparable(nameContains));
+    }
+    if (tagsContains != null) {
+      test &= sample.getTags().stream()
+          .filter(tag -> comparable(tag).contains(comparable(tagsContains))).findAny().isPresent();
     }
     if (protocolContains != null) {
       test &= comparable(replaceNull(sample.getProtocol().getName()))
@@ -76,6 +81,9 @@ public class SampleFilter implements Predicate<Sample> {
     BooleanBuilder predicate = new BooleanBuilder();
     if (nameContains != null) {
       predicate.and(sample.name.contains(nameContains));
+    }
+    if (tagsContains != null) {
+      predicate.and(sample.tags.any().contains(tagsContains));
     }
     if (protocolContains != null) {
       predicate.and(sample.protocol.name.contains(protocolContains));

@@ -40,13 +40,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -245,6 +249,26 @@ public class SampleService {
     } catch (IOException e) {
       return new ArrayList<>();
     }
+  }
+
+  /**
+   * Returns most recent tags.
+   *
+   * @param limit
+   *          maximum number of tags to return
+   * @return most recent tags
+   */
+  public List<String> topTags(int limit) {
+    Set<String> tags = new LinkedHashSet<>();
+    int page = 0;
+    while (tags.size() < limit) {
+      Page<Sample> samples = repository.findAllByOrderByIdDesc(PageRequest.of(page++, 50));
+      if (samples.isEmpty()) {
+        break; // No more datasets.
+      }
+      tags.addAll(samples.flatMap(s -> s.getTags().stream()).toList());
+    }
+    return tags.stream().limit(limit).collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**

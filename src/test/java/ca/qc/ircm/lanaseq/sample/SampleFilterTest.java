@@ -32,6 +32,8 @@ import com.google.common.collect.Range;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -70,6 +72,56 @@ public class SampleFilterTest {
     assertTrue(filter.test(name(null)));
     assertTrue(filter.test(name("")));
     assertTrue(filter.test(name("christian")));
+  }
+
+  @Test
+  public void test_TagsContains() {
+    filter.tagsContains = "test";
+
+    assertTrue(filter.test(tags("My test")));
+    assertTrue(filter.test(tags("Test my")));
+    assertTrue(filter.test(tags("My test my")));
+    assertTrue(filter.test(tags("My TEST my")));
+    assertFalse(filter.test(tags()));
+    assertFalse(filter.test(tags("")));
+    assertFalse(filter.test(tags("christian")));
+    assertTrue(filter.test(tags("My test", "tag1")));
+    assertTrue(filter.test(tags("Test my", "tag1")));
+    assertTrue(filter.test(tags("My test my", "tag1")));
+    assertTrue(filter.test(tags("My TEST my", "tag1")));
+    assertFalse(filter.test(tags("", "tag1")));
+    assertFalse(filter.test(tags("christian", "tag1")));
+    assertTrue(filter.test(tags("tag1", "My test")));
+    assertTrue(filter.test(tags("tag1", "Test my")));
+    assertTrue(filter.test(tags("tag1", "My test my")));
+    assertTrue(filter.test(tags("tag1", "My TEST my")));
+    assertFalse(filter.test(tags("tag1", "")));
+    assertFalse(filter.test(tags("tag1", "christian")));
+  }
+
+  @Test
+  public void test_TagsContainsNull() {
+    filter.tagsContains = null;
+
+    assertTrue(filter.test(tags("My test")));
+    assertTrue(filter.test(tags("Test my")));
+    assertTrue(filter.test(tags("My test my")));
+    assertTrue(filter.test(tags("My TEST my")));
+    assertTrue(filter.test(tags()));
+    assertTrue(filter.test(tags("")));
+    assertTrue(filter.test(tags("christian")));
+    assertTrue(filter.test(tags("My test", "tag1")));
+    assertTrue(filter.test(tags("Test my", "tag1")));
+    assertTrue(filter.test(tags("My test my", "tag1")));
+    assertTrue(filter.test(tags("My TEST my", "tag1")));
+    assertTrue(filter.test(tags("", "tag1")));
+    assertTrue(filter.test(tags("christian", "tag1")));
+    assertTrue(filter.test(tags("tag1", "My test")));
+    assertTrue(filter.test(tags("tag1", "Test my")));
+    assertTrue(filter.test(tags("tag1", "My test my")));
+    assertTrue(filter.test(tags("tag1", "My TEST my")));
+    assertTrue(filter.test(tags("tag1", "")));
+    assertTrue(filter.test(tags("tag1", "christian")));
   }
 
   @Test
@@ -205,6 +257,12 @@ public class SampleFilterTest {
     return sample;
   }
 
+  private Sample tags(String... tags) {
+    Sample sample = new Sample();
+    sample.setTags(Stream.of(tags).collect(Collectors.toSet()));
+    return sample;
+  }
+
   private Sample date(LocalDate date) {
     Sample sample = new Sample();
     sample.setDate(date);
@@ -251,6 +309,15 @@ public class SampleFilterTest {
     Predicate predicate = filter.predicate();
 
     assertEquals(sample.name.contains("test"), predicate);
+  }
+
+  @Test
+  public void predicate_TagsContains() throws Exception {
+    filter.tagsContains = "test";
+
+    Predicate predicate = filter.predicate();
+
+    assertEquals(sample.tags.any().contains("test"), predicate);
   }
 
   @Test

@@ -32,12 +32,17 @@ import org.openqa.selenium.Keys;
 @Attribute(name = "id", value = SamplesView.SAMPLES)
 public class SamplesGridElement extends MultiSelectGridElement {
   private static final int NAME_COLUMN = 1;
-  private static final int PROTOCOL_COLUMN = 2;
-  private static final int OWNER_COLUMN = 4;
-  private static final int EDIT_COLUMN = 5;
+  private static final int TAGS_COLUMN = 2;
+  private static final int PROTOCOL_COLUMN = 3;
+  private static final int OWNER_COLUMN = 5;
+  private static final int EDIT_COLUMN = 6;
 
   public TextFieldElement nameFilter() {
     return getHeaderCell(NAME_COLUMN).$(TextFieldElement.class).first();
+  }
+
+  public TextFieldElement tagsFilter() {
+    return getHeaderCell(TAGS_COLUMN).$(TextFieldElement.class).first();
   }
 
   public TextFieldElement protocolFilter() {

@@ -32,6 +32,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -44,6 +45,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Sample.
@@ -117,6 +119,11 @@ public class Sample implements DataWithFiles, Owned, Serializable {
   @Column
   @Size(max = 255)
   private String treatment;
+  /**
+   * Tags.
+   */
+  @ElementCollection
+  private Set<String> tags;
   /**
    * True if sample can be edited.
    */
@@ -300,6 +307,14 @@ public class Sample implements DataWithFiles, Owned, Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Set<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(Set<String> tags) {
+    this.tags = tags;
   }
 
   public boolean isEditable() {

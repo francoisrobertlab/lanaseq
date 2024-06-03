@@ -113,3 +113,38 @@ VALUES (7,2,'G24D');
 INSERT INTO dataset_tags (id,dataset_id,tags)
 VALUES (8,7,'Spt16');
 ALTER TABLE dataset_tags ALTER COLUMN id RESTART WITH 9;
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (1,1,'mnase');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (2,1,'ip');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (3,2,'mnase');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (4,2,'ip');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (5,3,'mnase');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (6,3,'ip');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (7,4,'chipseq');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (8,4,'ip');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (9,5,'chipseq');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (10,5,'ip');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (11,6,'chipseq');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (12,7,'chipseq');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (13,8,'chipseq');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (14,4,'G24D');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (15,5,'G24D');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (16,10,'Spt16');
+INSERT INTO sample_tags (id,sample_id,tags)
+VALUES (17,11,'Spt16');
+ALTER TABLE dataset_tags ALTER COLUMN id RESTART WITH 18;

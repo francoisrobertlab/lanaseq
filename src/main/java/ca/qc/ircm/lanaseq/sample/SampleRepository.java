@@ -34,6 +34,8 @@ public interface SampleRepository
     extends JpaRepository<Sample, Long>, QuerydslPredicateExecutor<Sample> {
   public boolean existsByName(String name);
 
+  public Page<Sample> findAllByOrderByIdDesc(Pageable pageable);
+
   public List<Sample> findByOwner(User owner);
 
   public boolean existsByProtocol(Protocol protocol);

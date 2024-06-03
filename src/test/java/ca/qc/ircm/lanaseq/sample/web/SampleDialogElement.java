@@ -21,6 +21,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NOTE;
@@ -34,6 +35,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 
+import ca.qc.ircm.lanaseq.web.TagsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
@@ -98,6 +100,10 @@ public class SampleDialogElement extends DialogElement {
 
   public DatePickerElement date() {
     return $(DatePickerElement.class).id(id(DATE));
+  }
+
+  public TagsFieldElement tags() {
+    return $(TagsFieldElement.class).id(id(TAGS));
   }
 
   public ButtonElement save() {

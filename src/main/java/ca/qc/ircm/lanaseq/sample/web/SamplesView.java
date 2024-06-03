@@ -28,6 +28,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.TAGS;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -73,8 +74,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,11 +109,13 @@ public class SamplesView extends VerticalLayout
   protected H2 header = new H2();
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
+  protected Column<Sample> tags;
   protected Column<Sample> protocol;
   protected Column<Sample> date;
   protected Column<Sample> owner;
   protected Column<Sample> edit;
   protected TextField nameFilter = new TextField();
+  protected TextField tagsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
@@ -154,6 +157,9 @@ public class SamplesView extends VerticalLayout
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
+    tags = samples
+        .addColumn(sample -> sample.getTags().stream().collect(Collectors.joining(", ")), TAGS)
+        .setKey(TAGS).setSortable(false).setFlexGrow(1);
     protocol = samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL)
         .setKey(PROTOCOL).setSortProperty(PROTOCOL + "." + NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
@@ -181,6 +187,10 @@ public class SamplesView extends VerticalLayout
     nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
+    filtersRow.getCell(tags).setComponent(tagsFilter);
+    tagsFilter.addValueChangeListener(e -> filterTags(e.getValue()));
+    tagsFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    tagsFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
     protocolFilter.addValueChangeListener(e -> filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -221,6 +231,8 @@ public class SamplesView extends VerticalLayout
     header.setText(resources.message(HEADER));
     String nameHeader = sampleResources.message(NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
+    String tagsHeader = sampleResources.message(TAGS);
+    tags.setHeader(tagsHeader).setFooter(tagsHeader);
     String protocolHeader = sampleResources.message(PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = sampleResources.message(DATE);
@@ -230,6 +242,7 @@ public class SamplesView extends VerticalLayout
     String editHeader = webResources.message(EDIT);
     edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(webResources.message(ALL));
+    tagsFilter.setPlaceholder(webResources.message(ALL));
     protocolFilter.setPlaceholder(webResources.message(ALL));
     ownerFilter.setPlaceholder(webResources.message(ALL));
     add.setText(webResources.message(ADD));
@@ -314,6 +327,8 @@ public class SamplesView extends VerticalLayout
   void merge() {
     List<Sample> samples = this.samples.getSelectedItems().stream()
         .sorted(Comparator.comparing(Sample::getId)).collect(Collectors.toList());
+    Set<String> tags =
+        samples.stream().flatMap(sample -> sample.getTags().stream()).collect(Collectors.toSet());
     AppResources resources = new AppResources(SamplesView.class, getLocale());
     boolean error = false;
     if (samples.isEmpty()) {
@@ -327,7 +342,7 @@ public class SamplesView extends VerticalLayout
     if (!error) {
       Dataset dataset = new Dataset();
       dataset.setSamples(samples);
-      dataset.setTags(new HashSet<>());
+      dataset.setTags(tags);
       dataset.setDate(samples.get(0).getDate());
       dataset.generateName();
       if (datasetService.exists(dataset.getName())) {
@@ -343,6 +358,11 @@ public class SamplesView extends VerticalLayout
 
   void filterName(String value) {
     filter.nameContains = value.isEmpty() ? null : value;
+    samples.getDataProvider().refreshAll();
+  }
+
+  void filterTags(String value) {
+    filter.tagsContains = value.isEmpty() ? null : value;
     samples.getDataProvider().refreshAll();
   }
 
