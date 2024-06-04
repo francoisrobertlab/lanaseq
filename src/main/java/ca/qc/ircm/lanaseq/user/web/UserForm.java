@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
@@ -31,12 +32,15 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -61,10 +65,12 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   protected PasswordsForm passwords = new PasswordsForm();
   private Binder<User> binder = new BeanValidationBinder<>(User.class);
   private User user;
+  private transient UserService service;
   private transient AuthenticatedUser authenticatedUser;
 
   @Autowired
-  protected UserForm(AuthenticatedUser authenticatedUser) {
+  protected UserForm(UserService service, AuthenticatedUser authenticatedUser) {
+    this.service = service;
     this.authenticatedUser = authenticatedUser;
   }
 
@@ -96,12 +102,24 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
     admin.setLabel(userResources.message(ADMIN));
     manager.setLabel(userResources.message(MANAGER));
     binder.forField(email).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL))).bind(EMAIL);
+        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL)))
+        .withValidator(emailExists()).bind(EMAIL);
     binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
         .bind(NAME);
     binder.forField(admin).bind(ADMIN);
     binder.forField(manager).bind(MANAGER);
     updateReadOnly();
+  }
+
+  private Validator<String> emailExists() {
+    return (value, context) -> {
+      if (service.exists(value) && (user.getId() == null
+          || !value.equalsIgnoreCase(service.get(user.getId()).map(User::getEmail).orElse("")))) {
+        final AppResources resources = new AppResources(Constants.class, getLocale());
+        return ValidationResult.error(resources.message(ALREADY_EXISTS));
+      }
+      return ValidationResult.ok();
+    };
   }
 
   private void updateReadOnly() {

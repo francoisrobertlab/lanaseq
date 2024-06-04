@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -40,6 +42,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
+import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -52,6 +55,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -61,6 +65,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class UserFormTest extends SpringUIUnitTest {
   private UserForm form;
+  @MockBean
+  private UserService service;
   @Autowired
   private UserRepository repository;
   @Captor
@@ -313,6 +319,38 @@ public class UserFormTest extends SpringUIUnitTest {
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(webResources.message(INVALID_EMAIL)), error.getMessage());
+  }
+
+  @Test
+  public void isValid_EmailExists() {
+    when(service.exists(any())).thenReturn(true);
+    fillForm();
+
+    assertFalse(form.isValid());
+
+    verify(service, atLeastOnce()).exists(email);
+    BinderValidationStatus<User> status = form.validateUser();
+    assertFalse(status.isOk());
+    Optional<BindingValidationStatus<?>> optionalError =
+        findValidationStatusByField(status, form.email);
+    assertTrue(optionalError.isPresent());
+    BindingValidationStatus<?> error = optionalError.get();
+    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+  }
+
+  @Test
+  public void isValid_EmailExistsSameUser() {
+    User user = repository.findById(3L).get();
+    form.setUser(user);
+    when(service.exists(any())).thenReturn(true);
+    when(service.get(any())).thenReturn(Optional.of(user));
+    fillForm();
+    form.email.setValue("jonh.smith@ircm.qc.ca");
+
+    assertTrue(form.isValid());
+
+    verify(service, atLeastOnce()).exists("jonh.smith@ircm.qc.ca");
+    verify(service, atLeastOnce()).get(3L);
   }
 
   @Test
