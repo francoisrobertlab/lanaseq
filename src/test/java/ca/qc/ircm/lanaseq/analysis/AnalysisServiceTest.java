@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.analysis;
 
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,7 +34,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -59,6 +59,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -67,6 +68,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 @ServiceTestAnnotations
 @WithMockUser
 public class AnalysisServiceTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(AnalysisService.class);
   private static final String READ = "read";
   @Autowired
   private AnalysisService service;
@@ -80,6 +82,8 @@ public class AnalysisServiceTest {
   private DatasetRepository datasetRepository;
   @Autowired
   private SampleRepository sampleRepository;
+  @Autowired
+  private MessageSource messageSource;
   @MockBean
   private PermissionEvaluatorDelegator permissionEvaluator;
   @Mock
@@ -132,7 +136,6 @@ public class AnalysisServiceTest {
   private Path thirdRawbam;
   private Random random = new Random();
   private Locale locale = ENGLISH;
-  private AppResources resources = new AppResources(AnalysisService.class, locale);
 
   /**
    * Before test.
@@ -249,8 +252,8 @@ public class AnalysisServiceTest {
   public void validateDatasets_NoSample() {
     datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
     service.validateDatasets(datasets, locale, errorHandler);
-    datasets.stream().forEach(
-        ds -> verify(errorHandler).accept(resources.message("dataset.noSample", ds.getName())));
+    datasets.stream().forEach(ds -> verify(errorHandler).accept(messageSource
+        .getMessage(MESSAGE_PREFIX + "dataset.noSample", new Object[] { ds.getName() }, locale)));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -260,7 +263,8 @@ public class AnalysisServiceTest {
   public void validateDatasets_PairedMissmatch() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, pairedPaths, secondPairedPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("datasets.pairedMissmatch"));
+    verify(errorHandler).accept(
+        messageSource.getMessage(MESSAGE_PREFIX + "datasets.pairedMissmatch", null, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -306,7 +310,8 @@ public class AnalysisServiceTest {
     pairedPaths.remove(paired1);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+        new Object[] { dataset.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -329,7 +334,8 @@ public class AnalysisServiceTest {
     pairedPaths.remove(paired2);
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+        new Object[] { dataset.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -340,7 +346,8 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(thirdUnpairedZipPaths, pairedZipPaths,
         pairedZipPaths, secondPairedZipPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("datasets.pairedMissmatch"));
+    verify(errorHandler).accept(
+        messageSource.getMessage(MESSAGE_PREFIX + "datasets.pairedMissmatch", null, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -375,7 +382,8 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+        new Object[] { dataset.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -400,7 +408,8 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondPairedZipPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+        new Object[] { dataset.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -430,7 +439,8 @@ public class AnalysisServiceTest {
   public void validateDatasets_PairedSecondSampleUnpaired() {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondUnpairedPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+        new Object[] { dataset.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -451,7 +461,8 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
         secondUnpairedZipPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+        new Object[] { dataset.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -470,12 +481,12 @@ public class AnalysisServiceTest {
   public void validateDatasets_NoFastq() {
     when(sampleService.files(any())).thenReturn(new ArrayList<>());
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler)
-        .accept(resources.message("sample.noFastq", datasets.get(0).getSamples().get(0).getName()));
-    verify(errorHandler)
-        .accept(resources.message("sample.noFastq", datasets.get(1).getSamples().get(0).getName()));
-    verify(errorHandler)
-        .accept(resources.message("sample.noFastq", datasets.get(1).getSamples().get(1).getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { datasets.get(0).getSamples().get(0).getName() }, locale));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { datasets.get(1).getSamples().get(0).getName() }, locale));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { datasets.get(1).getSamples().get(1).getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -486,10 +497,10 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(new ArrayList<>(), new ArrayList<>(),
         secondPairedPaths);
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler)
-        .accept(resources.message("sample.noFastq", datasets.get(0).getSamples().get(0).getName()));
-    verify(errorHandler)
-        .accept(resources.message("sample.noFastq", datasets.get(1).getSamples().get(0).getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { datasets.get(0).getSamples().get(0).getName() }, locale));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { datasets.get(1).getSamples().get(0).getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -499,7 +510,8 @@ public class AnalysisServiceTest {
   public void validateDatasets_NoFastqSecondSample() {
     when(sampleService.files(any())).thenReturn(pairedPaths, pairedPaths, new ArrayList<>());
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("sample.noFastq", sample2.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { sample2.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -512,7 +524,8 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(pairedPaths, pairedPaths, secondUnpairedPaths,
         new ArrayList<>());
     service.validateDatasets(datasets, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("sample.noFastq", sample.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { sample.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(datasets), eq(READ));
   }
@@ -538,7 +551,8 @@ public class AnalysisServiceTest {
   public void validateSamples_PairedMissmatch() {
     when(sampleService.files(any())).thenReturn(thirdUnpairedPaths, pairedPaths, secondPairedPaths);
     service.validateSamples(samples, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
+    verify(errorHandler)
+        .accept(messageSource.getMessage(MESSAGE_PREFIX + "samples.pairedMissmatch", null, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
   }
@@ -596,7 +610,8 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(thirdUnpairedZipPaths, pairedZipPaths,
         pairedZipPaths, secondPairedZipPaths);
     service.validateSamples(samples, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
+    verify(errorHandler)
+        .accept(messageSource.getMessage(MESSAGE_PREFIX + "samples.pairedMissmatch", null, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
   }
@@ -681,9 +696,12 @@ public class AnalysisServiceTest {
   public void validateSamples_NoFastq() {
     when(sampleService.files(any())).thenReturn(new ArrayList<>());
     service.validateSamples(samples, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(0).getName()));
-    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(1).getName()));
-    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(2).getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { samples.get(0).getName() }, locale));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { samples.get(1).getName() }, locale));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { samples.get(2).getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
   }
@@ -694,8 +712,10 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(new ArrayList<>(), new ArrayList<>(),
         secondPairedPaths);
     service.validateSamples(samples, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(0).getName()));
-    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(1).getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { samples.get(0).getName() }, locale));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { samples.get(1).getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
   }
@@ -705,7 +725,8 @@ public class AnalysisServiceTest {
   public void validateSamples_NoFastqThirdSample() {
     when(sampleService.files(any())).thenReturn(pairedPaths, pairedPaths, new ArrayList<>());
     service.validateSamples(samples, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("sample.noFastq", sample2.getName()));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { sample2.getName() }, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
   }
@@ -716,8 +737,12 @@ public class AnalysisServiceTest {
     when(sampleService.files(any())).thenReturn(pairedPaths, secondUnpairedPaths,
         new ArrayList<>());
     service.validateSamples(samples, locale, errorHandler);
-    verify(errorHandler).accept(resources.message("sample.noFastq", samples.get(2).getName()));
-    verify(errorHandler).accept(resources.message("samples.pairedMissmatch"));
+    verify(errorHandler).accept(messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+        new Object[] { samples.get(2).getName() }, locale));
+    verify(errorHandler)
+        .accept(messageSource.getMessage(MESSAGE_PREFIX + "samples.pairedMissmatch", null, locale));
+    verify(errorHandler)
+        .accept(messageSource.getMessage(MESSAGE_PREFIX + "samples.pairedMissmatch", null, locale));
     verifyNoMoreInteractions(errorHandler);
     verify(permissionEvaluator).hasCollectionPermission(any(), eq(samples), eq(READ));
   }

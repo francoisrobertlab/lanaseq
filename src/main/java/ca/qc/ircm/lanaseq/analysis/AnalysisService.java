@@ -17,8 +17,9 @@
 
 package ca.qc.ircm.lanaseq.analysis;
 
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
@@ -53,14 +55,18 @@ public class AnalysisService {
   private static final String FASTQ1_PATTERN = "(?:.*_)?R1" + FASTQ;
   private static final String FASTQ2_PATTERN = "(?:.*_)?R2" + FASTQ;
   private static final String BAM_PATTERN = "(?:.*)\\.bam";
+  private static final String MESSAGE_PREFIX = messagePrefix(AnalysisService.class);
   private static final Logger logger = LoggerFactory.getLogger(AnalysisService.class);
   private SampleService sampleService;
   private AppConfiguration configuration;
+  private MessageSource messageSource;
 
   @Autowired
-  protected AnalysisService(SampleService sampleService, AppConfiguration configuration) {
+  protected AnalysisService(SampleService sampleService, AppConfiguration configuration,
+      MessageSource messageSource) {
     this.sampleService = sampleService;
     this.configuration = configuration;
+    this.messageSource = messageSource;
   }
 
   /**
@@ -84,16 +90,16 @@ public class AnalysisService {
       return;
     }
 
-    AppResources resources = new AppResources(AnalysisService.class, locale);
     List<Optional<DatasetAnalysis>> metadatas =
-        datasets.stream().map(ds -> metadata(ds, resources, errorHandler))
-            .filter(md -> md.isPresent()).collect(Collectors.toList());
+        datasets.stream().map(ds -> metadata(ds, locale, errorHandler)).filter(md -> md.isPresent())
+            .collect(Collectors.toList());
     boolean paired =
         metadatas.stream().flatMap(omd -> omd.map(md -> md.samples.stream()).orElse(Stream.empty()))
             .map(ms -> ms.paired).findFirst().orElse(false);
     if (metadatas.stream().flatMap(omd -> omd.get().samples.stream())
         .filter(ms -> ms.paired != paired).findFirst().isPresent()) {
-      errorHandler.accept(resources.message("datasets.pairedMissmatch"));
+      errorHandler.accept(
+          messageSource.getMessage(MESSAGE_PREFIX + "datasets.pairedMissmatch", null, locale));
     }
   }
 
@@ -118,32 +124,34 @@ public class AnalysisService {
       return;
     }
 
-    AppResources resources = new AppResources(AnalysisService.class, locale);
     List<Optional<SampleAnalysis>> metadatas =
-        samples.stream().map(sa -> metadata(sa, resources, errorHandler))
-            .filter(ms -> ms.isPresent()).collect(Collectors.toList());
+        samples.stream().map(sa -> metadata(sa, locale, errorHandler)).filter(ms -> ms.isPresent())
+            .collect(Collectors.toList());
     boolean paired = metadatas.stream().map(oms -> oms.map(ms -> ms.paired).orElse(false))
         .findFirst().orElse(false);
     if (metadatas.stream().map(oms -> oms.get()).filter(ms -> ms.paired != paired).findFirst()
         .isPresent()) {
-      errorHandler.accept(resources.message("samples.pairedMissmatch"));
+      errorHandler.accept(
+          messageSource.getMessage(MESSAGE_PREFIX + "samples.pairedMissmatch", null, locale));
     }
   }
 
-  private Optional<DatasetAnalysis> metadata(Dataset dataset, AppResources resources,
+  private Optional<DatasetAnalysis> metadata(Dataset dataset, Locale locale,
       Consumer<String> errorHandler) {
     if (dataset.getSamples().isEmpty()) {
-      errorHandler.accept(resources.message("dataset.noSample", dataset.getName()));
+      errorHandler.accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.noSample",
+          new Object[] { dataset.getName() }, locale));
       return Optional.empty();
     }
 
     List<Optional<SampleAnalysis>> samples = dataset.getSamples().stream()
-        .map(sample -> metadata(sample, resources, errorHandler)).collect(Collectors.toList());
+        .map(sample -> metadata(sample, locale, errorHandler)).collect(Collectors.toList());
     if (!samples.stream().filter(sample -> !sample.isPresent()).findAny().isPresent()) {
       boolean paired =
           samples.stream().findFirst().map(sample -> sample.get().paired).orElse(false);
       if (samples.stream().filter(sample -> sample.get().paired != paired).findAny().isPresent()) {
-        errorHandler.accept(resources.message("dataset.pairedMissmatch", dataset.getName()));
+        errorHandler.accept(messageSource.getMessage(MESSAGE_PREFIX + "dataset.pairedMissmatch",
+            new Object[] { dataset.getName() }, locale));
         return Optional.empty();
       } else {
         DatasetAnalysis analysis = new DatasetAnalysis();
@@ -157,7 +165,7 @@ public class AnalysisService {
     }
   }
 
-  private Optional<SampleAnalysis> metadata(Sample sample, AppResources resources,
+  private Optional<SampleAnalysis> metadata(Sample sample, Locale locale,
       Consumer<String> errorHandler) {
     Pattern fastqPattern = Pattern.compile(FASTQ_PATTERN);
     Pattern fastq1Pattern = Pattern.compile(FASTQ1_PATTERN);
@@ -176,7 +184,8 @@ public class AnalysisService {
     List<Path> bams = files.stream().filter(file -> bamPattern.matcher(file.toString()).matches())
         .collect(Collectors.toList());
     if (fastq1 == null) {
-      String message = resources.message("sample.noFastq", sample.getName());
+      String message = messageSource.getMessage(MESSAGE_PREFIX + "sample.noFastq",
+          new Object[] { sample.getName() }, locale);
       errorHandler.accept(message);
       return Optional.empty();
     } else {
@@ -207,8 +216,8 @@ public class AnalysisService {
       throw new IllegalArgumentException("datasets parameter cannot be null or empty");
     }
 
-    Collection<DatasetAnalysis> analyses = datasets.stream().map(ds -> metadata(ds,
-        new AppResources(AnalysisService.class, Locale.getDefault()), message -> {
+    Collection<DatasetAnalysis> analyses =
+        datasets.stream().map(ds -> metadata(ds, Locale.getDefault(), message -> {
         })).filter(opt -> opt.isPresent()).map(Optional::get).collect(Collectors.toList());
     if (analyses.size() != datasets.size()) {
       throw new IllegalArgumentException(
@@ -245,8 +254,8 @@ public class AnalysisService {
       throw new IllegalArgumentException("samples parameter cannot be null or empty");
     }
 
-    Collection<SampleAnalysis> analyses = samples.stream().map(sample -> metadata(sample,
-        new AppResources(AnalysisService.class, Locale.getDefault()), message -> {
+    Collection<SampleAnalysis> analyses =
+        samples.stream().map(sample -> metadata(sample, Locale.getDefault(), message -> {
         })).filter(opt -> opt.isPresent()).map(Optional::get).collect(Collectors.toList());
     if (analyses.size() != samples.size()) {
       throw new IllegalArgumentException(
