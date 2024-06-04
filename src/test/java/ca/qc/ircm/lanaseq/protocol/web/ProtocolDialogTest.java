@@ -568,6 +568,27 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void save_NameExistsSameProtocolDifferentCase() {
+    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    when(service.nameExists(any())).thenReturn(true);
+    dialog.addSavedListener(savedListener);
+    fillFields();
+    dialog.name.setValue(protocol.getName().toLowerCase());
+
+    clickButton(dialog.save);
+
+    BinderValidationStatus<Protocol> status = dialog.validateProtocol();
+    assertTrue(status.isOk());
+    verify(service, atLeastOnce()).nameExists(protocol.getName());
+    verify(service, atLeastOnce()).get(protocol.getId());
+    verify(service).save(any(), any());
+    Notification notification = $(Notification.class).first();
+    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertFalse(dialog.isOpened());
+    verify(savedListener).onComponentEvent(any());
+  }
+
+  @Test
   public void save_NameExistsDifferentProtocol() {
     Protocol protocol = repository.findById(dialog.getProtocolId()).get();
     when(service.nameExists(any())).thenReturn(true);

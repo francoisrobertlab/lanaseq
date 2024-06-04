@@ -219,8 +219,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   private Validator<String> nameExists() {
     return (value, context) -> {
-      if (service.nameExists(value) && !service.get(binder.getBean().getId())
-          .map(pr -> value.equals(pr.getName())).orElse(false)) {
+      if (service.nameExists(value) && (binder.getBean().getId() == null || !value.equalsIgnoreCase(
+          service.get(binder.getBean().getId()).map(Protocol::getName).orElse("")))) {
         final AppResources resources = new AppResources(Constants.class, getLocale());
         return ValidationResult.error(resources.message(ALREADY_EXISTS));
       }
