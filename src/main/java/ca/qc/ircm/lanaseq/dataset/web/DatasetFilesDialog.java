@@ -200,6 +200,7 @@ public class DatasetFilesDialog extends Dialog
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
+    filenameEdit.setWidthFull();
     samples.setId(id(SAMPLES));
     samples.addItemDoubleClickListener(e -> viewFiles(e.getItem()));
     name = samples.addColumn(sa -> sa.getName(), NAME).setKey(NAME)

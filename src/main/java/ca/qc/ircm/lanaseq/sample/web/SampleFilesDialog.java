@@ -183,6 +183,7 @@ public class SampleFilesDialog extends Dialog
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
+    filenameEdit.setWidthFull();
     upload.setId(id(UPLOAD));
     upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
