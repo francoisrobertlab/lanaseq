@@ -114,6 +114,7 @@ public class DatasetsView extends VerticalLayout
     setId(ID);
     setHeightFull();
     add(header, datasets, error, new HorizontalLayout(merge, files, analyze));
+    datasets.setMinHeight("30em");
     expand(datasets);
     header.setId(HEADER);
     datasets.setSelectionMode(SelectionMode.MULTI);

@@ -151,6 +151,7 @@ public class SamplesView extends VerticalLayout
     setId(ID);
     setHeightFull();
     add(header, samples, error, new HorizontalLayout(add, merge, files, analyze));
+    samples.setMinHeight("30em");
     expand(samples);
     header.setId(HEADER);
     samples.setId(SAMPLES);
