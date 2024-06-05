@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
@@ -26,7 +27,6 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -71,6 +71,9 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   public static final String EDIT_BUTTON =
       "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
           + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -3052158575710045415L;
   protected Column<Dataset> name;
   protected Column<Dataset> tags;
@@ -159,25 +162,22 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
-    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    String nameHeader = datasetResources.message(NAME);
+    String nameHeader = getTranslation(DATASET_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String tagsHeader = datasetResources.message(TAGS);
+    String tagsHeader = getTranslation(DATASET_PREFIX + TAGS);
     tags.setHeader(tagsHeader).setFooter(tagsHeader);
-    String protocolHeader = sampleResources.message(PROTOCOL);
+    String protocolHeader = getTranslation(SAMPLE_PREFIX + PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
-    String dateHeader = datasetResources.message(DATE);
+    String dateHeader = getTranslation(DATASET_PREFIX + DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
-    String ownerHeader = datasetResources.message(OWNER);
+    String ownerHeader = getTranslation(DATASET_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    String editHeader = webResources.message(EDIT);
+    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
     edit.setHeader(editHeader).setFooter(editHeader);
-    nameFilter.setPlaceholder(webResources.message(ALL));
-    tagsFilter.setPlaceholder(webResources.message(ALL));
-    protocolFilter.setPlaceholder(webResources.message(ALL));
-    ownerFilter.setPlaceholder(webResources.message(ALL));
+    nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
   }
 
   /**

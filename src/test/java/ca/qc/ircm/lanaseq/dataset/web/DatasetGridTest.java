@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
@@ -41,7 +42,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -86,6 +86,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetGridTest extends SpringUIUnitTest {
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private DatasetGrid grid;
   @MockBean
   private DatasetService service;
@@ -98,9 +101,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
   @Autowired
   private DatasetRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources datasetResources = new AppResources(Dataset.class, locale);
-  private AppResources sampleResources = new AppResources(Sample.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Dataset> datasets;
 
   /**
@@ -147,49 +147,70 @@ public class DatasetGridTest extends SpringUIUnitTest {
   public void labels() {
     HeaderRow headerRow = grid.getHeaderRows().get(0);
     FooterRow footerRow = grid.getFooterRows().get(0);
-    assertEquals(datasetResources.message(NAME), headerRow.getCell(grid.name).getText());
-    assertEquals(datasetResources.message(NAME), footerRow.getCell(grid.name).getText());
-    assertEquals(datasetResources.message(TAGS), headerRow.getCell(grid.tags).getText());
-    assertEquals(datasetResources.message(TAGS), footerRow.getCell(grid.tags).getText());
-    assertEquals(sampleResources.message(PROTOCOL), headerRow.getCell(grid.protocol).getText());
-    assertEquals(sampleResources.message(PROTOCOL), footerRow.getCell(grid.protocol).getText());
-    assertEquals(datasetResources.message(DATE), headerRow.getCell(grid.date).getText());
-    assertEquals(datasetResources.message(DATE), footerRow.getCell(grid.date).getText());
-    assertEquals(datasetResources.message(OWNER), headerRow.getCell(grid.owner).getText());
-    assertEquals(datasetResources.message(OWNER), footerRow.getCell(grid.owner).getText());
-    assertEquals(webResources.message(EDIT), headerRow.getCell(grid.edit).getText());
-    assertEquals(webResources.message(EDIT), footerRow.getCell(grid.edit).getText());
-    assertEquals(webResources.message(ALL), grid.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), grid.tagsFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), grid.protocolFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), grid.ownerFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + NAME),
+        headerRow.getCell(grid.name).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + NAME),
+        footerRow.getCell(grid.name).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
+        headerRow.getCell(grid.tags).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
+        footerRow.getCell(grid.tags).getText());
+    assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        headerRow.getCell(grid.protocol).getText());
+    assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        footerRow.getCell(grid.protocol).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + DATE),
+        headerRow.getCell(grid.date).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + DATE),
+        footerRow.getCell(grid.date).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
+        headerRow.getCell(grid.owner).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
+        footerRow.getCell(grid.owner).getText());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
+        headerRow.getCell(grid.edit).getText());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
+        footerRow.getCell(grid.edit).getText());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.nameFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.tagsFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.protocolFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.ownerFilter.getPlaceholder());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources datasetResources = new AppResources(Dataset.class, locale);
-    final AppResources sampleResources = new AppResources(Sample.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     HeaderRow headerRow = grid.getHeaderRows().get(0);
     FooterRow footerRow = grid.getFooterRows().get(0);
-    assertEquals(datasetResources.message(NAME), headerRow.getCell(grid.name).getText());
-    assertEquals(datasetResources.message(NAME), footerRow.getCell(grid.name).getText());
-    assertEquals(datasetResources.message(TAGS), headerRow.getCell(grid.tags).getText());
-    assertEquals(datasetResources.message(TAGS), footerRow.getCell(grid.tags).getText());
-    assertEquals(sampleResources.message(PROTOCOL), headerRow.getCell(grid.protocol).getText());
-    assertEquals(sampleResources.message(PROTOCOL), footerRow.getCell(grid.protocol).getText());
-    assertEquals(datasetResources.message(DATE), headerRow.getCell(grid.date).getText());
-    assertEquals(datasetResources.message(DATE), footerRow.getCell(grid.date).getText());
-    assertEquals(datasetResources.message(OWNER), headerRow.getCell(grid.owner).getText());
-    assertEquals(datasetResources.message(OWNER), footerRow.getCell(grid.owner).getText());
-    assertEquals(webResources.message(EDIT), headerRow.getCell(grid.edit).getText());
-    assertEquals(webResources.message(EDIT), footerRow.getCell(grid.edit).getText());
-    assertEquals(webResources.message(ALL), grid.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), grid.tagsFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), grid.protocolFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), grid.ownerFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + NAME),
+        headerRow.getCell(grid.name).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + NAME),
+        footerRow.getCell(grid.name).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
+        headerRow.getCell(grid.tags).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
+        footerRow.getCell(grid.tags).getText());
+    assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        headerRow.getCell(grid.protocol).getText());
+    assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        footerRow.getCell(grid.protocol).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + DATE),
+        headerRow.getCell(grid.date).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + DATE),
+        footerRow.getCell(grid.date).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
+        headerRow.getCell(grid.owner).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
+        footerRow.getCell(grid.owner).getText());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
+        headerRow.getCell(grid.edit).getText());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
+        footerRow.getCell(grid.edit).getText());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.nameFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.tagsFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.protocolFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.ownerFilter.getPlaceholder());
   }
 
   @Test
