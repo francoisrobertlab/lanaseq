@@ -17,8 +17,9 @@
 
 package ca.qc.ircm.lanaseq.user;
 
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.mail.MailService;
 import jakarta.mail.MessagingException;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,6 +50,8 @@ public class ForgotPasswordService {
    * Period for which {@link ForgotPassword} instances are valid.
    */
   public static final Period VALID_PERIOD = Period.ofDays(2);
+  private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordService.class);
+  private static final String CONSTANT_PREFIX = messagePrefix(Constants.class);
   private final Logger logger = LoggerFactory.getLogger(ForgotPasswordService.class);
   @Autowired
   private ForgotPasswordRepository repository;
@@ -61,6 +65,8 @@ public class ForgotPasswordService {
   private MailService emailService;
   @Autowired
   private AppConfiguration appConfiguration;
+  @Autowired
+  private MessageSource messageSource;
 
   protected ForgotPasswordService() {
   }
@@ -131,9 +137,10 @@ public class ForgotPasswordService {
 
     // Prepare email content.
     MimeMessageHelper email = emailService.htmlEmail();
-    AppResources constants = new AppResources(Constants.class, locale);
-    AppResources resources = new AppResources(ForgotPasswordService.class, locale);
-    String subject = resources.message("subject", constants.message("application.name"));
+    String applicationName =
+        messageSource.getMessage(CONSTANT_PREFIX + "application.name", null, locale);
+    String subject = messageSource.getMessage(MESSAGE_PREFIX + "subject",
+        new Object[] { applicationName }, locale);
     email.setSubject(subject);
     email.addTo(emailAddress);
     Context context = new Context(locale);
