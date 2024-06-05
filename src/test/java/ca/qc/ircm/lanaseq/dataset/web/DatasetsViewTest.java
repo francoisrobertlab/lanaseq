@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
@@ -47,7 +48,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -80,6 +80,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsViewTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private DatasetsView view;
   @MockBean
   private DatasetService service;
@@ -94,9 +97,6 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Autowired
   private EntityManager entityManager;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(DatasetsView.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
-  private AppResources datasetResources = new AppResources(Dataset.class, locale);
   private List<Dataset> datasets;
 
   /**
@@ -128,27 +128,26 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(FILES), view.files.getText());
-    assertEquals(resources.message(ANALYZE), view.analyze.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(DatasetsView.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(FILES), view.files.getText());
-    assertEquals(resources.message(ANALYZE), view.analyze.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
-        view.getPageTitle());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + TITLE,
+        view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME)), view.getPageTitle());
   }
 
   @Test
@@ -260,7 +259,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
+        test(notification).getText());
   }
 
   @Test
@@ -307,7 +307,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     assertEquals((Long) 5L, dataset.getSamples().get(4).getId());
     assertEquals(datasets.get(0).getDate(), dataset.getDate());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
+        test(notification).getText());
   }
 
   @Test
@@ -315,7 +316,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     clickButton(view.merge);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED), view.error.getText());
     verify(sampleService, never()).isMergable(any());
     verify(service, never()).save(any());
     assertFalse($(Notification.class).exists());
@@ -352,7 +353,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
     assertEquals(dataset1.getDate(), dataset.getDate());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
+        test(notification).getText());
   }
 
   @Test
@@ -364,7 +366,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     clickButton(view.merge);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(MERGE_ERROR), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR), view.error.getText());
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
     assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
@@ -387,7 +389,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     assertTrue(view.error.isVisible());
     assertEquals(
-        datasetResources.message(NAME_ALREADY_EXISTS,
+        view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
         view.error.getText());
     verify(service).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");
@@ -412,7 +414,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     clickButton(view.files);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED), view.error.getText());
     assertFalse($(DatasetFilesDialog.class).exists());
   }
 
@@ -424,7 +426,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     clickButton(view.files);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(DATASETS_MORE_THAN_ONE), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE),
+        view.error.getText());
     assertFalse($(DatasetFilesDialog.class).exists());
   }
 
@@ -463,7 +466,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     assertFalse($(DatasetsAnalysisDialog.class).exists());
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(DATASETS_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED), view.error.getText());
   }
 
   @Test

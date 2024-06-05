@@ -21,11 +21,11 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -78,6 +78,9 @@ public class DatasetsView extends VerticalLayout
   public static final String DATASETS_REQUIRED = property(DATASETS, REQUIRED);
   public static final String DATASETS_MORE_THAN_ONE = property(DATASETS, "moreThanOne");
   public static final String MERGED = "merged";
+  private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
   protected H2 header = new H2();
@@ -146,18 +149,16 @@ public class DatasetsView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(DatasetsView.class, getLocale());
-    header.setText(resources.message(HEADER));
-    merge.setText(resources.message(MERGE));
-    files.setText(resources.message(FILES));
-    analyze.setText(resources.message(ANALYZE));
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
+    files.setText(getTranslation(MESSAGE_PREFIX + FILES));
+    analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));
   }
 
   @Override
   public String getPageTitle() {
-    AppResources resources = new AppResources(DatasetsView.class, getLocale());
-    AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   private void clearError() {
@@ -175,13 +176,12 @@ public class DatasetsView extends VerticalLayout
 
   void viewFiles() {
     List<Dataset> datasets = new ArrayList<>(this.datasets.getSelectedItems());
-    AppResources resources = new AppResources(DatasetsView.class, getLocale());
     boolean error = false;
     if (datasets.isEmpty()) {
-      this.error.setText(resources.message(DATASETS_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED));
       error = true;
     } else if (datasets.size() > 1) {
-      this.error.setText(resources.message(DATASETS_MORE_THAN_ONE));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE));
       error = true;
     }
     this.error.setVisible(error);
@@ -199,10 +199,9 @@ public class DatasetsView extends VerticalLayout
 
   void analyze() {
     List<Dataset> datasets = new ArrayList<>(this.datasets.getSelectedItems());
-    AppResources resources = new AppResources(DatasetsView.class, getLocale());
     boolean error = false;
     if (datasets.isEmpty()) {
-      this.error.setText(resources.message(DATASETS_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED));
       error = true;
     }
     this.error.setVisible(error);
@@ -228,13 +227,12 @@ public class DatasetsView extends VerticalLayout
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
         .filter(distinctByKey(Sample::getId)).sorted((s1, s2) -> s1.getId().compareTo(s2.getId()))
         .collect(Collectors.toList());
-    AppResources resources = new AppResources(DatasetsView.class, getLocale());
     boolean error = false;
     if (samples.isEmpty()) {
-      this.error.setText(resources.message(DATASETS_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED));
       error = true;
     } else if (!sampleService.isMergable(samples)) {
-      this.error.setText(resources.message(MERGE_ERROR));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + MERGE_ERROR));
       error = true;
     }
     this.error.setVisible(error);
@@ -245,13 +243,12 @@ public class DatasetsView extends VerticalLayout
       dataset.setDate(datasets.get(0).getDate());
       dataset.generateName();
       if (service.exists(dataset.getName())) {
-        AppResources datasetResources = new AppResources(Dataset.class, getLocale());
-        this.error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));
+        this.error.setText(getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName()));
         this.error.setVisible(true);
       } else {
         service.save(dataset);
         this.datasets.refreshDatasets();
-        showNotification(resources.message(MERGED, dataset.getName()));
+        showNotification(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));
       }
     }
   }

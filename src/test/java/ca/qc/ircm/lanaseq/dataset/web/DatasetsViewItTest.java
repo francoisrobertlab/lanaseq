@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
@@ -26,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -40,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -49,8 +50,11 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsViewItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
   @Autowired
   private DatasetRepository repository;
+  @Autowired
+  private MessageSource messageSource;
 
   private void open() {
     openView(VIEW_NAME);
@@ -107,8 +111,9 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
 
     String name = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS3_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetsView.class);
-    assertEquals(resources.message(MERGED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + MERGED, new Object[] { name }, currentLocale()),
+        notification.getText());
     List<Dataset> datasets = repository.findByOwner(new User(3L));
     Dataset dataset =
         datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
