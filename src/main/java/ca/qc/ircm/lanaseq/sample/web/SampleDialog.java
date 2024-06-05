@@ -47,7 +47,6 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -66,7 +65,6 @@ import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -104,7 +102,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected TextField replicate = new TextField();
   protected ComboBox<Protocol> protocol = new ComboBox<>();
   protected ComboBox<String> assay = new ComboBox<>();
-  protected Select<SampleType> type = new Select<>();
+  protected ComboBox<String> type = new ComboBox<>();
   protected TextField target = new TextField();
   protected TextField strain = new TextField();
   protected TextField strainDescription = new TextField();
@@ -161,8 +159,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     assay.addCustomValueSetListener(e -> assay.setValue(e.getDetail()));
     assay.setItems(service.topAssays(50));
     type.setId(id(TYPE));
-    type.setItemLabelGenerator(t -> t.getLabel(getLocale()));
-    type.setItems(SampleType.values());
+    type.setAllowCustomValue(true);
+    type.addCustomValueSetListener(e -> type.setValue(e.getDetail()));
+    type.setItems(service.topTypes(50));
     target.setId(id(TARGET));
     strain.setId(id(STRAIN));
     strainDescription.setId(id(STRAIN_DESCRIPTION));
@@ -205,7 +204,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
         .bind(REPLICATE);
     binder.forField(protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
     binder.forField(assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
-    binder.forField(type).withNullRepresentation(SampleType.NULL).bind(TYPE);
+    binder.forField(type).withNullRepresentation("").bind(TYPE);
     binder.forField(target).withNullRepresentation("").bind(TARGET);
     binder.forField(strain).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
         .bind(STRAIN);

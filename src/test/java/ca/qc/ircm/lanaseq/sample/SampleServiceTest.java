@@ -187,7 +187,7 @@ public class SampleServiceTest {
     assertEquals("FR1", sample.getSampleId());
     assertEquals("R1", sample.getReplicate());
     assertEquals("MNase-seq", sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals("IP", sample.getType());
     assertEquals("polr2a", sample.getTarget());
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
@@ -791,6 +791,21 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void topTypes() {
+    List<String> types = service.topTypes(2);
+    assertEquals(2, types.size());
+    assertTrue(types.contains("IP"));
+    assertTrue(types.contains("Input"));
+  }
+
+  @Test
+  public void topTypes_limit() {
+    List<String> types = service.topTypes(1);
+    assertEquals(1, types.size());
+    assertTrue(types.contains("Input"));
+  }
+
+  @Test
   public void isDeletable_FalseNotEditable() {
     Sample sample = repository.findById(9L).get();
     sample.setEditable(false);
@@ -919,10 +934,10 @@ public class SampleServiceTest {
   public void isMergable_TypeTrue() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     samples.add(sample);
     sample = new Sample();
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -931,10 +946,10 @@ public class SampleServiceTest {
   public void isMergable_TypeFalse() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     samples.add(sample);
     sample = new Sample();
-    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setType("IP");
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -943,7 +958,7 @@ public class SampleServiceTest {
   public void isMergable_TypeOneNull() {
     List<Sample> samples = new ArrayList<>();
     Sample sample = new Sample();
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     samples.add(sample);
     samples.add(new Sample());
     assertFalse(service.isMergable(samples));
@@ -1120,7 +1135,7 @@ public class SampleServiceTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("ChIP-seq");
-    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setType("IP");
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -1141,7 +1156,7 @@ public class SampleServiceTest {
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals("ChIP-seq", sample.getAssay());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, sample.getType());
+    assertEquals("IP", sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());
@@ -1169,7 +1184,7 @@ public class SampleServiceTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("ChIP-seq");
-    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setType("IP");
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -1191,7 +1206,7 @@ public class SampleServiceTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("ChIP-seq");
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -1211,7 +1226,7 @@ public class SampleServiceTest {
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals("ChIP-seq", sample.getAssay());
-    assertEquals(SampleType.INPUT, sample.getType());
+    assertEquals("Input", sample.getType());
     assertEquals("my target", sample.getTarget());
     assertEquals("yFR213", sample.getStrain());
     assertEquals("F56G", sample.getStrainDescription());

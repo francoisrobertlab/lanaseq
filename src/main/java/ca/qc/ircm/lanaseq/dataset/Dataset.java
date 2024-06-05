@@ -44,7 +44,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -129,7 +128,7 @@ public class Dataset implements DataWithFiles, Owned, Serializable {
     Sample first =
         samples != null ? samples.stream().findFirst().orElse(new Sample()) : new Sample();
     builder.append(first.getAssay() != null ? first.getAssay().replaceAll("[^\\w]", "") + "_" : "");
-    builder.append(first.getType() != null ? first.getType().getLabel(Locale.ENGLISH) + "_" : "");
+    builder.append(first.getType() != null ? first.getType().replaceAll("[^\\w]", "") + "_" : "");
     builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
     builder.append(first.getStrain() != null ? first.getStrain() + "_" : "");
     builder.append(first.getStrainDescription() != null ? first.getStrainDescription() + "_" : "");

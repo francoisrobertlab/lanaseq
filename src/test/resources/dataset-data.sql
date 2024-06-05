@@ -53,23 +53,23 @@ INSERT INTO dataset (id,name,experiment_date,owner_id,editable,creation_date,not
 VALUES ('8', '20181211', '2018-10-19', '3', 1, '2018-12-12 10:30:10', null);
 ALTER TABLE dataset ALTER COLUMN id RESTART WITH 9;
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (1, 'FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNase-seq', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:23', 'robtools version 2');
+VALUES (1, 'FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020', 'FR1', 'R1', 'MNase-seq', 'IP', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:23', 'robtools version 2');
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (2, 'FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020', 'FR2', 'R2', 'MNase-seq', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:53', null);
+VALUES (2, 'FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020', 'FR2', 'R2', 'MNase-seq', 'IP', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:29:53', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (3, 'FR3_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R3_20181020', 'FR3', 'R3', 'MNase-seq', 'IMMUNO_PRECIPITATION', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:30:23', null);
+VALUES (3, 'FR3_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R3_20181020', 'FR3', 'R3', 'MNase-seq', 'IP', 'polr2a', 'yFR100', 'WT', 'Rappa', '2018-10-20', '1', 2, 1, '2018-10-20 13:30:23', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (4, 'JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022', 'JS1', 'R1', 'ChIP-seq', null, 'Spt16', 'yFR101', 'G24D', null, '2018-10-22', '3', 3, 1, '2018-10-22 9:50:20', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (5, 'JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022', 'JS2', 'R2', 'ChIP-seq', null, 'Spt16', 'yFR101', 'G24D', null, '2018-10-22', '3', 3, 1, '2018-10-22 9:51:20', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (6, 'BC1_ChIPseq_IP_yBC102_R103S_R1_20181118', 'BC1', 'R1', 'ChIP-seq', 'IMMUNO_PRECIPITATION', null, 'yBC102', 'R103S', null, '2018-11-18', '2', 5, 1, '2018-11-18 9:32:14', null);
+VALUES (6, 'BC1_ChIPseq_IP_yBC102_R103S_R1_20181118', 'BC1', 'R1', 'ChIP-seq', 'IP', null, 'yBC102', 'R103S', null, '2018-11-18', '2', 5, 1, '2018-11-18 9:32:14', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (7, 'BC2_ChIPseq_IP_yBC102_R103S_R2_20181118', 'BC2', 'R2', 'ChIP-seq', 'IMMUNO_PRECIPITATION', null, 'yBC102', 'R103S', null, '2018-11-18', '2', 5, 1, '2018-11-18 9:33:14', null);
+VALUES (7, 'BC2_ChIPseq_IP_yBC102_R103S_R2_20181118', 'BC2', 'R2', 'ChIP-seq', 'IP', null, 'yBC102', 'R103S', null, '2018-11-18', '2', 5, 1, '2018-11-18 9:33:14', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (8, 'BC1_ChIPseq_IP_polr2b_yBC103_WT_R1_20181118', 'BC1', 'R1', 'ChIP-seq', 'IMMUNO_PRECIPITATION', 'polr2b', 'yBC103', 'WT', null, '2018-12-05', '2', 5, 0, '2018-12-05 9:29:23', null);
+VALUES (8, 'BC1_ChIPseq_IP_polr2b_yBC103_WT_R1_20181118', 'BC1', 'R1', 'ChIP-seq', 'IP', 'polr2b', 'yBC103', 'WT', null, '2018-12-05', '2', 5, 0, '2018-12-05 9:29:23', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
-VALUES (9, 'BC1_ChIPseq_Input_polr2c_yBC201_WT_R1_20181208', 'BC1', 'R1', 'ChIP-seq', 'INPUT', 'polr2c', 'yBC201', 'WT', null, '2018-12-08', '2', 5, 1, '2018-12-08 9:29:23', null);
+VALUES (9, 'BC1_ChIPseq_Input_polr2c_yBC201_WT_R1_20181208', 'BC1', 'R1', 'ChIP-seq', 'Input', 'polr2c', 'yBC201', 'WT', null, '2018-12-08', '2', 5, 1, '2018-12-08 9:29:23', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)
 VALUES (10, 'JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210', 'JS1', 'R1', 'ChIP-seq', null, 'Spt16', 'yFR101', 'G24D', null, '2018-12-10', '3', 3, 1, '2018-12-10 9:29:23', null);
 INSERT INTO sample (id,name,sample_id,replicate,assay,type,target,strain,strain_description,treatment,experiment_date,protocol_id,owner_id,editable,creation_date,note)

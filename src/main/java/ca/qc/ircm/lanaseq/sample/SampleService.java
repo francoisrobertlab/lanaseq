@@ -264,7 +264,7 @@ public class SampleService {
     while (tags.size() < limit) {
       Page<Sample> samples = repository.findAllByOrderByIdDesc(PageRequest.of(page++, 50));
       if (samples.isEmpty()) {
-        break; // No more datasets.
+        break; // No more samples.
       }
       tags.addAll(samples.flatMap(s -> s.getTags().stream()).toList());
     }
@@ -281,6 +281,18 @@ public class SampleService {
   public List<String> topAssays(int limit) {
     return queryFactory.select(sample.assay).distinct().from(sample).orderBy(sample.id.desc())
         .limit(limit).fetch();
+  }
+
+  /**
+   * Returns most recent types.
+   *
+   * @param limit
+   *          maximum number of types to return
+   * @return most recent types
+   */
+  public List<String> topTypes(int limit) {
+    return queryFactory.select(sample.type).distinct().from(sample).where(sample.type.isNotNull())
+        .orderBy(sample.id.desc()).limit(limit).fetch();
   }
 
   /**
