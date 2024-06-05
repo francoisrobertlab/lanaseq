@@ -42,7 +42,6 @@ import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.H2Element;
-import com.vaadin.flow.component.select.testbench.SelectElement;
 import com.vaadin.flow.component.textfield.testbench.TextAreaElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.annotations.Attribute;
@@ -78,8 +77,8 @@ public class SampleDialogElement extends DialogElement {
     return $(ComboBoxElement.class).id(id(ASSAY));
   }
 
-  public SelectElement type() {
-    return $(SelectElement.class).id(id(TYPE));
+  public ComboBoxElement type() {
+    return $(ComboBoxElement.class).id(id(TYPE));
   }
 
   public TextFieldElement target() {

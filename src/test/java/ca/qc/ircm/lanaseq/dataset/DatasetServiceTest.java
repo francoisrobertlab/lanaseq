@@ -46,7 +46,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -833,7 +832,7 @@ public class DatasetServiceTest {
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
     sample1.setAssay("ChIP-seq");
-    sample1.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample1.setType("IP");
     sample1.setTarget("my target");
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
@@ -881,7 +880,7 @@ public class DatasetServiceTest {
     sample1.setSampleId("sample1");
     sample1.setReplicate("r1");
     sample1.setAssay("ChIP-seq");
-    sample1.setType(SampleType.INPUT);
+    sample1.setType("Input");
     sample1.setTarget("my target");
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
@@ -933,7 +932,7 @@ public class DatasetServiceTest {
     newSample.setSampleId("new_sample");
     newSample.setReplicate("new_r");
     newSample.setAssay("ChIP-seq");
-    newSample.setType(SampleType.IMMUNO_PRECIPITATION);
+    newSample.setType("IP");
     newSample.setTarget("my target");
     newSample.setStrain("yFR213");
     newSample.setStrainDescription("F56G");

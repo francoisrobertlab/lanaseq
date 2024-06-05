@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,7 +51,7 @@ public class AppConfigurationTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("ChIP-seq");
-    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setType("IP");
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -72,7 +71,7 @@ public class AppConfigurationTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("ChIP-seq");
-    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setType("IP");
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -98,7 +97,7 @@ public class AppConfigurationTest {
     sample.setSampleId("s1");
     sample.setReplicate("r1");
     sample.setAssay("ChIP-seq");
-    sample.setType(SampleType.IMMUNO_PRECIPITATION);
+    sample.setType("IP");
     sample.setTarget("my target");
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
@@ -175,7 +174,7 @@ public class AppConfigurationTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("MNase-seq");
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
     sample.setDate(LocalDate.of(2020, 4, 10));
@@ -202,7 +201,7 @@ public class AppConfigurationTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("MNase-seq");
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
     dataset.getSamples().add(sample);
@@ -261,7 +260,7 @@ public class AppConfigurationTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("MNase-seq");
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
     sample.setDate(LocalDate.of(2020, 4, 10));
@@ -296,7 +295,7 @@ public class AppConfigurationTest {
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("MNase-seq");
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     sample.setTarget("polr2a");
     sample.setStrain("yFR111");
     dataset.getSamples().add(sample);

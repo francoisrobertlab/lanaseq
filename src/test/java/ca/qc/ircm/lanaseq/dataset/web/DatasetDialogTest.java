@@ -46,8 +46,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
-import static ca.qc.ircm.lanaseq.sample.SampleType.IMMUNO_PRECIPITATION;
-import static ca.qc.ircm.lanaseq.sample.SampleType.INPUT;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
@@ -77,7 +75,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -607,7 +604,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void setDatasetId_SampleWithDifferentFields() {
     Dataset dataset = repository.findById(1L).get();
     Sample sample = sampleRepository.findById(4L).get();
-    sample.setType(SampleType.INPUT);
+    sample.setType("Input");
     sample.setTreatment("Heat shock");
     dataset.getSamples().add(sample);
 
@@ -615,8 +612,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
     assertEquals("FLAG, Histone FLAG", dialog.protocol.getValue());
     assertEquals("MNase-seq" + ", " + "ChIP-seq", dialog.assay.getValue());
-    assertEquals(IMMUNO_PRECIPITATION.getLabel(locale) + ", " + INPUT.getLabel(locale),
-        dialog.type.getValue());
+    assertEquals("IP, Input", dialog.type.getValue());
     assertEquals("polr2a, Spt16", dialog.target.getValue());
     assertEquals("yFR100, yFR101", dialog.strain.getValue());
     assertEquals("WT, G24D", dialog.strainDescription.getValue());
@@ -639,7 +635,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
     assertEquals("FLAG", dialog.protocol.getValue());
     assertEquals("MNase-seq", dialog.assay.getValue());
-    assertEquals(IMMUNO_PRECIPITATION.getLabel(locale), dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertEquals("polr2a", dialog.target.getValue());
     assertEquals("yFR100", dialog.strain.getValue());
     assertEquals("WT", dialog.strainDescription.getValue());

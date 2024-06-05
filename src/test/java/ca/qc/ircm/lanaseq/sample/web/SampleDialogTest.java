@@ -47,13 +47,11 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDatePickerI18n;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -75,7 +73,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
@@ -143,11 +140,12 @@ public class SampleDialogTest extends SpringUIUnitTest {
   private AppResources webResources = new AppResources(Constants.class, locale);
   private List<String> topTags = new ArrayList<>();
   private List<String> topAssays = new ArrayList<>();
+  private List<String> topTypes = new ArrayList<>();
   private String sampleId = "Test Sample";
   private String replicate = "Test Replicate";
   private Protocol protocol;
   private String assay = "ChIP-seq";
-  private SampleType type = SampleType.IMMUNO_PRECIPITATION;
+  private String type = "IP";
   private String target = "polr3a";
   private String strain = "yFR20";
   private String strainDescription = "WT";
@@ -167,10 +165,13 @@ public class SampleDialogTest extends SpringUIUnitTest {
     when(service.all(any())).thenReturn(repository.findAll());
     topAssays = jpaQueryFactory.select(sample.assay).from(sample).fetch();
     when(service.topAssays(anyInt())).thenReturn(topAssays);
+    topTypes = jpaQueryFactory.select(sample.type).from(sample).fetch();
+    when(service.topTypes(anyInt())).thenReturn(topTypes);
     when(protocolService.all()).thenReturn(protocolRepository.findAll());
     protocol = protocolRepository.findById(1L).get();
     topTags.add("input");
     topTags.add("chip");
+    topTypes.add("ip_ms");
     when(service.topTags(anyInt())).thenReturn(topTags);
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
@@ -356,11 +357,17 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void type() {
-    List<SampleType> types = items(dialog.type);
-    assertArrayEquals(SampleType.values(), types.toArray(new SampleType[0]));
-    for (SampleType type : types) {
-      assertEquals(type.getLabel(locale), dialog.type.getItemLabelGenerator().apply(type));
+    verify(service).topTypes(50);
+    List<String> types = dialog.type.getListDataView().getItems().collect(Collectors.toList());
+    assertEquals(topTypes.size(), types.size());
+    for (String type : topTypes) {
+      assertTrue(types.contains(type));
     }
+    assertTrue(dialog.type.isAllowCustomValue());
+    dialog.type.setItems("Test", "Test2");
+    fireEvent(dialog.type, new ComboBoxBase.CustomValueSetEvent(dialog.type, false, "new_type"));
+    assertEquals("new_type", dialog.type.getValue());
+    assertEquals("Input", dialog.type.getItemLabelGenerator().apply("Input"));
   }
 
   @Test
@@ -426,7 +433,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.protocol.isReadOnly());
     assertEquals("ChIP-seq", dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
-    assertEquals(SampleType.NULL, dialog.type.getValue());
+    assertEquals("", dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
     assertEquals("Spt16", dialog.target.getValue());
     assertFalse(dialog.target.isReadOnly());
@@ -465,7 +472,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.protocol.isReadOnly());
     assertEquals("MNase-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2a", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -500,7 +507,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.protocol.isReadOnly());
     assertEquals("ChIP-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
-    assertEquals(SampleType.IMMUNO_PRECIPITATION, dialog.type.getValue());
+    assertEquals("IP", dialog.type.getValue());
     assertTrue(dialog.type.isReadOnly());
     assertEquals("polr2b", dialog.target.getValue());
     assertTrue(dialog.target.isReadOnly());
@@ -551,7 +558,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.protocol.isReadOnly());
     assertNull(dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
-    assertEquals(SampleType.NULL, dialog.type.getValue());
+    assertEquals("", dialog.type.getValue());
     assertFalse(dialog.type.isReadOnly());
     assertEquals("", dialog.target.getValue());
     assertFalse(dialog.target.isReadOnly());
@@ -716,7 +723,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
     fillForm();
-    dialog.type.setValue(SampleType.NULL);
+    dialog.type.setValue("");
 
     clickButton(dialog.save);
 
