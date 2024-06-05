@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
@@ -26,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
@@ -50,6 +50,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -59,6 +60,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogItTest.class);
   @TempDir
   Path temporaryFolder;
@@ -70,6 +72,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolRepository protocolRepository;
   @Autowired
   private AppConfiguration configuration;
+  @Autowired
+  private MessageSource messageSource;
   private String namePrefix = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2";
   private String tag1 = "mnase";
   private String tag2 = "ip";
@@ -141,8 +145,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        notification.getText());
     dataset = repository.findById(2L).get();
     assertEquals(name, dataset.getName());
     assertEquals(3, dataset.getTags().size());
@@ -206,8 +211,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        notification.getText());
     Dataset dataset = repository.findById(2L).get();
     assertEquals(name, dataset.getName());
     assertEquals(3, dataset.getTags().size());
@@ -266,9 +272,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetDialog.class);
     dataset = repository.findById(2L).get();
-    assertEquals(resources.message(SAVED, dataset.getName()), notification.getText());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
+        new Object[] { dataset.getName() }, currentLocale()), notification.getText());
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
     assertEquals(3, dataset.getTags().size());
     assertTrue(dataset.getTags().contains("chipseq"));
@@ -395,8 +401,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetDialog.class);
-    assertEquals(resources.message(DELETED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[] { name }, currentLocale()),
+        notification.getText());
     assertFalse(repository.findById(4L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.
     assertFalse(Files.exists(folder));

@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
@@ -40,7 +41,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -121,6 +121,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
+  private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialog.class);
   private static final long serialVersionUID = 3285639770914046262L;
   protected TextField namePrefix = new TextField();
@@ -267,15 +271,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
-    final AppResources datasetResources = new AppResources(Dataset.class, getLocale());
-    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
     DateTimeFormatter dateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
-    binder.forField(namePrefix).asRequired(webResources.message(REQUIRED))
+    binder.forField(namePrefix).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
         .withNullRepresentation("")
-        .withValidator(
-            new RegexpValidator(resources.message(NAME_PREFIX_REGEX_ERROR), NAME_PREFIX_REGEX))
+        .withValidator(new RegexpValidator(getTranslation(MESSAGE_PREFIX + NAME_PREFIX_REGEX_ERROR),
+            NAME_PREFIX_REGEX))
         .withConverter(
             namePrefix -> namePrefix
                 + date.getOptionalValue().map(date -> "_" + dateFormatter.format(date)).orElse(""),
@@ -288,31 +288,31 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       namePrefix.setValue(value);
     });
     binder.forField(tags).bind(TAGS);
-    binder.forField(date).asRequired(webResources.message(REQUIRED)).bind(DATE);
+    binder.forField(date).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED)).bind(DATE);
     binder.forField(note).withNullRepresentation("").bind(NOTE);
-    namePrefix.setLabel(resources.message(NAME_PREFIX));
-    generateName.setText(resources.message(GENERATE_NAME));
-    tags.setLabel(datasetResources.message(TAGS));
-    protocol.setLabel(sampleResources.message(PROTOCOL));
-    assay.setLabel(sampleResources.message(ASSAY));
-    type.setLabel(sampleResources.message(TYPE));
-    target.setLabel(sampleResources.message(TARGET));
-    strain.setLabel(sampleResources.message(STRAIN));
-    strainDescription.setLabel(sampleResources.message(STRAIN_DESCRIPTION));
-    treatment.setLabel(sampleResources.message(TREATMENT));
-    date.setLabel(datasetResources.message(DATE));
+    namePrefix.setLabel(getTranslation(MESSAGE_PREFIX + NAME_PREFIX));
+    generateName.setText(getTranslation(MESSAGE_PREFIX + GENERATE_NAME));
+    tags.setLabel(getTranslation(DATASET_PREFIX + TAGS));
+    protocol.setLabel(getTranslation(SAMPLE_PREFIX + PROTOCOL));
+    assay.setLabel(getTranslation(SAMPLE_PREFIX + ASSAY));
+    type.setLabel(getTranslation(SAMPLE_PREFIX + TYPE));
+    target.setLabel(getTranslation(SAMPLE_PREFIX + TARGET));
+    strain.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN));
+    strainDescription.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION));
+    treatment.setLabel(getTranslation(SAMPLE_PREFIX + TREATMENT));
+    date.setLabel(getTranslation(DATASET_PREFIX + DATE));
     date.setI18n(datePickerI18n(getLocale()));
     date.setLocale(Locale.CANADA);
-    note.setLabel(datasetResources.message(NOTE));
-    String sampleNameHeader = sampleResources.message(SampleProperties.NAME);
+    note.setLabel(getTranslation(DATASET_PREFIX + NOTE));
+    String sampleNameHeader = getTranslation(SAMPLE_PREFIX + SampleProperties.NAME);
     sampleName.setHeader(sampleNameHeader);
-    addSample.setText(resources.message(ADD_SAMPLE));
-    save.setText(webResources.message(SAVE));
-    cancel.setText(webResources.message(CANCEL));
-    delete.setText(webResources.message(DELETE));
-    confirm.setHeader(resources.message(DELETE_HEADER));
-    confirm.setConfirmText(webResources.message(DELETE));
-    confirm.setCancelText(webResources.message(CANCEL));
+    addSample.setText(getTranslation(MESSAGE_PREFIX + ADD_SAMPLE));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
+    cancel.setText(getTranslation(CONSTANTS_PREFIX + CANCEL));
+    delete.setText(getTranslation(CONSTANTS_PREFIX + DELETE));
+    confirm.setHeader(getTranslation(MESSAGE_PREFIX + DELETE_HEADER));
+    confirm.setConfirmText(getTranslation(CONSTANTS_PREFIX + DELETE));
+    confirm.setCancelText(getTranslation(CONSTANTS_PREFIX + CANCEL));
     updateSamplesFields();
     updateHeader();
   }
@@ -324,13 +324,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(DatasetDialog.class, getLocale());
     Dataset dataset = binder.getBean();
     if (dataset != null && dataset.getId() != null) {
-      setHeaderTitle(resources.message(HEADER, 1, dataset.getName()));
-      confirm.setText(resources.message(DELETE_MESSAGE, dataset.getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, dataset.getName()));
+      confirm.setText(getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, dataset.getName()));
     } else {
-      setHeaderTitle(resources.message(HEADER, 0));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     }
   }
 
@@ -425,8 +424,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       if (service.exists(dataset.getName()) && (dataset.getId() == null || !dataset.getName()
           .equalsIgnoreCase(service.get(dataset.getId()).map(Dataset::getName).orElse("")))) {
         valid = false;
-        AppResources datasetResources = new AppResources(Dataset.class, getLocale());
-        error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));
+        error.setText(getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName()));
         error.setVisible(true);
       }
     }
@@ -439,8 +437,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       Dataset dataset = binder.getBean();
       logger.debug("save dataset {}", dataset);
       service.save(dataset);
-      AppResources resources = new AppResources(DatasetDialog.class, getLocale());
-      showNotification(resources.message(SAVED, dataset.getName()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()));
       close();
       fireSavedEvent();
     }
@@ -450,8 +447,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     Dataset dataset = binder.getBean();
     logger.debug("delete dataset {}", dataset);
     service.delete(dataset);
-    AppResources resources = new AppResources(DatasetDialog.class, getLocale());
-    showNotification(resources.message(DELETED, dataset.getName()));
+    showNotification(getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()));
     fireDeletedEvent();
     close();
   }
