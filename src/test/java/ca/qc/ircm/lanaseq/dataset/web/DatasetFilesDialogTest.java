@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
@@ -70,7 +71,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -142,6 +142,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetFilesDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(DatasetFilesDialog.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @TempDir
   Path temporaryFolder;
   private DatasetFilesDialog dialog;
@@ -158,9 +161,6 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   @Autowired
   private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
-  private AppResources sampleResources = new AppResources(Sample.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<File> files = new ArrayList<>();
   private List<String> labels = new ArrayList<>();
   private List<Sample> samples = new ArrayList<>();
@@ -248,48 +248,59 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void labels() {
     Dataset dataset = repository.findById(2L).get();
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
+        dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     for (int i = 0; i < labels.size(); i++) {
       assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
     }
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
-    assertEquals(webResources.message(DOWNLOAD), headerRow.getCell(dialog.download).getText());
-    assertEquals(webResources.message(DELETE), headerRow.getCell(dialog.delete).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME),
+        headerRow.getCell(dialog.filename).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DOWNLOAD),
+        headerRow.getCell(dialog.download).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
+        headerRow.getCell(dialog.delete).getText());
     HeaderRow samplesHeaderRow = dialog.samples.getHeaderRows().get(0);
-    assertEquals(sampleResources.message(NAME), samplesHeaderRow.getCell(dialog.name).getText());
-    assertEquals(resources.message(FILE_COUNT),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NAME),
+        samplesHeaderRow.getCell(dialog.name).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILE_COUNT),
         samplesHeaderRow.getCell(dialog.fileCount).getText());
     validateEquals(englishUploadI18N(), dialog.upload.getI18n());
-    assertEquals(resources.message(ADD_LARGE_FILES), dialog.addLargeFiles.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + ADD_LARGE_FILES),
+        dialog.addLargeFiles.getText());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(DatasetFilesDialog.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
-    final AppResources sampleResources = new AppResources(Sample.class, locale);
     UI.getCurrent().setLocale(locale);
     Dataset dataset = repository.findById(2L).get();
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
+        dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     for (int i = 0; i < labels.size(); i++) {
       assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
     }
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
-    assertEquals(webResources.message(DOWNLOAD), headerRow.getCell(dialog.download).getText());
-    assertEquals(webResources.message(DELETE), headerRow.getCell(dialog.delete).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME),
+        headerRow.getCell(dialog.filename).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DOWNLOAD),
+        headerRow.getCell(dialog.download).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
+        headerRow.getCell(dialog.delete).getText());
     HeaderRow samplesHeaderRow = dialog.samples.getHeaderRows().get(0);
-    assertEquals(sampleResources.message(NAME), samplesHeaderRow.getCell(dialog.name).getText());
-    assertEquals(resources.message(FILE_COUNT),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NAME),
+        samplesHeaderRow.getCell(dialog.name).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILE_COUNT),
         samplesHeaderRow.getCell(dialog.fileCount).getText());
     validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
-    assertEquals(resources.message(ADD_LARGE_FILES), dialog.addLargeFiles.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + ADD_LARGE_FILES),
+        dialog.addLargeFiles.getText());
   }
 
   @Test
@@ -297,7 +308,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   public void folderLabels() {
     Dataset dataset = repository.findById(2L).get();
     verify(service).folderLabels(dataset, false);
-    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DatasetFilesDialog.MESSAGE, labels.size()),
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
@@ -311,7 +322,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   public void folderLabels_Linux() {
     Dataset dataset = repository.findById(2L).get();
     verify(service).folderLabels(dataset, true);
-    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
+        dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
       assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
@@ -324,7 +336,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   public void folderLabels_Mac() {
     Dataset dataset = repository.findById(2L).get();
     verify(service).folderLabels(dataset, true);
-    assertEquals(resources.message(DatasetFilesDialog.MESSAGE, labels.size()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DatasetFilesDialog.MESSAGE, labels.size()),
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
@@ -340,7 +352,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Dataset dataset = repository.findById(2L).get();
     dialog.setDatasetId(2L);
     verify(service, times(2)).folderLabels(dataset, false);
-    assertEquals(resources.message(MESSAGE, 1), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, 1), dialog.message.getText());
     assertEquals(1, dialog.folders.getComponentCount());
     assertTrue(dialog.folders.getComponentAt(0) instanceof Span);
     assertEquals(labels.get(0), dialog.folders.getComponentAt(0).getElement().getText());
@@ -353,7 +365,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Dataset dataset = repository.findById(2L).get();
     dialog.setDatasetId(2L);
     verify(service, times(2)).folderLabels(dataset, false);
-    assertEquals(resources.message(MESSAGE, 0), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, 0), dialog.message.getText());
     assertEquals(0, dialog.folders.getComponentCount());
   }
 
@@ -444,7 +456,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
   }
 
   @Test
@@ -482,7 +495,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(resources.message(FILENAME_REGEX_ERROR)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(MESSAGE_PREFIX + FILENAME_REGEX_ERROR)),
+        error.getMessage());
   }
 
   @Test
@@ -502,7 +516,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
+        error.getMessage());
   }
 
   @Test
@@ -528,7 +543,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
   }
 
   @Test
@@ -648,7 +664,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     assertEquals(filename, file.getFileName().toString());
     assertArrayEquals(fileContent, Files.readAllBytes(tempFile));
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(FILES_SUCCESS, filename), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename),
+        test(notification).getText());
     assertFalse(Files.exists(file));
     assertFalse(Files.exists(file.getParent()));
   }
@@ -668,7 +685,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().get();
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(FILES_IOEXCEPTION, filename), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
+        test(notification).getText());
     assertFalse(Files.exists(file));
     assertFalse(Files.exists(file.getParent()));
   }
@@ -684,8 +702,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
     dialog.setDatasetId(6L);
 
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
+        dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     for (int i = 0; i < labels.size(); i++) {
       assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
@@ -708,8 +728,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
     dialog.setDatasetId(1L);
 
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
+        dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     for (int i = 0; i < labels.size(); i++) {
       assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
@@ -733,8 +755,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
     dialog.setDatasetId(5L);
 
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, labels.size()), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
+        dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     for (int i = 0; i < labels.size(); i++) {
       assertEquals(labels.get(i), ((Span) dialog.folders.getComponentAt(i)).getText());
