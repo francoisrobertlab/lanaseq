@@ -20,7 +20,6 @@ package ca.qc.ircm.lanaseq.sample;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
-import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.DataWithFiles;
@@ -34,7 +33,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -44,7 +42,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -93,8 +90,8 @@ public class Sample implements DataWithFiles, Owned, Serializable {
    * Type.
    */
   @Column
-  @Enumerated(STRING)
-  private SampleType type;
+  @Size(max = 255)
+  private String type;
   /**
    * Target.
    */
@@ -185,7 +182,7 @@ public class Sample implements DataWithFiles, Owned, Serializable {
     StringBuilder builder = new StringBuilder();
     builder.append(sampleId != null ? sampleId + "_" : "");
     builder.append(assay != null ? assay.replaceAll("[^\\w]", "") + "_" : "");
-    builder.append(type != null ? type.getLabel(Locale.ENGLISH) + "_" : "");
+    builder.append(type != null ? type.replaceAll("[^\\w]", "") + "_" : "");
     builder.append(target != null ? target + "_" : "");
     builder.append(strain != null ? strain + "_" : "");
     builder.append(strainDescription != null ? strainDescription + "_" : "");
@@ -253,11 +250,11 @@ public class Sample implements DataWithFiles, Owned, Serializable {
     this.assay = assay;
   }
 
-  public SampleType getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(SampleType type) {
+  public void setType(String type) {
     this.type = type;
   }
 

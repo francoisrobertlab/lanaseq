@@ -34,7 +34,6 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.sample.SampleType;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -44,7 +43,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -72,7 +70,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private Protocol protocol;
   private LocalDate date = LocalDate.of(2020, 07, 20);
   private String assay = "RNA-seq";
-  private SampleType type = SampleType.IMMUNO_PRECIPITATION;
+  private String type = "IP";
   private String target = "polr3a";
   private String strain = "yFR20";
   private String strainDescription = "WT";
@@ -105,7 +103,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     dialog.assay().sendKeys(assay);
     dialog.assay().sendKeys(Keys.TAB);
     dialog.type().openPopup(); // Causes delay to make unit test work.
-    dialog.type().selectByText(type.getLabel(currentLocale()));
+    dialog.type().selectByText(type);
     dialog.type().closePopup(); // Causes delay to make unit test work.
     dialog.target().setValue(target);
     dialog.strain().setValue(strain);
@@ -118,7 +116,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private String name() {
-    return sampleId + "_" + assay.replaceAll("[^\\w]", "") + "_" + type.getLabel(Locale.ENGLISH)
+    return sampleId + "_" + assay.replaceAll("[^\\w]", "") + "_" + type.replaceAll("[^\\w]", "")
         + "_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_" + replicate;
   }
 

@@ -497,7 +497,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     assay.setValue(samples.stream().map(Sample::getAssay).filter(Objects::nonNull).distinct()
         .collect(Collectors.joining(", ")));
     type.setValue(samples.stream().map(Sample::getType).filter(Objects::nonNull).distinct()
-        .map(type -> type.getLabel(locale)).collect(Collectors.joining(", ")));
+        .collect(Collectors.joining(", ")));
     target.setValue(samples.stream().map(Sample::getTarget).filter(Objects::nonNull).distinct()
         .collect(Collectors.joining(", ")));
     strain.setValue(samples.stream().map(Sample::getStrain).filter(Objects::nonNull).distinct()
