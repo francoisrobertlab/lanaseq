@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
@@ -49,7 +50,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
@@ -90,6 +90,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolsViewTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
+  private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ProtocolsView view;
   @MockBean
   private ProtocolService service;
@@ -104,9 +107,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Autowired
   private ProtocolRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ProtocolsView.class, locale);
-  private AppResources protocolResources = new AppResources(Protocol.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Protocol> protocols;
 
   /**
@@ -152,51 +152,64 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
     FooterRow footerRow = view.protocols.getFooterRows().get(0);
-    assertEquals(protocolResources.message(NAME), headerRow.getCell(view.name).getText());
-    assertEquals(protocolResources.message(NAME), footerRow.getCell(view.name).getText());
-    assertEquals(protocolResources.message(CREATION_DATE), headerRow.getCell(view.date).getText());
-    assertEquals(protocolResources.message(CREATION_DATE), footerRow.getCell(view.date).getText());
-    assertEquals(protocolResources.message(OWNER), headerRow.getCell(view.owner).getText());
-    assertEquals(protocolResources.message(OWNER), footerRow.getCell(view.owner).getText());
-    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(webResources.message(ADD), view.add.getText());
-    assertEquals(resources.message(HISTORY), view.history.getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + NAME),
+        headerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + NAME),
+        footerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + CREATION_DATE),
+        headerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + CREATION_DATE),
+        footerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + OWNER),
+        headerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + OWNER),
+        footerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        headerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        footerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HISTORY), view.history.getText());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ProtocolsView.class, locale);
-    final AppResources protocolResources = new AppResources(Protocol.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
     FooterRow footerRow = view.protocols.getFooterRows().get(0);
-    assertEquals(protocolResources.message(NAME), headerRow.getCell(view.name).getText());
-    assertEquals(protocolResources.message(NAME), footerRow.getCell(view.name).getText());
-    assertEquals(protocolResources.message(CREATION_DATE), headerRow.getCell(view.date).getText());
-    assertEquals(protocolResources.message(CREATION_DATE), footerRow.getCell(view.date).getText());
-    assertEquals(protocolResources.message(OWNER), headerRow.getCell(view.owner).getText());
-    assertEquals(protocolResources.message(OWNER), footerRow.getCell(view.owner).getText());
-    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(webResources.message(ADD), view.add.getText());
-    assertEquals(resources.message(HISTORY), view.history.getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + NAME),
+        headerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + NAME),
+        footerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + CREATION_DATE),
+        headerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + CREATION_DATE),
+        footerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + OWNER),
+        headerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(PROTOCOL_PREFIX + OWNER),
+        footerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        headerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        footerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HISTORY), view.history.getText());
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
-        view.getPageTitle());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + TITLE,
+        view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME)), view.getPageTitle());
   }
 
   @Test
@@ -486,7 +499,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     clickButton(view.history);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(PROTOCOLS_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED), view.error.getText());
     assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 }

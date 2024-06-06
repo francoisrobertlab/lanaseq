@@ -23,13 +23,13 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -85,6 +85,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public static final String HISTORY = "history";
   public static final String PROTOCOLS_REQUIRED = property(PROTOCOLS, "required");
   public static final String PROTOCOLS_MORE_THAN_ONE = property(PROTOCOLS, "moreThanOne");
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
+  private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -2370599174391239721L;
   private static final Logger logger = LoggerFactory.getLogger(ProtocolsView.class);
   protected H2 header = new H2();
@@ -177,29 +180,25 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(ProtocolsView.class, getLocale());
-    final AppResources protocolResources = new AppResources(Protocol.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    String nameHeader = protocolResources.message(NAME);
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    String nameHeader = getTranslation(PROTOCOL_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String dateHeader = protocolResources.message(CREATION_DATE);
+    String dateHeader = getTranslation(PROTOCOL_PREFIX + CREATION_DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
-    String ownerHeader = protocolResources.message(OWNER);
+    String ownerHeader = getTranslation(PROTOCOL_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    String editHeader = webResources.message(EDIT);
+    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
     edit.setHeader(editHeader).setFooter(editHeader);
-    nameFilter.setPlaceholder(webResources.message(ALL));
-    ownerFilter.setPlaceholder(webResources.message(ALL));
-    add.setText(webResources.message(ADD));
-    history.setText(resources.message(HISTORY));
+    nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
+    history.setText(getTranslation(MESSAGE_PREFIX + HISTORY));
   }
 
   @Override
   public String getPageTitle() {
-    AppResources resources = new AppResources(ProtocolsView.class, getLocale());
-    AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   void edit(Protocol protocol) {
@@ -216,13 +215,12 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
 
   void history() {
     List<Protocol> protocols = new ArrayList<>(this.protocols.getSelectedItems());
-    AppResources resources = new AppResources(ProtocolsView.class, getLocale());
     boolean error = false;
     if (protocols.isEmpty()) {
-      this.error.setText(resources.message(PROTOCOLS_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED));
       error = true;
     } else if (protocols.size() > 1) {
-      this.error.setText(resources.message(PROTOCOLS_MORE_THAN_ONE));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + PROTOCOLS_MORE_THAN_ONE));
       error = true;
     }
     this.error.setVisible(error);
