@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.HEADER;
@@ -49,7 +50,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
@@ -102,6 +102,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddSampleFilesDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @TempDir
   Path temporaryFolder;
   private AddSampleFilesDialog dialog;
@@ -116,8 +118,6 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @Autowired
   private SampleRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private Path folder;
   private List<File> files = new ArrayList<>();
   private Random random = new Random();
@@ -193,32 +193,38 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels() {
     Sample sample = repository.findById(dialog.getSampleId()).get();
-    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(sample, true)), dialog.message.getText());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
-    assertEquals(resources.message(SIZE), headerRow.getCell(dialog.size).getText());
-    assertEquals(resources.message(OVERWRITE), headerRow.getCell(dialog.overwrite).getText());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME),
+        headerRow.getCell(dialog.filename).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SIZE),
+        headerRow.getCell(dialog.size).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
+        headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
   @Test
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(AddSampleFilesDialog.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     Sample sample = repository.findById(dialog.getSampleId()).get();
-    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(sample, true)), dialog.message.getText());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
-    assertEquals(resources.message(SIZE), headerRow.getCell(dialog.size).getText());
-    assertEquals(resources.message(OVERWRITE), headerRow.getCell(dialog.overwrite).getText());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME),
+        headerRow.getCell(dialog.filename).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SIZE),
+        headerRow.getCell(dialog.size).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
+        headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
   @Test
@@ -239,7 +245,9 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
       assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
-      assertEquals(resources.message(AddSampleFilesDialog.SIZE_VALUE, file.length() / 1048576),
+      assertEquals(
+          dialog.getTranslation(MESSAGE_PREFIX + AddSampleFilesDialog.SIZE_VALUE,
+              file.length() / 1048576),
           test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
       assertTrue(
           test(dialog.files).getCellComponent(i, dialog.overwrite.getKey()) instanceof Checkbox);
@@ -341,8 +349,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   public void message_Windows() {
     Sample sample = repository.findById(1L).get();
     dialog.setSampleId(1L);
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, false)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(sample, false)), dialog.message.getText());
   }
 
   @Test
@@ -350,8 +358,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   public void message_Linux() {
     Sample sample = repository.findById(1L).get();
     dialog.setSampleId(1L);
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(sample, true)), dialog.message.getText());
   }
 
   @Test
@@ -359,8 +367,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   public void message_Mac() {
     Sample sample = repository.findById(1L).get();
     dialog.setSampleId(1L);
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(sample, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(sample, true)), dialog.message.getText());
   }
 
   @Test
@@ -377,7 +385,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     verify(service, atLeastOnce()).uploadFiles(sample);
     List<File> files = items(dialog.files);
     assertEquals(4, files.size());
-    assertEquals(resources.message(HEADER, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()),
+        dialog.getHeaderTitle());
   }
 
   @Test
@@ -453,7 +462,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     dialog.save();
 
     assertTrue(dialog.error.isVisible());
-    assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR), dialog.error.getText());
     verify(service, never()).saveFiles(any(), any());
     assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
@@ -477,7 +486,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     }
     assertFalse(dialog.error.isVisible());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, 4, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 4, sample.getName()),
+        test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -499,7 +509,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath())));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath())));
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, 2, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 2, sample.getName()),
+        test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -518,7 +529,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     assertEquals(0, files.size());
     assertTrue(Files.exists(uploadFolder(sample)));
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, 0, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 0, sample.getName()),
+        test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }

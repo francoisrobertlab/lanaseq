@@ -19,11 +19,11 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -88,6 +88,8 @@ public class AddSampleFilesDialog extends Dialog
   public static final String SAVED = "saved";
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
+  private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 166699830639260659L;
   private static final Logger logger = LoggerFactory.getLogger(AddSampleFilesDialog.class);
   protected Div message = new Div();
@@ -190,39 +192,37 @@ public class AddSampleFilesDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    setHeaderTitle(resources.message(HEADER, 0));
+    setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     message.setText("");
-    filename.setHeader(resources.message(FILENAME));
+    filename.setHeader(getTranslation(MESSAGE_PREFIX + FILENAME));
     if (size != null) {
       files.removeColumn(size);
     }
     NumberFormat sizeFormat = NumberFormat.getIntegerInstance(getLocale());
     size = files.addColumn(file -> {
-      return resources.message(SIZE_VALUE, sizeFormat.format(file.length() / Math.pow(1024, 2)));
+      return getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
+          sizeFormat.format(file.length() / Math.pow(1024, 2)));
     }, SIZE).setKey(SIZE);
     files.setColumnOrder(filename, size, overwrite);
-    size.setHeader(resources.message(SIZE));
-    overwrite.setHeader(resources.message(OVERWRITE));
-    save.setText(webResources.message(SAVE));
+    size.setHeader(getTranslation(MESSAGE_PREFIX + SIZE));
+    overwrite.setHeader(getTranslation(MESSAGE_PREFIX + OVERWRITE));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
     updateHeader();
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
     if (sample != null && sample.getName() != null) {
-      setHeaderTitle(resources.message(HEADER, sample.getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()));
       getUI().ifPresent(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
         boolean unix = browser.isMacOSX() || browser.isLinux();
         if (sample != null) {
-          message
-              .setText(resources.message(MESSAGE, configuration.getUpload().label(sample, unix)));
+          message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE,
+              configuration.getUpload().label(sample, unix)));
         }
       });
     } else {
-      setHeaderTitle(resources.message(HEADER));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER));
     }
   }
 
@@ -293,9 +293,8 @@ public class AddSampleFilesDialog extends Dialog
         files.stream().filter(file -> exists(file.toFile()) && !overwrite(file.toFile()).getValue())
             .findAny().isPresent();
     if (anyExists) {
-      final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
       error.setVisible(true);
-      error.setText(resources.message(OVERWRITE_ERROR));
+      error.setText(getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR));
     }
     return !anyExists;
   }
@@ -305,8 +304,7 @@ public class AddSampleFilesDialog extends Dialog
     if (validate(files)) {
       logger.debug("save new files {} for sample {}", files, sample);
       service.saveFiles(sample, files);
-      final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
-      showNotification(resources.message(SAVED, files.size(), sample.getName()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, files.size(), sample.getName()));
       fireSavedEvent();
       close();
     }
@@ -330,8 +328,7 @@ public class AddSampleFilesDialog extends Dialog
         logger.debug("creating upload folder {} for sample {}", folder, sample);
         Files.createDirectories(folder);
       } catch (IOException e) {
-        final AppResources resources = new AppResources(AddSampleFilesDialog.class, getLocale());
-        showNotification(resources.message(CREATE_FOLDER_ERROR, folder));
+        showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
       }
     }
   }
