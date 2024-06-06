@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
@@ -65,7 +66,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
@@ -115,6 +115,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private SampleDialog dialog;
   @MockBean
   private SampleService service;
@@ -135,9 +138,6 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Autowired
   private JPAQueryFactory jpaQueryFactory;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(SampleDialog.class, locale);
-  private AppResources sampleResources = new AppResources(Sample.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<String> topTags = new ArrayList<>();
   private List<String> topAssays = new ArrayList<>();
   private List<String> topTypes = new ArrayList<>();
@@ -232,79 +232,80 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void labels() {
     Sample sample = repository.findById(dialog.getSampleId()).get();
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + DATE), dialog.date.getLabel());
     validateEquals(englishDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
-    assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
-    assertEquals(sampleResources.message(REPLICATE), dialog.replicate.getLabel());
-    assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
-    assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
-    assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
-    assertEquals(sampleResources.message(TARGET), dialog.target.getLabel());
-    assertEquals(sampleResources.message(property(TARGET, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + SAMPLE_ID), dialog.sampleId.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + REPLICATE), dialog.replicate.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TARGET), dialog.target.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TARGET, PLACEHOLDER)),
         dialog.target.getPlaceholder());
-    assertEquals(sampleResources.message(STRAIN), dialog.strain.getLabel());
-    assertEquals(sampleResources.message(property(STRAIN, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN), dialog.strain.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN, PLACEHOLDER)),
         dialog.strain.getPlaceholder());
-    assertEquals(sampleResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
-    assertEquals(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION),
+        dialog.strainDescription.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, PLACEHOLDER)),
         dialog.strainDescription.getPlaceholder());
-    assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
-    assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TREATMENT), dialog.treatment.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    assertEquals(sampleResources.message(TAGS), dialog.tags.getLabel());
-    assertEquals(sampleResources.message(NOTE), dialog.note.getLabel());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
-    assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    assertEquals(webResources.message(DELETE), dialog.delete.getText());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TAGS), dialog.tags.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE), dialog.delete.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(webResources.message(DELETE),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         dialog.confirm.getElement().getProperty("confirmText"));
-    assertEquals(webResources.message(CANCEL),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL),
         dialog.confirm.getElement().getProperty("cancelText"));
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(SampleDialog.class, locale);
-    final AppResources sampleResources = new AppResources(Sample.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     Sample sample = repository.findById(dialog.getSampleId()).get();
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(sampleResources.message(DATE), dialog.date.getLabel());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + DATE), dialog.date.getLabel());
     validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
-    assertEquals(sampleResources.message(SAMPLE_ID), dialog.sampleId.getLabel());
-    assertEquals(sampleResources.message(REPLICATE), dialog.replicate.getLabel());
-    assertEquals(sampleResources.message(PROTOCOL), dialog.protocol.getLabel());
-    assertEquals(sampleResources.message(ASSAY), dialog.assay.getLabel());
-    assertEquals(sampleResources.message(TYPE), dialog.type.getLabel());
-    assertEquals(sampleResources.message(TARGET), dialog.target.getLabel());
-    assertEquals(sampleResources.message(property(TARGET, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + SAMPLE_ID), dialog.sampleId.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + REPLICATE), dialog.replicate.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + PROTOCOL), dialog.protocol.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TARGET), dialog.target.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TARGET, PLACEHOLDER)),
         dialog.target.getPlaceholder());
-    assertEquals(sampleResources.message(STRAIN), dialog.strain.getLabel());
-    assertEquals(sampleResources.message(property(STRAIN, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN), dialog.strain.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN, PLACEHOLDER)),
         dialog.strain.getPlaceholder());
-    assertEquals(sampleResources.message(STRAIN_DESCRIPTION), dialog.strainDescription.getLabel());
-    assertEquals(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION),
+        dialog.strainDescription.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, PLACEHOLDER)),
         dialog.strainDescription.getPlaceholder());
-    assertEquals(sampleResources.message(TREATMENT), dialog.treatment.getLabel());
-    assertEquals(sampleResources.message(property(TREATMENT, PLACEHOLDER)),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TREATMENT), dialog.treatment.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    assertEquals(sampleResources.message(TAGS), dialog.tags.getLabel());
-    assertEquals(sampleResources.message(NOTE), dialog.note.getLabel());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
-    assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    assertEquals(webResources.message(DELETE), dialog.delete.getText());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TAGS), dialog.tags.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE), dialog.delete.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(webResources.message(DELETE),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         dialog.confirm.getElement().getProperty("confirmText"));
-    assertEquals(webResources.message(CANCEL),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL),
         dialog.confirm.getElement().getProperty("cancelText"));
   }
 
@@ -418,10 +419,11 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     dialog.setSampleId(4L);
 
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, sample.getName()),
         dialog.confirm.getElement().getProperty("message"));
     assertEquals(LocalDate.of(2018, 10, 22), dialog.date.getValue());
     assertFalse(dialog.date.isReadOnly());
@@ -457,10 +459,11 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     dialog.setSampleId(2L);
 
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, sample.getName()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, sample.getName()),
         dialog.confirm.getElement().getProperty("message"));
     assertEquals(LocalDate.of(2018, 10, 20), dialog.date.getValue());
     assertTrue(dialog.date.isReadOnly());
@@ -546,7 +549,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void setSampleId_Null() {
     dialog.setSampleId(null);
 
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
     assertTrue(LocalDate.now().minusDays(2).isBefore(dialog.date.getValue())
         && LocalDate.now().plusDays(1).isAfter(dialog.date.getValue()));
     assertFalse(dialog.date.isReadOnly());
@@ -591,7 +594,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.date);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse($(Notification.class).exists());
@@ -615,7 +619,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.sampleId);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse($(Notification.class).exists());
@@ -639,7 +644,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.replicate);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse($(Notification.class).exists());
@@ -663,7 +669,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.protocol);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse($(Notification.class).exists());
@@ -687,7 +694,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.assay);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse($(Notification.class).exists());
@@ -712,7 +720,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals("new_assay_type", sample.getAssay());
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -734,7 +743,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertNull(sample.getType());
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -756,7 +766,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertNull(sample.getTarget());
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -777,7 +788,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.strain);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any());
     verify(service, never()).delete(any());
     assertFalse($(Notification.class).exists());
@@ -803,7 +815,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertNull(sample.getStrainDescription());
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -825,7 +838,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertNull(sample.getTreatment());
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -846,7 +860,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     Sample sample = sampleCaptor.getValue();
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -867,7 +882,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     Sample sample = sampleCaptor.getValue();
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -909,7 +925,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     verify(service, atLeastOnce()).get(2L);
     verify(service).save(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -941,7 +958,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(sample.getTags().contains(tag2));
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -975,7 +993,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(sample.getTags().contains(tag2));
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
     verify(deletedListener, never()).onComponentEvent(any());
@@ -1016,7 +1035,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
     verify(service).delete(sample);
     assertFalse(dialog.isOpened());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(DELETED, sample.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()),
+        test(notification).getText());
     verify(savedListener, never()).onComponentEvent(any());
     verify(deletedListener).onComponentEvent(any());
   }
