@@ -51,6 +51,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
   private DatasetRepository repository;
   @Autowired
@@ -70,8 +71,10 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void title() throws Throwable {
     open();
-    assertEquals(resources(DatasetsView.class).message(TITLE,
-        resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
+    String applicationName =
+        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+        currentLocale()), getDriver().getTitle());
   }
 
   @Test
