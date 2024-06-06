@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
@@ -27,8 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
@@ -49,6 +48,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -57,12 +57,15 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   @TempDir
   Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
   @Autowired
   private AppConfiguration configuration;
+  @Autowired
+  private MessageSource messageSource;
   @Value("${download-home}")
   protected Path downloadHome;
   private Path file1;
@@ -213,8 +216,8 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     dialog.upload().upload(file1.toFile());
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(DatasetFilesDialog.class);
-    assertEquals(resources.message(FILES_SUCCESS, file1.getFileName()), notification.getText());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS,
+        new Object[] { file1.getFileName() }, currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertArrayEquals(

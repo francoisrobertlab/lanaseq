@@ -22,12 +22,12 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -105,6 +105,8 @@ public class SampleFilesDialog extends Dialog
   public static final int MAXIMUM_SMALL_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
   public static final String FILENAME_HTML = "<span title='${item.title}'>${item.filename}</span>";
+  private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(SampleFilesDialog.class);
   private static final long serialVersionUID = 166699830639260659L;
   protected Div message = new Div();
@@ -228,19 +230,18 @@ public class SampleFilesDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    fileBinder.forField(filenameEdit).asRequired(webResources.message(REQUIRED))
+    fileBinder.forField(filenameEdit).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
         .withNullRepresentation("")
-        .withValidator(new RegexpValidator(resources.message(FILENAME_REGEX_ERROR), FILENAME_REGEX))
+        .withValidator(new RegexpValidator(getTranslation(MESSAGE_PREFIX + FILENAME_REGEX_ERROR),
+            FILENAME_REGEX))
         .withValidator(exists()).bind(FILENAME);
-    setHeaderTitle(resources.message(HEADER, 0));
+    setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     message.setText("");
     message.setTitle("");
-    filename.setHeader(resources.message(FILENAME));
-    download.setHeader(webResources.message(DOWNLOAD));
-    delete.setHeader(webResources.message(DELETE));
-    addLargeFiles.setText(resources.message(ADD_LARGE_FILES));
+    filename.setHeader(getTranslation(MESSAGE_PREFIX + FILENAME));
+    download.setHeader(getTranslation(CONSTANTS_PREFIX + DOWNLOAD));
+    delete.setHeader(getTranslation(CONSTANTS_PREFIX + DELETE));
+    addLargeFiles.setText(getTranslation(MESSAGE_PREFIX + ADD_LARGE_FILES));
     upload.setI18n(uploadI18N(getLocale()));
     updateHeader();
     updateMessage();
@@ -251,30 +252,27 @@ public class SampleFilesDialog extends Dialog
       EditableFile item = files.getEditor().getItem();
       if (value != null && item != null && !value.equals(item.getFile().getName())
           && Files.exists(item.getFile().toPath().resolveSibling(value))) {
-        final AppResources webResources = new AppResources(Constants.class, getLocale());
-        return ValidationResult.error(webResources.message(ALREADY_EXISTS));
+        return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
       return ValidationResult.ok();
     };
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
     if (sample != null && sample.getName() != null) {
-      setHeaderTitle(resources.message(HEADER, sample.getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()));
     } else {
-      setHeaderTitle(resources.message(HEADER));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER));
     }
   }
 
   private void updateMessage() {
     getUI().ifPresent(ui -> {
-      final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
       WebBrowser browser = ui.getSession().getBrowser();
       boolean unix = browser.isMacOSX() || browser.isLinux();
       if (sample != null) {
         List<String> labels = service.folderLabels(sample, unix);
-        message.setText(resources.message(DatasetFilesDialog.MESSAGE, labels.size()));
+        message.setText(getTranslation(MESSAGE_PREFIX + DatasetFilesDialog.MESSAGE, labels.size()));
         folders.removeAll();
         labels.forEach(label -> folders.add(new Span(label)));
       }
@@ -294,19 +292,18 @@ public class SampleFilesDialog extends Dialog
     logger.debug("saving file {} to dataset {}", filename, sample);
     try {
       SecurityContextHolder.getContext().setAuthentication(authentication); // Sets user for current thread.
-      AppResources resources = new AppResources(DatasetFilesDialog.class, getLocale());
       try {
         Path folder = Files.createTempDirectory("lanaseq-dataset-");
         try {
           Path file = folder.resolve(filename);
           Files.copy(inputStream, file);
           service.saveFiles(sample, Collections.nCopies(1, file));
-          showNotification(resources.message(FILES_SUCCESS, filename));
+          showNotification(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
         } finally {
           FileSystemUtils.deleteRecursively(folder);
         }
       } catch (IOException | IllegalStateException e) {
-        showNotification(resources.message(FILES_IOEXCEPTION, filename));
+        showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
         return;
       }
       updateFiles();
@@ -331,9 +328,8 @@ public class SampleFilesDialog extends Dialog
       updateFiles();
     } catch (IOException e) {
       logger.error("renaming of file {} to {} failed", source, target);
-      final AppResources resources = new AppResources(SampleFilesDialog.class, getLocale());
-      showNotification(
-          resources.message(FILE_RENAME_ERROR, source.getFileName(), file.getFilename()));
+      showNotification(getTranslation(MESSAGE_PREFIX + FILE_RENAME_ERROR, source.getFileName(),
+          file.getFilename()));
     }
   }
 
