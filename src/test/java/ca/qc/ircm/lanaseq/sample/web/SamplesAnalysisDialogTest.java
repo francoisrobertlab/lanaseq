@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ERRORS;
@@ -44,7 +45,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
@@ -77,6 +77,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(SamplesAnalysisDialog.class);
   private SamplesAnalysisDialog dialog;
   @MockBean
   private SampleService service;
@@ -87,7 +88,6 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   @Autowired
   private SampleRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
   private List<Sample> samples = new ArrayList<>();
 
   /**
@@ -122,30 +122,37 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER, samples.size()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE), dialog.message.getText());
-    assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
-    assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(property(CONFIRM, CONFIRM)),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, samples.size()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CREATE_FOLDER),
+        dialog.createFolder.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CONFIRM),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, CONFIRM)),
         dialog.confirm.getElement().getProperty("confirmText"));
-    assertEquals(resources.message(ERRORS), dialog.errors.getElement().getProperty("header"));
-    assertEquals(resources.message(property(ERRORS, CONFIRM)),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + ERRORS),
+        dialog.errors.getElement().getProperty("header"));
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(ERRORS, CONFIRM)),
         dialog.errors.getElement().getProperty("confirmText"));
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(SamplesAnalysisDialog.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER, samples.size()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE), dialog.message.getText());
-    assertEquals(resources.message(CREATE_FOLDER), dialog.createFolder.getText());
-    assertEquals(resources.message(CONFIRM), dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(property(CONFIRM, CONFIRM)),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, samples.size()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CREATE_FOLDER),
+        dialog.createFolder.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CONFIRM),
+        dialog.confirm.getElement().getProperty("header"));
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, CONFIRM)),
         dialog.confirm.getElement().getProperty("confirmText"));
-    assertEquals(resources.message(ERRORS), dialog.errors.getElement().getProperty("header"));
-    assertEquals(resources.message(property(ERRORS, CONFIRM)),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + ERRORS),
+        dialog.errors.getElement().getProperty("header"));
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(ERRORS, CONFIRM)),
         dialog.errors.getElement().getProperty("confirmText"));
   }
 
@@ -198,7 +205,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
     verify(analysisService).copySamplesResources(samples);
     verify(configuration.getAnalysis()).label(samples, false);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
     assertTrue(dialog.confirm.isOpened());
     assertFalse(dialog.errors.isOpened());
@@ -214,7 +221,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
     verify(analysisService).copySamplesResources(samples);
     verify(configuration.getAnalysis()).label(samples, true);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
     assertTrue(dialog.confirm.isOpened());
     assertFalse(dialog.errors.isOpened());
@@ -230,7 +237,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
     verify(analysisService).copySamplesResources(samples);
     verify(configuration.getAnalysis()).label(samples, true);
-    assertEquals(resources.message(property(CONFIRM, "message"), folder),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
     assertTrue(dialog.confirm.isOpened());
     assertFalse(dialog.errors.isOpened());
@@ -247,7 +254,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.confirm.isOpened());
     assertEquals(1, dialog.errorsLayout.getComponentCount());
     assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
-    assertEquals(resources.message(CREATE_FOLDER_EXCEPTION),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_EXCEPTION),
         ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
     assertTrue(dialog.errors.isOpened());
     assertTrue(dialog.isOpened());
@@ -306,7 +313,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   public void setSampleId() {
     Sample sample = repository.findById(10L).get();
     dialog.setSampleId(10L);
-    assertEquals(resources.message(HEADER, 1, sample.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
+        dialog.getHeaderTitle());
   }
 
   @Test
@@ -316,6 +324,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     ids.add(5L);
     ids.add(10L);
     dialog.setSampleIds(ids);
-    assertEquals(resources.message(HEADER, ids.size()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, ids.size()),
+        dialog.getHeaderTitle());
   }
 }
