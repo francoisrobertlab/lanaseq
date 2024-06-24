@@ -19,9 +19,9 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
@@ -54,6 +54,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
   public static final String ID = "user-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
+  private static final String MESSAGE_PREFIX = messagePrefix(UserDialog.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 3285639770914046262L;
   private static final Logger logger = LoggerFactory.getLogger(UserDialog.class);
   protected UserForm form;
@@ -94,18 +96,16 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
     updateHeader();
-    save.setText(webResources.message(SAVE));
-    cancel.setText(webResources.message(CANCEL));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
+    cancel.setText(getTranslation(CONSTANTS_PREFIX + CANCEL));
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(UserDialog.class, getLocale());
     if (form.getUser() != null && form.getUser().getId() != null) {
-      setHeaderTitle(resources.message(HEADER, 1, form.getUser().getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, form.getUser().getName()));
     } else {
-      setHeaderTitle(resources.message(HEADER, 0));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     }
   }
 
@@ -115,8 +115,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
       String password = form.getPassword();
       logger.debug("save user {}", user);
       userService.save(user, password);
-      final AppResources resources = new AppResources(UserDialog.class, getLocale());
-      showNotification(resources.message(SAVED, user.getEmail()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, user.getEmail()));
       close();
       fireSavedEvent();
     }
