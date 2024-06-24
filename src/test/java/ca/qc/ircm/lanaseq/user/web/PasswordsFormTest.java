@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.ID;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.PASSWORD;
@@ -50,10 +51,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PasswordsFormTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(PasswordsForm.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private PasswordsForm form;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(PasswordsForm.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private String password = "test_password";
 
   /**
@@ -80,8 +81,9 @@ public class PasswordsFormTest extends SpringUIUnitTest {
   @Test
   public void labels() {
     form.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(PASSWORD), form.password.getLabel());
-    assertEquals(resources.message(PASSWORD_CONFIRM), form.passwordConfirm.getLabel());
+    assertEquals(form.getTranslation(MESSAGE_PREFIX + PASSWORD), form.password.getLabel());
+    assertEquals(form.getTranslation(MESSAGE_PREFIX + PASSWORD_CONFIRM),
+        form.passwordConfirm.getLabel());
   }
 
   @Test
@@ -91,8 +93,9 @@ public class PasswordsFormTest extends SpringUIUnitTest {
     final AppResources resources = new AppResources(PasswordsForm.class, locale);
     UI.getCurrent().setLocale(locale);
     form.localeChange(mock(LocaleChangeEvent.class));
-    assertEquals(resources.message(PASSWORD), form.password.getLabel());
-    assertEquals(resources.message(PASSWORD_CONFIRM), form.passwordConfirm.getLabel());
+    assertEquals(form.getTranslation(MESSAGE_PREFIX + PASSWORD), form.password.getLabel());
+    assertEquals(form.getTranslation(MESSAGE_PREFIX + PASSWORD_CONFIRM),
+        form.passwordConfirm.getLabel());
   }
 
   @Test
@@ -164,7 +167,7 @@ public class PasswordsFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.password);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
   }
 
   @Test
@@ -181,7 +184,7 @@ public class PasswordsFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.password);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
   }
 
   @Test
@@ -198,7 +201,8 @@ public class PasswordsFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.password);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(resources.message(PASSWORDS_NOT_MATCH)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(MESSAGE_PREFIX + PASSWORDS_NOT_MATCH)),
+        error.getMessage());
   }
 
   @Test
@@ -226,7 +230,7 @@ public class PasswordsFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.passwordConfirm);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
   }
 
   @Test
