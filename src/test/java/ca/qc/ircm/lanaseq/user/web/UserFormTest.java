@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -37,7 +38,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -64,6 +64,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class UserFormTest extends SpringUIUnitTest {
+  private static final String USER_PREFIX = messagePrefix(User.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private UserForm form;
   @MockBean
   private UserService service;
@@ -72,8 +74,6 @@ public class UserFormTest extends SpringUIUnitTest {
   @Captor
   private ArgumentCaptor<Boolean> booleanCaptor;
   private Locale locale = Locale.ENGLISH;
-  private AppResources userResources = new AppResources(User.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private String email = "test@ircm.qc.ca";
   private String name = "Test User";
   private String password = "test_password";
@@ -114,21 +114,20 @@ public class UserFormTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(userResources.message(EMAIL), form.email.getLabel());
-    assertEquals(userResources.message(NAME), form.name.getLabel());
-    assertEquals(userResources.message(ADMIN), form.admin.getLabel());
-    assertEquals(userResources.message(MANAGER), form.manager.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + EMAIL), form.email.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + NAME), form.name.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + ADMIN), form.admin.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + MANAGER), form.manager.getLabel());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources userResources = new AppResources(User.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(userResources.message(EMAIL), form.email.getLabel());
-    assertEquals(userResources.message(NAME), form.name.getLabel());
-    assertEquals(userResources.message(ADMIN), form.admin.getLabel());
-    assertEquals(userResources.message(MANAGER), form.manager.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + EMAIL), form.email.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + NAME), form.name.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + ADMIN), form.admin.getLabel());
+    assertEquals(form.getTranslation(USER_PREFIX + MANAGER), form.manager.getLabel());
   }
 
   @Test
@@ -302,7 +301,7 @@ public class UserFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
   }
 
   @Test
@@ -318,7 +317,8 @@ public class UserFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(INVALID_EMAIL)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + INVALID_EMAIL)),
+        error.getMessage());
   }
 
   @Test
@@ -335,7 +335,8 @@ public class UserFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
+        error.getMessage());
   }
 
   @Test
@@ -366,7 +367,7 @@ public class UserFormTest extends SpringUIUnitTest {
         findValidationStatusByField(status, form.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
   }
 
   @Test

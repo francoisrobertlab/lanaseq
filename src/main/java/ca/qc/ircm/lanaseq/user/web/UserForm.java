@@ -20,13 +20,13 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ADMIN;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.MANAGER;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
@@ -56,6 +56,8 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserForm extends FormLayout implements LocaleChangeObserver {
+  private static final String USER_PREFIX = messagePrefix(User.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 3285639770914046262L;
   public static final String ID = "user-form";
   protected TextField email = new TextField();
@@ -95,17 +97,16 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources userResources = new AppResources(User.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    email.setLabel(userResources.message(EMAIL));
-    name.setLabel(userResources.message(NAME));
-    admin.setLabel(userResources.message(ADMIN));
-    manager.setLabel(userResources.message(MANAGER));
-    binder.forField(email).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL)))
+    email.setLabel(getTranslation(USER_PREFIX + EMAIL));
+    name.setLabel(getTranslation(USER_PREFIX + NAME));
+    admin.setLabel(getTranslation(USER_PREFIX + ADMIN));
+    manager.setLabel(getTranslation(USER_PREFIX + MANAGER));
+    binder.forField(email).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("")
+        .withValidator(new EmailValidator(getTranslation(CONSTANTS_PREFIX + INVALID_EMAIL)))
         .withValidator(emailExists()).bind(EMAIL);
-    binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .bind(NAME);
+    binder.forField(name).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("").bind(NAME);
     binder.forField(admin).bind(ADMIN);
     binder.forField(manager).bind(MANAGER);
     updateReadOnly();
@@ -115,8 +116,7 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
     return (value, context) -> {
       if (service.exists(value) && (user.getId() == null
           || !value.equalsIgnoreCase(service.get(user.getId()).map(User::getEmail).orElse("")))) {
-        final AppResources resources = new AppResources(Constants.class, getLocale());
-        return ValidationResult.error(resources.message(ALREADY_EXISTS));
+        return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
       return ValidationResult.ok();
     };
