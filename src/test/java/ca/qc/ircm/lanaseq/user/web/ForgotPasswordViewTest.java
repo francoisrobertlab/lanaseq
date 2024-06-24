@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -71,6 +72,9 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 @ServiceTestAnnotations
 @WithAnonymousUser
 public class ForgotPasswordViewTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordView.class);
+  private static final String USER_PREFIX = messagePrefix(User.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ForgotPasswordView view;
   @MockBean
   private ForgotPasswordService service;
@@ -79,9 +83,6 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
   @Captor
   private ArgumentCaptor<ForgotPasswordWebContext> webContextCaptor;
   private Locale locale = ENGLISH;
-  private AppResources resources = new AppResources(ForgotPasswordView.class, locale);
-  private AppResources userResources = new AppResources(User.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
    * Before test.
@@ -104,10 +105,10 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(resources.message(MESSAGE), view.message.getText());
-    assertEquals(userResources.message(EMAIL), view.email.getLabel());
-    assertEquals(webResources.message(SAVE), view.save.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MESSAGE), view.message.getText());
+    assertEquals(view.getTranslation(USER_PREFIX + EMAIL), view.email.getLabel());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
@@ -118,16 +119,16 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
     final AppResources userResources = new AppResources(User.class, locale);
     final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(resources.message(MESSAGE), view.message.getText());
-    assertEquals(userResources.message(EMAIL), view.email.getLabel());
-    assertEquals(webResources.message(SAVE), view.save.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MESSAGE), view.message.getText());
+    assertEquals(view.getTranslation(USER_PREFIX + EMAIL), view.email.getLabel());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
-        view.getPageTitle());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + TITLE,
+        view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME)), view.getPageTitle());
   }
 
   @Test
@@ -142,7 +143,7 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
         findValidationStatusByField(status, view.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(view.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
     assertTrue($(ForgotPasswordView.class).exists());
     assertFalse($(Notification.class).exists());
   }
@@ -159,7 +160,8 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
         findValidationStatusByField(status, view.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(INVALID_EMAIL)), error.getMessage());
+    assertEquals(Optional.of(view.getTranslation(CONSTANTS_PREFIX + INVALID_EMAIL)),
+        error.getMessage());
     verify(service, never()).insert(any(), any());
     assertTrue($(ForgotPasswordView.class).exists());
     assertFalse($(Notification.class).exists());
@@ -176,7 +178,7 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
     verify(service, never()).insert(any(), any());
     assertTrue($(SigninView.class).exists());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, email), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAVED, email), test(notification).getText());
   }
 
   @Test
@@ -198,6 +200,6 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
         + UseForgotPasswordView.SEPARATOR + forgotPassword.getConfirmNumber(), url);
     assertTrue($(SigninView.class).exists());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, email), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAVED, email), test(notification).getText());
   }
 }
