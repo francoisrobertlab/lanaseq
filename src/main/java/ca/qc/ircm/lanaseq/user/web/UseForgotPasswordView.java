@@ -20,8 +20,8 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
@@ -63,6 +63,8 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
   public static final String MESSAGE = "message";
   public static final String SAVED = "saved";
   public static final String INVALID = "invalid";
+  private static final String MESSAGE_PREFIX = messagePrefix(UseForgotPasswordView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 4760310643370830640L;
   private static final Logger logger = LoggerFactory.getLogger(UseForgotPasswordView.class);
   protected H2 header = new H2();
@@ -97,24 +99,20 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    message.setText(resources.message(MESSAGE));
-    save.setText(webResources.message(SAVE));
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
   }
 
   @Override
   public String getPageTitle() {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   private boolean validateParameter(String parameter, Locale locale) {
-    final AppResources resources = new AppResources(UseForgotPasswordView.class, locale);
     if (parameter == null) {
-      showNotification(resources.message(INVALID));
+      showNotification(getTranslation(MESSAGE_PREFIX + INVALID));
       return false;
     }
 
@@ -134,7 +132,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
       }
     }
     if (!valid) {
-      showNotification(resources.message(INVALID));
+      showNotification(getTranslation(MESSAGE_PREFIX + INVALID));
     }
     return valid;
   }
@@ -157,8 +155,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
       String password = form.getPassword();
       logger.debug("save new password for user {}", forgotPassword.getUser());
       service.updatePassword(forgotPassword, password);
-      final AppResources resources = new AppResources(UseForgotPasswordView.class, getLocale());
-      showNotification(resources.message(SAVED));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED));
       UI.getCurrent().navigate(SigninView.class);
     }
   }
