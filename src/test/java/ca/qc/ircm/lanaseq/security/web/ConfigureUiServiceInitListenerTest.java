@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.security.web;
 
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +26,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -60,6 +60,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListenerTest.class);
   @Mock
@@ -73,7 +74,6 @@ public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
   @Mock
   private Location location;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ConfigureUiServiceInitListener.class, locale);
   private User user = new User(1L, "myuser");
 
   /**
@@ -115,8 +115,9 @@ public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
 
     doBeforeEnter();
 
-    String message = resources.message(AccessDeniedException.class.getSimpleName(),
-        "jonh.smith@ircm.qc.ca", UsersView.class.getSimpleName());
+    String message =
+        UI.getCurrent().getTranslation(MESSAGE_PREFIX + AccessDeniedException.class.getSimpleName(),
+            "jonh.smith@ircm.qc.ca", UsersView.class.getSimpleName());
     verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
   }
 
