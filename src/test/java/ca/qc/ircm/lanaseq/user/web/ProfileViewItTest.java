@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
@@ -37,6 +37,7 @@ import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -48,10 +49,14 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProfileViewItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProfileView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
   private UserRepository repository;
   @Autowired
   private PasswordEncoder passwordEncoder;
+  @Autowired
+  private MessageSource messageSource;
   private String email = "test@ircm.qc.ca";
   private String name = "Test User";
   private String password = "test_password";
@@ -72,8 +77,10 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void title() throws Throwable {
     open();
 
-    assertEquals(resources(ProfileView.class).message(TITLE,
-        resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
+    String applicationName =
+        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+        currentLocale()), getDriver().getTitle());
   }
 
   @Test
@@ -140,8 +147,8 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ProfileView.class);
-    assertEquals(resources.message(SAVED), notification.getText());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, currentLocale()),
+        notification.getText());
     User user = repository.findById(3L).orElse(null);
     assertNotNull(user);
     assertEquals(email, user.getEmail());

@@ -22,6 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.Constants.FRENCH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.ID;
@@ -35,7 +36,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -59,14 +59,14 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProfileViewTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProfileView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ProfileView view;
   @MockBean
   private UserService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;
   private Locale locale = ENGLISH;
-  private AppResources resources = new AppResources(ProfileView.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
    * Before test.
@@ -87,25 +87,23 @@ public class ProfileViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(webResources.message(SAVE), view.save.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
 
   @Test
   public void localeChange() {
     Locale locale = FRENCH;
-    final AppResources resources = new AppResources(ProfileView.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(webResources.message(SAVE), view.save.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
-        view.getPageTitle());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + TITLE,
+        view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME)), view.getPageTitle());
   }
 
   @Test
@@ -137,6 +135,6 @@ public class ProfileViewTest extends SpringUIUnitTest {
     verify(view.form).isValid();
     verify(service).save(eq(user), eq(password));
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAVED), test(notification).getText());
   }
 }

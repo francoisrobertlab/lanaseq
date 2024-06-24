@@ -20,9 +20,9 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
@@ -56,6 +56,8 @@ public class ProfileView extends VerticalLayout
   public static final String ID = "profile-view";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
+  private static final String MESSAGE_PREFIX = messagePrefix(ProfileView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 1252966315920684518L;
   private static final Logger logger = LoggerFactory.getLogger(ProfileView.class);
   protected H2 header = new H2();
@@ -91,17 +93,14 @@ public class ProfileView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(ProfileView.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    save.setText(webResources.message(SAVE));
-    header.setText(resources.message(HEADER));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
   }
 
   @Override
   public String getPageTitle() {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   void save() {
@@ -110,8 +109,7 @@ public class ProfileView extends VerticalLayout
       String password = form.getPassword();
       logger.debug("save user {}", user);
       service.save(user, password);
-      final AppResources resources = new AppResources(ProfileView.class, getLocale());
-      showNotification(resources.message(SAVED, user.getEmail()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, user.getEmail()));
     }
   }
 }
