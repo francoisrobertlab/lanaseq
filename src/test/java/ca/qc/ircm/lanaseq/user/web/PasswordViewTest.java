@@ -20,6 +20,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.ID;
@@ -31,7 +32,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
@@ -55,14 +55,14 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class PasswordViewTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private PasswordView view;
   @MockBean
   private UserService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(PasswordView.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
 
   /**
    * Before test.
@@ -84,24 +84,22 @@ public class PasswordViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(webResources.message(SAVE), view.save.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(PasswordView.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER), view.header.getText());
-    assertEquals(webResources.message(SAVE), view.save.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
-        view.getPageTitle());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + TITLE,
+        view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME)), view.getPageTitle());
   }
 
   @Test

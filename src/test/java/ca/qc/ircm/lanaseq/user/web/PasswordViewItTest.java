@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,6 +36,7 @@ import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -46,10 +48,14 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("christian.poitras@ircm.qc.ca")
 public class PasswordViewItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
   private UserRepository repository;
   @Autowired
   private PasswordEncoder passwordEncoder;
+  @Autowired
+  private MessageSource messageSource;
   private String password = "test_password";
 
   private void open() {
@@ -67,9 +73,10 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   @Test
   public void title() throws Throwable {
     open();
-
-    assertEquals(resources(PasswordView.class).message(TITLE,
-        resources(Constants.class).message(APPLICATION_NAME)), getDriver().getTitle());
+    String applicationName =
+        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+        currentLocale()), getDriver().getTitle());
   }
 
   @Test

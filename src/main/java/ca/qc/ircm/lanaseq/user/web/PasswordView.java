@@ -20,9 +20,9 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
@@ -56,6 +56,8 @@ public class PasswordView extends VerticalLayout
   public static final String VIEW_NAME = "password";
   public static final String ID = "password-view";
   public static final String HEADER = "header";
+  private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -8554355390432590290L;
   private static final Logger logger = LoggerFactory.getLogger(PasswordView.class);
   protected H2 header = new H2();
@@ -87,17 +89,14 @@ public class PasswordView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(PasswordView.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    save.setText(webResources.message(SAVE));
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
   }
 
   @Override
   public String getPageTitle() {
-    AppResources resources = new AppResources(PasswordView.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, webResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   private boolean validate() {
