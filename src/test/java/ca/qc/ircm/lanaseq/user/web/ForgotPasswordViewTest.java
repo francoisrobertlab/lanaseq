@@ -41,7 +41,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
@@ -115,9 +114,6 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
   @Test
   public void localeChange() {
     Locale locale = FRENCH;
-    final AppResources resources = new AppResources(ForgotPasswordView.class, locale);
-    final AppResources userResources = new AppResources(User.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MESSAGE), view.message.getText());

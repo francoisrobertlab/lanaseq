@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.UI;
@@ -90,7 +89,6 @@ public class PasswordsFormTest extends SpringUIUnitTest {
   public void localeChange() {
     form.localeChange(mock(LocaleChangeEvent.class));
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(PasswordsForm.class, locale);
     UI.getCurrent().setLocale(locale);
     form.localeChange(mock(LocaleChangeEvent.class));
     assertEquals(form.getTranslation(MESSAGE_PREFIX + PASSWORD), form.password.getLabel());
