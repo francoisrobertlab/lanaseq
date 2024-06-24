@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
@@ -60,7 +61,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetProperties;
@@ -108,6 +108,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(SamplesView.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private SamplesView view;
   @MockBean
   private SampleService service;
@@ -120,10 +124,6 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Autowired
   private SampleRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(SamplesView.class, locale);
-  private AppResources sampleResources = new AppResources(Sample.class, locale);
-  private AppResources datasetResources = new AppResources(Dataset.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Sample> samples;
 
   /**
@@ -179,67 +179,76 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.samples.getHeaderRows().get(0);
     FooterRow footerRow = view.samples.getFooterRows().get(0);
-    assertEquals(sampleResources.message(NAME), headerRow.getCell(view.name).getText());
-    assertEquals(sampleResources.message(NAME), footerRow.getCell(view.name).getText());
-    assertEquals(sampleResources.message(TAGS), headerRow.getCell(view.tags).getText());
-    assertEquals(sampleResources.message(TAGS), footerRow.getCell(view.tags).getText());
-    assertEquals(sampleResources.message(PROTOCOL), headerRow.getCell(view.protocol).getText());
-    assertEquals(sampleResources.message(PROTOCOL), footerRow.getCell(view.protocol).getText());
-    assertEquals(sampleResources.message(DATE), headerRow.getCell(view.date).getText());
-    assertEquals(sampleResources.message(DATE), footerRow.getCell(view.date).getText());
-    assertEquals(sampleResources.message(OWNER), headerRow.getCell(view.owner).getText());
-    assertEquals(sampleResources.message(OWNER), footerRow.getCell(view.owner).getText());
-    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.tagsFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(webResources.message(ADD), view.add.getText());
-    assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(FILES), view.files.getText());
-    assertEquals(resources.message(ANALYZE), view.analyze.getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), headerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), footerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), headerRow.getCell(view.tags).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), footerRow.getCell(view.tags).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        headerRow.getCell(view.protocol).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        footerRow.getCell(view.protocol).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + DATE), headerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + DATE), footerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + OWNER),
+        headerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + OWNER),
+        footerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        headerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        footerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(SamplesView.class, locale);
-    final AppResources sampleResources = new AppResources(Sample.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(HEADER), view.header.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.samples.getHeaderRows().get(0);
     FooterRow footerRow = view.samples.getFooterRows().get(0);
-    assertEquals(sampleResources.message(NAME), headerRow.getCell(view.name).getText());
-    assertEquals(sampleResources.message(NAME), footerRow.getCell(view.name).getText());
-    assertEquals(sampleResources.message(TAGS), headerRow.getCell(view.tags).getText());
-    assertEquals(sampleResources.message(TAGS), footerRow.getCell(view.tags).getText());
-    assertEquals(sampleResources.message(PROTOCOL), headerRow.getCell(view.protocol).getText());
-    assertEquals(sampleResources.message(PROTOCOL), footerRow.getCell(view.protocol).getText());
-    assertEquals(sampleResources.message(DATE), headerRow.getCell(view.date).getText());
-    assertEquals(sampleResources.message(DATE), footerRow.getCell(view.date).getText());
-    assertEquals(sampleResources.message(OWNER), headerRow.getCell(view.owner).getText());
-    assertEquals(sampleResources.message(OWNER), footerRow.getCell(view.owner).getText());
-    assertEquals(webResources.message(EDIT), headerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(EDIT), footerRow.getCell(view.edit).getText());
-    assertEquals(webResources.message(ALL), view.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.tagsFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.protocolFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(webResources.message(ADD), view.add.getText());
-    assertEquals(resources.message(MERGE), view.merge.getText());
-    assertEquals(resources.message(FILES), view.files.getText());
-    assertEquals(resources.message(ANALYZE), view.analyze.getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), headerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), footerRow.getCell(view.name).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), headerRow.getCell(view.tags).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), footerRow.getCell(view.tags).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        headerRow.getCell(view.protocol).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
+        footerRow.getCell(view.protocol).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + DATE), headerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + DATE), footerRow.getCell(view.date).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + OWNER),
+        headerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + OWNER),
+        footerRow.getCell(view.owner).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        headerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
+        footerRow.getCell(view.edit).getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
   }
 
   @Test
   public void getPageTitle() {
-    assertEquals(resources.message(TITLE, webResources.message(APPLICATION_NAME)),
-        view.getPageTitle());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + TITLE,
+        view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME)), view.getPageTitle());
   }
 
   @Test
@@ -576,7 +585,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
+        test(notification).getText());
   }
 
   @Test
@@ -603,7 +613,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(samples.get(1), dataset.getSamples().get(1));
     assertEquals(samples.get(0).getDate(), dataset.getDate());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(MERGED, dataset.getName()), test(notification).getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()),
+        test(notification).getText());
   }
 
   @Test
@@ -611,7 +622,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     clickButton(view.merge);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED), view.error.getText());
     verify(service, never()).isMergable(any());
     verify(datasetService, never()).save(any());
     assertFalse($(Notification.class).exists());
@@ -626,7 +637,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     clickButton(view.merge);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(MERGE_ERROR), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR), view.error.getText());
     verify(service).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
     assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
@@ -645,7 +656,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     clickButton(view.merge);
 
     assertTrue(view.error.isVisible());
-    assertEquals(datasetResources.message(NAME_ALREADY_EXISTS,
+    assertEquals(view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
         "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"), view.error.getText());
     verify(datasetService).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020");
     verify(datasetService, never()).save(any());
@@ -670,7 +681,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     clickButton(view.files);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED), view.error.getText());
     assertFalse($(SampleFilesDialog.class).exists());
   }
 
@@ -682,7 +693,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     clickButton(view.files);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(SAMPLES_MORE_THAN_ONE), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE), view.error.getText());
     assertFalse($(SampleFilesDialog.class).exists());
   }
 
@@ -705,7 +716,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     clickButton(view.analyze);
 
     assertTrue(view.error.isVisible());
-    assertEquals(resources.message(SAMPLES_REQUIRED), view.error.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED), view.error.getText());
     assertFalse($(SamplesAnalysisDialog.class).exists());
   }
 

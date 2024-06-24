@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
@@ -33,7 +34,6 @@ import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -104,6 +104,10 @@ public class SamplesView extends VerticalLayout
   public static final String EDIT_BUTTON =
       "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
           + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
+  private static final String MESSAGE_PREFIX = messagePrefix(SamplesView.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -6945706067250351889L;
   private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
   protected H2 header = new H2();
@@ -226,37 +230,33 @@ public class SamplesView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(SamplesView.class, getLocale());
-    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    String nameHeader = sampleResources.message(NAME);
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    String nameHeader = getTranslation(SAMPLE_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String tagsHeader = sampleResources.message(TAGS);
+    String tagsHeader = getTranslation(SAMPLE_PREFIX + TAGS);
     tags.setHeader(tagsHeader).setFooter(tagsHeader);
-    String protocolHeader = sampleResources.message(PROTOCOL);
+    String protocolHeader = getTranslation(SAMPLE_PREFIX + PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
-    String dateHeader = sampleResources.message(DATE);
+    String dateHeader = getTranslation(SAMPLE_PREFIX + DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
-    String ownerHeader = sampleResources.message(OWNER);
+    String ownerHeader = getTranslation(SAMPLE_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    String editHeader = webResources.message(EDIT);
+    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
     edit.setHeader(editHeader).setFooter(editHeader);
-    nameFilter.setPlaceholder(webResources.message(ALL));
-    tagsFilter.setPlaceholder(webResources.message(ALL));
-    protocolFilter.setPlaceholder(webResources.message(ALL));
-    ownerFilter.setPlaceholder(webResources.message(ALL));
-    add.setText(webResources.message(ADD));
-    merge.setText(resources.message(MERGE));
-    files.setText(resources.message(FILES));
-    analyze.setText(resources.message(ANALYZE));
+    nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
+    merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
+    files.setText(getTranslation(MESSAGE_PREFIX + FILES));
+    analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));
   }
 
   @Override
   public String getPageTitle() {
-    AppResources resources = new AppResources(SamplesView.class, getLocale());
-    AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   private void loadSamples() {
@@ -289,13 +289,12 @@ public class SamplesView extends VerticalLayout
 
   void viewFiles() {
     List<Sample> samples = new ArrayList<>(this.samples.getSelectedItems());
-    AppResources resources = new AppResources(SamplesView.class, getLocale());
     boolean error = false;
     if (samples.isEmpty()) {
-      this.error.setText(resources.message(SAMPLES_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED));
       error = true;
     } else if (samples.size() > 1) {
-      this.error.setText(resources.message(SAMPLES_MORE_THAN_ONE));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE));
       error = true;
     }
     this.error.setVisible(error);
@@ -307,10 +306,9 @@ public class SamplesView extends VerticalLayout
 
   void analyze() {
     List<Sample> samples = new ArrayList<>(this.samples.getSelectedItems());
-    AppResources resources = new AppResources(SamplesView.class, getLocale());
     boolean error = false;
     if (samples.isEmpty()) {
-      this.error.setText(resources.message(SAMPLES_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED));
       error = true;
     }
     this.error.setVisible(error);
@@ -330,13 +328,12 @@ public class SamplesView extends VerticalLayout
         .sorted(Comparator.comparing(Sample::getId)).collect(Collectors.toList());
     Set<String> tags =
         samples.stream().flatMap(sample -> sample.getTags().stream()).collect(Collectors.toSet());
-    AppResources resources = new AppResources(SamplesView.class, getLocale());
     boolean error = false;
     if (samples.isEmpty()) {
-      this.error.setText(resources.message(SAMPLES_REQUIRED));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED));
       error = true;
     } else if (!service.isMergable(samples)) {
-      this.error.setText(resources.message(MERGE_ERROR));
+      this.error.setText(getTranslation(MESSAGE_PREFIX + MERGE_ERROR));
       error = true;
     }
     this.error.setVisible(error);
@@ -347,12 +344,11 @@ public class SamplesView extends VerticalLayout
       dataset.setDate(samples.get(0).getDate());
       dataset.generateName();
       if (datasetService.exists(dataset.getName())) {
-        AppResources datasetResources = new AppResources(Dataset.class, getLocale());
-        this.error.setText(datasetResources.message(NAME_ALREADY_EXISTS, dataset.getName()));
+        this.error.setText(getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName()));
         this.error.setVisible(true);
       } else {
         datasetService.save(dataset);
-        showNotification(resources.message(MERGED, dataset.getName()));
+        showNotification(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));
       }
     }
   }
