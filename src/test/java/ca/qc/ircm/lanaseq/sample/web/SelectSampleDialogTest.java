@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
@@ -38,7 +39,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -85,6 +85,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SelectSampleDialogTest extends SpringUIUnitTest {
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private SelectSampleDialog dialog;
   @MockBean
   private SampleService service;
@@ -103,8 +105,6 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
   @Autowired
   private DatasetRepository datasetRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources sampleResources = new AppResources(Sample.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<Sample> samples;
 
   /**
@@ -157,25 +157,31 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
   public void labels() {
     dialog.localeChange(mock(LocaleChangeEvent.class));
     HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
-    assertEquals(sampleResources.message(NAME), headerRow.getCell(dialog.name).getText());
-    assertEquals(sampleResources.message(DATE), headerRow.getCell(dialog.date).getText());
-    assertEquals(sampleResources.message(OWNER), headerRow.getCell(dialog.owner).getText());
-    assertEquals(webResources.message(ALL), dialog.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), dialog.ownerFilter.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NAME),
+        headerRow.getCell(dialog.name).getText());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + DATE),
+        headerRow.getCell(dialog.date).getText());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + OWNER),
+        headerRow.getCell(dialog.owner).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + ALL), dialog.nameFilter.getPlaceholder());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + ALL),
+        dialog.ownerFilter.getPlaceholder());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources sampleResources = new AppResources(Sample.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
-    assertEquals(sampleResources.message(NAME), headerRow.getCell(dialog.name).getText());
-    assertEquals(sampleResources.message(DATE), headerRow.getCell(dialog.date).getText());
-    assertEquals(sampleResources.message(OWNER), headerRow.getCell(dialog.owner).getText());
-    assertEquals(webResources.message(ALL), dialog.nameFilter.getPlaceholder());
-    assertEquals(webResources.message(ALL), dialog.ownerFilter.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NAME),
+        headerRow.getCell(dialog.name).getText());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + DATE),
+        headerRow.getCell(dialog.date).getText());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + OWNER),
+        headerRow.getCell(dialog.owner).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + ALL), dialog.nameFilter.getPlaceholder());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + ALL),
+        dialog.ownerFilter.getPlaceholder());
   }
 
   @Test

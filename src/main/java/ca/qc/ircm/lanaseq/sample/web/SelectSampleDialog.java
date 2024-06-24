@@ -18,12 +18,12 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -67,6 +67,8 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   public static final String ID = "select-sample-dialog";
   public static final String SAMPLES = "samples";
   private static final Logger logger = LoggerFactory.getLogger(SelectSampleDialog.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -1701490833972618304L;
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
@@ -137,16 +139,14 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   @Override
   public void localeChange(LocaleChangeEvent event) {
     logger.debug("localeChange called with locale {}", event.getLocale());
-    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    String nameHeader = sampleResources.message(NAME);
+    String nameHeader = getTranslation(SAMPLE_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String dateHeader = sampleResources.message(DATE);
+    String dateHeader = getTranslation(SAMPLE_PREFIX + DATE);
     date.setHeader(dateHeader).setFooter(dateHeader);
-    String ownerHeader = sampleResources.message(OWNER);
+    String ownerHeader = getTranslation(SAMPLE_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    nameFilter.setPlaceholder(webResources.message(ALL));
-    ownerFilter.setPlaceholder(webResources.message(ALL));
+    nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
   }
 
   /**
