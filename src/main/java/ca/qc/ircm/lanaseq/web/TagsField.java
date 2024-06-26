@@ -17,7 +17,8 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import ca.qc.ircm.lanaseq.AppResources;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.data.binder.ValidationResult;
@@ -36,6 +37,7 @@ public class TagsField extends MultiSelectComboBox<String> implements LocaleChan
   public static final String CLASS_NAME = "tags-field";
   public static final String NEW_TAG_REGEX = "[\\w-]*";
   public static final String NEW_TAG_REGEX_ERROR = "regex";
+  private static final String MESSAGE_PREFIX = messagePrefix(TagsField.class);
   private static final long serialVersionUID = -1880458092354113415L;
   private Validator<String> validator;
 
@@ -62,8 +64,8 @@ public class TagsField extends MultiSelectComboBox<String> implements LocaleChan
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(TagsField.class, getLocale());
-    validator = new RegexpValidator(resources.message(NEW_TAG_REGEX_ERROR), NEW_TAG_REGEX);
+    validator =
+        new RegexpValidator(getTranslation(MESSAGE_PREFIX + NEW_TAG_REGEX_ERROR), NEW_TAG_REGEX);
   }
 
   public List<String> getSuggestions() {

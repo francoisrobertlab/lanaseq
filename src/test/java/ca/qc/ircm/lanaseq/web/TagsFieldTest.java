@@ -18,6 +18,7 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.web.TagsField.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG_REGEX_ERROR;
@@ -25,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBoxBase.CustomValueSetEvent;
@@ -48,11 +48,11 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class TagsFieldTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(TagsField.class);
   private TagsField tagsField;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
   private Locale locale = ENGLISH;
-  private AppResources resources = new AppResources(TagsField.class, locale);
 
   /**
    * Before test.
@@ -98,7 +98,8 @@ public class TagsFieldTest extends SpringUIUnitTest {
     fireEvent(tagsField, event);
     assertTrue(tagsField.getValue().isEmpty());
     assertTrue(tagsField.isInvalid());
-    assertEquals(resources.message(NEW_TAG_REGEX_ERROR), tagsField.getErrorMessage());
+    assertEquals(tagsField.getTranslation(MESSAGE_PREFIX + NEW_TAG_REGEX_ERROR),
+        tagsField.getErrorMessage());
   }
 
   @Test
