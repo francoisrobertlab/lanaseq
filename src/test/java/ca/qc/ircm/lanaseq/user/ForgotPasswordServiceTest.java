@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.user;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

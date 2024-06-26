@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;

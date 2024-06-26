@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;

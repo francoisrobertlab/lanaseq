@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.web.TagsField.CLASS_NAME;
 import static ca.qc.ircm.lanaseq.web.TagsField.NEW_TAG_REGEX_ERROR;

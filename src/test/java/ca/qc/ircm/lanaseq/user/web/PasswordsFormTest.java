@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.ID;
 import static ca.qc.ircm.lanaseq.user.web.PasswordsForm.PASSWORD;

@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVERED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

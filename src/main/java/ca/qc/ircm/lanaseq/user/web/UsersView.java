@@ -24,7 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;

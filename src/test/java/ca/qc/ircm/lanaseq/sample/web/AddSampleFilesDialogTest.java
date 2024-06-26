@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.HEADER;

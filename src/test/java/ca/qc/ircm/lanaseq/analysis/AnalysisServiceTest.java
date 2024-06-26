@@ -18,7 +18,7 @@
 package ca.qc.ircm.lanaseq.analysis;
 
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

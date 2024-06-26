@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.security.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.web.AccessDeniedView.HEADER;
 import static ca.qc.ircm.lanaseq.security.web.AccessDeniedView.HOME;
 import static ca.qc.ircm.lanaseq.security.web.AccessDeniedView.MESSAGE;

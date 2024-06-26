@@ -20,7 +20,7 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.Constants.FRENCH;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.text.Strings.property;

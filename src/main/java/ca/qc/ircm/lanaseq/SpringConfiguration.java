@@ -17,7 +17,6 @@
 
 package ca.qc.ircm.lanaseq;
 
-import java.util.regex.Pattern;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,16 +34,6 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 @EnableTransactionManagement
 @EnableScheduling
 public class SpringConfiguration {
-  /**
-   * Strip this key from class name, if it matches.
-   */
-  private static final String STRIP_KEY =
-      Pattern.quote(SpringConfiguration.class.getPackage().getName() + ".");
-
-  public static String messagePrefix(Class<?> baseClass) {
-    return baseClass.getName().replaceFirst(STRIP_KEY, "") + ".";
-  }
-
   /**
    * Creates {@link MessageSource} instance.
    * 

@@ -19,7 +19,7 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SEPARATOR;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.VIEW_NAME;

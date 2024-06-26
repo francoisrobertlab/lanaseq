@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;

@@ -26,7 +26,7 @@ import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;

@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.SAVED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;

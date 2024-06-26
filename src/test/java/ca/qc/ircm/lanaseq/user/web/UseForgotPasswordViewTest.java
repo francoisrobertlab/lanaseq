@@ -22,7 +22,7 @@ import static ca.qc.ircm.lanaseq.Constants.ENGLISH;
 import static ca.qc.ircm.lanaseq.Constants.FRENCH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.ID;

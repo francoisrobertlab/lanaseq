@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
