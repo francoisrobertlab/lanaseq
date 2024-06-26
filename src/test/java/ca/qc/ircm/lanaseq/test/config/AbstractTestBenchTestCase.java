@@ -23,7 +23,6 @@ import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
@@ -226,10 +225,6 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
           .findAny();
     }
     return optlocale.orElse(null);
-  }
-
-  protected AppResources resources(Class<?> baseClass) {
-    return new AppResources(baseClass, currentLocale());
   }
 
   protected <T> Optional<T> optional(Supplier<T> supplier) {
