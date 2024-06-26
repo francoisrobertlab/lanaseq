@@ -17,9 +17,9 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -69,6 +69,7 @@ public class ViewLayout extends VerticalLayout
   public static final String EXIT_SWITCH_USER_FORM = "exitSwitchUserform";
   public static final String SIGNOUT = "signout";
   public static final String TAB = "tab";
+  private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected Tabs tabs = new Tabs();
@@ -122,14 +123,13 @@ public class ViewLayout extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(ViewLayout.class, getLocale());
-    datasets.setLabel(resources.message(DATASETS));
-    samples.setLabel(resources.message(SAMPLES));
-    protocols.setLabel(resources.message(PROTOCOLS));
-    profile.setLabel(resources.message(PROFILE));
-    users.setLabel(resources.message(USERS));
-    exitSwitchUser.setLabel(resources.message(EXIT_SWITCH_USER));
-    signout.setLabel(resources.message(SIGNOUT));
+    datasets.setLabel(getTranslation(MESSAGE_PREFIX + DATASETS));
+    samples.setLabel(getTranslation(MESSAGE_PREFIX + SAMPLES));
+    protocols.setLabel(getTranslation(MESSAGE_PREFIX + PROTOCOLS));
+    profile.setLabel(getTranslation(MESSAGE_PREFIX + PROFILE));
+    users.setLabel(getTranslation(MESSAGE_PREFIX + USERS));
+    exitSwitchUser.setLabel(getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER));
+    signout.setLabel(getTranslation(MESSAGE_PREFIX + SIGNOUT));
   }
 
   private void selectTab() {
