@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MessageSourceI18NProvider implements I18NProvider {
+  private static final Logger logger = LoggerFactory.getLogger(MessageSourceI18NProvider.class);
   /**
    * {@link MessageSource} from Spring.
    */
@@ -32,11 +36,11 @@ public class MessageSourceI18NProvider implements I18NProvider {
 
   @Override
   public String getTranslation(String key, Locale locale, Object... params) {
-    return messageSource.getMessage(key, params, locale);
-  }
-
-  @Override
-  public String getTranslation(Object key, Locale locale, Object... params) {
-    return I18NProvider.super.getTranslation(key, locale, params);
+    try {
+      return messageSource.getMessage(key, params, locale);
+    } catch (NoSuchMessageException e) {
+      logger.warn("Could not find message for key {}", key);
+      return "!{" + key + "}!";
+    }
   }
 }
