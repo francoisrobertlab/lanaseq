@@ -19,11 +19,11 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.SpringConfiguration.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.HASHED_PASSWORD;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
@@ -71,6 +71,9 @@ public class SigninView extends LoginOverlay
   public static final String FAIL = "fail";
   public static final String DISABLED = "disabled";
   public static final String LOCKED = "locked";
+  private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
+  private static final String USER_PREFIX = messagePrefix(User.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 638443368018456019L;
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;
@@ -110,34 +113,31 @@ public class SigninView extends LoginOverlay
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources userResources = new AppResources(User.class, getLocale());
     i18n = LoginI18n.createDefault();
     i18n.setHeader(new LoginI18n.Header());
-    i18n.getHeader().setTitle(resources.message(HEADER));
-    i18n.getHeader().setDescription(resources.message(DESCRIPTION));
-    i18n.setAdditionalInformation(resources.message(ADDITIONAL_INFORMATION));
+    i18n.getHeader().setTitle(getTranslation(MESSAGE_PREFIX + HEADER));
+    i18n.getHeader().setDescription(getTranslation(MESSAGE_PREFIX + DESCRIPTION));
+    i18n.setAdditionalInformation(getTranslation(MESSAGE_PREFIX + ADDITIONAL_INFORMATION));
     i18n.setForm(new LoginI18n.Form());
-    i18n.getForm().setSubmit(resources.message(SIGNIN));
-    i18n.getForm().setTitle(resources.message(FORM_TITLE));
-    i18n.getForm().setUsername(userResources.message(EMAIL));
-    i18n.getForm().setPassword(userResources.message(HASHED_PASSWORD));
-    i18n.getForm().setForgotPassword(resources.message(FORGOT_PASSWORD));
+    i18n.getForm().setSubmit(getTranslation(MESSAGE_PREFIX + SIGNIN));
+    i18n.getForm().setTitle(getTranslation(MESSAGE_PREFIX + FORM_TITLE));
+    i18n.getForm().setUsername(getTranslation(USER_PREFIX + EMAIL));
+    i18n.getForm().setPassword(getTranslation(USER_PREFIX + HASHED_PASSWORD));
+    i18n.getForm().setForgotPassword(getTranslation(MESSAGE_PREFIX + FORGOT_PASSWORD));
     i18n.setErrorMessage(new ErrorMessage());
     if (error == null) {
       error = FAIL;
     }
-    i18n.getErrorMessage().setTitle(resources.message(property(error, TITLE)));
-    i18n.getErrorMessage()
-        .setMessage(resources.message(error, configuration.lockDuration().getSeconds() / 60));
+    i18n.getErrorMessage().setTitle(getTranslation(MESSAGE_PREFIX + property(error, TITLE)));
+    i18n.getErrorMessage().setMessage(
+        getTranslation(MESSAGE_PREFIX + error, configuration.lockDuration().getSeconds() / 60));
     setI18n(i18n);
   }
 
   @Override
   public String getPageTitle() {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   @Override
