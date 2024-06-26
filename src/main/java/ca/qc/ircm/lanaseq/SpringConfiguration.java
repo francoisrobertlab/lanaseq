@@ -54,7 +54,7 @@ public class SpringConfiguration {
   public ReloadableResourceBundleMessageSource messageSource() {
     ReloadableResourceBundleMessageSource messageSource =
         new ReloadableResourceBundleMessageSource();
-    messageSource.setBasename("classpath:AppResources");
+    messageSource.setBasename("classpath:messages");
     messageSource.setDefaultEncoding("UTF-8");
     return messageSource;
   }
