@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2018 Institut de recherches cliniques de Montreal (IRCM)
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
@@ -417,52 +399,6 @@
             </dependency>
           </dependencies>
         </plugin>
-        <plugin>
-          <groupId>com.mycila</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>${license-maven-plugin.version}</version>
-          <configuration>
-            <properties>
-              <owner>${project.organization.name}</owner>
-            </properties>
-            <headerDefinitions>
-              <headerDefinition>src/license/javacomment_style.xml</headerDefinition>
-            </headerDefinitions>
-            <mapping>
-              <java>JAVACOMMENT_STYLE</java>
-              <yml>SCRIPT_STYLE</yml>
-              <ini>SEMICOLON_STYLE</ini>
-              <scss>JAVADOC_STYLE</scss>
-              <ldif>SCRIPT_STYLE</ldif>
-            </mapping>
-            <licenseSets>
-              <licenseSet>
-                <header>license-header.txt</header>
-                <excludes>
-                  <exclude>**/.*</exclude>
-                  <exclude>**/LICENSE</exclude>
-                  <exclude>**/*.txt</exclude>
-                  <exclude>**/*.log*</exclude>
-                  <exclude>**/*.fastq</exclude>
-                  <exclude>/frontend/generated/**</exclude>
-                  <exclude>/frontend/index.html</exclude>
-                  <exclude>node_modules/**</exclude>
-                  <exclude>package*.json</exclude>
-                  <exclude>types.d.ts</exclude>
-                  <exclude>vite.*.ts</exclude>
-                  <exclude>webpack.*.js</exclude>
-                </excludes>
-              </licenseSet>
-            </licenseSets>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -491,10 +427,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
