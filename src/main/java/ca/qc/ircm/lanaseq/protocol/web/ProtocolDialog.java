@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
@@ -33,7 +34,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
@@ -108,6 +108,10 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolDialog.class);
+  private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
+  private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(ProtocolDialog.class);
   private static final long serialVersionUID = -7797831034001410430L;
   protected TextField name = new TextField();
@@ -196,46 +200,40 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources protocolResources = new AppResources(Protocol.class, getLocale());
-    final AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
-    binder.forField(name).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .withValidator(nameExists()).bind(NAME);
+    binder.forField(name).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("").withValidator(nameExists()).bind(NAME);
     binder.forField(note).withNullRepresentation("").bind(NOTE);
     updateHeader();
-    name.setLabel(protocolResources.message(NAME));
-    note.setLabel(protocolResources.message(NOTE));
+    name.setLabel(getTranslation(PROTOCOL_PREFIX + NAME));
+    note.setLabel(getTranslation(PROTOCOL_PREFIX + NOTE));
     upload.setI18n(uploadI18N(getLocale()));
-    filename.setHeader(protocolFileResources.message(FILENAME));
-    remove.setHeader(webResources.message(REMOVE));
-    save.setText(webResources.message(SAVE));
-    cancel.setText(webResources.message(CANCEL));
-    delete.setText(webResources.message(DELETE));
-    confirm.setHeader(resources.message(DELETE_HEADER));
-    confirm.setConfirmText(webResources.message(DELETE));
-    confirm.setCancelText(webResources.message(CANCEL));
+    filename.setHeader(getTranslation(PROTOCOL_FILE_PREFIX + FILENAME));
+    remove.setHeader(getTranslation(CONSTANTS_PREFIX + REMOVE));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
+    cancel.setText(getTranslation(CONSTANTS_PREFIX + CANCEL));
+    delete.setText(getTranslation(CONSTANTS_PREFIX + DELETE));
+    confirm.setHeader(getTranslation(MESSAGE_PREFIX + DELETE_HEADER));
+    confirm.setConfirmText(getTranslation(CONSTANTS_PREFIX + DELETE));
+    confirm.setCancelText(getTranslation(CONSTANTS_PREFIX + CANCEL));
   }
 
   private Validator<String> nameExists() {
     return (value, context) -> {
       if (service.nameExists(value) && (binder.getBean().getId() == null || !value.equalsIgnoreCase(
           service.get(binder.getBean().getId()).map(Protocol::getName).orElse("")))) {
-        final AppResources resources = new AppResources(Constants.class, getLocale());
-        return ValidationResult.error(resources.message(ALREADY_EXISTS));
+        return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
       return ValidationResult.ok();
     };
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
     Protocol protocol = binder.getBean();
     if (protocol != null && protocol.getId() != null) {
-      setHeaderTitle(resources.message(HEADER, 1, protocol.getName()));
-      confirm.setText(resources.message(DELETE_MESSAGE, protocol.getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()));
+      confirm.setText(getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, protocol.getName()));
     } else {
-      setHeaderTitle(resources.message(HEADER, 0));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     }
   }
 
@@ -288,8 +286,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   }
 
   void failedFile(String filename) {
-    AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
-    showNotification(resources.message(FILES_IOEXCEPTION, filename));
+    showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
   }
 
   void addFile(String filename, InputStream input) {
@@ -305,8 +302,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     }
     file.setContent(output.toByteArray());
     if (files.getListDataView().getItemCount() >= MAXIMUM_FILES_COUNT) {
-      AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
-      showNotification(resources.message(FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT));
+      showNotification(getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT));
       return;
     }
     files.getListDataView().addItem(file);
@@ -326,9 +322,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     valid = validateProtocol().isOk() && valid;
     if (files.getListDataView().getItemCount() == 0) {
       valid = false;
-      final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
       filesError.setVisible(true);
-      filesError.setText(resources.message(FILES_REQUIRED));
+      filesError.setText(getTranslation(MESSAGE_PREFIX + FILES_REQUIRED));
     }
     return valid;
   }
@@ -339,8 +334,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
       logger.debug("save protocol {}", protocol);
       List<ProtocolFile> files = this.files.getListDataView().getItems().toList();
       service.save(protocol, new ArrayList<>(files));
-      final AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
-      showNotification(resources.message(SAVED, protocol.getName()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()));
       close();
       fireSavedEvent();
     }
@@ -350,8 +344,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     Protocol protocol = binder.getBean();
     logger.debug("delete protocol {}", protocol);
     service.delete(protocol);
-    AppResources resources = new AppResources(ProtocolDialog.class, getLocale());
-    showNotification(resources.message(DELETED, protocol.getName()));
+    showNotification(getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()));
     fireDeletedEvent();
     close();
   }

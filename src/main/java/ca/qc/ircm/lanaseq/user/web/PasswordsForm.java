@@ -18,10 +18,10 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -41,6 +41,8 @@ public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
   public static final String PASSWORD = "password";
   public static final String PASSWORD_CONFIRM = PASSWORD + "Confirm";
   public static final String PASSWORDS_NOT_MATCH = property(PASSWORD, "notMatch");
+  private static final String MESSAGE_PREFIX = messagePrefix(PasswordsForm.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -2396373044368644264L;
   protected PasswordField password = new PasswordField();
   protected PasswordField passwordConfirm = new PasswordField();
@@ -64,21 +66,19 @@ public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(PasswordsForm.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    password.setLabel(resources.message(PASSWORD));
-    passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
+    password.setLabel(getTranslation(MESSAGE_PREFIX + PASSWORD));
+    passwordConfirm.setLabel(getTranslation(MESSAGE_PREFIX + PASSWORD_CONFIRM));
     passwordBinder.forField(password)
-        .withValidator(passwordRequiredValidator(webResources.message(REQUIRED)))
+        .withValidator(passwordRequiredValidator(getTranslation(CONSTANTS_PREFIX + REQUIRED)))
         .withNullRepresentation("").withValidator(password -> {
           String confirmPassword = passwordConfirm.getValue();
           return password == null || password.isEmpty() || confirmPassword == null
               || confirmPassword.isEmpty() || password.equals(confirmPassword);
-        }, resources.message(PASSWORDS_NOT_MATCH))
+        }, getTranslation(MESSAGE_PREFIX + PASSWORDS_NOT_MATCH))
         .bind(Passwords::getPassword, Passwords::setPassword);
-    passwordConfirm.setLabel(resources.message(PASSWORD_CONFIRM));
+    passwordConfirm.setLabel(getTranslation(MESSAGE_PREFIX + PASSWORD_CONFIRM));
     passwordBinder.forField(passwordConfirm)
-        .withValidator(passwordRequiredValidator(webResources.message(REQUIRED)))
+        .withValidator(passwordRequiredValidator(getTranslation(CONSTANTS_PREFIX + REQUIRED)))
         .withNullRepresentation("")
         .bind(Passwords::getConfirmPassword, Passwords::setConfirmPassword);
   }

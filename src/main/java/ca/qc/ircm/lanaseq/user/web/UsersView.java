@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -31,7 +32,6 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
@@ -87,6 +87,9 @@ public class UsersView extends VerticalLayout
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);
   public static final String SWITCH_USER = "switchUser";
   public static final String SWITCH_FAILED = "switchFailed";
+  private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
+  private static final String USER_PREFIX = messagePrefix(User.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(UsersView.class);
   protected H2 header = new H2();
@@ -185,9 +188,8 @@ public class UsersView extends VerticalLayout
   }
 
   private void updateActiveButton(Button button, User user) {
-    final AppResources userResources = new AppResources(User.class, getLocale());
     button.setIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create());
-    button.setText(userResources.message(property(ACTIVE, user.isActive())));
+    button.setText(getTranslation(USER_PREFIX + property(ACTIVE, user.isActive())));
     button
         .addThemeVariants(user.isActive() ? ButtonVariant.LUMO_SUCCESS : ButtonVariant.LUMO_ERROR);
   }
@@ -198,27 +200,25 @@ public class UsersView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(UsersView.class, getLocale());
-    final AppResources userResources = new AppResources(User.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    String emailHeader = userResources.message(EMAIL);
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    String emailHeader = getTranslation(USER_PREFIX + EMAIL);
     email.setHeader(emailHeader).setFooter(emailHeader);
-    String nameHeader = userResources.message(NAME);
+    String nameHeader = getTranslation(USER_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String activeHeader = userResources.message(ACTIVE);
+    String activeHeader = getTranslation(USER_PREFIX + ACTIVE);
     active.setHeader(activeHeader).setFooter(activeHeader);
-    String editHeader = webResources.message(EDIT);
+    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
     edit.setHeader(editHeader).setFooter(editHeader);
-    emailFilter.setPlaceholder(webResources.message(ALL));
-    nameFilter.setPlaceholder(webResources.message(ALL));
-    activeFilter.setItemLabelGenerator(value -> value
-        .map(bv -> userResources.message(property(ACTIVE, bv))).orElse(webResources.message(ALL)));
+    emailFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    activeFilter.setItemLabelGenerator(
+        value -> value.map(bv -> getTranslation(USER_PREFIX + property(ACTIVE, bv)))
+            .orElse(getTranslation(CONSTANTS_PREFIX + ALL)));
     actives.entrySet().stream().forEach(entry -> entry.getValue()
-        .setText(userResources.message(property(ACTIVE, entry.getKey().isActive()))));
-    add.setText(webResources.message(ADD));
+        .setText(getTranslation(USER_PREFIX + property(ACTIVE, entry.getKey().isActive()))));
+    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
     add.setIcon(VaadinIcon.PLUS.create());
-    switchUser.setText(resources.message(SWITCH_USER));
+    switchUser.setText(getTranslation(MESSAGE_PREFIX + SWITCH_USER));
     switchUser.setIcon(VaadinIcon.BUG.create());
   }
 
@@ -230,9 +230,8 @@ public class UsersView extends VerticalLayout
 
   @Override
   public String getPageTitle() {
-    AppResources resources = new AppResources(UsersView.class, getLocale());
-    AppResources webResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, webResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   void filterEmail(String value) {
@@ -276,8 +275,7 @@ public class UsersView extends VerticalLayout
     clearError();
     User user = users.getSelectedItems().stream().findFirst().orElse(null);
     if (user == null) {
-      AppResources resources = new AppResources(UsersView.class, getLocale());
-      error.setText(resources.message(USERS_REQUIRED));
+      error.setText(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED));
       error.setVisible(true);
     } else {
       switchUserService.switchUser(user, VaadinServletRequest.getCurrent());

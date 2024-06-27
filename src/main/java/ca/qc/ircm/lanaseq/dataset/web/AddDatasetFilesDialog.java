@@ -19,11 +19,11 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -88,6 +88,8 @@ public class AddDatasetFilesDialog extends Dialog
   public static final String SAVED = "saved";
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
+  private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 166699830639260659L;
   private static final Logger logger = LoggerFactory.getLogger(AddDatasetFilesDialog.class);
   protected Div message = new Div();
@@ -188,39 +190,37 @@ public class AddDatasetFilesDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    setHeaderTitle(resources.message(HEADER, 0));
+    setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     message.setText("");
-    filename.setHeader(resources.message(FILENAME));
+    filename.setHeader(getTranslation(MESSAGE_PREFIX + FILENAME));
     if (size != null) {
       files.removeColumn(size);
     }
     NumberFormat sizeFormat = NumberFormat.getIntegerInstance(getLocale());
     size = files.addColumn(file -> {
-      return resources.message(SIZE_VALUE, sizeFormat.format(file.length() / Math.pow(1024, 2)));
+      return getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
+          sizeFormat.format(file.length() / Math.pow(1024, 2)));
     }, SIZE).setKey(SIZE);
     files.setColumnOrder(filename, size, overwrite);
-    size.setHeader(resources.message(SIZE));
-    overwrite.setHeader(resources.message(OVERWRITE));
-    save.setText(webResources.message(SAVE));
+    size.setHeader(getTranslation(MESSAGE_PREFIX + SIZE));
+    overwrite.setHeader(getTranslation(MESSAGE_PREFIX + OVERWRITE));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
     updateHeader();
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
     if (dataset != null && dataset.getName() != null) {
-      setHeaderTitle(resources.message(HEADER, dataset.getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()));
       getUI().ifPresent(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
         boolean unix = browser.isMacOSX() || browser.isLinux();
         if (dataset != null) {
-          message
-              .setText(resources.message(MESSAGE, configuration.getUpload().label(dataset, unix)));
+          message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE,
+              configuration.getUpload().label(dataset, unix)));
         }
       });
     } else {
-      setHeaderTitle(resources.message(HEADER));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER));
     }
   }
 
@@ -291,9 +291,8 @@ public class AddDatasetFilesDialog extends Dialog
         files.stream().filter(file -> exists(file.toFile()) && !overwrite(file.toFile()).getValue())
             .findAny().isPresent();
     if (anyExists) {
-      final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
       error.setVisible(true);
-      error.setText(resources.message(OVERWRITE_ERROR));
+      error.setText(getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR));
     }
     return !anyExists;
   }
@@ -303,8 +302,7 @@ public class AddDatasetFilesDialog extends Dialog
     if (validate(files)) {
       logger.debug("save new files {} for dataset {}", files, dataset);
       service.saveFiles(dataset, files);
-      final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
-      showNotification(resources.message(SAVED, files.size(), dataset.getName()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, files.size(), dataset.getName()));
       fireSavedEvent();
       close();
     }
@@ -328,8 +326,7 @@ public class AddDatasetFilesDialog extends Dialog
         logger.debug("creating upload folder {} for dataset {}", folder, dataset);
         Files.createDirectories(folder);
       } catch (IOException e) {
-        final AppResources resources = new AppResources(AddDatasetFilesDialog.class, getLocale());
-        showNotification(resources.message(CREATE_FOLDER_ERROR, folder));
+        showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
       }
     }
   }

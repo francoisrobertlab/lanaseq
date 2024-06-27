@@ -17,10 +17,10 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -61,6 +61,8 @@ public class ProtocolHistoryDialog extends Dialog
       + ButtonVariant.LUMO_SUCCESS.getVariantName() + "' @click='${recoverFile}'>"
       + "<vaadin-icon icon='vaadin:ambulance' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String RECOVERED = "recovered";
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
+  private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private static final Logger logger = LoggerFactory.getLogger(ProtocolHistoryDialog.class);
   private static final long serialVersionUID = -7797831034001410430L;
   protected Grid<ProtocolFile> files = new Grid<>();
@@ -106,24 +108,20 @@ public class ProtocolHistoryDialog extends Dialog
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
-    AppResources protocolFileResources = new AppResources(ProtocolFile.class, getLocale());
     updateHeader();
-    filename.setHeader(protocolFileResources.message(FILENAME));
-    recover.setHeader(resources.message(RECOVER));
+    filename.setHeader(getTranslation(PROTOCOL_FILE_PREFIX + FILENAME));
+    recover.setHeader(getTranslation(MESSAGE_PREFIX + RECOVER));
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
-    setHeaderTitle(resources.message(HEADER,
+    setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER,
         protocol != null && protocol.getId() != null ? protocol.getName() : ""));
   }
 
   void recoverFile(ProtocolFile file) {
     logger.debug("save recovered protocol files for protocol {}", protocol);
     service.recover(file);
-    final AppResources resources = new AppResources(ProtocolHistoryDialog.class, getLocale());
-    showNotification(resources.message(RECOVERED, file.getFilename()));
+    showNotification(getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()));
     files.getListDataView().removeItem(file);
     files.getListDataView().refreshAll();
   }

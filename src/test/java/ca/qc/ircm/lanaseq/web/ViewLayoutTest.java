@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
@@ -37,7 +38,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -66,13 +66,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ViewLayoutTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private ViewLayout view;
   @MockBean
   private SwitchUserService switchUserService;
   @Mock
   private AfterNavigationListener navigationListener;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ViewLayout.class, locale);
   private User user = new User(1L, "myuser");
 
   /**
@@ -105,27 +105,28 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(resources.message(DATASETS), view.datasets.getLabel());
-    assertEquals(resources.message(SAMPLES), view.samples.getLabel());
-    assertEquals(resources.message(PROTOCOLS), view.protocols.getLabel());
-    assertEquals(resources.message(PROFILE), view.profile.getLabel());
-    assertEquals(resources.message(USERS), view.users.getLabel());
-    assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
-    assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS), view.datasets.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROFILE), view.profile.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS), view.users.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER),
+        view.exitSwitchUser.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SIGNOUT), view.signout.getLabel());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ViewLayout.class, locale);
     UI.getCurrent().setLocale(locale);
-    assertEquals(resources.message(DATASETS), view.datasets.getLabel());
-    assertEquals(resources.message(SAMPLES), view.samples.getLabel());
-    assertEquals(resources.message(PROTOCOLS), view.protocols.getLabel());
-    assertEquals(resources.message(PROFILE), view.profile.getLabel());
-    assertEquals(resources.message(USERS), view.users.getLabel());
-    assertEquals(resources.message(EXIT_SWITCH_USER), view.exitSwitchUser.getLabel());
-    assertEquals(resources.message(SIGNOUT), view.signout.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS), view.datasets.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROFILE), view.profile.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS), view.users.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER),
+        view.exitSwitchUser.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SIGNOUT), view.signout.getLabel());
   }
 
   @Test

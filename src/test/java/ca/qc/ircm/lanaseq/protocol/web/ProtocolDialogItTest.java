@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.SAVED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
@@ -26,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
@@ -45,6 +45,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -54,10 +55,13 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolDialog.class);
   @Autowired
   private ProtocolRepository repository;
   @Autowired
   private ProtocolFileRepository fileRepository;
+  @Autowired
+  private MessageSource messageSource;
   @Value("${download-home}")
   protected Path downloadHome;
   private String name = "test protocol";
@@ -130,8 +134,9 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ProtocolDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        notification.getText());
     Protocol protocol = repository.findByName(name).orElse(null);
     assertNotNull(protocol);
     assertNotNull(protocol.getId());
@@ -162,8 +167,9 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ProtocolDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        notification.getText());
     Protocol protocol = repository.findById(1L).get();
     assertEquals(name, protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
@@ -251,8 +257,9 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ProtocolDialog.class);
-    assertEquals(resources.message(DELETED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[] { name }, currentLocale()),
+        notification.getText());
     assertFalse(repository.findById(4L).isPresent());
   }
 }

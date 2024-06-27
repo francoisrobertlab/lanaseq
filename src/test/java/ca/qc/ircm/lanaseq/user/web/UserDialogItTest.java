@@ -17,13 +17,13 @@
 
 package ca.qc.ircm.lanaseq.user.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.UserDialog.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -31,6 +31,7 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
@@ -41,10 +42,13 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UserDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(UserDialog.class);
   @Autowired
   private UserRepository repository;
   @Autowired
   private PasswordEncoder passwordEncoder;
+  @Autowired
+  private MessageSource messageSource;
   private String email = "it_test@ircm.qc.ca";
   private String name = "test_name";
   private String password = "test_password";
@@ -116,8 +120,9 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(UserDialog.class);
-    assertEquals(resources.message(SAVED, email), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { email }, currentLocale()),
+        notification.getText());
     User user = repository.findById(3L).get();
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());

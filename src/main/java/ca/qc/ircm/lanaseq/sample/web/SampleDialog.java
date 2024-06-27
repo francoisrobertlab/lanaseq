@@ -24,6 +24,7 @@ import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.Sample.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
@@ -41,7 +42,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
@@ -95,6 +95,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
   public static final String DELETE_MESSAGE = property(DELETE, "message");
+  private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
+  private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 166699830639260659L;
   private static final Logger logger = LoggerFactory.getLogger(SampleDialog.class);
   protected DatePicker date = new DatePicker();
@@ -194,61 +197,58 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(SampleDialog.class, getLocale());
-    final AppResources sampleResources = new AppResources(Sample.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    binder.forField(date).asRequired(webResources.message(REQUIRED)).bind(DATE);
-    binder.forField(sampleId).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .bind(SAMPLE_ID);
-    binder.forField(replicate).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .bind(REPLICATE);
-    binder.forField(protocol).asRequired(webResources.message(REQUIRED)).bind(PROTOCOL);
-    binder.forField(assay).asRequired(webResources.message(REQUIRED)).bind(ASSAY);
+    binder.forField(date).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED)).bind(DATE);
+    binder.forField(sampleId).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("").bind(SAMPLE_ID);
+    binder.forField(replicate).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("").bind(REPLICATE);
+    binder.forField(protocol).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .bind(PROTOCOL);
+    binder.forField(assay).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED)).bind(ASSAY);
     binder.forField(type).withNullRepresentation("").bind(TYPE);
     binder.forField(target).withNullRepresentation("").bind(TARGET);
-    binder.forField(strain).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .bind(STRAIN);
+    binder.forField(strain).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("").bind(STRAIN);
     binder.forField(strainDescription).withNullRepresentation("").bind(STRAIN_DESCRIPTION);
     binder.forField(treatment).withNullRepresentation("").bind(TREATMENT);
     binder.forField(tags).bind(TAGS);
     binder.forField(note).withNullRepresentation("").bind(NOTE);
-    setHeaderTitle(resources.message(HEADER, 0));
-    date.setLabel(sampleResources.message(DATE));
+    setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
+    date.setLabel(getTranslation(SAMPLE_PREFIX + DATE));
     date.setI18n(datePickerI18n(getLocale()));
     date.setLocale(Locale.CANADA);
-    sampleId.setLabel(sampleResources.message(SAMPLE_ID));
-    replicate.setLabel(sampleResources.message(REPLICATE));
-    protocol.setLabel(sampleResources.message(PROTOCOL));
-    assay.setLabel(sampleResources.message(ASSAY));
-    type.setLabel(sampleResources.message(TYPE));
-    target.setLabel(sampleResources.message(TARGET));
-    target.setPlaceholder(sampleResources.message(property(TARGET, PLACEHOLDER)));
-    strain.setLabel(sampleResources.message(STRAIN));
-    strain.setPlaceholder(sampleResources.message(property(STRAIN, PLACEHOLDER)));
-    strainDescription.setLabel(sampleResources.message(STRAIN_DESCRIPTION));
+    sampleId.setLabel(getTranslation(SAMPLE_PREFIX + SAMPLE_ID));
+    replicate.setLabel(getTranslation(SAMPLE_PREFIX + REPLICATE));
+    protocol.setLabel(getTranslation(SAMPLE_PREFIX + PROTOCOL));
+    assay.setLabel(getTranslation(SAMPLE_PREFIX + ASSAY));
+    type.setLabel(getTranslation(SAMPLE_PREFIX + TYPE));
+    target.setLabel(getTranslation(SAMPLE_PREFIX + TARGET));
+    target.setPlaceholder(getTranslation(SAMPLE_PREFIX + property(TARGET, PLACEHOLDER)));
+    strain.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN));
+    strain.setPlaceholder(getTranslation(SAMPLE_PREFIX + property(STRAIN, PLACEHOLDER)));
+    strainDescription.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION));
     strainDescription
-        .setPlaceholder(sampleResources.message(property(STRAIN_DESCRIPTION, PLACEHOLDER)));
-    treatment.setLabel(sampleResources.message(TREATMENT));
-    treatment.setPlaceholder(sampleResources.message(property(TREATMENT, PLACEHOLDER)));
-    tags.setLabel(sampleResources.message(TAGS));
-    note.setLabel(sampleResources.message(NOTE));
-    save.setText(webResources.message(SAVE));
-    cancel.setText(webResources.message(CANCEL));
-    delete.setText(webResources.message(DELETE));
-    confirm.setHeader(resources.message(DELETE_HEADER));
-    confirm.setConfirmText(webResources.message(DELETE));
-    confirm.setCancelText(webResources.message(CANCEL));
+        .setPlaceholder(getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, PLACEHOLDER)));
+    treatment.setLabel(getTranslation(SAMPLE_PREFIX + TREATMENT));
+    treatment.setPlaceholder(getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)));
+    tags.setLabel(getTranslation(SAMPLE_PREFIX + TAGS));
+    note.setLabel(getTranslation(SAMPLE_PREFIX + NOTE));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
+    cancel.setText(getTranslation(CONSTANTS_PREFIX + CANCEL));
+    delete.setText(getTranslation(CONSTANTS_PREFIX + DELETE));
+    confirm.setHeader(getTranslation(MESSAGE_PREFIX + DELETE_HEADER));
+    confirm.setConfirmText(getTranslation(CONSTANTS_PREFIX + DELETE));
+    confirm.setCancelText(getTranslation(CONSTANTS_PREFIX + CANCEL));
     updateHeader();
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(SampleDialog.class, getLocale());
     Sample sample = binder.getBean();
     if (sample != null && sample.getName() != null) {
-      setHeaderTitle(resources.message(HEADER, 1, sample.getName()));
-      confirm.setText(resources.message(DELETE_MESSAGE, sample.getName()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()));
+      confirm.setText(getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, sample.getName()));
     } else {
-      setHeaderTitle(resources.message(HEADER, 0));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     }
   }
 
@@ -297,8 +297,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
       if (service.exists(sample.getName()) && (sample.getId() == null || !sample.getName()
           .equalsIgnoreCase(service.get(sample.getId()).map(Sample::getName).orElse("")))) {
         valid = false;
-        AppResources sampleResources = new AppResources(Sample.class, getLocale());
-        error.setText(sampleResources.message(NAME_ALREADY_EXISTS, sample.getName()));
+        error.setText(getTranslation(SAMPLE_PREFIX + NAME_ALREADY_EXISTS, sample.getName()));
         error.setVisible(true);
       }
     }
@@ -311,8 +310,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     if (validate()) {
       logger.debug("save sample {}", sample);
       service.save(sample);
-      AppResources resources = new AppResources(SampleDialog.class, getLocale());
-      showNotification(resources.message(SAVED, sample.getName()));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()));
       fireSavedEvent();
       close();
     }
@@ -326,8 +324,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     Sample sample = binder.getBean();
     logger.debug("delete sample {}", sample);
     service.delete(sample);
-    AppResources resources = new AppResources(SampleDialog.class, getLocale());
-    showNotification(resources.message(DELETED, sample.getName()));
+    showNotification(getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()));
     fireDeletedEvent();
     close();
   }

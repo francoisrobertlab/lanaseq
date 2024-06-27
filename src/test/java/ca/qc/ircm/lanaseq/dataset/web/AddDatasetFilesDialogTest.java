@@ -19,6 +19,7 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.HEADER;
@@ -50,7 +51,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -105,6 +105,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @TempDir
   Path temporaryFolder;
   private AddDatasetFilesDialog dialog;
@@ -126,8 +128,6 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @Autowired
   private DatasetRepository repository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private Path folder;
   private List<File> files = new ArrayList<>();
   private Random random = new Random();
@@ -213,32 +213,38 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void labels() {
     Dataset dataset = repository.findById(dialog.getDatasetId()).get();
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(dataset, true)), dialog.message.getText());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
-    assertEquals(resources.message(SIZE), headerRow.getCell(dialog.size).getText());
-    assertEquals(resources.message(OVERWRITE), headerRow.getCell(dialog.overwrite).getText());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME),
+        headerRow.getCell(dialog.filename).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SIZE),
+        headerRow.getCell(dialog.size).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
+        headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
   @Test
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(AddDatasetFilesDialog.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     Dataset dataset = repository.findById(dialog.getDatasetId()).get();
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(dataset, true)), dialog.message.getText());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(resources.message(FILENAME), headerRow.getCell(dialog.filename).getText());
-    assertEquals(resources.message(SIZE), headerRow.getCell(dialog.size).getText());
-    assertEquals(resources.message(OVERWRITE), headerRow.getCell(dialog.overwrite).getText());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME),
+        headerRow.getCell(dialog.filename).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SIZE),
+        headerRow.getCell(dialog.size).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
+        headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
   @Test
@@ -259,7 +265,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
       Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
       assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
-      assertEquals(resources.message(SIZE_VALUE, file.length() / 1048576),
+      assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SIZE_VALUE, file.length() / 1048576),
           test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
       assertTrue(
           test(dialog.files).getCellComponent(i, dialog.overwrite.getKey()) instanceof Checkbox);
@@ -361,8 +367,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   public void message_Windows() {
     Dataset dataset = repository.findById(1L).get();
     dialog.setDatasetId(1L);
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, false)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(dataset, false)), dialog.message.getText());
   }
 
   @Test
@@ -370,8 +376,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   public void message_Linux() {
     Dataset dataset = repository.findById(1L).get();
     dialog.setDatasetId(1L);
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(dataset, true)), dialog.message.getText());
   }
 
   @Test
@@ -379,8 +385,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   public void message_Mac() {
     Dataset dataset = repository.findById(1L).get();
     dialog.setDatasetId(1L);
-    assertEquals(resources.message(MESSAGE, configuration.getUpload().label(dataset, true)),
-        dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE,
+        configuration.getUpload().label(dataset, true)), dialog.message.getText());
   }
 
   @Test
@@ -397,7 +403,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     verify(service, atLeastOnce()).uploadFiles(dataset);
     List<File> files = items(dialog.files);
     assertEquals(4, files.size());
-    assertEquals(resources.message(HEADER, dataset.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()),
+        dialog.getHeaderTitle());
   }
 
   @Test
@@ -473,7 +480,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     dialog.save();
 
     assertTrue(dialog.error.isVisible());
-    assertEquals(resources.message(OVERWRITE_ERROR), dialog.error.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR), dialog.error.getText());
     verify(service, never()).saveFiles(any(), any());
     assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
@@ -497,7 +504,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     }
     assertFalse(dialog.error.isVisible());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, 4, dataset.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 4, dataset.getName()),
+        test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -519,7 +527,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath())));
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath())));
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, 2, dataset.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 2, dataset.getName()),
+        test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }
@@ -538,7 +547,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     assertEquals(0, files.size());
     assertTrue(Files.exists(uploadFolder(dataset)));
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, 0, dataset.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 0, dataset.getName()),
+        test(notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }

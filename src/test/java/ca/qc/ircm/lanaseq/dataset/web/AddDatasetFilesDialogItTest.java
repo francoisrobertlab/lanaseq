@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -25,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -50,12 +51,15 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
   @TempDir
   Path temporaryFolder;
   @Autowired
   private DatasetRepository repository;
   @Autowired
   private AppConfiguration configuration;
+  @Autowired
+  private MessageSource messageSource;
   private Path file1;
   private Path file2;
 
@@ -134,8 +138,8 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(AddDatasetFilesDialog.class);
-    assertEquals(resources.message(SAVED, 3, dataset.getName()), notification.getText());
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
+        new Object[] { 3, dataset.getName() }, currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(dataset);
     Path upload = configuration.getUpload().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));

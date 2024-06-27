@@ -26,6 +26,7 @@ import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
@@ -66,7 +67,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
@@ -116,6 +116,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolDialog.class);
+  private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
+  private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ProtocolDialog dialog;
   @MockBean
   private ProtocolService service;
@@ -132,10 +136,6 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   @Autowired
   private ProtocolFileRepository fileRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ProtocolDialog.class, locale);
-  private AppResources protocolResources = new AppResources(Protocol.class, locale);
-  private AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
-  private AppResources webResources = new AppResources(Constants.class, locale);
   private List<ProtocolFile> protocolFiles;
   private String name = "test protocol";
   private String note = "test note\nsecond line";
@@ -208,50 +208,50 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   @Test
   public void labels() {
     Protocol protocol = repository.findById(dialog.getProtocolId()).get();
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
-    assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
-    assertEquals(protocolResources.message(NOTE), dialog.note.getLabel());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(PROTOCOL_PREFIX + NAME), dialog.name.getLabel());
+    assertEquals(dialog.getTranslation(PROTOCOL_PREFIX + NOTE), dialog.note.getLabel());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(protocolFileResources.message(FILENAME),
+    assertEquals(dialog.getTranslation(PROTOCOL_FILE_PREFIX + FILENAME),
         headerRow.getCell(dialog.filename).getText());
-    assertEquals(webResources.message(REMOVE), headerRow.getCell(dialog.remove).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REMOVE),
+        headerRow.getCell(dialog.remove).getText());
     validateEquals(englishUploadI18N(), dialog.upload.getI18n());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
-    assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    assertEquals(webResources.message(DELETE), dialog.delete.getText());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE), dialog.delete.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(webResources.message(DELETE),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         dialog.confirm.getElement().getProperty("confirmText"));
-    assertEquals(webResources.message(CANCEL),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL),
         dialog.confirm.getElement().getProperty("cancelText"));
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ProtocolDialog.class, locale);
-    final AppResources protocolResources = new AppResources(Protocol.class, locale);
-    final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
-    final AppResources webResources = new AppResources(Constants.class, locale);
     UI.getCurrent().setLocale(locale);
     Protocol protocol = repository.findById(dialog.getProtocolId()).get();
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
-    assertEquals(protocolResources.message(NAME), dialog.name.getLabel());
-    assertEquals(protocolResources.message(NOTE), dialog.note.getLabel());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(PROTOCOL_PREFIX + NAME), dialog.name.getLabel());
+    assertEquals(dialog.getTranslation(PROTOCOL_PREFIX + NOTE), dialog.note.getLabel());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(protocolFileResources.message(FILENAME),
+    assertEquals(dialog.getTranslation(PROTOCOL_FILE_PREFIX + FILENAME),
         headerRow.getCell(dialog.filename).getText());
-    assertEquals(webResources.message(REMOVE), headerRow.getCell(dialog.remove).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REMOVE),
+        headerRow.getCell(dialog.remove).getText());
     validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
-    assertEquals(webResources.message(SAVE), dialog.save.getText());
-    assertEquals(webResources.message(CANCEL), dialog.cancel.getText());
-    assertEquals(webResources.message(DELETE), dialog.delete.getText());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE), dialog.delete.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(webResources.message(DELETE),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         dialog.confirm.getElement().getProperty("confirmText"));
-    assertEquals(webResources.message(CANCEL),
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL),
         dialog.confirm.getElement().getProperty("cancelText"));
   }
 
@@ -282,7 +282,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     test(dialog.upload).uploadFailed(filename, mimeType);
 
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(FILES_IOEXCEPTION, filename), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
+        test(notification).getText());
     List<ProtocolFile> files = items(dialog.files);
     assertEquals(1, files.size());
   }
@@ -299,7 +300,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     test(dialog.upload).upload(filename + "6", mimeType, fileContent);
 
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT),
         test(notification).getText());
     assertEquals(MAXIMUM_FILES_COUNT, items(dialog.files).size());
     assertEquals(filename + "1", items(dialog.files).get(1).getFilename());
@@ -386,10 +387,11 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     dialog.setProtocolId(1L);
 
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, protocol.getName()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, protocol.getName()),
         dialog.confirm.getElement().getProperty("message"));
     assertEquals(protocol.getName(), dialog.name.getValue());
     assertFalse(dialog.name.isReadOnly());
@@ -412,10 +414,11 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     dialog.setProtocolId(2L);
 
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, protocol.getName()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, protocol.getName()),
         dialog.confirm.getElement().getProperty("message"));
     assertEquals(protocol.getName(), dialog.name.getValue());
     assertTrue(dialog.name.isReadOnly());
@@ -439,10 +442,11 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     dialog.setProtocolId(1L);
 
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, protocol.getName()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, protocol.getName()),
         dialog.confirm.getElement().getProperty("message"));
     assertEquals(protocol.getName(), dialog.name.getValue());
     assertFalse(dialog.name.isReadOnly());
@@ -465,10 +469,11 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     dialog.setProtocolId(3L);
 
-    assertEquals(resources.message(HEADER, 1, protocol.getName()), dialog.getHeaderTitle());
-    assertEquals(resources.message(DELETE_HEADER),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
+        dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_HEADER),
         dialog.confirm.getElement().getProperty("header"));
-    assertEquals(resources.message(DELETE_MESSAGE, protocol.getName()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, protocol.getName()),
         dialog.confirm.getElement().getProperty("message"));
     assertEquals(protocol.getName(), dialog.name.getValue());
     assertTrue(dialog.name.isReadOnly());
@@ -489,7 +494,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   public void setProtocolId_Null() {
     dialog.setProtocolId(null);
 
-    assertEquals(resources.message(HEADER, 0), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
     assertEquals("", dialog.name.getValue());
     assertFalse(dialog.name.isReadOnly());
     assertEquals("", dialog.note.getValue());
@@ -516,7 +521,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(REQUIRED)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
+        error.getMessage());
     verify(service, never()).save(any(), any());
     assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
@@ -538,7 +544,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
+        error.getMessage());
     verify(service, atLeastOnce()).nameExists(name);
     verify(service, never()).save(any(), any());
     assertFalse($(Notification.class).exists());
@@ -562,7 +569,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service).save(any(), any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -583,7 +591,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service).save(any(), any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -603,7 +612,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
         findValidationStatusByField(status, dialog.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
-    assertEquals(Optional.of(webResources.message(ALREADY_EXISTS)), error.getMessage());
+    assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
+        error.getMessage());
     verify(service, atLeastOnce()).nameExists(name);
     verify(service, atLeastOnce()).get(protocol.getId());
     verify(service, never()).save(any(), any());
@@ -625,7 +635,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertTrue(status.isOk());
     verify(service).save(any(), any());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -639,7 +650,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     clickButton(dialog.save);
 
     dialog.filesError.setVisible(true);
-    assertEquals(resources.message(FILES_REQUIRED), dialog.filesError.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_REQUIRED),
+        dialog.filesError.getText());
     verify(service, never()).save(any(), any());
     assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
@@ -680,7 +692,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertEquals(filename, file.getFilename());
     assertArrayEquals(fileContent, file.getContent());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -712,7 +725,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -740,7 +754,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(SAVED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()),
+        test(notification).getText());
     assertFalse(dialog.isOpened());
     verify(savedListener).onComponentEvent(any());
   }
@@ -765,7 +780,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     verify(service).delete(protocol);
     assertFalse(dialog.isOpened());
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(DELETED, protocol.getName()), test(notification).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()),
+        test(notification).getText());
     verify(deletedListener).onComponentEvent(any());
   }
 

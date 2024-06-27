@@ -19,8 +19,8 @@ package ca.qc.ircm.lanaseq.security.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.component.Composite;
@@ -53,6 +53,8 @@ public class AccessDeniedView extends Composite<VerticalLayout>
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
   public static final String HOME = "home";
+  private static final String MESSAGE_PREFIX = messagePrefix(AccessDeniedView.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -5974627607641654031L;
   private static final Logger logger = LoggerFactory.getLogger(AccessDeniedView.class);
   protected H2 header = new H2();
@@ -81,16 +83,14 @@ public class AccessDeniedView extends Composite<VerticalLayout>
 
   @Override
   public String getPageTitle() {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    header.setText(resources.message(HEADER));
-    message.setText(resources.message(MESSAGE));
-    home.setText(resources.message(HOME));
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE));
+    home.setText(getTranslation(MESSAGE_PREFIX + HOME));
   }
 }

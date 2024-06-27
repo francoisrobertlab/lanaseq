@@ -22,9 +22,9 @@ import static ca.qc.ircm.lanaseq.Constants.INVALID_EMAIL;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
 import ca.qc.ircm.lanaseq.user.User;
@@ -69,6 +69,9 @@ public class ForgotPasswordView extends VerticalLayout
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
   public static final String SAVED = "saved";
+  private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordView.class);
+  private static final String USER_PREFIX = messagePrefix(User.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 4760310643370830640L;
   private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordView.class);
   protected H2 header = new H2();
@@ -109,22 +112,20 @@ public class ForgotPasswordView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources userResources = new AppResources(User.class, getLocale());
-    final AppResources webResources = new AppResources(Constants.class, getLocale());
-    header.setText(resources.message(HEADER));
-    message.setText(resources.message(MESSAGE));
-    email.setLabel(userResources.message(EMAIL));
-    save.setText(webResources.message(SAVE));
-    binder.forField(email).asRequired(webResources.message(REQUIRED)).withNullRepresentation("")
-        .withValidator(new EmailValidator(webResources.message(INVALID_EMAIL))).bind(EMAIL);
+    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
+    message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE));
+    email.setLabel(getTranslation(USER_PREFIX + EMAIL));
+    save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
+    binder.forField(email).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
+        .withNullRepresentation("")
+        .withValidator(new EmailValidator(getTranslation(CONSTANTS_PREFIX + INVALID_EMAIL)))
+        .bind(EMAIL);
   }
 
   @Override
   public String getPageTitle() {
-    final AppResources resources = new AppResources(getClass(), getLocale());
-    final AppResources generalResources = new AppResources(Constants.class, getLocale());
-    return resources.message(TITLE, generalResources.message(APPLICATION_NAME));
+    return getTranslation(MESSAGE_PREFIX + TITLE,
+        getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
   BinderValidationStatus<User> validateUser() {
@@ -143,8 +144,7 @@ public class ForgotPasswordView extends VerticalLayout
         service.insert(email, (fp, fplocale) -> getUrl(UseForgotPasswordView.VIEW_NAME) + "/"
             + fp.getId() + UseForgotPasswordView.SEPARATOR + fp.getConfirmNumber());
       }
-      final AppResources resources = new AppResources(ForgotPasswordView.class, getLocale());
-      showNotification(resources.message(SAVED, email));
+      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, email));
       UI.getCurrent().navigate(SigninView.class);
     }
   }

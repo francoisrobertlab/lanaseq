@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.RECOVERED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -24,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -48,8 +49,11 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("francois.robert@ircm.qc.ca")
 public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
   @Autowired
   private ProtocolFileRepository fileRepository;
+  @Autowired
+  private MessageSource messageSource;
   @Value("${download-home}")
   protected Path downloadHome;
 
@@ -81,8 +85,9 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(ProtocolHistoryDialog.class);
-    assertEquals(resources.message(RECOVERED, "Histone FLAG Protocol.docx"),
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + RECOVERED,
+            new Object[] { "Histone FLAG Protocol.docx" }, currentLocale()),
         notification.getText());
     ProtocolFile file = fileRepository.findById(3L).orElse(null);
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());

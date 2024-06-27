@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
@@ -27,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
@@ -48,6 +48,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -57,6 +58,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleDialogItTest extends AbstractTestBenchTestCase {
+  private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
   @TempDir
   Path temporaryFolder;
   @Autowired
@@ -67,6 +69,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private DatasetRepository datasetRepository;
   @Autowired
   private AppConfiguration configuration;
+  @Autowired
+  private MessageSource messageSource;
   private Protocol protocol;
   private LocalDate date = LocalDate.of(2020, 07, 20);
   private String assay = "RNA-seq";
@@ -211,8 +215,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     String name = name() + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(SampleDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        notification.getText());
     List<Sample> samples = repository.findByOwner(new User(3L));
     Sample sample =
         samples.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
@@ -256,8 +261,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     String name = name() + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(SampleDialog.class);
-    assertEquals(resources.message(SAVED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        notification.getText());
     sample = repository.findById(4L).get();
     assertEquals(name, sample.getName());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
@@ -342,8 +348,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    AppResources resources = this.resources(SampleDialog.class);
-    assertEquals(resources.message(DELETED, name), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[] { name }, currentLocale()),
+        notification.getText());
     assertFalse(repository.findById(9L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.
     assertFalse(Files.exists(folder));

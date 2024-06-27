@@ -19,10 +19,10 @@ package ca.qc.ircm.lanaseq.test.config;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,11 +46,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 
 /**
  * Additional functions for TestBenchTestCase.
  */
 public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  private static final String LAYOUT_PREFIX = messagePrefix(ViewLayout.class);
+  private static final String SIGNIN_PREFIX = messagePrefix(SigninView.class);
+  private static final String USE_FORGOT_PASSWORD_PREFIX =
+      messagePrefix(UseForgotPasswordView.class);
+  private static final String PASSWORD_PREFIX = messagePrefix(PasswordView.class);
+  private static final String ACCESS_DENIED_PREFIX = messagePrefix(AccessDeniedView.class);
   private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchTestCase.class);
   @Value("http://localhost:${local.server.port}${server.servlet.context-path:}")
   protected String baseUrl;
@@ -59,6 +68,8 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private Path upload;
   @Autowired
   private AppConfiguration configuration;
+  @Autowired
+  private MessageSource messageSource;
 
   /**
    * Saves home folder to reset its value upon test completion.
@@ -173,44 +184,47 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
 
   protected Locale currentLocale() {
     List<Locale> locales = Constants.getLocales();
+    Function<Locale, String> applicationName =
+        locale -> messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, locale);
     TabElement home =
         optional(() -> $(TabsElement.class).first().$(TabElement.class).first()).orElse(null);
-    Optional<Locale> optlocale =
-        locales.stream().filter(locale -> new AppResources(ViewLayout.class, locale)
-            .message(DATASETS).equals(home != null ? home.getText() : "")).findAny();
+    Optional<Locale> optlocale = locales.stream()
+        .filter(locale -> messageSource.getMessage(LAYOUT_PREFIX + DATASETS, null, locale)
+            .equals(home != null ? home.getText() : ""))
+        .findAny();
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
-          .filter(locale -> new AppResources(SigninView.class, locale)
-              .message(TITLE, new AppResources(Constants.class, locale).message(APPLICATION_NAME))
+          .filter(locale -> messageSource.getMessage(SIGNIN_PREFIX + TITLE,
+              new Object[] { applicationName.apply(locale) }, locale)
               .equals(getDriver().getTitle()))
           .findAny();
     }
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
-          .filter(locale -> new AppResources(UseForgotPasswordView.class, locale)
-              .message(TITLE, new AppResources(Constants.class, locale).message(APPLICATION_NAME))
+          .filter(locale -> messageSource
+              .getMessage(USE_FORGOT_PASSWORD_PREFIX + TITLE,
+                  new Object[] { applicationName.apply(locale) }, locale)
               .equals(getDriver().getTitle()))
           .findAny();
     }
     if (!optlocale.isPresent()) {
-      optlocale = locales.stream()
-          .filter(locale -> new AppResources(PasswordView.class, locale)
-              .message(TITLE, new AppResources(Constants.class, locale).message(APPLICATION_NAME))
-              .equals(getDriver().getTitle()))
-          .findAny();
+      optlocale =
+          locales.stream()
+              .filter(locale -> messageSource
+                  .getMessage(PASSWORD_PREFIX + TITLE,
+                      new Object[] { applicationName.apply(locale) }, locale)
+                  .equals(getDriver().getTitle()))
+              .findAny();
     }
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
-          .filter(locale -> new AppResources(AccessDeniedView.class, locale)
-              .message(TITLE, new AppResources(Constants.class, locale).message(APPLICATION_NAME))
+          .filter(locale -> messageSource
+              .getMessage(ACCESS_DENIED_PREFIX + TITLE,
+                  new Object[] { applicationName.apply(locale) }, locale)
               .equals(getDriver().getTitle()))
           .findAny();
     }
     return optlocale.orElse(null);
-  }
-
-  protected AppResources resources(Class<?> baseClass) {
-    return new AppResources(baseClass, currentLocale());
   }
 
   protected <T> Optional<T> optional(Supplier<T> supplier) {

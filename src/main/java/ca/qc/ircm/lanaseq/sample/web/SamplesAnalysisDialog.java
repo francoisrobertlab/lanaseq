@@ -18,11 +18,11 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -62,6 +62,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   public static final String CREATE_FOLDER = "createFolder";
   public static final String ERRORS = "errors";
   public static final String CREATE_FOLDER_EXCEPTION = property(CREATE_FOLDER, "exception");
+  private static final String MESSAGE_PREFIX = messagePrefix(SamplesAnalysisDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(SamplesAnalysisDialog.class);
   private static final long serialVersionUID = 3521519771905055445L;
   protected Div message = new Div();
@@ -112,23 +113,21 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
-    setHeaderTitle(resources.message(HEADER));
-    message.setText(resources.message(MESSAGE));
-    createFolder.setText(resources.message(CREATE_FOLDER));
-    confirm.setHeader(resources.message(CONFIRM));
-    confirm.setConfirmText(resources.message(property(CONFIRM, CONFIRM)));
-    errors.setHeader(resources.message(ERRORS));
-    errors.setConfirmText(resources.message(property(ERRORS, CONFIRM)));
+    setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER));
+    message.setText(getTranslation(MESSAGE_PREFIX + MESSAGE));
+    createFolder.setText(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER));
+    confirm.setHeader(getTranslation(MESSAGE_PREFIX + CONFIRM));
+    confirm.setConfirmText(getTranslation(MESSAGE_PREFIX + property(CONFIRM, CONFIRM)));
+    errors.setHeader(getTranslation(MESSAGE_PREFIX + ERRORS));
+    errors.setConfirmText(getTranslation(MESSAGE_PREFIX + property(ERRORS, CONFIRM)));
     updateHeader();
   }
 
   private void updateHeader() {
-    final AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
     if (samples.size() > 1) {
-      setHeaderTitle(resources.message(HEADER, samples.size()));
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, samples.size()));
     } else {
-      setHeaderTitle(resources.message(HEADER, samples.size(),
+      setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, samples.size(),
           samples.stream().findFirst().map(Sample::getName).orElse("")));
     }
   }
@@ -148,7 +147,6 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   void createFolder() {
     if (validate()) {
       logger.debug("creating analysis folder for samples {}", samples);
-      AppResources resources = new AppResources(SamplesAnalysisDialog.class, getLocale());
       try {
         analysisService.copySamplesResources(samples);
         boolean unix = getUI().map(ui -> {
@@ -156,11 +154,11 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
           return browser.isMacOSX() || browser.isLinux();
         }).orElse(false);
         String folder = configuration.getAnalysis().label(samples, unix);
-        confirm.setText(resources.message(property(CONFIRM, "message"), folder));
+        confirm.setText(getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder));
         confirm.open();
       } catch (IOException e) {
         errorsLayout.removeAll();
-        errorsLayout.add(new Span(resources.message(CREATE_FOLDER_EXCEPTION)));
+        errorsLayout.add(new Span(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_EXCEPTION)));
         errors.open();
       } catch (IllegalArgumentException e) {
         // re-validate, something changed.

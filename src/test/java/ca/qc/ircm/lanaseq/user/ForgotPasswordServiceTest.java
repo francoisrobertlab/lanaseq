@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.user;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,7 +31,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.mail.MailService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,6 +61,8 @@ import org.thymeleaf.util.StringUtils;
  */
 @ServiceTestAnnotations
 public class ForgotPasswordServiceTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordService.class);
+  private static final String CONSTANT_PREFIX = messagePrefix(Constants.class);
   @SuppressWarnings("unused")
   private final Logger logger = LoggerFactory.getLogger(ForgotPasswordServiceTest.class);
   @Autowired
@@ -74,6 +77,8 @@ public class ForgotPasswordServiceTest {
   private MailService mailService;
   @MockBean
   private PasswordEncoder passwordEncoder;
+  @Autowired
+  private MessageSource messageSource;
   @Mock
   private ForgotPasswordWebContext forgotPasswordWebContext;
   @Mock
@@ -202,10 +207,11 @@ public class ForgotPasswordServiceTest {
     verify(mailService).htmlEmail();
     verify(mailService).send(email);
     verify(email).addTo(user.getEmail());
-    AppResources resources = new AppResources(ForgotPasswordService.class, locale);
-    AppResources constants = new AppResources(Constants.class, locale);
+    String applicationName =
+        messageSource.getMessage(CONSTANT_PREFIX + "application.name", null, locale);
     ResourceBundle mailResources = ResourceBundle.getBundle("user.forgotpassword", locale);
-    verify(email).setSubject(resources.message("subject", constants.message("application.name")));
+    verify(email).setSubject(messageSource.getMessage(MESSAGE_PREFIX + "subject",
+        new Object[] { applicationName }, locale));
     verify(email).setText(stringCaptor.capture(), stringCaptor.capture());
     String textContent = stringCaptor.getAllValues().get(0);
     String htmlContent = stringCaptor.getAllValues().get(1);

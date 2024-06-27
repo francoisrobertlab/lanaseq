@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq.protocol.web;
 
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolHistoryDialog.HEADER;
@@ -36,7 +37,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import ca.qc.ircm.lanaseq.AppResources;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
@@ -74,6 +74,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
+  private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
+  private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private ProtocolHistoryDialog dialog;
   @MockBean
   private ProtocolService service;
@@ -84,8 +86,6 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   @Autowired
   private ProtocolFileRepository fileRepository;
   private Locale locale = Locale.ENGLISH;
-  private AppResources resources = new AppResources(ProtocolHistoryDialog.class, locale);
-  private AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
   private List<ProtocolFile> protocolFiles;
 
   /**
@@ -126,25 +126,27 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   @Test
   public void labels() {
     Protocol protocol = repository.findById(dialog.getProtocolId()).get();
-    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, protocol.getName()),
+        dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(protocolFileResources.message(FILENAME),
+    assertEquals(dialog.getTranslation(PROTOCOL_FILE_PREFIX + FILENAME),
         headerRow.getCell(dialog.filename).getText());
-    assertEquals(resources.message(RECOVER), headerRow.getCell(dialog.recover).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + RECOVER),
+        headerRow.getCell(dialog.recover).getText());
   }
 
   @Test
   public void localeChange() {
     Locale locale = Locale.FRENCH;
-    final AppResources resources = new AppResources(ProtocolHistoryDialog.class, locale);
-    final AppResources protocolFileResources = new AppResources(ProtocolFile.class, locale);
     UI.getCurrent().setLocale(locale);
     Protocol protocol = repository.findById(dialog.getProtocolId()).get();
-    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, protocol.getName()),
+        dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
-    assertEquals(protocolFileResources.message(FILENAME),
+    assertEquals(dialog.getTranslation(PROTOCOL_FILE_PREFIX + FILENAME),
         headerRow.getCell(dialog.filename).getText());
-    assertEquals(resources.message(RECOVER), headerRow.getCell(dialog.recover).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + RECOVER),
+        headerRow.getCell(dialog.recover).getText());
   }
 
   @Test
@@ -180,8 +182,9 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
     functions(recoverRenderer).get("recoverFile").accept(file, null);
     verify(service).recover(file);
     Notification notification = $(Notification.class).first();
-    assertEquals(resources.message(RECOVERED, file.getFilename()), test(notification).getText());
-    dialog.showNotification(resources.message(RECOVERED, file.getFilename()));
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()),
+        test(notification).getText());
+    dialog.showNotification(dialog.getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()));
     assertTrue(items(dialog.files).isEmpty());
   }
 
@@ -206,7 +209,8 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
     dialog.setProtocolId(3L);
 
-    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, protocol.getName()),
+        dialog.getHeaderTitle());
     assertEquals(1, dialog.files.getListDataView().getItemCount());
   }
 
@@ -216,7 +220,8 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
     dialog.setProtocolId(2L);
 
-    assertEquals(resources.message(HEADER, protocol.getName()), dialog.getHeaderTitle());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, protocol.getName()),
+        dialog.getHeaderTitle());
     assertEquals(0, dialog.files.getListDataView().getItemCount());
   }
 
