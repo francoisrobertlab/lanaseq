@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.lanaseq;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +42,10 @@ public class SpringConfiguration {
    */
   @Bean
   public ReloadableResourceBundleMessageSource messageSource() {
+    String currentDir = FilenameUtils.separatorsToUnix(System.getProperty("user.dir"));
     ReloadableResourceBundleMessageSource messageSource =
         new ReloadableResourceBundleMessageSource();
-    messageSource.setBasename("classpath:messages");
+    messageSource.setBasenames("file:" + currentDir + "/messages", "classpath:messages");
     messageSource.setDefaultEncoding("UTF-8");
     return messageSource;
   }
