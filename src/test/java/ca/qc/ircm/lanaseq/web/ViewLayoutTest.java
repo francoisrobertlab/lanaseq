@@ -13,16 +13,15 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SAMPLES;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.SIDE_NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.TABS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -99,7 +98,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals("100%", view.laboratoryLayout.getWidth());
     assertEquals(styleName(ID, LABORATORY), view.laboratory.getId().orElse(""));
     assertEquals(DRAWER_TOGGLE, view.drawerToggle.getId().orElse(""));
-    assertEquals(TABS, view.tabs.getId().orElse(""));
+    assertEquals(SIDE_NAV, view.sideNav.getId().orElse(""));
     assertEquals(styleName(DATASETS, TAB), view.datasets.getId().orElse(""));
     assertEquals(styleName(SAMPLES, TAB), view.samples.getId().orElse(""));
     assertEquals(styleName(PROTOCOLS, TAB), view.protocols.getId().orElse(""));
@@ -158,23 +157,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     view = $(ViewLayout.class).first();
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    test(view.tabs).select(view.datasets.getLabel());
+    test(view.sideNav).clickItem(view.datasets.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.datasets, view.tabs.getSelectedTab());
-    assertEquals(view.datasets.getLabel(), view.header.getText());
-    assertTrue($(DatasetsView.class).exists());
-    assertNoExecuteJs();
-  }
-
-  @Test
-  public void tabs_SelectDatasetsNoChange() {
-    UI.getCurrent().addAfterNavigationListener(navigationListener);
-
-    test(view.tabs).select(view.datasets.getLabel());
-
-    verify(navigationListener, never()).afterNavigation(any());
-    assertEquals(view.datasets, view.tabs.getSelectedTab());
+    assertEquals(view.datasets, view.selectedSideNavItem().orElse(null));
     assertEquals(view.datasets.getLabel(), view.header.getText());
     assertTrue($(DatasetsView.class).exists());
     assertNoExecuteJs();
@@ -184,25 +170,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void tabs_SelectSamples() {
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    test(view.tabs).select(view.samples.getLabel());
+    test(view.sideNav).clickItem(view.samples.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.samples, view.tabs.getSelectedTab());
-    assertEquals(view.samples.getLabel(), view.header.getText());
-    assertTrue($(SamplesView.class).exists());
-    assertNoExecuteJs();
-  }
-
-  @Test
-  public void tabs_SelectSamplesNoChange() {
-    navigate(SamplesView.class);
-    view = $(ViewLayout.class).first();
-    UI.getCurrent().addAfterNavigationListener(navigationListener);
-
-    test(view.tabs).select(view.samples.getLabel());
-
-    verify(navigationListener, never()).afterNavigation(any());
-    assertEquals(view.samples, view.tabs.getSelectedTab());
+    assertEquals(view.samples, view.selectedSideNavItem().orElse(null));
     assertEquals(view.samples.getLabel(), view.header.getText());
     assertTrue($(SamplesView.class).exists());
     assertNoExecuteJs();
@@ -212,25 +183,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void tabs_SelectProtocol() {
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    test(view.tabs).select(view.protocols.getLabel());
+    test(view.sideNav).clickItem(view.protocols.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.protocols, view.tabs.getSelectedTab());
-    assertEquals(view.protocols.getLabel(), view.header.getText());
-    assertTrue($(ProtocolsView.class).exists());
-    assertNoExecuteJs();
-  }
-
-  @Test
-  public void tabs_SelectProtocolNoChange() {
-    navigate(ProtocolsView.class);
-    view = $(ViewLayout.class).first();
-    UI.getCurrent().addAfterNavigationListener(navigationListener);
-
-    test(view.tabs).select(view.protocols.getLabel());
-
-    verify(navigationListener, never()).afterNavigation(any());
-    assertEquals(view.protocols, view.tabs.getSelectedTab());
+    assertEquals(view.protocols, view.selectedSideNavItem().orElse(null));
     assertEquals(view.protocols.getLabel(), view.header.getText());
     assertTrue($(ProtocolsView.class).exists());
     assertNoExecuteJs();
@@ -240,25 +196,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void tabs_SelectProfile() {
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    test(view.tabs).select(view.profile.getLabel());
+    test(view.sideNav).clickItem(view.profile.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.profile, view.tabs.getSelectedTab());
-    assertEquals(view.profile.getLabel(), view.header.getText());
-    assertTrue($(ProfileView.class).exists());
-    assertNoExecuteJs();
-  }
-
-  @Test
-  public void tabs_SelectProfileNoChange() {
-    navigate(ProfileView.class);
-    view = $(ViewLayout.class).first();
-    UI.getCurrent().addAfterNavigationListener(navigationListener);
-
-    test(view.tabs).select(view.profile.getLabel());
-
-    verify(navigationListener, never()).afterNavigation(any());
-    assertEquals(view.profile, view.tabs.getSelectedTab());
+    assertEquals(view.profile, view.selectedSideNavItem().orElse(null));
     assertEquals(view.profile.getLabel(), view.header.getText());
     assertTrue($(ProfileView.class).exists());
     assertNoExecuteJs();
@@ -269,26 +210,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void tabs_SelectUsers() {
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    test(view.tabs).select(view.users.getLabel());
+    test(view.sideNav).clickItem(view.users.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.users, view.tabs.getSelectedTab());
-    assertEquals(view.users.getLabel(), view.header.getText());
-    assertTrue($(UsersView.class).exists());
-    assertNoExecuteJs();
-  }
-
-  @Test
-  @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void tabs_SelectUsersNoChange() {
-    navigate(UsersView.class);
-    view = $(ViewLayout.class).first();
-    UI.getCurrent().addAfterNavigationListener(navigationListener);
-
-    test(view.tabs).select(view.users.getLabel());
-
-    verify(navigationListener, never()).afterNavigation(any());
-    assertEquals(view.users, view.tabs.getSelectedTab());
+    assertEquals(view.users, view.selectedSideNavItem().orElse(null));
     assertEquals(view.users.getLabel(), view.header.getText());
     assertTrue($(UsersView.class).exists());
     assertNoExecuteJs();
@@ -302,7 +227,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     navigate(SamplesView.class);
     view = $(ViewLayout.class).first();
 
-    view.tabs.setSelectedTab(view.exitSwitchUser);
+    test(view.sideNav).clickItem(view.exitSwitchUser.getLabel());
 
     verify(switchUserService).exitSwitchUser(VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
@@ -317,7 +242,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     // Invalidated session.
     assertThrows(InvocationTargetException.class, () -> {
-      test(view.tabs).select(view.signout.getLabel());
+      test(view.sideNav).clickItem(view.signout.getLabel());
     });
     assertThrows(IllegalStateException.class, () -> {
       VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames();

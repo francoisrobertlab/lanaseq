@@ -14,8 +14,8 @@ import com.vaadin.flow.component.applayout.testbench.AppLayoutElement;
 import com.vaadin.flow.component.applayout.testbench.DrawerToggleElement;
 import com.vaadin.flow.component.html.testbench.H1Element;
 import com.vaadin.flow.component.html.testbench.H2Element;
-import com.vaadin.flow.component.tabs.testbench.TabElement;
-import com.vaadin.flow.component.tabs.testbench.TabsElement;
+import com.vaadin.flow.component.sidenav.testbench.SideNavElement;
+import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -41,35 +41,35 @@ public class ViewLayoutElement extends AppLayoutElement {
     return $(DrawerToggleElement.class).first();
   }
 
-  public TabsElement tabs() {
-    return $(TabsElement.class).first();
+  public SideNavElement sideNav() {
+    return $(SideNavElement.class).first();
   }
 
-  public TabElement datasets() {
-    return $(TabElement.class).id(styleName(DATASETS, TAB));
+  public SideNavItemElement datasets() {
+    return $(SideNavItemElement.class).id(styleName(DATASETS, TAB));
   }
 
-  public TabElement samples() {
-    return $(TabElement.class).id(styleName(SAMPLES, TAB));
+  public SideNavItemElement samples() {
+    return $(SideNavItemElement.class).id(styleName(SAMPLES, TAB));
   }
 
-  public TabElement protocols() {
-    return $(TabElement.class).id(styleName(PROTOCOLS, TAB));
+  public SideNavItemElement protocols() {
+    return $(SideNavItemElement.class).id(styleName(PROTOCOLS, TAB));
   }
 
-  public TabElement profile() {
-    return $(TabElement.class).id(styleName(PROFILE, TAB));
+  public SideNavItemElement profile() {
+    return $(SideNavItemElement.class).id(styleName(PROFILE, TAB));
   }
 
-  public TabElement users() {
-    return $(TabElement.class).id(styleName(USERS, TAB));
+  public SideNavItemElement users() {
+    return $(SideNavItemElement.class).id(styleName(USERS, TAB));
   }
 
-  public TabElement exitSwitchUser() {
-    return $(TabElement.class).id(styleName(EXIT_SWITCH_USER, TAB));
+  public SideNavItemElement exitSwitchUser() {
+    return $(SideNavItemElement.class).id(styleName(EXIT_SWITCH_USER, TAB));
   }
 
-  public TabElement signout() {
-    return $(TabElement.class).id(styleName(SIGNOUT, TAB));
+  public SideNavItemElement signout() {
+    return $(SideNavItemElement.class).id(styleName(SIGNOUT, TAB));
   }
 }
