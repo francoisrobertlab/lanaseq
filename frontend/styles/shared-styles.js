@@ -6,10 +6,6 @@ $_documentContainer.innerHTML = `<custom-style>
       --vaadin-app-layout-drawer-width: 13em;
     }
 
-    .main-layout {
-        padding: 20px;
-    }
-    
     /* Font sizes */
     .font-size-xxxl {
       font-size: var(--lumo-font-size-xxxl);
