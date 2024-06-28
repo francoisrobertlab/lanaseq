@@ -9,7 +9,7 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
-import ca.qc.ircm.lanaseq.security.SwitchUserService;
+import ca.qc.ircm.lanaseq.user.web.ExitSwitchUserView;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
@@ -28,8 +28,6 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.server.VaadinServletRequest;
-import com.vaadin.flow.server.VaadinServletResponse;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +35,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
-import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 /**
@@ -82,15 +77,12 @@ public class ViewLayout extends AppLayout
   private Map<Tab, String> tabsHref = new HashMap<>();
   private String currentHref;
   @Autowired
-  private transient SwitchUserService switchUserService;
-  @Autowired
   private transient AuthenticatedUser authenticatedUser;
 
   protected ViewLayout() {
   }
 
-  protected ViewLayout(SwitchUserService switchUserService, AuthenticatedUser authenticatedUser) {
-    this.switchUserService = switchUserService;
+  protected ViewLayout(AuthenticatedUser authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
   }
 
@@ -131,6 +123,8 @@ public class ViewLayout extends AppLayout
     tabsHref.put(protocols, ProtocolsView.VIEW_NAME);
     tabsHref.put(profile, ProfileView.VIEW_NAME);
     tabsHref.put(users, UsersView.VIEW_NAME);
+    tabsHref.put(exitSwitchUser, ExitSwitchUserView.VIEW_NAME);
+    tabsHref.put(signout, SignoutView.VIEW_NAME);
     tabs.addSelectedChangeListener(e -> selectTab());
   }
 
@@ -148,21 +142,9 @@ public class ViewLayout extends AppLayout
   }
 
   private void selectTab() {
-    if (tabs.getSelectedTab() == signout) {
-      logger.debug("Sign out user {}", authenticatedUser);
-      UI.getCurrent().getPage().setLocation(getUrl(MainView.VIEW_NAME));
-      CompositeLogoutHandler logoutHandler = new CompositeLogoutHandler(
-          new CookieClearingLogoutHandler("remember-me"), new SecurityContextLogoutHandler());
-      logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(),
-          VaadinServletResponse.getCurrent().getHttpServletResponse(), null);
-    } else if (tabs.getSelectedTab() == exitSwitchUser) {
-      switchUserService.exitSwitchUser(VaadinServletRequest.getCurrent());
-      UI.getCurrent().getPage().setLocation(getUrl(MainView.VIEW_NAME));
-    } else {
-      if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
-        logger.debug("navigate to {}", tabsHref.get(tabs.getSelectedTab()));
-        UI.getCurrent().navigate(tabsHref.get(tabs.getSelectedTab()));
-      }
+    if (!currentHref.equals(tabsHref.get(tabs.getSelectedTab()))) {
+      logger.debug("navigate to {}", tabsHref.get(tabs.getSelectedTab()));
+      UI.getCurrent().navigate(tabsHref.get(tabs.getSelectedTab()));
     }
   }
 

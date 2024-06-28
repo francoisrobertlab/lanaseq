@@ -19,7 +19,7 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.TABS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -32,20 +32,24 @@ import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -58,10 +62,14 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ViewLayout view;
-  @MockBean
+  @SpyBean
   private SwitchUserService switchUserService;
+  @Autowired
+  private UserRepository userRepository;
   @Mock
   private AfterNavigationListener navigationListener;
+  @Captor
+  private ArgumentCaptor<AfterNavigationEvent> afterNavigationEventCaptor;
   private Locale locale = Locale.ENGLISH;
   private User user = new User(1L, "myuser");
 
@@ -287,7 +295,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   }
 
   @Test
+  @WithUserDetails("lanaseq@ircm.qc.ca")
   public void tabs_SelectExitSwitchUser() {
+    switchUserService.switchUser(userRepository.findById(3L).get(),
+        VaadinServletRequest.getCurrent());
     navigate(SamplesView.class);
     view = $(ViewLayout.class).first();
 
@@ -301,14 +312,21 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   }
 
   @Test
-  @Disabled("Fails because of invalidated session")
   public void tabs_SelectSignout() {
     UI.getCurrent().addAfterNavigationListener(navigationListener);
 
-    test(view.tabs).select(view.signout.getLabel());
+    // Invalidated session.
+    assertThrows(InvocationTargetException.class, () -> {
+      test(view.tabs).select(view.signout.getLabel());
+    });
+    assertThrows(IllegalStateException.class, () -> {
+      VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames();
+    });
 
-    verify(navigationListener, never()).afterNavigation(any());
-    assertNull(SecurityContextHolder.getContext().getAuthentication());
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
+        .anyMatch(i -> i.getInvocation().getExpression().contains("window.open($0, $1)")
+            && i.getInvocation().getParameters().size() > 0
+            && i.getInvocation().getParameters().get(0).equals("/")));
   }
 
   @Test
