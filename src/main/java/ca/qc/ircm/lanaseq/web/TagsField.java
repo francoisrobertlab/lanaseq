@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
@@ -15,7 +14,6 @@ import java.util.List;
 /**
  * List of tags field.
  */
-@JsModule("./styles/tags-field-styles.js")
 public class TagsField extends MultiSelectComboBox<String> implements LocaleChangeObserver {
   public static final String CLASS_NAME = "tags-field";
   public static final String NEW_TAG_REGEX = "[\\w-]*";
