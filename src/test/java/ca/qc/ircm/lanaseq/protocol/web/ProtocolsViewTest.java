@@ -11,7 +11,6 @@ import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.EDIT_BUTTON;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
@@ -121,7 +120,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
-    assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(PROTOCOLS, view.protocols.getId().orElse(""));
     assertTrue(
         view.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
@@ -135,7 +133,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
     FooterRow footerRow = view.protocols.getFooterRows().get(0);
     assertEquals(view.getTranslation(PROTOCOL_PREFIX + NAME),
@@ -164,7 +161,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.protocols.getHeaderRows().get(0);
     FooterRow footerRow = view.protocols.getFooterRows().get(0);
     assertEquals(view.getTranslation(PROTOCOL_PREFIX + NAME),

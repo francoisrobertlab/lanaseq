@@ -16,7 +16,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ANALYZE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
-import static ca.qc.ircm.lanaseq.sample.web.SamplesView.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
@@ -145,7 +144,6 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
-    assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAMPLES, view.samples.getId().orElse(""));
     assertTrue(
         view.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
@@ -162,7 +160,6 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.samples.getHeaderRows().get(0);
     FooterRow footerRow = view.samples.getFooterRows().get(0);
     assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), headerRow.getCell(view.name).getText());
@@ -197,7 +194,6 @@ public class SamplesViewTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.samples.getHeaderRows().get(0);
     FooterRow footerRow = view.samples.getFooterRows().get(0);
     assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), headerRow.getCell(view.name).getText());

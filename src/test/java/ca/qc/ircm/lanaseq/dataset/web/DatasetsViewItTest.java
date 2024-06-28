@@ -64,7 +64,6 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
     assertTrue(optional(() -> view.files()).isPresent());

@@ -1,10 +1,13 @@
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.DRAWER_TOGGLE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER_FORM;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
@@ -21,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -50,6 +54,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ViewLayoutTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ViewLayout view;
   @MockBean
   private SwitchUserService switchUserService;
@@ -76,6 +81,9 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
+    assertEquals(styleName(APPLICATION_NAME), view.applicationName.getId().orElse(""));
+    assertEquals(styleName(ID, HEADER), view.header.getId().orElse(""));
+    assertEquals(DRAWER_TOGGLE, view.drawerToggle.getId().orElse(""));
     assertEquals(TABS, view.tabs.getId().orElse(""));
     assertEquals(styleName(DATASETS, TAB), view.datasets.getId().orElse(""));
     assertEquals(styleName(SAMPLES, TAB), view.samples.getId().orElse(""));
@@ -88,6 +96,8 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME),
+        view.applicationName.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS), view.datasets.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
@@ -102,6 +112,8 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME),
+        view.applicationName.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS), view.datasets.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
@@ -133,6 +145,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.datasets, view.tabs.getSelectedTab());
+    assertEquals(view.datasets.getLabel(), view.header.getText());
     assertTrue($(DatasetsView.class).exists());
     assertNoExecuteJs();
   }
@@ -145,6 +158,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener, never()).afterNavigation(any());
     assertEquals(view.datasets, view.tabs.getSelectedTab());
+    assertEquals(view.datasets.getLabel(), view.header.getText());
     assertTrue($(DatasetsView.class).exists());
     assertNoExecuteJs();
   }
@@ -157,6 +171,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.samples, view.tabs.getSelectedTab());
+    assertEquals(view.samples.getLabel(), view.header.getText());
     assertTrue($(SamplesView.class).exists());
     assertNoExecuteJs();
   }
@@ -171,6 +186,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener, never()).afterNavigation(any());
     assertEquals(view.samples, view.tabs.getSelectedTab());
+    assertEquals(view.samples.getLabel(), view.header.getText());
     assertTrue($(SamplesView.class).exists());
     assertNoExecuteJs();
   }
@@ -183,6 +199,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.protocols, view.tabs.getSelectedTab());
+    assertEquals(view.protocols.getLabel(), view.header.getText());
     assertTrue($(ProtocolsView.class).exists());
     assertNoExecuteJs();
   }
@@ -197,6 +214,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener, never()).afterNavigation(any());
     assertEquals(view.protocols, view.tabs.getSelectedTab());
+    assertEquals(view.protocols.getLabel(), view.header.getText());
     assertTrue($(ProtocolsView.class).exists());
     assertNoExecuteJs();
   }
@@ -209,6 +227,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.profile, view.tabs.getSelectedTab());
+    assertEquals(view.profile.getLabel(), view.header.getText());
     assertTrue($(ProfileView.class).exists());
     assertNoExecuteJs();
   }
@@ -223,6 +242,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener, never()).afterNavigation(any());
     assertEquals(view.profile, view.tabs.getSelectedTab());
+    assertEquals(view.profile.getLabel(), view.header.getText());
     assertTrue($(ProfileView.class).exists());
     assertNoExecuteJs();
   }
@@ -236,6 +256,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener).afterNavigation(any());
     assertEquals(view.users, view.tabs.getSelectedTab());
+    assertEquals(view.users.getLabel(), view.header.getText());
     assertTrue($(UsersView.class).exists());
     assertNoExecuteJs();
   }
@@ -251,6 +272,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     verify(navigationListener, never()).afterNavigation(any());
     assertEquals(view.users, view.tabs.getSelectedTab());
+    assertEquals(view.users.getLabel(), view.header.getText());
     assertTrue($(UsersView.class).exists());
     assertNoExecuteJs();
   }

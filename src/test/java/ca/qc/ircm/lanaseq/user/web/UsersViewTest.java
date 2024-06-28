@@ -15,7 +15,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
-import static ca.qc.ircm.lanaseq.user.web.UsersView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.ID;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS;
@@ -122,7 +121,6 @@ public class UsersViewTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
-    assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(USERS, view.users.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
@@ -131,7 +129,6 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.users.getHeaderRows().get(0);
     FooterRow footerRow = view.users.getFooterRows().get(0);
     assertEquals(view.getTranslation(USER_PREFIX + EMAIL), headerRow.getCell(view.email).getText());
@@ -164,7 +161,6 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     HeaderRow headerRow = view.users.getHeaderRows().get(0);
     FooterRow footerRow = view.users.getFooterRows().get(0);
     assertEquals(view.getTranslation(USER_PREFIX + EMAIL), headerRow.getCell(view.email).getText());

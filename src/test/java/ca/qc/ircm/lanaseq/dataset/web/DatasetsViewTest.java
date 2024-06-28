@@ -9,7 +9,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_MORE_THAN_ONE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.DATASETS_REQUIRED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
@@ -98,7 +97,6 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
-    assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(DatasetGrid.ID, view.datasets.getId().orElse(""));
     assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
@@ -111,7 +109,6 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
@@ -121,7 +118,6 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());

@@ -33,7 +33,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -65,7 +64,6 @@ public class UsersView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent, UrlComponent {
   public static final String VIEW_NAME = "users";
   public static final String ID = "users-view";
-  public static final String HEADER = "header";
   public static final String USERS = "users";
   public static final String USERS_REQUIRED = property(USERS, REQUIRED);
   public static final String SWITCH_USER = "switchUser";
@@ -75,7 +73,6 @@ public class UsersView extends VerticalLayout
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(UsersView.class);
-  protected H2 header = new H2();
   protected Grid<User> users = new Grid<>();
   protected Column<User> email;
   protected Column<User> name;
@@ -109,9 +106,8 @@ public class UsersView extends VerticalLayout
     logger.debug("users view");
     setId(ID);
     setHeightFull();
-    add(header, users, error, new HorizontalLayout(add, switchUser));
+    add(users, error, new HorizontalLayout(add, switchUser));
     expand(users);
-    header.setId(HEADER);
     users.setId(USERS);
     users.addItemDoubleClickListener(e -> view(e.getItem()));
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
@@ -183,7 +179,6 @@ public class UsersView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
     String emailHeader = getTranslation(USER_PREFIX + EMAIL);
     email.setHeader(emailHeader).setFooter(emailHeader);
     String nameHeader = getTranslation(USER_PREFIX + NAME);

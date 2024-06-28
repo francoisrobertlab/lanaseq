@@ -29,7 +29,6 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -60,7 +59,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ProtocolsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
   public static final String VIEW_NAME = "protocols";
   public static final String ID = "protocols-view";
-  public static final String HEADER = "header";
   public static final String PROTOCOLS = "protocols";
   public static final String EDIT_BUTTON =
       "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
@@ -73,7 +71,6 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -2370599174391239721L;
   private static final Logger logger = LoggerFactory.getLogger(ProtocolsView.class);
-  protected H2 header = new H2();
   protected Grid<Protocol> protocols = new Grid<>();
   protected Column<Protocol> name;
   protected Column<Protocol> date;
@@ -106,10 +103,9 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     logger.debug("protocols view");
     setId(ID);
     setHeightFull();
-    add(header, protocols, error, new HorizontalLayout(add, history));
+    add(protocols, error, new HorizontalLayout(add, history));
     protocols.setMinHeight("30em");
     expand(protocols);
-    header.setId(HEADER);
     protocols.setId(PROTOCOLS);
     name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Protocol::getName));
@@ -163,7 +159,6 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
     String nameHeader = getTranslation(PROTOCOL_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
     String dateHeader = getTranslation(PROTOCOL_PREFIX + CREATION_DATE);

@@ -70,7 +70,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_User() throws Throwable {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.form()).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
     assertTrue(optional(() -> view.form().name()).isPresent());
@@ -87,7 +86,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Manager() throws Throwable {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.form()).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
     assertTrue(optional(() -> view.form().name()).isPresent());
@@ -104,7 +102,6 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Admin() throws Throwable {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.form()).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
     assertTrue(optional(() -> view.form().name()).isPresent());

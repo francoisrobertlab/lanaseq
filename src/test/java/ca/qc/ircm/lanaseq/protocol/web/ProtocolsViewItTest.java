@@ -55,7 +55,6 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertFalse(optional(() -> view.history()).isPresent());
@@ -66,7 +65,6 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Manager() throws Throwable {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.history()).isPresent());

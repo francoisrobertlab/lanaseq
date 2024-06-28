@@ -1,8 +1,10 @@
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
+import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
@@ -12,8 +14,11 @@ import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -39,9 +44,11 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
  * Main layout.
  */
 @JsModule("./styles/shared-styles.js")
-public class ViewLayout extends VerticalLayout
+public class ViewLayout extends AppLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver, UrlComponent {
   public static final String ID = "view-layout";
+  public static final String HEADER = "header";
+  public static final String DRAWER_TOGGLE = "drawerToggle";
   public static final String TABS = styleName(ID, "tabs");
   public static final String DATASETS = "datasets";
   public static final String SAMPLES = "samples";
@@ -53,8 +60,12 @@ public class ViewLayout extends VerticalLayout
   public static final String SIGNOUT = "signout";
   public static final String TAB = "tab";
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
+  protected H1 applicationName = new H1();
+  protected H2 header = new H2();
+  protected DrawerToggle drawerToggle = new DrawerToggle();
   protected Tabs tabs = new Tabs();
   protected Tab datasets = new Tab();
   protected Tab samples = new Tab();
@@ -81,12 +92,19 @@ public class ViewLayout extends VerticalLayout
   @PostConstruct
   void init() {
     setId(ID);
-    setSizeFull();
-    setPadding(false);
-    setSpacing(false);
-    add(tabs);
+    addToDrawer(applicationName, tabs);
+    addToNavbar(drawerToggle, header);
+    setPrimarySection(Section.DRAWER);
+    applicationName.setId(styleName(APPLICATION_NAME));
+    applicationName.getStyle().set("font-size", "var(--lumo-font-size-l)")
+        .set("line-height", "var(--lumo-size-l)")
+        .set("margin", "var(--lumo-space-s) var(--lumo-space-m)");
+    header.setId(styleName(ID, HEADER));
+    header.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
+    drawerToggle.setId(DRAWER_TOGGLE);
     tabs.setId(TABS);
     tabs.add(datasets, samples, protocols, profile, users, exitSwitchUser, signout);
+    tabs.setOrientation(Tabs.Orientation.VERTICAL);
     datasets.setId(styleName(DATASETS, TAB));
     samples.setId(styleName(SAMPLES, TAB));
     protocols.setId(styleName(PROTOCOLS, TAB));
@@ -106,6 +124,7 @@ public class ViewLayout extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    applicationName.setText(getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
     datasets.setLabel(getTranslation(MESSAGE_PREFIX + DATASETS));
     samples.setLabel(getTranslation(MESSAGE_PREFIX + SAMPLES));
     protocols.setLabel(getTranslation(MESSAGE_PREFIX + PROTOCOLS));
@@ -143,5 +162,6 @@ public class ViewLayout extends VerticalLayout
     Optional<Tab> currentTab = tabsHref.entrySet().stream()
         .filter(e -> e.getValue().equals(currentHref)).map(e -> e.getKey()).findFirst();
     currentTab.ifPresent(tab -> tabs.setSelectedTab(tab));
+    currentTab.ifPresentOrElse(tab -> header.setText(tab.getLabel()), () -> header.setText(""));
   }
 }

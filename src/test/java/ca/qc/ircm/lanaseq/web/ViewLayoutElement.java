@@ -10,7 +10,10 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 
-import com.vaadin.flow.component.orderedlayout.testbench.VerticalLayoutElement;
+import com.vaadin.flow.component.applayout.testbench.AppLayoutElement;
+import com.vaadin.flow.component.applayout.testbench.DrawerToggleElement;
+import com.vaadin.flow.component.html.testbench.H1Element;
+import com.vaadin.flow.component.html.testbench.H2Element;
 import com.vaadin.flow.component.tabs.testbench.TabElement;
 import com.vaadin.flow.component.tabs.testbench.TabsElement;
 import com.vaadin.testbench.annotations.Attribute;
@@ -19,9 +22,21 @@ import com.vaadin.testbench.elementsbase.Element;
 /**
  * Web element for {@link ViewLayout}.
  */
-@Element("vaadin-vertical-layout")
+@Element("vaadin-app-layout")
 @Attribute(name = "id", value = ViewLayout.ID)
-public class ViewLayoutElement extends VerticalLayoutElement {
+public class ViewLayoutElement extends AppLayoutElement {
+  public H1Element applicationName() {
+    return $(H1Element.class).first();
+  }
+
+  public H2Element header() {
+    return $(H2Element.class).first();
+  }
+
+  public DrawerToggleElement drawerToggle() {
+    return $(DrawerToggleElement.class).first();
+  }
+
   public TabsElement tabs() {
     return $(TabsElement.class).first();
   }

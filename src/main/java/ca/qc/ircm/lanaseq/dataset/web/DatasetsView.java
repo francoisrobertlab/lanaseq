@@ -20,7 +20,6 @@ import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -52,7 +51,6 @@ public class DatasetsView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "datasets";
   public static final String ID = "datasets-view";
-  public static final String HEADER = "header";
   public static final String DATASETS = "datasets";
   public static final String MERGE = "merge";
   public static final String FILES = "files";
@@ -66,7 +64,6 @@ public class DatasetsView extends VerticalLayout
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
-  protected H2 header = new H2();
   protected Div error = new Div();
   protected Button merge = new Button();
   protected Button files = new Button();
@@ -99,10 +96,9 @@ public class DatasetsView extends VerticalLayout
     logger.debug("datasets view");
     setId(ID);
     setHeightFull();
-    add(header, datasets, error, new HorizontalLayout(merge, files, analyze));
+    add(datasets, error, new HorizontalLayout(merge, files, analyze));
     datasets.setMinHeight("30em");
     expand(datasets);
-    header.setId(HEADER);
     datasets.setSelectionMode(SelectionMode.MULTI);
     datasets.addItemClickListener(e -> {
       if (e.isCtrlKey() || e.isMetaKey()) {
@@ -132,7 +128,6 @@ public class DatasetsView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
     merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
     files.setText(getTranslation(MESSAGE_PREFIX + FILES));
     analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));

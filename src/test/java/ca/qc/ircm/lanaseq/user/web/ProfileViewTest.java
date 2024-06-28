@@ -7,7 +7,6 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
-import static ca.qc.ircm.lanaseq.user.web.ProfileView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.ID;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,14 +62,12 @@ public class ProfileViewTest extends SpringUIUnitTest {
   @Test
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
-    assertEquals(HEADER, view.header.getId().orElse(""));
     assertEquals(SAVE, view.save.getId().orElse(""));
     assertTrue(view.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
   }
 
   @Test
   public void labels() {
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
     validateIcon(VaadinIcon.CHECK.create(), view.save.getIcon());
   }
@@ -79,7 +76,6 @@ public class ProfileViewTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = FRENCH;
     UI.getCurrent().setLocale(locale);
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + HEADER), view.header.getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + SAVE), view.save.getText());
   }
 

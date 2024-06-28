@@ -14,7 +14,6 @@ import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -37,13 +36,11 @@ public class ProfileView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "profile";
   public static final String ID = "profile-view";
-  public static final String HEADER = "header";
   public static final String SAVED = "saved";
   private static final String MESSAGE_PREFIX = messagePrefix(ProfileView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 1252966315920684518L;
   private static final Logger logger = LoggerFactory.getLogger(ProfileView.class);
-  protected H2 header = new H2();
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
@@ -65,8 +62,7 @@ public class ProfileView extends VerticalLayout
     logger.debug("profile view");
     setId(ID);
     setMaxWidth("40em");
-    add(header, form, save);
-    header.setId(HEADER);
+    add(form, save);
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -77,7 +73,6 @@ public class ProfileView extends VerticalLayout
   @Override
   public void localeChange(LocaleChangeEvent event) {
     save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
-    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
   }
 
   @Override

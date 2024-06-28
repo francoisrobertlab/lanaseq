@@ -64,7 +64,6 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());

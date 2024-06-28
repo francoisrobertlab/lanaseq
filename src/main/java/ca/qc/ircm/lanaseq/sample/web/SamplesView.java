@@ -38,7 +38,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -74,7 +73,6 @@ public class SamplesView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
   public static final String VIEW_NAME = "samples";
   public static final String ID = "samples-view";
-  public static final String HEADER = "header";
   public static final String SAMPLES = "samples";
   public static final String MERGE = "merge";
   public static final String FILES = "files";
@@ -93,7 +91,6 @@ public class SamplesView extends VerticalLayout
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -6945706067250351889L;
   private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
-  protected H2 header = new H2();
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
   protected Column<Sample> tags;
@@ -137,10 +134,9 @@ public class SamplesView extends VerticalLayout
     logger.debug("samples view");
     setId(ID);
     setHeightFull();
-    add(header, samples, error, new HorizontalLayout(add, merge, files, analyze));
+    add(samples, error, new HorizontalLayout(add, merge, files, analyze));
     samples.setMinHeight("30em");
     expand(samples);
-    header.setId(HEADER);
     samples.setId(SAMPLES);
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME).setSortProperty(NAME)
@@ -213,7 +209,6 @@ public class SamplesView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    header.setText(getTranslation(MESSAGE_PREFIX + HEADER));
     String nameHeader = getTranslation(SAMPLE_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
     String tagsHeader = getTranslation(SAMPLE_PREFIX + TAGS);
