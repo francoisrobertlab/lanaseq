@@ -6,6 +6,11 @@ $_documentContainer.innerHTML = `<custom-style>
       --vaadin-app-layout-drawer-width: 13em;
     }
 
+    #view-layout-laboratory {
+      background-color: var(--lumo-base-color);
+      color: var(--lumo-success-text-color);
+    }
+
     /* Font sizes */
     .font-size-xxxl {
       font-size: var(--lumo-font-size-xxxl);

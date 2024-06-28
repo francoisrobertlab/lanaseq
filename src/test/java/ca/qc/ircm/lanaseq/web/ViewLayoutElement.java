@@ -33,6 +33,10 @@ public class ViewLayoutElement extends AppLayoutElement {
     return $(H2Element.class).first();
   }
 
+  public H2Element laboratory() {
+    return $(H2Element.class).first();
+  }
+
   public DrawerToggleElement drawerToggle() {
     return $(DrawerToggleElement.class).first();
   }

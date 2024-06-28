@@ -9,6 +9,7 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SAMPLES;
@@ -34,6 +35,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
@@ -83,6 +85,11 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(styleName(APPLICATION_NAME), view.applicationName.getId().orElse(""));
     assertEquals(styleName(ID, HEADER), view.header.getId().orElse(""));
+    assertEquals(styleName(ID, LABORATORY, "layout"), view.laboratoryLayout.getId().orElse(""));
+    assertEquals(FlexComponent.JustifyContentMode.END,
+        view.laboratoryLayout.getJustifyContentMode());
+    assertEquals("100%", view.laboratoryLayout.getWidth());
+    assertEquals(styleName(ID, LABORATORY), view.laboratory.getId().orElse(""));
     assertEquals(DRAWER_TOGGLE, view.drawerToggle.getId().orElse(""));
     assertEquals(TABS, view.tabs.getId().orElse(""));
     assertEquals(styleName(DATASETS, TAB), view.datasets.getId().orElse(""));
@@ -98,6 +105,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void labels() {
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME),
         view.applicationName.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + LABORATORY), view.laboratory.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS), view.datasets.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
@@ -114,6 +122,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     UI.getCurrent().setLocale(locale);
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME),
         view.applicationName.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + LABORATORY), view.laboratory.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS), view.datasets.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());

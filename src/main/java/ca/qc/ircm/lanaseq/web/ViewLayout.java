@@ -19,6 +19,8 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -48,6 +50,7 @@ public class ViewLayout extends AppLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver, UrlComponent {
   public static final String ID = "view-layout";
   public static final String HEADER = "header";
+  public static final String LABORATORY = "laboratory";
   public static final String DRAWER_TOGGLE = "drawerToggle";
   public static final String TABS = styleName(ID, "tabs");
   public static final String DATASETS = "datasets";
@@ -65,6 +68,8 @@ public class ViewLayout extends AppLayout
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected H1 applicationName = new H1();
   protected H2 header = new H2();
+  protected HorizontalLayout laboratoryLayout = new HorizontalLayout();
+  protected H1 laboratory = new H1();
   protected DrawerToggle drawerToggle = new DrawerToggle();
   protected Tabs tabs = new Tabs();
   protected Tab datasets = new Tab();
@@ -93,7 +98,7 @@ public class ViewLayout extends AppLayout
   void init() {
     setId(ID);
     addToDrawer(applicationName, tabs);
-    addToNavbar(drawerToggle, header);
+    addToNavbar(drawerToggle, header, laboratoryLayout);
     setPrimarySection(Section.DRAWER);
     applicationName.setId(styleName(APPLICATION_NAME));
     applicationName.getStyle().set("font-size", "var(--lumo-font-size-l)")
@@ -101,6 +106,13 @@ public class ViewLayout extends AppLayout
         .set("margin", "var(--lumo-space-s) var(--lumo-space-m)");
     header.setId(styleName(ID, HEADER));
     header.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
+    laboratoryLayout.setId(styleName(ID, LABORATORY, "layout"));
+    laboratoryLayout.add(laboratory);
+    laboratoryLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+    laboratoryLayout.setWidthFull();
+    laboratoryLayout.setMargin(true);
+    laboratory.setId(styleName(ID, LABORATORY));
+    laboratory.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
     drawerToggle.setId(DRAWER_TOGGLE);
     tabs.setId(TABS);
     tabs.add(datasets, samples, protocols, profile, users, exitSwitchUser, signout);
@@ -125,6 +137,7 @@ public class ViewLayout extends AppLayout
   @Override
   public void localeChange(LocaleChangeEvent event) {
     applicationName.setText(getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
+    laboratory.setText(getTranslation(MESSAGE_PREFIX + LABORATORY));
     datasets.setLabel(getTranslation(MESSAGE_PREFIX + DATASETS));
     samples.setLabel(getTranslation(MESSAGE_PREFIX + SAMPLES));
     protocols.setLabel(getTranslation(MESSAGE_PREFIX + PROTOCOLS));
