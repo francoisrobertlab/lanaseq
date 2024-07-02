@@ -30,6 +30,7 @@ public class SpringConfiguration {
         new ReloadableResourceBundleMessageSource();
     messageSource.setBasenames("file:" + currentDir + "/messages", "classpath:messages");
     messageSource.setDefaultEncoding("UTF-8");
+    messageSource.setAlwaysUseMessageFormat(true);
     return messageSource;
   }
 
