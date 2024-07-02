@@ -4,8 +4,6 @@ import ca.qc.ircm.lanaseq.Constants;
 import com.vaadin.flow.i18n.I18NProvider;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,7 @@ public class MessageSourceI18NProvider implements I18NProvider {
 
   @Override
   public List<Locale> getProvidedLocales() {
-    return Stream.of(Constants.ENGLISH, Constants.FRENCH).collect(Collectors.toList());
+    return Constants.getLocales();
   }
 
   @Override
