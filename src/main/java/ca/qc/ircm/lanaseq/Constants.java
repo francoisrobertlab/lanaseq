@@ -40,7 +40,7 @@ public class Constants {
    * Strip this key from class name, if it matches.
    */
   private static final String STRIP_KEY =
-      Pattern.quote(SpringConfiguration.class.getPackage().getName() + ".");
+      Pattern.quote(Constants.class.getPackage().getName() + ".");
 
   /**
    * Returns all valid locales for program.
