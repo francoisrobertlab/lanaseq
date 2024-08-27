@@ -56,7 +56,7 @@ public class ViewLayout extends AppLayout
   public static final String EXIT_SWITCH_USER = "exitSwitchUser";
   public static final String EXIT_SWITCH_USER_FORM = "exitSwitchUserform";
   public static final String SIGNOUT = "signout";
-  public static final String TAB = "tab";
+  public static final String NAV = "nav";
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 710800815636494374L;
@@ -106,22 +106,22 @@ public class ViewLayout extends AppLayout
     drawerToggle.setId(DRAWER_TOGGLE);
     sideNav.setId(SIDE_NAV);
     datasets = new SideNavItem("Datasets", DatasetsView.class, VaadinIcon.FLASK.create());
-    datasets.setId(styleName(DATASETS, TAB));
+    datasets.setId(styleName(DATASETS, NAV));
     samples = new SideNavItem("Samples", SamplesView.class, VaadinIcon.EYEDROPPER.create());
-    samples.setId(styleName(SAMPLES, TAB));
+    samples.setId(styleName(SAMPLES, NAV));
     protocols = new SideNavItem("Protocols", ProtocolsView.class, VaadinIcon.BOOK.create());
-    protocols.setId(styleName(PROTOCOLS, TAB));
+    protocols.setId(styleName(PROTOCOLS, NAV));
     profile = new SideNavItem("Profile", ProfileView.class, VaadinIcon.USER.create());
-    profile.setId(styleName(PROFILE, TAB));
+    profile.setId(styleName(PROFILE, NAV));
     users = new SideNavItem("Users", UsersView.class, VaadinIcon.GROUP.create());
-    users.setId(styleName(USERS, TAB));
+    users.setId(styleName(USERS, NAV));
     users.setVisible(false);
     exitSwitchUser = new SideNavItem("Exit switch user", ExitSwitchUserView.class,
         VaadinIcon.LEVEL_LEFT.create());
-    exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, TAB));
+    exitSwitchUser.setId(styleName(EXIT_SWITCH_USER, NAV));
     exitSwitchUser.setVisible(false);
     signout = new SideNavItem("Signout", SignoutView.class, VaadinIcon.SIGN_OUT.create());
-    signout.setId(styleName(SIGNOUT, TAB));
+    signout.setId(styleName(SIGNOUT, NAV));
     sideNav.addItem(datasets, samples, protocols, profile, users, exitSwitchUser, signout);
   }
 

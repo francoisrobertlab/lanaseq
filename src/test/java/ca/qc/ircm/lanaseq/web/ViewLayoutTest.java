@@ -10,12 +10,12 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SAMPLES;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIDE_NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -99,13 +99,13 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(styleName(ID, LABORATORY), view.laboratory.getId().orElse(""));
     assertEquals(DRAWER_TOGGLE, view.drawerToggle.getId().orElse(""));
     assertEquals(SIDE_NAV, view.sideNav.getId().orElse(""));
-    assertEquals(styleName(DATASETS, TAB), view.datasets.getId().orElse(""));
-    assertEquals(styleName(SAMPLES, TAB), view.samples.getId().orElse(""));
-    assertEquals(styleName(PROTOCOLS, TAB), view.protocols.getId().orElse(""));
-    assertEquals(styleName(PROFILE, TAB), view.profile.getId().orElse(""));
-    assertEquals(styleName(USERS, TAB), view.users.getId().orElse(""));
-    assertEquals(styleName(EXIT_SWITCH_USER, TAB), view.exitSwitchUser.getId().orElse(""));
-    assertEquals(styleName(SIGNOUT, TAB), view.signout.getId().orElse(""));
+    assertEquals(styleName(DATASETS, NAV), view.datasets.getId().orElse(""));
+    assertEquals(styleName(SAMPLES, NAV), view.samples.getId().orElse(""));
+    assertEquals(styleName(PROTOCOLS, NAV), view.protocols.getId().orElse(""));
+    assertEquals(styleName(PROFILE, NAV), view.profile.getId().orElse(""));
+    assertEquals(styleName(USERS, NAV), view.users.getId().orElse(""));
+    assertEquals(styleName(EXIT_SWITCH_USER, NAV), view.exitSwitchUser.getId().orElse(""));
+    assertEquals(styleName(SIGNOUT, NAV), view.signout.getId().orElse(""));
   }
 
   @Test

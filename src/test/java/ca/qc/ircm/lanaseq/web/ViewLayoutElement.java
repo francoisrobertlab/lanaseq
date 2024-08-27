@@ -3,11 +3,11 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SAMPLES;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SIGNOUT;
-import static ca.qc.ircm.lanaseq.web.ViewLayout.TAB;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 
 import com.vaadin.flow.component.applayout.testbench.AppLayoutElement;
@@ -46,30 +46,30 @@ public class ViewLayoutElement extends AppLayoutElement {
   }
 
   public SideNavItemElement datasets() {
-    return $(SideNavItemElement.class).id(styleName(DATASETS, TAB));
+    return $(SideNavItemElement.class).id(styleName(DATASETS, NAV));
   }
 
   public SideNavItemElement samples() {
-    return $(SideNavItemElement.class).id(styleName(SAMPLES, TAB));
+    return $(SideNavItemElement.class).id(styleName(SAMPLES, NAV));
   }
 
   public SideNavItemElement protocols() {
-    return $(SideNavItemElement.class).id(styleName(PROTOCOLS, TAB));
+    return $(SideNavItemElement.class).id(styleName(PROTOCOLS, NAV));
   }
 
   public SideNavItemElement profile() {
-    return $(SideNavItemElement.class).id(styleName(PROFILE, TAB));
+    return $(SideNavItemElement.class).id(styleName(PROFILE, NAV));
   }
 
   public SideNavItemElement users() {
-    return $(SideNavItemElement.class).id(styleName(USERS, TAB));
+    return $(SideNavItemElement.class).id(styleName(USERS, NAV));
   }
 
   public SideNavItemElement exitSwitchUser() {
-    return $(SideNavItemElement.class).id(styleName(EXIT_SWITCH_USER, TAB));
+    return $(SideNavItemElement.class).id(styleName(EXIT_SWITCH_USER, NAV));
   }
 
   public SideNavItemElement signout() {
-    return $(SideNavItemElement.class).id(styleName(SIGNOUT, TAB));
+    return $(SideNavItemElement.class).id(styleName(SIGNOUT, NAV));
   }
 }
