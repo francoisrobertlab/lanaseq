@@ -238,8 +238,6 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
   @Test
   public void tabs_SelectSignout() {
-    UI.getCurrent().addAfterNavigationListener(navigationListener);
-
     // Invalidated session.
     assertThrows(InvocationTargetException.class, () -> {
       test(view.sideNav).clickItem(view.signout.getLabel());
