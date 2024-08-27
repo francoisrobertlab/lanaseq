@@ -12,8 +12,8 @@ import ca.qc.ircm.lanaseq.user.web.PasswordView;
 import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import com.vaadin.flow.component.tabs.testbench.TabElement;
-import com.vaadin.flow.component.tabs.testbench.TabsElement;
+import com.vaadin.flow.component.sidenav.testbench.SideNavElement;
+import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
 import com.vaadin.testbench.TestBenchTestCase;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -169,11 +169,12 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     List<Locale> locales = Constants.getLocales();
     Function<Locale, String> applicationName =
         locale -> messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, locale);
-    TabElement home =
-        optional(() -> $(TabsElement.class).first().$(TabElement.class).first()).orElse(null);
+    SideNavItemElement home =
+        optional(() -> $(SideNavElement.class).first().$(SideNavItemElement.class).first())
+            .orElse(null);
     Optional<Locale> optlocale = locales.stream()
         .filter(locale -> messageSource.getMessage(LAYOUT_PREFIX + DATASETS, null, locale)
-            .equals(home != null ? home.getText() : ""))
+            .equals(home != null ? home.getLabel() : ""))
         .findAny();
     if (!optlocale.isPresent()) {
       optlocale = locales.stream()
