@@ -25,3 +25,11 @@ hs_err_pid*
 # Vaadin Flow
 frontend-*
 /frontend/index.html
+/frontend/generated
+/node_modules
+/package.json
+/package-lock.json
+/src/main/bundles/dev.bundle
+/src/main/bundles/prod.bundle
+/tsconfig.json
+/types.d.ts
