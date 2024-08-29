@@ -100,13 +100,13 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.date()).isPresent());
+    assertTrue(optional(() -> dialog.samplesHeader()).isPresent());
     assertTrue(optional(() -> dialog.samples()).isPresent());
     assertTrue(optional(() -> dialog.addSample()).isPresent());
     assertFalse(optional(() -> dialog.error()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
     assertTrue(optional(() -> dialog.delete()).isPresent());
-    assertTrue(optional(() -> dialog.confirm()).isPresent());
   }
 
   @Test

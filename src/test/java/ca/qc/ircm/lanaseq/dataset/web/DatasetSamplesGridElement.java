@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import ca.qc.ircm.lanaseq.dataset.DatasetProperties;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.html.testbench.NativeLabelElement;
@@ -10,7 +11,7 @@ import com.vaadin.testbench.elementsbase.Element;
  * Web element for {@link DatasetDialog} samples grid.
  */
 @Element("vaadin-grid")
-@Attribute(name = "id", value = DatasetDialog.ID + "-" + DatasetDialog.SAMPLES)
+@Attribute(name = "id", value = DatasetDialog.ID + "-" + DatasetProperties.SAMPLES)
 public class DatasetSamplesGridElement extends GridElement {
   private static final int SAMPLE_ID_COLUMN = 0;
   private static final int REPLICATE_COLUMN = 1;

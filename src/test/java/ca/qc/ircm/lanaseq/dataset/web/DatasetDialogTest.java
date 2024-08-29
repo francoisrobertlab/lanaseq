@@ -10,6 +10,7 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
@@ -20,7 +21,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX_REGEX_ERROR;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
@@ -175,6 +176,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(NAME_PREFIX), dialog.namePrefix.getId().orElse(""));
     assertEquals(id(GENERATE_NAME), dialog.generateName.getId().orElse(""));
+    validateIcon(VaadinIcon.MAGIC.create(), dialog.generateName.getIcon());
     assertEquals(id(TAGS), dialog.tags.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
@@ -184,8 +186,10 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(NOTE), dialog.note.getId().orElse(""));
+    assertEquals(id(SAMPLES_HEADER), dialog.samplesHeader.getId().orElse(""));
     assertEquals(id(SAMPLES), dialog.samples.getId().orElse(""));
     assertEquals(id(ADD_SAMPLE), dialog.addSample.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), dialog.addSample.getIcon());
     assertEquals(id(ERROR_TEXT), dialog.error.getId().orElse(""));
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
@@ -225,6 +229,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(DATASET_PREFIX + DATE), dialog.date.getLabel());
     validateEquals(englishDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + SAMPLES), dialog.samplesHeader.getText());
     HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + SampleProperties.NAME),
         headerRow.getCell(dialog.sampleName).getText());
@@ -263,6 +268,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(DATASET_PREFIX + DATE), dialog.date.getLabel());
     validateEquals(frenchDatePickerI18n(), dialog.date.getI18n());
     assertEquals(Locale.CANADA, dialog.date.getLocale());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + SAMPLES), dialog.samplesHeader.getText());
     HeaderRow headerRow = dialog.samples.getHeaderRows().get(0);
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + SampleProperties.NAME),
         headerRow.getCell(dialog.sampleName).getText());

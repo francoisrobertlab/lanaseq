@@ -12,6 +12,7 @@ import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -46,14 +47,15 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -99,7 +101,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public static final String NAME_PREFIX_REGEX_ERROR = "namePrefix.regex";
   public static final String GENERATE_NAME = "generateName";
   public static final String ADD_SAMPLE = "addSample";
-  public static final String SAMPLES = "samples";
+  public static final String SAMPLES_HEADER = "samplesHeader";
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
@@ -122,6 +124,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField treatment = new TextField();
   protected TextArea note = new TextArea();
   protected DatePicker date = new DatePicker();
+  protected H4 samplesHeader = new H4();
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> sampleName;
   protected Column<Sample> sampleRemove;
@@ -166,11 +169,18 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
     FormLayout form = new FormLayout(sampleForm, strainForm);
     form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
-    layout.add(datasetForm, form, samples, error, confirm);
+    HorizontalLayout samplesHeaderLayout = new HorizontalLayout(samplesHeader, addSample);
+    samplesHeaderLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+    samplesHeaderLayout.setWidthFull();
+    VerticalLayout samplesLayout = new VerticalLayout(samplesHeaderLayout, samples);
+    samplesLayout.setSpacing(false);
+    samplesLayout.setPadding(false);
+    layout.add(datasetForm, form, samplesLayout, error);
     layout.setSizeFull();
     getFooter().add(delete, cancel, save);
     namePrefix.setId(id(NAME_PREFIX));
     generateName.setId(id(GENERATE_NAME));
+    generateName.setIcon(VaadinIcon.MAGIC.create());
     generateName.addClickListener(e -> generateName());
     tags.setId(id(TAGS));
     protocol.setId(id(PROTOCOL));
@@ -190,9 +200,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     date.setId(id(DATE));
     note.setId(id(NOTE));
     note.setHeight("6em");
+    samplesHeader.setId(id(SAMPLES_HEADER));
     samples.setId(id(SAMPLES));
-    samples.setMinHeight("15em");
-    samples.setHeight("15em");
+    samples.setMinHeight("11em");
+    samples.setHeight("11em");
     samples.setSelectionMode(SelectionMode.NONE);
     sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
         .setKey(SampleProperties.NAME)
@@ -214,11 +225,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         dropSample(draggedSample, dropped, e.getDropLocation());
       }
     });
-    samples.appendFooterRow(); // Footers
-    FooterRow footer = samples.appendFooterRow();
-    footer.join(footer.getCell(sampleName), footer.getCell(sampleRemove));
-    footer.getCell(sampleName).setComponent(new HorizontalLayout(addSample));
     addSample.setId(id(ADD_SAMPLE));
+    addSample.addClassName("right");
+    //addSample.addThemeVariants(ButtonVariant.LUMO_SMALL);
     addSample.setIcon(VaadinIcon.PLUS.create());
     addSample.addClickListener(e -> addSample());
     error.setId(id(ERROR_TEXT));
@@ -287,6 +296,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     date.setI18n(datePickerI18n(getLocale()));
     date.setLocale(Locale.CANADA);
     note.setLabel(getTranslation(DATASET_PREFIX + NOTE));
+    samplesHeader.setText(getTranslation(DATASET_PREFIX + SAMPLES));
     String sampleNameHeader = getTranslation(SAMPLE_PREFIX + SampleProperties.NAME);
     sampleName.setHeader(sampleNameHeader);
     addSample.setText(getTranslation(MESSAGE_PREFIX + ADD_SAMPLE));

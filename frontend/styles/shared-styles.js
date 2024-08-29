@@ -54,6 +54,10 @@ $_documentContainer.innerHTML = `<custom-style>
       color: var(--lumo-error-contrast-color);
     }
     
+    vaadin-button.right {
+      margin-left: auto;
+    }
+
     /* Ordered layout with borders */
     vaadin-vertical-layout.border, vaadin-horizontal-layout.border {
       border: 1px solid var(--lumo-contrast-40pct);
