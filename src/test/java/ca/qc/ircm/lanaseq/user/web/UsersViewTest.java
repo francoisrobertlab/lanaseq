@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
@@ -39,6 +38,7 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.UserService;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -48,6 +48,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.selection.SelectionModel;
@@ -122,7 +123,6 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(USERS, view.users.getId().orElse(""));
-    assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
     assertEquals(SWITCH_USER, view.switchUser.getId().orElse(""));
   }
@@ -446,11 +446,6 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void error() {
-    assertFalse(view.error.isVisible());
-  }
-
-  @Test
   public void add() {
     clickButton(view.add);
 
@@ -460,11 +455,20 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void switchUser_Enabled() throws Throwable {
+    assertFalse(view.switchUser.isEnabled());
+    User user = repository.findById(3L).orElse(null);
+    view.users.select(user);
+    assertTrue(view.switchUser.isEnabled());
+    view.users.deselectAll();
+    assertFalse(view.switchUser.isEnabled());
+  }
+
+  @Test
   public void switchUser() throws Throwable {
     User user = repository.findById(3L).orElse(null);
     view.users.select(user);
-    view.switchUser();
-    assertFalse(view.error.isVisible());
+    view.switchUser.click();
     verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
         .anyMatch(i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)")
@@ -477,18 +481,11 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void switchUser_EmptySelection() throws Throwable {
     UI.getCurrent().navigate(UsersView.class);
     view.switchUser();
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED), view.error.getText());
-    assertTrue(view.error.isVisible());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
+        ((ErrorNotification) error).getText());
     verify(switchUserService, never()).switchUser(any(), any());
     assertTrue($(UsersView.class).exists());
-  }
-
-  @Test
-  public void permissions_ErrorThenView() {
-    User user = users.get(1);
-    when(service.get(any())).thenReturn(Optional.of(user));
-    view.switchUser();
-    view.view(user);
-    assertFalse(view.error.isVisible());
   }
 }
