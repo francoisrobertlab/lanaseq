@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
@@ -38,12 +37,14 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
@@ -123,8 +124,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     assertEquals(PROTOCOLS, view.protocols.getId().orElse(""));
     assertTrue(
         view.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
-    assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
-    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(ADD, view.add.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(HISTORY, view.history.getId().orElse(""));
@@ -433,6 +432,16 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void history_Enabled() {
+    assertFalse(view.history.isEnabled());
+    Protocol protocol = repository.findById(1L).get();
+    view.protocols.select(protocol);
+    assertTrue(view.history.isEnabled());
+    view.protocols.deselectAll();
+    assertFalse(view.history.isEnabled());
+  }
+
+  @Test
   public void history_User() {
     Protocol protocol = repository.findById(1L).get();
     view.protocols.select(protocol);
@@ -440,7 +449,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
     clickButton(view.history);
 
-    assertFalse(view.error.isVisible());
     assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 
@@ -453,7 +461,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     clickButton(view.history);
 
     verify(service).get(protocol.getId());
-    assertFalse(view.error.isVisible());
     ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
@@ -464,10 +471,9 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     Protocol protocol = repository.findById(1L).get();
     view.protocols.select(protocol);
 
-    clickButton(view.history);
+    view.history.click();
 
     verify(service).get(protocol.getId());
-    assertFalse(view.error.isVisible());
     ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
     assertEquals(protocol.getId(), dialog.getProtocolId());
   }
@@ -475,10 +481,12 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void history_NoSelection() {
-    clickButton(view.history);
+    view.history();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED),
+        ((ErrorNotification) error).getText());
     assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 }
