@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -15,11 +14,11 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -64,7 +63,6 @@ public class DatasetsView extends VerticalLayout
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
-  protected Div error = new Div();
   protected Button merge = new Button();
   protected Button files = new Button();
   protected Button analyze = new Button();
@@ -96,7 +94,7 @@ public class DatasetsView extends VerticalLayout
     logger.debug("datasets view");
     setId(ID);
     setHeightFull();
-    add(datasets, error, new HorizontalLayout(merge, files, analyze));
+    add(datasets, new HorizontalLayout(merge, files, analyze));
     datasets.setMinHeight("30em");
     expand(datasets);
     datasets.setSelectionMode(SelectionMode.MULTI);
@@ -107,17 +105,22 @@ public class DatasetsView extends VerticalLayout
     });
     datasets.addEditListener(e -> view(e.getItem()));
     datasets.addItemDoubleClickListener(e -> view(e.getItem()));
-    error.setId(ERROR_TEXT);
-    error.addClassName(ERROR_TEXT);
+    datasets.addSelectionListener(e -> {
+      merge.setEnabled(e.getAllSelectedItems().size() > 0);
+      files.setEnabled(e.getAllSelectedItems().size() == 1);
+      analyze.setEnabled(e.getAllSelectedItems().size() > 0);
+    });
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
+    merge.setEnabled(false);
     merge.addClickListener(e -> merge());
     files.setId(FILES);
     files.setIcon(VaadinIcon.FILE_O.create());
+    files.setEnabled(false);
     files.addClickListener(e -> viewFiles());
     analyze.setId(ANALYZE);
+    analyze.setEnabled(false);
     analyze.addClickListener(e -> analyze());
-    clearError();
   }
 
   private Protocol protocol(Dataset dataset) {
@@ -139,12 +142,7 @@ public class DatasetsView extends VerticalLayout
         getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
-  private void clearError() {
-    error.setVisible(false);
-  }
-
   void view(Dataset dataset) {
-    clearError();
     DatasetDialog dialog = dialogFactory.getObject();
     dialog.setDatasetId(dataset.getId());
     dialog.addSavedListener(e -> datasets.refreshDatasets());
@@ -153,17 +151,12 @@ public class DatasetsView extends VerticalLayout
   }
 
   void viewFiles() {
-    List<Dataset> datasets = new ArrayList<>(this.datasets.getSelectedItems());
-    boolean error = false;
+    Set<Dataset> datasets = this.datasets.getSelectedItems();
     if (datasets.isEmpty()) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED));
-      error = true;
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED)).open();
     } else if (datasets.size() > 1) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE));
-      error = true;
-    }
-    this.error.setVisible(error);
-    if (!error) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE)).open();
+    } else {
       Dataset dataset = datasets.iterator().next();
       viewFiles(dataset);
     }
@@ -177,13 +170,9 @@ public class DatasetsView extends VerticalLayout
 
   void analyze() {
     List<Dataset> datasets = new ArrayList<>(this.datasets.getSelectedItems());
-    boolean error = false;
     if (datasets.isEmpty()) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED));
-      error = true;
-    }
-    this.error.setVisible(error);
-    if (!error) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED)).open();
+    } else {
       DatasetsAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
       analysisDialog
           .setDatasetIds(datasets.stream().map(Dataset::getId).collect(Collectors.toList()));
@@ -197,7 +186,6 @@ public class DatasetsView extends VerticalLayout
   }
 
   void merge() {
-    clearError();
     List<Dataset> datasets = this.datasets.getSelectedItems().stream()
         .sorted((d1, d2) -> d1.getId().compareTo(d2.getId())).collect(Collectors.toList());
     Set<String> tags = datasets.stream().flatMap(dataset -> dataset.getTags().stream())
@@ -205,24 +193,19 @@ public class DatasetsView extends VerticalLayout
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
         .filter(distinctByKey(Sample::getId)).sorted((s1, s2) -> s1.getId().compareTo(s2.getId()))
         .collect(Collectors.toList());
-    boolean error = false;
     if (samples.isEmpty()) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED));
-      error = true;
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED)).open();
     } else if (!sampleService.isMergable(samples)) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + MERGE_ERROR));
-      error = true;
-    }
-    this.error.setVisible(error);
-    if (!error) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + MERGE_ERROR)).open();
+    } else {
       Dataset dataset = new Dataset();
       dataset.setTags(tags);
       dataset.setSamples(samples);
       dataset.setDate(datasets.get(0).getDate());
       dataset.generateName();
       if (service.exists(dataset.getName())) {
-        this.error.setText(getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName()));
-        this.error.setVisible(true);
+        new ErrorNotification(
+            getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName())).open();
       } else {
         service.save(dataset);
         this.datasets.refreshDatasets();
