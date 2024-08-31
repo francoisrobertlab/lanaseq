@@ -152,7 +152,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
         footerRow.getCell(view.edit).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + HISTORY), view.history.getText());
   }
 
@@ -180,7 +180,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
         footerRow.getCell(view.edit).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + HISTORY), view.history.getText());
   }
 

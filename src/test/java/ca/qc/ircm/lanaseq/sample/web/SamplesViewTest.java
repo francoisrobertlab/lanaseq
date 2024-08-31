@@ -182,7 +182,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
@@ -216,7 +216,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());

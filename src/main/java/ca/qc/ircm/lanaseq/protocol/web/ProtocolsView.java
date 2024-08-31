@@ -142,7 +142,6 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
     add.setId(ADD);
-    add.addClassName("right");
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> add());
     history.setId(HISTORY);
@@ -170,7 +169,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
-    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
+    add.setText(getTranslation(MESSAGE_PREFIX + ADD));
     history.setText(getTranslation(MESSAGE_PREFIX + HISTORY));
   }
 

@@ -196,7 +196,6 @@ public class SamplesView extends VerticalLayout
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
     add.setId(ADD);
-    add.addClassName("right");
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> add());
     merge.setId(MERGE);
@@ -234,7 +233,7 @@ public class SamplesView extends VerticalLayout
     tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
-    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
+    add.setText(getTranslation(MESSAGE_PREFIX + ADD));
     merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
     files.setText(getTranslation(MESSAGE_PREFIX + FILES));
     analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));
