@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
@@ -26,6 +25,7 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -37,7 +37,6 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -54,7 +53,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -103,7 +101,6 @@ public class SamplesView extends VerticalLayout
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
-  protected Div error = new Div();
   protected Button add = new Button();
   protected Button merge = new Button();
   protected Button files = new Button();
@@ -134,10 +131,16 @@ public class SamplesView extends VerticalLayout
     logger.debug("samples view");
     setId(ID);
     setHeightFull();
-    add(samples, error, new HorizontalLayout(add, merge, files, analyze));
-    samples.setMinHeight("30em");
-    expand(samples);
+    VerticalLayout samplesLayout = new VerticalLayout();
+    samplesLayout.setWidthFull();
+    samplesLayout.setPadding(false);
+    samplesLayout.setSpacing(false);
+    samplesLayout.add(add, samples);
+    samplesLayout.expand(samples);
+    add(samplesLayout, new HorizontalLayout(merge, files, analyze));
+    expand(samplesLayout);
     samples.setId(SAMPLES);
+    samples.setMinHeight("30em");
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
@@ -165,6 +168,11 @@ public class SamplesView extends VerticalLayout
         viewFiles(e.getItem());
       }
     });
+    samples.addSelectionListener(e -> {
+      merge.setEnabled(e.getAllSelectedItems().size() > 0);
+      files.setEnabled(e.getAllSelectedItems().size() == 1);
+      analyze.setEnabled(e.getAllSelectedItems().size() > 0);
+    });
     samples.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = samples.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
@@ -187,19 +195,19 @@ public class SamplesView extends VerticalLayout
     ownerFilter.addValueChangeListener(e -> filterOwner(e.getValue()));
     ownerFilter.setValueChangeMode(ValueChangeMode.EAGER);
     ownerFilter.setSizeFull();
-    error.setId(ERROR_TEXT);
-    error.addClassName(ERROR_TEXT);
-    error.setVisible(false);
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> add());
     merge.setId(MERGE);
+    merge.setEnabled(false);
     merge.setIcon(VaadinIcon.CONNECT.create());
     merge.addClickListener(e -> merge());
     files.setId(FILES);
+    files.setEnabled(false);
     files.setIcon(VaadinIcon.FILE_O.create());
     files.addClickListener(e -> viewFiles());
     analyze.setId(ANALYZE);
+    analyze.setEnabled(false);
     analyze.addClickListener(e -> analyze());
     if (!authenticatedUser.hasAnyRole(UserRole.ADMIN, UserRole.MANAGER)) {
       authenticatedUser.getUser().ifPresent(user -> ownerFilter.setValue(user.getEmail()));
@@ -225,7 +233,7 @@ public class SamplesView extends VerticalLayout
     tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
-    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
+    add.setText(getTranslation(MESSAGE_PREFIX + ADD));
     merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
     files.setText(getTranslation(MESSAGE_PREFIX + FILES));
     analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));
@@ -266,31 +274,22 @@ public class SamplesView extends VerticalLayout
   }
 
   void viewFiles() {
-    List<Sample> samples = new ArrayList<>(this.samples.getSelectedItems());
-    boolean error = false;
+    Set<Sample> samples = this.samples.getSelectedItems();
     if (samples.isEmpty()) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED));
-      error = true;
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED)).open();
     } else if (samples.size() > 1) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE));
-      error = true;
-    }
-    this.error.setVisible(error);
-    if (!error) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE)).open();
+    } else {
       Sample sample = samples.iterator().next();
       viewFiles(sample);
     }
   }
 
   void analyze() {
-    List<Sample> samples = new ArrayList<>(this.samples.getSelectedItems());
-    boolean error = false;
+    Set<Sample> samples = this.samples.getSelectedItems();
     if (samples.isEmpty()) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED));
-      error = true;
-    }
-    this.error.setVisible(error);
-    if (!error) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED)).open();
+    } else {
       SamplesAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
       analysisDialog.setSampleIds(samples.stream().map(Sample::getId).collect(Collectors.toList()));
       analysisDialog.open();
@@ -306,24 +305,19 @@ public class SamplesView extends VerticalLayout
         .sorted(Comparator.comparing(Sample::getId)).collect(Collectors.toList());
     Set<String> tags =
         samples.stream().flatMap(sample -> sample.getTags().stream()).collect(Collectors.toSet());
-    boolean error = false;
     if (samples.isEmpty()) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED));
-      error = true;
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED)).open();
     } else if (!service.isMergable(samples)) {
-      this.error.setText(getTranslation(MESSAGE_PREFIX + MERGE_ERROR));
-      error = true;
-    }
-    this.error.setVisible(error);
-    if (!error) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + MERGE_ERROR)).open();
+    } else {
       Dataset dataset = new Dataset();
       dataset.setSamples(samples);
       dataset.setTags(tags);
       dataset.setDate(samples.get(0).getDate());
       dataset.generateName();
       if (datasetService.exists(dataset.getName())) {
-        this.error.setText(getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName()));
-        this.error.setVisible(true);
+        new ErrorNotification(
+            getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName())).open();
       } else {
         datasetService.save(dataset);
         showNotification(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));

@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -21,6 +20,7 @@ import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -32,9 +32,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -81,7 +79,6 @@ public class UsersView extends VerticalLayout
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected Select<Optional<Boolean>> activeFilter = new Select<>();
-  protected Div error = new Div();
   protected Button add = new Button();
   protected Button switchUser = new Button();
   private WebUserFilter filter = new WebUserFilter();
@@ -106,10 +103,17 @@ public class UsersView extends VerticalLayout
     logger.debug("users view");
     setId(ID);
     setHeightFull();
-    add(users, error, new HorizontalLayout(add, switchUser));
-    expand(users);
+    VerticalLayout usersLayout = new VerticalLayout();
+    usersLayout.setWidthFull();
+    usersLayout.setPadding(false);
+    usersLayout.setSpacing(false);
+    usersLayout.add(add, users);
+    usersLayout.expand(users);
+    add(usersLayout, switchUser);
+    expand(usersLayout);
     users.setId(USERS);
     users.addItemDoubleClickListener(e -> view(e.getItem()));
+    users.addSelectionListener(e -> switchUser.setEnabled(e.getAllSelectedItems().size() == 1));
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator(NormalizedComparator.of(User::getEmail));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
@@ -134,13 +138,12 @@ public class UsersView extends VerticalLayout
     activeFilter.setItems(Optional.empty(), Optional.of(false), Optional.of(true));
     activeFilter.addValueChangeListener(e -> filterActive(e.getValue().orElse(null)));
     activeFilter.setSizeFull();
-    error.setId(ERROR_TEXT);
-    error.setVisible(false);
     add.setId(ADD);
     add.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
     add.addClickListener(e -> add());
     switchUser.setId(SWITCH_USER);
     switchUser.setVisible(authenticatedUser.hasRole(ADMIN));
+    switchUser.setEnabled(false);
     switchUser.addClickListener(e -> switchUser());
     loadUsers();
   }
@@ -194,7 +197,7 @@ public class UsersView extends VerticalLayout
             .orElse(getTranslation(CONSTANTS_PREFIX + ALL)));
     actives.entrySet().stream().forEach(entry -> entry.getValue()
         .setText(getTranslation(USER_PREFIX + property(ACTIVE, entry.getKey().isActive()))));
-    add.setText(getTranslation(CONSTANTS_PREFIX + ADD));
+    add.setText(getTranslation(MESSAGE_PREFIX + ADD));
     add.setIcon(VaadinIcon.PLUS.create());
     switchUser.setText(getTranslation(MESSAGE_PREFIX + SWITCH_USER));
     switchUser.setIcon(VaadinIcon.BUG.create());
@@ -227,12 +230,7 @@ public class UsersView extends VerticalLayout
     users.getDataProvider().refreshAll();
   }
 
-  private void clearError() {
-    error.setVisible(false);
-  }
-
   void view(User user) {
-    clearError();
     showDialog(user.getId());
   }
 
@@ -244,17 +242,14 @@ public class UsersView extends VerticalLayout
   }
 
   void toggleActive(User user) {
-    clearError();
     user.setActive(!user.isActive());
     service.save(user, null);
   }
 
   void switchUser() {
-    clearError();
     User user = users.getSelectedItems().stream().findFirst().orElse(null);
     if (user == null) {
-      error.setText(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED));
-      error.setVisible(true);
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED)).open();
     } else {
       switchUserService.switchUser(user, VaadinServletRequest.getCurrent());
       UI.getCurrent().getPage().setLocation(getUrl(MainView.VIEW_NAME));

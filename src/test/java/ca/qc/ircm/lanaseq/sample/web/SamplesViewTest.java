@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.ADD;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.EDIT;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
@@ -53,6 +52,7 @@ import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
@@ -147,8 +147,6 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(SAMPLES, view.samples.getId().orElse(""));
     assertTrue(
         view.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
-    assertEquals(ERROR_TEXT, view.error.getId().orElse(""));
-    assertTrue(view.error.getClassNames().contains(ERROR_TEXT));
     assertEquals(ADD, view.add.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
@@ -184,7 +182,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
@@ -218,7 +216,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
@@ -541,14 +539,24 @@ public class SamplesViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void merge_Enabled() {
+    assertFalse(view.merge.isEnabled());
+    view.samples.select(samples.get(0));
+    assertTrue(view.merge.isEnabled());
+    view.samples.select(samples.get(1));
+    assertTrue(view.merge.isEnabled());
+    view.samples.deselectAll();
+    assertFalse(view.merge.isEnabled());
+  }
+
+  @Test
   public void merge() {
     when(service.isMergable(any())).thenReturn(true);
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
 
-    clickButton(view.merge);
+    view.merge.click();
 
-    assertFalse(view.error.isVisible());
     verify(service).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
     assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
@@ -574,9 +582,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.samples.select(samples.get(1));
     view.samples.select(samples.get(0));
 
-    clickButton(view.merge);
+    view.merge.click();
 
-    assertFalse(view.error.isVisible());
     verify(service).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
     assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
@@ -598,13 +605,14 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void merge_NoSelection() {
-    clickButton(view.merge);
+    view.merge();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
+        ((ErrorNotification) error).getText());
     verify(service, never()).isMergable(any());
     verify(datasetService, never()).save(any());
-    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -613,16 +621,17 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
 
-    clickButton(view.merge);
+    view.merge.click();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR),
+        ((ErrorNotification) error).getText());
     verify(service).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
     assertTrue(samplesCaptor.getValue().contains(samples.get(0)));
     assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
     verify(datasetService, never()).save(any());
-    assertFalse($(Notification.class).exists());
   }
 
   @Test
@@ -632,14 +641,27 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
 
-    clickButton(view.merge);
+    view.merge.click();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
-        "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(
+        view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"),
+        ((ErrorNotification) error).getText());
     verify(datasetService).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020");
     verify(datasetService, never()).save(any());
-    assertFalse($(Notification.class).exists());
+  }
+
+  @Test
+  public void files_Enabled() {
+    assertFalse(view.files.isEnabled());
+    view.samples.select(samples.get(0));
+    assertTrue(view.files.isEnabled());
+    view.samples.select(samples.get(1));
+    assertFalse(view.files.isEnabled());
+    view.samples.deselectAll();
+    assertFalse(view.files.isEnabled());
   }
 
   @Test
@@ -647,9 +669,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     Sample sample = samples.get(0);
     view.samples.select(sample);
 
-    clickButton(view.files);
+    view.files.click();
 
-    assertFalse(view.error.isVisible());
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(sample.getId(), dialog.getSampleId());
@@ -657,10 +678,12 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void files_NoSelection() {
-    clickButton(view.files);
+    view.viewFiles();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
+        ((ErrorNotification) error).getText());
     assertFalse($(SampleFilesDialog.class).exists());
   }
 
@@ -669,11 +692,24 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.samples.select(samples.get(0));
     view.samples.select(samples.get(1));
 
-    clickButton(view.files);
+    view.viewFiles();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE),
+        ((ErrorNotification) error).getText());
     assertFalse($(SampleFilesDialog.class).exists());
+  }
+
+  @Test
+  public void analyze_Enabled() {
+    assertFalse(view.analyze.isEnabled());
+    view.samples.select(samples.get(0));
+    assertTrue(view.analyze.isEnabled());
+    view.samples.select(samples.get(1));
+    assertTrue(view.analyze.isEnabled());
+    view.samples.deselectAll();
+    assertFalse(view.analyze.isEnabled());
   }
 
   @Test
@@ -681,9 +717,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     Sample sample = samples.get(0);
     view.samples.select(sample);
 
-    clickButton(view.analyze);
+    view.analyze.click();
 
-    assertFalse(view.error.isVisible());
     SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(1, dialog.getSampleIds().size());
@@ -692,10 +727,12 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void analyze_NoSelection() {
-    clickButton(view.analyze);
+    view.analyze();
 
-    assertTrue(view.error.isVisible());
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED), view.error.getText());
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
+        ((ErrorNotification) error).getText());
     assertFalse($(SamplesAnalysisDialog.class).exists());
   }
 
@@ -704,9 +741,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     List<Sample> samples = this.samples.subList(0, 2);
     samples.forEach(sample -> view.samples.select(sample));
 
-    clickButton(view.analyze);
+    view.analyze.click();
 
-    assertFalse(view.error.isVisible());
     SamplesAnalysisDialog dialog = $(SamplesAnalysisDialog.class).first();
     assertTrue(dialog.isOpened());
     assertEquals(2, dialog.getSampleIds().size());
