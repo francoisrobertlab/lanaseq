@@ -125,6 +125,8 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(USERS, view.users.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
     assertEquals(SWITCH_USER, view.switchUser.getId().orElse(""));
+    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
   }
 
   @Test
@@ -152,9 +154,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(USER_PREFIX + property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SWITCH_USER), view.switchUser.getText());
-    validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
   }
 
   @Test
@@ -184,9 +184,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(USER_PREFIX + property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
-    validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SWITCH_USER), view.switchUser.getText());
-    validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
   }
 
   @Test

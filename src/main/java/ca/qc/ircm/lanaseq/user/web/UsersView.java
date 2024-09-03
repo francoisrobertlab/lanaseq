@@ -139,9 +139,11 @@ public class UsersView extends VerticalLayout
     activeFilter.addValueChangeListener(e -> filterActive(e.getValue().orElse(null)));
     activeFilter.setSizeFull();
     add.setId(ADD);
+    add.setIcon(VaadinIcon.PLUS.create());
     add.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
     add.addClickListener(e -> add());
     switchUser.setId(SWITCH_USER);
+    switchUser.setIcon(VaadinIcon.BUG.create());
     switchUser.setVisible(authenticatedUser.hasRole(ADMIN));
     switchUser.setEnabled(false);
     switchUser.addClickListener(e -> switchUser());
@@ -198,9 +200,7 @@ public class UsersView extends VerticalLayout
     actives.entrySet().stream().forEach(entry -> entry.getValue()
         .setText(getTranslation(USER_PREFIX + property(ACTIVE, entry.getKey().isActive()))));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
-    add.setIcon(VaadinIcon.PLUS.create());
     switchUser.setText(getTranslation(MESSAGE_PREFIX + SWITCH_USER));
-    switchUser.setIcon(VaadinIcon.BUG.create());
   }
 
   @Override
