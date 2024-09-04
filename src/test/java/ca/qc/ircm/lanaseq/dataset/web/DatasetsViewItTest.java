@@ -65,6 +65,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.datasets()).isPresent());
+    assertTrue(optional(() -> view.edit()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
     assertTrue(optional(() -> view.files()).isPresent());
   }
@@ -81,7 +82,8 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void edit() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    view.datasets().edit(0).click();
+    view.datasets().select(0);
+    view.edit().click();
     assertTrue(view.dialog().isOpen());
   }
 

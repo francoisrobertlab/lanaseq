@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -63,6 +64,7 @@ public class DatasetsView extends VerticalLayout
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
+  protected Button edit = new Button();
   protected Button merge = new Button();
   protected Button files = new Button();
   protected Button analyze = new Button();
@@ -94,7 +96,7 @@ public class DatasetsView extends VerticalLayout
     logger.debug("datasets view");
     setId(ID);
     setHeightFull();
-    add(datasets, new HorizontalLayout(merge, files, analyze));
+    add(datasets, new HorizontalLayout(edit, merge, files, analyze));
     datasets.setMinHeight("30em");
     expand(datasets);
     datasets.setSelectionMode(SelectionMode.MULTI);
@@ -103,13 +105,17 @@ public class DatasetsView extends VerticalLayout
         viewFiles(e.getItem());
       }
     });
-    datasets.addEditListener(e -> view(e.getItem()));
-    datasets.addItemDoubleClickListener(e -> view(e.getItem()));
+    datasets.addItemDoubleClickListener(e -> edit(e.getItem()));
     datasets.addSelectionListener(e -> {
+      edit.setEnabled(e.getAllSelectedItems().size() == 1);
       merge.setEnabled(e.getAllSelectedItems().size() > 0);
       files.setEnabled(e.getAllSelectedItems().size() == 1);
       analyze.setEnabled(e.getAllSelectedItems().size() > 0);
     });
+    edit.setId(EDIT);
+    edit.setIcon(VaadinIcon.EDIT.create());
+    edit.setEnabled(false);
+    edit.addClickListener(e -> edit());
     merge.setId(MERGE);
     merge.setIcon(VaadinIcon.CONNECT.create());
     merge.setEnabled(false);
@@ -131,6 +137,7 @@ public class DatasetsView extends VerticalLayout
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    edit.setText(getTranslation(CONSTANTS_PREFIX + EDIT));
     merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
     files.setText(getTranslation(MESSAGE_PREFIX + FILES));
     analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));
@@ -142,7 +149,19 @@ public class DatasetsView extends VerticalLayout
         getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
   }
 
-  void view(Dataset dataset) {
+  void edit() {
+    Set<Dataset> datasets = this.datasets.getSelectedItems();
+    if (datasets.isEmpty()) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED)).open();
+    } else if (datasets.size() > 1) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE)).open();
+    } else {
+      Dataset dataset = datasets.iterator().next();
+      edit(dataset);
+    }
+  }
+
+  void edit(Dataset dataset) {
     DatasetDialog dialog = dialogFactory.getObject();
     dialog.setDatasetId(dataset.getId());
     dialog.addSavedListener(e -> datasets.refreshDatasets());

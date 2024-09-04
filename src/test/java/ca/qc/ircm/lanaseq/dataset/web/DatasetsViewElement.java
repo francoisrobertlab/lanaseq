@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ANALYZE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
@@ -19,6 +20,10 @@ import org.openqa.selenium.By;
 public class DatasetsViewElement extends VerticalLayoutElement {
   public DatasetGridElement datasets() {
     return $(DatasetGridElement.class).first();
+  }
+
+  public ButtonElement edit() {
+    return $(ButtonElement.class).id(EDIT);
   }
 
   public ButtonElement merge() {
