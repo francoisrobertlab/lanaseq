@@ -35,7 +35,6 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.server.VaadinServletRequest;
@@ -92,11 +91,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(styleName(APPLICATION_NAME), view.applicationName.getId().orElse(""));
     assertEquals(styleName(ID, HEADER), view.header.getId().orElse(""));
-    assertEquals(styleName(ID, LABORATORY, "layout"), view.laboratoryLayout.getId().orElse(""));
-    assertEquals(FlexComponent.JustifyContentMode.END,
-        view.laboratoryLayout.getJustifyContentMode());
-    assertEquals("100%", view.laboratoryLayout.getWidth());
+    assertEquals("100%", view.header.getWidth());
     assertEquals(styleName(ID, LABORATORY), view.laboratory.getId().orElse(""));
+    assertEquals("15em", view.laboratory.getMinWidth());
+    assertEquals("right", view.laboratory.getStyle().get("text-align"));
     assertEquals(DRAWER_TOGGLE, view.drawerToggle.getId().orElse(""));
     assertEquals(SIDE_NAV, view.sideNav.getId().orElse(""));
     assertEquals(styleName(DATASETS, NAV), view.datasets.getId().orElse(""));

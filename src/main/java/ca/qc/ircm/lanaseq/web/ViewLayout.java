@@ -21,8 +21,6 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -63,7 +61,6 @@ public class ViewLayout extends AppLayout
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected H1 applicationName = new H1();
   protected H2 header = new H2();
-  protected HorizontalLayout laboratoryLayout = new HorizontalLayout();
   protected H1 laboratory = new H1();
   protected DrawerToggle drawerToggle = new DrawerToggle();
   protected SideNav sideNav = new SideNav();
@@ -88,7 +85,7 @@ public class ViewLayout extends AppLayout
   void init() {
     setId(ID);
     addToDrawer(applicationName, sideNav);
-    addToNavbar(drawerToggle, header, laboratoryLayout);
+    addToNavbar(drawerToggle, header, laboratory);
     setPrimarySection(Section.DRAWER);
     applicationName.setId(styleName(APPLICATION_NAME));
     applicationName.getStyle().set("font-size", "var(--lumo-font-size-l)")
@@ -96,13 +93,11 @@ public class ViewLayout extends AppLayout
         .set("margin", "var(--lumo-space-s) var(--lumo-space-m)");
     header.setId(styleName(ID, HEADER));
     header.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
-    laboratoryLayout.setId(styleName(ID, LABORATORY, "layout"));
-    laboratoryLayout.add(laboratory);
-    laboratoryLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-    laboratoryLayout.setWidthFull();
-    laboratoryLayout.setMargin(true);
+    header.setWidthFull();
     laboratory.setId(styleName(ID, LABORATORY));
-    laboratory.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
+    laboratory.setMinWidth("15em");
+    laboratory.getStyle().set("font-size", "var(--lumo-font-size-l)").set("text-align", "right")
+        .set("margin", "0 var(--lumo-space-m)");
     drawerToggle.setId(DRAWER_TOGGLE);
     sideNav.setId(SIDE_NAV);
     datasets = new SideNavItem("Datasets", DatasetsView.class, VaadinIcon.FLASK.create());
