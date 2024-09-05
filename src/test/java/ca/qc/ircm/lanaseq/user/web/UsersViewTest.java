@@ -124,8 +124,10 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(USERS, view.users.getId().orElse(""));
     assertEquals(ADD, view.add.getId().orElse(""));
-    assertEquals(SWITCH_USER, view.switchUser.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(EDIT, view.edit.getId().orElse(""));
+    validateIcon(VaadinIcon.EDIT.create(), view.edit.getIcon());
+    assertEquals(SWITCH_USER, view.switchUser.getId().orElse(""));
     validateIcon(VaadinIcon.BUG.create(), view.switchUser.getIcon());
   }
 
@@ -141,10 +143,6 @@ public class UsersViewTest extends SpringUIUnitTest {
         headerRow.getCell(view.active).getText());
     assertEquals(view.getTranslation(USER_PREFIX + ACTIVE),
         footerRow.getCell(view.active).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        headerRow.getCell(view.edit).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        footerRow.getCell(view.edit).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.emailFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL),
@@ -154,6 +152,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(USER_PREFIX + property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT), view.edit.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SWITCH_USER), view.switchUser.getText());
   }
 
@@ -171,10 +170,6 @@ public class UsersViewTest extends SpringUIUnitTest {
         headerRow.getCell(view.active).getText());
     assertEquals(view.getTranslation(USER_PREFIX + ACTIVE),
         footerRow.getCell(view.active).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        headerRow.getCell(view.edit).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        footerRow.getCell(view.edit).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.emailFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL),
@@ -184,6 +179,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(USER_PREFIX + property(ACTIVE, true)),
         view.activeFilter.getItemLabelGenerator().apply(Optional.of(true)));
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT), view.edit.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SWITCH_USER), view.switchUser.getText());
   }
 
@@ -227,15 +223,13 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void users_Columns() {
-    assertEquals(4, view.users.getColumns().size());
+    assertEquals(3, view.users.getColumns().size());
     assertNotNull(view.users.getColumnByKey(EMAIL));
     assertTrue(view.users.getColumnByKey(EMAIL).isSortable());
     assertNotNull(view.users.getColumnByKey(NAME));
     assertTrue(view.users.getColumnByKey(NAME).isSortable());
     assertNotNull(view.users.getColumnByKey(ACTIVE));
     assertTrue(view.users.getColumnByKey(ACTIVE).isSortable());
-    assertNotNull(view.users.getColumnByKey(EDIT));
-    assertFalse(view.users.getColumnByKey(EDIT).isSortable());
   }
 
   @Test
@@ -267,15 +261,6 @@ public class UsersViewTest extends SpringUIUnitTest {
           activeButton.getText());
       validateIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create(),
           activeButton.getIcon());
-      Button editButton = (Button) test(view.users).getCellComponent(i, view.edit.getKey());
-      assertTrue(editButton.hasClassName(EDIT));
-      assertTrue(editButton.hasThemeName(ButtonVariant.LUMO_ICON.getVariantName()));
-      validateIcon(VaadinIcon.EDIT.create(), editButton.getIcon());
-      clickButton(editButton);
-      assertEquals(1, $(UserDialog.class).all().size());
-      UserDialog dialog = $(UserDialog.class).first();
-      assertEquals(user.getId(), dialog.getUserId());
-      dialog.close();
     }
   }
 
@@ -325,7 +310,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void refreshDatasetsOnUserSaved() {
     User user = mock(User.class);
     when(service.get(any())).thenReturn(Optional.of(user));
-    view.view(user);
+    view.edit(user);
     UserDialog dialog = $(UserDialog.class).first();
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
@@ -453,6 +438,38 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void edit_Enabled() throws Throwable {
+    assertFalse(view.edit.isEnabled());
+    User user = repository.findById(3L).orElse(null);
+    view.users.select(user);
+    assertTrue(view.edit.isEnabled());
+    view.users.deselectAll();
+    assertFalse(view.edit.isEnabled());
+  }
+
+  @Test
+  public void edit() throws Throwable {
+    User user = repository.findById(3L).orElse(null);
+    when(service.get(any())).thenReturn(Optional.of(user));
+    view.users.select(user);
+    test(view.edit).click();
+    assertEquals(1, $(UserDialog.class).all().size());
+    UserDialog dialog = $(UserDialog.class).first();
+    assertEquals(user.getId(), dialog.getUserId());
+  }
+
+  @Test
+  public void edit_EmptySelection() throws Throwable {
+    view.edit();
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
+        ((ErrorNotification) error).getText());
+    verify(switchUserService, never()).switchUser(any(), any());
+    assertTrue($(UsersView.class).exists());
+  }
+
+  @Test
   public void switchUser_Enabled() throws Throwable {
     assertFalse(view.switchUser.isEnabled());
     User user = repository.findById(3L).orElse(null);
@@ -477,7 +494,6 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void switchUser_EmptySelection() throws Throwable {
-    UI.getCurrent().navigate(UsersView.class);
     view.switchUser();
     Notification error = $(Notification.class).first();
     assertTrue(error instanceof ErrorNotification);

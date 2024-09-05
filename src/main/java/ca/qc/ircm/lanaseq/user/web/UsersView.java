@@ -33,6 +33,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -75,11 +76,11 @@ public class UsersView extends VerticalLayout
   protected Column<User> email;
   protected Column<User> name;
   protected Column<User> active;
-  protected Column<User> edit;
   protected TextField emailFilter = new TextField();
   protected TextField nameFilter = new TextField();
   protected Select<Optional<Boolean>> activeFilter = new Select<>();
   protected Button add = new Button();
+  protected Button edit = new Button();
   protected Button switchUser = new Button();
   private WebUserFilter filter = new WebUserFilter();
   private Map<User, Button> actives = new HashMap<>();
@@ -109,11 +110,14 @@ public class UsersView extends VerticalLayout
     usersLayout.setSpacing(false);
     usersLayout.add(add, users);
     usersLayout.expand(users);
-    add(usersLayout, switchUser);
+    add(usersLayout, new HorizontalLayout(edit, switchUser));
     expand(usersLayout);
     users.setId(USERS);
-    users.addItemDoubleClickListener(e -> view(e.getItem()));
-    users.addSelectionListener(e -> switchUser.setEnabled(e.getAllSelectedItems().size() == 1));
+    users.addItemDoubleClickListener(e -> edit(e.getItem()));
+    users.addSelectionListener(e -> {
+      edit.setEnabled(e.getAllSelectedItems().size() == 1);
+      switchUser.setEnabled(e.getAllSelectedItems().size() == 1);
+    });
     email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
         .setComparator(NormalizedComparator.of(User::getEmail));
     name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
@@ -122,8 +126,6 @@ public class UsersView extends VerticalLayout
         .setSortProperty(ACTIVE)
         .setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
     active.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
-    edit = users.addColumn(new ComponentRenderer<>(user -> editButton(user))).setKey(EDIT)
-        .setSortable(false).setFlexGrow(0);
     users.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = users.appendHeaderRow();
     filtersRow.getCell(email).setComponent(emailFilter);
@@ -142,6 +144,11 @@ public class UsersView extends VerticalLayout
     add.setIcon(VaadinIcon.PLUS.create());
     add.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
     add.addClickListener(e -> add());
+    edit.setId(EDIT);
+    edit.setIcon(VaadinIcon.EDIT.create());
+    edit.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));
+    edit.setEnabled(false);
+    edit.addClickListener(e -> edit());
     switchUser.setId(SWITCH_USER);
     switchUser.setIcon(VaadinIcon.BUG.create());
     switchUser.setVisible(authenticatedUser.hasRole(ADMIN));
@@ -159,15 +166,6 @@ public class UsersView extends VerticalLayout
       toggleActive(user);
       updateActiveButton(button, user);
     });
-    return button;
-  }
-
-  private Button editButton(User user) {
-    Button button = new Button();
-    button.addClassName(EDIT);
-    button.addThemeVariants(ButtonVariant.LUMO_ICON);
-    button.setIcon(VaadinIcon.EDIT.create());
-    button.addClickListener(e -> view(user));
     return button;
   }
 
@@ -190,8 +188,6 @@ public class UsersView extends VerticalLayout
     name.setHeader(nameHeader).setFooter(nameHeader);
     String activeHeader = getTranslation(USER_PREFIX + ACTIVE);
     active.setHeader(activeHeader).setFooter(activeHeader);
-    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
-    edit.setHeader(editHeader).setFooter(editHeader);
     emailFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     activeFilter.setItemLabelGenerator(
@@ -200,6 +196,7 @@ public class UsersView extends VerticalLayout
     actives.entrySet().stream().forEach(entry -> entry.getValue()
         .setText(getTranslation(USER_PREFIX + property(ACTIVE, entry.getKey().isActive()))));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
+    edit.setText(getTranslation(CONSTANTS_PREFIX + EDIT));
     switchUser.setText(getTranslation(MESSAGE_PREFIX + SWITCH_USER));
   }
 
@@ -230,7 +227,16 @@ public class UsersView extends VerticalLayout
     users.getDataProvider().refreshAll();
   }
 
-  void view(User user) {
+  void edit() {
+    User user = users.getSelectedItems().stream().findFirst().orElse(null);
+    if (user == null) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED)).open();
+    } else {
+      edit(user);
+    }
+  }
+
+  void edit(User user) {
     showDialog(user.getId());
   }
 
