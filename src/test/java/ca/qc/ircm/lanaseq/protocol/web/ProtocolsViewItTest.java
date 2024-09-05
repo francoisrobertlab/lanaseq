@@ -57,6 +57,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.edit()).isPresent());
     assertFalse(optional(() -> view.history()).isPresent());
   }
 
@@ -67,6 +68,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.protocols()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.edit()).isPresent());
     assertTrue(optional(() -> view.history()).isPresent());
   }
 
@@ -75,7 +77,8 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 
-    view.protocols().edit(0).click();
+    view.protocols().select(0);
+    view.edit().click();
 
     assertTrue(view.dialog().isOpen());
   }

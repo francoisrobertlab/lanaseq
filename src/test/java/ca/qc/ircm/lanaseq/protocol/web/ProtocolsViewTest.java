@@ -9,16 +9,12 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -126,6 +122,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
         view.dateFilter.getThemeNames().contains(CustomFieldVariant.LUMO_SMALL.getVariantName()));
     assertEquals(ADD, view.add.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), view.add.getIcon());
+    assertEquals(EDIT, view.edit.getId().orElse(""));
+    validateIcon(VaadinIcon.EDIT.create(), view.edit.getIcon());
     assertEquals(HISTORY, view.history.getId().orElse(""));
     validateIcon(VaadinIcon.ARCHIVE.create(), view.history.getIcon());
   }
@@ -146,13 +144,10 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
         headerRow.getCell(view.owner).getText());
     assertEquals(view.getTranslation(PROTOCOL_PREFIX + OWNER),
         footerRow.getCell(view.owner).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        headerRow.getCell(view.edit).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        footerRow.getCell(view.edit).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT), view.edit.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + HISTORY), view.history.getText());
   }
 
@@ -174,13 +169,10 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
         headerRow.getCell(view.owner).getText());
     assertEquals(view.getTranslation(PROTOCOL_PREFIX + OWNER),
         footerRow.getCell(view.owner).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        headerRow.getCell(view.edit).getText());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT),
-        footerRow.getCell(view.edit).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT), view.edit.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + HISTORY), view.history.getText());
   }
 
@@ -192,15 +184,13 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void protocols() {
-    assertEquals(4, view.protocols.getColumns().size());
+    assertEquals(3, view.protocols.getColumns().size());
     assertNotNull(view.protocols.getColumnByKey(NAME));
     assertTrue(view.name.isSortable());
     assertNotNull(view.protocols.getColumnByKey(CREATION_DATE));
     assertTrue(view.date.isSortable());
     assertNotNull(view.protocols.getColumnByKey(OWNER));
     assertTrue(view.owner.isSortable());
-    assertNotNull(view.protocols.getColumnByKey(EDIT));
-    assertFalse(view.edit.isSortable());
     assertTrue(view.protocols.getSelectionModel() instanceof SelectionModel.Single);
     List<Protocol> protocols = items(view.protocols);
     verify(service).all();
@@ -225,10 +215,6 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
           test(view.protocols).getCellText(i, view.protocols.getColumns().indexOf(view.date)));
       assertEquals(protocol.getOwner().getEmail(),
           test(view.protocols).getCellText(i, view.protocols.getColumns().indexOf(view.owner)));
-      LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
-      assertEquals(EDIT_BUTTON, rendererTemplate(editRenderer));
-      assertTrue(functions(editRenderer).containsKey("edit"));
-      assertNotNull(functions(editRenderer).get("edit"));
     }
   }
 
@@ -255,9 +241,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   public void protocols_EditAndSave() {
     Protocol protocol = repository.findById(1L).get();
-    LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
 
-    functions(editRenderer).get("edit").accept(protocol, null);
+    test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
@@ -269,9 +254,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   public void protocols_EditAndDelete() {
     Protocol protocol = repository.findById(1L).get();
-    LitRenderer<Protocol> editRenderer = (LitRenderer<Protocol>) view.edit.getRenderer();
 
-    functions(editRenderer).get("edit").accept(protocol, null);
+    test(view.protocols).doubleClickRow(0);
 
     verify(service).get(protocol.getId());
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
@@ -423,12 +407,45 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void add() {
-    clickButton(view.add);
+    test(view.add).click();
 
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
     assertNull(dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
+  }
+
+  @Test
+  public void edit_Enabled() {
+    assertFalse(view.edit.isEnabled());
+    Protocol protocol = repository.findById(1L).get();
+    view.protocols.select(protocol);
+    assertTrue(view.edit.isEnabled());
+    view.protocols.deselectAll();
+    assertFalse(view.edit.isEnabled());
+  }
+
+  @Test
+  public void edit() {
+    Protocol protocol = repository.findById(1L).get();
+    view.protocols.select(protocol);
+
+    test(view.edit).click();
+
+    verify(service).get(protocol.getId());
+    ProtocolDialog dialog = $(ProtocolDialog.class).first();
+    assertEquals(protocol.getId(), dialog.getProtocolId());
+  }
+
+  @Test
+  public void edit_NoSelection() {
+    view.edit();
+
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED),
+        ((ErrorNotification) error).getText());
+    assertFalse($(ProtocolHistoryDialog.class).exists());
   }
 
   @Test
@@ -447,7 +464,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     view.protocols.select(protocol);
     assertFalse(view.history.isVisible());
 
-    clickButton(view.history);
+    view.history();
 
     assertFalse($(ProtocolHistoryDialog.class).exists());
   }
@@ -458,7 +475,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     Protocol protocol = repository.findById(1L).get();
     view.protocols.select(protocol);
 
-    clickButton(view.history);
+    test(view.history).click();
 
     verify(service).get(protocol.getId());
     ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
@@ -471,7 +488,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     Protocol protocol = repository.findById(1L).get();
     view.protocols.select(protocol);
 
-    view.history.click();
+    test(view.history).click();
 
     verify(service).get(protocol.getId());
     ProtocolHistoryDialog dialog = $(ProtocolHistoryDialog.class).first();
