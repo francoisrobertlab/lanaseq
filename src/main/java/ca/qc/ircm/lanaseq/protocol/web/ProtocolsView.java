@@ -29,9 +29,9 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -56,9 +56,6 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public static final String VIEW_NAME = "protocols";
   public static final String ID = "protocols-view";
   public static final String PROTOCOLS = "protocols";
-  public static final String EDIT_BUTTON =
-      "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
-          + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String HISTORY = "history";
   public static final String PROTOCOLS_REQUIRED = property(PROTOCOLS, "required");
   public static final String PROTOCOLS_MORE_THAN_ONE = property(PROTOCOLS, "moreThanOne");
@@ -71,11 +68,11 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected Column<Protocol> name;
   protected Column<Protocol> date;
   protected Column<Protocol> owner;
-  protected Column<Protocol> edit;
   protected TextField nameFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
   protected Button add = new Button();
+  protected Button edit = new Button();
   protected Button history = new Button();
   private WebProtocolFilter filter = new WebProtocolFilter();
   private transient ObjectFactory<ProtocolDialog> dialogFactory;
@@ -104,7 +101,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     protocolsLayout.setSpacing(false);
     protocolsLayout.add(add, protocols);
     protocolsLayout.expand(protocols);
-    add(protocolsLayout, history);
+    add(protocolsLayout, new HorizontalLayout(edit, history));
     expand(protocolsLayout);
     protocols.setId(PROTOCOLS);
     protocols.setMinHeight("30em");
@@ -116,17 +113,16 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
         .setKey(CREATION_DATE).setSortProperty(CREATION_DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
-    edit = protocols
-        .addColumn(
-            LitRenderer.<Protocol>of(EDIT_BUTTON).withFunction("edit", protocol -> edit(protocol)))
-        .setKey(EDIT).setSortable(false).setFlexGrow(0);
     protocols.addItemDoubleClickListener(e -> edit(e.getItem()));
     protocols.addItemClickListener(e -> {
       if (e.isAltKey()) {
         history(e.getItem());
       }
     });
-    protocols.addSelectionListener(e -> history.setEnabled(e.getAllSelectedItems().size() == 1));
+    protocols.addSelectionListener(e -> {
+      edit.setEnabled(e.getAllSelectedItems().size() == 1);
+      history.setEnabled(e.getAllSelectedItems().size() == 1);
+    });
     protocols.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = protocols.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);
@@ -144,6 +140,10 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> add());
+    edit.setId(EDIT);
+    edit.setIcon(VaadinIcon.EDIT.create());
+    edit.addClickListener(e -> edit());
+    edit.setEnabled(false);
     history.setId(HISTORY);
     history.setIcon(VaadinIcon.ARCHIVE.create());
     history.addClickListener(e -> history());
@@ -165,11 +165,10 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = getTranslation(PROTOCOL_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
-    edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
+    edit.setText(getTranslation(CONSTANTS_PREFIX + EDIT));
     history.setText(getTranslation(MESSAGE_PREFIX + HISTORY));
   }
 
@@ -177,6 +176,15 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   public String getPageTitle() {
     return getTranslation(MESSAGE_PREFIX + TITLE,
         getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME));
+  }
+
+  void edit() {
+    Protocol protocol = protocols.getSelectedItems().stream().findFirst().orElse(null);
+    if (protocol == null) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED)).open();
+    } else {
+      edit(protocol);
+    }
   }
 
   void edit(Protocol protocol) {

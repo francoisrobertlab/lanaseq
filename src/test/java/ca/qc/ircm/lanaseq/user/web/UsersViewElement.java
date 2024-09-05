@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_FAILED;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.SWITCH_USER;
 
@@ -28,6 +29,10 @@ public class UsersViewElement extends VerticalLayoutElement {
 
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
+  }
+
+  public ButtonElement edit() {
+    return $(ButtonElement.class).id(EDIT);
   }
 
   public ButtonElement switchUser() {

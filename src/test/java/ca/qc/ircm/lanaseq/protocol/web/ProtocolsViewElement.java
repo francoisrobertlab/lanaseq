@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ADD;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
@@ -22,6 +23,10 @@ public class ProtocolsViewElement extends VerticalLayoutElement {
 
   public ButtonElement add() {
     return $(ButtonElement.class).id(ADD);
+  }
+
+  public ButtonElement edit() {
+    return $(ButtonElement.class).id(EDIT);
   }
 
   public ButtonElement history() {

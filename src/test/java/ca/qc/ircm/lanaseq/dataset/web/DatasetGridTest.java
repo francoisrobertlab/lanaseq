@@ -1,17 +1,13 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
-import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetGrid.EDIT_BUTTON;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,8 +40,6 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
-import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.shared.Registration;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -150,10 +144,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
         headerRow.getCell(grid.owner).getText());
     assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
         footerRow.getCell(grid.owner).getText());
-    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
-        headerRow.getCell(grid.edit).getText());
-    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
-        footerRow.getCell(grid.edit).getText());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.nameFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.tagsFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.protocolFilter.getPlaceholder());
@@ -186,10 +176,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
         headerRow.getCell(grid.owner).getText());
     assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
         footerRow.getCell(grid.owner).getText());
-    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
-        headerRow.getCell(grid.edit).getText());
-    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + EDIT),
-        footerRow.getCell(grid.edit).getText());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.nameFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.tagsFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.protocolFilter.getPlaceholder());
@@ -198,7 +184,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void datasets() {
-    assertEquals(6, grid.getColumns().size());
+    assertEquals(5, grid.getColumns().size());
     assertNotNull(grid.getColumnByKey(NAME));
     assertTrue(grid.name.isSortable());
     assertEquals(NAME, grid.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
@@ -216,9 +202,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertEquals(OWNER + "." + EMAIL, grid.getColumnByKey(OWNER)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
     assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
-    assertNotNull(grid.getColumnByKey(EDIT));
-    assertFalse(grid.edit.isSortable());
-    assertTrue(grid.edit.isVisible());
     List<Dataset> datasets = items(grid);
     verify(service, atLeastOnce()).all(grid.filter());
     assertEquals(this.datasets.size(), datasets.size());
@@ -242,9 +225,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.date)));
       assertEquals(dataset.getOwner().getEmail(),
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.owner)));
-      LitRenderer<Dataset> editRenderer = (LitRenderer<Dataset>) grid.edit.getRenderer();
-      assertEquals(EDIT_BUTTON, rendererTemplate(editRenderer));
-      assertTrue(functions(editRenderer).containsKey("edit"));
     }
   }
 
@@ -266,16 +246,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertTrue(comparator.compare(owner("a"), owner("é")) < 0);
     assertTrue(comparator.compare(owner("e"), owner("a")) > 0);
     assertTrue(comparator.compare(owner("é"), owner("a")) > 0);
-  }
-
-  @Test
-  public void datasets_ClickEdit() {
-    grid.addEditListener(editListener);
-    Dataset dataset = datasets.get(1);
-    LitRenderer<Dataset> editRenderer = (LitRenderer<Dataset>) grid.edit.getRenderer();
-    functions(editRenderer).get("edit").accept(dataset, null);
-    verify(editListener, atLeastOnce()).onComponentEvent(editEventCaptor.capture());
-    assertEquals(dataset, editEventCaptor.getValue().getItem());
   }
 
   @Test
@@ -402,16 +372,6 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
     verify(grid.getDataProvider(), times(2)).refreshAll();
     assertNull(grid.filter().ownerContains);
-  }
-
-  @Test
-  public void addEditListener() {
-    DatasetGrid grid = new DatasetGrid(service, authenticatedUser);
-    grid.init();
-    Registration registration = grid.addEditListener(editListener);
-    assertTrue(grid.edit.isVisible());
-    registration.remove();
-    assertFalse(grid.edit.isVisible());
   }
 
   @Test

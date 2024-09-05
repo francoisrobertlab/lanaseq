@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
+import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
@@ -15,7 +16,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,7 +35,6 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.web.EditEvent;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -97,6 +96,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   public void styles() {
     assertEquals(ID, view.getId().orElse(""));
     assertEquals(DatasetGrid.ID, view.datasets.getId().orElse(""));
+    assertEquals(EDIT, view.edit.getId().orElse(""));
+    validateIcon(VaadinIcon.EDIT.create(), view.edit.getIcon());
     assertEquals(MERGE, view.merge.getId().orElse(""));
     validateIcon(VaadinIcon.CONNECT.create(), view.merge.getIcon());
     assertEquals(FILES, view.files.getId().orElse(""));
@@ -106,6 +107,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT), view.edit.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
@@ -115,6 +117,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + EDIT), view.edit.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE), view.merge.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + FILES), view.files.getText());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ANALYZE), view.analyze.getText());
@@ -192,15 +195,50 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void datasets_Edit() {
-    Dataset dataset = datasets.get(0);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+  public void edit_Enabled() {
+    assertFalse(view.edit.isEnabled());
+    view.datasets.select(datasets.get(0));
+    assertTrue(view.edit.isEnabled());
+    view.datasets.select(datasets.get(1));
+    assertFalse(view.edit.isEnabled());
+    view.datasets.deselectAll();
+    assertFalse(view.edit.isEnabled());
+  }
 
-    fireEvent(view.datasets, new EditEvent<>(view.datasets, false, dataset));
+  @Test
+  public void edit() {
+    Dataset dataset = datasets.get(0);
+    view.datasets.select(dataset);
+
+    view.edit.click();
 
     DatasetDialog dialog = $(DatasetDialog.class).first();
     assertEquals(dataset.getId(), dialog.getDatasetId());
-    verify(service).get(dataset.getId());
+  }
+
+  @Test
+  public void edit_NoSelection() {
+    view.edit();
+
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
+        ((ErrorNotification) error).getText());
+    assertFalse($(DatasetFilesDialog.class).exists());
+  }
+
+  @Test
+  public void edit_MoreThanOneDatasetSelected() {
+    view.datasets.select(datasets.get(0));
+    view.datasets.select(datasets.get(1));
+
+    view.edit();
+
+    Notification error = $(Notification.class).first();
+    assertTrue(error instanceof ErrorNotification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE),
+        ((ErrorNotification) error).getText());
+    assertFalse($(DatasetFilesDialog.class).exists());
   }
 
   @Test

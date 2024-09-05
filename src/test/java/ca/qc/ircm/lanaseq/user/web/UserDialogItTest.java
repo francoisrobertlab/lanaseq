@@ -53,7 +53,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
-    view.users().edit(1).click();
+    view.users().select(1);
+    view.edit().click();
 
     UserDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
@@ -74,7 +75,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
-    view.users().edit(2).click();
+    view.users().select(2);
+    view.edit().click();
 
     UserDialogElement dialog = view.dialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
@@ -94,7 +96,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void save() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().edit(2).click();
+    view.users().select(2);
+    view.edit().click();
     UserDialogElement dialog = view.dialog();
     setFields(dialog);
 
@@ -118,7 +121,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void save_Fail() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().edit(2).click();
+    view.users().select(2);
+    view.edit().click();
     UserDialogElement dialog = view.dialog();
     setFields(dialog);
     dialog.form().email().setValue("test");
@@ -141,7 +145,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   public void cancel() throws Throwable {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    view.users().edit(2).click();
+    view.users().select(2);
+    view.edit().click();
     UserDialogElement dialog = view.dialog();
     setFields(dialog);
 

@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ALL;
-import static ca.qc.ircm.lanaseq.Constants.EDIT;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
@@ -19,22 +18,18 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
-import ca.qc.ircm.lanaseq.web.EditEvent;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
@@ -51,9 +46,6 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   public static final String ID = "datasets-grid";
-  public static final String EDIT_BUTTON =
-      "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
-          + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -63,7 +55,6 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
-  protected Column<Dataset> edit;
   protected TextField nameFilter = new TextField();
   protected TextField tagsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
@@ -94,10 +85,6 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
-    edit = addColumn(LitRenderer.<Dataset>of(EDIT_BUTTON).withFunction("edit",
-        dataset -> fireEvent(new EditEvent(this, false, dataset)))).setKey(EDIT).setSortable(false)
-            .setFlexGrow(0);
-    edit.setVisible(false);
     sort(GridSortOrder.desc(date).build());
     appendHeaderRow(); // Headers.
     HeaderRow filtersRow = appendHeaderRow();
@@ -155,31 +142,10 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = getTranslation(DATASET_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
-    edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
-  }
-
-  /**
-   * Adds listener to be informed when a dataset is to be edited.
-   *
-   * @param listener
-   *          listener
-   * @return listener registration
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public Registration
-      addEditListener(ComponentEventListener<EditEvent<DatasetGrid, Dataset>> listener) {
-    edit.setVisible(true);
-    Registration hideEdit = Registration.once(() -> {
-      if (!this.getEventBus().hasListener(EditEvent.class)) {
-        edit.setVisible(false);
-      }
-    });
-    return Registration.combine(addListener((Class) EditEvent.class, listener), hideEdit);
   }
 
   public void refreshDatasets() {

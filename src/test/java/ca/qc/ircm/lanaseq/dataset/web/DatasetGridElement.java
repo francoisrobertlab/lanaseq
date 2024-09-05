@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
@@ -18,7 +17,6 @@ public class DatasetGridElement extends GridElement {
   private static final int NAME_COLUMN = 0;
   private static final int PROTOCOL_COLUMN = 2;
   private static final int OWNER_COLUMN = 4;
-  private static final int EDIT_COLUMN = 5;
 
   private int column(int column) {
     return isMultiSelect() ? column + 1 : column;
@@ -34,10 +32,6 @@ public class DatasetGridElement extends GridElement {
 
   public TextFieldElement ownerFilter() {
     return getHeaderCell(column(OWNER_COLUMN)).$(TextFieldElement.class).first();
-  }
-
-  public ButtonElement edit(int row) {
-    return getCell(row, column(EDIT_COLUMN)).$(ButtonElement.class).first();
   }
 
   /**

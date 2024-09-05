@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.protocol.web;
 
-import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.annotations.Attribute;
@@ -14,13 +13,8 @@ import com.vaadin.testbench.elementsbase.Element;
 public class ProtocolsGridElement extends GridElement {
   private static final int NAME_COLUMN = 0;
   private static final int OWNER_COLUMN = 2;
-  private static final int EDIT_COLUMN = 3;
 
   public TextFieldElement ownerFilter() {
     return getHeaderCell(OWNER_COLUMN).$(TextFieldElement.class).first();
-  }
-
-  public ButtonElement edit(int row) {
-    return getCell(row, EDIT_COLUMN).$(ButtonElement.class).first();
   }
 }

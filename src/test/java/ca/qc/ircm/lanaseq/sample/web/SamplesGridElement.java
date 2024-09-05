@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import ca.qc.ircm.lanaseq.test.web.MultiSelectGridElement;
-import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
@@ -18,7 +17,6 @@ public class SamplesGridElement extends MultiSelectGridElement {
   private static final int TAGS_COLUMN = 2;
   private static final int PROTOCOL_COLUMN = 3;
   private static final int OWNER_COLUMN = 5;
-  private static final int EDIT_COLUMN = 6;
 
   public TextFieldElement nameFilter() {
     return getHeaderCell(NAME_COLUMN).$(TextFieldElement.class).first();
@@ -38,10 +36,6 @@ public class SamplesGridElement extends MultiSelectGridElement {
 
   public String name(int row) {
     return getCell(row, NAME_COLUMN).getText();
-  }
-
-  public ButtonElement edit(int row) {
-    return getCell(row, EDIT_COLUMN).$(ButtonElement.class).first();
   }
 
   /**
