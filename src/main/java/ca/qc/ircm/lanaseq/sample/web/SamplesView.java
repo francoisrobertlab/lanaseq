@@ -42,7 +42,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -80,9 +79,6 @@ public class SamplesView extends VerticalLayout
   public static final String SAMPLES_MORE_THAN_ONE = property(SAMPLES, "moreThanOne");
   public static final String SAMPLES_CANNOT_WRITE = property(SAMPLES, "cannotWrite");
   public static final String MERGE_ERROR = property(MERGE, "error");
-  public static final String EDIT_BUTTON =
-      "<vaadin-button class='" + EDIT + "' theme='icon' @click='${edit}'>"
-          + "<vaadin-icon icon='vaadin:edit' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   private static final String MESSAGE_PREFIX = messagePrefix(SamplesView.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
@@ -95,13 +91,13 @@ public class SamplesView extends VerticalLayout
   protected Column<Sample> protocol;
   protected Column<Sample> date;
   protected Column<Sample> owner;
-  protected Column<Sample> edit;
   protected TextField nameFilter = new TextField();
   protected TextField tagsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
   protected Button add = new Button();
+  protected Button edit = new Button();
   protected Button merge = new Button();
   protected Button files = new Button();
   protected Button analyze = new Button();
@@ -137,7 +133,7 @@ public class SamplesView extends VerticalLayout
     samplesLayout.setSpacing(false);
     samplesLayout.add(add, samples);
     samplesLayout.expand(samples);
-    add(samplesLayout, new HorizontalLayout(merge, files, analyze));
+    add(samplesLayout, new HorizontalLayout(edit, merge, files, analyze));
     expand(samplesLayout);
     samples.setId(SAMPLES);
     samples.setMinHeight("30em");
@@ -158,17 +154,15 @@ public class SamplesView extends VerticalLayout
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
-    edit = samples
-        .addColumn(LitRenderer.<Sample>of(EDIT_BUTTON).withFunction("edit", sample -> view(sample)))
-        .setKey(EDIT).setSortable(false).setFlexGrow(0);
     samples.sort(GridSortOrder.desc(date).build());
-    samples.addItemDoubleClickListener(e -> view(e.getItem()));
+    samples.addItemDoubleClickListener(e -> edit(e.getItem()));
     samples.addItemClickListener(e -> {
       if (e.isCtrlKey() || e.isMetaKey()) {
         viewFiles(e.getItem());
       }
     });
     samples.addSelectionListener(e -> {
+      edit.setEnabled(e.getAllSelectedItems().size() == 1);
       merge.setEnabled(e.getAllSelectedItems().size() > 0);
       files.setEnabled(e.getAllSelectedItems().size() == 1);
       analyze.setEnabled(e.getAllSelectedItems().size() > 0);
@@ -198,6 +192,10 @@ public class SamplesView extends VerticalLayout
     add.setId(ADD);
     add.setIcon(VaadinIcon.PLUS.create());
     add.addClickListener(e -> add());
+    edit.setId(EDIT);
+    edit.setEnabled(false);
+    edit.setIcon(VaadinIcon.EDIT.create());
+    edit.addClickListener(e -> edit());
     merge.setId(MERGE);
     merge.setEnabled(false);
     merge.setIcon(VaadinIcon.CONNECT.create());
@@ -227,13 +225,12 @@ public class SamplesView extends VerticalLayout
     date.setHeader(dateHeader).setFooter(dateHeader);
     String ownerHeader = getTranslation(SAMPLE_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
-    String editHeader = getTranslation(CONSTANTS_PREFIX + EDIT);
-    edit.setHeader(editHeader).setFooter(editHeader);
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
+    edit.setText(getTranslation(CONSTANTS_PREFIX + EDIT));
     merge.setText(getTranslation(MESSAGE_PREFIX + MERGE));
     files.setText(getTranslation(MESSAGE_PREFIX + FILES));
     analyze.setText(getTranslation(MESSAGE_PREFIX + ANALYZE));
@@ -255,7 +252,19 @@ public class SamplesView extends VerticalLayout
     samples.setItems(fetchCallback);
   }
 
-  void view(Sample sample) {
+  void edit() {
+    Set<Sample> samples = this.samples.getSelectedItems();
+    if (samples.isEmpty()) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED)).open();
+    } else if (samples.size() > 1) {
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE)).open();
+    } else {
+      Sample sample = samples.iterator().next();
+      edit(sample);
+    }
+  }
+
+  void edit(Sample sample) {
     showDialog(sample);
   }
 

@@ -66,6 +66,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.samples()).isPresent());
     assertTrue(optional(() -> view.add()).isPresent());
+    assertTrue(optional(() -> view.edit()).isPresent());
     assertTrue(optional(() -> view.merge()).isPresent());
     assertTrue(optional(() -> view.files()).isPresent());
     assertTrue(optional(() -> view.analyze()).isPresent());
@@ -83,7 +84,8 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void edit() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().edit(0).click();
+    view.samples().select(0);
+    view.edit().click();
     assertTrue(view.dialog().isOpen());
   }
 
