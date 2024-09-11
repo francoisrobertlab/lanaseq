@@ -3,9 +3,9 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
@@ -51,12 +51,12 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final long serialVersionUID = -3052158575710045415L;
   protected Column<Dataset> name;
-  protected Column<Dataset> tags;
+  protected Column<Dataset> keywords;
   protected Column<Dataset> protocol;
   protected Column<Dataset> date;
   protected Column<Dataset> owner;
   protected TextField nameFilter = new TextField();
-  protected TextField tagsFilter = new TextField();
+  protected TextField keywordsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
@@ -75,8 +75,9 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     setId(ID);
     name = addColumn(dataset -> dataset.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
-    tags = addColumn(dataset -> dataset.getTags().stream().collect(Collectors.joining(", ")), TAGS)
-        .setKey(TAGS).setSortable(false).setFlexGrow(1);
+    keywords =
+        addColumn(dataset -> dataset.getKeywords().stream().collect(Collectors.joining(", ")),
+            KEYWORDS).setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setSortable(false).setFlexGrow(1);
     date =
@@ -92,10 +93,10 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
-    filtersRow.getCell(tags).setComponent(tagsFilter);
-    tagsFilter.addValueChangeListener(e -> filterTags(e.getValue()));
-    tagsFilter.setValueChangeMode(ValueChangeMode.EAGER);
-    tagsFilter.setSizeFull();
+    filtersRow.getCell(keywords).setComponent(keywordsFilter);
+    keywordsFilter.addValueChangeListener(e -> filterKeywords(e.getValue()));
+    keywordsFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    keywordsFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
     protocolFilter.addValueChangeListener(e -> filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -134,8 +135,8 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   public void localeChange(LocaleChangeEvent event) {
     String nameHeader = getTranslation(DATASET_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String tagsHeader = getTranslation(DATASET_PREFIX + TAGS);
-    tags.setHeader(tagsHeader).setFooter(tagsHeader);
+    String keywordsHeader = getTranslation(DATASET_PREFIX + KEYWORDS);
+    keywords.setHeader(keywordsHeader).setFooter(keywordsHeader);
     String protocolHeader = getTranslation(SAMPLE_PREFIX + PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = getTranslation(DATASET_PREFIX + DATE);
@@ -143,7 +144,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     String ownerHeader = getTranslation(DATASET_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
-    tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    keywordsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
   }
@@ -157,8 +158,8 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     getDataProvider().refreshAll();
   }
 
-  void filterTags(String value) {
-    filter.tagsContains = value.isEmpty() ? null : value;
+  void filterKeywords(String value) {
+    filter.keywordsContains = value.isEmpty() ? null : value;
     getDataProvider().refreshAll();
   }
 

@@ -117,11 +117,11 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertNotNull(dataset);
     assertNotNull(dataset.getId());
     assertEquals(name, dataset.getName());
-    assertEquals(4, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("chipseq"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertTrue(dataset.getTags().contains("G24D"));
-    assertTrue(dataset.getTags().contains("Spt16"));
+    assertEquals(4, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("chipseq"));
+    assertTrue(dataset.getKeywords().contains("ip"));
+    assertTrue(dataset.getKeywords().contains("G24D"));
+    assertTrue(dataset.getKeywords().contains("Spt16"));
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(dataset.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(dataset.getCreationDate()));

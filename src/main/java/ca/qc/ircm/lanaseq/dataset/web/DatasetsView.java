@@ -207,7 +207,7 @@ public class DatasetsView extends VerticalLayout
   void merge() {
     List<Dataset> datasets = this.datasets.getSelectedItems().stream()
         .sorted((d1, d2) -> d1.getId().compareTo(d2.getId())).collect(Collectors.toList());
-    Set<String> tags = datasets.stream().flatMap(dataset -> dataset.getTags().stream())
+    Set<String> keywords = datasets.stream().flatMap(dataset -> dataset.getKeywords().stream())
         .collect(Collectors.toSet());
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
         .filter(distinctByKey(Sample::getId)).sorted((s1, s2) -> s1.getId().compareTo(s2.getId()))
@@ -218,7 +218,7 @@ public class DatasetsView extends VerticalLayout
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + MERGE_ERROR)).open();
     } else {
       Dataset dataset = new Dataset();
-      dataset.setTags(tags);
+      dataset.setKeywords(keywords);
       dataset.setSamples(samples);
       dataset.setDate(datasets.get(0).getDate());
       dataset.generateName();

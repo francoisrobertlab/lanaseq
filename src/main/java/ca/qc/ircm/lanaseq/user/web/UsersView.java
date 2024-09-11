@@ -178,6 +178,7 @@ public class UsersView extends VerticalLayout
 
   private void loadUsers() {
     users.setItems(service.all());
+    users.getListDataView().setFilter(filter);
   }
 
   @Override

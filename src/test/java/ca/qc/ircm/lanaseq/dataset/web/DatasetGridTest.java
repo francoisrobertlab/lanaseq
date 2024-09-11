@@ -3,9 +3,9 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.ALL;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -128,10 +128,10 @@ public class DatasetGridTest extends SpringUIUnitTest {
         headerRow.getCell(grid.name).getText());
     assertEquals(grid.getTranslation(DATASET_PREFIX + NAME),
         footerRow.getCell(grid.name).getText());
-    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
-        headerRow.getCell(grid.tags).getText());
-    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
-        footerRow.getCell(grid.tags).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + KEYWORDS),
+        headerRow.getCell(grid.keywords).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + KEYWORDS),
+        footerRow.getCell(grid.keywords).getText());
     assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
         headerRow.getCell(grid.protocol).getText());
     assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
@@ -145,7 +145,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
         footerRow.getCell(grid.owner).getText());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.nameFilter.getPlaceholder());
-    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.tagsFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.keywordsFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.protocolFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.ownerFilter.getPlaceholder());
   }
@@ -160,10 +160,10 @@ public class DatasetGridTest extends SpringUIUnitTest {
         headerRow.getCell(grid.name).getText());
     assertEquals(grid.getTranslation(DATASET_PREFIX + NAME),
         footerRow.getCell(grid.name).getText());
-    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
-        headerRow.getCell(grid.tags).getText());
-    assertEquals(grid.getTranslation(DATASET_PREFIX + TAGS),
-        footerRow.getCell(grid.tags).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + KEYWORDS),
+        headerRow.getCell(grid.keywords).getText());
+    assertEquals(grid.getTranslation(DATASET_PREFIX + KEYWORDS),
+        footerRow.getCell(grid.keywords).getText());
     assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
         headerRow.getCell(grid.protocol).getText());
     assertEquals(grid.getTranslation(SAMPLE_PREFIX + PROTOCOL),
@@ -177,7 +177,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertEquals(grid.getTranslation(DATASET_PREFIX + OWNER),
         footerRow.getCell(grid.owner).getText());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.nameFilter.getPlaceholder());
-    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.tagsFilter.getPlaceholder());
+    assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.keywordsFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.protocolFilter.getPlaceholder());
     assertEquals(grid.getTranslation(CONSTANTS_PREFIX + ALL), grid.ownerFilter.getPlaceholder());
   }
@@ -189,8 +189,8 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertTrue(grid.name.isSortable());
     assertEquals(NAME, grid.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
         .map(so -> so.getSorted()).orElse(null));
-    assertNotNull(grid.getColumnByKey(TAGS));
-    assertFalse(grid.tags.isSortable());
+    assertNotNull(grid.getColumnByKey(KEYWORDS));
+    assertFalse(grid.keywords.isSortable());
     assertNotNull(grid.getColumnByKey(PROTOCOL));
     assertFalse(grid.protocol.isSortable());
     assertNotNull(grid.getColumnByKey(DATE));
@@ -217,8 +217,8 @@ public class DatasetGridTest extends SpringUIUnitTest {
       Dataset dataset = datasets.get(i);
       assertEquals(dataset.getName(),
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.name)));
-      assertEquals(dataset.getTags().stream().collect(Collectors.joining(", ")),
-          test(grid).getCellText(i, grid.getColumns().indexOf(grid.tags)));
+      assertEquals(dataset.getKeywords().stream().collect(Collectors.joining(", ")),
+          test(grid).getCellText(i, grid.getColumns().indexOf(grid.keywords)));
       assertEquals(protocol(dataset).map(Protocol::getName).orElse(""),
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.protocol)));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(dataset.getDate()),
@@ -287,24 +287,24 @@ public class DatasetGridTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filterTags() {
+  public void filterKeywords() {
     grid.setItems(mock(DataProvider.class));
 
-    grid.tagsFilter.setValue("test");
+    grid.keywordsFilter.setValue("test");
 
     verify(grid.getDataProvider()).refreshAll();
-    assertEquals("test", grid.filter().tagsContains);
+    assertEquals("test", grid.filter().keywordsContains);
   }
 
   @Test
-  public void filterTags_Empty() {
+  public void filterKeywords_Empty() {
     grid.setItems(mock(DataProvider.class));
-    grid.tagsFilter.setValue("test");
+    grid.keywordsFilter.setValue("test");
 
-    grid.tagsFilter.setValue("");
+    grid.keywordsFilter.setValue("");
 
     verify(grid.getDataProvider(), times(2)).refreshAll();
-    assertNull(grid.filter().tagsContains);
+    assertNull(grid.filter().keywordsContains);
   }
 
   @Test

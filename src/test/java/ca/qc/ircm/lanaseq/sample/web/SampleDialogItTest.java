@@ -65,8 +65,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private String sampleId = "FR3";
   private String replicate = "R3";
   private String note = "test note\nsecond line";
-  private String tag1 = "mnase";
-  private String tag2 = "ip";
+  private String keyword1 = "mnase";
+  private String keyword2 = "ip";
 
   /**
    * Before test.
@@ -96,9 +96,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     dialog.strain().setValue(strain);
     dialog.strainDescription().setValue(strainDescription);
     dialog.treatment().setValue(treatment);
-    dialog.tags().deselectByText("G24D");
-    dialog.tags().selectByText(tag1);
-    dialog.tags().selectByText(tag2);
+    dialog.keywords().deselectByText("G24D");
+    dialog.keywords().selectByText(keyword1);
+    dialog.keywords().selectByText(keyword2);
     dialog.note().setValue(note);
   }
 
@@ -124,7 +124,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.tags()).isPresent());
+    assertTrue(optional(() -> dialog.keywords()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -150,7 +150,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.tags()).isPresent());
+    assertTrue(optional(() -> dialog.keywords()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -178,7 +178,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strain()).isPresent());
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.tags()).isPresent());
+    assertTrue(optional(() -> dialog.keywords()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -222,9 +222,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    assertEquals(2, sample.getTags().size());
-    assertTrue(sample.getTags().contains(tag1));
-    assertTrue(sample.getTags().contains(tag2));
+    assertEquals(2, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains(keyword1));
+    assertTrue(sample.getKeywords().contains(keyword2));
     assertEquals(note, sample.getNote());
     assertEquals(5, view.samples().getRowCount());
   }
@@ -264,10 +264,10 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(strain, sample.getStrain());
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
-    assertEquals(3, sample.getTags().size());
-    assertTrue(sample.getTags().contains("chipseq"));
-    assertTrue(sample.getTags().contains(tag1));
-    assertTrue(sample.getTags().contains(tag2));
+    assertEquals(3, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains("chipseq"));
+    assertTrue(sample.getKeywords().contains(keyword1));
+    assertTrue(sample.getKeywords().contains(keyword2));
     assertEquals(note, sample.getNote());
     Dataset dataset = datasetRepository.findById(2L).get();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
@@ -308,10 +308,10 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals("yFR101", sample.getStrain());
     assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
-    assertEquals(3, sample.getTags().size());
-    assertTrue(sample.getTags().contains("chipseq"));
-    assertTrue(sample.getTags().contains("ip"));
-    assertTrue(sample.getTags().contains("G24D"));
+    assertEquals(3, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains("chipseq"));
+    assertTrue(sample.getKeywords().contains("ip"));
+    assertTrue(sample.getKeywords().contains("G24D"));
     assertNull(sample.getNote());
     assertEquals(4, view.samples().getRowCount());
   }

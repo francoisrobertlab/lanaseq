@@ -8,10 +8,10 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TAGS;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -87,12 +87,12 @@ public class SamplesView extends VerticalLayout
   private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
-  protected Column<Sample> tags;
+  protected Column<Sample> keywords;
   protected Column<Sample> protocol;
   protected Column<Sample> date;
   protected Column<Sample> owner;
   protected TextField nameFilter = new TextField();
-  protected TextField tagsFilter = new TextField();
+  protected TextField keywordsFilter = new TextField();
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
@@ -140,9 +140,9 @@ public class SamplesView extends VerticalLayout
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
-    tags = samples
-        .addColumn(sample -> sample.getTags().stream().collect(Collectors.joining(", ")), TAGS)
-        .setKey(TAGS).setSortable(false).setFlexGrow(1);
+    keywords =
+        samples.addColumn(sample -> sample.getKeywords().stream().collect(Collectors.joining(", ")),
+            KEYWORDS).setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
     protocol = samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL)
         .setKey(PROTOCOL).setSortProperty(PROTOCOL + "." + NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
@@ -173,10 +173,10 @@ public class SamplesView extends VerticalLayout
     nameFilter.addValueChangeListener(e -> filterName(e.getValue()));
     nameFilter.setValueChangeMode(ValueChangeMode.EAGER);
     nameFilter.setSizeFull();
-    filtersRow.getCell(tags).setComponent(tagsFilter);
-    tagsFilter.addValueChangeListener(e -> filterTags(e.getValue()));
-    tagsFilter.setValueChangeMode(ValueChangeMode.EAGER);
-    tagsFilter.setSizeFull();
+    filtersRow.getCell(keywords).setComponent(keywordsFilter);
+    keywordsFilter.addValueChangeListener(e -> filterKeywords(e.getValue()));
+    keywordsFilter.setValueChangeMode(ValueChangeMode.EAGER);
+    keywordsFilter.setSizeFull();
     filtersRow.getCell(protocol).setComponent(protocolFilter);
     protocolFilter.addValueChangeListener(e -> filterProtocol(e.getValue()));
     protocolFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -217,8 +217,8 @@ public class SamplesView extends VerticalLayout
   public void localeChange(LocaleChangeEvent event) {
     String nameHeader = getTranslation(SAMPLE_PREFIX + NAME);
     name.setHeader(nameHeader).setFooter(nameHeader);
-    String tagsHeader = getTranslation(SAMPLE_PREFIX + TAGS);
-    tags.setHeader(tagsHeader).setFooter(tagsHeader);
+    String keywordsHeader = getTranslation(SAMPLE_PREFIX + KEYWORDS);
+    keywords.setHeader(keywordsHeader).setFooter(keywordsHeader);
     String protocolHeader = getTranslation(SAMPLE_PREFIX + PROTOCOL);
     protocol.setHeader(protocolHeader).setFooter(protocolHeader);
     String dateHeader = getTranslation(SAMPLE_PREFIX + DATE);
@@ -226,7 +226,7 @@ public class SamplesView extends VerticalLayout
     String ownerHeader = getTranslation(SAMPLE_PREFIX + OWNER);
     owner.setHeader(ownerHeader).setFooter(ownerHeader);
     nameFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
-    tagsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
+    keywordsFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     protocolFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     ownerFilter.setPlaceholder(getTranslation(CONSTANTS_PREFIX + ALL));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
@@ -312,8 +312,8 @@ public class SamplesView extends VerticalLayout
   void merge() {
     List<Sample> samples = this.samples.getSelectedItems().stream()
         .sorted(Comparator.comparing(Sample::getId)).collect(Collectors.toList());
-    Set<String> tags =
-        samples.stream().flatMap(sample -> sample.getTags().stream()).collect(Collectors.toSet());
+    Set<String> keywords = samples.stream().flatMap(sample -> sample.getKeywords().stream())
+        .collect(Collectors.toSet());
     if (samples.isEmpty()) {
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED)).open();
     } else if (!service.isMergable(samples)) {
@@ -321,7 +321,7 @@ public class SamplesView extends VerticalLayout
     } else {
       Dataset dataset = new Dataset();
       dataset.setSamples(samples);
-      dataset.setTags(tags);
+      dataset.setKeywords(keywords);
       dataset.setDate(samples.get(0).getDate());
       dataset.generateName();
       if (datasetService.exists(dataset.getName())) {
@@ -339,8 +339,8 @@ public class SamplesView extends VerticalLayout
     samples.getDataProvider().refreshAll();
   }
 
-  void filterTags(String value) {
-    filter.tagsContains = value.isEmpty() ? null : value;
+  void filterKeywords(String value) {
+    filter.keywordsContains = value.isEmpty() ? null : value;
     samples.getDataProvider().refreshAll();
   }
 

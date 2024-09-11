@@ -100,10 +100,10 @@ public class Sample implements DataWithFiles, Owned, Serializable {
   @Size(max = 255)
   private String treatment;
   /**
-   * Tags.
+   * Keywords.
    */
   @ElementCollection
-  private Set<String> tags;
+  private Set<String> keywords;
   /**
    * True if sample can be edited.
    */
@@ -289,12 +289,12 @@ public class Sample implements DataWithFiles, Owned, Serializable {
     this.name = name;
   }
 
-  public Set<String> getTags() {
-    return tags;
+  public Set<String> getKeywords() {
+    return keywords;
   }
 
-  public void setTags(Set<String> tags) {
-    this.tags = tags;
+  public void setKeywords(Set<String> keywords) {
+    this.keywords = keywords;
   }
 
   public boolean isEditable() {

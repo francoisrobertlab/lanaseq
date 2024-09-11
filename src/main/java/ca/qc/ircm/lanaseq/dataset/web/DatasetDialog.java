@@ -10,10 +10,10 @@ import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
@@ -36,8 +36,8 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
+import ca.qc.ircm.lanaseq.web.KeywordsField;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import ca.qc.ircm.lanaseq.web.TagsField;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
@@ -114,7 +114,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final long serialVersionUID = 3285639770914046262L;
   protected TextField namePrefix = new TextField();
   protected Button generateName = new Button();
-  protected TagsField tags = new TagsField();
+  protected KeywordsField keywords = new KeywordsField();
   protected TextField protocol = new TextField();
   protected TextField assay = new TextField();
   protected TextField type = new TextField();
@@ -158,10 +158,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout datasetForm = new FormLayout(namePrefix, generateName, date, tags, note);
+    FormLayout datasetForm = new FormLayout(namePrefix, generateName, date, keywords, note);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
     datasetForm.setColspan(namePrefix, 3);
-    datasetForm.setColspan(tags, 3);
+    datasetForm.setColspan(keywords, 3);
     datasetForm.setColspan(note, 4);
     FormLayout sampleForm = new FormLayout(protocol, assay, type, target);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
@@ -182,7 +182,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     generateName.setId(id(GENERATE_NAME));
     generateName.setIcon(VaadinIcon.MAGIC.create());
     generateName.addClickListener(e -> generateName());
-    tags.setId(id(TAGS));
+    keywords.setId(id(KEYWORDS));
     protocol.setId(id(PROTOCOL));
     protocol.setReadOnly(true);
     assay.setId(id(ASSAY));
@@ -248,7 +248,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> delete());
-    tags.setSuggestions(service.topTags(50));
+    keywords.setSuggestions(service.topKeywords(50));
     error.setVisible(false);
     setDatasetId(null);
   }
@@ -279,12 +279,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       namePrefix.setValue("");
       namePrefix.setValue(value);
     });
-    binder.forField(tags).bind(TAGS);
+    binder.forField(keywords).bind(KEYWORDS);
     binder.forField(date).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED)).bind(DATE);
     binder.forField(note).withNullRepresentation("").bind(NOTE);
     namePrefix.setLabel(getTranslation(MESSAGE_PREFIX + NAME_PREFIX));
     generateName.setText(getTranslation(MESSAGE_PREFIX + GENERATE_NAME));
-    tags.setLabel(getTranslation(DATASET_PREFIX + TAGS));
+    keywords.setLabel(getTranslation(DATASET_PREFIX + KEYWORDS));
     protocol.setLabel(getTranslation(SAMPLE_PREFIX + PROTOCOL));
     assay.setLabel(getTranslation(SAMPLE_PREFIX + ASSAY));
     type.setLabel(getTranslation(SAMPLE_PREFIX + TYPE));
@@ -454,8 +454,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     if (dataset == null) {
       dataset = new Dataset();
     }
-    if (dataset.getTags() == null) {
-      dataset.setTags(new HashSet<>());
+    if (dataset.getKeywords() == null) {
+      dataset.setKeywords(new HashSet<>());
     }
     if (dataset.getDate() == null) {
       dataset.setDate(LocalDate.now());

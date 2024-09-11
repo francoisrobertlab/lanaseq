@@ -349,6 +349,15 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void filterEmail_value() {
+    assertEquals(9, view.users.getListDataView().getItems().count());
+
+    view.emailFilter.setValue("an");
+
+    assertEquals(3, view.users.getListDataView().getItems().count());
+  }
+
+  @Test
   public void filterEmail_Empty() {
     view.users.setItems(mock(DataProvider.class));
 

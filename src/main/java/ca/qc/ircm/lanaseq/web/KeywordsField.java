@@ -12,20 +12,20 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import java.util.List;
 
 /**
- * List of tags field.
+ * List of keywords field.
  */
-public class TagsField extends MultiSelectComboBox<String> implements LocaleChangeObserver {
-  public static final String CLASS_NAME = "tags-field";
-  public static final String NEW_TAG_REGEX = "[\\w-]*";
-  public static final String NEW_TAG_REGEX_ERROR = "regex";
-  private static final String MESSAGE_PREFIX = messagePrefix(TagsField.class);
+public class KeywordsField extends MultiSelectComboBox<String> implements LocaleChangeObserver {
+  public static final String CLASS_NAME = "keywords-field";
+  public static final String NEW_KEYWORD_REGEX = "[\\w-]*";
+  public static final String NEW_KEYWORD_REGEX_ERROR = "regex";
+  private static final String MESSAGE_PREFIX = messagePrefix(KeywordsField.class);
   private static final long serialVersionUID = -1880458092354113415L;
   private Validator<String> validator;
 
   /**
-   * Creates a tags field.
+   * Creates a keywords field.
    */
-  public TagsField() {
+  public KeywordsField() {
     this.addClassName(CLASS_NAME);
     setItems(List.of());
     setAutoExpand(AutoExpandMode.BOTH);
@@ -45,8 +45,8 @@ public class TagsField extends MultiSelectComboBox<String> implements LocaleChan
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    validator =
-        new RegexpValidator(getTranslation(MESSAGE_PREFIX + NEW_TAG_REGEX_ERROR), NEW_TAG_REGEX);
+    validator = new RegexpValidator(getTranslation(MESSAGE_PREFIX + NEW_KEYWORD_REGEX_ERROR),
+        NEW_KEYWORD_REGEX);
   }
 
   public List<String> getSuggestions() {

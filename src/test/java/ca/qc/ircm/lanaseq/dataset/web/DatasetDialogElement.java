@@ -6,8 +6,8 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.GENERATE_NAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX;
@@ -23,7 +23,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
-import ca.qc.ircm.lanaseq.web.TagsFieldElement;
+import ca.qc.ircm.lanaseq.web.KeywordsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
@@ -56,8 +56,8 @@ public class DatasetDialogElement extends DialogElement {
     return $(ButtonElement.class).id(id(GENERATE_NAME));
   }
 
-  public TagsFieldElement tags() {
-    return $(TagsFieldElement.class).id(id(TAGS));
+  public KeywordsFieldElement keywords() {
+    return $(KeywordsFieldElement.class).id(id(KEYWORDS));
   }
 
   public TextFieldElement protocol() {

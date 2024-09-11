@@ -58,8 +58,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private MessageSource messageSource;
   private String namePrefix = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2";
-  private String tag1 = "mnase";
-  private String tag2 = "ip";
+  private String keyword1 = "mnase";
+  private String keyword2 = "ip";
   private String note = "test note\nsecond line";
   private LocalDate date = LocalDate.of(2020, 07, 20);
 
@@ -73,10 +73,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void fill(DatasetDialogElement dialog) throws InterruptedException {
-    dialog.tags().deselectByText("G24D");
+    dialog.keywords().deselectByText("G24D");
     dialog.namePrefix().setValue(namePrefix);
-    dialog.tags().selectByText(tag1);
-    dialog.tags().selectByText(tag2);
+    dialog.keywords().selectByText(keyword1);
+    dialog.keywords().selectByText(keyword2);
     dialog.note().setValue(note);
     dialog.date().setDate(date);
   }
@@ -91,7 +91,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.namePrefix()).isPresent());
     assertTrue(optional(() -> dialog.generateName()).isPresent());
-    assertTrue(optional(() -> dialog.tags()).isPresent());
+    assertTrue(optional(() -> dialog.keywords()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
     assertTrue(optional(() -> dialog.type()).isPresent());
@@ -135,10 +135,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
         notification.getText());
     dataset = repository.findById(2L).get();
     assertEquals(name, dataset.getName());
-    assertEquals(3, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("chipseq"));
-    assertTrue(dataset.getTags().contains(tag1));
-    assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(3, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("chipseq"));
+    assertTrue(dataset.getKeywords().contains(keyword1));
+    assertTrue(dataset.getKeywords().contains(keyword2));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
@@ -202,10 +202,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
         notification.getText());
     Dataset dataset = repository.findById(2L).get();
     assertEquals(name, dataset.getName());
-    assertEquals(3, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("chipseq"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(3, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("chipseq"));
+    assertTrue(dataset.getKeywords().contains("ip"));
+    assertTrue(dataset.getKeywords().contains("G24D"));
     assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
@@ -263,10 +263,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
         new Object[] { dataset.getName() }, currentLocale()), notification.getText());
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
-    assertEquals(3, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("chipseq"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(3, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("chipseq"));
+    assertTrue(dataset.getKeywords().contains("ip"));
+    assertTrue(dataset.getKeywords().contains("G24D"));
     assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
@@ -335,10 +335,10 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Dataset dataset = repository.findById(2L).get();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
-    assertEquals(3, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("chipseq"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertTrue(dataset.getTags().contains("G24D"));
+    assertEquals(3, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("chipseq"));
+    assertTrue(dataset.getKeywords().contains("ip"));
+    assertTrue(dataset.getKeywords().contains("G24D"));
     assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());

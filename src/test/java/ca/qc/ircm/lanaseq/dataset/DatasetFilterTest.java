@@ -60,53 +60,53 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void test_TagsContains() {
-    filter.tagsContains = "test";
+  public void test_KeywordsContains() {
+    filter.keywordsContains = "test";
 
-    assertTrue(filter.test(tags("My test")));
-    assertTrue(filter.test(tags("Test my")));
-    assertTrue(filter.test(tags("My test my")));
-    assertTrue(filter.test(tags("My TEST my")));
-    assertFalse(filter.test(tags()));
-    assertFalse(filter.test(tags("")));
-    assertFalse(filter.test(tags("christian")));
-    assertTrue(filter.test(tags("My test", "tag1")));
-    assertTrue(filter.test(tags("Test my", "tag1")));
-    assertTrue(filter.test(tags("My test my", "tag1")));
-    assertTrue(filter.test(tags("My TEST my", "tag1")));
-    assertFalse(filter.test(tags("", "tag1")));
-    assertFalse(filter.test(tags("christian", "tag1")));
-    assertTrue(filter.test(tags("tag1", "My test")));
-    assertTrue(filter.test(tags("tag1", "Test my")));
-    assertTrue(filter.test(tags("tag1", "My test my")));
-    assertTrue(filter.test(tags("tag1", "My TEST my")));
-    assertFalse(filter.test(tags("tag1", "")));
-    assertFalse(filter.test(tags("tag1", "christian")));
+    assertTrue(filter.test(keywords("My test")));
+    assertTrue(filter.test(keywords("Test my")));
+    assertTrue(filter.test(keywords("My test my")));
+    assertTrue(filter.test(keywords("My TEST my")));
+    assertFalse(filter.test(keywords()));
+    assertFalse(filter.test(keywords("")));
+    assertFalse(filter.test(keywords("christian")));
+    assertTrue(filter.test(keywords("My test", "keyword1")));
+    assertTrue(filter.test(keywords("Test my", "keyword1")));
+    assertTrue(filter.test(keywords("My test my", "keyword1")));
+    assertTrue(filter.test(keywords("My TEST my", "keyword1")));
+    assertFalse(filter.test(keywords("", "keyword1")));
+    assertFalse(filter.test(keywords("christian", "keyword1")));
+    assertTrue(filter.test(keywords("keyword1", "My test")));
+    assertTrue(filter.test(keywords("keyword1", "Test my")));
+    assertTrue(filter.test(keywords("keyword1", "My test my")));
+    assertTrue(filter.test(keywords("keyword1", "My TEST my")));
+    assertFalse(filter.test(keywords("keyword1", "")));
+    assertFalse(filter.test(keywords("keyword1", "christian")));
   }
 
   @Test
-  public void test_TagsContainsNull() {
-    filter.tagsContains = null;
+  public void test_KeywordsContainsNull() {
+    filter.keywordsContains = null;
 
-    assertTrue(filter.test(tags("My test")));
-    assertTrue(filter.test(tags("Test my")));
-    assertTrue(filter.test(tags("My test my")));
-    assertTrue(filter.test(tags("My TEST my")));
-    assertTrue(filter.test(tags()));
-    assertTrue(filter.test(tags("")));
-    assertTrue(filter.test(tags("christian")));
-    assertTrue(filter.test(tags("My test", "tag1")));
-    assertTrue(filter.test(tags("Test my", "tag1")));
-    assertTrue(filter.test(tags("My test my", "tag1")));
-    assertTrue(filter.test(tags("My TEST my", "tag1")));
-    assertTrue(filter.test(tags("", "tag1")));
-    assertTrue(filter.test(tags("christian", "tag1")));
-    assertTrue(filter.test(tags("tag1", "My test")));
-    assertTrue(filter.test(tags("tag1", "Test my")));
-    assertTrue(filter.test(tags("tag1", "My test my")));
-    assertTrue(filter.test(tags("tag1", "My TEST my")));
-    assertTrue(filter.test(tags("tag1", "")));
-    assertTrue(filter.test(tags("tag1", "christian")));
+    assertTrue(filter.test(keywords("My test")));
+    assertTrue(filter.test(keywords("Test my")));
+    assertTrue(filter.test(keywords("My test my")));
+    assertTrue(filter.test(keywords("My TEST my")));
+    assertTrue(filter.test(keywords()));
+    assertTrue(filter.test(keywords("")));
+    assertTrue(filter.test(keywords("christian")));
+    assertTrue(filter.test(keywords("My test", "keyword1")));
+    assertTrue(filter.test(keywords("Test my", "keyword1")));
+    assertTrue(filter.test(keywords("My test my", "keyword1")));
+    assertTrue(filter.test(keywords("My TEST my", "keyword1")));
+    assertTrue(filter.test(keywords("", "keyword1")));
+    assertTrue(filter.test(keywords("christian", "keyword1")));
+    assertTrue(filter.test(keywords("keyword1", "My test")));
+    assertTrue(filter.test(keywords("keyword1", "Test my")));
+    assertTrue(filter.test(keywords("keyword1", "My test my")));
+    assertTrue(filter.test(keywords("keyword1", "My TEST my")));
+    assertTrue(filter.test(keywords("keyword1", "")));
+    assertTrue(filter.test(keywords("keyword1", "christian")));
   }
 
   @Test
@@ -242,9 +242,9 @@ public class DatasetFilterTest {
     return dataset;
   }
 
-  private Dataset tags(String... tags) {
+  private Dataset keywords(String... keywords) {
     Dataset dataset = new Dataset();
-    dataset.setTags(Stream.of(tags).collect(Collectors.toSet()));
+    dataset.setKeywords(Stream.of(keywords).collect(Collectors.toSet()));
     return dataset;
   }
 
@@ -300,12 +300,12 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_TagsContains() throws Exception {
-    filter.tagsContains = "test";
+  public void predicate_KeywordsContains() throws Exception {
+    filter.keywordsContains = "test";
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.tags.any().contains("test"), predicate);
+    assertEquals(dataset.keywords.any().contains("test"), predicate);
   }
 
   @Test

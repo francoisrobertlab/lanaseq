@@ -175,10 +175,10 @@ public class SampleServiceTest {
     assertEquals("yFR100", sample.getStrain());
     assertEquals("WT", sample.getStrainDescription());
     assertEquals("Rappa", sample.getTreatment());
-    Set<String> tags = sample.getTags();
-    assertEquals(2, tags.size());
-    assertTrue(tags.contains("mnase"));
-    assertTrue(tags.contains("ip"));
+    Set<String> keywords = sample.getKeywords();
+    assertEquals(2, keywords.size());
+    assertTrue(keywords.contains("mnase"));
+    assertTrue(keywords.contains("ip"));
     assertTrue(sample.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 29, 23), sample.getCreationDate());
     assertEquals(LocalDate.of(2018, 10, 20), sample.getDate());
@@ -238,7 +238,7 @@ public class SampleServiceTest {
 
     List<Sample> samples = service.all(filter);
 
-    samples.stream().forEach(sample -> sample.getTags().size());
+    samples.stream().forEach(sample -> sample.getKeywords().size());
     assertEquals(11, samples.size());
     assertEquals((Long) 1L, samples.get(0).getId());
     assertEquals((Long) 2L, samples.get(1).getId());
@@ -749,13 +749,13 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void topTags() {
-    List<String> tags = service.topTags(4);
-    assertEquals(4, tags.size());
-    assertTrue(tags.contains("ip"));
-    assertTrue(tags.contains("chipseq"));
-    assertTrue(tags.contains("G24D"));
-    assertTrue(tags.contains("Spt16"));
+  public void topKeywords() {
+    List<String> keywords = service.topKeywords(4);
+    assertEquals(4, keywords.size());
+    assertTrue(keywords.contains("ip"));
+    assertTrue(keywords.contains("chipseq"));
+    assertTrue(keywords.contains("G24D"));
+    assertTrue(keywords.contains("Spt16"));
   }
 
   @Test
@@ -1126,9 +1126,9 @@ public class SampleServiceTest {
     sample.setProtocol(protocolRepository.findById(1L).get());
     sample.setDate(LocalDate.of(2020, 7, 21));
     sample.setNote("test note");
-    sample.setTags(new HashSet<>());
-    sample.getTags().add("tag1");
-    sample.getTags().add("tag2");
+    sample.setKeywords(new HashSet<>());
+    sample.getKeywords().add("keyword1");
+    sample.getKeywords().add("keyword2");
     sample.generateName();
 
     service.save(sample);
@@ -1145,9 +1145,9 @@ public class SampleServiceTest {
     assertEquals("F56G", sample.getStrainDescription());
     assertEquals("37C", sample.getTreatment());
     assertEquals("test note", sample.getNote());
-    assertEquals(2, sample.getTags().size());
-    assertTrue(sample.getTags().contains("tag1"));
-    assertTrue(sample.getTags().contains("tag2"));
+    assertEquals(2, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains("keyword1"));
+    assertTrue(sample.getKeywords().contains("keyword2"));
     assertEquals((Long) 1L, sample.getProtocol().getId());
     assertEquals(user.getId(), sample.getOwner().getId());
     assertTrue(sample.isEditable());
@@ -1197,9 +1197,9 @@ public class SampleServiceTest {
     sample.setProtocol(protocolRepository.findById(3L).get());
     sample.setDate(LocalDate.of(2020, 7, 21));
     sample.setNote("test note");
-    sample.getTags().remove("ip");
-    sample.getTags().add("tag1");
-    sample.getTags().add("tag2");
+    sample.getKeywords().remove("ip");
+    sample.getKeywords().add("keyword1");
+    sample.getKeywords().add("keyword2");
     sample.generateName();
 
     service.save(sample);
@@ -1215,10 +1215,10 @@ public class SampleServiceTest {
     assertEquals("F56G", sample.getStrainDescription());
     assertEquals("37C", sample.getTreatment());
     assertEquals("test note", sample.getNote());
-    assertEquals(3, sample.getTags().size());
-    assertTrue(sample.getTags().contains("mnase"));
-    assertTrue(sample.getTags().contains("tag1"));
-    assertTrue(sample.getTags().contains("tag2"));
+    assertEquals(3, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains("mnase"));
+    assertTrue(sample.getKeywords().contains("keyword1"));
+    assertTrue(sample.getKeywords().contains("keyword2"));
     assertEquals((Long) 3L, sample.getProtocol().getId());
     assertEquals((Long) 2L, sample.getOwner().getId());
     assertTrue(sample.isEditable());

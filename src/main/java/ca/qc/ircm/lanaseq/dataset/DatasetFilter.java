@@ -1,7 +1,7 @@
 package ca.qc.ircm.lanaseq.dataset;
 
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ID;
 import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -22,7 +22,7 @@ import org.springframework.data.domain.Sort.Direction;
  */
 public class DatasetFilter implements Predicate<Dataset> {
   public String nameContains;
-  public String tagsContains;
+  public String keywordsContains;
   public String protocolContains;
   public Range<LocalDate> dateRange;
   public String ownerContains;
@@ -36,9 +36,10 @@ public class DatasetFilter implements Predicate<Dataset> {
     if (nameContains != null) {
       test &= comparable(replaceNull(dataset.getName())).contains(comparable(nameContains));
     }
-    if (tagsContains != null) {
-      test &= dataset.getTags().stream()
-          .filter(tag -> comparable(tag).contains(comparable(tagsContains))).findAny().isPresent();
+    if (keywordsContains != null) {
+      test &= dataset.getKeywords().stream()
+          .filter(keyword -> comparable(keyword).contains(comparable(keywordsContains))).findAny()
+          .isPresent();
     }
     if (protocolContains != null) {
       Sample sample = dataset.getSamples() != null
@@ -69,8 +70,8 @@ public class DatasetFilter implements Predicate<Dataset> {
     if (nameContains != null) {
       predicate.and(dataset.name.contains(nameContains));
     }
-    if (tagsContains != null) {
-      predicate.and(dataset.tags.any().contains(tagsContains));
+    if (keywordsContains != null) {
+      predicate.and(dataset.keywords.any().contains(keywordsContains));
     }
     if (protocolContains != null) {
       predicate.and(dataset.samples.any().protocol.name.contains(protocolContains));

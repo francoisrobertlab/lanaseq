@@ -235,23 +235,23 @@ public class SampleService {
   }
 
   /**
-   * Returns most recent tags.
+   * Returns most recent keywords.
    *
    * @param limit
-   *          maximum number of tags to return
-   * @return most recent tags
+   *          maximum number of keywords to return
+   * @return most recent keywords
    */
-  public List<String> topTags(int limit) {
-    Set<String> tags = new LinkedHashSet<>();
+  public List<String> topKeywords(int limit) {
+    Set<String> keywords = new LinkedHashSet<>();
     int page = 0;
-    while (tags.size() < limit) {
+    while (keywords.size() < limit) {
       Page<Sample> samples = repository.findAllByOrderByIdDesc(PageRequest.of(page++, 50));
       if (samples.isEmpty()) {
         break; // No more samples.
       }
-      tags.addAll(samples.flatMap(s -> s.getTags().stream()).toList());
+      keywords.addAll(samples.flatMap(s -> s.getKeywords().stream()).toList());
     }
-    return tags.stream().limit(limit).collect(Collectors.toCollection(ArrayList::new));
+    return keywords.stream().limit(limit).collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**

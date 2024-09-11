@@ -9,9 +9,9 @@ import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.TAGS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETE_HEADER;
@@ -132,11 +132,11 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   private SampleRepository sampleRepository;
   private Locale locale = Locale.ENGLISH;
   private List<Sample> samples;
-  private List<String> topTags = new ArrayList<>();
+  private List<String> topKeywords = new ArrayList<>();
   private DateTimeFormatter nameDateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
   private String namePrefix = "ChIPseq_IP_polr3a_yFR20_WT_37C_testsample1-testsample2";
-  private String tag1 = "Tag 1";
-  private String tag2 = "Tag 2";
+  private String keyword1 = "Keyword 1";
+  private String keyword2 = "Keyword 2";
   private LocalDate date = LocalDate.of(2020, 7, 20);
   private String note = "test note\nsecond line";
 
@@ -148,9 +148,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     when(service.get(any())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     samples = sampleRepository.findAll();
-    topTags.add("input");
-    topTags.add("chip");
-    when(service.topTags(anyInt())).thenReturn(topTags);
+    topKeywords.add("input");
+    topKeywords.add("chip");
+    when(service.topKeywords(anyInt())).thenReturn(topKeywords);
     UI.getCurrent().setLocale(locale);
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
@@ -166,7 +166,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   private void fillForm() {
     dialog.namePrefix.setValue(namePrefix);
-    dialog.tags.setValue(Stream.of(tag1, tag2).collect(Collectors.toSet()));
+    dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
     dialog.date.setValue(date);
     dialog.note.setValue(note);
   }
@@ -177,7 +177,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(id(NAME_PREFIX), dialog.namePrefix.getId().orElse(""));
     assertEquals(id(GENERATE_NAME), dialog.generateName.getId().orElse(""));
     validateIcon(VaadinIcon.MAGIC.create(), dialog.generateName.getIcon());
-    assertEquals(id(TAGS), dialog.tags.getId().orElse(""));
+    assertEquals(id(KEYWORDS), dialog.keywords.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
     assertEquals(id(TYPE), dialog.type.getId().orElse(""));
@@ -216,7 +216,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + NAME_PREFIX), dialog.namePrefix.getLabel());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + GENERATE_NAME),
         dialog.generateName.getText());
-    assertEquals(dialog.getTranslation(DATASET_PREFIX + TAGS), dialog.tags.getLabel());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + KEYWORDS), dialog.keywords.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + PROTOCOL), dialog.protocol.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
@@ -255,7 +255,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + NAME_PREFIX), dialog.namePrefix.getLabel());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + GENERATE_NAME),
         dialog.generateName.getText());
-    assertEquals(dialog.getTranslation(DATASET_PREFIX + TAGS), dialog.tags.getLabel());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + KEYWORDS), dialog.keywords.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + PROTOCOL), dialog.protocol.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
@@ -285,11 +285,11 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void tags() {
-    List<String> tags = dialog.tags.getSuggestions();
-    assertEquals(topTags.size(), tags.size());
-    for (String tag : topTags) {
-      assertTrue(tags.contains(tag));
+  public void keywords() {
+    List<String> keywords = dialog.keywords.getSuggestions();
+    assertEquals(topKeywords.size(), keywords.size());
+    for (String keyword : topKeywords) {
+      assertTrue(keywords.contains(keyword));
     }
   }
 
@@ -486,7 +486,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2", dialog.namePrefix.getValue());
     assertFalse(dialog.namePrefix.isReadOnly());
     assertTrue(dialog.generateName.isVisible());
-    assertFalse(dialog.tags.isReadOnly());
+    assertFalse(dialog.keywords.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -533,7 +533,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals("ChIPseq_IP_yBC102_R103S_BC1-BC2", dialog.namePrefix.getValue());
     assertTrue(dialog.namePrefix.isReadOnly());
     assertFalse(dialog.generateName.isVisible());
-    assertTrue(dialog.tags.isReadOnly());
+    assertTrue(dialog.keywords.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -572,7 +572,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals("ChIPseq_IP_polr2b_yBC103_WT_BC1", dialog.namePrefix.getValue());
     assertTrue(dialog.namePrefix.isReadOnly());
     assertFalse(dialog.generateName.isVisible());
-    assertTrue(dialog.tags.isReadOnly());
+    assertTrue(dialog.keywords.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -644,7 +644,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals("", dialog.namePrefix.getValue());
     assertFalse(dialog.namePrefix.isReadOnly());
     assertTrue(dialog.generateName.isVisible());
-    assertFalse(dialog.tags.isReadOnly());
+    assertFalse(dialog.keywords.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -667,7 +667,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void requiredIndicator() {
     assertTrue(dialog.namePrefix.isRequiredIndicatorVisible());
-    assertFalse(dialog.tags.isRequiredIndicatorVisible());
+    assertFalse(dialog.keywords.isRequiredIndicatorVisible());
     assertTrue(dialog.date.isRequiredIndicatorVisible());
     assertFalse(dialog.note.isRequiredIndicatorVisible());
   }
@@ -808,10 +808,10 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void save_TagsEmpty() {
+  public void save_KeywordsEmpty() {
     dialog.addSavedListener(savedListener);
     fillForm();
-    dialog.tags.setValue(new HashSet<>());
+    dialog.keywords.setValue(new HashSet<>());
 
     clickButton(dialog.save);
 
@@ -819,7 +819,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertTrue(status.isOk());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertTrue(dataset.getTags().isEmpty());
+    assertTrue(dataset.getKeywords().isEmpty());
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
         test(notification).getText());
@@ -915,9 +915,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertEquals(namePrefix + "_" + nameDateFormatter.format(date), dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains(tag1));
-    assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains(keyword1));
+    assertTrue(dataset.getKeywords().contains(keyword2));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(0, dataset.getSamples().size());
@@ -940,9 +940,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     verify(service).save(datasetCaptor.capture());
     dataset = datasetCaptor.getValue();
     assertEquals(namePrefix + "_" + nameDateFormatter.format(date), dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains(tag1));
-    assertTrue(dataset.getTags().contains(tag2));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains(keyword1));
+    assertTrue(dataset.getKeywords().contains(keyword2));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(2, dataset.getSamples().size());

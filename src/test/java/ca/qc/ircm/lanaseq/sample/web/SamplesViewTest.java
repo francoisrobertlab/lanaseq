@@ -8,10 +8,10 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ANALYZE;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.ID;
@@ -40,7 +40,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
-import ca.qc.ircm.lanaseq.dataset.DatasetProperties;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -158,8 +157,10 @@ public class SamplesViewTest extends SpringUIUnitTest {
     FooterRow footerRow = view.samples.getFooterRows().get(0);
     assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), headerRow.getCell(view.name).getText());
     assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), footerRow.getCell(view.name).getText());
-    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), headerRow.getCell(view.tags).getText());
-    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), footerRow.getCell(view.tags).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + KEYWORDS),
+        headerRow.getCell(view.keywords).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + KEYWORDS),
+        footerRow.getCell(view.keywords).getText());
     assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
         headerRow.getCell(view.protocol).getText());
     assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
@@ -171,7 +172,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(SAMPLE_PREFIX + OWNER),
         footerRow.getCell(view.owner).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.keywordsFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
@@ -189,8 +190,10 @@ public class SamplesViewTest extends SpringUIUnitTest {
     FooterRow footerRow = view.samples.getFooterRows().get(0);
     assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), headerRow.getCell(view.name).getText());
     assertEquals(view.getTranslation(SAMPLE_PREFIX + NAME), footerRow.getCell(view.name).getText());
-    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), headerRow.getCell(view.tags).getText());
-    assertEquals(view.getTranslation(SAMPLE_PREFIX + TAGS), footerRow.getCell(view.tags).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + KEYWORDS),
+        headerRow.getCell(view.keywords).getText());
+    assertEquals(view.getTranslation(SAMPLE_PREFIX + KEYWORDS),
+        footerRow.getCell(view.keywords).getText());
     assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
         headerRow.getCell(view.protocol).getText());
     assertEquals(view.getTranslation(SAMPLE_PREFIX + PROTOCOL),
@@ -202,7 +205,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(SAMPLE_PREFIX + OWNER),
         footerRow.getCell(view.owner).getText());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.nameFilter.getPlaceholder());
-    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.tagsFilter.getPlaceholder());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.keywordsFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.protocolFilter.getPlaceholder());
     assertEquals(view.getTranslation(CONSTANTS_PREFIX + ALL), view.ownerFilter.getPlaceholder());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + ADD), view.add.getText());
@@ -225,8 +228,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(NAME, view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING)
         .findFirst().map(so -> so.getSorted()).orElse(null));
     assertTrue(view.name.isSortable());
-    assertNotNull(view.samples.getColumnByKey(DatasetProperties.TAGS));
-    assertFalse(view.tags.isSortable());
+    assertNotNull(view.samples.getColumnByKey(KEYWORDS));
+    assertFalse(view.keywords.isSortable());
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
     assertEquals(PROTOCOL + "." + NAME, view.samples.getColumnByKey(PROTOCOL)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
@@ -260,8 +263,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
       Sample sample = samples.get(i);
       assertEquals(sample.getName(),
           test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.name)));
-      assertEquals(sample.getTags().stream().collect(Collectors.joining(", ")),
-          test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.tags)));
+      assertEquals(sample.getKeywords().stream().collect(Collectors.joining(", ")),
+          test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.keywords)));
       assertEquals(sample.getProtocol().getName(),
           test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.protocol)));
       assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(sample.getDate()),
@@ -401,24 +404,24 @@ public class SamplesViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filterTags() {
+  public void filterKeywords() {
     view.samples.setItems(mock(DataProvider.class));
 
-    view.tagsFilter.setValue("test");
+    view.keywordsFilter.setValue("test");
 
     verify(view.samples.getDataProvider()).refreshAll();
-    assertEquals("test", view.filter().tagsContains);
+    assertEquals("test", view.filter().keywordsContains);
   }
 
   @Test
-  public void filterTags_Empty() {
+  public void filterKeywords_Empty() {
     view.samples.setItems(mock(DataProvider.class));
-    view.tagsFilter.setValue("test");
+    view.keywordsFilter.setValue("test");
 
-    view.tagsFilter.setValue("");
+    view.keywordsFilter.setValue("");
 
     verify(view.samples.getDataProvider(), times(2)).refreshAll();
-    assertNull(view.filter().tagsContains);
+    assertNull(view.filter().keywordsContains);
   }
 
   @Test
@@ -591,9 +594,9 @@ public class SamplesViewTest extends SpringUIUnitTest {
     verify(datasetService).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("mnase"));
+    assertTrue(dataset.getKeywords().contains("ip"));
     assertEquals(2, dataset.getSamples().size());
     assertEquals(samples.get(0), dataset.getSamples().get(0));
     assertEquals(samples.get(1), dataset.getSamples().get(1));
@@ -618,9 +621,9 @@ public class SamplesViewTest extends SpringUIUnitTest {
     verify(datasetService).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("mnase"));
+    assertTrue(dataset.getKeywords().contains("ip"));
     assertEquals(2, dataset.getSamples().size());
     assertEquals(samples.get(0), dataset.getSamples().get(0));
     assertEquals(samples.get(1), dataset.getSamples().get(1));

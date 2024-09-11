@@ -11,13 +11,13 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NOTE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.REPLICATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.SAMPLE_ID;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.TAGS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
@@ -121,7 +121,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Autowired
   private JPAQueryFactory jpaQueryFactory;
   private Locale locale = Locale.ENGLISH;
-  private List<String> topTags = new ArrayList<>();
+  private List<String> topKeywords = new ArrayList<>();
   private List<String> topAssays = new ArrayList<>();
   private List<String> topTypes = new ArrayList<>();
   private String sampleId = "Test Sample";
@@ -135,8 +135,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
   private String treatment = "37C";
   private LocalDate date = LocalDate.of(2020, 7, 20);
   private String note = "test note\nsecond line";
-  private String tag1 = "Tag 1";
-  private String tag2 = "Tag 2";
+  private String keyword1 = "Keyword 1";
+  private String keyword2 = "Keyword 2";
 
   /**
    * Before test.
@@ -152,10 +152,10 @@ public class SampleDialogTest extends SpringUIUnitTest {
     when(service.topTypes(anyInt())).thenReturn(topTypes);
     when(protocolService.all()).thenReturn(protocolRepository.findAll());
     protocol = protocolRepository.findById(1L).get();
-    topTags.add("input");
-    topTags.add("chip");
+    topKeywords.add("input");
+    topKeywords.add("chip");
     topTypes.add("ip_ms");
-    when(service.topTags(anyInt())).thenReturn(topTags);
+    when(service.topKeywords(anyInt())).thenReturn(topKeywords);
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
@@ -174,7 +174,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     dialog.strain.setValue(strain);
     dialog.strainDescription.setValue(strainDescription);
     dialog.treatment.setValue(treatment);
-    dialog.tags.setValue(Stream.of(tag1, tag2).collect(Collectors.toSet()));
+    dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
     dialog.note.setValue(note);
   }
 
@@ -191,7 +191,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(id(STRAIN), dialog.strain.getId().orElse(""));
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
-    assertEquals(id(TAGS), dialog.tags.getId().orElse(""));
+    assertEquals(id(KEYWORDS), dialog.keywords.getId().orElse(""));
     assertEquals(id(NOTE), dialog.note.getId().orElse(""));
     assertEquals(id(ERROR_TEXT), dialog.error.getId().orElse(""));
     assertFalse(dialog.error.isVisible());
@@ -238,7 +238,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TREATMENT), dialog.treatment.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TAGS), dialog.tags.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + KEYWORDS), dialog.keywords.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
@@ -279,7 +279,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TREATMENT), dialog.treatment.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)),
         dialog.treatment.getPlaceholder());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TAGS), dialog.tags.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + KEYWORDS), dialog.keywords.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
@@ -304,7 +304,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.strain.isRequiredIndicatorVisible());
     assertFalse(dialog.strainDescription.isRequiredIndicatorVisible());
     assertFalse(dialog.treatment.isRequiredIndicatorVisible());
-    assertFalse(dialog.tags.isRequiredIndicatorVisible());
+    assertFalse(dialog.keywords.isRequiredIndicatorVisible());
     assertFalse(dialog.note.isRequiredIndicatorVisible());
   }
 
@@ -355,11 +355,11 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void tags() {
-    List<String> tags = dialog.tags.getSuggestions();
-    assertEquals(topTags.size(), tags.size());
-    for (String tag : topTags) {
-      assertTrue(tags.contains(tag));
+  public void keywords() {
+    List<String> keywords = dialog.keywords.getSuggestions();
+    assertEquals(topKeywords.size(), keywords.size());
+    for (String keyword : topKeywords) {
+      assertTrue(keywords.contains(keyword));
     }
   }
 
@@ -429,7 +429,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.tags.isReadOnly());
+    assertFalse(dialog.keywords.isReadOnly());
     assertFalse(dialog.note.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -469,7 +469,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals("Rappa", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
-    assertTrue(dialog.tags.isReadOnly());
+    assertTrue(dialog.keywords.isReadOnly());
     assertTrue(dialog.note.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -504,7 +504,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals("", dialog.treatment.getValue());
     assertTrue(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
-    assertTrue(dialog.tags.isReadOnly());
+    assertTrue(dialog.keywords.isReadOnly());
     assertTrue(dialog.note.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -555,7 +555,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals("", dialog.treatment.getValue());
     assertFalse(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
-    assertFalse(dialog.tags.isReadOnly());
+    assertFalse(dialog.keywords.isReadOnly());
     assertFalse(dialog.note.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -851,11 +851,11 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void save_TagsEmpty() {
+  public void save_KeywordsEmpty() {
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
     fillForm();
-    dialog.tags.setValue(new HashSet<>());
+    dialog.keywords.setValue(new HashSet<>());
 
     clickButton(dialog.save);
 
@@ -936,9 +936,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     assertEquals(note, sample.getNote());
-    assertEquals(2, sample.getTags().size());
-    assertTrue(sample.getTags().contains(tag1));
-    assertTrue(sample.getTags().contains(tag2));
+    assertEquals(2, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains(keyword1));
+    assertTrue(sample.getKeywords().contains(keyword2));
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
@@ -971,9 +971,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(strainDescription, sample.getStrainDescription());
     assertEquals(treatment, sample.getTreatment());
     assertEquals(note, sample.getNote());
-    assertEquals(2, sample.getTags().size());
-    assertTrue(sample.getTags().contains(tag1));
-    assertTrue(sample.getTags().contains(tag2));
+    assertEquals(2, sample.getKeywords().size());
+    assertTrue(sample.getKeywords().contains(keyword1));
+    assertTrue(sample.getKeywords().contains(keyword2));
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),

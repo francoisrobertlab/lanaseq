@@ -156,7 +156,7 @@ public class DatasetServiceTest {
   }
 
   private void detach(Dataset dataset) {
-    dataset.getTags().size();
+    dataset.getKeywords().size();
     dataset.getSamples().forEach(sample -> entityManager.detach(sample));
     entityManager.detach(dataset);
   }
@@ -167,9 +167,9 @@ public class DatasetServiceTest {
 
     assertEquals((Long) 1L, dataset.getId());
     assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("mnase"));
+    assertTrue(dataset.getKeywords().contains("ip"));
     assertEquals("robtools version 2", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertTrue(dataset.isEditable());
@@ -232,7 +232,7 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all(filter);
 
-    datasets.stream().forEach(dataset -> dataset.getTags().size());
+    datasets.stream().forEach(dataset -> dataset.getKeywords().size());
     datasets.stream().forEach(
         dataset -> dataset.getSamples().stream().forEach(sample -> sample.getProtocol().getName()));
     assertEquals(8, datasets.size());
@@ -730,13 +730,13 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void topTags() {
-    List<String> tags = service.topTags(4);
-    assertEquals(4, tags.size());
-    assertTrue(tags.contains("ip"));
-    assertTrue(tags.contains("chipseq"));
-    assertTrue(tags.contains("G24D"));
-    assertTrue(tags.contains("Spt16"));
+  public void topKeywords() {
+    List<String> keywords = service.topKeywords(4);
+    assertEquals(4, keywords.size());
+    assertTrue(keywords.contains("ip"));
+    assertTrue(keywords.contains("chipseq"));
+    assertTrue(keywords.contains("G24D"));
+    assertTrue(keywords.contains("Spt16"));
   }
 
   @Test
@@ -768,9 +768,9 @@ public class DatasetServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
-    dataset.setTags(new HashSet<>());
-    dataset.getTags().add("tag1");
-    dataset.getTags().add("tag2");
+    dataset.setKeywords(new HashSet<>());
+    dataset.getKeywords().add("keyword1");
+    dataset.getKeywords().add("keyword2");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     dataset.setNote("test note");
@@ -784,9 +784,9 @@ public class DatasetServiceTest {
     assertNotNull(dataset.getId());
     dataset = repository.findById(dataset.getId()).orElse(null);
     assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20200721", dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("tag1"));
-    assertTrue(dataset.getTags().contains("tag2"));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("keyword1"));
+    assertTrue(dataset.getKeywords().contains("keyword2"));
     assertEquals("test note", dataset.getNote());
     assertEquals(user.getId(), dataset.getOwner().getId());
     assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
@@ -805,9 +805,9 @@ public class DatasetServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
-    dataset.setTags(new HashSet<>());
-    dataset.getTags().add("tag1");
-    dataset.getTags().add("tag2");
+    dataset.setKeywords(new HashSet<>());
+    dataset.getKeywords().add("keyword1");
+    dataset.getKeywords().add("keyword2");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     dataset.setNote("test note");
@@ -836,9 +836,9 @@ public class DatasetServiceTest {
     User user = userRepository.findById(3L).orElse(null);
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = new Dataset();
-    dataset.setTags(new HashSet<>());
-    dataset.getTags().add("tag1");
-    dataset.getTags().add("tag2");
+    dataset.setKeywords(new HashSet<>());
+    dataset.getKeywords().add("keyword1");
+    dataset.getKeywords().add("keyword2");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     dataset.setNote("test note");
@@ -855,8 +855,8 @@ public class DatasetServiceTest {
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
-    dataset.getTags().remove("rappa");
-    dataset.getTags().add("tag1");
+    dataset.getKeywords().remove("rappa");
+    dataset.getKeywords().add("keyword1");
     dataset.setNote("test note");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     Sample sample1 = dataset.getSamples().get(0);
@@ -886,10 +886,10 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR3-JS1_20200721",
         dataset.getName());
-    assertEquals(3, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertTrue(dataset.getTags().contains("tag1"));
+    assertEquals(3, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("mnase"));
+    assertTrue(dataset.getKeywords().contains("ip"));
+    assertTrue(dataset.getKeywords().contains("keyword1"));
     assertEquals("test note", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDate.of(2020, 7, 21), dataset.getDate());
@@ -907,8 +907,8 @@ public class DatasetServiceTest {
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     detach(dataset);
-    dataset.getTags().remove("rappa");
-    dataset.getTags().add("tag1");
+    dataset.getKeywords().remove("rappa");
+    dataset.getKeywords().add("keyword1");
     dataset.setNote("test note");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     Sample newSample = new Sample();
@@ -959,9 +959,9 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElse(null);
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
-    assertEquals(2, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
+    assertEquals(2, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("mnase"));
+    assertTrue(dataset.getKeywords().contains("ip"));
     assertEquals("robtools version 2", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertTrue(dataset.isEditable());
@@ -1193,8 +1193,8 @@ public class DatasetServiceTest {
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Dataset dataset = repository.findById(1L).orElse(null);
     dataset.setName("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020");
-    dataset.getTags().remove("rappa");
-    dataset.getTags().add("tag1");
+    dataset.getKeywords().remove("rappa");
+    dataset.getKeywords().add("keyword1");
     dataset.setNote("test note");
     Sample sample1 = dataset.getSamples().get(0);
     sample1.setEditable(false);
@@ -1204,10 +1204,10 @@ public class DatasetServiceTest {
     repository.flush();
     dataset = repository.findById(1L).orElse(null);
     assertEquals("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020", dataset.getName());
-    assertEquals(3, dataset.getTags().size());
-    assertTrue(dataset.getTags().contains("mnase"));
-    assertTrue(dataset.getTags().contains("ip"));
-    assertTrue(dataset.getTags().contains("tag1"));
+    assertEquals(3, dataset.getKeywords().size());
+    assertTrue(dataset.getKeywords().contains("mnase"));
+    assertTrue(dataset.getKeywords().contains("ip"));
+    assertTrue(dataset.getKeywords().contains("keyword1"));
     assertEquals("test note", dataset.getNote());
     assertEquals((Long) 2L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
