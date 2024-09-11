@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -1437,6 +1438,912 @@ public class AnalysisServiceTest {
     assertThrows(IllegalArgumentException.class, () -> {
       service.copyDatasetsResources(new ArrayList<>());
     });
+  }
+
+  @Test
+  public void copyDatasetsResources_Fastq() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+
+    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(8, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_NoFastq() throws Throwable {
+    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(2, Files.list(folder).count());
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_Fastq_Symlinks() throws Throwable {
+    assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
+    when(configuration.isAnalysisSymlinks()).thenReturn(true);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+
+    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(8, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertTrue(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertTrue(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertTrue(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertTrue(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertTrue(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertTrue(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_Fastq_Zip() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
+        secondPairedZipPaths);
+    final byte[] fastq1Content = writeRandom(pairedZip1);
+    final byte[] fastq2Content = writeRandom(pairedZip2);
+    final byte[] fastq3Content = writeRandom(secondPairedZip1);
+    final byte[] fastq4Content = writeRandom(secondPairedZip2);
+    final byte[] fastq5Content = writeRandom(thirdPairedZip1);
+    final byte[] fastq6Content = writeRandom(thirdPairedZip2);
+
+    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq*"));
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(8, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_Fastq_Bam() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    final byte[] bamContent = writeRandom(bam);
+    final byte[] bam2Content = writeRandom(bam2);
+    final byte[] rawbamContent = writeRandom(rawbam);
+    pairedPaths.add(bam);
+    pairedPaths.add(bam2);
+    pairedPaths.add(rawbam);
+    final byte[] secondBamContent = writeRandom(secondBam);
+    final byte[] secondBam2Content = writeRandom(secondBam2);
+    final byte[] secondRawbamContent = writeRandom(secondRawbam);
+    secondPairedPaths.add(secondBam);
+    secondPairedPaths.add(secondBam2);
+    secondPairedPaths.add(secondRawbam);
+    final byte[] thirdBamContent = writeRandom(thirdBam);
+    final byte[] thirdBam2Content = writeRandom(thirdBam2);
+    final byte[] thirdRawbamContent = writeRandom(thirdRawbam);
+    thirdPairedPaths.add(thirdBam);
+    thirdPairedPaths.add(thirdBam2);
+    thirdPairedPaths.add(thirdRawbam);
+
+    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq", "*.bam"));
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(17, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path bam1 = folder.resolve(sample.getName() + ".bam");
+    assertTrue(Files.exists(bam1));
+    assertFalse(Files.isSymbolicLink(bam1));
+    assertArrayEquals(bamContent, Files.readAllBytes(bam1));
+    Path bam2 = folder.resolve(sample.getName() + "-test.bam");
+    assertTrue(Files.exists(bam2));
+    assertFalse(Files.isSymbolicLink(bam2));
+    assertArrayEquals(bam2Content, Files.readAllBytes(bam2));
+    Path bam3 = folder.resolve(sample.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam3));
+    assertFalse(Files.isSymbolicLink(bam3));
+    assertArrayEquals(rawbamContent, Files.readAllBytes(bam3));
+    Path bam4 = folder.resolve(sample2.getName() + ".bam");
+    assertTrue(Files.exists(bam4));
+    assertFalse(Files.isSymbolicLink(bam4));
+    assertArrayEquals(secondBamContent, Files.readAllBytes(bam4));
+    Path bam5 = folder.resolve(sample2.getName() + "-test.bam");
+    assertTrue(Files.exists(bam5));
+    assertFalse(Files.isSymbolicLink(bam5));
+    assertArrayEquals(secondBam2Content, Files.readAllBytes(bam5));
+    Path bam6 = folder.resolve(sample2.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam6));
+    assertFalse(Files.isSymbolicLink(bam6));
+    assertArrayEquals(secondRawbamContent, Files.readAllBytes(bam6));
+    Path bam7 = folder.resolve(sample3.getName() + ".bam");
+    assertTrue(Files.exists(bam7));
+    assertFalse(Files.isSymbolicLink(bam7));
+    assertArrayEquals(thirdBamContent, Files.readAllBytes(bam7));
+    Path bam8 = folder.resolve(sample3.getName() + "-test.bam");
+    assertTrue(Files.exists(bam8));
+    assertFalse(Files.isSymbolicLink(bam8));
+    assertArrayEquals(thirdBam2Content, Files.readAllBytes(bam8));
+    Path bam9 = folder.resolve(sample3.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam9));
+    assertFalse(Files.isSymbolicLink(bam9));
+    assertArrayEquals(thirdRawbamContent, Files.readAllBytes(bam9));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_Fastq_FolderAlreadyExists() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    Path folder = configuration.getAnalysis().folder(datasets);
+    String extraFilename = "test.bam";
+    Files.createDirectories(folder);
+    Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
+    Files.write(folder.resolve(extraFilename), fastq1Content);
+
+    Path copyFolder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+
+    assertEquals(folder, copyFolder);
+    assertFalse(Files.exists(folder.resolve(extraFilename)));
+    assertTrue(Files.exists(folder));
+    assertEquals(8, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_SameSamples() throws Throwable {
+    List<Dataset> datasets = new ArrayList<>();
+    datasets.add(datasetRepository.findById(2L).get());
+    datasets.add(datasetRepository.findById(6L).get());
+
+    Path folder = service.copyDatasetsResources(datasets, new ArrayList<>());
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(2, Files.list(folder).count());
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(3, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022", samplesContent.get(1));
+    assertEquals("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022", samplesContent.get(2));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(
+        "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022\tJS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022\t"
+            + "JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022",
+        datasetMetaContent.get(1));
+    assertEquals(
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208\tJS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022",
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_NullDatasets() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copyDatasetsResources(null, new ArrayList<>());
+    });
+  }
+
+  @Test
+  public void copyDatasetsResources_EmptyDatasets() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copyDatasetsResources(new ArrayList<>(), new ArrayList<>());
+    });
+  }
+
+  @Test
+  public void copyDatasetsResources_NullFilenamePatterns() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    Files.createFile(paired1);
+    Files.createFile(paired2);
+    Files.createFile(secondPaired1);
+    Files.createFile(secondPaired2);
+    Files.createFile(thirdPaired1);
+    Files.createFile(thirdPaired2);
+
+    Path folder = service.copyDatasetsResources(datasets, null);
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(2, Files.list(folder).count());
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copyDatasetsResources_EmptyFilenamePattern() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    Files.createFile(paired1);
+    Files.createFile(paired2);
+    Files.createFile(secondPaired1);
+    Files.createFile(secondPaired2);
+    Files.createFile(thirdPaired1);
+    Files.createFile(thirdPaired2);
+
+    Path folder = service.copyDatasetsResources(datasets, new ArrayList<>());
+
+    assertEquals(configuration.getAnalysis().folder(datasets), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(2, Files.list(folder).count());
+    Sample sample3 = datasets.get(0).getSamples().get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
+        datasetMetaContent.get(1));
+    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(2));
+  }
+
+  @Test
+  public void copySamplesResources_Fastq() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+
+    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(7, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_NoFastq() throws Throwable {
+    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(1, Files.list(folder).count());
+    Sample sample3 = samples.get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_Fastq_Symlinks() throws Throwable {
+    assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
+    when(configuration.isAnalysisSymlinks()).thenReturn(true);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+
+    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(7, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertTrue(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertTrue(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertTrue(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertTrue(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertTrue(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertTrue(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_Fastq_Zip() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
+        secondPairedZipPaths);
+    final byte[] fastq1Content = writeRandom(pairedZip1);
+    final byte[] fastq2Content = writeRandom(pairedZip2);
+    final byte[] fastq3Content = writeRandom(secondPairedZip1);
+    final byte[] fastq4Content = writeRandom(secondPairedZip2);
+    final byte[] fastq5Content = writeRandom(thirdPairedZip1);
+    final byte[] fastq6Content = writeRandom(thirdPairedZip2);
+
+    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq*"));
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(7, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq.gz");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq.gz");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_Fastq_Bam() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    final byte[] bamContent = writeRandom(bam);
+    final byte[] bam2Content = writeRandom(bam2);
+    final byte[] rawbamContent = writeRandom(rawbam);
+    pairedPaths.add(bam);
+    pairedPaths.add(bam2);
+    pairedPaths.add(rawbam);
+    final byte[] secondBamContent = writeRandom(secondBam);
+    final byte[] secondBam2Content = writeRandom(secondBam2);
+    final byte[] secondRawbamContent = writeRandom(secondRawbam);
+    secondPairedPaths.add(secondBam);
+    secondPairedPaths.add(secondBam2);
+    secondPairedPaths.add(secondRawbam);
+    final byte[] thirdBamContent = writeRandom(thirdBam);
+    final byte[] thirdBam2Content = writeRandom(thirdBam2);
+    final byte[] thirdRawbamContent = writeRandom(thirdRawbam);
+    thirdPairedPaths.add(thirdBam);
+    thirdPairedPaths.add(thirdBam2);
+    thirdPairedPaths.add(thirdRawbam);
+
+    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq", "*.bam"));
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(16, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path bam1 = folder.resolve(sample.getName() + ".bam");
+    assertTrue(Files.exists(bam1));
+    assertFalse(Files.isSymbolicLink(bam1));
+    assertArrayEquals(bamContent, Files.readAllBytes(bam1));
+    Path bam2 = folder.resolve(sample.getName() + "-test.bam");
+    assertTrue(Files.exists(bam2));
+    assertFalse(Files.isSymbolicLink(bam2));
+    assertArrayEquals(bam2Content, Files.readAllBytes(bam2));
+    Path bam3 = folder.resolve(sample.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam3));
+    assertFalse(Files.isSymbolicLink(bam3));
+    assertArrayEquals(rawbamContent, Files.readAllBytes(bam3));
+    Path bam4 = folder.resolve(sample2.getName() + ".bam");
+    assertTrue(Files.exists(bam4));
+    assertFalse(Files.isSymbolicLink(bam4));
+    assertArrayEquals(secondBamContent, Files.readAllBytes(bam4));
+    Path bam5 = folder.resolve(sample2.getName() + "-test.bam");
+    assertTrue(Files.exists(bam5));
+    assertFalse(Files.isSymbolicLink(bam5));
+    assertArrayEquals(secondBam2Content, Files.readAllBytes(bam5));
+    Path bam6 = folder.resolve(sample2.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam6));
+    assertFalse(Files.isSymbolicLink(bam6));
+    assertArrayEquals(secondRawbamContent, Files.readAllBytes(bam6));
+    Path bam7 = folder.resolve(sample3.getName() + ".bam");
+    assertTrue(Files.exists(bam7));
+    assertFalse(Files.isSymbolicLink(bam7));
+    assertArrayEquals(thirdBamContent, Files.readAllBytes(bam7));
+    Path bam8 = folder.resolve(sample3.getName() + "-test.bam");
+    assertTrue(Files.exists(bam8));
+    assertFalse(Files.isSymbolicLink(bam8));
+    assertArrayEquals(thirdBam2Content, Files.readAllBytes(bam8));
+    Path bam9 = folder.resolve(sample3.getName() + "-raw.bam");
+    assertTrue(Files.exists(bam9));
+    assertFalse(Files.isSymbolicLink(bam9));
+    assertArrayEquals(thirdRawbamContent, Files.readAllBytes(bam9));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_Fastq_AlreadyExists() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    final byte[] fastq1Content = writeRandom(paired1);
+    final byte[] fastq2Content = writeRandom(paired2);
+    final byte[] fastq3Content = writeRandom(secondPaired1);
+    final byte[] fastq4Content = writeRandom(secondPaired2);
+    final byte[] fastq5Content = writeRandom(thirdPaired1);
+    final byte[] fastq6Content = writeRandom(thirdPaired2);
+    Path folder = configuration.getAnalysis().folder(samples);
+    String extraFilename = "test.bam";
+    Files.createDirectories(folder);
+    Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
+    Files.write(folder.resolve(extraFilename), fastq1Content);
+
+    Path copyFolder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+
+    assertEquals(folder, copyFolder);
+    assertFalse(Files.exists(folder.resolve(extraFilename)));
+    assertTrue(Files.exists(folder));
+    assertEquals(7, Files.list(folder).count());
+    Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq1));
+    assertFalse(Files.isSymbolicLink(fastq1));
+    assertArrayEquals(fastq1Content, Files.readAllBytes(fastq1));
+    Path fastq2 = folder.resolve(sample.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq2));
+    assertFalse(Files.isSymbolicLink(fastq2));
+    assertArrayEquals(fastq2Content, Files.readAllBytes(fastq2));
+    Path fastq3 = folder.resolve(sample2.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq3));
+    assertFalse(Files.isSymbolicLink(fastq3));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(fastq3));
+    Path fastq4 = folder.resolve(sample2.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq4));
+    assertFalse(Files.isSymbolicLink(fastq4));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(fastq4));
+    Sample sample3 = samples.get(0);
+    Path fastq5 = folder.resolve(sample3.getName() + "_R1.fastq");
+    assertTrue(Files.exists(fastq5));
+    assertFalse(Files.isSymbolicLink(fastq5));
+    assertArrayEquals(fastq5Content, Files.readAllBytes(fastq5));
+    Path fastq6 = folder.resolve(sample3.getName() + "_R2.fastq");
+    assertTrue(Files.exists(fastq6));
+    assertFalse(Files.isSymbolicLink(fastq6));
+    assertArrayEquals(fastq6Content, Files.readAllBytes(fastq6));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_NullSamples() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copySamplesResources(null, new ArrayList<>());
+    });
+  }
+
+  @Test
+  public void copySamplesResources_EmptySamples() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      service.copySamplesResources(new ArrayList<>(), new ArrayList<>());
+    });
+  }
+
+  @Test
+  public void copySamplesResources_NullFilenamePatterns() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    Files.createFile(paired1);
+    Files.createFile(paired2);
+    Files.createFile(secondPaired1);
+    Files.createFile(secondPaired2);
+    Files.createFile(thirdPaired1);
+    Files.createFile(thirdPaired2);
+
+    Path folder = service.copySamplesResources(samples, null);
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(1, Files.list(folder).count());
+    Sample sample3 = samples.get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
+  }
+
+  @Test
+  public void copySamplesResources_EmptyFilenamePatterns() throws Throwable {
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    Files.createFile(paired1);
+    Files.createFile(paired2);
+    Files.createFile(secondPaired1);
+    Files.createFile(secondPaired2);
+    Files.createFile(thirdPaired1);
+    Files.createFile(thirdPaired2);
+
+    Path folder = service.copySamplesResources(samples, new ArrayList<>());
+
+    assertEquals(configuration.getAnalysis().folder(samples), folder);
+    assertTrue(Files.exists(folder));
+    assertEquals(1, Files.list(folder).count());
+    Sample sample3 = samples.get(0);
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(4, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample3.getName(), samplesContent.get(1));
+    assertEquals(sample.getName(), samplesContent.get(2));
+    assertEquals(sample2.getName(), samplesContent.get(3));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertFalse(Files.exists(datasetMeta));
   }
 
   @Test
