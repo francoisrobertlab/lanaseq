@@ -3,10 +3,12 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.CREATE_FOLDER;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.ERRORS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.FILENAME_PATTERNS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsAnalysisDialog.id;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.combobox.testbench.MultiSelectComboBoxElement;
 import com.vaadin.flow.component.confirmdialog.testbench.ConfirmDialogElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.html.testbench.DivElement;
@@ -26,6 +28,10 @@ public class DatasetsAnalysisDialogElement extends DialogElement {
 
   public DivElement message() {
     return $(DivElement.class).id(id(MESSAGE));
+  }
+
+  public MultiSelectComboBoxElement filenamePatterns() {
+    return $(MultiSelectComboBoxElement.class).id(id(FILENAME_PATTERNS));
   }
 
   public ButtonElement create() {
