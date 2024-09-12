@@ -256,8 +256,8 @@ public class AnalysisService {
    *           dataset analysis validation failed
    */
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
-  public Path copyDatasetsResources(Collection<Dataset> datasets, List<String> filenamePatterns)
-      throws IOException {
+  public Path copyDatasetsResources(Collection<Dataset> datasets,
+      Collection<String> filenamePatterns) throws IOException {
     if (datasets == null || datasets.isEmpty()) {
       throw new IllegalArgumentException("datasets parameter cannot be null or empty");
     }
@@ -325,7 +325,7 @@ public class AnalysisService {
    *           sample analysis validation failed
    */
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #samples, 'read')")
-  public Path copySamplesResources(Collection<Sample> samples, List<String> filenamePatterns)
+  public Path copySamplesResources(Collection<Sample> samples, Collection<String> filenamePatterns)
       throws IOException {
     if (samples == null || samples.isEmpty()) {
       throw new IllegalArgumentException("samples parameter cannot be null or empty");

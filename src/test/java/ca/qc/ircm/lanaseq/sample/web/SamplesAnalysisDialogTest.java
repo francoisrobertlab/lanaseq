@@ -5,6 +5,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.CREATE_FOLDER_EXCEPTION;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ERRORS;
+import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.FILENAME_PATTERNS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.HEADER;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesAnalysisDialog.MESSAGE;
@@ -18,12 +19,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +34,6 @@ import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,11 +41,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -70,6 +65,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   private AppConfiguration configuration;
   @Autowired
   private SampleRepository repository;
+  @Captor
+  private ArgumentCaptor<Collection<String>> filenamePatternsCaptor;
   private Locale locale = Locale.ENGLISH;
   private List<Sample> samples = new ArrayList<>();
 
@@ -95,12 +92,12 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   public void styles() {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
+    assertEquals(id(FILENAME_PATTERNS), dialog.filenamePatterns.getId().orElse(""));
     assertEquals(id(CREATE_FOLDER), dialog.createFolder.getId().orElse(""));
     assertTrue(
         dialog.createFolder.getThemeNames().contains(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     assertEquals(id(CONFIRM), dialog.confirm.getId().orElse(""));
     assertEquals(id(ERRORS), dialog.errors.getId().orElse(""));
-    assertEquals(dialog.errorsLayout.getElement(), dialog.errors.getElement().getChild(0));
   }
 
   @Test
@@ -108,6 +105,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, samples.size()),
         dialog.getHeaderTitle());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME_PATTERNS),
+        dialog.filenamePatterns.getHelperText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CREATE_FOLDER),
         dialog.createFolder.getText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CONFIRM),
@@ -127,6 +126,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, samples.size()),
         dialog.getHeaderTitle());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE), dialog.message.getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILENAME_PATTERNS),
+        dialog.filenamePatterns.getHelperText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CREATE_FOLDER),
         dialog.createFolder.getText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CONFIRM),
@@ -140,53 +141,18 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void validate_Success() {
-    dialog.validate();
-    verify(analysisService, atLeastOnce()).validateSamples(eq(samples), eq(locale), any());
-    assertEquals(0, dialog.errorsLayout.getComponentCount());
-    assertFalse(dialog.errors.isOpened());
-    assertFalse($(ConfirmDialog.class).exists());
-    assertTrue(dialog.createFolder.isEnabled());
-  }
-
-  @Test
-  public void validate_Errors() {
-    doAnswer(i -> {
-      Consumer<String> errorHandler = i.getArgument(2);
-      errorHandler.accept("error1");
-      errorHandler.accept("error2");
-      return null;
-    }).when(analysisService).validateSamples(any(Collection.class), any(), any());
-    dialog.validate();
-    verify(analysisService, atLeastOnce()).validateSamples(eq(samples), eq(locale), any());
-    assertEquals(2, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
-    assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.errorsLayout.getComponentAt(1) instanceof Span);
-    assertEquals("error2", ((Span) dialog.errorsLayout.getComponentAt(1)).getText());
-    assertTrue(dialog.errors.isOpened());
-    assertEquals(1, $(ConfirmDialog.class).all().size());
-    ConfirmDialog confirmDialog = $(ConfirmDialog.class).first();
-    assertEquals(dialog.errors, confirmDialog);
-    assertFalse(dialog.createFolder.isEnabled());
-  }
-
-  @Test
-  public void validate_OnOpen() {
-    verify(analysisService, times(1)).validateSamples(eq(samples), eq(locale), any());
-    dialog.close();
-    dialog.open();
-    verify(analysisService, times(2)).validateSamples(eq(samples), eq(locale), any());
-  }
-
-  @Test
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_Windows() throws Throwable {
     String folder = "test/sample";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
+    dialog.filenamePatterns.setValue("*.fastq", "*.bam");
+
     dialog.createFolder.click();
-    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(analysisService).copySamplesResources(samples);
+
+    verify(analysisService).copySamplesResources(eq(samples), filenamePatternsCaptor.capture());
+    assertEquals(2, filenamePatternsCaptor.getValue().size());
+    assertTrue(filenamePatternsCaptor.getValue().contains("*.fastq"));
+    assertTrue(filenamePatternsCaptor.getValue().contains("*.bam"));
     verify(configuration.getAnalysis()).label(samples, false);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -200,9 +166,13 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   public void createFolder_Unix() throws Throwable {
     String folder = "test/sample";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
+    dialog.filenamePatterns.setValue("*.fastq");
+
     dialog.createFolder.click();
-    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(analysisService).copySamplesResources(samples);
+
+    verify(analysisService).copySamplesResources(eq(samples), filenamePatternsCaptor.capture());
+    assertEquals(1, filenamePatternsCaptor.getValue().size());
+    assertTrue(filenamePatternsCaptor.getValue().contains("*.fastq"));
     verify(configuration.getAnalysis()).label(samples, true);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -216,9 +186,13 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   public void createFolder_Mac() throws Throwable {
     String folder = "test/sample";
     when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
+    dialog.filenamePatterns.setValue("*.fastq");
+
     dialog.createFolder.click();
-    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(analysisService).copySamplesResources(samples);
+
+    verify(analysisService).copySamplesResources(eq(samples), filenamePatternsCaptor.capture());
+    assertEquals(1, filenamePatternsCaptor.getValue().size());
+    assertTrue(filenamePatternsCaptor.getValue().contains("*.fastq"));
     verify(configuration.getAnalysis()).label(samples, true);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + property(CONFIRM, "message"), folder),
         dialog.confirm.getElement().getProperty("message"));
@@ -230,43 +204,17 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   @Test
   public void createFolder_IoException() throws Throwable {
     doThrow(new IOException("test")).when(analysisService)
-        .copySamplesResources(any(Collection.class));
+        .copySamplesResources(any(Collection.class), any(Collection.class));
+    dialog.filenamePatterns.setValue("*.fastq");
+
     dialog.createFolder.click();
-    verify(analysisService, atLeast(2)).validateSamples(eq(samples), eq(locale), any());
-    verify(analysisService).copySamplesResources(samples);
+
+    verify(analysisService).copySamplesResources(eq(samples), filenamePatternsCaptor.capture());
+    assertEquals(1, filenamePatternsCaptor.getValue().size());
+    assertTrue(filenamePatternsCaptor.getValue().contains("*.fastq"));
     assertFalse(dialog.confirm.isOpened());
-    assertEquals(1, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_EXCEPTION),
-        ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
-    assertTrue(dialog.errors.isOpened());
-    assertTrue(dialog.isOpened());
-  }
-
-  @Test
-  public void createFolder_IllegalArgumentException() throws Throwable {
-    doThrow(new IllegalArgumentException("test")).when(analysisService)
-        .copySamplesResources(any(Collection.class));
-    doAnswer(new Answer<Void>() {
-      private int calls = 0;
-
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        calls++;
-        if (calls > 1) {
-          Consumer<String> errorHandler = invocation.getArgument(2);
-          errorHandler.accept("error1");
-        }
-        return null;
-      }
-    }).when(analysisService).validateSamples(any(Collection.class), any(), any());
-    dialog.createFolder.click();
-    verify(analysisService, atLeast(3)).validateSamples(eq(samples), eq(locale), any());
-    verify(analysisService).copySamplesResources(samples);
-    assertFalse(dialog.confirm.isOpened());
-    assertEquals(1, dialog.errorsLayout.getComponentCount());
-    assertTrue(dialog.errorsLayout.getComponentAt(0) instanceof Span);
-    assertEquals("error1", ((Span) dialog.errorsLayout.getComponentAt(0)).getText());
+        test(dialog.errors).getText());
     assertTrue(dialog.errors.isOpened());
     assertTrue(dialog.isOpened());
   }
