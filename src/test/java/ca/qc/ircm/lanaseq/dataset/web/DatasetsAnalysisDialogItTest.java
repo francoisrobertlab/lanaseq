@@ -22,6 +22,7 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -65,9 +66,8 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
     assertTrue(optional(() -> dialog.header()).isPresent());
     assertTrue(optional(() -> dialog.message()).isPresent());
+    assertTrue(optional(() -> dialog.filenamePatterns()).isPresent());
     assertTrue(optional(() -> dialog.create()).isPresent());
-    assertTrue(optional(() -> dialog.confirm()).isPresent());
-    assertTrue(optional(() -> dialog.errors()).isPresent());
   }
 
   @Test
@@ -92,6 +92,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().select(3);
     view.analyze().click();
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
+    dialog.filenamePatterns().sendKeys("*.fastq" + Keys.RETURN);
 
     dialog.create().click();
     Thread.sleep(2000); // Wait for file copy.
@@ -107,12 +108,10 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R2.fastq")));
     assertArrayEquals(fastq2Content,
         Files.readAllBytes(folder.resolve(sample1.getName() + "_R2.fastq")));
-    assertTrue(Files.exists(folder.resolve(sample2.getName() + "_R1.fastq")));
-    assertArrayEquals(fastq3Content,
-        Files.readAllBytes(folder.resolve(sample2.getName() + "_R1.fastq")));
-    assertTrue(Files.exists(folder.resolve(sample2.getName() + "_R2.fastq")));
-    assertArrayEquals(fastq4Content,
-        Files.readAllBytes(folder.resolve(sample2.getName() + "_R2.fastq")));
+    assertTrue(Files.exists(folder.resolve("a_R1.fastq")));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(folder.resolve("a_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("a_R2.fastq")));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(folder.resolve("a_R2.fastq")));
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
     List<String> samplesContent = Files.readAllLines(samples);
@@ -160,6 +159,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().select(0);
     view.analyze().click();
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
+    dialog.filenamePatterns().sendKeys("*.fastq" + Keys.RETURN);
 
     dialog.create().click();
     Thread.sleep(2000); // Wait for file copy.
@@ -175,12 +175,10 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R2.fastq")));
     assertArrayEquals(fastq2Content,
         Files.readAllBytes(folder.resolve(sample1.getName() + "_R2.fastq")));
-    assertTrue(Files.exists(folder.resolve(sample2.getName() + "_R1.fastq")));
-    assertArrayEquals(fastq3Content,
-        Files.readAllBytes(folder.resolve(sample2.getName() + "_R1.fastq")));
-    assertTrue(Files.exists(folder.resolve(sample2.getName() + "_R2.fastq")));
-    assertArrayEquals(fastq4Content,
-        Files.readAllBytes(folder.resolve(sample2.getName() + "_R2.fastq")));
+    assertTrue(Files.exists(folder.resolve("a_R1.fastq")));
+    assertArrayEquals(fastq3Content, Files.readAllBytes(folder.resolve("a_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("a_R2.fastq")));
+    assertArrayEquals(fastq4Content, Files.readAllBytes(folder.resolve("a_R2.fastq")));
     assertTrue(Files.exists(folder.resolve(sample3.getName() + "_R1.fastq")));
     assertArrayEquals(fastq5Content,
         Files.readAllBytes(folder.resolve(sample3.getName() + "_R1.fastq")));
@@ -205,8 +203,22 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void create_Error() throws Throwable {
-    Dataset dataset = repository.findById(8L).get();
+  public void create_NoFilenamePattern() throws Throwable {
+    Dataset dataset = repository.findById(2L).get();
+    Sample sample1 = dataset.getSamples().get(0);
+    Path sample1Folder = configuration.getHome().folder(sample1);
+    Files.createDirectories(sample1Folder);
+    Path fastq1 = sample1Folder.resolve(sample1.getName() + "_R1.fastq");
+    final byte[] fastq1Content = writeFile(fastq1);
+    Path fastq2 = sample1Folder.resolve(sample1.getName() + "_R2.fastq");
+    final byte[] fastq2Content = writeFile(fastq2);
+    Sample sample2 = dataset.getSamples().get(1);
+    Path sample2Folder = configuration.getHome().folder(sample2);
+    Files.createDirectories(sample2Folder);
+    Path fastq3 = sample2Folder.resolve("a_R1.fastq");
+    final byte[] fastq3Content = writeFile(fastq3);
+    Path fastq4 = sample2Folder.resolve("a_R2.fastq");
+    final byte[] fastq4Content = writeFile(fastq4);
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(3);
@@ -216,9 +228,26 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     dialog.create().click();
 
     assertTrue(dialog.isOpen());
-    dialog.errors().getConfirmButton().click();
+    dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
     Path folder = configuration.getAnalysis().folder(Arrays.asList(dataset));
-    assertFalse(Files.exists(folder));
+    assertTrue(Files.exists(folder));
+    assertFalse(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
+    assertFalse(Files.exists(folder.resolve(sample1.getName() + "_R2.fastq")));
+    assertFalse(Files.exists(folder.resolve("a_R1.fastq")));
+    assertFalse(Files.exists(folder.resolve("a_R2.fastq")));
+    Path samples = folder.resolve("samples.txt");
+    assertTrue(Files.exists(samples));
+    List<String> samplesContent = Files.readAllLines(samples);
+    assertEquals(3, samplesContent.size());
+    assertTrue(samplesContent.get(0).startsWith("#sample"));
+    assertEquals(sample1.getName(), samplesContent.get(1));
+    assertEquals(sample2.getName(), samplesContent.get(2));
+    Path datasetMeta = folder.resolve("dataset.txt");
+    assertTrue(Files.exists(datasetMeta));
+    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
+    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
+        datasetMetaContent.get(1));
   }
 }
