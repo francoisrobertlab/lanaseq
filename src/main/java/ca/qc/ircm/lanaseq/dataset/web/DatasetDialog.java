@@ -311,9 +311,16 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   }
 
   private String nameToNamePrefix(String name) {
+    if (name == null) {
+      name = "";
+    }
     Pattern namePattern = Pattern.compile("(?:(.*)_)?\\d{8}");
-    return Optional.ofNullable(name).map(namePattern::matcher).filter(Matcher::matches)
-        .map(matcher -> matcher.group(1)).orElse("");
+    Matcher matcher = namePattern.matcher(name);
+    if (matcher.matches()) {
+      return Optional.ofNullable(matcher.group(1)).orElse("");
+    } else {
+      return name;
+    }
   }
 
   private void updateHeader() {

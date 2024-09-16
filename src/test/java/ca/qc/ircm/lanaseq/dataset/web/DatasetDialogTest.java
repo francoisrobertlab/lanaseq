@@ -94,6 +94,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -282,6 +284,13 @@ public class DatasetDialogTest extends SpringUIUnitTest {
         dialog.confirm.getElement().getProperty("confirmText"));
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL),
         dialog.confirm.getElement().getProperty("cancelText"));
+  }
+
+  @Test
+  public void date_NoValue() {
+    dialog.date.setValue(null);
+    assertNull(dialog.date.getValue());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2", dialog.namePrefix.getValue());
   }
 
   @Test
@@ -512,6 +521,11 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void setDatasetId_NoPrefix() {
     Dataset dataset = repository.findById(3L).get();
+    Pattern namePattern = Pattern.compile("(?:(.*)_)?\\d{8}");
+    System.out.println(dataset.getName());
+    Matcher matcher = namePattern.matcher(dataset.getName());
+    System.out.println(matcher.matches());
+    System.out.println(matcher.group(1));
 
     dialog.setDatasetId(3L);
 
