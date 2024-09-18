@@ -4,7 +4,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
+import static ca.qc.ircm.lanaseq.Constants.HELPER;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -206,14 +206,14 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     assay.setLabel(getTranslation(SAMPLE_PREFIX + ASSAY));
     type.setLabel(getTranslation(SAMPLE_PREFIX + TYPE));
     target.setLabel(getTranslation(SAMPLE_PREFIX + TARGET));
-    target.setPlaceholder(getTranslation(SAMPLE_PREFIX + property(TARGET, PLACEHOLDER)));
+    target.setHelperText(getTranslation(SAMPLE_PREFIX + property(TARGET, HELPER)));
     strain.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN));
-    strain.setPlaceholder(getTranslation(SAMPLE_PREFIX + property(STRAIN, PLACEHOLDER)));
+    strain.setHelperText(getTranslation(SAMPLE_PREFIX + property(STRAIN, HELPER)));
     strainDescription.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION));
     strainDescription
-        .setPlaceholder(getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, PLACEHOLDER)));
+        .setHelperText(getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, HELPER)));
     treatment.setLabel(getTranslation(SAMPLE_PREFIX + TREATMENT));
-    treatment.setPlaceholder(getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)));
+    treatment.setHelperText(getTranslation(SAMPLE_PREFIX + property(TREATMENT, HELPER)));
     keywords.setLabel(getTranslation(SAMPLE_PREFIX + KEYWORDS));
     note.setLabel(getTranslation(SAMPLE_PREFIX + NOTE));
     save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));

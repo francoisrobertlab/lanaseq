@@ -18,6 +18,7 @@ public class Constants {
   public static final String ERROR_TEXT = "error-text";
   public static final String BORDER = "border";
   public static final String PLACEHOLDER = "placeholder";
+  public static final String HELPER = "helper";
   public static final String FIELD_NOTIFICATION = "field.notification";
   public static final String REQUIRED = "required";
   public static final String INVALID = "invalid";

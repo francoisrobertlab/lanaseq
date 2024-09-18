@@ -4,7 +4,7 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
-import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
+import static ca.qc.ircm.lanaseq.Constants.HELPER;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -226,18 +226,18 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TARGET), dialog.target.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TARGET, PLACEHOLDER)),
-        dialog.target.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TARGET, HELPER)),
+        dialog.target.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN), dialog.strain.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN, PLACEHOLDER)),
-        dialog.strain.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN, HELPER)),
+        dialog.strain.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION),
         dialog.strainDescription.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, PLACEHOLDER)),
-        dialog.strainDescription.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, HELPER)),
+        dialog.strainDescription.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TREATMENT), dialog.treatment.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)),
-        dialog.treatment.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, HELPER)),
+        dialog.treatment.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + KEYWORDS), dialog.keywords.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
@@ -267,18 +267,18 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TARGET), dialog.target.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TARGET, PLACEHOLDER)),
-        dialog.target.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TARGET, HELPER)),
+        dialog.target.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN), dialog.strain.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN, PLACEHOLDER)),
-        dialog.strain.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN, HELPER)),
+        dialog.strain.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION),
         dialog.strainDescription.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, PLACEHOLDER)),
-        dialog.strainDescription.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, HELPER)),
+        dialog.strainDescription.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TREATMENT), dialog.treatment.getLabel());
-    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, PLACEHOLDER)),
-        dialog.treatment.getPlaceholder());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, HELPER)),
+        dialog.treatment.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + KEYWORDS), dialog.keywords.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
