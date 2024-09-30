@@ -71,12 +71,9 @@ public class ViewLayout extends AppLayout
   protected SideNavItem users;
   protected SideNavItem exitSwitchUser;
   protected SideNavItem signout;
-  @Autowired
   private transient AuthenticatedUser authenticatedUser;
 
-  protected ViewLayout() {
-  }
-
+  @Autowired
   protected ViewLayout(AuthenticatedUser authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
   }

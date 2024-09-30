@@ -23,13 +23,13 @@ public class MainView extends Composite<VerticalLayout> implements BeforeEnterOb
   public static final String VIEW_NAME = "";
   private static final long serialVersionUID = -8440231785563887343L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
-  @Autowired
   private transient AuthenticatedUser authenticatedUser;
 
   public MainView() {
     logger.debug("main view");
   }
 
+  @Autowired
   protected MainView(AuthenticatedUser authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
   }

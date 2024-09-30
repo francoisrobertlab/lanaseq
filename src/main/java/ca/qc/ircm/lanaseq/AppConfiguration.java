@@ -86,8 +86,7 @@ public class AppConfiguration {
    * Server's actual URL, used in emails.
    */
   private String serverUrl;
-  @Autowired
-  private AuthenticatedUser authenticatedUser;
+  private final AuthenticatedUser authenticatedUser;
   /**
    * Location of files inside home folder.
    */
@@ -111,6 +110,11 @@ public class AppConfiguration {
       return sampleAnalysisSubfolder((Collection<Sample>) collection);
     }
   };
+
+  @Autowired
+  protected AppConfiguration(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
+  }
 
   /**
    * Initializes instances of NetworkDrive.

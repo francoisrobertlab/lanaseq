@@ -32,7 +32,6 @@ public class InitializeDatabaseExecutionListener
   @SuppressWarnings("checkstyle:linelength")
   public static final String PASSWORD_PASS2 =
       "$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu";
-  @Autowired
   private UserRepository userRepository;
 
   @Override
@@ -63,5 +62,10 @@ public class InitializeDatabaseExecutionListener
     user = userRepository.findById(6L).orElse(null);
     user.setLastSignAttempt(LocalDateTime.now().minus(20, ChronoUnit.MINUTES));
     userRepository.save(user);
+  }
+
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 }

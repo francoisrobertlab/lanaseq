@@ -3,6 +3,8 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.Constants.DEFAULT_LOCALE;
 
 import ca.qc.ircm.lanaseq.logging.web.MdcFilter;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +24,13 @@ import org.springframework.web.util.IntrospectorCleanupListener;
  */
 @Configuration
 public class SpringWebConfiguration implements WebMvcConfigurer {
+  private final AuthenticatedUser authenticatedUser;
+
+  @Autowired
+  protected SpringWebConfiguration(AuthenticatedUser authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
+  }
+
   /**
    * Returns filter that logs request information like headers.
    *
@@ -42,7 +51,7 @@ public class SpringWebConfiguration implements WebMvcConfigurer {
 
   @Bean(name = MdcFilter.BEAN_NAME)
   public MdcFilter mdcFilter() {
-    return new MdcFilter();
+    return new MdcFilter(authenticatedUser);
   }
 
   @Bean

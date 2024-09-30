@@ -36,22 +36,26 @@ public class ForgotPasswordService {
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordService.class);
   private static final String CONSTANT_PREFIX = messagePrefix(Constants.class);
   private final Logger logger = LoggerFactory.getLogger(ForgotPasswordService.class);
-  @Autowired
-  private ForgotPasswordRepository repository;
-  @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-  @Autowired
-  private TemplateEngine emailTemplateEngine;
-  @Autowired
-  private MailService emailService;
-  @Autowired
-  private AppConfiguration appConfiguration;
-  @Autowired
-  private MessageSource messageSource;
+  private final ForgotPasswordRepository repository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final TemplateEngine emailTemplateEngine;
+  private final MailService emailService;
+  private final AppConfiguration appConfiguration;
+  private final MessageSource messageSource;
 
-  protected ForgotPasswordService() {
+  @Autowired
+  protected ForgotPasswordService(ForgotPasswordRepository repository,
+      UserRepository userRepository, PasswordEncoder passwordEncoder,
+      TemplateEngine emailTemplateEngine, MailService emailService,
+      AppConfiguration appConfiguration, MessageSource messageSource) {
+    this.repository = repository;
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.emailTemplateEngine = emailTemplateEngine;
+    this.emailService = emailService;
+    this.appConfiguration = appConfiguration;
+    this.messageSource = messageSource;
   }
 
   /**

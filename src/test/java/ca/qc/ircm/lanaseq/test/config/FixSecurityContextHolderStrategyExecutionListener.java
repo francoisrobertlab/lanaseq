@@ -13,7 +13,6 @@ import org.springframework.test.context.TestExecutionListener;
  */
 public class FixSecurityContextHolderStrategyExecutionListener
     implements TestExecutionListener, InjectDependencies {
-  @Autowired
   private SecurityContextHolderStrategy injectedStrategy;
   private static final Logger logger =
       LoggerFactory.getLogger(FixSecurityContextHolderStrategyExecutionListener.class);
@@ -29,5 +28,10 @@ public class FixSecurityContextHolderStrategyExecutionListener
           injectedStrategy, holderStrategy);
       SecurityContextHolder.setContextHolderStrategy(injectedStrategy);
     }
+  }
+
+  @Autowired
+  public void setInjectedStrategy(SecurityContextHolderStrategy injectedStrategy) {
+    this.injectedStrategy = injectedStrategy;
   }
 }

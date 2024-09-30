@@ -21,16 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService {
-  @Autowired
-  private UserRepository repository;
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-  @Autowired
-  private AuthenticatedUser authenticatedUser;
+  private final UserRepository repository;
+  private final PasswordEncoder passwordEncoder;
+  private final AuthenticatedUser authenticatedUser;
 
-  protected UserService() {
-  }
-
+  @Autowired
   protected UserService(UserRepository repository, PasswordEncoder passwordEncoder,
       AuthenticatedUser authenticatedUser) {
     this.repository = repository;

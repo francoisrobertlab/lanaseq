@@ -8,7 +8,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
@@ -17,13 +16,9 @@ import org.springframework.web.filter.GenericFilterBean;
 public class MdcFilter extends GenericFilterBean {
   public static final String BEAN_NAME = "MdcFilter";
   public static final String USER_CONTEXT_KEY = "user";
-  @Autowired
-  private AuthenticatedUser authenticatedUser;
+  private final AuthenticatedUser authenticatedUser;
 
-  public MdcFilter() {
-  }
-
-  protected MdcFilter(AuthenticatedUser authenticatedUser) {
+  public MdcFilter(AuthenticatedUser authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
   }
 

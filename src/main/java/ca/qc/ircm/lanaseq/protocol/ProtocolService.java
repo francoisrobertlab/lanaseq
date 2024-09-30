@@ -25,18 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ProtocolService {
-  @Autowired
-  private ProtocolRepository repository;
-  @Autowired
-  private ProtocolFileRepository fileRepository;
-  @Autowired
-  private SampleRepository sampleRepository;
-  @Autowired
-  private AuthenticatedUser authenticatedUser;
+  private final ProtocolRepository repository;
+  private final ProtocolFileRepository fileRepository;
+  private final SampleRepository sampleRepository;
+  private final AuthenticatedUser authenticatedUser;
 
-  protected ProtocolService() {
-  }
-
+  @Autowired
   protected ProtocolService(ProtocolRepository repository, ProtocolFileRepository fileRepository,
       SampleRepository sampleRepository, AuthenticatedUser authenticatedUser) {
     this.repository = repository;

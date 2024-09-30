@@ -24,16 +24,11 @@ import org.springframework.util.StreamUtils;
 @Component
 public class MailService {
   private final Logger logger = LoggerFactory.getLogger(MailService.class);
-  @Autowired
-  private MailConfiguration mailConfiguration;
-  @Autowired
-  private JavaMailSender mailSender;
-  @Autowired
-  private AuthenticatedUser authenticatedUser;
+  private final MailConfiguration mailConfiguration;
+  private final JavaMailSender mailSender;
+  private final AuthenticatedUser authenticatedUser;
 
-  protected MailService() {
-  }
-
+  @Autowired
   protected MailService(MailConfiguration mailConfiguration, JavaMailSender mailSender,
       AuthenticatedUser authenticatedUser) {
     this.mailConfiguration = mailConfiguration;
