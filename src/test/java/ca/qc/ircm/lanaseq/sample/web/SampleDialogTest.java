@@ -11,6 +11,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.FILENAMES;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NOTE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -134,9 +135,11 @@ public class SampleDialogTest extends SpringUIUnitTest {
   private String strainDescription = "WT";
   private String treatment = "37C";
   private LocalDate date = LocalDate.of(2020, 7, 20);
-  private String note = "test note\nsecond line";
   private String keyword1 = "Keyword 1";
   private String keyword2 = "Keyword 2";
+  private String filename1 = "OF_20241120_ROB_01";
+  private String filename2 = "OF_20241120_ROB_02";
+  private String note = "test note\nsecond line";
 
   /**
    * Before test.
@@ -175,6 +178,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     dialog.strainDescription.setValue(strainDescription);
     dialog.treatment.setValue(treatment);
     dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
+    dialog.filenames.setValue(Stream.of(filename1, filename2).collect(Collectors.toSet()));
     dialog.note.setValue(note);
   }
 
@@ -192,6 +196,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(id(STRAIN_DESCRIPTION), dialog.strainDescription.getId().orElse(""));
     assertEquals(id(TREATMENT), dialog.treatment.getId().orElse(""));
     assertEquals(id(KEYWORDS), dialog.keywords.getId().orElse(""));
+    assertEquals(id(FILENAMES), dialog.filenames.getId().orElse(""));
     assertEquals(id(NOTE), dialog.note.getId().orElse(""));
     assertEquals(id(ERROR_TEXT), dialog.error.getId().orElse(""));
     assertFalse(dialog.error.isVisible());
@@ -239,6 +244,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, HELPER)),
         dialog.treatment.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + KEYWORDS), dialog.keywords.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + FILENAMES), dialog.filenames.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(FILENAMES, HELPER)),
+        dialog.filenames.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
@@ -280,6 +288,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(TREATMENT, HELPER)),
         dialog.treatment.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + KEYWORDS), dialog.keywords.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + FILENAMES), dialog.filenames.getLabel());
+    assertEquals(dialog.getTranslation(SAMPLE_PREFIX + property(FILENAMES, HELPER)),
+        dialog.filenames.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + NOTE), dialog.note.getLabel());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + CANCEL), dialog.cancel.getText());
@@ -305,6 +316,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.strainDescription.isRequiredIndicatorVisible());
     assertFalse(dialog.treatment.isRequiredIndicatorVisible());
     assertFalse(dialog.keywords.isRequiredIndicatorVisible());
+    assertFalse(dialog.filenames.isRequiredIndicatorVisible());
     assertFalse(dialog.note.isRequiredIndicatorVisible());
   }
 
@@ -361,6 +373,12 @@ public class SampleDialogTest extends SpringUIUnitTest {
     for (String keyword : topKeywords) {
       assertTrue(keywords.contains(keyword));
     }
+  }
+
+  @Test
+  public void filenames() {
+    List<String> filenames = dialog.filenames.getSuggestions();
+    assertTrue(filenames.isEmpty());
   }
 
   @Test
@@ -430,6 +448,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertFalse(dialog.keywords.isReadOnly());
+    assertFalse(dialog.filenames.isReadOnly());
     assertFalse(dialog.note.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -470,6 +489,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertTrue(dialog.keywords.isReadOnly());
+    assertTrue(dialog.filenames.isReadOnly());
     assertTrue(dialog.note.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -505,6 +525,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertTrue(dialog.keywords.isReadOnly());
+    assertTrue(dialog.filenames.isReadOnly());
     assertTrue(dialog.note.isReadOnly());
     assertFalse(dialog.save.isVisible());
     assertFalse(dialog.cancel.isVisible());
@@ -556,6 +577,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.treatment.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertFalse(dialog.keywords.isReadOnly());
+    assertFalse(dialog.filenames.isReadOnly());
     assertFalse(dialog.note.isReadOnly());
     assertTrue(dialog.save.isVisible());
     assertTrue(dialog.cancel.isVisible());
@@ -873,6 +895,28 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void save_FilenamesEmpty() {
+    dialog.addSavedListener(savedListener);
+    dialog.addDeletedListener(deletedListener);
+    fillForm();
+    dialog.filenames.setValue(new HashSet<>());
+
+    clickButton(dialog.save);
+
+    BinderValidationStatus<Sample> status = dialog.validateSample();
+    assertTrue(status.isOk());
+    verify(service).save(sampleCaptor.capture());
+    Sample sample = sampleCaptor.getValue();
+    verify(service, never()).delete(any());
+    Notification notification = $(Notification.class).first();
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
+        test(notification).getText());
+    assertFalse(dialog.isOpened());
+    verify(savedListener).onComponentEvent(any());
+    verify(deletedListener, never()).onComponentEvent(any());
+  }
+
+  @Test
   public void save_NameExists() {
     when(service.get(anyLong())).thenReturn(Optional.empty());
     when(service.exists(any())).thenReturn(true);
@@ -885,7 +929,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     verify(service).exists(
         (sampleId + "_" + "ChIPseq_IP_" + target + "_" + strain + "_" + strainDescription + "_"
             + treatment + "_" + replicate + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
-                .replaceAll("[^\\w-]", ""));
+            .replaceAll("[^\\w-]", ""));
     verify(service, never()).save(any());
     assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());
@@ -939,6 +983,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(2, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
+    assertEquals(2, sample.getFilenames().size());
+    assertTrue(sample.getFilenames().contains(filename1));
+    assertTrue(sample.getFilenames().contains(filename2));
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),
@@ -974,6 +1021,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertEquals(2, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
+    assertEquals(2, sample.getFilenames().size());
+    assertTrue(sample.getFilenames().contains(filename1));
+    assertTrue(sample.getFilenames().contains(filename2));
     verify(service, never()).delete(any());
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()),

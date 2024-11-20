@@ -64,9 +64,10 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   private String treatment = "37C";
   private String sampleId = "FR3";
   private String replicate = "R3";
-  private String note = "test note\nsecond line";
   private String keyword1 = "mnase";
   private String keyword2 = "ip";
+  private String filename = "OF_20241120_ROB_01";
+  private String note = "test note\nsecond line";
 
   /**
    * Before test.
@@ -99,6 +100,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     dialog.keywords().deselectByText("G24D");
     dialog.keywords().selectByText(keyword1);
     dialog.keywords().selectByText(keyword2);
+    dialog.filenames().sendKeys(filename + Keys.RETURN);
     dialog.note().setValue(note);
   }
 
@@ -125,6 +127,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.keywords()).isPresent());
+    assertTrue(optional(() -> dialog.filenames()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -151,6 +154,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.keywords()).isPresent());
+    assertTrue(optional(() -> dialog.filenames()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -179,6 +183,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.strainDescription()).isPresent());
     assertTrue(optional(() -> dialog.treatment()).isPresent());
     assertTrue(optional(() -> dialog.keywords()).isPresent());
+    assertTrue(optional(() -> dialog.filenames()).isPresent());
     assertTrue(optional(() -> dialog.note()).isPresent());
     assertTrue(optional(() -> dialog.save()).isPresent());
     assertTrue(optional(() -> dialog.cancel()).isPresent());
@@ -225,6 +230,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(2, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
+    assertEquals(1, sample.getFilenames().size());
+    assertTrue(sample.getFilenames().contains(filename));
     assertEquals(note, sample.getNote());
     assertEquals(5, view.samples().getRowCount());
   }
@@ -268,6 +275,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(sample.getKeywords().contains("chipseq"));
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
+    assertEquals(2, sample.getFilenames().size());
+    assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
+    assertTrue(sample.getFilenames().contains(filename));
     assertEquals(note, sample.getNote());
     Dataset dataset = datasetRepository.findById(2L).get();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
@@ -312,6 +322,8 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(sample.getKeywords().contains("chipseq"));
     assertTrue(sample.getKeywords().contains("ip"));
     assertTrue(sample.getKeywords().contains("G24D"));
+    assertEquals(1, sample.getFilenames().size());
+    assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
     assertNull(sample.getNote());
     assertEquals(4, view.samples().getRowCount());
   }

@@ -6,6 +6,7 @@ import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ASSAY;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
+import static ca.qc.ircm.lanaseq.sample.SampleProperties.FILENAMES;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NOTE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
@@ -18,6 +19,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.id;
 
+import ca.qc.ircm.lanaseq.web.FilenamesFieldElement;
 import ca.qc.ircm.lanaseq.web.KeywordsFieldElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
@@ -86,6 +88,10 @@ public class SampleDialogElement extends DialogElement {
 
   public KeywordsFieldElement keywords() {
     return $(KeywordsFieldElement.class).id(id(KEYWORDS));
+  }
+
+  public FilenamesFieldElement filenames() {
+    return $(FilenamesFieldElement.class).id(id(FILENAMES));
   }
 
   public ButtonElement save() {
