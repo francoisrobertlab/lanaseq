@@ -4,11 +4,13 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.HELPER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.FILENAMES;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
@@ -37,6 +39,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatus
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.fireEvent;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateEquals;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
+import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDatePickerI18n;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -139,6 +142,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   private String namePrefix = "ChIPseq_IP_polr3a_yFR20_WT_37C_testsample1-testsample2";
   private String keyword1 = "Keyword 1";
   private String keyword2 = "Keyword 2";
+  private String filename1 = "OF_20241120_ROB_01";
+  private String filename2 = "OF_20241120_ROB_02";
   private LocalDate date = LocalDate.of(2020, 7, 20);
   private String note = "test note\nsecond line";
 
@@ -168,8 +173,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   private void fillForm() {
     dialog.namePrefix.setValue(namePrefix);
-    dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
     dialog.date.setValue(date);
+    dialog.keywords.setValue(Stream.of(keyword1, keyword2).collect(Collectors.toSet()));
+    dialog.filenames.setValue(Stream.of(filename1, filename2).collect(Collectors.toSet()));
     dialog.note.setValue(note);
   }
 
@@ -180,6 +186,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(id(GENERATE_NAME), dialog.generateName.getId().orElse(""));
     validateIcon(VaadinIcon.MAGIC.create(), dialog.generateName.getIcon());
     assertEquals(id(KEYWORDS), dialog.keywords.getId().orElse(""));
+    assertEquals(id(FILENAMES), dialog.filenames.getId().orElse(""));
     assertEquals(id(PROTOCOL), dialog.protocol.getId().orElse(""));
     assertEquals(id(ASSAY), dialog.assay.getId().orElse(""));
     assertEquals(id(TYPE), dialog.type.getId().orElse(""));
@@ -219,6 +226,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + GENERATE_NAME),
         dialog.generateName.getText());
     assertEquals(dialog.getTranslation(DATASET_PREFIX + KEYWORDS), dialog.keywords.getLabel());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + FILENAMES), dialog.filenames.getLabel());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + property(FILENAMES, HELPER)),
+        dialog.filenames.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + PROTOCOL), dialog.protocol.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
@@ -258,6 +268,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + GENERATE_NAME),
         dialog.generateName.getText());
     assertEquals(dialog.getTranslation(DATASET_PREFIX + KEYWORDS), dialog.keywords.getLabel());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + FILENAMES), dialog.filenames.getLabel());
+    assertEquals(dialog.getTranslation(DATASET_PREFIX + property(FILENAMES, HELPER)),
+        dialog.filenames.getHelperText());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + PROTOCOL), dialog.protocol.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + ASSAY), dialog.assay.getLabel());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + TYPE), dialog.type.getLabel());
@@ -300,6 +313,12 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     for (String keyword : topKeywords) {
       assertTrue(keywords.contains(keyword));
     }
+  }
+
+  @Test
+  public void filenames() {
+    List<String> filenames = dialog.filenames.getSuggestions();
+    assertTrue(filenames.isEmpty());
   }
 
   @Test
@@ -496,6 +515,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.namePrefix.isReadOnly());
     assertTrue(dialog.generateName.isVisible());
     assertFalse(dialog.keywords.isReadOnly());
+    assertFalse(dialog.filenames.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -548,6 +568,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.namePrefix.isReadOnly());
     assertFalse(dialog.generateName.isVisible());
     assertTrue(dialog.keywords.isReadOnly());
+    assertTrue(dialog.filenames.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -587,6 +608,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.namePrefix.isReadOnly());
     assertFalse(dialog.generateName.isVisible());
     assertTrue(dialog.keywords.isReadOnly());
+    assertTrue(dialog.filenames.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -659,6 +681,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.namePrefix.isReadOnly());
     assertTrue(dialog.generateName.isVisible());
     assertFalse(dialog.keywords.isReadOnly());
+    assertFalse(dialog.filenames.isReadOnly());
     assertTrue(dialog.protocol.isReadOnly());
     assertTrue(dialog.assay.isReadOnly());
     assertTrue(dialog.type.isReadOnly());
@@ -682,6 +705,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void requiredIndicator() {
     assertTrue(dialog.namePrefix.isRequiredIndicatorVisible());
     assertFalse(dialog.keywords.isRequiredIndicatorVisible());
+    assertFalse(dialog.filenames.isRequiredIndicatorVisible());
     assertTrue(dialog.date.isRequiredIndicatorVisible());
     assertFalse(dialog.note.isRequiredIndicatorVisible());
   }
@@ -842,6 +866,26 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void save_FilenamesEmpty() {
+    dialog.addSavedListener(savedListener);
+    fillForm();
+    dialog.filenames.setValue(new HashSet<>());
+
+    clickButton(dialog.save);
+
+    BinderValidationStatus<Dataset> status = dialog.validateDataset();
+    assertTrue(status.isOk());
+    verify(service).save(datasetCaptor.capture());
+    Dataset dataset = datasetCaptor.getValue();
+    assertTrue(dataset.getFilenames().isEmpty());
+    Notification notification = $(Notification.class).first();
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()),
+        test(notification).getText());
+    assertFalse(dialog.isOpened());
+    verify(savedListener).onComponentEvent(any());
+  }
+
+  @Test
   public void save_NoteEmpty() {
     dialog.addSavedListener(savedListener);
     fillForm();
@@ -932,6 +976,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(2, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains(keyword1));
     assertTrue(dataset.getKeywords().contains(keyword2));
+    assertEquals(2, dataset.getFilenames().size());
+    assertTrue(dataset.getFilenames().contains(filename1));
+    assertTrue(dataset.getFilenames().contains(filename2));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(0, dataset.getSamples().size());
@@ -957,6 +1004,9 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertEquals(2, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains(keyword1));
     assertTrue(dataset.getKeywords().contains(keyword2));
+    assertEquals(2, dataset.getFilenames().size());
+    assertTrue(dataset.getFilenames().contains(filename1));
+    assertTrue(dataset.getFilenames().contains(filename2));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(2, dataset.getSamples().size());

@@ -1,4 +1,6 @@
+DROP TABLE IF EXISTS sample_filenames;
 DROP TABLE IF EXISTS sample_keywords;
+DROP TABLE IF EXISTS dataset_filenames;
 DROP TABLE IF EXISTS dataset_keywords;
 DROP TABLE IF EXISTS dataset_samples;
 DROP TABLE IF EXISTS sample;

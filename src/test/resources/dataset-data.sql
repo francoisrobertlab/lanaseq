@@ -96,6 +96,9 @@ VALUES (7,2,'G24D');
 INSERT INTO dataset_keywords (id,dataset_id,keywords)
 VALUES (8,7,'Spt16');
 ALTER TABLE dataset_keywords ALTER COLUMN id RESTART WITH 9;
+INSERT INTO dataset_filenames (id,dataset_id,filenames)
+VALUES (1,2,'OF_20241118_ROB');
+ALTER TABLE dataset_filenames ALTER COLUMN id RESTART WITH 2;
 INSERT INTO sample_keywords (id,sample_id,keywords)
 VALUES (1,1,'mnase');
 INSERT INTO sample_keywords (id,sample_id,keywords)
@@ -130,4 +133,9 @@ INSERT INTO sample_keywords (id,sample_id,keywords)
 VALUES (16,10,'Spt16');
 INSERT INTO sample_keywords (id,sample_id,keywords)
 VALUES (17,11,'Spt16');
-ALTER TABLE dataset_keywords ALTER COLUMN id RESTART WITH 18;
+ALTER TABLE sample_keywords ALTER COLUMN id RESTART WITH 18;
+INSERT INTO sample_filenames (id,sample_id,filenames)
+VALUES (1,4,'OF_20241118_ROB_01');
+INSERT INTO sample_filenames (id,sample_id,filenames)
+VALUES (2,5,'OF_20241118_ROB_02');
+ALTER TABLE sample_filenames ALTER COLUMN id RESTART WITH 3;

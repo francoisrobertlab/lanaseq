@@ -4,12 +4,14 @@ import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.HELPER;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.Dataset.NAME_ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
+import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.FILENAMES;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
@@ -36,6 +38,7 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
+import ca.qc.ircm.lanaseq.web.FilenamesField;
 import ca.qc.ircm.lanaseq.web.KeywordsField;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
@@ -115,6 +118,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected TextField namePrefix = new TextField();
   protected Button generateName = new Button();
   protected KeywordsField keywords = new KeywordsField();
+  protected FilenamesField filenames = new FilenamesField();
   protected TextField protocol = new TextField();
   protected TextField assay = new TextField();
   protected TextField type = new TextField();
@@ -158,10 +162,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     setWidth("1000px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout datasetForm = new FormLayout(namePrefix, generateName, date, keywords, note);
+    FormLayout datasetForm =
+        new FormLayout(namePrefix, generateName, date, keywords, filenames, note);
     datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
     datasetForm.setColspan(namePrefix, 3);
     datasetForm.setColspan(keywords, 3);
+    datasetForm.setColspan(filenames, 4);
     datasetForm.setColspan(note, 4);
     FormLayout sampleForm = new FormLayout(protocol, assay, type, target);
     sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
@@ -183,6 +189,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     generateName.setIcon(VaadinIcon.MAGIC.create());
     generateName.addClickListener(e -> generateName());
     keywords.setId(id(KEYWORDS));
+    filenames.setId(id(FILENAMES));
     protocol.setId(id(PROTOCOL));
     protocol.setReadOnly(true);
     assay.setId(id(ASSAY));
@@ -280,11 +287,14 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       namePrefix.setValue(value);
     });
     binder.forField(keywords).bind(KEYWORDS);
+    binder.forField(filenames).bind(FILENAMES);
     binder.forField(date).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED)).bind(DATE);
     binder.forField(note).withNullRepresentation("").bind(NOTE);
     namePrefix.setLabel(getTranslation(MESSAGE_PREFIX + NAME_PREFIX));
     generateName.setText(getTranslation(MESSAGE_PREFIX + GENERATE_NAME));
     keywords.setLabel(getTranslation(DATASET_PREFIX + KEYWORDS));
+    filenames.setLabel(getTranslation(DATASET_PREFIX + FILENAMES));
+    filenames.setHelperText(getTranslation(DATASET_PREFIX + property(FILENAMES, HELPER)));
     protocol.setLabel(getTranslation(SAMPLE_PREFIX + PROTOCOL));
     assay.setLabel(getTranslation(SAMPLE_PREFIX + ASSAY));
     type.setLabel(getTranslation(SAMPLE_PREFIX + TYPE));
@@ -458,11 +468,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
 
   public void setDatasetId(Long id) {
     Dataset dataset = id != null ? service.get(id).orElseThrow() : new Dataset();
-    if (dataset == null) {
-      dataset = new Dataset();
-    }
     if (dataset.getKeywords() == null) {
       dataset.setKeywords(new HashSet<>());
+    }
+    if (dataset.getFilenames() == null) {
+      dataset.setFilenames(new HashSet<>());
     }
     if (dataset.getDate() == null) {
       dataset.setDate(LocalDate.now());

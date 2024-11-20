@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -101,25 +102,30 @@ public class SampleServiceTest {
    * Before test.
    */
   @BeforeEach
+  @SuppressWarnings("unchecked")
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().getFolder()).thenReturn(temporaryFolder.resolve("home"));
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
+      return sample != null && sample.getName() != null
+          ? temporaryFolder.resolve("home").resolve(sample.getName())
           : null;
     });
     when(configuration.getHome().label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
       boolean unix = i.getArgument(1);
-      String label =
-          "\\\\lanaseq01\\" + (sample != null && sample.getName() != null ? sample.getName() : "");
+      String label = "\\\\lanaseq01\\home\\"
+          + (sample != null && sample.getName() != null ? sample.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
-    List archives = new ArrayList();
+    List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getArchives()).thenReturn(archives);
+    when(configuration.getArchives().get(0).getFolder())
+        .thenReturn(temporaryFolder.resolve("archives"));
     when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null
@@ -133,6 +139,8 @@ public class SampleServiceTest {
           + (sample != null && sample.getName() != null ? sample.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
+    when(configuration.getArchives().get(1).getFolder())
+        .thenReturn(temporaryFolder.resolve("archives2"));
     when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null && sample.getName() != null
@@ -432,6 +440,28 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void files_Filenames() throws Throwable {
+    Sample sample = repository.findById(4L).orElse(null);
+    Path folder = configuration.getHome().getFolder();
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("OF_20241118_ROB_01.raw"));
+    Files.createDirectory(folder.resolve("otherdirectory"));
+    Files.createFile(folder.resolve("otherdirectory/A_OF_20241118_ROB_01_0.raw"));
+    Files.createFile(folder.resolve(".OF_20241118_ROB_01.raw"));
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(folder.resolve(".OF_20241118_ROB_01.raw"), "dos:hidden", Boolean.TRUE);
+    }
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration.getHome(), times(2)).getFolder();
+    assertEquals(2, files.size());
+    assertTrue(files.contains(folder.resolve("OF_20241118_ROB_01.raw")));
+    assertTrue(files.contains(folder.resolve("otherdirectory/A_OF_20241118_ROB_01_0.raw")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
   public void files_FolderNotExists() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
 
@@ -514,6 +544,34 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void files_Archives_Filenames() throws Throwable {
+    Sample sample = repository.findById(4L).orElse(null);
+    Path folder = configuration.getArchives().get(0).getFolder().resolve("otherdirectory");
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("OF_20241118_ROB_01.raw"));
+    Files.createFile(folder.resolve(".OF_20241118_ROB_01.raw"));
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(folder.resolve(".OF_20241118_ROB_01.raw"), "dos:hidden", Boolean.TRUE);
+    }
+    folder = configuration.getArchives().get(1).getFolder();
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("A_OF_20241118_ROB_01_0.raw"));
+
+    List<Path> files = service.files(sample);
+
+    verify(configuration.getHome()).getFolder();
+    verify(configuration.getArchives().get(0), times(2)).getFolder();
+    verify(configuration.getArchives().get(1), times(2)).getFolder();
+    System.out.println(files);
+    assertEquals(2, files.size());
+    folder = configuration.getArchives().get(0).getFolder().resolve("otherdirectory");
+    assertTrue(files.contains(folder.resolve("OF_20241118_ROB_01.raw")));
+    folder = configuration.getArchives().get(1).getFolder();
+    assertTrue(files.contains(folder.resolve("A_OF_20241118_ROB_01_0.raw")));
+    verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+  }
+
+  @Test
   public void files_ArchivesNotExists() throws Throwable {
     Sample sample = repository.findById(1L).orElse(null);
     Path folder = configuration.getHome().folder(sample);
@@ -552,7 +610,7 @@ public class SampleServiceTest {
     List<String> labels = service.folderLabels(sample, false);
 
     assertEquals(1, labels.size());
-    assertEquals("\\\\lanaseq01\\" + sample.getName(), labels.get(0));
+    assertEquals("\\\\lanaseq01\\home\\" + sample.getName(), labels.get(0));
   }
 
   @Test
@@ -564,7 +622,7 @@ public class SampleServiceTest {
     List<String> labels = service.folderLabels(sample, true);
 
     assertEquals(1, labels.size());
-    assertEquals("//lanaseq01/" + sample.getName(), labels.get(0));
+    assertEquals("//lanaseq01/home/" + sample.getName(), labels.get(0));
   }
 
   @Test
@@ -580,7 +638,7 @@ public class SampleServiceTest {
     List<String> labels = service.folderLabels(sample, false);
 
     assertEquals(3, labels.size());
-    assertEquals("\\\\lanaseq01\\" + sample.getName(), labels.get(0));
+    assertEquals("\\\\lanaseq01\\home\\" + sample.getName(), labels.get(0));
     assertEquals("\\\\lanaseq01\\archives\\" + sample.getName(), labels.get(1));
     assertEquals("\\\\lanaseq02\\archives2\\" + sample.getName(), labels.get(2));
   }
@@ -598,7 +656,7 @@ public class SampleServiceTest {
     List<String> labels = service.folderLabels(sample, true);
 
     assertEquals(3, labels.size());
-    assertEquals("//lanaseq01/" + sample.getName(), labels.get(0));
+    assertEquals("//lanaseq01/home/" + sample.getName(), labels.get(0));
     assertEquals("//lanaseq01/archives/" + sample.getName(), labels.get(1));
     assertEquals("//lanaseq02/archives2/" + sample.getName(), labels.get(2));
   }
@@ -1395,7 +1453,7 @@ public class SampleServiceTest {
         beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq.md5"),
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
         beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
@@ -1403,7 +1461,7 @@ public class SampleServiceTest {
         beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq.md5"),
         ("c0f5c3b76104640e306fce3c669f300e  "
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
     Files.createDirectories(beforeArchive1);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeArchive1.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
@@ -1412,7 +1470,7 @@ public class SampleServiceTest {
         beforeArchive1.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq.md5"),
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
     Files.createDirectories(beforeArchive2);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeArchive2.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
@@ -1421,7 +1479,7 @@ public class SampleServiceTest {
         beforeArchive2.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq.md5"),
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
 
     service.save(sample);
 

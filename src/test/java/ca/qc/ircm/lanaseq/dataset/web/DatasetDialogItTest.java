@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -60,6 +61,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String namePrefix = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2";
   private String keyword1 = "mnase";
   private String keyword2 = "ip";
+  private String filename = "OF_20241120_ROB_01";
   private String note = "test note\nsecond line";
   private LocalDate date = LocalDate.of(2020, 07, 20);
 
@@ -77,6 +79,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.namePrefix().setValue(namePrefix);
     dialog.keywords().selectByText(keyword1);
     dialog.keywords().selectByText(keyword2);
+    dialog.filenames().sendKeys(filename + Keys.RETURN);
     dialog.note().setValue(note);
     dialog.date().setDate(date);
   }
@@ -92,6 +95,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.namePrefix()).isPresent());
     assertTrue(optional(() -> dialog.generateName()).isPresent());
     assertTrue(optional(() -> dialog.keywords()).isPresent());
+    assertTrue(optional(() -> dialog.filenames()).isPresent());
     assertTrue(optional(() -> dialog.protocol()).isPresent());
     assertTrue(optional(() -> dialog.assay()).isPresent());
     assertTrue(optional(() -> dialog.type()).isPresent());
@@ -139,6 +143,9 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains(keyword1));
     assertTrue(dataset.getKeywords().contains(keyword2));
+    assertEquals(2, dataset.getFilenames().size());
+    assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
+    assertTrue(dataset.getFilenames().contains(filename));
     assertEquals(note, dataset.getNote());
     assertEquals(date, dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
@@ -206,6 +213,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("G24D"));
+    assertEquals(1, dataset.getFilenames().size());
+    assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
@@ -267,6 +276,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("G24D"));
+    assertEquals(1, dataset.getFilenames().size());
+    assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
@@ -339,6 +350,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("G24D"));
+    assertEquals(1, dataset.getFilenames().size());
+    assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertNull(dataset.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
