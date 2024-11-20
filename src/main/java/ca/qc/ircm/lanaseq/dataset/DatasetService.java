@@ -13,8 +13,11 @@ import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
@@ -160,6 +163,31 @@ public class DatasetService {
             .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
       } catch (IOException e) {
         // Ignore since folder probably does not exist.
+      }
+    }
+    if (!dataset.getFilenames().isEmpty()) {
+      List<PathMatcher> matchers = dataset.getFilenames().stream()
+          .map(filename -> FileSystems.getDefault().getPathMatcher("glob:**/*" + filename + "*"))
+          .toList();
+      try (Stream<Path> filenamesFiles =
+          Files.walk(configuration.getHome().getFolder(), FileVisitOption.FOLLOW_LINKS)) {
+        filenamesFiles.filter(Files::isRegularFile)
+            .filter(file -> matchers.stream().anyMatch(matcher -> matcher.matches(file)))
+            .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+            .filter(file -> !file.toFile().isHidden()).forEach(files::add);
+      } catch (IOException e) {
+        // Ignore since folder probably does not exist.
+      }
+      for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
+        try (Stream<Path> filenamesFiles =
+            Files.walk(drive.getFolder(), FileVisitOption.FOLLOW_LINKS)) {
+          filenamesFiles.filter(Files::isRegularFile)
+              .filter(file -> matchers.stream().anyMatch(matcher -> matcher.matches(file)))
+              .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
+              .filter(file -> !file.toFile().isHidden()).forEach(files::add);
+        } catch (IOException e) {
+          // Ignore since folder probably does not exist.
+        }
       }
     }
     return files;

@@ -59,6 +59,11 @@ public class Dataset implements DataWithFiles, Owned, Serializable {
   @ElementCollection
   private Set<String> keywords;
   /**
+   * Other filenames to look for in directories.
+   */
+  @ElementCollection
+  private Set<String> filenames;
+  /**
    * True if dataset can be edited.
    */
   @Column
@@ -209,5 +214,13 @@ public class Dataset implements DataWithFiles, Owned, Serializable {
 
   public void setNote(String note) {
     this.note = note;
+  }
+
+  public Set<String> getFilenames() {
+    return filenames;
+  }
+
+  public void setFilenames(Set<String> filenames) {
+    this.filenames = filenames;
   }
 }

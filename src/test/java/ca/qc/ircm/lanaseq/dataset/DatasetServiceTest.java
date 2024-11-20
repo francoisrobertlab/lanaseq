@@ -100,6 +100,7 @@ public class DatasetServiceTest {
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome().getFolder()).thenReturn(temporaryFolder.resolve("home"));
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
@@ -109,7 +110,7 @@ public class DatasetServiceTest {
     when(configuration.getHome().label(any(Dataset.class), anyBoolean())).then(i -> {
       Dataset dataset = i.getArgument(0);
       boolean unix = i.getArgument(1);
-      String label = "\\\\lanaseq01\\"
+      String label = "\\\\lanaseq01\\home\\"
           + (dataset != null && dataset.getName() != null ? dataset.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
@@ -117,6 +118,8 @@ public class DatasetServiceTest {
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getArchives()).thenReturn(archives);
+    when(configuration.getArchives().get(0).getFolder())
+        .thenReturn(temporaryFolder.resolve("archives"));
     when(configuration.getArchives().get(0).folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
@@ -130,6 +133,8 @@ public class DatasetServiceTest {
           + (dataset != null && dataset.getName() != null ? dataset.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
+    when(configuration.getArchives().get(1).getFolder())
+        .thenReturn(temporaryFolder.resolve("archives2"));
     when(configuration.getArchives().get(1).folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null && dataset.getName() != null
@@ -413,6 +418,27 @@ public class DatasetServiceTest {
   }
 
   @Test
+  public void files_Filenames() throws Throwable {
+    Dataset dataset = repository.findById(2L).orElse(null);
+    Path folder = configuration.getHome().getFolder().resolve("otherdirectory");
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("OF_20241118_ROB.raw"));
+    Files.createFile(folder.resolve("A_OF_20241118_ROB_01.raw"));
+    Files.createFile(folder.resolve(".OF_20241118_ROB.raw"));
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(folder.resolve(".OF_20241118_ROB.raw"), "dos:hidden", Boolean.TRUE);
+    }
+
+    List<Path> files = service.files(dataset);
+
+    verify(configuration.getHome(), times(2)).getFolder();
+    assertEquals(2, files.size());
+    assertTrue(files.contains(folder.resolve("OF_20241118_ROB.raw")));
+    assertTrue(files.contains(folder.resolve("A_OF_20241118_ROB_01.raw")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
   public void files_FolderNotExists() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
 
@@ -495,6 +521,33 @@ public class DatasetServiceTest {
   }
 
   @Test
+  public void files_Archives_Filenames() throws Throwable {
+    Dataset dataset = repository.findById(2L).orElse(null);
+    Path folder = configuration.getArchives().get(0).getFolder().resolve("otherdirectory");
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("OF_20241118_ROB.raw"));
+    Files.createFile(folder.resolve(".OF_20241118_ROB.raw"));
+    if (SystemUtils.IS_OS_WINDOWS) {
+      Files.setAttribute(folder.resolve(".OF_20241118_ROB.raw"), "dos:hidden", Boolean.TRUE);
+    }
+    folder = configuration.getArchives().get(1).getFolder();
+    Files.createDirectories(folder);
+    Files.createFile(folder.resolve("A_OF_20241118_ROB_01.raw"));
+
+    List<Path> files = service.files(dataset);
+
+    verify(configuration.getHome()).getFolder();
+    verify(configuration.getArchives().get(0), times(2)).getFolder();
+    verify(configuration.getArchives().get(1), times(2)).getFolder();
+    assertEquals(2, files.size());
+    folder = configuration.getArchives().get(0).getFolder().resolve("otherdirectory");
+    assertTrue(files.contains(folder.resolve("OF_20241118_ROB.raw")));
+    folder = configuration.getArchives().get(1).getFolder();
+    assertTrue(files.contains(folder.resolve("A_OF_20241118_ROB_01.raw")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
   public void files_ArchivesNotExists() throws Throwable {
     Dataset dataset = repository.findById(1L).orElse(null);
     Path folder = configuration.getHome().folder(dataset);
@@ -533,7 +586,7 @@ public class DatasetServiceTest {
     List<String> labels = service.folderLabels(dataset, false);
 
     assertEquals(1, labels.size());
-    assertEquals("\\\\lanaseq01\\" + dataset.getName(), labels.get(0));
+    assertEquals("\\\\lanaseq01\\home\\" + dataset.getName(), labels.get(0));
   }
 
   @Test
@@ -545,7 +598,7 @@ public class DatasetServiceTest {
     List<String> labels = service.folderLabels(dataset, true);
 
     assertEquals(1, labels.size());
-    assertEquals("//lanaseq01/" + dataset.getName(), labels.get(0));
+    assertEquals("//lanaseq01/home/" + dataset.getName(), labels.get(0));
   }
 
   @Test
@@ -561,7 +614,7 @@ public class DatasetServiceTest {
     List<String> labels = service.folderLabels(dataset, false);
 
     assertEquals(3, labels.size());
-    assertEquals("\\\\lanaseq01\\" + dataset.getName(), labels.get(0));
+    assertEquals("\\\\lanaseq01\\home\\" + dataset.getName(), labels.get(0));
     assertEquals("\\\\lanaseq01\\archives\\" + dataset.getName(), labels.get(1));
     assertEquals("\\\\lanaseq02\\archives2\\" + dataset.getName(), labels.get(2));
   }
@@ -579,7 +632,7 @@ public class DatasetServiceTest {
     List<String> labels = service.folderLabels(dataset, true);
 
     assertEquals(3, labels.size());
-    assertEquals("//lanaseq01/" + dataset.getName(), labels.get(0));
+    assertEquals("//lanaseq01/home/" + dataset.getName(), labels.get(0));
     assertEquals("//lanaseq01/archives/" + dataset.getName(), labels.get(1));
     assertEquals("//lanaseq02/archives2/" + dataset.getName(), labels.get(2));
   }
@@ -1071,7 +1124,7 @@ public class DatasetServiceTest {
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
     Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
         beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
@@ -1080,7 +1133,7 @@ public class DatasetServiceTest {
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq.md5"),
         ("c0f5c3b76104640e306fce3c669f300e  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
     Files.createDirectories(beforeArchive1);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeArchive1.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
@@ -1090,7 +1143,7 @@ public class DatasetServiceTest {
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
     Files.createDirectories(beforeArchive2);
     Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
         beforeArchive2.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
@@ -1100,7 +1153,7 @@ public class DatasetServiceTest {
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
-                .getBytes(StandardCharsets.UTF_8));
+            .getBytes(StandardCharsets.UTF_8));
 
     service.save(dataset);
 

@@ -105,6 +105,11 @@ public class Sample implements DataWithFiles, Owned, Serializable {
   @ElementCollection
   private Set<String> keywords;
   /**
+   * Other filenames to look for in directories.
+   */
+  @ElementCollection
+  private Set<String> filenames;
+  /**
    * True if sample can be edited.
    */
   @Column
@@ -319,5 +324,13 @@ public class Sample implements DataWithFiles, Owned, Serializable {
 
   public void setNote(String note) {
     this.note = note;
+  }
+
+  public Set<String> getFilenames() {
+    return filenames;
+  }
+
+  public void setFilenames(Set<String> filenames) {
+    this.filenames = filenames;
   }
 }
