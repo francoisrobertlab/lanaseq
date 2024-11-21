@@ -2,7 +2,6 @@ package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
@@ -18,6 +17,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -30,12 +30,14 @@ public class DeleteOldUploadFoldersTest {
   private DeleteOldUploadFolders task;
   @MockBean
   private AppConfiguration configuration;
+  @Mock
+  private AppConfiguration.NetworkDrive<DataWithFiles> upload;
   @TempDir
   Path temporaryFolder;
 
   @BeforeEach
   public void beforeTest() {
-    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload()).thenReturn(upload);
     when(configuration.getUpload().getFolder()).thenReturn(temporaryFolder);
     when(configuration.getUploadDeleteAge()).thenReturn(Duration.ofHours(24));
   }

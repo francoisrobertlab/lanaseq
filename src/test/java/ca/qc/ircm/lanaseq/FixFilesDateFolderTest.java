@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -23,6 +22,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -38,16 +38,18 @@ public class FixFilesDateFolderTest {
   private SampleRepository sampleRepository;
   @MockBean
   private AppConfiguration configuration;
+  @Mock
+  private AppConfiguration.NetworkDrive<DataWithFiles> home;
   @TempDir
   Path tempDir;
   private List<Dataset> datasets;
   private List<Sample> samples;
-  private Map<DataWithFiles, List<Path>> files = new HashMap<>();
+  private final Map<DataWithFiles, List<Path>> files = new HashMap<>();
 
   @BeforeEach
   public void beforeTest() {
     fixFilesDateFolder = new FixFilesDateFolder(configuration, datasetRepository, sampleRepository);
-    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getHome()).thenReturn(home);
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return tempDir.resolve("datasets").resolve(String.valueOf(dataset.getDate().getYear()))
@@ -194,10 +196,8 @@ public class FixFilesDateFolderTest {
       return tempDir.resolve("samples").resolve(String.valueOf(sample.getCreationDate().getYear()))
           .resolve(sample.getName());
     });
-    datasets.stream()
-        .forEach(dataset -> dataset.setCreationDate(dataset.getCreationDate().minusYears(1)));
-    samples.stream()
-        .forEach(sample -> sample.setCreationDate(sample.getCreationDate().minusYears(1)));
+    datasets.forEach(dataset -> dataset.setCreationDate(dataset.getCreationDate().minusYears(1)));
+    samples.forEach(sample -> sample.setCreationDate(sample.getCreationDate().minusYears(1)));
     Path datasetsBase = tempDir.resolve("datasets");
     for (Dataset dataset : datasets) {
       Path folder = datasetsBase.resolve(String.valueOf(dataset.getCreationDate().getYear()))

@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ca.qc.ircm.lanaseq.dataset.Dataset;
@@ -12,7 +13,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -357,7 +357,7 @@ public class AppConfigurationTest {
   @Test
   public void analysis_DatasetsNoSample() {
     Collection<Dataset> datasets = datasets();
-    datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
+    datasets.forEach(ds -> ds.setSamples(new ArrayList<>()));
     Path path = appConfiguration.getAnalysis().folder(datasets);
     assertEquals(analysisFolder().resolve("jonh_20191208"), path);
   }
@@ -366,7 +366,7 @@ public class AppConfigurationTest {
   public void analysis_OneDataset() {
     Dataset dataset = dataset();
     assertEquals(analysisFolder().resolve(dataset.getName()),
-        appConfiguration.getAnalysis().folder(Arrays.asList(dataset)));
+        appConfiguration.getAnalysis().folder(List.of(dataset)));
   }
 
   @Test
@@ -390,7 +390,7 @@ public class AppConfigurationTest {
   public void analysis_OneSample() {
     Sample sample = sample();
     assertEquals(analysisFolder().resolve(sample.getName()),
-        appConfiguration.getAnalysis().folder(Arrays.asList(sample)));
+        appConfiguration.getAnalysis().folder(List.of(sample)));
   }
 
   @Test
@@ -410,7 +410,7 @@ public class AppConfigurationTest {
   @Test
   public void analysisLabel_DatasetsNoSample() {
     Collection<Dataset> datasets = datasets();
-    datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
+    datasets.forEach(ds -> ds.setSamples(new ArrayList<>()));
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_20191208",
         appConfiguration.getAnalysis().label(datasets, false));
   }
@@ -418,7 +418,7 @@ public class AppConfigurationTest {
   @Test
   public void analysisLabel_DatasetsNoSampleUnix() {
     Collection<Dataset> datasets = datasets();
-    datasets.stream().forEach(ds -> ds.setSamples(new ArrayList<>()));
+    datasets.forEach(ds -> ds.setSamples(new ArrayList<>()));
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_20191208",
         appConfiguration.getAnalysis().label(datasets, true));
   }
@@ -427,14 +427,14 @@ public class AppConfigurationTest {
   public void analysisLabel_OneDataset() {
     Dataset dataset = dataset();
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\" + dataset.getName(),
-        appConfiguration.getAnalysis().label(Arrays.asList(dataset), false));
+        appConfiguration.getAnalysis().label(List.of(dataset), false));
   }
 
   @Test
   public void analysisLabel_OneDatasetUnix() {
     Dataset dataset = dataset();
     assertEquals("smb://lanaseq01/lanaseq/analysis/" + dataset.getName(),
-        appConfiguration.getAnalysis().label(Arrays.asList(dataset), true));
+        appConfiguration.getAnalysis().label(List.of(dataset), true));
   }
 
   @Test
@@ -475,19 +475,19 @@ public class AppConfigurationTest {
   public void analysisLabel_OneSample() {
     Sample sample = sample();
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\" + sample.getName(),
-        appConfiguration.getAnalysis().label(Arrays.asList(sample), false));
+        appConfiguration.getAnalysis().label(List.of(sample), false));
   }
 
   @Test
   public void analysisLabel_OneSampleUnix() {
     Sample sample = sample();
     assertEquals("smb://lanaseq01/lanaseq/analysis/" + sample.getName(),
-        appConfiguration.getAnalysis().label(Arrays.asList(sample), true));
+        appConfiguration.getAnalysis().label(List.of(sample), true));
   }
 
   @Test
   public void analysisSymlinks() {
-    assertEquals(false, appConfiguration.isAnalysisSymlinks());
+    assertFalse(appConfiguration.isAnalysisSymlinks());
   }
 
   @Test

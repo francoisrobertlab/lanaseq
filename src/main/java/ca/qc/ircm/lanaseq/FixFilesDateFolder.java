@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,9 @@ import org.springframework.stereotype.Component;
 @Profile({ "!test & !integration-test" })
 public class FixFilesDateFolder {
   private static final Logger logger = LoggerFactory.getLogger(FixFilesDateFolder.class);
-  private AppConfiguration configuration;
-  private DatasetRepository datasetRepository;
-  private SampleRepository sampleRepository;
+  private final AppConfiguration configuration;
+  private final DatasetRepository datasetRepository;
+  private final SampleRepository sampleRepository;
 
   @Autowired
   protected FixFilesDateFolder(AppConfiguration configuration, DatasetRepository datasetRepository,
@@ -50,38 +51,24 @@ public class FixFilesDateFolder {
   public void fixFilesDateFolder() {
     List<Dataset> datasets = datasetRepository.findAll();
     for (Dataset dataset : datasets) {
-      if (dataset.getCreationDate().getYear() != dataset.getDate().getYear()) {
-        Path folder = configuration.getHome().folder(dataset);
-        if (!validateParent(folder, dataset.getDate().getYear())) {
-          continue;
-        }
-        Path oldFolder = Optional.of(folder).map(Path::getParent)
-            .map(f -> f.resolveSibling(String.valueOf(dataset.getCreationDate().getYear())))
-            .map(f -> f.resolve(folder.getFileName())).orElseThrow(
-                () -> new IllegalStateException("parent folder of " + folder + " does not exists"));
-        if (Files.exists(oldFolder)) {
-          logger.info("moving folder {} to {} for dataset {}", oldFolder, folder, dataset);
-          try {
-            moveFolder(oldFolder, folder);
-          } catch (IOException e) {
-            logger.error("could not move all old files from {} to {}", oldFolder, folder);
-          }
-        }
-      }
+      moveFolderIfNecessary(dataset);
     }
     List<Sample> samples = sampleRepository.findAll();
     for (Sample sample : samples) {
-      if (sample.getCreationDate().getYear() != sample.getDate().getYear()) {
-        Path folder = configuration.getHome().folder(sample);
-        if (!validateParent(folder, sample.getDate().getYear())) {
-          continue;
-        }
+      moveFolderIfNecessary(sample);
+    }
+  }
+
+  private void moveFolderIfNecessary(DataWithFiles data) {
+    if (data.getCreationDate().getYear() != data.getDate().getYear()) {
+      Path folder = configuration.getHome().folder(data);
+      if (validateParent(folder, data.getDate().getYear())) {
         Path oldFolder = Optional.of(folder).map(Path::getParent)
-            .map(f -> f.resolveSibling(String.valueOf(sample.getCreationDate().getYear())))
+            .map(f -> f.resolveSibling(String.valueOf(data.getCreationDate().getYear())))
             .map(f -> f.resolve(folder.getFileName())).orElseThrow(
                 () -> new IllegalStateException("parent folder of " + folder + " does not exists"));
         if (Files.exists(oldFolder)) {
-          logger.info("moving folder {} to {} for sample {}", oldFolder, folder, sample);
+          logger.info("moving folder {} to {} for dataset {}", oldFolder, folder, data);
           try {
             moveFolder(oldFolder, folder);
           } catch (IOException e) {
@@ -106,20 +93,22 @@ public class FixFilesDateFolder {
   private void moveFolder(Path oldFolder, Path folder) throws IOException {
     try {
       Files.createDirectories(folder);
-      Files.walk(oldFolder).sorted(Collections.reverseOrder()).forEach(oldFile -> {
-        Path file = folder.resolve(oldFolder.relativize(oldFile));
-        try {
-          if (Files.isDirectory(oldFile)) {
-            Files.delete(oldFile);
-          } else {
-            Files.createDirectories(file.getParent());
-            Files.move(oldFile, file);
+      try (Stream<Path> walkFiles = Files.walk(oldFolder).sorted(Collections.reverseOrder())) {
+        walkFiles.forEach(oldFile -> {
+          Path file = folder.resolve(oldFolder.relativize(oldFile));
+          try {
+            if (Files.isDirectory(oldFile)) {
+              Files.delete(oldFile);
+            } else {
+              Files.createDirectories(file.getParent());
+              Files.move(oldFile, file);
+            }
+          } catch (IOException e) {
+            logger.error("could not move old file from {} to {}", oldFile, file);
+            throw new IllegalStateException("could not move old file " + oldFile + " to " + file);
           }
-        } catch (IOException e) {
-          logger.error("could not move old file from {} to {}", oldFile, file);
-          throw new IllegalStateException("could not move old file " + oldFile + " to " + file);
-        }
-      });
+        });
+      }
     } catch (IllegalStateException e) {
       throw new IOException(e.getMessage(), e);
     }

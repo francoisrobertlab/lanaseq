@@ -21,7 +21,7 @@ import org.springframework.util.FileSystemUtils;
 public class DeleteOldUploadFolders {
   private static final Logger logger = LoggerFactory.getLogger(DeleteOldUploadFolders.class);
 
-  private AppConfiguration configuration;
+  private final AppConfiguration configuration;
 
   @Autowired
   protected DeleteOldUploadFolders(AppConfiguration configuration) {
@@ -32,7 +32,7 @@ public class DeleteOldUploadFolders {
    * Deletes old upload folders.
    *
    * <br>
-   * This method is executed every hour with a initial delay of 2 minutes to let the application
+   * This method is executed every hour with an initial delay of 2 minutes to let the application
    * start.
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
@@ -56,9 +56,7 @@ public class DeleteOldUploadFolders {
       }).forEach(file -> {
         try {
           logger.debug("deleting old upload folder {}", file);
-          if (!FileSystemUtils.deleteRecursively(file)) {
-            logger.warn("could not delete folder {}", file);
-          }
+          FileSystemUtils.deleteRecursively(file);
         } catch (IOException e) {
           logger.warn("could not delete folder {}", file);
         }
