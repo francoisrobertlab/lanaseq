@@ -59,7 +59,7 @@
     <!-- Dependencies -->
     <vaadin.version>24.4.4</vaadin.version>
     <generate-property-names.version>2.1</generate-property-names.version>
-    <querydsl.version>5.0.0</querydsl.version>
+    <querydsl.version>5.1.0</querydsl.version>
     <guava.version>32.0.0-jre</guava.version>
     <karibu-testing.version>1.3.23</karibu-testing.version>
     <greenmail.version>2.0.1</greenmail.version>
