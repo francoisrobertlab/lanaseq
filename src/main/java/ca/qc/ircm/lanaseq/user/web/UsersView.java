@@ -241,7 +241,7 @@ public class UsersView extends VerticalLayout
     showDialog(user.getId());
   }
 
-  private void showDialog(Long id) {
+  private void showDialog(long id) {
     UserDialog dialog = dialogFactory.getObject();
     dialog.setUserId(id);
     dialog.addSavedListener(e -> loadUsers());
@@ -264,7 +264,7 @@ public class UsersView extends VerticalLayout
   }
 
   void add() {
-    showDialog(null);
+    showDialog(0);
   }
 
   WebUserFilter filter() {

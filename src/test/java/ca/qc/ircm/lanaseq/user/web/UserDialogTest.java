@@ -36,6 +36,8 @@ import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -54,6 +56,8 @@ public class UserDialogTest extends SpringUIUnitTest {
   private UserService service;
   @Mock
   private ComponentEventListener<SavedEvent<UserDialog>> savedListener;
+  @Captor
+  private ArgumentCaptor<User> userCaptor;
   @Autowired
   private UserRepository repository;
   private Locale locale = Locale.ENGLISH;
@@ -140,12 +144,13 @@ public class UserDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setUser_Null() {
+  public void setUser_0() {
     dialog.form = mock(UserForm.class);
 
-    dialog.setUserId(null);
+    dialog.setUserId(0);
 
-    verify(dialog.form).setUser(null);
+    verify(dialog.form).setUser(userCaptor.capture());
+    assertEquals(0, userCaptor.getValue().getId());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
   }
 

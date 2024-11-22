@@ -72,7 +72,7 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
       return true;
     }
     User owner = protocol.getOwner();
-    boolean authorized = owner.getId().equals(currentUser.getId());
+    boolean authorized = owner.getId() == currentUser.getId();
     authorized |= permission.equals(READ);
     authorized |= permission.equals(WRITE) && roleValidator.hasRole(MANAGER);
     return authorized;

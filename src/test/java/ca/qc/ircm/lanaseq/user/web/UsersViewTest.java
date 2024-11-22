@@ -443,7 +443,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
     assertEquals(1, $(UserDialog.class).all().size());
     UserDialog dialog = $(UserDialog.class).first();
-    assertNull(dialog.getUserId());
+    assertEquals(0, dialog.getUserId());
   }
 
   @Test

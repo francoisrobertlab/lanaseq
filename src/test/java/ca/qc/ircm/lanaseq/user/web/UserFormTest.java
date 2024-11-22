@@ -247,10 +247,10 @@ public class UserFormTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setUser_Null() {
+  public void setUser_New() {
     mockPasswordForm();
 
-    form.setUser(null);
+    form.setUser(new User());
 
     assertEquals("", form.email.getValue());
     assertEquals("", form.name.getValue());
@@ -265,7 +265,7 @@ public class UserFormTest extends SpringUIUnitTest {
     form.passwords.password.setValue("test");
     form.passwords.passwordConfirm.setValue("test");
 
-    form.setUser(null);
+    form.setUser(new User());
 
     assertEquals("", form.passwords.password.getValue());
     assertEquals("", form.passwords.passwordConfirm.getValue());

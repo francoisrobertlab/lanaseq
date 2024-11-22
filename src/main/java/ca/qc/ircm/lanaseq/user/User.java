@@ -2,7 +2,7 @@ package ca.qc.ircm.lanaseq.user;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import ca.qc.ircm.lanaseq.DataNullableId;
+import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +20,7 @@ import java.util.Locale;
 @Entity
 @Table(name = User.TABLE_NAME)
 @GeneratePropertyNames
-public class User implements DataNullableId, Owned, Serializable {
+public class User implements Data, Owned, Serializable {
   public static final String TABLE_NAME = "users";
   public static final long ROBOT_ID = 1;
   private static final long serialVersionUID = -3200958473089020837L;
@@ -30,7 +30,7 @@ public class User implements DataNullableId, Owned, Serializable {
   @Id
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
-  private Long id;
+  private long id;
   /**
    * User's email, also serves for signin.
    */
@@ -96,7 +96,7 @@ public class User implements DataNullableId, Owned, Serializable {
   public User() {
   }
 
-  public User(Long id) {
+  public User(long id) {
     this.id = id;
   }
 
@@ -104,7 +104,7 @@ public class User implements DataNullableId, Owned, Serializable {
     this.email = email;
   }
 
-  public User(Long id, String email) {
+  public User(long id, String email) {
     this.id = id;
     this.email = email;
   }
@@ -150,11 +150,11 @@ public class User implements DataNullableId, Owned, Serializable {
   }
 
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

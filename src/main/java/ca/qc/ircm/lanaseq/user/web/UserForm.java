@@ -29,6 +29,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -97,7 +98,7 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
 
   private Validator<String> emailExists() {
     return (value, context) -> {
-      if (service.exists(value) && (user.getId() == null
+      if (service.exists(value) && (user.getId() == 0
           || !value.equalsIgnoreCase(service.get(user.getId()).map(User::getEmail).orElse("")))) {
         return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
@@ -107,7 +108,7 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
 
   private void updateReadOnly() {
     boolean readOnly =
-        user.getId() != null && !authenticatedUser.hasPermission(user, Permission.WRITE);
+        user.getId() != 0 && !authenticatedUser.hasPermission(user, Permission.WRITE);
     binder.setReadOnly(readOnly);
     passwords.setVisible(!readOnly);
   }
@@ -132,14 +133,12 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   }
 
   void setUser(User user) {
-    if (user == null) {
-      user = new User();
-    }
+    Objects.requireNonNull(user, "user parameter cannot be null");
     this.user = user;
     binder.setBean(user);
     passwords.password.setValue("");
     passwords.passwordConfirm.setValue("");
-    passwords.setRequired(user.getId() == null);
+    passwords.setRequired(user.getId() == 0);
     updateReadOnly();
   }
 }
