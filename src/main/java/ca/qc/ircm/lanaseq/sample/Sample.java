@@ -6,7 +6,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.DataWithFiles;
-import ca.qc.ircm.lanaseq.dataset.DatasetProperties;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
@@ -36,7 +35,7 @@ import java.util.Set;
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
 public class Sample implements DataWithFiles, Owned, Serializable {
-  public static final String NAME_ALREADY_EXISTS = property(DatasetProperties.NAME, ALREADY_EXISTS);
+  public static final String NAME_ALREADY_EXISTS = property(SampleProperties.NAME, ALREADY_EXISTS);
   private static final long serialVersionUID = -6336061129214438932L;
   /**
    * Database identifier.
