@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.security;
 
-import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.DataNullableId;
 import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.User;
 /**
  * An authenticated user.
  */
-public class UserDetailsWithId extends User implements Data {
+public class UserDetailsWithId extends User implements DataNullableId {
   private static final long serialVersionUID = -5167464958438112402L;
   private final Long id;
 

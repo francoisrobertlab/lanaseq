@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.protocol;
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.DataNullableId;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @SuppressFBWarnings(
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
-public class Protocol implements Data, Owned, Serializable {
+public class Protocol implements DataNullableId, Owned, Serializable {
   private static final long serialVersionUID = 5424531974394821303L;
   /**
    * Database identifier.

@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.user;
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.DataNullableId;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @SuppressFBWarnings(
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
-public class ForgotPassword implements Data, Serializable {
+public class ForgotPassword implements DataNullableId, Serializable {
   private static final long serialVersionUID = -2805056622482303376L;
   /**
    * Database identifier.

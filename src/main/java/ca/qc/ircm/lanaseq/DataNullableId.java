@@ -3,11 +3,11 @@ package ca.qc.ircm.lanaseq;
 /**
  * Data in the database.
  */
-public interface Data {
+public interface DataNullableId {
   /**
    * Returns database's identifier.
    *
    * @return database identifier
    */
-  long getId();
+  Long getId();
 }

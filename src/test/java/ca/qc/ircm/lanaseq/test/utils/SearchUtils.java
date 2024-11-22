@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.test.utils;
 
-import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.DataNullableId;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ import java.util.Optional;
  * Search utilities.
  */
 public class SearchUtils {
-  public static <D extends Data> Optional<D> find(Collection<D> datas, Long id) {
+  public static <D extends DataNullableId> Optional<D> find(Collection<D> datas, Long id) {
     return datas.stream().filter(data -> id.equals(data.getId())).findFirst();
   }
 
