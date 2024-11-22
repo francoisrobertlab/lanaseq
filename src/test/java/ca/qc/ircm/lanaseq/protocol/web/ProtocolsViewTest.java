@@ -13,7 +13,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -201,8 +201,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     view.ownerFilter.setValue("jonh.smith@ircm.qc.ca");
     assertEquals(1, view.protocols.getListDataView().getItemCount());
     protocols = view.protocols.getListDataView().getItems().toList();
-    assertTrue(find(protocols, 1L).isPresent());
-    assertFalse(find(protocols, 2L).isPresent());
+    assertTrue(findD(protocols, 1L).isPresent());
+    assertFalse(findD(protocols, 2L).isPresent());
   }
 
   @Test
@@ -410,7 +410,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     test(view.add).click();
 
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertNull(dialog.getProtocolId());
+    assertEquals(0, dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }

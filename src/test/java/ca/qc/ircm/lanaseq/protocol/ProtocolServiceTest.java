@@ -1,10 +1,10 @@
 package ca.qc.ircm.lanaseq.protocol;
 
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -118,10 +118,10 @@ public class ProtocolServiceTest {
     List<Protocol> protocols = service.all();
 
     assertEquals(4, protocols.size());
-    assertTrue(find(protocols, 1L).isPresent());
-    assertTrue(find(protocols, 2L).isPresent());
-    assertTrue(find(protocols, 3L).isPresent());
-    assertTrue(find(protocols, 4L).isPresent());
+    assertTrue(findD(protocols, 1L).isPresent());
+    assertTrue(findD(protocols, 2L).isPresent());
+    assertTrue(findD(protocols, 3L).isPresent());
+    assertTrue(findD(protocols, 4L).isPresent());
     for (Protocol protocol : protocols) {
       verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
     }
@@ -266,7 +266,7 @@ public class ProtocolServiceTest {
     service.save(protocol, Collections.nCopies(1, file));
 
     repository.flush();
-    assertNotNull(protocol.getId());
+    assertNotEquals(0, protocol.getId());
     Protocol database = repository.findById(protocol.getId()).orElse(null);
     assertEquals(protocol.getName(), database.getName());
     assertEquals(protocol.getNote(), database.getNote());
@@ -276,7 +276,7 @@ public class ProtocolServiceTest {
     List<ProtocolFile> files = fileRepository.findByProtocol(protocol);
     assertEquals(1, files.size());
     file = files.get(0);
-    assertNotNull(file.getId());
+    assertNotEquals(0, file.getId());
     assertEquals("New protocol file.docx", file.getFilename());
     assertArrayEquals(content, file.getContent());
     assertFalse(file.isDeleted());
@@ -329,7 +329,7 @@ public class ProtocolServiceTest {
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), file.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
     file = files.get(1);
-    assertNotNull(file.getId());
+    assertNotEquals(0, file.getId());
     assertEquals("New protocol file.docx", file.getFilename());
     assertArrayEquals(content, file.getContent());
     assertFalse(file.isDeleted());

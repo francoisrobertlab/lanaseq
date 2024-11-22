@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.protocol;
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import ca.qc.ircm.lanaseq.DataNullableId;
+import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @SuppressFBWarnings(
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
-public class ProtocolFile implements DataNullableId, Serializable {
+public class ProtocolFile implements Data, Serializable {
   private static final long serialVersionUID = 4522245557420544824L;
   /**
    * Protocol file database identifier.
@@ -31,7 +31,7 @@ public class ProtocolFile implements DataNullableId, Serializable {
   @Id
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
-  private Long id;
+  private long id;
   /**
    * Filename as entered by user.
    */
@@ -83,11 +83,11 @@ public class ProtocolFile implements DataNullableId, Serializable {
   }
 
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

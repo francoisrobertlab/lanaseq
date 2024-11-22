@@ -899,7 +899,7 @@ public class SampleServiceTest {
     List<Sample> samples = new ArrayList<>();
     samples.add(new Sample());
     samples.add(new Sample());
-    assertTrue(service.isMergable(samples));
+    assertFalse(service.isMergable(samples));
   }
 
   @Test
@@ -940,11 +940,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_AssayTrue() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setAssay("ChIP-seq");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setAssay("ChIP-seq");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -952,11 +955,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_AssayFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setAssay("ChIP-seq");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setAssay("ChIP-exo");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -964,21 +970,28 @@ public class SampleServiceTest {
   @Test
   public void isMergable_AssayOneNull() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setAssay("ChIP-seq");
+    sample.setProtocol(protocol);
     samples.add(sample);
-    samples.add(new Sample());
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_TypeTrue() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setType("Input");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setType("Input");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -986,11 +999,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_TypeFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setType("Input");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setType("IP");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -998,21 +1014,28 @@ public class SampleServiceTest {
   @Test
   public void isMergable_TypeOneNull() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setType("Input");
+    sample.setProtocol(protocol);
     samples.add(sample);
-    samples.add(new Sample());
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_TargetTrue() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTarget("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setTarget("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -1020,11 +1043,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_TargetFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTarget("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setTarget("test2");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -1032,21 +1058,28 @@ public class SampleServiceTest {
   @Test
   public void isMergable_TargetOneNull() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTarget("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
-    samples.add(new Sample());
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_StrainTrue() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setStrain("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setStrain("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -1054,11 +1087,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_StrainFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setStrain("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setStrain("test2");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -1066,21 +1102,28 @@ public class SampleServiceTest {
   @Test
   public void isMergable_StrainOneNull() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setStrain("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
-    samples.add(new Sample());
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_StrainDescriptionTrue() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setStrainDescription("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setStrainDescription("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -1088,11 +1131,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_StrainDescriptionFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setStrainDescription("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setStrainDescription("test2");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -1100,21 +1146,28 @@ public class SampleServiceTest {
   @Test
   public void isMergable_StrainDescriptionOneNull() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setStrainDescription("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
-    samples.add(new Sample());
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_TreatmentTrue() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTreatment("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setTreatment("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertTrue(service.isMergable(samples));
   }
@@ -1122,11 +1175,14 @@ public class SampleServiceTest {
   @Test
   public void isMergable_TreatmentFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTreatment("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setTreatment("test2");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
@@ -1134,23 +1190,30 @@ public class SampleServiceTest {
   @Test
   public void isMergable_TreatmentOneNull() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTreatment("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
-    samples.add(new Sample());
+    sample = new Sample();
+    sample.setProtocol(protocol);
+    samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_TargetTrueTreatmentFalse() {
     List<Sample> samples = new ArrayList<>();
+    Protocol protocol = new Protocol(1L);
     Sample sample = new Sample();
     sample.setTarget("test");
     sample.setTreatment("test");
+    sample.setProtocol(protocol);
     samples.add(sample);
     sample = new Sample();
     sample.setTarget("test");
     sample.setTreatment("test2");
+    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }

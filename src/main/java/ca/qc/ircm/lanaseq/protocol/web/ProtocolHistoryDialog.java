@@ -98,7 +98,7 @@ public class ProtocolHistoryDialog extends Dialog
 
   private void updateHeader() {
     setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER,
-        protocol != null && protocol.getId() != null ? protocol.getName() : ""));
+        protocol != null && protocol.getId() != 0 ? protocol.getName() : ""));
   }
 
   void recoverFile(ProtocolFile file) {
@@ -109,11 +109,11 @@ public class ProtocolHistoryDialog extends Dialog
     files.getListDataView().refreshAll();
   }
 
-  public Long getProtocolId() {
+  public long getProtocolId() {
     return protocol.getId();
   }
 
-  public void setProtocolId(Long id) {
+  public void setProtocolId(long id) {
     protocol = service.get(id).orElseThrow();
     files.setItems(service.deletedFiles(protocol));
     updateHeader();

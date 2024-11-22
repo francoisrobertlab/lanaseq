@@ -82,7 +82,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     when(service.deletedFiles(any())).then(i -> {
       Protocol protocol = i.getArgument(0);
-      if (protocol != null && protocol.getId() != null) {
+      if (protocol != null && protocol.getId() != 0) {
         return fileRepository.findByProtocolAndDeletedTrue(protocol);
       } else {
         return new ArrayList<>();
@@ -209,9 +209,9 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setProtocol_Null() {
+  public void setProtocol_0() {
     assertThrows(NoSuchElementException.class, () -> {
-      dialog.setProtocolId(null);
+      dialog.setProtocolId(0);
     });
   }
 }

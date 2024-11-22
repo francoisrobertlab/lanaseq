@@ -337,8 +337,7 @@ public class SampleService {
     boolean mergable = true;
     for (Sample sample : samples) {
       mergable &= first.getProtocol() != null && sample.getProtocol() != null
-          ? first.getProtocol().getId().equals(sample.getProtocol().getId())
-          : first.getProtocol() == sample.getProtocol();
+          && first.getProtocol().getId() == sample.getProtocol().getId();
       mergable &= first.getAssay() != null ? first.getAssay().equals(sample.getAssay())
           : sample.getAssay() == null;
       mergable &= first.getType() != null ? first.getType().equals(sample.getType())

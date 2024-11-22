@@ -90,7 +90,7 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#protocol, 'read')")
   public List<ProtocolFile> files(Protocol protocol) {
-    if (protocol == null || protocol.getId() == null) {
+    if (protocol == null || protocol.getId() == 0) {
       return new ArrayList<>();
     }
     return fileRepository.findByProtocolAndDeletedFalse(protocol);
@@ -106,7 +106,7 @@ public class ProtocolService {
   @PreAuthorize("hasPermission(#protocol, 'read') && hasAnyRole('" + MANAGER + "', '" + ADMIN
       + "')")
   public List<ProtocolFile> deletedFiles(Protocol protocol) {
-    if (protocol == null || protocol.getId() == null) {
+    if (protocol == null || protocol.getId() == 0) {
       return new ArrayList<>();
     }
     return fileRepository.findByProtocolAndDeletedTrue(protocol);
@@ -121,7 +121,7 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#protocol, 'read')")
   public boolean isDeletable(Protocol protocol) {
-    if (protocol == null || protocol.getId() == null) {
+    if (protocol == null || protocol.getId() == 0) {
       return false;
     }
     return !sampleRepository.existsByProtocol(protocol);
@@ -141,14 +141,14 @@ public class ProtocolService {
       throw new IllegalArgumentException("at least one file is required for protocols");
     }
     LocalDateTime now = LocalDateTime.now();
-    if (protocol.getId() == null) {
+    if (protocol.getId() == 0) {
       User user = authenticatedUser.getUser().orElse(null);
       protocol.setOwner(user);
       protocol.setCreationDate(now);
     } else {
       List<ProtocolFile> oldFiles = fileRepository.findByProtocolAndDeletedFalse(protocol);
       for (ProtocolFile file : oldFiles) {
-        if (!files.stream().filter(f -> file.getId().equals(f.getId())).findAny().isPresent()) {
+        if (!files.stream().filter(f -> file.getId() == f.getId()).findAny().isPresent()) {
           file.setDeleted(true);
           fileRepository.save(file);
         }
@@ -156,7 +156,7 @@ public class ProtocolService {
     }
     repository.save(protocol);
     for (ProtocolFile file : files) {
-      if (file.getId() == null) {
+      if (file.getId() == 0) {
         file.setProtocol(protocol);
         file.setCreationDate(now);
       }

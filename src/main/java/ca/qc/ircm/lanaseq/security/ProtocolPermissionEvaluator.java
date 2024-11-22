@@ -68,7 +68,7 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
     if (roleValidator.hasRole(ADMIN)) {
       return true;
     }
-    if (protocol.getId() == null) {
+    if (protocol.getId() == 0) {
       return true;
     }
     User owner = protocol.getOwner();
