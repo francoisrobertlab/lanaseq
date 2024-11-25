@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.protocol;
 
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -118,10 +118,10 @@ public class ProtocolServiceTest {
     List<Protocol> protocols = service.all();
 
     assertEquals(4, protocols.size());
-    assertTrue(findD(protocols, 1L).isPresent());
-    assertTrue(findD(protocols, 2L).isPresent());
-    assertTrue(findD(protocols, 3L).isPresent());
-    assertTrue(findD(protocols, 4L).isPresent());
+    assertTrue(find(protocols, 1L).isPresent());
+    assertTrue(find(protocols, 2L).isPresent());
+    assertTrue(find(protocols, 3L).isPresent());
+    assertTrue(find(protocols, 4L).isPresent());
     for (Protocol protocol : protocols) {
       verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
     }

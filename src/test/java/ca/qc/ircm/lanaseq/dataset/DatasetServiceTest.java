@@ -5,7 +5,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -216,14 +216,14 @@ public class DatasetServiceTest {
     List<Dataset> datasets = service.all();
 
     assertEquals(8, datasets.size());
-    assertTrue(findD(datasets, 1L).isPresent());
-    assertTrue(findD(datasets, 2L).isPresent());
-    assertTrue(findD(datasets, 3L).isPresent());
-    assertTrue(findD(datasets, 4L).isPresent());
-    assertTrue(findD(datasets, 5L).isPresent());
-    assertTrue(findD(datasets, 6L).isPresent());
-    assertTrue(findD(datasets, 7L).isPresent());
-    assertTrue(findD(datasets, 8L).isPresent());
+    assertTrue(find(datasets, 1L).isPresent());
+    assertTrue(find(datasets, 2L).isPresent());
+    assertTrue(find(datasets, 3L).isPresent());
+    assertTrue(find(datasets, 4L).isPresent());
+    assertTrue(find(datasets, 5L).isPresent());
+    assertTrue(find(datasets, 6L).isPresent());
+    assertTrue(find(datasets, 7L).isPresent());
+    assertTrue(find(datasets, 8L).isPresent());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -949,9 +949,9 @@ public class DatasetServiceTest {
     assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
-    assertTrue(findD(dataset.getSamples(), 1L).isPresent());
-    assertTrue(findD(dataset.getSamples(), 3L).isPresent());
-    assertTrue(findD(dataset.getSamples(), 4L).isPresent());
+    assertTrue(find(dataset.getSamples(), 1L).isPresent());
+    assertTrue(find(dataset.getSamples(), 3L).isPresent());
+    assertTrue(find(dataset.getSamples(), 4L).isPresent());
   }
 
   @Test
@@ -1020,9 +1020,9 @@ public class DatasetServiceTest {
     assertTrue(dataset.isEditable());
     assertEquals(LocalDateTime.of(2018, 10, 20, 13, 28, 12), dataset.getCreationDate());
     assertEquals(3, dataset.getSamples().size());
-    assertTrue(findD(dataset.getSamples(), 1L).isPresent());
-    assertTrue(findD(dataset.getSamples(), 2L).isPresent());
-    assertTrue(findD(dataset.getSamples(), 3L).isPresent());
+    assertTrue(find(dataset.getSamples(), 1L).isPresent());
+    assertTrue(find(dataset.getSamples(), 2L).isPresent());
+    assertTrue(find(dataset.getSamples(), 3L).isPresent());
     Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));

@@ -13,7 +13,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.HISTORY;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.ID;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.PROTOCOLS_REQUIRED;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -199,8 +199,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     view.ownerFilter.setValue("jonh.smith@ircm.qc.ca");
     assertEquals(1, view.protocols.getListDataView().getItemCount());
     protocols = view.protocols.getListDataView().getItems().toList();
-    assertTrue(findD(protocols, 1L).isPresent());
-    assertFalse(findD(protocols, 2L).isPresent());
+    assertTrue(find(protocols, 1L).isPresent());
+    assertFalse(find(protocols, 2L).isPresent());
   }
 
   @Test

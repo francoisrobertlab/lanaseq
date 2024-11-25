@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.user;
 
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -172,9 +172,9 @@ public class UserServiceTest {
     List<User> users = service.all();
 
     assertEquals(9, users.size());
-    assertTrue(findD(users, 1L).isPresent());
-    assertTrue(findD(users, 2L).isPresent());
-    assertTrue(findD(users, 3L).isPresent());
+    assertTrue(find(users, 1L).isPresent());
+    assertTrue(find(users, 2L).isPresent());
+    assertTrue(find(users, 3L).isPresent());
     for (User user : users) {
       verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
     }
