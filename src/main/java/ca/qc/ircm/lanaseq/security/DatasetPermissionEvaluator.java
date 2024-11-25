@@ -68,7 +68,7 @@ public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
     if (roleValidator.hasRole(ADMIN)) {
       return true;
     }
-    if (dataset.getId() == null) {
+    if (dataset.getId() == 0) {
       return true;
     }
     User owner = dataset.getOwner();

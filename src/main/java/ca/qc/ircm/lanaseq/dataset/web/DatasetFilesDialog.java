@@ -375,11 +375,11 @@ public class DatasetFilesDialog extends Dialog
     return fileBinder.validate();
   }
 
-  public Long getDatasetId() {
+  public long getDatasetId() {
     return dataset.getId();
   }
 
-  public void setDatasetId(Long id) {
+  public void setDatasetId(long id) {
     dataset = service.get(id).orElseThrow();
     boolean readOnly =
         !dataset.isEditable() || !authenticatedUser.hasPermission(dataset, Permission.WRITE);

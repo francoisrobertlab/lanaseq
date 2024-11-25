@@ -291,11 +291,11 @@ public class AddDatasetFilesDialog extends Dialog
     }
   }
 
-  Long getDatasetId() {
+  long getDatasetId() {
     return dataset.getId();
   }
 
-  void setDatasetId(Long id) {
+  void setDatasetId(long id) {
     dataset = service.get(id).orElseThrow();
     updateHeader();
     createFolder();

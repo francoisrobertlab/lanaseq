@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -85,8 +86,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
-    when(service.get(any())).then(
-        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     datasets = repository.findAll();
     when(service.all(any())).thenReturn(datasets);
     UI.getCurrent().setLocale(locale);

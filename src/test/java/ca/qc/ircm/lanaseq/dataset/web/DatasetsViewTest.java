@@ -13,16 +13,15 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.ID;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -85,8 +84,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
-    when(service.get(any())).then(
-        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     datasets = repository.findAll();
     when(service.all(any())).thenReturn(datasets);
     UI.getCurrent().setLocale(locale);
@@ -138,7 +136,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void datasets_View() {
     Dataset dataset = datasets.get(0);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+    when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
     doubleClickItem(view.datasets, dataset);
 
@@ -150,7 +148,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void datasets_View_RefreshOnSave() {
     Dataset dataset = datasets.get(0);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+    when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
     doubleClickItem(view.datasets, dataset);
 
@@ -163,7 +161,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void datasets_View_RefreshOnDelete() {
     Dataset dataset = datasets.get(0);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+    when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
     doubleClickItem(view.datasets, dataset);
 
@@ -176,7 +174,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void datasets_AddFiles_Control() {
     Dataset dataset = datasets.get(0);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+    when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
     clickItem(view.datasets, dataset, view.datasets.name, true, false, false, false);
 
@@ -187,7 +185,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void datasets_AddFiles_Meta() {
     Dataset dataset = datasets.get(0);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+    when(service.get(anyLong())).thenReturn(Optional.of(dataset));
 
     clickItem(view.datasets, dataset, view.datasets.name, false, false, false, true);
 
@@ -270,7 +268,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getId());
+    assertEquals(0, dataset.getId());
     assertEquals(4, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("mnase"));
     assertTrue(dataset.getKeywords().contains("ip"));
@@ -317,7 +315,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getId());
+    assertEquals(0, dataset.getId());
     assertEquals(4, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("mnase"));
     assertTrue(dataset.getKeywords().contains("ip"));
@@ -350,8 +348,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void merge_DuplicatedSample() {
     when(sampleService.isMergable(any())).thenReturn(true);
-    Dataset dataset1 = find(datasets, 2L).get();
-    Dataset dataset2 = find(datasets, 6L).get();
+    Dataset dataset1 = findD(datasets, 2L).get();
+    Dataset dataset2 = findD(datasets, 6L).get();
     dataset1.getSamples();
     dataset1.getSamples().forEach(sample -> entityManager.detach(sample));
     dataset2.getSamples();
@@ -367,7 +365,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getId());
+    assertEquals(0, dataset.getId());
     assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("chipseq"));

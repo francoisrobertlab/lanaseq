@@ -5,7 +5,6 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -189,8 +188,8 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void get_Null() {
-    Dataset dataset = service.get(null).orElse(null);
+  public void get_0() {
+    Dataset dataset = service.get(0).orElse(null);
     assertNull(dataset);
   }
 
@@ -217,14 +216,14 @@ public class DatasetServiceTest {
     List<Dataset> datasets = service.all();
 
     assertEquals(8, datasets.size());
-    assertTrue(find(datasets, 1L).isPresent());
-    assertTrue(find(datasets, 2L).isPresent());
-    assertTrue(find(datasets, 3L).isPresent());
-    assertTrue(find(datasets, 4L).isPresent());
-    assertTrue(find(datasets, 5L).isPresent());
-    assertTrue(find(datasets, 6L).isPresent());
-    assertTrue(find(datasets, 7L).isPresent());
-    assertTrue(find(datasets, 8L).isPresent());
+    assertTrue(findD(datasets, 1L).isPresent());
+    assertTrue(findD(datasets, 2L).isPresent());
+    assertTrue(findD(datasets, 3L).isPresent());
+    assertTrue(findD(datasets, 4L).isPresent());
+    assertTrue(findD(datasets, 5L).isPresent());
+    assertTrue(findD(datasets, 6L).isPresent());
+    assertTrue(findD(datasets, 7L).isPresent());
+    assertTrue(findD(datasets, 8L).isPresent());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
