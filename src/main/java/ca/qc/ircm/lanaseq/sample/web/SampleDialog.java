@@ -180,7 +180,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> delete());
-    setSampleId(null);
+    setSampleId(0);
   }
 
   @Override
@@ -285,7 +285,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     boolean valid = validateSample().isOk();
     if (valid) {
       Sample sample = binder.getBean();
-      if (service.exists(sample.getName()) && (sample.getId() == null || !sample.getName()
+      if (service.exists(sample.getName()) && (sample.getId() == 0 || !sample.getName()
           .equalsIgnoreCase(service.get(sample.getId()).map(Sample::getName).orElse("")))) {
         valid = false;
         error.setText(getTranslation(SAMPLE_PREFIX + NAME_ALREADY_EXISTS, sample.getName()));
@@ -320,18 +320,18 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     close();
   }
 
-  Long getSampleId() {
+  long getSampleId() {
     return binder.getBean().getId();
   }
 
-  void setSampleId(Long id) {
-    Sample sample = id != null ? service.get(id).orElseThrow() : new Sample();
+  void setSampleId(long id) {
+    Sample sample = id != 0 ? service.get(id).orElseThrow() : new Sample();
     if (sample.getDate() == null) {
       sample.setDate(LocalDate.now());
     }
     binder.setBean(sample);
     boolean readOnly = !authenticatedUser.hasPermission(sample, Permission.WRITE)
-        || (sample.getId() != null && !sample.isEditable());
+        || (sample.getId() != 0 && !sample.isEditable());
     binder.setReadOnly(readOnly);
     save.setVisible(!readOnly);
     cancel.setVisible(!readOnly);

@@ -5,7 +5,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -128,8 +128,8 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(dataset.isEditable());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(2, dataset.getSamples().size());
-    assertTrue(find(dataset.getSamples(), 5L).isPresent());
-    assertTrue(find(dataset.getSamples(), 10L).isPresent());
+    assertTrue(findD(dataset.getSamples(), 5L).isPresent());
+    assertTrue(findD(dataset.getSamples(), 10L).isPresent());
   }
 
   @Test

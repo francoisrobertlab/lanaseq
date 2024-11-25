@@ -9,7 +9,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog.id;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -182,11 +182,11 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
     }
     assertEquals(4, dialog.samples.getListDataView().getItemCount());
     samples = dialog.samples.getListDataView().getItems().toList();
-    assertFalse(find(samples, 1L).isPresent());
-    assertTrue(find(samples, 4L).isPresent());
-    assertTrue(find(samples, 5L).isPresent());
-    assertTrue(find(samples, 10L).isPresent());
-    assertTrue(find(samples, 11L).isPresent());
+    assertFalse(findD(samples, 1L).isPresent());
+    assertTrue(findD(samples, 4L).isPresent());
+    assertTrue(findD(samples, 5L).isPresent());
+    assertTrue(findD(samples, 10L).isPresent());
+    assertTrue(findD(samples, 11L).isPresent());
   }
 
   @Test

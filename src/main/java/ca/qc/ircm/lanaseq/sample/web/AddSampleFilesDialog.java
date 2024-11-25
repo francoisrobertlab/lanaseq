@@ -293,11 +293,11 @@ public class AddSampleFilesDialog extends Dialog
     }
   }
 
-  Long getSampleId() {
+  long getSampleId() {
     return sample.getId();
   }
 
-  void setSampleId(Long id) {
+  void setSampleId(long id) {
     sample = service.get(id).orElseThrow();
     updateHeader();
     createFolder();

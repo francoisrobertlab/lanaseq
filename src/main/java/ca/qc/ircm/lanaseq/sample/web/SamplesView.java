@@ -270,7 +270,7 @@ public class SamplesView extends VerticalLayout
 
   private void showDialog(Sample sample) {
     SampleDialog dialog = dialogFactory.getObject();
-    dialog.setSampleId(sample != null ? sample.getId() : null);
+    dialog.setSampleId(sample != null ? sample.getId() : 0);
     dialog.addSavedListener(e -> samples.getDataProvider().refreshAll());
     dialog.addDeletedListener(e -> samples.getDataProvider().refreshAll());
     dialog.open();

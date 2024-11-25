@@ -5,7 +5,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
-import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -197,8 +197,8 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void get_Null() {
-    Sample sample = service.get(null).orElse(null);
+  public void get_invalid() {
+    Sample sample = service.get(0).orElse(null);
     assertNull(sample);
   }
 
@@ -222,17 +222,17 @@ public class SampleServiceTest {
     List<Sample> samples = service.all();
 
     assertEquals(11, samples.size());
-    assertTrue(find(samples, 1L).isPresent());
-    assertTrue(find(samples, 2L).isPresent());
-    assertTrue(find(samples, 3L).isPresent());
-    assertTrue(find(samples, 4L).isPresent());
-    assertTrue(find(samples, 5L).isPresent());
-    assertTrue(find(samples, 6L).isPresent());
-    assertTrue(find(samples, 7L).isPresent());
-    assertTrue(find(samples, 8L).isPresent());
-    assertTrue(find(samples, 9L).isPresent());
-    assertTrue(find(samples, 10L).isPresent());
-    assertTrue(find(samples, 11L).isPresent());
+    assertTrue(findD(samples, 1L).isPresent());
+    assertTrue(findD(samples, 2L).isPresent());
+    assertTrue(findD(samples, 3L).isPresent());
+    assertTrue(findD(samples, 4L).isPresent());
+    assertTrue(findD(samples, 5L).isPresent());
+    assertTrue(findD(samples, 6L).isPresent());
+    assertTrue(findD(samples, 7L).isPresent());
+    assertTrue(findD(samples, 8L).isPresent());
+    assertTrue(findD(samples, 9L).isPresent());
+    assertTrue(findD(samples, 10L).isPresent());
+    assertTrue(findD(samples, 11L).isPresent());
     for (Sample sample : samples) {
       verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
     }

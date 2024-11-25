@@ -310,7 +310,7 @@ public class DatasetService {
       throw new NullPointerException("dataset's name cannot be null");
     }
     if (dataset.getSamples() != null && dataset.getSamples().stream()
-        .filter(sample -> sample.getId() == null).findAny().isPresent()) {
+        .filter(sample -> sample.getId() == 0).findAny().isPresent()) {
       throw new IllegalArgumentException("all dataset's samples must already be in database");
     }
     LocalDateTime now = LocalDateTime.now();

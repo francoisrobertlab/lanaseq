@@ -550,8 +550,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setSampleId_Null() {
-    dialog.setSampleId(null);
+  public void setSampleId_0() {
+    dialog.setSampleId(0);
 
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
     assertTrue(LocalDate.now().minusDays(2).isBefore(dialog.date.getValue())
@@ -941,7 +941,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void save_NameExistsSameSample() {
     Sample sample = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
     dialog.setSampleId(sample.getId());

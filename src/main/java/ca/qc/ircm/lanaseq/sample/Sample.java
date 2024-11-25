@@ -5,7 +5,7 @@ import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import ca.qc.ircm.lanaseq.DataNullableId;
+import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.text.Strings;
@@ -35,7 +35,7 @@ import java.util.Set;
 @SuppressFBWarnings(
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
-public class Sample implements DataNullableId, DataWithFiles, Owned, Serializable {
+public class Sample implements Data, DataWithFiles, Owned, Serializable {
   public static final String NAME_ALREADY_EXISTS = property(SampleProperties.NAME, ALREADY_EXISTS);
   private static final long serialVersionUID = -6336061129214438932L;
   /**
@@ -44,7 +44,7 @@ public class Sample implements DataNullableId, DataWithFiles, Owned, Serializabl
   @Id
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
-  private Long id;
+  private long id;
   /**
    * Name that is used for files associated with sample.
    */
@@ -145,7 +145,7 @@ public class Sample implements DataNullableId, DataWithFiles, Owned, Serializabl
   public Sample() {
   }
 
-  public Sample(Long id) {
+  public Sample(long id) {
     this.id = id;
   }
 
@@ -153,7 +153,7 @@ public class Sample implements DataNullableId, DataWithFiles, Owned, Serializabl
     this.sampleId = sampleId;
   }
 
-  public Sample(Long id, String sampleId) {
+  public Sample(long id, String sampleId) {
     this.id = id;
     this.sampleId = sampleId;
   }
@@ -189,11 +189,11 @@ public class Sample implements DataNullableId, DataWithFiles, Owned, Serializabl
   }
 
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

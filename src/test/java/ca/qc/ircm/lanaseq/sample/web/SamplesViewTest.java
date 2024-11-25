@@ -324,7 +324,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void view() {
     Sample sample = samples.get(0);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
 
     doubleClickItem(view.samples, sample);
 
@@ -337,7 +337,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void view_RefreshOnSave() {
     Sample sample = samples.get(0);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
     view.samples.setItems(mock(DataProvider.class));
 
     doubleClickItem(view.samples, sample);
@@ -350,7 +350,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void view_RefreshOnDelete() {
     Sample sample = samples.get(0);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
     view.samples.setItems(mock(DataProvider.class));
 
     doubleClickItem(view.samples, sample);
@@ -495,7 +495,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertNull(dialog.getSampleId());
+    assertEquals(0, dialog.getSampleId());
   }
 
   @Test

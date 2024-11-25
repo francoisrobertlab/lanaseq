@@ -14,6 +14,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.MERGE_ERROR;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.findD;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
@@ -262,11 +263,11 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
@@ -309,11 +310,11 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
@@ -362,8 +363,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(2, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
     assertNull(dataset.getId());
@@ -394,11 +395,11 @@ public class DatasetsViewTest extends SpringUIUnitTest {
         ((ErrorNotification) error).getText());
     verify(sampleService).isMergable(samplesCaptor.capture());
     assertEquals(5, samplesCaptor.getValue().size());
-    assertTrue(find(samplesCaptor.getValue(), 1L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 2L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 3L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 4L).isPresent());
-    assertTrue(find(samplesCaptor.getValue(), 5L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 1L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 2L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 3L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 4L).isPresent());
+    assertTrue(findD(samplesCaptor.getValue(), 5L).isPresent());
     verify(service, never()).save(any());
   }
 
