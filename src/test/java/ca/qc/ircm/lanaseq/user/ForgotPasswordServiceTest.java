@@ -122,17 +122,15 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void get_NullId() throws Exception {
-    ForgotPassword forgotPassword = service.get(null, confirmNumber).orElse(null);
+  public void get_Id0() throws Exception {
+    ForgotPassword forgotPassword = service.get(0, confirmNumber).orElse(null);
 
     assertNull(forgotPassword);
   }
 
   @Test
   public void get_NullConfirmNumber() throws Exception {
-    ForgotPassword forgotPassword = service.get(7L, null).orElse(null);
-
-    assertNull(forgotPassword);
+    assertThrows(NullPointerException.class, () -> service.get(7L, null));
   }
 
   @Test

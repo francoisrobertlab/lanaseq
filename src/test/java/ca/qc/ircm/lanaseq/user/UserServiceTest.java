@@ -94,8 +94,8 @@ public class UserServiceTest {
 
   @Test
   @WithMockUser
-  public void get_Null() {
-    User user = service.get(null).orElse(null);
+  public void get_0() {
+    User user = service.get(0).orElse(null);
 
     assertNull(user);
   }

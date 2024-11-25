@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -62,7 +63,7 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
-    when(service.get(any(), any())).thenReturn(Optional.of(forgotPassword));
+    when(service.get(anyLong(), any())).thenReturn(Optional.of(forgotPassword));
     UI.getCurrent().setLocale(locale);
     String parameter = "2/b";
     view = navigate(UseForgotPasswordView.class, parameter);
@@ -139,7 +140,7 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
   public void setParameter_IdNotNumber() {
     String parameter = "A434GS";
     view = navigate(UseForgotPasswordView.class, parameter);
-    verify(service, times(2)).get(any(), any());
+    verify(service, times(2)).get(anyLong(), any());
     Notification notification = $(Notification.class).first();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());
@@ -151,7 +152,7 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
     view.form = mock(PasswordsForm.class);
     String parameter = "34925";
     view = navigate(UseForgotPasswordView.class, parameter);
-    verify(service, times(2)).get(any(), any());
+    verify(service, times(2)).get(anyLong(), any());
     Notification notification = $(Notification.class).first();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());
@@ -173,7 +174,7 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
   @Test
   public void setParameter_Null() {
     view = navigate(UseForgotPasswordView.class);
-    verify(service, times(2)).get(any(), any());
+    verify(service, times(2)).get(anyLong(), any());
     Notification notification = $(Notification.class).first();
     assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
     assertFalse(view.save.isEnabled());

@@ -41,11 +41,7 @@ public class UserService {
    * @return user having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
-  public Optional<User> get(Long id) {
-    if (id == null) {
-      return Optional.empty();
-    }
-
+  public Optional<User> get(long id) {
     return repository.findById(id);
   }
 
