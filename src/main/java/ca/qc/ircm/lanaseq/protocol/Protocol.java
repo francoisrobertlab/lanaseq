@@ -61,7 +61,7 @@ public class Protocol implements Data, Owned, Serializable {
   public Protocol() {
   }
 
-  public Protocol(Long id) {
+  public Protocol(long id) {
     this.id = id;
   }
 
@@ -69,7 +69,7 @@ public class Protocol implements Data, Owned, Serializable {
     this.name = name;
   }
 
-  public Protocol(Long id, String name) {
+  public Protocol(long id, String name) {
     this.id = id;
     this.name = name;
   }

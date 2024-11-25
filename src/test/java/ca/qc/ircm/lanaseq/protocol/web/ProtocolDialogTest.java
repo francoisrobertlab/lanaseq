@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -133,8 +134,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   public void beforeTest() {
     protocolFiles = fileRepository.findAll();
     when(service.all()).thenReturn(repository.findAll());
-    when(service.get(any())).then(
-        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     when(service.files(any())).then(i -> {
       Protocol protocol = i.getArgument(0);
       return protocol.getId() != 0 ? fileRepository.findByProtocolAndDeletedFalse(protocol)

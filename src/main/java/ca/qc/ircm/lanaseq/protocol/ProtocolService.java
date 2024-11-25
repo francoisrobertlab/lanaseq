@@ -47,11 +47,7 @@ public class ProtocolService {
    * @return protocol having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
-  public Optional<Protocol> get(Long id) {
-    if (id == null) {
-      return Optional.empty();
-    }
-
+  public Optional<Protocol> get(long id) {
     return repository.findById(id);
   }
 

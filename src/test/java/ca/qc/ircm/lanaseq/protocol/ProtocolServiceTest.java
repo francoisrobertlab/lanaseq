@@ -81,8 +81,8 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
-  public void get_Null() {
-    Protocol protocol = service.get(null).orElse(null);
+  public void get_0() {
+    Protocol protocol = service.get(0).orElse(null);
     assertNull(protocol);
   }
 
