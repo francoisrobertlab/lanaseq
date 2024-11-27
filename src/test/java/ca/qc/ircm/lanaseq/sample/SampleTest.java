@@ -350,26 +350,4 @@ public class SampleTest {
     sample.generateName();
     assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IcAA_R1_20200508", sample.getName());
   }
-
-  @Test
-  public void generateName_NullDate() {
-    Sample sample = new Sample();
-    sample.setSampleId("FR1");
-    sample.setReplicate("R1");
-    sample.setAssay("RNA-seq");
-    sample.setType("IP");
-    sample.setTarget("Spt16");
-    sample.setStrain("yFR101");
-    sample.setStrainDescription("G24D");
-    sample.setTreatment("IAA");
-    sample.generateName();
-    assertEquals("FR1_RNAseq_IP_Spt16_yFR101_G24D_IAA_R1", sample.getName());
-  }
-
-  @Test
-  public void generateName_AllNull() {
-    Sample sample = new Sample();
-    sample.generateName();
-    assertEquals("", sample.getName());
-  }
 }

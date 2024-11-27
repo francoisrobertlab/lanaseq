@@ -177,7 +177,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null ? Paths.get(sample.getName()) : null;
+      return sample != null ? Paths.get(sample.getName()) : null;
     });
     List archives = new ArrayList();
     archives.add(mock(AppConfiguration.NetworkDrive.class));
@@ -185,17 +185,17 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     when(configuration.getArchives()).thenReturn(archives);
     when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null
-          ? temporaryFolder.resolve("archives").resolve(sample.getName())
-          : null;
+      return sample != null ? temporaryFolder.resolve("archives").resolve(sample.getName()) : null;
     });
     when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null
-          ? temporaryFolder.resolve("archives2").resolve(sample.getName())
-          : null;
+      return sample != null ? temporaryFolder.resolve("archives2").resolve(sample.getName()) : null;
     });
     when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
+      Sample sample = i.getArgument(0);
+      return sample != null ? temporaryFolder.resolve("upload").resolve(sample.getName()) : null;
+    });
     random.nextBytes(fileContent);
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
@@ -549,7 +549,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     Mockito.doAnswer(i -> {
       Collection<Path> files = i.getArgument(1);
-      Path file = files.stream().findFirst().orElse(null);
+      Path file = files.stream().findFirst().orElseThrow();
       Files.copy(file, tempFile, StandardCopyOption.REPLACE_EXISTING);
       assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
       return null;

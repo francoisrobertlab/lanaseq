@@ -60,7 +60,6 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,7 +234,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
 
   private void updateHeader() {
     Sample sample = binder.getBean();
-    if (sample != null && sample.getName() != null) {
+    if (sample != null && sample.getId() != 0) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()));
       confirm.setText(getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, sample.getName()));
     } else {
@@ -325,9 +324,12 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   }
 
   void setSampleId(long id) {
-    Sample sample = id != 0 ? service.get(id).orElseThrow() : new Sample();
-    if (sample.getDate() == null) {
-      sample.setDate(LocalDate.now());
+    Sample sample;
+    if (id == 0) {
+      sample = new Sample();
+      sample.setOwner(authenticatedUser.getUser().orElseThrow());
+    } else {
+      sample = service.get(id).orElseThrow();
     }
     binder.setBean(sample);
     boolean readOnly = !authenticatedUser.hasPermission(sample, Permission.WRITE)

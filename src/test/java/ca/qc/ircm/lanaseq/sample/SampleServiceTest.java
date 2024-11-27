@@ -11,7 +11,7 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,11 +29,9 @@ import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
-import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +47,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -65,13 +63,13 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Tests for {@link SampleService}.
  */
 @ServiceTestAnnotations
-@WithMockUser
+@WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleServiceTest {
   private static final String READ = "read";
   private static final String WRITE = "write";
@@ -93,7 +91,7 @@ public class SampleServiceTest {
   private AppConfiguration configuration;
   @MockBean
   private PermissionEvaluator permissionEvaluator;
-  @MockBean
+  @Autowired
   private AuthenticatedUser authenticatedUser;
   @TempDir
   Path temporaryFolder;
@@ -109,15 +107,12 @@ public class SampleServiceTest {
     when(configuration.getHome().getFolder()).thenReturn(temporaryFolder.resolve("home"));
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null
-          ? temporaryFolder.resolve("home").resolve(sample.getName())
-          : null;
+      return sample != null ? temporaryFolder.resolve("home").resolve(sample.getName()) : null;
     });
     when(configuration.getHome().label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
       boolean unix = i.getArgument(1);
-      String label = "\\\\lanaseq01\\home\\"
-          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      String label = "\\\\lanaseq01\\home\\" + (sample != null ? sample.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
@@ -128,37 +123,30 @@ public class SampleServiceTest {
         .thenReturn(temporaryFolder.resolve("archives"));
     when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null
-          ? temporaryFolder.resolve("archives").resolve(sample.getName())
-          : null;
+      return sample != null ? temporaryFolder.resolve("archives").resolve(sample.getName()) : null;
     });
     when(configuration.getArchives().get(0).label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
       boolean unix = i.getArgument(1);
-      String label = "\\\\lanaseq01\\archives\\"
-          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      String label = "\\\\lanaseq01\\archives\\" + (sample != null ? sample.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
     when(configuration.getArchives().get(1).getFolder())
         .thenReturn(temporaryFolder.resolve("archives2"));
     when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null
-          ? temporaryFolder.resolve("archives2").resolve(sample.getName())
-          : null;
+      return sample != null ? temporaryFolder.resolve("archives2").resolve(sample.getName()) : null;
     });
     when(configuration.getArchives().get(1).label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);
       boolean unix = i.getArgument(1);
-      String label = "\\\\lanaseq02\\archives2\\"
-          + (sample != null && sample.getName() != null ? sample.getName() : "");
+      String label = "\\\\lanaseq02\\archives2\\" + (sample != null ? sample.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
     when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null ? temporaryFolder.resolve(sample.getName())
-          : null;
+      return sample != null ? temporaryFolder.resolve(sample.getName()) : null;
     });
     when(configuration.getUpload().getFolder()).then(i -> {
       return temporaryFolder.resolve("upload");
@@ -171,7 +159,7 @@ public class SampleServiceTest {
 
   @Test
   public void get() {
-    Sample sample = service.get(1L).orElse(null);
+    Sample sample = service.get(1L).orElseThrow();
 
     assertEquals((Long) 1L, sample.getId());
     assertEquals("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020", sample.getName());
@@ -196,6 +184,22 @@ public class SampleServiceTest {
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }
 
+  private Sample sample() {
+    Sample sample = new Sample();
+    sample.setSampleId("JS");
+    sample.setReplicate("1");
+    sample.setAssay("ChIP-seq");
+    sample.setType("IP");
+    sample.setStrain("yFR101");
+    sample.setStrainDescription("WT");
+    sample.setTarget("polr2a");
+    sample.setTreatment("dmso");
+    sample.generateName();
+    sample.setOwner(authenticatedUser.getUser().orElseThrow());
+    sample.setProtocol(protocolRepository.findById(1L).orElseThrow());
+    return sample;
+  }
+
   @Test
   public void get_invalid() {
     Sample sample = service.get(0).orElse(null);
@@ -210,11 +214,6 @@ public class SampleServiceTest {
   @Test
   public void exists_False() {
     assertFalse(service.exists("FR1_MNaseSeq_IP_polr2a_yFR100_WT_Rappa"));
-  }
-
-  @Test
-  public void exists_Null() {
-    assertFalse(service.exists(null));
   }
 
   @Test
@@ -363,27 +362,6 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void all_NullFilter() {
-    List<Sample> samples = service.all(null);
-
-    assertEquals(11, samples.size());
-    assertEquals((Long) 1L, samples.get(0).getId());
-    assertEquals((Long) 2L, samples.get(1).getId());
-    assertEquals((Long) 3L, samples.get(2).getId());
-    assertEquals((Long) 4L, samples.get(3).getId());
-    assertEquals((Long) 5L, samples.get(4).getId());
-    assertEquals((Long) 6L, samples.get(5).getId());
-    assertEquals((Long) 7L, samples.get(6).getId());
-    assertEquals((Long) 8L, samples.get(7).getId());
-    assertEquals((Long) 9L, samples.get(8).getId());
-    assertEquals((Long) 10L, samples.get(9).getId());
-    assertEquals((Long) 11L, samples.get(10).getId());
-    for (Sample sample : samples) {
-      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
-    }
-  }
-
-  @Test
   public void count_Filter() {
     SampleFilter filter = mock(SampleFilter.class);
     when(filter.predicate()).thenReturn(sample.isNotNull());
@@ -405,22 +383,17 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void count_NullFilter() {
-    long count = service.count(null);
-
-    assertEquals(11, count);
-  }
-
-  @Test
   public void files() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve("sample_R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve(".deleted");
     Files.createFile(file);
@@ -441,7 +414,7 @@ public class SampleServiceTest {
 
   @Test
   public void files_Filenames() throws Throwable {
-    Sample sample = repository.findById(4L).orElse(null);
+    Sample sample = repository.findById(4L).orElseThrow();
     Path folder = configuration.getHome().getFolder();
     Files.createDirectories(folder);
     Files.createFile(folder.resolve("OF_20241118_ROB_01.raw"));
@@ -463,7 +436,7 @@ public class SampleServiceTest {
 
   @Test
   public void files_FolderNotExists() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
 
     List<Path> files = service.files(sample);
 
@@ -474,19 +447,22 @@ public class SampleServiceTest {
 
   @Test
   public void files_Archives() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_h_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     folder = configuration.getArchives().get(0).folder(sample);
     Files.createDirectories(folder);
     file = folder.resolve("sample_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve("sample_R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve(".deleted");
     Files.createFile(file);
@@ -498,7 +474,8 @@ public class SampleServiceTest {
     folder = configuration.getArchives().get(1).folder(sample);
     Files.createDirectories(folder);
     file = folder.resolve("sample_a2_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
 
     List<Path> files = service.files(sample);
@@ -519,7 +496,7 @@ public class SampleServiceTest {
 
   @Test
   public void files_ArchivesSameFilename() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Files.createFile(folder.resolve("sample_R1.fastq"));
@@ -545,7 +522,7 @@ public class SampleServiceTest {
 
   @Test
   public void files_Archives_Filenames() throws Throwable {
-    Sample sample = repository.findById(4L).orElse(null);
+    Sample sample = repository.findById(4L).orElseThrow();
     Path folder = configuration.getArchives().get(0).getFolder().resolve("otherdirectory");
     Files.createDirectories(folder);
     Files.createFile(folder.resolve("OF_20241118_ROB_01.raw"));
@@ -573,7 +550,7 @@ public class SampleServiceTest {
 
   @Test
   public void files_ArchivesNotExists() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Files.createFile(folder.resolve("sample_R1.fastq"));
@@ -588,22 +565,15 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void files_NullId() throws Throwable {
+  public void files_NewSample() throws Throwable {
     List<Path> files = service.files(new Sample());
 
     assertTrue(files.isEmpty());
   }
 
   @Test
-  public void files_Null() throws Throwable {
-    List<Path> files = service.files(null);
-
-    assertTrue(files.isEmpty());
-  }
-
-  @Test
   public void folderLabels() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
 
@@ -615,7 +585,7 @@ public class SampleServiceTest {
 
   @Test
   public void folderLabels_Unix() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
 
@@ -627,7 +597,7 @@ public class SampleServiceTest {
 
   @Test
   public void folderLabels_Archives() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     folder = configuration.getArchives().get(0).folder(sample);
@@ -645,7 +615,7 @@ public class SampleServiceTest {
 
   @Test
   public void folderLabels_Archives_Unix() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     folder = configuration.getArchives().get(0).folder(sample);
@@ -663,7 +633,7 @@ public class SampleServiceTest {
 
   @Test
   public void folderLabels_FoldersNotExists() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
 
     List<String> labels = service.folderLabels(sample, false);
 
@@ -678,23 +648,18 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void folderLabels_Null() throws Throwable {
-    List<String> labels = service.folderLabels(null, false);
-
-    assertTrue(labels.isEmpty());
-  }
-
-  @Test
   public void uploadFiles() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path upload = configuration.getUpload().getFolder();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(sample.getName() + ".fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        uploadFile, StandardCopyOption.REPLACE_EXISTING);
     uploadFile = upload.resolve("R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), uploadFile,
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
+        uploadFile, StandardCopyOption.REPLACE_EXISTING);
     uploadFile = upload.resolve("." + sample.getName() + ".bed");
     Files.createFile(uploadFile);
     if (SystemUtils.IS_OS_WINDOWS) {
@@ -705,10 +670,12 @@ public class SampleServiceTest {
     Path folder = configuration.getUpload().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve("sample_R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve(".hiddenFile");
     Files.createFile(file);
@@ -733,15 +700,17 @@ public class SampleServiceTest {
 
   @Test
   public void uploadFiles_SampleFolderNotExists() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path upload = configuration.getUpload().getFolder();
     Files.createDirectories(upload);
     Path uploadFile = upload.resolve(sample.getName() + ".fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), uploadFile,
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        uploadFile, StandardCopyOption.REPLACE_EXISTING);
     uploadFile = upload.resolve("R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), uploadFile,
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
+        uploadFile, StandardCopyOption.REPLACE_EXISTING);
     uploadFile = upload.resolve("." + sample.getName() + ".bed");
     Files.createFile(uploadFile);
     if (SystemUtils.IS_OS_WINDOWS) {
@@ -763,14 +732,16 @@ public class SampleServiceTest {
 
   @Test
   public void uploadFiles_UploadFolderNotExists() throws Throwable {
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     Path folder = configuration.getUpload().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("sample_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve("sample_R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     file = folder.resolve(".hiddenFile");
     Files.createFile(file);
@@ -793,15 +764,8 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void uploadFiles_NullId() throws Throwable {
+  public void uploadFiles_NewSample() throws Throwable {
     List<Path> files = service.uploadFiles(new Sample());
-
-    assertTrue(files.isEmpty());
-  }
-
-  @Test
-  public void uploadFiles_Null() throws Throwable {
-    List<Path> files = service.uploadFiles(null);
 
     assertTrue(files.isEmpty());
   }
@@ -869,12 +833,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void isDeletable_Null() {
-    assertFalse(service.isDeletable(null));
-  }
-
-  @Test
-  public void isDeletable_NullId() {
+  public void isDeletable_NewSample() {
     assertFalse(service.isDeletable(new Sample()));
   }
 
@@ -895,327 +854,157 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void isMergable_AllNull() {
+  public void isMergable_SameProperties() {
     List<Sample> samples = new ArrayList<>();
-    samples.add(new Sample());
-    samples.add(new Sample());
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_ProtocolTrue() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
-    samples.add(sample);
+    samples.add(sample());
+    samples.add(sample());
     assertTrue(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_ProtocolFalse() {
+  public void isMergable_DifferentProtocols() {
     List<Sample> samples = new ArrayList<>();
-    Sample sample = new Sample();
-    sample.setProtocol(new Protocol(1L));
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(new Protocol(2L));
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setProtocol(protocolRepository.findById(2L).orElseThrow());
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_ProtocolOneNull() {
+  public void isMergable_DifferentAssays() {
     List<Sample> samples = new ArrayList<>();
-    Sample sample = new Sample();
-    sample.setProtocol(new Protocol(1L));
-    samples.add(sample);
-    samples.add(new Sample());
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_AssayTrue() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setAssay("ChIP-seq");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setAssay("ChIP-seq");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertTrue(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_AssayFalse() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setAssay("ChIP-seq");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
+    samples.add(sample());
+    Sample sample = sample();
     sample.setAssay("ChIP-exo");
-    sample.setProtocol(protocol);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_AssayOneNull() {
+  public void isMergable_DifferentTypes() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setAssay("ChIP-seq");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_TypeTrue() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
+    samples.add(sample());
+    Sample sample = sample();
     sample.setType("Input");
-    sample.setProtocol(protocol);
     samples.add(sample);
-    sample = new Sample();
-    sample.setType("Input");
-    sample.setProtocol(protocol);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  public void isMergable_OneTypeNull() {
+    List<Sample> samples = new ArrayList<>();
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setType(null);
     samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  public void isMergable_AllTypesNull() {
+    List<Sample> samples = new ArrayList<>();
+    samples.add(sample());
+    samples.add(sample());
+    samples.forEach(s -> s.setType(null));
     assertTrue(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_TypeFalse() {
+  public void isMergable_DifferentTargets() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setType("Input");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setType("IP");
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setTarget("spt16");
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_TypeOneNull() {
+  public void isMergable_OneTargetNull() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setType("Input");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setTarget(null);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_TargetTrue() {
+  public void isMergable_AllTargetsNull() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTarget("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setTarget("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
+    samples.add(sample());
+    samples.add(sample());
+    samples.forEach(s -> s.setTarget(null));
     assertTrue(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_TargetFalse() {
+  public void isMergable_DifferentStrains() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTarget("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setTarget("test2");
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setStrain("yFR513");
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_TargetOneNull() {
+  public void isMergable_DifferentStrainDescriptions() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTarget("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setStrainDescription("R103S");
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_StrainTrue() {
+  public void isMergable_OneStrainDescriptionNull() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setStrain("test");
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setStrainDescription(null);
     samples.add(sample);
-    sample = new Sample();
-    sample.setStrain("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
+    assertFalse(service.isMergable(samples));
+  }
+
+  @Test
+  public void isMergable_AllStrainDescriptionsNull() {
+    List<Sample> samples = new ArrayList<>();
+    samples.add(sample());
+    samples.add(sample());
+    samples.forEach(s -> s.setStrainDescription(null));
     assertTrue(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_StrainFalse() {
+  public void isMergable_DifferentTreatments() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setStrain("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setStrain("test2");
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setTreatment("rappa");
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_StrainOneNull() {
+  public void isMergable_OneTreatmentNull() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setStrain("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
+    samples.add(sample());
+    Sample sample = sample();
+    sample.setTreatment(null);
     samples.add(sample);
     assertFalse(service.isMergable(samples));
   }
 
   @Test
-  public void isMergable_StrainDescriptionTrue() {
+  public void isMergable_AllTreatmentsNull() {
     List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setStrainDescription("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setStrainDescription("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
+    samples.add(sample());
+    samples.add(sample());
+    samples.forEach(s -> s.setTreatment(null));
     assertTrue(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_StrainDescriptionFalse() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setStrainDescription("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setStrainDescription("test2");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_StrainDescriptionOneNull() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setStrainDescription("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_TreatmentTrue() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTreatment("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setTreatment("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertTrue(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_TreatmentFalse() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTreatment("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setTreatment("test2");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_TreatmentOneNull() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTreatment("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertFalse(service.isMergable(samples));
-  }
-
-  @Test
-  public void isMergable_TargetTrueTreatmentFalse() {
-    List<Sample> samples = new ArrayList<>();
-    Protocol protocol = new Protocol(1L);
-    Sample sample = new Sample();
-    sample.setTarget("test");
-    sample.setTreatment("test");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    sample = new Sample();
-    sample.setTarget("test");
-    sample.setTreatment("test2");
-    sample.setProtocol(protocol);
-    samples.add(sample);
-    assertFalse(service.isMergable(samples));
   }
 
   @Test
@@ -1233,8 +1022,6 @@ public class SampleServiceTest {
 
   @Test
   public void save_New() {
-    User user = userRepository.findById(3L).orElse(null);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -1255,8 +1042,8 @@ public class SampleServiceTest {
     service.save(sample);
 
     repository.flush();
-    assertNotNull(sample.getId());
-    sample = repository.findById(sample.getId()).orElse(null);
+    assertNotEquals(0, sample.getId());
+    sample = repository.findById(sample.getId()).orElseThrow();
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals("ChIP-seq", sample.getAssay());
@@ -1270,7 +1057,7 @@ public class SampleServiceTest {
     assertTrue(sample.getKeywords().contains("keyword1"));
     assertTrue(sample.getKeywords().contains("keyword2"));
     assertEquals((Long) 1L, sample.getProtocol().getId());
-    assertEquals(user.getId(), sample.getOwner().getId());
+    assertEquals(3, sample.getOwner().getId());
     assertTrue(sample.isEditable());
     assertTrue(LocalDateTime.now().minusSeconds(10).isBefore(sample.getCreationDate()));
     assertTrue(LocalDateTime.now().plusSeconds(10).isAfter(sample.getCreationDate()));
@@ -1282,8 +1069,6 @@ public class SampleServiceTest {
 
   @Test
   public void save_NewNoName() {
-    User user = userRepository.findById(3L).orElse(null);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
     Sample sample = new Sample();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -1303,10 +1088,9 @@ public class SampleServiceTest {
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
   public void save_Update() {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
     sample.setAssay("ChIP-seq");
@@ -1326,7 +1110,7 @@ public class SampleServiceTest {
     service.save(sample);
 
     repository.flush();
-    sample = repository.findById(1L).orElse(null);
+    sample = repository.findById(1L).orElseThrow();
     assertEquals("my sample", sample.getSampleId());
     assertEquals("my replicate", sample.getReplicate());
     assertEquals("ChIP-seq", sample.getAssay());
@@ -1376,131 +1160,143 @@ public class SampleServiceTest {
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
   public void save_UpdateNotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
-      User user = userRepository.findById(2L).orElse(null);
-      when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-      Sample sample = repository.findById(8L).orElse(null);
+      Sample sample = repository.findById(8L).orElseThrow();
       service.save(sample);
     });
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
   public void save_UpdateMoveFiles() throws Throwable {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     detach(sample);
     Path beforeFolder = configuration.getHome().folder(sample);
     Path beforeArchive1 = configuration.getArchives().get(0).folder(sample);
     Path beforeArchive2 = configuration.getArchives().get(1).folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
     Files.createDirectories(beforeArchive1);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive1.resolve("sample_a1_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
     Files.createDirectories(beforeArchive2);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive2.resolve("sample_a2_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
 
     service.save(sample);
 
     repository.flush();
-    sample = repository.findById(1L).orElse(null);
+    sample = repository.findById(1L).orElseThrow();
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(sample);
     assertTrue(Files.exists(archive1.resolve("sample_a1_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1.resolve("sample_a1_R1.fastq")));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(sample);
     assertTrue(Files.exists(archive2.resolve("sample_a2_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2.resolve("sample_a2_R1.fastq")));
     assertFalse(Files.exists(beforeArchive2));
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
   public void save_UpdateMoveFilesParentNotExists() throws Throwable {
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
-      return sample != null && sample.getName() != null ? temporaryFolder
-          .resolve(String.valueOf(sample.getDate().getYear())).resolve(sample.getName()) : null;
+      return sample != null ? temporaryFolder.resolve(String.valueOf(sample.getDate().getYear()))
+          .resolve(sample.getName()) : null;
     });
-    User user = userRepository.findById(2L).orElse(null);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     detach(sample);
     Path beforeFolder = configuration.getHome().folder(sample);
     Path beforeArchive1 = configuration.getArchives().get(0).folder(sample);
     Path beforeArchive2 = configuration.getArchives().get(1).folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeFolder.resolve("sample_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
     sample.setDate(LocalDate.of(2020, 01, 12));
     Files.createDirectories(beforeArchive1);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive1.resolve("sample_a1_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
     Files.createDirectories(beforeArchive2);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive2.resolve("sample_a2_R1.fastq"), StandardCopyOption.REPLACE_EXISTING);
 
     service.save(sample);
 
     repository.flush();
-    sample = repository.findById(1L).orElse(null);
+    sample = repository.findById(1L).orElseThrow();
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
     assertEquals(LocalDate.of(2020, 01, 12), sample.getDate());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(sample);
     assertTrue(Files.exists(archive1.resolve("sample_a1_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1.resolve("sample_a1_R1.fastq")));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(sample);
     assertTrue(Files.exists(archive2.resolve("sample_a2_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2.resolve("sample_a2_R1.fastq")));
     assertFalse(Files.exists(beforeArchive2));
   }
 
   @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
   public void save_RenameFiles() throws Throwable {
-    User user = userRepository.findById(2L).orElse(null);
-    when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-    Sample sample = repository.findById(1L).orElse(null);
+    Sample sample = repository.findById(1L).orElseThrow();
     detach(sample);
     sample.setSampleId("my sample");
     sample.setReplicate("my replicate");
@@ -1509,7 +1305,8 @@ public class SampleServiceTest {
     Path beforeArchive2 = configuration.getArchives().get(1).folder(sample);
     sample.setName("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020");
     Files.createDirectories(beforeFolder);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
     Files.write(
@@ -1517,7 +1314,8 @@ public class SampleServiceTest {
         ("e254a11d5102c5555232c3d7d0a53a0b  "
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
             .getBytes(StandardCharsets.UTF_8));
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
     Files.write(
@@ -1526,7 +1324,8 @@ public class SampleServiceTest {
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R2.fastq")
             .getBytes(StandardCharsets.UTF_8));
     Files.createDirectories(beforeArchive1);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive1.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
     Files.write(
@@ -1535,7 +1334,8 @@ public class SampleServiceTest {
             + "FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq")
             .getBytes(StandardCharsets.UTF_8));
     Files.createDirectories(beforeArchive2);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive2.resolve("FR1_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R1_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
     Files.write(
@@ -1547,14 +1347,15 @@ public class SampleServiceTest {
     service.save(sample);
 
     repository.flush();
-    sample = repository.findById(1L).orElse(null);
+    sample = repository.findById(1L).orElseThrow();
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder
         .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder
             .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertTrue(Files.exists(folder
@@ -1569,7 +1370,8 @@ public class SampleServiceTest {
     assertTrue(Files.exists(folder
         .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder
             .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
     assertTrue(Files.exists(folder
@@ -1586,7 +1388,8 @@ public class SampleServiceTest {
     assertTrue(Files.exists(archive1
         .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1
             .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertTrue(Files.exists(archive1
@@ -1603,7 +1406,8 @@ public class SampleServiceTest {
     assertTrue(Files.exists(archive2
         .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2
             .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
     assertTrue(Files.exists(archive2
@@ -1620,13 +1424,17 @@ public class SampleServiceTest {
 
   @Test
   public void saveFiles() throws Throwable {
-    final Sample sample = repository.findById(1L).orElse(null);
+    final Sample sample = repository.findById(1L).orElseThrow();
     List<Path> files = new ArrayList<>();
     Path file = temporaryFolder.resolve("sample_R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file);
     files.add(file);
     file = temporaryFolder.resolve("sample_R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
+        file);
     files.add(file);
 
     service.saveFiles(sample, files);
@@ -1637,11 +1445,13 @@ public class SampleServiceTest {
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
@@ -1652,7 +1462,8 @@ public class SampleServiceTest {
     Path folder = configuration.getHome().folder(sample);
     Path file = folder.resolve("R1.fastq");
     Files.createDirectories(folder);
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
 
     service.delete(sample);
@@ -1686,7 +1497,8 @@ public class SampleServiceTest {
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
@@ -1713,8 +1525,9 @@ public class SampleServiceTest {
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        folder.resolve(file), StandardCopyOption.REPLACE_EXISTING);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(folder.resolve(file), FileTime.from(toInstant(modifiedTime)));
 
@@ -1727,8 +1540,9 @@ public class SampleServiceTest {
     Path folder = configuration.getArchives().get(0).folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), folder.resolve(file),
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        folder.resolve(file), StandardCopyOption.REPLACE_EXISTING);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(folder.resolve(file), FileTime.from(toInstant(modifiedTime)));
 
@@ -1739,7 +1553,8 @@ public class SampleServiceTest {
   public void deleteFile_NotInSampleFolder() throws Throwable {
     Sample sample = repository.findById(9L).get();
     Path file = temporaryFolder.resolve("test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     Files.setLastModifiedTime(file,
         FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));
@@ -1753,7 +1568,8 @@ public class SampleServiceTest {
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("../test.txt");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file,
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
     Files.setLastModifiedTime(file,
         FileTime.from(LocalDateTime.now().minusDays(2).toInstant(ZoneOffset.UTC)));

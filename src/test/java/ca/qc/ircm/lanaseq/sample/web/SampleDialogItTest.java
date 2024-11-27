@@ -6,6 +6,7 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -210,9 +211,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
         notification.getText());
     List<Sample> samples = repository.findByOwner(new User(3L));
     Sample sample =
-        samples.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
+        samples.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElseThrow();
     assertNotNull(sample);
-    assertNotNull(sample.getId());
+    assertNotEquals(0, sample.getId());
     assertEquals(name, sample.getName());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(sample.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(sample.getCreationDate()));

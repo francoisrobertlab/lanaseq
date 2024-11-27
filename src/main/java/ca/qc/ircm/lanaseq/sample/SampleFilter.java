@@ -92,7 +92,8 @@ public class SampleFilter implements Predicate<Sample> {
       predicate.and(
           sample.owner.email.contains(ownerContains).or(sample.owner.name.contains(ownerContains)));
     }
-    return predicate.hasValue() ? predicate.getValue() : Expressions.asBoolean(true).isTrue();
+    return predicate.getValue() != null ? predicate.getValue()
+        : Expressions.asBoolean(true).isTrue();
   }
 
   public Pageable pageable() {
