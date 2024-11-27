@@ -95,8 +95,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
   }
 
   private Optional<Protocol> protocol(Dataset dataset) {
-    return dataset.getSamples() != null
-        ? dataset.getSamples().stream().findFirst().map(s -> s.getProtocol())
+    return !dataset.getSamples().isEmpty() ? Optional.of(dataset.getSamples().get(0).getProtocol())
         : Optional.empty();
   }
 

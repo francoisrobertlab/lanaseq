@@ -131,8 +131,7 @@ public class DatasetsView extends VerticalLayout
   }
 
   private Protocol protocol(Dataset dataset) {
-    return dataset.getSamples() != null
-        ? dataset.getSamples().stream().findFirst().map(s -> s.getProtocol()).orElse(new Protocol())
+    return !dataset.getSamples().isEmpty() ? dataset.getSamples().get(0).getProtocol()
         : new Protocol();
   }
 

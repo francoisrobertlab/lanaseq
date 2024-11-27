@@ -653,11 +653,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void setDatasetId_SampleWithEmtpyFields() {
     Dataset dataset = repository.findById(1L).get();
     Sample sample = dataset.getSamples().get(0);
-    sample.setProtocol(null);
-    sample.setAssay(null);
     sample.setType(null);
     sample.setTarget(null);
-    sample.setStrain(null);
     sample.setStrainDescription(null);
     sample.setTreatment(null);
 

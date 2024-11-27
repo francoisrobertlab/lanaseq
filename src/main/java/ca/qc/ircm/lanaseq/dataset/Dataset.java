@@ -12,6 +12,7 @@ import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -27,6 +28,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -58,12 +61,12 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
    * Keywords.
    */
   @ElementCollection
-  private Set<String> keywords;
+  private Set<String> keywords = new HashSet<>();
   /**
    * Other filenames to look for in directories.
    */
   @ElementCollection
-  private Set<String> filenames;
+  private Set<String> filenames = new HashSet<>();
   /**
    * True if dataset can be edited.
    */
@@ -73,12 +76,12 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
    * Date.
    */
   @Column(name = "experiment_date", nullable = false)
-  private LocalDate date;
+  private LocalDate date = LocalDate.now();
   /**
    * Time when dataset was created.
    */
   @Column(nullable = false)
-  private LocalDateTime creationDate;
+  private LocalDateTime creationDate = LocalDateTime.now();
   /**
    * Notes.
    */
@@ -95,7 +98,7 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
    */
   @OneToMany
   @OrderColumn
-  private List<Sample> samples;
+  private List<Sample> samples = new ArrayList<>();
 
   public Dataset() {
   }
@@ -114,24 +117,24 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
    */
   public void generateName() {
     StringBuilder builder = new StringBuilder();
-    Sample first =
-        samples != null ? samples.stream().findFirst().orElse(new Sample()) : new Sample();
-    builder.append(first.getAssay() != null ? first.getAssay().replaceAll("[^\\w]", "") + "_" : "");
-    builder.append(first.getType() != null ? first.getType().replaceAll("[^\\w]", "") + "_" : "");
-    builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
-    builder.append(first.getStrain() != null ? first.getStrain() + "_" : "");
-    builder.append(first.getStrainDescription() != null ? first.getStrainDescription() + "_" : "");
-    builder.append(first.getTreatment() != null ? first.getTreatment() + "_" : "");
-    if (samples != null) {
-      StringBuilder samplesBuilder = new StringBuilder();
-      for (Sample sample : samples) {
-        samplesBuilder.append(sample.getSampleId() != null ? sample.getSampleId() + "-" : "");
-      }
-      if (samplesBuilder.length() > 0) {
-        samplesBuilder.setCharAt(samplesBuilder.length() - 1, '_');
-      }
-      builder.append(samplesBuilder);
+    if (!samples.isEmpty()) {
+      Sample first = samples.get(0);
+      builder.append(first.getAssay().replaceAll("[^\\w]", "") + "_");
+      builder.append(first.getType() != null ? first.getType().replaceAll("[^\\w]", "") + "_" : "");
+      builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
+      builder.append(first.getStrain() + "_");
+      builder
+          .append(first.getStrainDescription() != null ? first.getStrainDescription() + "_" : "");
+      builder.append(first.getTreatment() != null ? first.getTreatment() + "_" : "");
     }
+    StringBuilder samplesBuilder = new StringBuilder();
+    for (Sample sample : samples) {
+      samplesBuilder.append(sample.getSampleId() + "-");
+    }
+    if (samplesBuilder.length() > 0) {
+      samplesBuilder.setCharAt(samplesBuilder.length() - 1, '_');
+    }
+    builder.append(samplesBuilder);
     DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
     builder.append(date != null ? formatter.format(date) + "_" : "");
     if (builder.length() > 0) {
@@ -209,11 +212,12 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
     this.date = date;
   }
 
+  @Nullable
   public String getNote() {
     return note;
   }
 
-  public void setNote(String note) {
+  public void setNote(@Nullable String note) {
     this.note = note;
   }
 

@@ -119,7 +119,7 @@ public class Protocol implements Data, Owned, Serializable {
     return note;
   }
 
-  public void setNote(String note) {
+  public void setNote(@Nullable String note) {
     this.note = note;
   }
 }

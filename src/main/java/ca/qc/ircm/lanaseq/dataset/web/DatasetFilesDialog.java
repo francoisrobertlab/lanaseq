@@ -269,7 +269,7 @@ public class DatasetFilesDialog extends Dialog
   }
 
   private void updateHeader() {
-    if (dataset != null && dataset.getName() != null) {
+    if (dataset != null && dataset.getId() != 0) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()));
     } else {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER));

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,9 +86,7 @@ public class DatasetService {
    * @return true if a dataset with specified name exists, false otherwise
    */
   public boolean exists(String name) {
-    if (name == null) {
-      return false;
-    }
+    Objects.requireNonNull(name, "name parameter cannot be null");
     return repository.existsByName(name);
   }
 
@@ -110,10 +109,7 @@ public class DatasetService {
    */
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Dataset> all(DatasetFilter filter) {
-    if (filter == null) {
-      filter = new DatasetFilter();
-    }
-
+    Objects.requireNonNull(filter, "filter parameter cannot be null");
     return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
   }
 
@@ -125,10 +121,7 @@ public class DatasetService {
    * @return number of datasets passing filter
    */
   public long count(DatasetFilter filter) {
-    if (filter == null) {
-      filter = new DatasetFilter();
-    }
-
+    Objects.requireNonNull(filter, "filter parameter cannot be null");
     return repository.count(filter.predicate());
   }
 
@@ -141,7 +134,8 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public List<Path> files(Dataset dataset) {
-    if (dataset == null || dataset.getId() == 0) {
+    Objects.requireNonNull(dataset, "dataset parameter cannot be null");
+    if (dataset.getId() == 0) {
       return new ArrayList<>();
     }
     List<Path> files = new ArrayList<>();
@@ -203,7 +197,8 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public List<String> folderLabels(Dataset dataset, boolean unix) {
-    if (dataset == null || dataset.getId() == 0) {
+    Objects.requireNonNull(dataset, "dataset parameter cannot be null");
+    if (dataset.getId() == 0) {
       return new ArrayList<>();
     }
     List<String> labels = new ArrayList<>();
@@ -229,7 +224,8 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public List<Path> uploadFiles(Dataset dataset) {
-    if (dataset == null || dataset.getId() == 0) {
+    Objects.requireNonNull(dataset, "dataset parameter cannot be null");
+    if (dataset.getId() == 0) {
       return new ArrayList<>();
     }
     Path upload = configuration.getUpload().getFolder();
@@ -285,9 +281,7 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public boolean isDeletable(Dataset dataset) {
-    if (dataset == null || dataset.getId() == 0) {
-      return false;
-    }
+    Objects.requireNonNull(dataset, "dataset parameter cannot be null");
     return dataset.isEditable();
   }
 
@@ -299,18 +293,17 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void save(Dataset dataset) {
+    Objects.requireNonNull(dataset, "dataset parameter cannot be null");
+    Objects.requireNonNull(dataset.getName(), "dataset's name cannot be null");
+    Objects.requireNonNull(dataset.getSamples(), "dataset's samples cannot be null");
     if (dataset.getId() != 0 && !dataset.isEditable()) {
       throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
     }
-    if (dataset.getName() == null) {
-      throw new NullPointerException("dataset's name cannot be null");
-    }
-    if (dataset.getSamples() != null && dataset.getSamples().stream()
-        .filter(sample -> sample.getId() == 0).findAny().isPresent()) {
+    if (dataset.getSamples().stream().filter(sample -> sample.getId() == 0).findAny().isPresent()) {
       throw new IllegalArgumentException("all dataset's samples must already be in database");
     }
     LocalDateTime now = LocalDateTime.now();
-    User user = authenticatedUser.getUser().orElse(null);
+    User user = authenticatedUser.getUser().orElseThrow();
     if (dataset.getId() == 0) {
       dataset.setOwner(user);
       dataset.setCreationDate(now);

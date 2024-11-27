@@ -329,7 +329,7 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     return note;
   }
 
-  public void setNote(String note) {
+  public void setNote(@Nullable String note) {
     this.note = note;
   }
 
