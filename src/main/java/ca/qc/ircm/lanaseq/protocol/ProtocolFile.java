@@ -52,11 +52,11 @@ public class ProtocolFile implements Data, Serializable {
    * Creation date.
    */
   @Column
-  private LocalDateTime creationDate;
+  private LocalDateTime creationDate = LocalDateTime.now();
   /**
    * Protocol.
    */
-  @ManyToOne
+  @ManyToOne(optional = false)
   private Protocol protocol;
 
   public ProtocolFile() {
@@ -75,11 +75,11 @@ public class ProtocolFile implements Data, Serializable {
   }
 
   public byte[] getContent() {
-    return content != null ? content.clone() : null;
+    return content.clone();
   }
 
   public void setContent(byte[] content) {
-    this.content = content != null ? content.clone() : null;
+    this.content = content.clone();
   }
 
   @Override

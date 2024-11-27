@@ -7,6 +7,7 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +56,10 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
   @BeforeEach
   public void beforeTest() throws Throwable {
-    file1 = Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI());
-    file2 = Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI());
+    file1 = Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI());
+    file2 = Paths.get(Objects
+        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI());
   }
 
   private void open() {
@@ -124,7 +128,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
         notification.getText());
     Protocol protocol = repository.findByName(name).orElse(null);
     assertNotNull(protocol);
-    assertNotNull(protocol.getId());
+    assertNotEquals(0, protocol.getId());
     assertEquals(name, protocol.getName());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(protocol.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(protocol.getCreationDate()));
@@ -165,8 +169,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     ProtocolFile file = files.get(0);
     assertEquals("FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(
-        Files.readAllBytes(
-            Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
+        Files.readAllBytes(Paths.get(Objects
+            .requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI())),
         file.getContent());
     file = files.get(1);
     assertEquals("FLAG_Protocol.docx", file.getFilename());
@@ -199,8 +203,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     ProtocolFile file = files.get(0);
     assertEquals("FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(
-        Files.readAllBytes(
-            Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI())),
+        Files.readAllBytes(Paths.get(Objects
+            .requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI())),
         file.getContent());
   }
 
@@ -210,7 +214,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("FLAG Protocol.docx");
     Files.deleteIfExists(downloaded);
-    Path source = Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI());
+    Path source = Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI());
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(0);

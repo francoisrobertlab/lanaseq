@@ -257,7 +257,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   private void setReadOnly() {
     boolean readOnly = false;
     Protocol protocol = binder.getBean();
-    if (protocol != null && protocol.getId() != 0) {
+    if (protocol.getId() != 0) {
       readOnly = !authenticatedUser.hasPermission(protocol, Permission.WRITE);
     }
     binder.setReadOnly(readOnly);
@@ -265,7 +265,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     remove.setVisible(!readOnly);
     save.setVisible(!readOnly);
     cancel.setVisible(!readOnly);
-    delete.setVisible(!readOnly && service.isDeletable(protocol));
+    delete.setVisible(!readOnly && protocol.getId() != 0 && service.isDeletable(protocol));
   }
 
   void failedFile(String filename) {
@@ -337,9 +337,16 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   }
 
   void setProtocolId(long id) {
-    Protocol protocol = id != 0 ? service.get(id).orElseThrow() : new Protocol();
+    Protocol protocol;
+    if (id == 0) {
+      protocol = new Protocol();
+      protocol.setOwner(authenticatedUser.getUser().orElseThrow());
+      files.setItems();
+    } else {
+      protocol = service.get(id).orElseThrow();
+      files.setItems(service.files(protocol));
+    }
     binder.setBean(protocol);
-    files.setItems(service.files(protocol));
     setReadOnly();
     updateHeader();
   }

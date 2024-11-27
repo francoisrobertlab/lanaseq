@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import org.springframework.lang.Nullable;
 
 /**
  * A protocol.
@@ -49,8 +50,8 @@ public class Protocol implements Data, Owned, Serializable {
   /**
    * Creation date.
    */
-  @Column
-  private LocalDateTime creationDate;
+  @Column(nullable = false)
+  private LocalDateTime creationDate = LocalDateTime.now();
   /**
    * Owner.
    */
@@ -113,6 +114,7 @@ public class Protocol implements Data, Owned, Serializable {
     this.creationDate = creationDate;
   }
 
+  @Nullable
   public String getNote() {
     return note;
   }

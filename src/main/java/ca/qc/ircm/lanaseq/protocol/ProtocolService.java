@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -60,10 +61,7 @@ public class ProtocolService {
    */
   @PreAuthorize("hasRole('" + USER + "')")
   public boolean nameExists(String name) {
-    if (name == null) {
-      return false;
-    }
-
+    Objects.requireNonNull(name, "name parameter cannot be null");
     return repository.existsByName(name);
   }
 
@@ -86,7 +84,8 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#protocol, 'read')")
   public List<ProtocolFile> files(Protocol protocol) {
-    if (protocol == null || protocol.getId() == 0) {
+    Objects.requireNonNull(protocol, "protocol parameter cannot be null");
+    if (protocol.getId() == 0) {
       return new ArrayList<>();
     }
     return fileRepository.findByProtocolAndDeletedFalse(protocol);
@@ -102,9 +101,7 @@ public class ProtocolService {
   @PreAuthorize("hasPermission(#protocol, 'read') && hasAnyRole('" + MANAGER + "', '" + ADMIN
       + "')")
   public List<ProtocolFile> deletedFiles(Protocol protocol) {
-    if (protocol == null || protocol.getId() == 0) {
-      return new ArrayList<>();
-    }
+    Objects.requireNonNull(protocol, "protocol parameter cannot be null");
     return fileRepository.findByProtocolAndDeletedTrue(protocol);
   }
 
@@ -117,9 +114,7 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#protocol, 'read')")
   public boolean isDeletable(Protocol protocol) {
-    if (protocol == null || protocol.getId() == 0) {
-      return false;
-    }
+    Objects.requireNonNull(protocol, "protocol parameter cannot be null");
     return !sampleRepository.existsByProtocol(protocol);
   }
 
@@ -133,18 +128,20 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#protocol, 'write')")
   public void save(Protocol protocol, Collection<ProtocolFile> files) {
-    if (files == null || files.isEmpty()) {
+    Objects.requireNonNull(protocol, "protocol parameter cannot be null");
+    Objects.requireNonNull(files, "files parameter cannot be null");
+    if (files.isEmpty()) {
       throw new IllegalArgumentException("at least one file is required for protocols");
     }
     LocalDateTime now = LocalDateTime.now();
     if (protocol.getId() == 0) {
-      User user = authenticatedUser.getUser().orElse(null);
+      User user = authenticatedUser.getUser().orElseThrow();
       protocol.setOwner(user);
       protocol.setCreationDate(now);
     } else {
       List<ProtocolFile> oldFiles = fileRepository.findByProtocolAndDeletedFalse(protocol);
       for (ProtocolFile file : oldFiles) {
-        if (!files.stream().filter(f -> file.getId() == f.getId()).findAny().isPresent()) {
+        if (files.stream().noneMatch(f -> file.getId() == f.getId())) {
           file.setDeleted(true);
           fileRepository.save(file);
         }
@@ -168,6 +165,7 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#file.protocol, 'write')")
   public void recover(ProtocolFile file) {
+    Objects.requireNonNull(file, "file parameter cannot be null");
     file.setDeleted(false);
     fileRepository.save(file);
   }
@@ -180,6 +178,7 @@ public class ProtocolService {
    */
   @PreAuthorize("hasPermission(#protocol, 'write')")
   public void delete(Protocol protocol) {
+    Objects.requireNonNull(protocol, "protocol parameter cannot be null");
     if (!isDeletable(protocol)) {
       throw new IllegalArgumentException("protocol cannot be deleted");
     }

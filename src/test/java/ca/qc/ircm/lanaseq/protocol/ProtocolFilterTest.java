@@ -25,7 +25,6 @@ public class ProtocolFilterTest {
     assertTrue(filter.test(name("Test my")));
     assertTrue(filter.test(name("My test my")));
     assertTrue(filter.test(name("My TEST my")));
-    assertFalse(filter.test(name(null)));
     assertFalse(filter.test(name("")));
     assertFalse(filter.test(name("christian")));
   }
@@ -38,7 +37,6 @@ public class ProtocolFilterTest {
     assertTrue(filter.test(name("Test my")));
     assertTrue(filter.test(name("My test my")));
     assertTrue(filter.test(name("My TEST my")));
-    assertTrue(filter.test(name(null)));
     assertTrue(filter.test(name("")));
     assertTrue(filter.test(name("christian")));
   }
@@ -84,9 +82,7 @@ public class ProtocolFilterTest {
     assertTrue(filter.test(owner("christian@abc.com", "Test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My TEST my")));
-    assertFalse(filter.test(owner(null, "Christian")));
     assertFalse(filter.test(owner("", "Christian")));
-    assertFalse(filter.test(owner("christian@abc.com", null)));
     assertFalse(filter.test(owner("christian@abc.com", "")));
     assertFalse(filter.test(owner("christian@abc.com", "Christian")));
   }
@@ -106,9 +102,7 @@ public class ProtocolFilterTest {
     assertTrue(filter.test(owner("christian@abc.com", "Test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My TEST my")));
-    assertTrue(filter.test(owner(null, "Christian")));
     assertTrue(filter.test(owner("", "Christian")));
-    assertTrue(filter.test(owner("christian@abc.com", null)));
     assertTrue(filter.test(owner("christian@abc.com", "")));
     assertTrue(filter.test(owner("christian@abc.com", "Christian")));
   }
@@ -136,11 +130,8 @@ public class ProtocolFilterTest {
     assertFalse(filter.test(nameOwner("Test my", "christian@abc.com")));
     assertFalse(filter.test(nameOwner("My test my", "christian@abc.com")));
     assertFalse(filter.test(nameOwner("My TEST my", "christian@abc.com")));
-    assertFalse(filter.test(nameOwner(null, null)));
     assertFalse(filter.test(nameOwner("", "")));
-    assertFalse(filter.test(nameOwner("My test", null)));
     assertFalse(filter.test(nameOwner("My test", "")));
-    assertFalse(filter.test(nameOwner(null, "my.test@abc.com")));
     assertFalse(filter.test(nameOwner("", "my.test@abc.com")));
   }
 
