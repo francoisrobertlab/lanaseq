@@ -7,7 +7,6 @@ import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -129,8 +128,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, currentLocale()),
         notification.getText());
-    User user = repository.findById(3L).orElse(null);
-    assertNotNull(user);
+    User user = repository.findById(3L).orElseThrow();
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));

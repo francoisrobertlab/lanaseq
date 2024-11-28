@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import org.springframework.lang.Nullable;
 
 /**
  * User.
@@ -40,7 +41,7 @@ public class User implements Data, Owned, Serializable {
   /**
    * User's real name.
    */
-  @Column
+  @Column(nullable = false)
   @Size(max = 255)
   private String name;
   /**
@@ -52,7 +53,7 @@ public class User implements Data, Owned, Serializable {
   /**
    * User's number of sign attempts since last success.
    */
-  @Column
+  @Column(nullable = false)
   private int signAttempts;
   /**
    * User's last sign attempt.
@@ -65,22 +66,22 @@ public class User implements Data, Owned, Serializable {
    * Inactive user cannot access application.
    * </p>
    */
-  @Column
+  @Column(nullable = false)
   private boolean active;
   /**
    * True if user is a manager of his lab.
    */
-  @Column
+  @Column(nullable = false)
   private boolean manager;
   /**
    * True if user is an administrator.
    */
-  @Column
+  @Column(nullable = false)
   private boolean admin;
   /**
    * True if user's password is expired.
    */
-  @Column
+  @Column(nullable = false)
   private boolean expiredPassword;
   /**
    * User's prefered locale.
@@ -90,8 +91,8 @@ public class User implements Data, Owned, Serializable {
   /**
    * Creation date.
    */
-  @Column
-  private LocalDateTime creationDate;
+  @Column(nullable = false)
+  private LocalDateTime creationDate = LocalDateTime.now();
 
   public User() {
   }
@@ -174,11 +175,12 @@ public class User implements Data, Owned, Serializable {
     this.email = email;
   }
 
+  @Nullable
   public String getHashedPassword() {
     return hashedPassword;
   }
 
-  public void setHashedPassword(String hashedPassword) {
+  public void setHashedPassword(@Nullable String hashedPassword) {
     this.hashedPassword = hashedPassword;
   }
 
@@ -190,11 +192,12 @@ public class User implements Data, Owned, Serializable {
     this.signAttempts = signAttempts;
   }
 
+  @Nullable
   public LocalDateTime getLastSignAttempt() {
     return lastSignAttempt;
   }
 
-  public void setLastSignAttempt(LocalDateTime lastSignAttempt) {
+  public void setLastSignAttempt(@Nullable LocalDateTime lastSignAttempt) {
     this.lastSignAttempt = lastSignAttempt;
   }
 
@@ -214,11 +217,12 @@ public class User implements Data, Owned, Serializable {
     this.manager = manager;
   }
 
+  @Nullable
   public Locale getLocale() {
     return locale;
   }
 
-  public void setLocale(Locale locale) {
+  public void setLocale(@Nullable Locale locale) {
     this.locale = locale;
   }
 

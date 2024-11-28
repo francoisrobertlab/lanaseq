@@ -319,7 +319,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void toggleActive_Active() {
-    User user = repository.findById(3L).orElse(null);
+    User user = repository.findById(3L).orElseThrow();
     view.toggleActive(user);
     verify(service).save(user, null);
     assertFalse(user.isActive());
@@ -327,7 +327,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void toggleActive_Inactive() {
-    User user = repository.findById(7L).orElse(null);
+    User user = repository.findById(7L).orElseThrow();
     view.toggleActive(user);
     verify(service).save(user, null);
     assertTrue(user.isActive());
@@ -459,7 +459,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void edit() throws Throwable {
-    User user = repository.findById(3L).orElse(null);
+    User user = repository.findById(3L).orElseThrow();
     when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.users.select(user);
     test(view.edit).click();
@@ -482,7 +482,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   @Test
   public void switchUser_Enabled() throws Throwable {
     assertFalse(view.switchUser.isEnabled());
-    User user = repository.findById(3L).orElse(null);
+    User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
     assertTrue(view.switchUser.isEnabled());
     view.users.deselectAll();
@@ -491,7 +491,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void switchUser() throws Throwable {
-    User user = repository.findById(3L).orElse(null);
+    User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
     view.switchUser.click();
     verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());

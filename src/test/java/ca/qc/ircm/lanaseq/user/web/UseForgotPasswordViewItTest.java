@@ -85,10 +85,10 @@ public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, currentLocale()),
         notification.getText());
-    ForgotPassword forgotPassword = repository.findById(id).orElse(null);
+    ForgotPassword forgotPassword = repository.findById(id).orElseThrow();
     entityManager.refresh(forgotPassword);
     assertTrue(forgotPassword.isUsed());
-    User user = userRepository.findById(9L).orElse(null);
+    User user = userRepository.findById(9L).orElseThrow();
     entityManager.refresh(user);
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
     $(SigninViewElement.class).waitForFirst();

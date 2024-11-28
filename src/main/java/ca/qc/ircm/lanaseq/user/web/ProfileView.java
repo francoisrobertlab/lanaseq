@@ -67,7 +67,7 @@ public class ProfileView extends VerticalLayout
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> save());
-    form.setUser(authenticatedUser.getUser().orElse(null));
+    form.setUser(authenticatedUser.getUser().orElseThrow());
   }
 
   @Override

@@ -119,7 +119,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     $(DatasetsViewElement.class).waitForFirst();
-    User user = repository.findById(6L).orElse(null);
+    User user = repository.findById(6L).orElseThrow();
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
   }
 }
