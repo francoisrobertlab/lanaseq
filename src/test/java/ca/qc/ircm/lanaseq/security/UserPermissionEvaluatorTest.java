@@ -36,7 +36,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithAnonymousUser
   public void hasPermission_ReadUser_Anonymous() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, BASE_READ));
     assertFalse(
@@ -48,7 +48,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void hasPermission_ReadUser_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user.getId(), USER_CLASS, READ));
@@ -59,7 +59,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
   public void hasPermission_ReadUser_NotSelf() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user.getId(), USER_CLASS, READ));
@@ -70,7 +70,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void hasPermission_ReadUser_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user.getId(), USER_CLASS, READ));
@@ -81,7 +81,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_ReadUser_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user.getId(), USER_CLASS, READ));
@@ -150,7 +150,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithAnonymousUser
   public void hasPermission_WriteUser_Anonymous() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));
     assertFalse(
@@ -162,7 +162,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void hasPermission_WriteUser_Self() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));
     assertTrue(
@@ -174,7 +174,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
   public void hasPermission_WriteUser_NotSelf() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));
     assertFalse(
@@ -186,7 +186,7 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void hasPermission_WriteUser_Manager() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));
     assertTrue(
@@ -198,52 +198,13 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_WriteUser_Admin() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
+    User user = userRepository.findById(3L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), user, BASE_WRITE));
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), user.getId(), USER_CLASS, WRITE));
     assertTrue(
         permissionEvaluator.hasPermission(authentication(), user.getId(), USER_CLASS, BASE_WRITE));
-  }
-
-  @Test
-  public void hasPermission_NullAuthentication() throws Throwable {
-    User user = userRepository.findById(3L).orElse(null);
-    assertFalse(permissionEvaluator.hasPermission(null, user, READ));
-    assertFalse(permissionEvaluator.hasPermission(null, user, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(null, user, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(null, user, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(null, user.getId(), USER_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(null, user.getId(), USER_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(null, user.getId(), USER_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(null, user.getId(), USER_CLASS, BASE_WRITE));
-  }
-
-  @Test
-  @WithAnonymousUser
-  public void hasPermission_Null_Anonymous() throws Throwable {
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, BASE_WRITE));
-  }
-
-  @Test
-  @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasPermission_Null() throws Throwable {
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), null, USER_CLASS, BASE_WRITE));
   }
 
   @Test

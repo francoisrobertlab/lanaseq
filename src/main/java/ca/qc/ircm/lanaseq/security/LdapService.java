@@ -62,9 +62,7 @@ public class LdapService {
   public Optional<String> getEmail(String username) {
     ContainerCriteria builder = query().attributes(ldapConfiguration.mailAttribute())
         .where(ldapConfiguration.idAttribute()).is(username);
-    if (ldapConfiguration.objectClass() != null) {
-      builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
-    }
+    builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
     LdapQuery query = builder;
     AttributesMapper<String> mapper =
         attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.mailAttribute())).map(attr -> {
@@ -90,9 +88,7 @@ public class LdapService {
   public Optional<String> getUsername(String email) {
     ContainerCriteria builder = query().attributes(ldapConfiguration.idAttribute())
         .where(ldapConfiguration.mailAttribute()).is(email);
-    if (ldapConfiguration.objectClass() != null) {
-      builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
-    }
+    builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
     LdapQuery query = builder;
     AttributesMapper<String> mapper =
         attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.idAttribute())).map(attr -> {

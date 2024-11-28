@@ -11,6 +11,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if ((authentication == null) || !(targetDomainObject instanceof Sample)
+    if (!(targetDomainObject instanceof Sample)
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
@@ -47,8 +48,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Serializable targetId,
       String targetType, Object permission) {
-    if ((authentication == null) || !(targetId instanceof Long)
-        || !targetType.equals(Sample.class.getName())
+    if (!(targetId instanceof Long) || !targetType.equals(Sample.class.getName())
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
@@ -61,7 +61,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
     return hasPermission(sample, currentUser, realPermission);
   }
 
-  private boolean hasPermission(Sample sample, User currentUser, Permission permission) {
+  private boolean hasPermission(Sample sample, @Nullable User currentUser, Permission permission) {
     if (currentUser == null) {
       return false;
     }

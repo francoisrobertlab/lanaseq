@@ -11,6 +11,7 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if ((authentication == null) || !(targetDomainObject instanceof User)
+    if (!(targetDomainObject instanceof User)
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
@@ -49,8 +50,7 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Serializable targetId,
       String targetType, Object permission) {
-    if ((authentication == null) || !(targetId instanceof Long)
-        || !targetType.equals(User.class.getName())
+    if (!(targetId instanceof Long) || !targetType.equals(User.class.getName())
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
@@ -63,7 +63,7 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     return hasPermission(user, currentUser, realPermission);
   }
 
-  private boolean hasPermission(User user, User currentUser, Permission permission) {
+  private boolean hasPermission(User user, @Nullable User currentUser, Permission permission) {
     if (currentUser == null) {
       return false;
     }
