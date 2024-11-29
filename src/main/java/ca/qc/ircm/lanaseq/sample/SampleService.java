@@ -75,11 +75,7 @@ public class SampleService {
    * @return sample with id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
-  public Optional<Sample> get(Long id) {
-    if (id == null) {
-      return Optional.empty();
-    }
-
+  public Optional<Sample> get(long id) {
     return repository.findById(id);
   }
 
@@ -147,7 +143,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public List<Path> files(Sample sample) {
-    if (sample == null || sample.getId() == null) {
+    if (sample == null || sample.getId() == 0) {
       return new ArrayList<>();
     }
     List<Path> files = new ArrayList<>();
@@ -209,7 +205,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public List<String> folderLabels(Sample sample, boolean unix) {
-    if (sample == null || sample.getId() == null) {
+    if (sample == null || sample.getId() == 0) {
       return new ArrayList<>();
     }
     List<String> labels = new ArrayList<>();
@@ -235,7 +231,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public List<Path> uploadFiles(Sample sample) {
-    if (sample == null || sample.getId() == null) {
+    if (sample == null || sample.getId() == 0) {
       return new ArrayList<>();
     }
     Path upload = configuration.getUpload().getFolder();
@@ -315,7 +311,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public boolean isDeletable(Sample sample) {
-    if (sample == null || sample.getId() == null) {
+    if (sample == null || sample.getId() == 0) {
       return false;
     }
     return sample.isEditable() && !datasetRepository.existsBySamples(sample);
@@ -337,8 +333,7 @@ public class SampleService {
     boolean mergable = true;
     for (Sample sample : samples) {
       mergable &= first.getProtocol() != null && sample.getProtocol() != null
-          ? first.getProtocol().getId().equals(sample.getProtocol().getId())
-          : first.getProtocol() == sample.getProtocol();
+          && first.getProtocol().getId() == sample.getProtocol().getId();
       mergable &= first.getAssay() != null ? first.getAssay().equals(sample.getAssay())
           : sample.getAssay() == null;
       mergable &= first.getType() != null ? first.getType().equals(sample.getType())
@@ -364,7 +359,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void save(Sample sample) {
-    if (sample.getId() != null && !sample.isEditable()) {
+    if (sample.getId() != 0 && !sample.isEditable()) {
       throw new IllegalArgumentException("sample " + sample + " cannot be edited");
     }
     if (sample.getName() == null) {
@@ -372,7 +367,7 @@ public class SampleService {
     }
     LocalDateTime now = LocalDateTime.now();
     User user = authenticatedUser.getUser().orElse(null);
-    if (sample.getId() == null) {
+    if (sample.getId() == 0) {
       sample.setOwner(user);
       sample.setCreationDate(now);
       sample.setEditable(true);
@@ -400,7 +395,7 @@ public class SampleService {
 
   @Transactional(TxType.REQUIRES_NEW)
   protected Optional<Sample> old(Sample sample) {
-    if (sample.getId() != null) {
+    if (sample.getId() != 0) {
       return repository.findById(sample.getId());
     } else {
       return Optional.empty();

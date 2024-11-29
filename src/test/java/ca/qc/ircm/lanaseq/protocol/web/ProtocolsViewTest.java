@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,7 +54,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -95,8 +94,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   public void beforeTest() {
     protocols = repository.findAll();
     when(service.all()).thenReturn(protocols);
-    when(service.get(any())).then(
-        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     UI.getCurrent().setLocale(locale);
     view = navigate(ProtocolsView.class);
   }
@@ -410,7 +408,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     test(view.add).click();
 
     ProtocolDialog dialog = $(ProtocolDialog.class).first();
-    assertNull(dialog.getProtocolId());
+    assertEquals(0, dialog.getProtocolId());
     dialog.fireSavedEvent();
     verify(service, times(2)).all();
   }

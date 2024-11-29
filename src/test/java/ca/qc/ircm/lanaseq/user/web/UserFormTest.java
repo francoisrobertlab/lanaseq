@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -247,10 +248,10 @@ public class UserFormTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setUser_Null() {
+  public void setUser_New() {
     mockPasswordForm();
 
-    form.setUser(null);
+    form.setUser(new User());
 
     assertEquals("", form.email.getValue());
     assertEquals("", form.name.getValue());
@@ -265,7 +266,7 @@ public class UserFormTest extends SpringUIUnitTest {
     form.passwords.password.setValue("test");
     form.passwords.passwordConfirm.setValue("test");
 
-    form.setUser(null);
+    form.setUser(new User());
 
     assertEquals("", form.passwords.password.getValue());
     assertEquals("", form.passwords.passwordConfirm.getValue());
@@ -327,7 +328,7 @@ public class UserFormTest extends SpringUIUnitTest {
     User user = repository.findById(3L).get();
     form.setUser(user);
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(Optional.of(user));
+    when(service.get(anyLong())).thenReturn(Optional.of(user));
     fillForm();
     form.email.setValue("jonh.smith@ircm.qc.ca");
 

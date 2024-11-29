@@ -73,7 +73,7 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
     if (user.isAdmin()) {
       return false;
     }
-    boolean authorized = currentUser.getId().equals(user.getId());
+    boolean authorized = currentUser.getId() == user.getId();
     authorized |= permission.equals(READ);
     authorized |= permission.equals(WRITE) && roleValidator.hasRole(MANAGER);
     return authorized;

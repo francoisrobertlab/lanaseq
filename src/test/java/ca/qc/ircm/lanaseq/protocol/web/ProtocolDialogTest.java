@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -133,11 +134,10 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   public void beforeTest() {
     protocolFiles = fileRepository.findAll();
     when(service.all()).thenReturn(repository.findAll());
-    when(service.get(any())).then(
-        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     when(service.files(any())).then(i -> {
       Protocol protocol = i.getArgument(0);
-      return protocol.getId() != null ? fileRepository.findByProtocolAndDeletedFalse(protocol)
+      return protocol.getId() != 0 ? fileRepository.findByProtocolAndDeletedFalse(protocol)
           : new ArrayList<>();
     });
     random.nextBytes(fileContent);
@@ -474,8 +474,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setProtocolId_Null() {
-    dialog.setProtocolId(null);
+  public void setProtocolId_0() {
+    dialog.setProtocolId(0);
 
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
     assertEquals("", dialog.name.getValue());
@@ -516,7 +516,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   public void save_NameExistsNewProtocol() {
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
-    dialog.setProtocolId(null);
+    dialog.setProtocolId(0);
     fillFields();
 
     clickButton(dialog.save);
@@ -656,14 +656,14 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NewProtocol() {
     dialog.addSavedListener(savedListener);
-    dialog.setProtocolId(null);
+    dialog.setProtocolId(0);
     fillFields();
 
     clickButton(dialog.save);
 
     verify(service).save(protocolCaptor.capture(), filesCaptor.capture());
     Protocol protocol = protocolCaptor.getValue();
-    assertNull(protocol.getId());
+    assertEquals(0, protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(note, protocol.getNote());
     assertNull(protocol.getCreationDate());
@@ -671,7 +671,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
     assertEquals(1, files.size());
     ProtocolFile file = files.get(0);
-    assertNull(file.getId());
+    assertEquals(0, file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(fileContent, file.getContent());
     Notification notification = $(Notification.class).first();
@@ -704,7 +704,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
         .readAllBytes(Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI()));
     assertArrayEquals(fileContent, file.getContent());
     file = files.get(1);
-    assertNull(file.getId());
+    assertEquals(0, file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
     Notification notification = $(Notification.class).first();
@@ -733,7 +733,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
     assertEquals(1, files.size());
     ProtocolFile file = files.get(0);
-    assertNull(file.getId());
+    assertEquals(0, file.getId());
     assertEquals(filename, file.getFilename());
     assertArrayEquals(this.fileContent, file.getContent());
     Notification notification = $(Notification.class).first();

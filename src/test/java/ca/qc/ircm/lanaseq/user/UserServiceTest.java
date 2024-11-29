@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.user;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,8 +94,8 @@ public class UserServiceTest {
 
   @Test
   @WithMockUser
-  public void get_Null() {
-    User user = service.get(null).orElse(null);
+  public void get_0() {
+    User user = service.get(0).orElse(null);
 
     assertNull(user);
   }
@@ -189,10 +190,10 @@ public class UserServiceTest {
 
     service.save(user, "password");
 
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     user = repository.findById(user.getId()).get();
     assertNotNull(user);
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("password");
@@ -217,10 +218,10 @@ public class UserServiceTest {
 
     service.save(user, "password");
 
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     user = repository.findById(user.getId()).get();
     assertNotNull(user);
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("password");
@@ -245,10 +246,10 @@ public class UserServiceTest {
 
     service.save(user, "password");
 
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     user = repository.findById(user.getId()).get();
     assertNotNull(user);
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("password");
@@ -273,10 +274,10 @@ public class UserServiceTest {
 
     service.save(user, null);
 
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     user = repository.findById(user.getId()).get();
     assertNotNull(user);
-    assertNotNull(user.getId());
+    assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertNull(user.getHashedPassword());

@@ -9,5 +9,5 @@ public interface Data {
    *
    * @return database identifier
    */
-  Long getId();
+  long getId();
 }

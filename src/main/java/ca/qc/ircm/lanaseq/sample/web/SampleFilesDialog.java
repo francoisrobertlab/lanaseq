@@ -333,11 +333,11 @@ public class SampleFilesDialog extends Dialog
     return fileBinder.validate();
   }
 
-  public Long getSampleId() {
+  public long getSampleId() {
     return sample.getId();
   }
 
-  public void setSampleId(Long id) {
+  public void setSampleId(long id) {
     sample = service.get(id).orElseThrow();
     boolean readOnly =
         !sample.isEditable() || !authenticatedUser.hasPermission(sample, Permission.WRITE);

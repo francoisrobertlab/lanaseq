@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 /**
  * Data with files.
  */
-public interface DataWithFiles extends Data {
+public interface DataWithFiles {
   LocalDate getDate();
 
   LocalDateTime getCreationDate();

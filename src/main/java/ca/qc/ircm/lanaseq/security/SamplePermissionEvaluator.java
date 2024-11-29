@@ -68,11 +68,11 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
     if (roleValidator.hasRole(ADMIN)) {
       return true;
     }
-    if (sample.getId() == null) {
+    if (sample.getId() == 0) {
       return true;
     }
     User owner = sample.getOwner();
-    boolean authorized = owner.getId().equals(currentUser.getId());
+    boolean authorized = owner.getId() == currentUser.getId();
     authorized |= permission.equals(READ);
     authorized |= permission.equals(WRITE) && roleValidator.hasRole(MANAGER);
     return authorized;

@@ -324,7 +324,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void view() {
     Sample sample = samples.get(0);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
 
     doubleClickItem(view.samples, sample);
 
@@ -337,7 +337,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void view_RefreshOnSave() {
     Sample sample = samples.get(0);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
     view.samples.setItems(mock(DataProvider.class));
 
     doubleClickItem(view.samples, sample);
@@ -350,7 +350,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void view_RefreshOnDelete() {
     Sample sample = samples.get(0);
-    when(service.get(any())).thenReturn(Optional.of(sample));
+    when(service.get(anyLong())).thenReturn(Optional.of(sample));
     view.samples.setItems(mock(DataProvider.class));
 
     doubleClickItem(view.samples, sample);
@@ -495,7 +495,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     SampleDialog dialog = $(SampleDialog.class).first();
     assertTrue(dialog.isOpened());
-    assertNull(dialog.getSampleId());
+    assertEquals(0, dialog.getSampleId());
   }
 
   @Test
@@ -593,7 +593,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
     verify(datasetService).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getId());
+    assertEquals(0, dataset.getId());
     assertEquals(2, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("mnase"));
     assertTrue(dataset.getKeywords().contains("ip"));
@@ -620,7 +620,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertTrue(samplesCaptor.getValue().contains(samples.get(1)));
     verify(datasetService).save(datasetCaptor.capture());
     Dataset dataset = datasetCaptor.getValue();
-    assertNull(dataset.getId());
+    assertEquals(0, dataset.getId());
     assertEquals(2, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("mnase"));
     assertTrue(dataset.getKeywords().contains("ip"));

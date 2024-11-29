@@ -30,6 +30,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -206,11 +207,11 @@ public class DatasetsView extends VerticalLayout
 
   void merge() {
     List<Dataset> datasets = this.datasets.getSelectedItems().stream()
-        .sorted((d1, d2) -> d1.getId().compareTo(d2.getId())).collect(Collectors.toList());
+        .sorted(Comparator.comparingLong(Dataset::getId)).collect(Collectors.toList());
     Set<String> keywords = datasets.stream().flatMap(dataset -> dataset.getKeywords().stream())
         .collect(Collectors.toSet());
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
-        .filter(distinctByKey(Sample::getId)).sorted((s1, s2) -> s1.getId().compareTo(s2.getId()))
+        .filter(distinctByKey(Sample::getId)).sorted(Comparator.comparingLong(Sample::getId))
         .collect(Collectors.toList());
     if (samples.isEmpty()) {
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED)).open();

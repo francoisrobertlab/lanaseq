@@ -31,7 +31,7 @@ public class ProtocolFile implements Data, Serializable {
   @Id
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
-  private Long id;
+  private long id;
   /**
    * Filename as entered by user.
    */
@@ -83,11 +83,11 @@ public class ProtocolFile implements Data, Serializable {
   }
 
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

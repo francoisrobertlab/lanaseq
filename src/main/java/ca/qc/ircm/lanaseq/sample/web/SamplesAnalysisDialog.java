@@ -139,7 +139,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     return samples.stream().map(Sample::getId).collect(Collectors.toList());
   }
 
-  public void setSampleId(Long id) {
+  public void setSampleId(long id) {
     this.samples = Collections.nCopies(1, service.get(id).orElseThrow());
     updateHeader();
   }

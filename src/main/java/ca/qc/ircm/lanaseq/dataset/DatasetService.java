@@ -73,11 +73,7 @@ public class DatasetService {
    * @return dataset having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
-  public Optional<Dataset> get(Long id) {
-    if (id == null) {
-      return Optional.empty();
-    }
-
+  public Optional<Dataset> get(long id) {
     return repository.findById(id);
   }
 
@@ -145,7 +141,7 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public List<Path> files(Dataset dataset) {
-    if (dataset == null || dataset.getId() == null) {
+    if (dataset == null || dataset.getId() == 0) {
       return new ArrayList<>();
     }
     List<Path> files = new ArrayList<>();
@@ -207,7 +203,7 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public List<String> folderLabels(Dataset dataset, boolean unix) {
-    if (dataset == null || dataset.getId() == null) {
+    if (dataset == null || dataset.getId() == 0) {
       return new ArrayList<>();
     }
     List<String> labels = new ArrayList<>();
@@ -233,7 +229,7 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public List<Path> uploadFiles(Dataset dataset) {
-    if (dataset == null || dataset.getId() == null) {
+    if (dataset == null || dataset.getId() == 0) {
       return new ArrayList<>();
     }
     Path upload = configuration.getUpload().getFolder();
@@ -289,7 +285,7 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
   public boolean isDeletable(Dataset dataset) {
-    if (dataset == null || dataset.getId() == null) {
+    if (dataset == null || dataset.getId() == 0) {
       return false;
     }
     return dataset.isEditable();
@@ -303,19 +299,19 @@ public class DatasetService {
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void save(Dataset dataset) {
-    if (dataset.getId() != null && !dataset.isEditable()) {
+    if (dataset.getId() != 0 && !dataset.isEditable()) {
       throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
     }
     if (dataset.getName() == null) {
       throw new NullPointerException("dataset's name cannot be null");
     }
     if (dataset.getSamples() != null && dataset.getSamples().stream()
-        .filter(sample -> sample.getId() == null).findAny().isPresent()) {
+        .filter(sample -> sample.getId() == 0).findAny().isPresent()) {
       throw new IllegalArgumentException("all dataset's samples must already be in database");
     }
     LocalDateTime now = LocalDateTime.now();
     User user = authenticatedUser.getUser().orElse(null);
-    if (dataset.getId() == null) {
+    if (dataset.getId() == 0) {
       dataset.setOwner(user);
       dataset.setCreationDate(now);
       dataset.setEditable(true);
@@ -343,7 +339,7 @@ public class DatasetService {
 
   @Transactional(TxType.REQUIRES_NEW)
   protected Optional<Dataset> old(Dataset dataset) {
-    if (dataset.getId() != null) {
+    if (dataset.getId() != 0) {
       return repository.findById(dataset.getId());
     } else {
       return Optional.empty();

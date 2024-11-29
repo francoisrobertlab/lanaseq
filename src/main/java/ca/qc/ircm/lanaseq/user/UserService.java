@@ -41,11 +41,7 @@ public class UserService {
    * @return user having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
-  public Optional<User> get(Long id) {
-    if (id == null) {
-      return Optional.empty();
-    }
-
+  public Optional<User> get(long id) {
     return repository.findById(id);
   }
 
@@ -107,12 +103,12 @@ public class UserService {
    */
   @PreAuthorize("hasPermission(#user, 'write')")
   public void save(User user, String password) {
-    if (user.getId() != null && user.getId() == 1L && (!user.isAdmin() || !user.isActive())) {
+    if (user.getId() == 1 && (!user.isAdmin() || !user.isActive())) {
       throw new AccessDeniedException("user 1 must be an admin and active");
     }
 
     final boolean reloadAuthorities = user.isExpiredPassword() && password != null;
-    if (user.getId() == null) {
+    if (user.getId() == 0) {
       user.setActive(true);
       user.setCreationDate(LocalDateTime.now());
     }

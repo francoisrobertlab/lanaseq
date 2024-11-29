@@ -31,7 +31,7 @@ public class ForgotPassword implements Data, Serializable {
   @Id
   @Column(unique = true, nullable = false)
   @GeneratedValue(strategy = IDENTITY)
-  private Long id;
+  private long id;
   /**
    * Moment where User requested a forgot password.
    */
@@ -98,11 +98,11 @@ public class ForgotPassword implements Data, Serializable {
   }
 
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -234,7 +235,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void users_ColumnsValueProvider() {
-    when(service.get(any())).then(i -> repository.findById(i.getArgument(0)));
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     for (int i = 0; i < users.size(); i++) {
       User user = users.get(i);
       assertEquals(user.getEmail() != null ? user.getEmail() : "",
@@ -296,7 +297,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   @Test
   public void view() {
     User user = users.get(0);
-    when(service.get(any())).thenReturn(Optional.of(user));
+    when(service.get(anyLong())).thenReturn(Optional.of(user));
 
     doubleClickItem(view.users, user);
 
@@ -309,7 +310,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   @Test
   public void refreshDatasetsOnUserSaved() {
     User user = mock(User.class);
-    when(service.get(any())).thenReturn(Optional.of(user));
+    when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.edit(user);
     UserDialog dialog = $(UserDialog.class).first();
     dialog.fireSavedEvent();
@@ -443,7 +444,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
     assertEquals(1, $(UserDialog.class).all().size());
     UserDialog dialog = $(UserDialog.class).first();
-    assertNull(dialog.getUserId());
+    assertEquals(0, dialog.getUserId());
   }
 
   @Test
@@ -459,7 +460,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   @Test
   public void edit() throws Throwable {
     User user = repository.findById(3L).orElse(null);
-    when(service.get(any())).thenReturn(Optional.of(user));
+    when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.users.select(user);
     test(view.edit).click();
     assertEquals(1, $(UserDialog.class).all().size());

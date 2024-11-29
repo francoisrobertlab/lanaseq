@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -152,8 +153,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
    */
   @BeforeEach
   public void beforeTest() {
-    when(service.get(any())).then(
-        i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
+    when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     samples = sampleRepository.findAll();
     topKeywords.add("input");
     topKeywords.add("chip");
@@ -673,8 +673,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setDatasetId_Null() {
-    dialog.setDatasetId(null);
+  public void setDatasetId_0() {
+    dialog.setDatasetId(0);
 
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
     assertEquals("", dialog.namePrefix.getValue());
@@ -930,7 +930,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void save_NameExists() {
     dialog.addSavedListener(savedListener);
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(repository.findById(2L), repository.findById(1L));
+    when(service.get(anyLong())).thenReturn(repository.findById(2L), repository.findById(1L));
     dialog.setDatasetId(2L);
 
     clickButton(dialog.save);
@@ -947,7 +947,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.addSavedListener(savedListener);
     Dataset dataset = repository.findById(2L).get();
     when(service.exists(any())).thenReturn(true);
-    when(service.get(any())).thenReturn(Optional.of(dataset));
+    when(service.get(anyLong())).thenReturn(Optional.of(dataset));
     dialog.setDatasetId(2L);
 
     clickButton(dialog.save);
@@ -965,7 +965,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NewDataset() {
     dialog.addSavedListener(savedListener);
-    dialog.setDatasetId(null);
+    dialog.setDatasetId(0);
     fillForm();
 
     clickButton(dialog.save);

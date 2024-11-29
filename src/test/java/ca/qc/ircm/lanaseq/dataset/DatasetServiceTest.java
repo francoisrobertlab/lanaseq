@@ -188,8 +188,8 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void get_Null() {
-    Dataset dataset = service.get(null).orElse(null);
+  public void get_0() {
+    Dataset dataset = service.get(0).orElse(null);
     assertNull(dataset);
   }
 

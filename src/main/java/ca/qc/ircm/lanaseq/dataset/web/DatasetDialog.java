@@ -257,7 +257,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     confirm.addConfirmListener(e -> delete());
     keywords.setSuggestions(service.topKeywords(50));
     error.setVisible(false);
-    setDatasetId(null);
+    setDatasetId(0);
   }
 
   Button sampleDelete(Sample sample) {
@@ -335,7 +335,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
 
   private void updateHeader() {
     Dataset dataset = binder.getBean();
-    if (dataset != null && dataset.getId() != null) {
+    if (dataset != null && dataset.getId() != 0) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, dataset.getName()));
       confirm.setText(getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, dataset.getName()));
     } else {
@@ -396,7 +396,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
 
   private void addSample(Sample sample) {
     if (!samples.getListDataView().getItems()
-        .anyMatch(sa -> sa.getId() != null && sa.getId().equals(sample.getId()))) {
+        .anyMatch(sa -> sa.getId() != 0 && sa.getId() == sample.getId())) {
       samples.getListDataView().addItem(sample);
       updateSamplesFields();
     }
@@ -431,7 +431,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     boolean valid = validateDataset().isOk();
     if (valid) {
       Dataset dataset = binder.getBean();
-      if (service.exists(dataset.getName()) && (dataset.getId() == null || !dataset.getName()
+      if (service.exists(dataset.getName()) && (dataset.getId() == 0 || !dataset.getName()
           .equalsIgnoreCase(service.get(dataset.getId()).map(Dataset::getName).orElse("")))) {
         valid = false;
         error.setText(getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName()));
@@ -462,12 +462,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     close();
   }
 
-  public Long getDatasetId() {
+  public long getDatasetId() {
     return binder.getBean().getId();
   }
 
-  public void setDatasetId(Long id) {
-    Dataset dataset = id != null ? service.get(id).orElseThrow() : new Dataset();
+  public void setDatasetId(long id) {
+    Dataset dataset = id != 0 ? service.get(id).orElseThrow() : new Dataset();
     if (dataset.getKeywords() == null) {
       dataset.setKeywords(new HashSet<>());
     }
@@ -482,7 +482,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     }
     binder.setBean(dataset);
     boolean readOnly = !authenticatedUser.hasPermission(dataset, Permission.WRITE)
-        || (dataset.getId() != null && !dataset.isEditable());
+        || (dataset.getId() != 0 && !dataset.isEditable());
     binder.setReadOnly(readOnly);
     samples.setItems(dataset.getSamples());
     generateName.setVisible(!readOnly);

@@ -169,7 +169,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     confirm.setConfirmButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName() + " "
         + ButtonVariant.LUMO_PRIMARY.getVariantName());
     confirm.addConfirmListener(e -> delete());
-    setProtocolId(null);
+    setProtocolId(0);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {
@@ -202,7 +202,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   private Validator<String> nameExists() {
     return (value, context) -> {
-      if (service.nameExists(value) && (binder.getBean().getId() == null || !value.equalsIgnoreCase(
+      if (service.nameExists(value) && (binder.getBean().getId() == 0 || !value.equalsIgnoreCase(
           service.get(binder.getBean().getId()).map(Protocol::getName).orElse("")))) {
         return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
@@ -212,7 +212,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   private void updateHeader() {
     Protocol protocol = binder.getBean();
-    if (protocol != null && protocol.getId() != null) {
+    if (protocol != null && protocol.getId() != 0) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()));
       confirm.setText(getTranslation(MESSAGE_PREFIX + DELETE_MESSAGE, protocol.getName()));
     } else {
@@ -257,7 +257,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   private void setReadOnly() {
     boolean readOnly = false;
     Protocol protocol = binder.getBean();
-    if (protocol != null && protocol.getId() != null) {
+    if (protocol != null && protocol.getId() != 0) {
       readOnly = !authenticatedUser.hasPermission(protocol, Permission.WRITE);
     }
     binder.setReadOnly(readOnly);
@@ -332,12 +332,12 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     close();
   }
 
-  Long getProtocolId() {
+  long getProtocolId() {
     return binder.getBean().getId();
   }
 
-  void setProtocolId(Long id) {
-    Protocol protocol = id != null ? service.get(id).orElseThrow() : new Protocol();
+  void setProtocolId(long id) {
+    Protocol protocol = id != 0 ? service.get(id).orElseThrow() : new Protocol();
     binder.setBean(protocol);
     files.setItems(service.files(protocol));
     setReadOnly();

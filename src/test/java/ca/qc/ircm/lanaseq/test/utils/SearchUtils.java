@@ -8,8 +8,8 @@ import java.util.Optional;
  * Search utilities.
  */
 public class SearchUtils {
-  public static <D extends Data> Optional<D> find(Collection<D> datas, Long id) {
-    return datas.stream().filter(data -> id.equals(data.getId())).findFirst();
+  public static <D extends Data> Optional<D> find(Collection<D> datas, long id) {
+    return datas.stream().filter(data -> id == data.getId()).findFirst();
   }
 
   public static <V> boolean containsInstanceOf(Collection<V> values, Class<? extends V> clazz) {

@@ -21,7 +21,6 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +84,7 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
   }
 
   private void updateHeader() {
-    if (form.getUser() != null && form.getUser().getId() != null) {
+    if (form.getUser() != null && form.getUser().getId() != 0) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 1, form.getUser().getName()));
     } else {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
@@ -124,8 +123,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
     fireEvent(new SavedEvent<>(this, true));
   }
 
-  public Long getUserId() {
-    return Optional.ofNullable(form.getUser()).map(User::getId).orElse(null);
+  public long getUserId() {
+    return form.getUser().getId();
   }
 
   /**
@@ -134,8 +133,8 @@ public class UserDialog extends Dialog implements LocaleChangeObserver, Notifica
    * @param id
    *          user id
    */
-  public void setUserId(Long id) {
-    User user = id != null ? userService.get(id).orElseThrow() : null;
+  public void setUserId(long id) {
+    User user = id != 0 ? userService.get(id).orElseThrow() : new User();
     form.setUser(user);
     updateHeader();
   }
