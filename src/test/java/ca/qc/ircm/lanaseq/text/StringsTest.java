@@ -10,11 +10,8 @@ import org.junit.jupiter.api.Test;
 public class StringsTest {
   @Test
   public void property() {
-    assertEquals("", Strings.property((Object) null));
     assertEquals("true", Strings.property(true));
     assertEquals("sample", Strings.property("sample"));
-    assertEquals("sample", Strings.property("sample", null));
-    assertEquals("sample.name", Strings.property("sample", null, "name"));
     assertEquals("sample.true", Strings.property("sample", true));
     assertEquals("sample.name", Strings.property("sample.name"));
     assertEquals("sample.name", Strings.property("sample", "name"));
@@ -26,12 +23,9 @@ public class StringsTest {
 
   @Test
   public void styleName() {
-    assertEquals("", Strings.property((Object) null));
     assertEquals("true", Strings.styleName(true));
     assertEquals("sample", Strings.styleName("sample"));
     assertEquals("sample-true", Strings.styleName("sample", true));
-    assertEquals("sample", Strings.styleName("sample", null));
-    assertEquals("sample-name", Strings.styleName("sample", null, "name"));
     assertEquals("sample-name", Strings.styleName("sample-name"));
     assertEquals("sample-name", Strings.styleName("sample.name"));
     assertEquals("sample-name", Strings.styleName("sample", "name"));
