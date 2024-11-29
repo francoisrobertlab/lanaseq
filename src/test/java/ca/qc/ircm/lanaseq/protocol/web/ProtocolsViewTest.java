@@ -370,15 +370,15 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filterRange_Empty() {
+  public void filterRange_All() {
     view.protocols.setItems(mock(DataProvider.class));
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
     view.dateFilter.setValue(range);
 
-    view.dateFilter.setValue(null);
+    view.dateFilter.setValue(Range.all());
 
-    assertNull(view.filter().dateRange);
+    assertEquals(Range.all(), view.filter().dateRange);
     verify(view.protocols.getDataProvider(), times(2)).refreshAll();
   }
 

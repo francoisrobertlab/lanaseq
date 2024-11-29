@@ -246,13 +246,6 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void setPresentationValue_Null() {
-    dateRange.setPresentationValue(null);
-    assertNull(dateRange.from.getValue());
-    assertNull(dateRange.to.getValue());
-  }
-
-  @Test
   public void addThemeVariants() {
     dateRange.from.getThemeNames().forEach(theme -> dateRange.from.removeThemeName(theme));
     dateRange.to.getThemeNames().forEach(theme -> dateRange.to.removeThemeName(theme));

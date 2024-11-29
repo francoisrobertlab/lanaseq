@@ -457,14 +457,14 @@ public class SamplesViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filterDate_Empty() {
+  public void filterDate_All() {
     view.samples.setItems(mock(DataProvider.class));
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     view.dateFilter.setValue(range);
 
-    view.dateFilter.setValue(null);
+    view.dateFilter.setValue(Range.all());
 
-    assertNull(view.filter().dateRange);
+    assertEquals(Range.all(), view.filter().dateRange);
     verify(view.samples.getDataProvider(), times(2)).refreshAll();
   }
 
