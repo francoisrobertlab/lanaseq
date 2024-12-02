@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.user;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -97,7 +98,7 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void get() throws Exception {
-    ForgotPassword forgotPassword = service.get(9L, "174407008").orElse(null);
+    ForgotPassword forgotPassword = service.get(9L, "174407008").orElseThrow();
 
     assertEquals((Long) 9L, forgotPassword.getId());
     assertEquals("174407008", forgotPassword.getConfirmNumber());
@@ -129,11 +130,6 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void get_NullConfirmNumber() throws Exception {
-    assertThrows(NullPointerException.class, () -> service.get(7L, null));
-  }
-
-  @Test
   public void get_Used() throws Exception {
     ForgotPassword forgotPassword = service.get(10L, "460559412").orElse(null);
 
@@ -157,10 +153,10 @@ public class ForgotPasswordServiceTest {
     verify(forgotPasswordWebContext).getChangeForgottenPasswordUrl(forgotPasswordCaptor.capture(),
         any());
     ForgotPassword forgotPassword = forgotPasswordCaptor.getValue();
-    assertNotNull(forgotPassword.getId());
+    assertNotEquals(0, forgotPassword.getId());
     verify(mailService).htmlEmail();
     verify(mailService).send(email);
-    forgotPassword = repository.findById(forgotPassword.getId()).orElse(null);
+    forgotPassword = repository.findById(forgotPassword.getId()).orElseThrow();
     assertNotNull(forgotPassword.getConfirmNumber());
     assertTrue(
         LocalDateTime.now().plus(2, ChronoUnit.MINUTES).isAfter(forgotPassword.getRequestMoment()));
@@ -223,20 +219,20 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void updatePassword() throws Exception {
-    ForgotPassword forgotPassword = repository.findById(9L).orElse(null);
+    ForgotPassword forgotPassword = repository.findById(9L).orElseThrow();
 
     service.updatePassword(forgotPassword, "abc");
 
     repository.flush();
     assertNull(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()).orElse(null));
     verify(passwordEncoder).encode("abc");
-    User user = userRepository.findById(9L).orElse(null);
+    User user = userRepository.findById(9L).orElseThrow();
     assertEquals(hashedPassword, user.getHashedPassword());
   }
 
   @Test
   public void updatePassword_Expired() throws Exception {
-    ForgotPassword forgotPassword = repository.findById(7L).orElse(null);
+    ForgotPassword forgotPassword = repository.findById(7L).orElseThrow();
 
     try {
       service.updatePassword(forgotPassword, "abc");

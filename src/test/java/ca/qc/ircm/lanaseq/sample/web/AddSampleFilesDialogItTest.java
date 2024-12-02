@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -63,8 +64,12 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
     file2 = folder.resolve("R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file1);
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file2);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file1);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
+        file2);
   }
 
   @Test
@@ -94,9 +99,11 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     copyFiles(sample);
     Thread.sleep(2500);
     assertEquals(2, dialog.files().getRowCount());
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         configuration.getUpload().folder(sample).resolve("other.fastq"));
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         configuration.getUpload().getFolder().resolve("prefix_" + sample.getName() + "_R1"));
     Thread.sleep(2500);
     assertEquals(4, dialog.files().getRowCount());
@@ -113,7 +120,8 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Sample sample = repository.findById(10L).get();
     copyFiles(sample);
     String filenameInRoot = "prefix_" + sample.getName() + "_R1";
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()),
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         configuration.getUpload().getFolder().resolve(filenameInRoot));
 
     TestTransaction.flagForCommit();
@@ -131,13 +139,16 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(Files.exists(upload.resolve(file1.getFileName())));
     assertFalse(Files.exists(upload.resolve(file2.getFileName())));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file2.getFileName())));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R2.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(filenameInRoot)));
   }
 }

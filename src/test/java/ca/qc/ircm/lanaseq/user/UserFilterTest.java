@@ -24,7 +24,6 @@ public class UserFilterTest {
     assertTrue(filter.test(email("abc@test.com")));
     assertTrue(filter.test(email("abc@a.test")));
     assertTrue(filter.test(email("test@test.com")));
-    assertFalse(filter.test(email(null)));
     assertFalse(filter.test(email("")));
     assertFalse(filter.test(email("christian@abc.com")));
   }
@@ -40,7 +39,6 @@ public class UserFilterTest {
     assertTrue(filter.test(email("abc@test.com")));
     assertTrue(filter.test(email("abc@a.test")));
     assertTrue(filter.test(email("test@test.com")));
-    assertTrue(filter.test(email(null)));
     assertTrue(filter.test(email("")));
     assertTrue(filter.test(email("christian@abc.com")));
   }
@@ -53,7 +51,6 @@ public class UserFilterTest {
     assertTrue(filter.test(name("Test my")));
     assertTrue(filter.test(name("My test my")));
     assertTrue(filter.test(name("My TEST my")));
-    assertFalse(filter.test(name(null)));
     assertFalse(filter.test(name("")));
     assertFalse(filter.test(name("christian")));
   }
@@ -66,7 +63,6 @@ public class UserFilterTest {
     assertTrue(filter.test(name("Test my")));
     assertTrue(filter.test(name("My test my")));
     assertTrue(filter.test(name("My TEST my")));
-    assertTrue(filter.test(name(null)));
     assertTrue(filter.test(name("")));
     assertTrue(filter.test(name("christian")));
   }
@@ -118,11 +114,8 @@ public class UserFilterTest {
     assertFalse(filter.test(emailName("christian@abc.com", "Test my")));
     assertFalse(filter.test(emailName("christian@abc.com", "My test my")));
     assertFalse(filter.test(emailName("christian@abc.com", "My TEST my")));
-    assertFalse(filter.test(emailName(null, null)));
     assertFalse(filter.test(emailName("", "")));
-    assertFalse(filter.test(emailName(null, "My test")));
     assertFalse(filter.test(emailName("", "My test")));
-    assertFalse(filter.test(emailName("my.test@abc.com", null)));
     assertFalse(filter.test(emailName("my.test@abc.com", "")));
   }
 

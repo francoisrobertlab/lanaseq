@@ -73,10 +73,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -90,6 +87,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.lang.Nullable;
 
 /**
  * Dataset dialog.
@@ -320,7 +318,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     updateHeader();
   }
 
-  private String nameToNamePrefix(String name) {
+  private String nameToNamePrefix(@Nullable String name) {
     if (name == null) {
       name = "";
     }
@@ -467,18 +465,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   }
 
   public void setDatasetId(long id) {
-    Dataset dataset = id != 0 ? service.get(id).orElseThrow() : new Dataset();
-    if (dataset.getKeywords() == null) {
-      dataset.setKeywords(new HashSet<>());
-    }
-    if (dataset.getFilenames() == null) {
-      dataset.setFilenames(new HashSet<>());
-    }
-    if (dataset.getDate() == null) {
-      dataset.setDate(LocalDate.now());
-    }
-    if (dataset.getSamples() == null) {
-      dataset.setSamples(new ArrayList<>());
+    Dataset dataset;
+    if (id == 0) {
+      dataset = new Dataset();
+      dataset.setOwner(authenticatedUser.getUser().orElseThrow());
+    } else {
+      dataset = service.get(id).orElseThrow();
     }
     binder.setBean(dataset);
     boolean readOnly = !authenticatedUser.hasPermission(dataset, Permission.WRITE)
@@ -498,16 +490,16 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private void updateSamplesFields() {
     Locale locale = getLocale();
     List<Sample> samples = this.samples.getListDataView().getItems().toList();
-    protocol.setValue(samples.stream().map(Sample::getProtocol).filter(Objects::nonNull)
-        .map(Protocol::getName).distinct().collect(Collectors.joining(", ")));
-    assay.setValue(samples.stream().map(Sample::getAssay).filter(Objects::nonNull).distinct()
+    protocol.setValue(samples.stream().map(Sample::getProtocol).map(Protocol::getName).distinct()
         .collect(Collectors.joining(", ")));
+    assay.setValue(
+        samples.stream().map(Sample::getAssay).distinct().collect(Collectors.joining(", ")));
     type.setValue(samples.stream().map(Sample::getType).filter(Objects::nonNull).distinct()
         .collect(Collectors.joining(", ")));
     target.setValue(samples.stream().map(Sample::getTarget).filter(Objects::nonNull).distinct()
         .collect(Collectors.joining(", ")));
-    strain.setValue(samples.stream().map(Sample::getStrain).filter(Objects::nonNull).distinct()
-        .collect(Collectors.joining(", ")));
+    strain.setValue(
+        samples.stream().map(Sample::getStrain).distinct().collect(Collectors.joining(", ")));
     strainDescription.setValue(samples.stream().map(Sample::getStrainDescription)
         .filter(Objects::nonNull).distinct().collect(Collectors.joining(", ")));
     treatment.setValue(samples.stream().map(Sample::getTreatment).filter(Objects::nonNull)

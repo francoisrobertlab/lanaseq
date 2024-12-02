@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.security;
 
 import java.util.Collection;
+import java.util.Optional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,8 +15,8 @@ public class RoleValidator {
   protected RoleValidator() {
   }
 
-  private Authentication getAuthentication() {
-    return SecurityContextHolder.getContext().getAuthentication();
+  private Optional<Authentication> getAuthentication() {
+    return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
   }
 
   /**
@@ -26,10 +27,11 @@ public class RoleValidator {
    * @return true if current user has specified role, false otherwise
    */
   public boolean hasRole(String role) {
-    Authentication authentication = getAuthentication();
-    if (authentication == null) {
+    Optional<Authentication> optionalAuthentication = getAuthentication();
+    if (optionalAuthentication.isEmpty()) {
       return false;
     }
+    Authentication authentication = optionalAuthentication.orElseThrow();
 
     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
     boolean hasRole = false;

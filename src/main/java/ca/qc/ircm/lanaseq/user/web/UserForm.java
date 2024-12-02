@@ -33,6 +33,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.lang.Nullable;
 
 /**
  * User form.
@@ -124,6 +125,7 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
     return valid;
   }
 
+  @Nullable
   String getPassword() {
     return passwords.getPassword();
   }

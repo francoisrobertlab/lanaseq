@@ -63,7 +63,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get() {
-    User user = service.get(1L).orElse(null);
+    User user = service.get(1L).orElseThrow();
 
     assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
@@ -86,14 +86,6 @@ public class UserServiceTest {
 
   @Test
   @WithMockUser
-  public void get_Invalid() {
-    User user = service.get(0L).orElse(null);
-
-    assertNull(user);
-  }
-
-  @Test
-  @WithMockUser
   public void get_0() {
     User user = service.get(0).orElse(null);
 
@@ -103,7 +95,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail() {
-    User user = service.getByEmail("francois.robert@ircm.qc.ca").orElse(null);
+    User user = service.getByEmail("francois.robert@ircm.qc.ca").orElseThrow();
 
     assertNotNull(user);
     assertEquals((Long) 2L, user.getId());
@@ -132,14 +124,6 @@ public class UserServiceTest {
   }
 
   @Test
-  @WithMockUser
-  public void getByEmail_Null() {
-    User user = service.getByEmail(null).orElse(null);
-
-    assertNull(user);
-  }
-
-  @Test
   public void exists_Email_True() throws Throwable {
     boolean exists = service.exists("christian.poitras@ircm.qc.ca");
 
@@ -155,13 +139,6 @@ public class UserServiceTest {
     assertEquals(false, exists);
 
     verifyNoInteractions(authenticatedUser);
-  }
-
-  @Test
-  public void exists_Email_Null() throws Throwable {
-    boolean exists = service.exists(null);
-
-    assertEquals(false, exists);
   }
 
   @Test
@@ -331,7 +308,7 @@ public class UserServiceTest {
 
     service.save(user, null);
 
-    user = repository.findById(6L).orElse(null);
+    user = repository.findById(6L).orElseThrow();
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -370,14 +347,6 @@ public class UserServiceTest {
       user.setActive(false);
 
       service.save(user, "newpassword");
-    });
-  }
-
-  @Test
-  @WithMockUser
-  public void save_Null() {
-    assertThrows(NullPointerException.class, () -> {
-      service.save(null, null);
     });
   }
 
@@ -443,17 +412,6 @@ public class UserServiceTest {
       when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
       service.save("new password");
-    });
-  }
-
-  @Test
-  @WithMockUser
-  public void save_PasswordNull() {
-    assertThrows(NullPointerException.class, () -> {
-      User user = repository.findById(3L).get();
-      when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
-
-      service.save(null);
     });
   }
 }

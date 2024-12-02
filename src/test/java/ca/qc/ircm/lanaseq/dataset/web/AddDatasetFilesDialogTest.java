@@ -71,7 +71,7 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.Collectors;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -157,10 +157,10 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   /**
    * After test.
    */
-  @After
+  @AfterEach
   public void afterTest() {
-    Thread thread = dialog.updateFilesThread();
-    if (thread != null) {
+    if (dialog != null) {
+      Thread thread = dialog.updateFilesThread();
       thread.interrupt();
     }
   }

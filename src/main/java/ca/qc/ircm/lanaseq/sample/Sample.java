@@ -25,7 +25,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.Set;
+import org.springframework.lang.Nullable;
 
 /**
  * Sample.
@@ -103,12 +105,12 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
    * Keywords.
    */
   @ElementCollection
-  private Set<String> keywords;
+  private Set<String> keywords = new HashSet<>();
   /**
    * Other filenames to look for in directories.
    */
   @ElementCollection
-  private Set<String> filenames;
+  private Set<String> filenames = new HashSet<>();
   /**
    * True if sample can be edited.
    */
@@ -118,12 +120,12 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
    * Date.
    */
   @Column(name = "experiment_date", nullable = false)
-  private LocalDate date;
+  private LocalDate date = LocalDate.now();
   /**
    * Time when sample was created.
    */
   @Column(nullable = false)
-  private LocalDateTime creationDate;
+  private LocalDateTime creationDate = LocalDateTime.now();
   /**
    * Notes.
    */
@@ -238,19 +240,21 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     this.assay = assay;
   }
 
+  @Nullable
   public String getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(@Nullable String type) {
     this.type = type;
   }
 
+  @Nullable
   public String getTarget() {
     return target;
   }
 
-  public void setTarget(String target) {
+  public void setTarget(@Nullable String target) {
     this.target = target;
   }
 
@@ -262,19 +266,21 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     this.strain = strain;
   }
 
+  @Nullable
   public String getStrainDescription() {
     return strainDescription;
   }
 
-  public void setStrainDescription(String strainDescription) {
+  public void setStrainDescription(@Nullable String strainDescription) {
     this.strainDescription = strainDescription;
   }
 
+  @Nullable
   public String getTreatment() {
     return treatment;
   }
 
-  public void setTreatment(String treatment) {
+  public void setTreatment(@Nullable String treatment) {
     this.treatment = treatment;
   }
 
@@ -318,11 +324,12 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     this.date = date;
   }
 
+  @Nullable
   public String getNote() {
     return note;
   }
 
-  public void setNote(String note) {
+  public void setNote(@Nullable String note) {
     this.note = note;
   }
 

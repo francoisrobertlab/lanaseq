@@ -24,6 +24,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
     setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
     setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
-    file1 = Paths.get(getClass().getResource("/sample/R1.fastq").toURI());
+    file1 = Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI());
   }
 
   private void open() {
@@ -86,11 +87,15 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path home = configuration.getHome().folder(dataset);
     Files.createDirectories(home);
     Path file1 = home.resolve("R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file1);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file1);
     Path archive = configuration.getArchives().get(0).folder(dataset);
     Files.createDirectories(archive);
     Path file2 = archive.resolve("R2.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R2.fastq").toURI()), file2);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
+        file2);
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
@@ -111,7 +116,9 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file);
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
@@ -124,7 +131,8 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
 
     assertTrue(Files.exists(file.resolveSibling(dataset.getName() + "_R1.fastq")));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(file.resolveSibling(dataset.getName() + "_R1.fastq")));
     assertFalse(Files.exists(file));
   }
@@ -139,7 +147,9 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
@@ -165,7 +175,9 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
-    Files.copy(Paths.get(getClass().getResource("/sample/R1.fastq").toURI()), file);
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file);
     LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
     Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
     open();
@@ -216,7 +228,8 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertArrayEquals(
-        Files.readAllBytes(Paths.get(getClass().getResource("/sample/R1.fastq").toURI())),
+        Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
   }
 

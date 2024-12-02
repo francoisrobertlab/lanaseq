@@ -242,7 +242,7 @@ public class SampleFilesDialog extends Dialog
   }
 
   private void updateHeader() {
-    if (sample != null && sample.getName() != null) {
+    if (sample != null) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()));
     } else {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER));

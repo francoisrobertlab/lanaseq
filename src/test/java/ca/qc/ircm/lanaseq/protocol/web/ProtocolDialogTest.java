@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -57,6 +56,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -83,6 +83,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
@@ -119,6 +120,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   private ProtocolRepository repository;
   @Autowired
   private ProtocolFileRepository fileRepository;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
   private Locale locale = Locale.ENGLISH;
   private List<ProtocolFile> protocolFiles;
   private String name = "test protocol";
@@ -666,8 +669,9 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertEquals(0, protocol.getId());
     assertEquals(name, protocol.getName());
     assertEquals(note, protocol.getNote());
-    assertNull(protocol.getCreationDate());
-    assertNull(protocol.getOwner());
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(protocol.getCreationDate())
+        && LocalDateTime.now().plusMinutes(1).isAfter(protocol.getCreationDate()));
+    assertEquals(authenticatedUser.getUser().orElseThrow(), protocol.getOwner());
     List<ProtocolFile> files = new ArrayList<>(filesCaptor.getValue());
     assertEquals(1, files.size());
     ProtocolFile file = files.get(0);
@@ -700,8 +704,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     ProtocolFile file = files.get(0);
     assertEquals((Long) 1L, file.getId());
     assertEquals("FLAG Protocol.docx", file.getFilename());
-    byte[] fileContent = Files
-        .readAllBytes(Paths.get(getClass().getResource("/protocol/FLAG_Protocol.docx").toURI()));
+    byte[] fileContent = Files.readAllBytes(Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI()));
     assertArrayEquals(fileContent, file.getContent());
     file = files.get(1);
     assertEquals(0, file.getId());

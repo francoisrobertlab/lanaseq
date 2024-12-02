@@ -90,6 +90,9 @@ public class ForgotPasswordService {
    *          web context used to send email to user
    */
   public void insert(String email, ForgotPasswordWebContext webContext) {
+    Objects.requireNonNull(email, "email parameter cannot be null");
+    Objects.requireNonNull(webContext, "webContext parameter cannot be null");
+
     ForgotPassword forgotPassword = new ForgotPassword();
 
     // Set time.
@@ -153,6 +156,8 @@ public class ForgotPasswordService {
    *           if forgotPassword has expired
    */
   public synchronized void updatePassword(ForgotPassword forgotPassword, String newPassword) {
+    Objects.requireNonNull(forgotPassword, "forgotPassword parameter cannot be null");
+    Objects.requireNonNull(newPassword, "newPassword parameter cannot be null");
     if (LocalDateTime.now().isAfter(forgotPassword.getRequestMoment().plus(VALID_PERIOD))) {
       throw new IllegalArgumentException("ForgotPassword instance has expired.");
     }
@@ -163,7 +168,7 @@ public class ForgotPasswordService {
     // Encrypt password.
     String hashedPassword = passwordEncoder.encode(newPassword);
     // Update password.
-    user = userRepository.findById(user.getId()).orElse(null);
+    user = userRepository.findById(user.getId()).orElseThrow();
     user.setHashedPassword(hashedPassword);
     userRepository.save(user);
 

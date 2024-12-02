@@ -192,7 +192,7 @@ public class AddDatasetFilesDialog extends Dialog
   }
 
   private void updateHeader() {
-    if (dataset != null && dataset.getName() != null) {
+    if (dataset != null && dataset.getId() != 0) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, dataset.getName()));
       getUI().ifPresent(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
@@ -265,7 +265,7 @@ public class AddDatasetFilesDialog extends Dialog
   }
 
   private Path folder() {
-    return dataset != null ? configuration.getUpload().folder(dataset) : null;
+    return configuration.getUpload().folder(dataset);
   }
 
   private boolean validate(Collection<Path> files) {
@@ -304,13 +304,11 @@ public class AddDatasetFilesDialog extends Dialog
 
   private void createFolder() {
     Path folder = folder();
-    if (folder != null) {
-      try {
-        logger.debug("creating upload folder {} for dataset {}", folder, dataset);
-        Files.createDirectories(folder);
-      } catch (IOException e) {
-        showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
-      }
+    try {
+      logger.debug("creating upload folder {} for dataset {}", folder, dataset);
+      Files.createDirectories(folder);
+    } catch (IOException e) {
+      showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
     }
   }
 

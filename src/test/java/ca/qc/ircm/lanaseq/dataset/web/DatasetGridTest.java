@@ -95,8 +95,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
   }
 
   private Optional<Protocol> protocol(Dataset dataset) {
-    return dataset.getSamples() != null
-        ? dataset.getSamples().stream().findFirst().map(s -> s.getProtocol())
+    return !dataset.getSamples().isEmpty() ? Optional.of(dataset.getSamples().get(0).getProtocol())
         : Optional.empty();
   }
 
@@ -341,16 +340,16 @@ public class DatasetGridTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filterDate_Null() {
+  public void filterDate_All() {
     grid.setItems(mock(DataProvider.class));
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(11), LocalDate.now().minusDays(3));
     grid.dateFilter.setValue(range);
 
-    grid.dateFilter.setValue(null);
+    grid.dateFilter.setValue(Range.all());
 
     verify(grid.getDataProvider(), times(2)).refreshAll();
-    assertNull(grid.filter().dateRange);
+    assertEquals(Range.all(), grid.filter().dateRange);
   }
 
   @Test

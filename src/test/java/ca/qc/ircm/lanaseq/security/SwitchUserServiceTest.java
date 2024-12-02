@@ -123,21 +123,6 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void switchUser_NullSwitchTo() {
-    assertThrows(NullPointerException.class, () -> {
-      service.switchUser(null, VaadinServletRequest.getCurrent());
-    });
-  }
-
-  @Test
-  public void switchUser_NullRequest() {
-    User user = repository.findById(3L).get();
-    assertThrows(NullPointerException.class, () -> {
-      service.switchUser(user, null);
-    });
-  }
-
-  @Test
   public void exitSwitchUser() {
     User user = repository.findById(3L).get();
     service.switchUser(user, VaadinServletRequest.getCurrent());

@@ -27,7 +27,7 @@ public class Renamer {
    *          new folder
    */
   public static void moveFolder(Path oldFolder, Path newFolder) {
-    if (oldFolder != null && Files.exists(oldFolder) && !oldFolder.equals(newFolder)) {
+    if (Files.exists(oldFolder) && !oldFolder.equals(newFolder)) {
       try {
         logger.debug("moving folder {} to {}", oldFolder, newFolder);
         Path parent = newFolder.getParent();

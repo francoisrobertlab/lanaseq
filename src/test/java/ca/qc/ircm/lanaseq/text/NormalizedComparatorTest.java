@@ -39,8 +39,6 @@ public class NormalizedComparatorTest {
     assertTrue(comparator.compare("pepin1", "pepin") > 0);
     assertTrue(comparator.compare("pepin", "péqîn") < 0);
     assertTrue(comparator.compare("peqin", "pépîn") > 0);
-    assertTrue(comparator.compare(null, "pepin") < 0);
-    assertTrue(comparator.compare("pepin", null) > 0);
     assertTrue(comparator.compare("", "pepin") < 0);
     assertTrue(comparator.compare("pepin", "") > 0);
     // Test Polish, out of curiosity.
@@ -86,10 +84,6 @@ public class NormalizedComparatorTest {
     assertTrue(comparator.compare(name("pepin1"), name("pepin")) > 0);
     assertTrue(comparator.compare(name("pepin"), name("péqîn")) < 0);
     assertTrue(comparator.compare(name("peqin"), name("pépîn")) > 0);
-    assertTrue(comparator.compare(null, name("pepin")) < 0);
-    assertTrue(comparator.compare(name(null), name("pepin")) < 0);
-    assertTrue(comparator.compare(name("pepin"), null) > 0);
-    assertTrue(comparator.compare(name("pepin"), name(null)) > 0);
     assertTrue(comparator.compare(name(""), name("pepin")) < 0);
     assertTrue(comparator.compare(name("pepin"), name("")) > 0);
     // Test Polish, out of curiosity.
@@ -111,7 +105,6 @@ public class NormalizedComparatorTest {
     assertEquals("test", comparator.getConverter().apply("test"));
     assertEquals("abc", comparator.getConverter().apply("abc"));
     assertEquals("pépîn", comparator.getConverter().apply("pépîn"));
-    assertEquals(null, comparator.getConverter().apply(null));
   }
 
   @Test
@@ -120,7 +113,6 @@ public class NormalizedComparatorTest {
     assertEquals("test", comparator.getConverter().apply(name("test")));
     assertEquals("abc", comparator.getConverter().apply(name("abc")));
     assertEquals("pépîn", comparator.getConverter().apply(name("pépîn")));
-    assertEquals(null, comparator.getConverter().apply(name(null)));
   }
 
   private TestName name(String name) {

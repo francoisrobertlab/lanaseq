@@ -265,12 +265,12 @@ public class SamplesView extends VerticalLayout
   }
 
   void edit(Sample sample) {
-    showDialog(sample);
+    showDialog(sample.getId());
   }
 
-  private void showDialog(Sample sample) {
+  private void showDialog(long sampleId) {
     SampleDialog dialog = dialogFactory.getObject();
-    dialog.setSampleId(sample != null ? sample.getId() : 0);
+    dialog.setSampleId(sampleId);
     dialog.addSavedListener(e -> samples.getDataProvider().refreshAll());
     dialog.addDeletedListener(e -> samples.getDataProvider().refreshAll());
     dialog.open();
@@ -306,7 +306,7 @@ public class SamplesView extends VerticalLayout
   }
 
   void add() {
-    showDialog(null);
+    showDialog(0);
   }
 
   void merge() {

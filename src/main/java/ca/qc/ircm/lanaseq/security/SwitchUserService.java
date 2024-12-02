@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -148,7 +149,7 @@ public class SwitchUserService {
     // get the source user details
     UserDetails originalUser = null;
     Object obj = original.getPrincipal();
-    if ((obj != null) && obj instanceof UserDetails) {
+    if (obj instanceof UserDetails) {
       originalUser = (UserDetails) obj;
     }
     // publish event
@@ -158,6 +159,7 @@ public class SwitchUserService {
     return original;
   }
 
+  @Nullable
   private Authentication getSourceAuthentication(Authentication current) {
     Authentication original = null;
     // iterate over granted authorities and find the 'switch user' authority
@@ -179,7 +181,7 @@ public class SwitchUserService {
 
   public void setAuthenticationDetailsSource(
       AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
-    Objects.requireNonNull(userDetailsChecker,
+    Objects.requireNonNull(authenticationDetailsSource,
         "authenticationDetailsSource parameter cannot be null");
     this.authenticationDetailsSource = authenticationDetailsSource;
   }

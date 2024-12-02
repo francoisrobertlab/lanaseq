@@ -35,22 +35,22 @@ public class ForgotPassword implements Data, Serializable {
   /**
    * Moment where User requested a forgot password.
    */
-  @Column
+  @Column(nullable = false)
   private LocalDateTime requestMoment;
   /**
    * Confirm number for the forgot password request.
    */
-  @Column
+  @Column(nullable = false)
   private String confirmNumber;
   /**
    * Forgot password request was used.
    */
-  @Column
+  @Column(nullable = false)
   private boolean used;
   /**
    * User that created this forgot password request.
    */
-  @ManyToOne
+  @ManyToOne(optional = false)
   @JoinColumn
   private User user;
 

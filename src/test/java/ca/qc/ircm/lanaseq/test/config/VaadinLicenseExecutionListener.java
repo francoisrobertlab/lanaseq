@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.test.config;
 
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.abort;
 
 import com.vaadin.testbench.TestBenchTestCase;
 import com.vaadin.testbench.unit.UIUnitTest;
@@ -43,7 +43,7 @@ public class VaadinLicenseExecutionListener implements TestExecutionListener, In
             MessageFormat.format(LICENSE_ERROR_MESSAGE, testContext.getTestClass().getName());
         logger.info(message);
         // Vaadin license file not found, skip tests.
-        assumeTrue(false, message);
+        abort(message);
       }
     }
   }

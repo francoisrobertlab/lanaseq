@@ -39,7 +39,6 @@ public class SampleFilterTest {
     assertTrue(filter.test(name("Test my")));
     assertTrue(filter.test(name("My test my")));
     assertTrue(filter.test(name("My TEST my")));
-    assertFalse(filter.test(name(null)));
     assertFalse(filter.test(name("")));
     assertFalse(filter.test(name("christian")));
   }
@@ -52,7 +51,6 @@ public class SampleFilterTest {
     assertTrue(filter.test(name("Test my")));
     assertTrue(filter.test(name("My test my")));
     assertTrue(filter.test(name("My TEST my")));
-    assertTrue(filter.test(name(null)));
     assertTrue(filter.test(name("")));
     assertTrue(filter.test(name("christian")));
   }
@@ -116,7 +114,6 @@ public class SampleFilterTest {
     assertTrue(filter.test(protocol("My test my")));
     assertTrue(filter.test(protocol("My TEST my")));
     assertFalse(filter.test(protocol("Christian")));
-    assertFalse(filter.test(protocol(null)));
     assertFalse(filter.test(protocol("")));
   }
 
@@ -129,7 +126,6 @@ public class SampleFilterTest {
     assertTrue(filter.test(protocol("My test my")));
     assertTrue(filter.test(protocol("My TEST my")));
     assertTrue(filter.test(protocol("Christian")));
-    assertTrue(filter.test(protocol(null)));
     assertTrue(filter.test(protocol("")));
   }
 
@@ -174,9 +170,7 @@ public class SampleFilterTest {
     assertTrue(filter.test(owner("christian@abc.com", "Test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My TEST my")));
-    assertFalse(filter.test(owner(null, "Christian")));
     assertFalse(filter.test(owner("", "Christian")));
-    assertFalse(filter.test(owner("christian@abc.com", null)));
     assertFalse(filter.test(owner("christian@abc.com", "")));
     assertFalse(filter.test(owner("christian@abc.com", "Christian")));
   }
@@ -196,9 +190,7 @@ public class SampleFilterTest {
     assertTrue(filter.test(owner("christian@abc.com", "Test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My test my")));
     assertTrue(filter.test(owner("christian@abc.com", "My TEST my")));
-    assertTrue(filter.test(owner(null, "Christian")));
     assertTrue(filter.test(owner("", "Christian")));
-    assertTrue(filter.test(owner("christian@abc.com", null)));
     assertTrue(filter.test(owner("christian@abc.com", "")));
     assertTrue(filter.test(owner("christian@abc.com", "Christian")));
   }
@@ -226,11 +218,8 @@ public class SampleFilterTest {
     assertFalse(filter.test(protocolOwner("Test my", "christian@abc.com")));
     assertFalse(filter.test(protocolOwner("My test my", "christian@abc.com")));
     assertFalse(filter.test(protocolOwner("My TEST my", "christian@abc.com")));
-    assertFalse(filter.test(protocolOwner(null, null)));
     assertFalse(filter.test(protocolOwner("", "")));
-    assertFalse(filter.test(protocolOwner("My test", null)));
     assertFalse(filter.test(protocolOwner("My test", "")));
-    assertFalse(filter.test(protocolOwner(null, "my.test@abc.com")));
     assertFalse(filter.test(protocolOwner("", "my.test@abc.com")));
   }
 

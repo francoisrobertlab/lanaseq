@@ -158,15 +158,10 @@ public class AnalysisServiceTest {
       }
       if (collection.stream().findFirst().get() instanceof Dataset) {
         Collection<Dataset> datasets = (Collection<Dataset>) collection;
-        return datasets != null && !datasets.isEmpty()
-            && datasets.iterator().next().getName() != null
-                ? temporaryFolder.resolve(datasets.iterator().next().getName())
-                : null;
+        return temporaryFolder.resolve(datasets.iterator().next().getName());
       } else {
         Collection<Sample> samples = (Collection<Sample>) collection;
-        return samples != null && !samples.isEmpty() && samples.iterator().next().getName() != null
-            ? temporaryFolder.resolve(samples.iterator().next().getName())
-            : null;
+        return temporaryFolder.resolve(samples.iterator().next().getName());
       }
     });
   }
@@ -590,13 +585,6 @@ public class AnalysisServiceTest {
   }
 
   @Test
-  public void copyDatasetsResources_NullDatasets() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      service.copyDatasetsResources(null, new ArrayList<>());
-    });
-  }
-
-  @Test
   public void copyDatasetsResources_EmptyDatasets() {
     assertThrows(IllegalArgumentException.class, () -> {
       service.copyDatasetsResources(new ArrayList<>(), new ArrayList<>());
@@ -604,41 +592,7 @@ public class AnalysisServiceTest {
   }
 
   @Test
-  public void copyDatasetsResources_NullFilenamePatterns() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    Files.createFile(paired1);
-    Files.createFile(paired2);
-    Files.createFile(secondPaired1);
-    Files.createFile(secondPaired2);
-    Files.createFile(thirdPaired1);
-    Files.createFile(thirdPaired2);
-
-    Path folder = service.copyDatasetsResources(datasets, null);
-
-    assertEquals(configuration.getAnalysis().folder(datasets), folder);
-    assertTrue(Files.exists(folder));
-    assertEquals(2, Files.list(folder).count());
-    Sample sample3 = datasets.get(0).getSamples().get(0);
-    Path samples = folder.resolve("samples.txt");
-    assertTrue(Files.exists(samples));
-    List<String> samplesContent = Files.readAllLines(samples);
-    assertEquals(4, samplesContent.size());
-    assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample3.getName(), samplesContent.get(1));
-    assertEquals(sample.getName(), samplesContent.get(2));
-    assertEquals(sample2.getName(), samplesContent.get(3));
-    Path datasetMeta = folder.resolve("dataset.txt");
-    assertTrue(Files.exists(datasetMeta));
-    List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
-    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
-    assertEquals(datasets.get(0).getName() + "\t" + datasets.get(0).getSamples().get(0).getName(),
-        datasetMetaContent.get(1));
-    assertEquals(dataset.getName() + "\t" + this.sample.getName() + "\t" + sample2.getName(),
-        datasetMetaContent.get(2));
-  }
-
-  @Test
-  public void copyDatasetsResources_EmptyFilenamePattern() throws Throwable {
+  public void copyDatasetsResources_EmptyFilenamePatterns() throws Throwable {
     when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
     Files.createFile(paired1);
     Files.createFile(paired2);
@@ -1015,45 +969,10 @@ public class AnalysisServiceTest {
   }
 
   @Test
-  public void copySamplesResources_NullSamples() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      service.copySamplesResources(null, new ArrayList<>());
-    });
-  }
-
-  @Test
   public void copySamplesResources_EmptySamples() {
     assertThrows(IllegalArgumentException.class, () -> {
       service.copySamplesResources(new ArrayList<>(), new ArrayList<>());
     });
-  }
-
-  @Test
-  public void copySamplesResources_NullFilenamePatterns() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
-    Files.createFile(paired1);
-    Files.createFile(paired2);
-    Files.createFile(secondPaired1);
-    Files.createFile(secondPaired2);
-    Files.createFile(thirdPaired1);
-    Files.createFile(thirdPaired2);
-
-    Path folder = service.copySamplesResources(samples, null);
-
-    assertEquals(configuration.getAnalysis().folder(samples), folder);
-    assertTrue(Files.exists(folder));
-    assertEquals(1, Files.list(folder).count());
-    Sample sample3 = samples.get(0);
-    Path samples = folder.resolve("samples.txt");
-    assertTrue(Files.exists(samples));
-    List<String> samplesContent = Files.readAllLines(samples);
-    assertEquals(4, samplesContent.size());
-    assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample3.getName(), samplesContent.get(1));
-    assertEquals(sample.getName(), samplesContent.get(2));
-    assertEquals(sample2.getName(), samplesContent.get(3));
-    Path datasetMeta = folder.resolve("dataset.txt");
-    assertFalse(Files.exists(datasetMeta));
   }
 
   @Test

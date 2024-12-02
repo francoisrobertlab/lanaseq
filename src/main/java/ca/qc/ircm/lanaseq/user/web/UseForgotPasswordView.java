@@ -74,6 +74,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     buttonsLayout.add(save);
     header.setId(HEADER);
     message.setId(MESSAGE);
+    form.setRequired(true);
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -94,11 +95,6 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
   }
 
   private boolean validateParameter(String parameter, Locale locale) {
-    if (parameter == null) {
-      showNotification(getTranslation(MESSAGE_PREFIX + INVALID));
-      return false;
-    }
-
     String[] parameters = parameter.split(SEPARATOR, -1);
     boolean valid = true;
     if (parameters.length < 2) {
@@ -126,7 +122,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
       String[] parameters = parameter.split(SEPARATOR, -1);
       long id = Long.parseLong(parameters[0]);
       String confirmNumber = parameters[1];
-      forgotPassword = service.get(id, confirmNumber).orElse(null);
+      forgotPassword = service.get(id, confirmNumber).orElseThrow();
     } else {
       save.setEnabled(false);
       form.setEnabled(false);
@@ -136,6 +132,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
   void save() {
     if (form.isValid()) {
       String password = form.getPassword();
+      assert password != null;
       logger.debug("save new password for user {}", forgotPassword.getUser());
       service.updatePassword(forgotPassword, password);
       showNotification(getTranslation(MESSAGE_PREFIX + SAVED));

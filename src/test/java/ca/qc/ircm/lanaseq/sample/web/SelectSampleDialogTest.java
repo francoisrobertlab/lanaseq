@@ -285,14 +285,14 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filterDate_Empty() {
+  public void filterDate_All() {
     dialog.samples.setItems(mock(DataProvider.class));
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     dialog.dateFilter.setValue(range);
 
-    dialog.dateFilter.setValue(null);
+    dialog.dateFilter.setValue(Range.all());
 
-    assertEquals(null, dialog.filter().dateRange);
+    assertEquals(Range.all(), dialog.filter().dateRange);
     verify(dialog.samples.getDataProvider(), times(2)).refreshAll();
   }
 

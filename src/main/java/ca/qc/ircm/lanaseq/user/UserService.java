@@ -5,8 +5,10 @@ import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
@@ -54,10 +56,7 @@ public class UserService {
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
   public Optional<User> getByEmail(String email) {
-    if (email == null) {
-      return Optional.empty();
-    }
-
+    Objects.requireNonNull(email, "email parameter cannot be null");
     return repository.findByEmail(email);
   }
 
@@ -69,10 +68,7 @@ public class UserService {
    * @return true if a user exists with this email
    */
   public boolean exists(String email) {
-    if (email == null) {
-      return false;
-    }
-
+    Objects.requireNonNull(email, "email parameter cannot be null");
     return repository.findByEmail(email).isPresent();
   }
 
@@ -102,7 +98,8 @@ public class UserService {
    *          password
    */
   @PreAuthorize("hasPermission(#user, 'write')")
-  public void save(User user, String password) {
+  public void save(User user, @Nullable String password) {
+    Objects.requireNonNull(user, "user parameter cannot be null");
     if (user.getId() == 1 && (!user.isAdmin() || !user.isActive())) {
       throw new AccessDeniedException("user 1 must be an admin and active");
     }
@@ -131,9 +128,7 @@ public class UserService {
    */
   @PreAuthorize("hasAuthority('" + USER + "')")
   public void save(String password) {
-    if (password == null) {
-      throw new NullPointerException("password parameter cannot be null");
-    }
+    Objects.requireNonNull(password, "password parameter cannot be null");
 
     authenticatedUser.getUser().ifPresent(user -> {
       final boolean reloadAuthorities = user.isExpiredPassword();

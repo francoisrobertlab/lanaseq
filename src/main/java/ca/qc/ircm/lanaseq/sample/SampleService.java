@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,9 +88,7 @@ public class SampleService {
    * @return true if a dataset with specified name exists, false otherwise
    */
   public boolean exists(String name) {
-    if (name == null) {
-      return false;
-    }
+    Objects.requireNonNull(name, "name parameter cannot be null");
     return repository.existsByName(name);
   }
 
@@ -112,10 +111,7 @@ public class SampleService {
    */
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Sample> all(SampleFilter filter) {
-    if (filter == null) {
-      filter = new SampleFilter();
-    }
-
+    Objects.requireNonNull(filter, "filter parameter cannot be null");
     return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
   }
 
@@ -127,10 +123,7 @@ public class SampleService {
    * @return number of samples passing filter
    */
   public long count(SampleFilter filter) {
-    if (filter == null) {
-      filter = new SampleFilter();
-    }
-
+    Objects.requireNonNull(filter, "filter parameter cannot be null");
     return repository.count(filter.predicate());
   }
 
@@ -143,7 +136,8 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public List<Path> files(Sample sample) {
-    if (sample == null || sample.getId() == 0) {
+    Objects.requireNonNull(sample, "sample parameter cannot be null");
+    if (sample.getId() == 0) {
       return new ArrayList<>();
     }
     List<Path> files = new ArrayList<>();
@@ -205,7 +199,8 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public List<String> folderLabels(Sample sample, boolean unix) {
-    if (sample == null || sample.getId() == 0) {
+    Objects.requireNonNull(sample, "sample parameter cannot be null");
+    if (sample.getId() == 0) {
       return new ArrayList<>();
     }
     List<String> labels = new ArrayList<>();
@@ -231,7 +226,8 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public List<Path> uploadFiles(Sample sample) {
-    if (sample == null || sample.getId() == 0) {
+    Objects.requireNonNull(sample, "sample parameter cannot be null");
+    if (sample.getId() == 0) {
       return new ArrayList<>();
     }
     Path upload = configuration.getUpload().getFolder();
@@ -311,9 +307,7 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
   public boolean isDeletable(Sample sample) {
-    if (sample == null || sample.getId() == 0) {
-      return false;
-    }
+    Objects.requireNonNull(sample, "sample parameter cannot be null");
     return sample.isEditable() && !datasetRepository.existsBySamples(sample);
   }
 
@@ -326,22 +320,20 @@ public class SampleService {
    */
   @PreAuthorize("hasRole('USER')")
   public boolean isMergable(Collection<Sample> samples) {
-    if (samples == null || samples.isEmpty()) {
+    Objects.requireNonNull(samples, "samples parameter cannot be null");
+    if (samples.isEmpty()) {
       return false;
     }
     Sample first = samples.stream().findAny().orElse(new Sample());
     boolean mergable = true;
     for (Sample sample : samples) {
-      mergable &= first.getProtocol() != null && sample.getProtocol() != null
-          && first.getProtocol().getId() == sample.getProtocol().getId();
-      mergable &= first.getAssay() != null ? first.getAssay().equals(sample.getAssay())
-          : sample.getAssay() == null;
+      mergable &= first.getProtocol().getId() == sample.getProtocol().getId();
+      mergable &= first.getAssay().equals(sample.getAssay());
       mergable &= first.getType() != null ? first.getType().equals(sample.getType())
           : sample.getType() == null;
       mergable &= first.getTarget() != null ? first.getTarget().equals(sample.getTarget())
           : sample.getTarget() == null;
-      mergable &= first.getStrain() != null ? first.getStrain().equals(sample.getStrain())
-          : sample.getStrain() == null;
+      mergable &= first.getStrain().equals(sample.getStrain());
       mergable &= first.getStrainDescription() != null
           ? first.getStrainDescription().equals(sample.getStrainDescription())
           : sample.getStrainDescription() == null;
@@ -359,14 +351,13 @@ public class SampleService {
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void save(Sample sample) {
+    Objects.requireNonNull(sample, "sample parameter cannot be null");
+    Objects.requireNonNull(sample.getName(), "sample's name cannot be null");
     if (sample.getId() != 0 && !sample.isEditable()) {
       throw new IllegalArgumentException("sample " + sample + " cannot be edited");
     }
-    if (sample.getName() == null) {
-      throw new NullPointerException("dataset's name cannot be null");
-    }
     LocalDateTime now = LocalDateTime.now();
-    User user = authenticatedUser.getUser().orElse(null);
+    User user = authenticatedUser.getUser().orElseThrow();
     if (sample.getId() == 0) {
       sample.setOwner(user);
       sample.setCreationDate(now);

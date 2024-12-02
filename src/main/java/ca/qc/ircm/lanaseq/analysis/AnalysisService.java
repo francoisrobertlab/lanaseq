@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,11 +61,10 @@ public class AnalysisService {
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
   public Path copyDatasetsResources(Collection<Dataset> datasets,
       Collection<String> filenamePatterns) throws IOException {
-    if (datasets == null || datasets.isEmpty()) {
-      throw new IllegalArgumentException("datasets parameter cannot be null or empty");
-    }
-    if (filenamePatterns == null) {
-      filenamePatterns = new ArrayList<>();
+    Objects.requireNonNull(datasets, "datasets parameter cannot be null");
+    Objects.requireNonNull(filenamePatterns, "filenamePatterns parameter cannot be null");
+    if (datasets.isEmpty()) {
+      throw new IllegalArgumentException("datasets parameter cannot be empty");
     }
 
     boolean symlinks = configuration.isAnalysisSymlinks();
@@ -129,11 +129,10 @@ public class AnalysisService {
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #samples, 'read')")
   public Path copySamplesResources(Collection<Sample> samples, Collection<String> filenamePatterns)
       throws IOException {
-    if (samples == null || samples.isEmpty()) {
-      throw new IllegalArgumentException("samples parameter cannot be null or empty");
-    }
-    if (filenamePatterns == null) {
-      filenamePatterns = new ArrayList<>();
+    Objects.requireNonNull(samples, "samples parameter cannot be null");
+    Objects.requireNonNull(filenamePatterns, "filenamePatterns parameter cannot be null");
+    if (samples.isEmpty()) {
+      throw new IllegalArgumentException("samples parameter cannot be empty");
     }
 
     boolean symlinks = configuration.isAnalysisSymlinks();

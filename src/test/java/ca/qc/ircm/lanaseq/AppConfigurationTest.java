@@ -378,15 +378,6 @@ public class AppConfigurationTest {
   }
 
   @Test
-  public void analysis_NoAssay() {
-    Collection<Sample> samples =
-        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
-    samples.forEach(sa -> sa.setAssay(null));
-    Path path = appConfiguration.getAnalysis().folder(samples);
-    assertEquals(analysisFolder().resolve("jonh_20191208"), path);
-  }
-
-  @Test
   public void analysis_OneSample() {
     Sample sample = sample();
     assertEquals(analysisFolder().resolve(sample.getName()),
@@ -450,24 +441,6 @@ public class AppConfigurationTest {
     Collection<Sample> samples =
         datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_ChIPseq_20191208",
-        appConfiguration.getAnalysis().label(samples, true));
-  }
-
-  @Test
-  public void analysisLabel_SamplesNoAssay() {
-    Collection<Sample> samples =
-        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
-    samples.forEach(sa -> sa.setAssay(null));
-    assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_20191208",
-        appConfiguration.getAnalysis().label(samples, false));
-  }
-
-  @Test
-  public void analysisLabel_SamplesNoAssayUnix() {
-    Collection<Sample> samples =
-        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
-    samples.forEach(sa -> sa.setAssay(null));
-    assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_20191208",
         appConfiguration.getAnalysis().label(samples, true));
   }
 

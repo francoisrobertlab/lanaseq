@@ -93,7 +93,7 @@ public class AuthenticatedUserTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void getUser() throws Throwable {
-    User user = authenticatedUser.getUser().orElse(null);
+    User user = authenticatedUser.getUser().orElseThrow();
     assertNotNull(authenticatedUser.getUser());
     assertEquals((Long) 1L, user.getId());
   }
@@ -101,7 +101,7 @@ public class AuthenticatedUserTest {
   @Test
   @WithMockUser("lanaseq@ircm.qc.ca")
   public void getUser_NoId() throws Throwable {
-    User user = authenticatedUser.getUser().orElse(null);
+    User user = authenticatedUser.getUser().orElseThrow();
     assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
   }

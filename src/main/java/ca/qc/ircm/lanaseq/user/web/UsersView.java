@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 
 /**
  * Users view.
@@ -223,7 +224,7 @@ public class UsersView extends VerticalLayout
     users.getDataProvider().refreshAll();
   }
 
-  void filterActive(Boolean value) {
+  void filterActive(@Nullable Boolean value) {
     filter.active = value;
     users.getDataProvider().refreshAll();
   }

@@ -7,6 +7,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -105,7 +106,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
     Dataset dataset =
         datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
     assertNotNull(dataset);
-    assertNotNull(dataset.getId());
+    assertNotEquals(0, dataset.getId());
     assertEquals(name, dataset.getName());
     assertEquals(4, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));

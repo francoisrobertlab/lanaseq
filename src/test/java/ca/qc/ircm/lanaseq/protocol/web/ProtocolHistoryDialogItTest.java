@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,11 +73,10 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
         messageSource.getMessage(MESSAGE_PREFIX + RECOVERED,
             new Object[] { "Histone FLAG Protocol.docx" }, currentLocale()),
         notification.getText());
-    ProtocolFile file = fileRepository.findById(3L).orElse(null);
+    ProtocolFile file = fileRepository.findById(3L).orElseThrow();
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(
-        Files.readAllBytes(
-            Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI())),
+    assertArrayEquals(Files.readAllBytes(Paths.get(Objects
+        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
@@ -88,7 +88,8 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("Histone FLAG Protocol.docx");
     Files.deleteIfExists(downloaded);
-    Path source = Paths.get(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx").toURI());
+    Path source = Paths.get(Objects
+        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI());
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(2);

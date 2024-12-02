@@ -194,7 +194,7 @@ public class AddSampleFilesDialog extends Dialog
   }
 
   private void updateHeader() {
-    if (sample != null && sample.getName() != null) {
+    if (sample != null) {
       setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, sample.getName()));
       getUI().ifPresent(ui -> {
         WebBrowser browser = ui.getSession().getBrowser();
@@ -267,7 +267,7 @@ public class AddSampleFilesDialog extends Dialog
   }
 
   private Path folder() {
-    return sample != null ? configuration.getUpload().folder(sample) : null;
+    return configuration.getUpload().folder(sample);
   }
 
   private boolean validate(Collection<Path> files) {
@@ -306,13 +306,11 @@ public class AddSampleFilesDialog extends Dialog
 
   private void createFolder() {
     Path folder = folder();
-    if (folder != null) {
-      try {
-        logger.debug("creating upload folder {} for sample {}", folder, sample);
-        Files.createDirectories(folder);
-      } catch (IOException e) {
-        showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
-      }
+    try {
+      logger.debug("creating upload folder {} for sample {}", folder, sample);
+      Files.createDirectories(folder);
+    } catch (IOException e) {
+      showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
     }
   }
 

@@ -4,6 +4,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ID;
 import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
 import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 
+import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
@@ -11,6 +12,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,11 +44,9 @@ public class DatasetFilter implements Predicate<Dataset> {
           .isPresent();
     }
     if (protocolContains != null) {
-      Sample sample = dataset.getSamples() != null
-          ? dataset.getSamples().stream().findFirst().orElse(new Sample())
-          : new Sample();
-      test &= comparable(replaceNull(sample.getProtocol().getName()))
-          .contains(comparable(protocolContains));
+      String protocol = !dataset.getSamples().isEmpty() ? Optional.of(dataset.getSamples().get(0))
+          .map(Sample::getProtocol).map(Protocol::getName).orElse("") : "";
+      test &= comparable(protocol).contains(comparable(protocolContains));
     }
     if (dateRange != null) {
       test &= dateRange.contains(dataset.getDate());
@@ -96,7 +96,8 @@ public class DatasetFilter implements Predicate<Dataset> {
       predicate.and(dataset.owner.email.contains(ownerContains)
           .or(dataset.owner.name.contains(ownerContains)));
     }
-    return predicate.hasValue() ? predicate.getValue() : Expressions.asBoolean(true).isTrue();
+    return predicate.getValue() != null ? predicate.getValue()
+        : Expressions.asBoolean(true).isTrue();
   }
 
   public Pageable pageable() {

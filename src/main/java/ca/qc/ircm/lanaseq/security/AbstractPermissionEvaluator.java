@@ -19,15 +19,14 @@ public abstract class AbstractPermissionEvaluator implements PermissionEvaluator
   }
 
   protected Optional<UserDetails> getUserDetails(Authentication authentication) {
-    return Optional.ofNullable(authentication)
-        .filter(au -> au.getPrincipal() instanceof UserDetails)
+    return Optional.of(authentication).filter(au -> au.getPrincipal() instanceof UserDetails)
         .map(au -> (UserDetails) au.getPrincipal());
   }
 
   protected Optional<User> getUser(Authentication authentication) {
     return getUserDetails(authentication).filter(ud -> ud instanceof UserDetailsWithId)
         .map(ud -> (UserDetailsWithId) ud).map(au -> au.getId())
-        .map(id -> userRepository.findById(id).orElse(null));
+        .map(id -> userRepository.findById(id).orElseThrow());
   }
 
   protected Permission resolvePermission(Object permission) {

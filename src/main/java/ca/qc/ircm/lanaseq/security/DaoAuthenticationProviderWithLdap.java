@@ -60,7 +60,7 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
 
   private User getUser(UserDetails userDetails) {
     String email = userDetails.getUsername();
-    return userRepository.findByEmail(email).orElse(null);
+    return userRepository.findByEmail(email).orElseThrow();
   }
 
   private boolean accountLocked(User user) {
