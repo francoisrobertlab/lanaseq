@@ -38,9 +38,6 @@ public class DeleteOldUploadFolders {
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
   public void deleteOldUploadFolders() {
     Path upload = configuration.getUpload().getFolder();
-    if (upload == null) {
-      return;
-    }
     logger.debug("deleting old folders in upload {}", upload);
     Duration deleteAge = configuration.getUploadDeleteAge();
     Instant now = Instant.now();

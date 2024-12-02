@@ -115,8 +115,9 @@ public class AppConfiguration implements InitializingBean {
   }
 
   private Path analysisSubfolder(Collection<? extends DataWithFiles> datas) {
-    if (datas == null || datas.isEmpty()) {
-      throw new IllegalArgumentException("datas cannot be null or empty");
+    Objects.requireNonNull(datas, "datas parameter cannot be null");
+    if (datas.isEmpty()) {
+      throw new IllegalArgumentException("datas parameter cannot be empty");
     }
     DataWithFiles data = datas.iterator().next();
     Objects.requireNonNull(data);
