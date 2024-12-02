@@ -4,6 +4,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,25 +42,25 @@ public class InitializeDatabaseExecutionListener
 
   @Override
   @SuppressWarnings("checkstyle:linelength")
-  public void beforeTestMethod(TestContext testContext) throws Exception {
+  public void beforeTestMethod(@NotNull TestContext testContext) throws Exception {
     logger.debug("Initializes database");
 
-    User user = userRepository.findById(1L).orElse(null);
+    User user = userRepository.findById(1L).orElseThrow();
     user.setLastSignAttempt(LocalDateTime.now().minus(4, ChronoUnit.DAYS));
     userRepository.save(user);
-    user = userRepository.findById(2L).orElse(null);
+    user = userRepository.findById(2L).orElseThrow();
     user.setLastSignAttempt(LocalDateTime.now().minus(2, ChronoUnit.HOURS));
     userRepository.save(user);
-    user = userRepository.findById(3L).orElse(null);
+    user = userRepository.findById(3L).orElseThrow();
     user.setLastSignAttempt(LocalDateTime.now().minus(10, ChronoUnit.DAYS));
     userRepository.save(user);
-    user = userRepository.findById(4L).orElse(null);
+    user = userRepository.findById(4L).orElseThrow();
     user.setLastSignAttempt(LocalDateTime.now().minus(21, ChronoUnit.DAYS));
     userRepository.save(user);
-    user = userRepository.findById(5L).orElse(null);
+    user = userRepository.findById(5L).orElseThrow();
     user.setLastSignAttempt(LocalDateTime.now().minus(20, ChronoUnit.MINUTES));
     userRepository.save(user);
-    user = userRepository.findById(6L).orElse(null);
+    user = userRepository.findById(6L).orElseThrow();
     user.setLastSignAttempt(LocalDateTime.now().minus(20, ChronoUnit.MINUTES));
     userRepository.save(user);
   }

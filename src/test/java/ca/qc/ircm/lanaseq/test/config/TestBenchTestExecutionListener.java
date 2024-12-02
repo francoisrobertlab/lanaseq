@@ -1,12 +1,13 @@
 package ca.qc.ircm.lanaseq.test.config;
 
 import static ca.qc.ircm.lanaseq.test.config.AnnotationFinder.findAnnotation;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.abort;
 
 import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.TestBenchTestCase;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -46,7 +47,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
     injectDependencies(testContext.getApplicationContext());
     if (isTestBenchTest(testContext)) {
       if (isSkipTestBenchTests()) {
-        assumeTrue(false, SKIP_TESTS_ERROR_MESSAGE);
+        abort(SKIP_TESTS_ERROR_MESSAGE);
       }
 
       setRetries();
@@ -54,7 +55,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   @Override
-  public void beforeTestMethod(TestContext testContext) throws Exception {
+  public void beforeTestMethod(@NotNull TestContext testContext) throws Exception {
     if (isTestBenchTest(testContext)) {
       WebDriver driver = driver(testContext);
       TestBenchTestCase target = getInstance(testContext);
@@ -68,7 +69,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   @Override
-  public void afterTestMethod(TestContext testContext) throws Exception {
+  public void afterTestMethod(@NotNull TestContext testContext) throws Exception {
     if (isTestBenchTest(testContext)) {
       TestBenchTestCase target = getInstance(testContext);
       target.getDriver().manage().deleteAllCookies();
