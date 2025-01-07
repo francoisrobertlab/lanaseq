@@ -1,6 +1,8 @@
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
+import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +13,7 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ProfileViewElement;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
+import com.vaadin.flow.component.html.testbench.H1Element;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -94,6 +97,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(1);
     usersView.switchUser().click();
+    waitUntil(driver -> $(H1Element.class).id(styleName(APPLICATION_NAME))); // Otherwise Firefox will not find elements.
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
     assertTrue(optional(() -> view.header()).isPresent());
@@ -157,6 +161,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(2);
     usersView.switchUser().click();
+    waitUntil(driver -> $(H1Element.class).id(styleName(APPLICATION_NAME))); // Otherwise Firefox will not find elements.
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.profile().click();
     view.exitSwitchUser().click();
