@@ -21,8 +21,8 @@ public class VaadinLicenseExecutionListener implements TestExecutionListener, In
   private static final String LICENSE_ERROR_MESSAGE =
       "License for Vaadin TestBench not found. Skipping test class {0} .";
   private static final String[] LICENSE_PATHS =
-      new String[] { ".vaadin/offlineKey", ".vaadin/proKey", "vaadin.testbench.developer.license",
-          ".vaadin.testbench.developer.license" };
+      new String[] { ".vaadin/offlineKey", ".vaadin/proKey", ".vaadin/userKey",
+          "vaadin.testbench.developer.license", ".vaadin.testbench.developer.license" };
   private static final String LICENSE_SYSTEM_PROPERTY = "vaadin.testbench.developer.license";
   private static final Class<?>[] TEST_BENCH_CLASSES =
       new Class[] { UIUnitTest.class, TestBenchTestCase.class };
