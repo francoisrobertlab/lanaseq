@@ -15,10 +15,10 @@ import com.vaadin.testbench.elementsbase.Element;
 @Attribute(name = "class", value = DateRangeField.CLASS_NAME)
 public class DateRangeFieldElement extends CustomFieldElement {
   public DatePickerElement form() {
-    return $(DatePickerElement.class).attribute("class", FROM).first();
+    return $(DatePickerElement.class).withAttribute("class", FROM).first();
   }
 
   public DatePickerElement to() {
-    return $(DatePickerElement.class).attribute("class", TO).first();
+    return $(DatePickerElement.class).withAttribute("class", TO).first();
   }
 }
