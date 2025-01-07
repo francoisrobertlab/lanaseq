@@ -1,8 +1,12 @@
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
@@ -23,18 +27,18 @@ import com.vaadin.testbench.elementsbase.Element;
  * Web element for {@link ViewLayout}.
  */
 @Element("vaadin-app-layout")
-@Attribute(name = "id", value = ViewLayout.ID)
+@Attribute(name = "id", value = ID)
 public class ViewLayoutElement extends AppLayoutElement {
   public H1Element applicationName() {
-    return $(H1Element.class).first();
+    return $(H1Element.class).id(styleName(APPLICATION_NAME));
   }
 
   public H2Element header() {
-    return $(H2Element.class).first();
+    return $(H2Element.class).id(styleName(ID, HEADER));
   }
 
-  public H2Element laboratory() {
-    return $(H2Element.class).first();
+  public H1Element laboratory() {
+    return $(H1Element.class).id(styleName(ID, LABORATORY));
   }
 
   public DrawerToggleElement drawerToggle() {

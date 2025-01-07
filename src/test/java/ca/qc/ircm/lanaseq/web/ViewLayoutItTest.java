@@ -39,6 +39,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
     assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(() -> view.laboratory()).isPresent());
     assertTrue(optional(() -> view.drawerToggle()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
@@ -56,6 +57,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
     assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(() -> view.laboratory()).isPresent());
     assertTrue(optional(() -> view.drawerToggle()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
@@ -73,6 +75,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
     assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(() -> view.laboratory()).isPresent());
     assertTrue(optional(() -> view.drawerToggle()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
@@ -94,6 +97,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
     assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(() -> view.laboratory()).isPresent());
     assertTrue(optional(() -> view.drawerToggle()).isPresent());
     assertTrue(optional(() -> view.datasets()).isPresent());
     assertTrue(optional(() -> view.samples()).isPresent());
