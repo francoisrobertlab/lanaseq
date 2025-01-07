@@ -83,7 +83,7 @@ public class ErrorNotificationTest extends SpringUIUnitTest {
   @Test
   public void setText() {
     assertEquals(errorText, errorNotification.getText());
-    String errorText = RandomStringUtils.randomAlphanumeric(20);
+    String errorText = RandomStringUtils.insecure().nextAlphanumeric(20);
     errorNotification.setText(errorText);
     assertEquals(errorText, errorNotification.getText());
   }

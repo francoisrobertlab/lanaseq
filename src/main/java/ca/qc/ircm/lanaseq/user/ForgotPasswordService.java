@@ -99,7 +99,7 @@ public class ForgotPasswordService {
     forgotPassword.setRequestMoment(LocalDateTime.now());
 
     // Generate random confirm number.
-    forgotPassword.setConfirmNumber(RandomStringUtils.randomAlphanumeric(40));
+    forgotPassword.setConfirmNumber(RandomStringUtils.insecure().nextAlphanumeric(40));
 
     userRepository.findByEmail(email).ifPresent(user -> {
       if (user.getId() == User.ROBOT_ID) {
