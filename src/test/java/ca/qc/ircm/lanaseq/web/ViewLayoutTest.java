@@ -47,9 +47,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Tests for {@link ViewLayout}.
@@ -60,7 +60,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ViewLayout view;
-  @SpyBean
+  @MockitoSpyBean
   private SwitchUserService switchUserService;
   @Autowired
   private UserRepository userRepository;
