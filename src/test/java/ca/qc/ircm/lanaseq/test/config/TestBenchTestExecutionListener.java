@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assumptions.abort;
 
 import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.TestBenchTestCase;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   private static final Logger logger =
       LoggerFactory.getLogger(TestBenchTestExecutionListener.class);
   @Value("${download-home:${user.dir}/target}")
-  protected String downloadHome;
+  protected File downloadHome;
 
   @Override
   public void beforeTestClass(TestContext testContext) throws Exception {
@@ -116,7 +117,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       if (downloadAnnotations != null) {
         HashMap<String, Object> chromePrefs = new HashMap<>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
-        chromePrefs.put("download.default_directory", downloadHome);
+        chromePrefs.put("download.default_directory", downloadHome.getPath());
         options.setExperimentalOption("prefs", chromePrefs);
       } else if (headless) {
         options.addArguments("--headless");
@@ -125,7 +126,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
     } else if (driverClass.equals(FIREFOX_DRIVER)) {
       FirefoxProfile profile = new FirefoxProfile();
       profile.setPreference("browser.download.folderList", 2);
-      profile.setPreference("browser.download.dir", downloadHome);
+      profile.setPreference("browser.download.dir", downloadHome.getPath());
       profile.setPreference("browser.download.useDownloadDir", true);
       profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
           "application/msword,application/pdf");
