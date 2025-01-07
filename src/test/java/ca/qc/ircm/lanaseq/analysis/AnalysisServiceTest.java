@@ -33,8 +33,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link AnalysisService}.
@@ -44,17 +44,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 public class AnalysisServiceTest {
   @Autowired
   private AnalysisService service;
-  @MockBean
+  @MockitoBean
   private DatasetService datasetService;
-  @MockBean
+  @MockitoBean
   private SampleService sampleService;
-  @MockBean
+  @MockitoBean
   private AppConfiguration configuration;
   @Autowired
   private DatasetRepository datasetRepository;
   @Autowired
   private SampleRepository sampleRepository;
-  @MockBean
+  @MockitoBean
   private PermissionEvaluatorDelegator permissionEvaluator;
   @TempDir
   Path temporaryFolder;

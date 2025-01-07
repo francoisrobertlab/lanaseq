@@ -108,8 +108,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link DatasetDialog}.
@@ -122,7 +122,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private DatasetDialog dialog;
-  @MockBean
+  @MockitoBean
   private DatasetService service;
   @Mock
   private ComponentEventListener<SavedEvent<DatasetDialog>> savedListener;

@@ -29,7 +29,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,6 +41,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link AuthenticatedUser}.
@@ -55,9 +55,9 @@ public class AuthenticatedUserTest {
   private UserRepository repository;
   @Autowired
   private UserDetailsService userDetailsService;
-  @MockBean
+  @MockitoBean
   private RoleValidator roleValidator;
-  @MockBean
+  @MockitoBean
   private PermissionEvaluator permissionEvaluator;
   @Mock
   private User user;

@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link MailService}.
@@ -47,7 +47,7 @@ public class MailServiceTest {
   private JavaMailSender mailSender;
   @Autowired
   private MailConfiguration mailConfiguration;
-  @MockBean
+  @MockitoBean
   private AuthenticatedUser authenticatedUser;
   @Value("${spring.mail.port}")
   private int smtpPort;

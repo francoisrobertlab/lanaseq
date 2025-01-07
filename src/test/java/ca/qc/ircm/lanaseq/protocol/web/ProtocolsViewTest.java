@@ -59,8 +59,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link ProtocolsView}.
@@ -72,7 +72,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ProtocolsView view;
-  @MockBean
+  @MockitoBean
   private ProtocolService service;
   @Captor
   private ArgumentCaptor<ValueProvider<Protocol, String>> valueProviderCaptor;

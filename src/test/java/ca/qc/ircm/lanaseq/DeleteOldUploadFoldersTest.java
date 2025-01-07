@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link DeleteOldUploadFolders}.
@@ -28,7 +28,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 public class DeleteOldUploadFoldersTest {
   @Autowired
   private DeleteOldUploadFolders task;
-  @MockBean
+  @MockitoBean
   private AppConfiguration configuration;
   @Mock
   private AppConfiguration.NetworkDrive<DataWithFiles> upload;

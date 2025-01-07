@@ -55,7 +55,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -64,6 +63,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link SampleService}.
@@ -85,11 +85,11 @@ public class SampleServiceTest {
   private UserRepository userRepository;
   @Autowired
   private EntityManager entityManager;
-  @MockBean
+  @MockitoBean
   private DatasetService datasetService;
-  @MockBean
+  @MockitoBean
   private AppConfiguration configuration;
-  @MockBean
+  @MockitoBean
   private PermissionEvaluator permissionEvaluator;
   @Autowired
   private AuthenticatedUser authenticatedUser;

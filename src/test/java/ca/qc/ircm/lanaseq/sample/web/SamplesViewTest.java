@@ -74,8 +74,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link SamplesView}.
@@ -88,9 +88,9 @@ public class SamplesViewTest extends SpringUIUnitTest {
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private SamplesView view;
-  @MockBean
+  @MockitoBean
   private SampleService service;
-  @MockBean
+  @MockitoBean
   private DatasetService datasetService;
   @Captor
   private ArgumentCaptor<Collection<Sample>> samplesCaptor;

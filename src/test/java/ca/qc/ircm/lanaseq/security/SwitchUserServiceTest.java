@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -37,6 +36,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link SwitchUserService}.
@@ -50,9 +50,9 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   private UserDetailsService userDetailsService;
   @Autowired
   private UserRepository repository;
-  @MockBean
+  @MockitoBean
   private ApplicationEventPublisher eventPublisher;
-  @MockBean
+  @MockitoBean
   private UserDetailsChecker userDetailsChecker;
 
   @BeforeEach

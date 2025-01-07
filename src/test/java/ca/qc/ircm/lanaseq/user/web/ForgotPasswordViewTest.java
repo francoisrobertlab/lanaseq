@@ -45,8 +45,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link ForgotPasswordView}.
@@ -58,9 +58,9 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ForgotPasswordView view;
-  @MockBean
+  @MockitoBean
   private ForgotPasswordService service;
-  @MockBean
+  @MockitoBean
   private UserService userService;
   @Captor
   private ArgumentCaptor<ForgotPasswordWebContext> webContextCaptor;

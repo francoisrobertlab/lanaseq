@@ -65,8 +65,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link UsersView}.
@@ -78,9 +78,9 @@ public class UsersViewTest extends SpringUIUnitTest {
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private UsersView view;
-  @MockBean
+  @MockitoBean
   private UserService service;
-  @MockBean
+  @MockitoBean
   private SwitchUserService switchUserService;
   @Captor
   private ArgumentCaptor<User> userCaptor;

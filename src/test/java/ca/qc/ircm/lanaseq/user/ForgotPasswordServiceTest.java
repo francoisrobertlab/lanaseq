@@ -33,11 +33,11 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -55,11 +55,11 @@ public class ForgotPasswordServiceTest {
   private ForgotPasswordRepository repository;
   @Autowired
   private UserRepository userRepository;
-  @MockBean
+  @MockitoBean
   private AppConfiguration appConfiguration;
-  @MockBean
+  @MockitoBean
   private MailService mailService;
-  @MockBean
+  @MockitoBean
   private PasswordEncoder passwordEncoder;
   @Autowired
   private MessageSource messageSource;

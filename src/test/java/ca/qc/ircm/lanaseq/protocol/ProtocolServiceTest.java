@@ -29,11 +29,11 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link ProtocolService}.
@@ -50,9 +50,9 @@ public class ProtocolServiceTest {
   private ProtocolFileRepository fileRepository;
   @Autowired
   private UserRepository userRepository;
-  @MockBean
+  @MockitoBean
   private AuthenticatedUser authenticatedUser;
-  @MockBean
+  @MockitoBean
   private PermissionEvaluator permissionEvaluator;
   private Random random = new Random();
   private User currentUser;

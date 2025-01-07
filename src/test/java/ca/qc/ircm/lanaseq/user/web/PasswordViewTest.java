@@ -29,8 +29,8 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link PasswordView}.
@@ -41,7 +41,7 @@ public class PasswordViewTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private PasswordView view;
-  @MockBean
+  @MockitoBean
   private UserService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;

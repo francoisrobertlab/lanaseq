@@ -14,8 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link ExitSwitchUserView}.
@@ -24,7 +24,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ExitSwitchUserViewTest extends SpringUIUnitTest {
   private ExitSwitchUserView view;
-  @MockBean
+  @MockitoBean
   private SwitchUserService switchUserService;
   @Autowired
   private AuthenticatedUser authenticatedUser;

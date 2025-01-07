@@ -79,8 +79,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link AddDatasetFilesDialog}.
@@ -93,11 +93,11 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @TempDir
   Path temporaryFolder;
   private AddDatasetFilesDialog dialog;
-  @MockBean
+  @MockitoBean
   private DatasetService service;
-  @MockBean
+  @MockitoBean
   private SampleService sampleService;
-  @MockBean
+  @MockitoBean
   private AppConfiguration configuration;
   @Mock
   private Dialog.OpenedChangeEvent openedChangeEvent;

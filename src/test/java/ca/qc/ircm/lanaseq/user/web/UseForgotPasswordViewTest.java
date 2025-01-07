@@ -40,8 +40,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link UseForgotPasswordView}.
@@ -52,7 +52,7 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(UseForgotPasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private UseForgotPasswordView view;
-  @MockBean
+  @MockitoBean
   private ForgotPasswordService service;
   @Mock
   private ForgotPassword forgotPassword;

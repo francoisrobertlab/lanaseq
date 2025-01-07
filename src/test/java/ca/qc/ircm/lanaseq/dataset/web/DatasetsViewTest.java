@@ -51,8 +51,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link DatasetsView}.
@@ -64,9 +64,9 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private DatasetsView view;
-  @MockBean
+  @MockitoBean
   private DatasetService service;
-  @MockBean
+  @MockitoBean
   private SampleService sampleService;
   @Captor
   private ArgumentCaptor<Dataset> datasetCaptor;

@@ -25,12 +25,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link UserService}.
@@ -43,11 +43,11 @@ public class UserServiceTest {
   private UserService service;
   @Autowired
   private UserRepository repository;
-  @MockBean
+  @MockitoBean
   private PasswordEncoder passwordEncoder;
-  @MockBean
+  @MockitoBean
   private AuthenticatedUser authenticatedUser;
-  @MockBean
+  @MockitoBean
   private PermissionEvaluator permissionEvaluator;
   private String hashedPassword = "4k7GCUVUzV5zL74V867q";
 

@@ -92,8 +92,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link ProtocolDialog}.
@@ -106,7 +106,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private ProtocolDialog dialog;
-  @MockBean
+  @MockitoBean
   private ProtocolService service;
   @Mock
   private ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener;

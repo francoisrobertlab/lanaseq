@@ -109,10 +109,10 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link SampleFilesDialog}.
@@ -125,9 +125,9 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   @TempDir
   Path temporaryFolder;
   private SampleFilesDialog dialog;
-  @MockBean
+  @MockitoBean
   private SampleService service;
-  @MockBean
+  @MockitoBean
   private AppConfiguration configuration;
   @Captor
   private ArgumentCaptor<LitRenderer<EditableFile>> litRendererCaptor;

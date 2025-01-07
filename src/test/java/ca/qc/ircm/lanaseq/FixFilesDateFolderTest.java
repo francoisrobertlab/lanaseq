@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link FixFilesDateFolder}.
@@ -36,7 +36,7 @@ public class FixFilesDateFolderTest {
   private DatasetRepository datasetRepository;
   @Autowired
   private SampleRepository sampleRepository;
-  @MockBean
+  @MockitoBean
   private AppConfiguration configuration;
   @Mock
   private AppConfiguration.NetworkDrive<DataWithFiles> home;

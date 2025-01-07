@@ -48,8 +48,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Tests for {@link ProtocolHistoryDialog}.
@@ -60,7 +60,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
   private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private ProtocolHistoryDialog dialog;
-  @MockBean
+  @MockitoBean
   private ProtocolService service;
   @Mock
   private ComponentEventListener<SavedEvent<ProtocolDialog>> savedListener;
