@@ -6,7 +6,7 @@ import com.vaadin.flow.component.ComponentEvent;
 /**
  * Select event.
  */
-public class SelectedEvent<V extends Component, E extends Object> extends ComponentEvent<V> {
+public class SelectedEvent<V extends Component, E> extends ComponentEvent<V> {
   private static final long serialVersionUID = -9036570365228629040L;
   private final E selection;
 
