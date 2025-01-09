@@ -120,14 +120,14 @@ public class MailService {
     message.append("\n");
     StringWriter stringWriter = new StringWriter();
     error.printStackTrace(new PrintWriter(stringWriter));
-    message.append(stringWriter.toString());
+    message.append(stringWriter);
     try {
       MimeMessageHelper email = textEmail();
       email.setTo(mailConfiguration.to());
       email.setText(message.toString());
       send(email);
     } catch (MessagingException e) {
-      logger.error("Could not send error email with content {}", message.toString(), e);
+      logger.error("Could not send error email with content {}", message, e);
     }
   }
 }

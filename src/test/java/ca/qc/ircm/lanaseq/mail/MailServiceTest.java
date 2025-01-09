@@ -294,8 +294,8 @@ public class MailServiceTest {
     assertTrue(message.getRecipients(RecipientType.BCC) == null
         || message.getRecipients(RecipientType.BCC).length == 0);
     String body = GreenMailUtil.getBody(message).replaceAll("\r?\n", "");
-    String expectedBody = "User:" + user.getEmail()
-        + (error.getMessage() + "\n" + writer.toString()).replaceAll("\r?\n", "");
+    String expectedBody =
+        "User:" + user.getEmail() + (error.getMessage() + "\n" + writer).replaceAll("\r?\n", "");
     assertEquals(expectedBody, body);
   }
 
@@ -327,7 +327,7 @@ public class MailServiceTest {
         || message.getRecipients(RecipientType.BCC).length == 0);
     String body = GreenMailUtil.getBody(message).replaceAll("\r?\n", "");
     String expectedBody =
-        "User:null" + (error.getMessage() + "\n" + writer.toString()).replaceAll("\r?\n", "");
+        "User:null" + (error.getMessage() + "\n" + writer).replaceAll("\r?\n", "");
     assertEquals(expectedBody, body);
   }
 }
