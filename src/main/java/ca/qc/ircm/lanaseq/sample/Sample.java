@@ -181,7 +181,7 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     if (date != null) {
       builder.append(DateTimeFormatter.BASIC_ISO_DATE.format(date) + "_");
     }
-    if (builder.length() > 0) {
+    if (!builder.isEmpty()) {
       builder.deleteCharAt(builder.length() - 1);
     }
     String name = builder.toString();

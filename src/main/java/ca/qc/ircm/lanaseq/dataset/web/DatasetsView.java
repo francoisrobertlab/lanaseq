@@ -109,9 +109,9 @@ public class DatasetsView extends VerticalLayout
     datasets.addItemDoubleClickListener(e -> edit(e.getItem()));
     datasets.addSelectionListener(e -> {
       edit.setEnabled(e.getAllSelectedItems().size() == 1);
-      merge.setEnabled(e.getAllSelectedItems().size() > 0);
+      merge.setEnabled(!e.getAllSelectedItems().isEmpty());
       files.setEnabled(e.getAllSelectedItems().size() == 1);
-      analyze.setEnabled(e.getAllSelectedItems().size() > 0);
+      analyze.setEnabled(!e.getAllSelectedItems().isEmpty());
     });
     edit.setId(EDIT);
     edit.setIcon(VaadinIcon.EDIT.create());

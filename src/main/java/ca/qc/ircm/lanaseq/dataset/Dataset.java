@@ -131,13 +131,13 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
     for (Sample sample : samples) {
       samplesBuilder.append(sample.getSampleId() + "-");
     }
-    if (samplesBuilder.length() > 0) {
+    if (!samplesBuilder.isEmpty()) {
       samplesBuilder.setCharAt(samplesBuilder.length() - 1, '_');
     }
     builder.append(samplesBuilder);
     DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
     builder.append(date != null ? formatter.format(date) + "_" : "");
-    if (builder.length() > 0) {
+    if (!builder.isEmpty()) {
       builder.deleteCharAt(builder.length() - 1);
     }
     String name = builder.toString();
