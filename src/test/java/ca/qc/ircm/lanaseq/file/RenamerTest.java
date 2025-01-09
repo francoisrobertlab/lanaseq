@@ -122,8 +122,7 @@ public class RenamerTest {
     assertTrue(Files.exists(other));
     assertArrayEquals(otherContent, Files.readAllBytes(other));
     assertTrue(Files.exists(otherMd5));
-    assertEquals(
-        "93bde352cb4ceb943f7188d307bcd72f  test.txt.md5" + System.getProperty("line.separator"),
+    assertEquals("93bde352cb4ceb943f7188d307bcd72f  test.txt.md5" + System.lineSeparator(),
         Files.readString(otherMd5));
     suffix = tempDir.resolve(newName + "test.txt");
     assertTrue(Files.exists(suffix));
@@ -137,6 +136,6 @@ public class RenamerTest {
     md5 = tempDir.resolve("prefix_" + newName + "_suffix.txt.md5");
     assertTrue(Files.exists(md5));
     assertEquals("2d5fb8660262af5a205c485bed4fe6b1  prefix_" + newName + "_suffix.txt.md5"
-        + System.getProperty("line.separator"), Files.readString(md5));
+        + System.lineSeparator(), Files.readString(md5));
   }
 }
