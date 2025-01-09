@@ -37,12 +37,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for presenter testign.
  */
 public class VaadinTestUtils {
   private static final String ICON_ATTRIBUTE = "icon";
+  private static final Logger logger = LoggerFactory.getLogger(VaadinTestUtils.class);
 
   /**
    * Fires an event on component.
@@ -321,7 +324,7 @@ public class VaadinTestUtils {
       return (String) getFormattedValue.invoke(renderer, value);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
-      e.printStackTrace();
+      logger.warn("Cannot get formatted value for renderer {} and item {}", renderer, item, e);
     }
     return null;
   }
