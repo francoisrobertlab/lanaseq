@@ -9,5 +9,5 @@ public interface Owned {
    *
    * @return owner
    */
-  public User getOwner();
+  User getOwner();
 }

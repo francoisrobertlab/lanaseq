@@ -35,5 +35,5 @@ public @interface TestBenchTestAnnotations {
    *
    * @return true if ScreenshotOnFailureRule is used, false otherwise
    */
-  public boolean useScreenshotRule() default false;
+  boolean useScreenshotRule() default false;
 }

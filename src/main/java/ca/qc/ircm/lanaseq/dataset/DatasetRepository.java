@@ -16,20 +16,20 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
  */
 public interface DatasetRepository
     extends JpaRepository<Dataset, Long>, QuerydslPredicateExecutor<Dataset> {
-  public boolean existsByName(String name);
+  boolean existsByName(String name);
 
-  public boolean existsBySamples(Sample sample);
+  boolean existsBySamples(Sample sample);
 
-  public Page<Dataset> findAllByOrderByIdDesc(Pageable pageable);
+  Page<Dataset> findAllByOrderByIdDesc(Pageable pageable);
 
-  public List<Dataset> findBySamples(Sample sample);
+  List<Dataset> findBySamples(Sample sample);
 
-  public List<Dataset> findByOwner(User owner);
+  List<Dataset> findByOwner(User owner);
 
   @EntityGraph(attributePaths = { "tags", "samples", "samples.protocol", "owner" })
-  public List<Dataset> findAllByIdIn(Iterable<Long> ids, Sort sort);
+  List<Dataset> findAllByIdIn(Iterable<Long> ids, Sort sort);
 
   @Override
   @EntityGraph(attributePaths = { "owner" })
-  public Page<Dataset> findAll(Predicate predicate, Pageable pageable);
+  Page<Dataset> findAll(Predicate predicate, Pageable pageable);
 }

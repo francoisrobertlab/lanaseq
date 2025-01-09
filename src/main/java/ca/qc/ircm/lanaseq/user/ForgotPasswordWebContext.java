@@ -16,5 +16,5 @@ public interface ForgotPasswordWebContext {
    *          adapt URL to specified locale
    * @return URL that leads to change forgotten password function
    */
-  public String getChangeForgottenPasswordUrl(ForgotPassword forgotPassword, Locale locale);
+  String getChangeForgottenPasswordUrl(ForgotPassword forgotPassword, Locale locale);
 }

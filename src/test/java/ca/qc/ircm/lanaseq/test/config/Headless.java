@@ -16,5 +16,5 @@ public @interface Headless {
    *
    * @return true if headless mode should be used, if available
    */
-  public boolean value() default true;
+  boolean value() default true;
 }

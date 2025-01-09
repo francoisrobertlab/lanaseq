@@ -15,15 +15,15 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
  */
 public interface SampleRepository
     extends JpaRepository<Sample, Long>, QuerydslPredicateExecutor<Sample> {
-  public boolean existsByName(String name);
+  boolean existsByName(String name);
 
-  public Page<Sample> findAllByOrderByIdDesc(Pageable pageable);
+  Page<Sample> findAllByOrderByIdDesc(Pageable pageable);
 
-  public List<Sample> findByOwner(User owner);
+  List<Sample> findByOwner(User owner);
 
-  public boolean existsByProtocol(Protocol protocol);
+  boolean existsByProtocol(Protocol protocol);
 
   @Override
   @EntityGraph(attributePaths = { "protocol", "owner" })
-  public Page<Sample> findAll(Predicate predicate, Pageable pageable);
+  Page<Sample> findAll(Predicate predicate, Pageable pageable);
 }

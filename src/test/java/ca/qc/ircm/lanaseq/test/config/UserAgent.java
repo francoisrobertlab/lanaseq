@@ -11,11 +11,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UserAgent {
-  public static final String FIREFOX_WINDOWS_USER_AGENT =
+  String FIREFOX_WINDOWS_USER_AGENT =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
-  public static final String FIREFOX_LINUX_USER_AGENT =
+  String FIREFOX_LINUX_USER_AGENT =
       "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:77.0) Gecko/20100101 Firefox/77.0";
-  public static final String FIREFOX_MACOSX_USER_AGENT =
+  String FIREFOX_MACOSX_USER_AGENT =
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0";
 
   /**
