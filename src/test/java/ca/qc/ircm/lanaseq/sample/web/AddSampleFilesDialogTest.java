@@ -381,10 +381,11 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void updateFiles() {
-    when(service.uploadFiles(any())).thenReturn(
-        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
-            .collect(Collectors.toList()),
-        files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    when(service.uploadFiles(any()))
+        .thenReturn(files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList()))
+        .thenReturn(
+            files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     Sample sample = repository.findById(dialog.getSampleId()).get();
 
     dialog.updateFiles();

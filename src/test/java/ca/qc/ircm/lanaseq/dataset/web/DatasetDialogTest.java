@@ -927,7 +927,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void save_NameExists() {
     dialog.addSavedListener(savedListener);
     when(service.exists(any())).thenReturn(true);
-    when(service.get(anyLong())).thenReturn(repository.findById(2L), repository.findById(1L));
+    when(service.get(anyLong())).thenReturn(repository.findById(2L))
+        .thenReturn(repository.findById(1L));
     dialog.setDatasetId(2L);
 
     clickButton(dialog.save);

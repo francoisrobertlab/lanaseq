@@ -399,10 +399,11 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void updateFiles() {
-    when(service.uploadFiles(any())).thenReturn(
-        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
-            .collect(Collectors.toList()),
-        files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    when(service.uploadFiles(any()))
+        .thenReturn(files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList()))
+        .thenReturn(
+            files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     Dataset dataset = repository.findById(dialog.getDatasetId()).get();
 
     dialog.updateFiles();

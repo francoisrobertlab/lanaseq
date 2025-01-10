@@ -184,7 +184,9 @@ public class AddDatasetFilesDialog extends Dialog
       return getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
           sizeFormat.format(file.length() / Math.pow(1024, 2)));
     }, SIZE).setKey(SIZE);
-    files.setColumnOrder(filename, size, overwrite);
+    @SuppressWarnings("unchecked")
+    Column<File>[] sortOrder = new Column[] { filename, size, overwrite };
+    files.setColumnOrder(sortOrder);
     size.setHeader(getTranslation(MESSAGE_PREFIX + SIZE));
     overwrite.setHeader(getTranslation(MESSAGE_PREFIX + OVERWRITE));
     save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));

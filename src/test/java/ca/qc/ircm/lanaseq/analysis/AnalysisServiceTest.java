@@ -175,7 +175,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_Fastq() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -261,7 +262,8 @@ public class AnalysisServiceTest {
   public void copyDatasetsResources_Fastq_Symlinks() throws Throwable {
     assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -319,8 +321,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_Fastq_Zip() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
-        secondPairedZipPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths).thenReturn(pairedZipPaths)
+        .thenReturn(secondPairedZipPaths);
     final byte[] fastq1Content = writeRandom(pairedZip1);
     final byte[] fastq2Content = writeRandom(pairedZip2);
     final byte[] fastq3Content = writeRandom(secondPairedZip1);
@@ -378,7 +380,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_Fastq_Bam() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -490,7 +493,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_Fastq_FolderAlreadyExists() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -593,7 +597,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_EmptyFilenamePatterns() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     Files.createFile(paired1);
     Files.createFile(paired2);
     Files.createFile(secondPaired1);
@@ -627,7 +632,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_Fastq() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -701,7 +707,8 @@ public class AnalysisServiceTest {
   public void copySamplesResources_Fastq_Symlinks() throws Throwable {
     assumeFalse(SystemUtils.IS_OS_WINDOWS); // Symbolic links don't work on Windows.
     when(configuration.isAnalysisSymlinks()).thenReturn(true);
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -753,8 +760,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_Fastq_Zip() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths, pairedZipPaths,
-        secondPairedZipPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedZipPaths).thenReturn(pairedZipPaths)
+        .thenReturn(secondPairedZipPaths);
     final byte[] fastq1Content = writeRandom(pairedZip1);
     final byte[] fastq2Content = writeRandom(pairedZip2);
     final byte[] fastq3Content = writeRandom(secondPairedZip1);
@@ -806,7 +813,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_Fastq_Bam() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -912,7 +920,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_Fastq_AlreadyExists() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     final byte[] fastq1Content = writeRandom(paired1);
     final byte[] fastq2Content = writeRandom(paired2);
     final byte[] fastq3Content = writeRandom(secondPaired1);
@@ -977,7 +986,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_EmptyFilenamePatterns() throws Throwable {
-    when(sampleService.files(any())).thenReturn(thirdPairedPaths, pairedPaths, secondPairedPaths);
+    when(sampleService.files(any())).thenReturn(thirdPairedPaths).thenReturn(pairedPaths)
+        .thenReturn(secondPairedPaths);
     Files.createFile(paired1);
     Files.createFile(paired2);
     Files.createFile(secondPaired1);
