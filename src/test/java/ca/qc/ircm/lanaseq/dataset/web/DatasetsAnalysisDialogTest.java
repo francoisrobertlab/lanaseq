@@ -15,8 +15,8 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -145,7 +145,7 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_WINDOWS_USER_AGENT)
   public void createFolder_Windows() throws Throwable {
     String folder = "test/dataset";
-    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(anyCollection(), anyBoolean())).thenReturn(folder);
     dialog.filenamePatterns.setValue("*.fastq", "*.bam");
 
     dialog.createFolder.click();
@@ -166,7 +166,7 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_LINUX_USER_AGENT)
   public void createFolder_Unix() throws Throwable {
     String folder = "test/dataset";
-    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(anyCollection(), anyBoolean())).thenReturn(folder);
     dialog.filenamePatterns.setValue("*.fastq");
 
     dialog.createFolder.click();
@@ -186,7 +186,7 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   @UserAgent(UserAgent.FIREFOX_MACOSX_USER_AGENT)
   public void createFolder_Mac() throws Throwable {
     String folder = "test/dataset";
-    when(configuration.getAnalysis().label(any(Collection.class), anyBoolean())).thenReturn(folder);
+    when(configuration.getAnalysis().label(anyCollection(), anyBoolean())).thenReturn(folder);
     dialog.filenamePatterns.setValue("*.fastq");
 
     dialog.createFolder.click();
@@ -204,8 +204,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createFolder_IoException() throws Throwable {
-    doThrow(new IOException("test")).when(analysisService)
-        .copyDatasetsResources(any(Collection.class), any(Collection.class));
+    doThrow(new IOException("test")).when(analysisService).copyDatasetsResources(anyCollection(),
+        anyCollection());
     dialog.filenamePatterns.setValue("*.fastq");
 
     dialog.createFolder.click();

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -151,7 +152,7 @@ public class AnalysisServiceTest {
     thirdBam2 = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-test.bam");
     thirdRawbam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-raw.bam");
     when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
-    when(configuration.getAnalysis().folder(any(Collection.class))).then(i -> {
+    when(configuration.getAnalysis().folder(anyCollection())).then(i -> {
       Collection<?> collection = i.getArgument(0);
       if (collection == null || collection.isEmpty()) {
         return null;
