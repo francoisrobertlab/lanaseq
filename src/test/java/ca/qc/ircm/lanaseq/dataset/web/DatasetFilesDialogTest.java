@@ -81,7 +81,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -111,6 +111,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -144,6 +145,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   private DatasetRepository repository;
   @Autowired
   private SampleRepository sampleRepository;
+  @Mock
+  private Grid<EditableFile> filesGrid;
+  @Mock
+  private Editor<EditableFile> filesGridEditor;
   private Locale locale = Locale.ENGLISH;
   private List<File> files = new ArrayList<>();
   private List<String> labels = new ArrayList<>();
@@ -175,14 +180,23 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     labels.add("\\\\lanaseq01\\archives");
     labels.add("\\\\lanaseq02\\archives2");
     when(service.folderLabels(any(), anyBoolean())).thenReturn(labels);
-    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? Paths.get(dataset.getName()) : null;
     });
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
-    archives.add(mock(AppConfiguration.NetworkDrive.class));
-    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 =
+        mock(AppConfiguration.NetworkDrive.class);
+    archives.add(archiveFolder1);
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 =
+        mock(AppConfiguration.NetworkDrive.class);
+    archives.add(archiveFolder2);
     when(configuration.getArchives()).thenReturn(archives);
     when(configuration.getArchives().get(0).folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
@@ -194,7 +208,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
       return dataset != null ? temporaryFolder.resolve("archives2").resolve(dataset.getName())
           : null;
     });
-    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? temporaryFolder.resolve("upload").resolve(dataset.getName()) : null;
@@ -490,8 +507,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
     Files.createFile(temporaryFolder.resolve("abc.txt"));
     EditableFile file = new EditableFile(path);
-    dialog.files = mock(Grid.class);
-    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    dialog.files = filesGrid;
+    when(dialog.files.getEditor()).thenReturn(filesGridEditor);
     when(dialog.files.getEditor().getItem()).thenReturn(file);
 
     dialog.filenameEdit.setValue("abc.txt");
@@ -509,8 +526,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void filenameEdit_ExistsSameFile() throws Throwable {
     Files.createFile(temporaryFolder.resolve("abc.txt"));
-    dialog.files = mock(Grid.class);
-    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    dialog.files = filesGrid;
+    when(dialog.files.getEditor()).thenReturn(filesGridEditor);
     when(dialog.files.getEditor().getItem()).thenReturn(null);
 
     dialog.filenameEdit.setValue("abc.txt");
@@ -541,7 +558,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Files.write(path, fileContent);
     Path sibling = path.resolveSibling("new_name.txt");
     file.setFilename(sibling.getFileName().toString());
-    EditorImpl<EditableFile> editor = (EditorImpl) dialog.files.getEditor();
+    EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
     Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
     method.setAccessible(true);
 
@@ -614,7 +631,9 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     doubleClickItem(dialog.samples, sample);
     SampleFilesDialog sampleFilesDialog = $(SampleFilesDialog.class).first();
     assertEquals(sample.getId(), sampleFilesDialog.getSampleId());
-    dialog.samples.setItems(mock(DataProvider.class));
+    @SuppressWarnings("unchecked")
+    ListDataProvider<Sample> sampleDataProvider = mock(ListDataProvider.class);
+    dialog.samples.setItems(sampleDataProvider);
     sampleFilesDialog.close();
     verify(dialog.samples.getDataProvider()).refreshAll();
   }

@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -131,10 +132,16 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
       writeFile(file.toPath(), random.nextInt(10) * 1024 ^ 2);
     }
     folder = temporaryFolder.resolve("dataset");
-    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().folder(any(Dataset.class)))
         .thenReturn(temporaryFolder.resolve("home"));
-    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Dataset.class))).thenReturn(folder);
     when(configuration.getUpload().label(any(Dataset.class), anyBoolean())).then(i -> {
       Dataset dataset = i.getArgument(0);

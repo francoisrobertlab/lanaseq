@@ -734,6 +734,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void addSample() {
     clickButton(dialog.addSample);
 
+    @SuppressWarnings("unchecked")
     Grid<Sample> selectSampleDialogGrid =
         $(Grid.class).id(SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
@@ -761,6 +762,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void addSample_AlreadyInDataset() {
     clickButton(dialog.addSample);
 
+    @SuppressWarnings("unchecked")
     Grid<Sample> selectSampleDialogGrid =
         $(Grid.class).id(SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(

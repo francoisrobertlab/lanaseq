@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -39,7 +38,7 @@ import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import jakarta.persistence.EntityManager;
@@ -50,6 +49,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -76,6 +76,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   private DatasetRepository repository;
   @Autowired
   private EntityManager entityManager;
+  @Mock
+  private ListDataProvider<Dataset> datasetDataProvider;
   private Locale locale = Locale.ENGLISH;
   private List<Dataset> datasets;
 
@@ -153,7 +155,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     doubleClickItem(view.datasets, dataset);
 
     DatasetDialog dialog = $(DatasetDialog.class).first();
-    view.datasets.setItems(mock(DataProvider.class));
+    view.datasets.setItems(datasetDataProvider);
     dialog.fireSavedEvent();
     verify(view.datasets.getDataProvider()).refreshAll();
   }
@@ -166,7 +168,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     doubleClickItem(view.datasets, dataset);
 
     DatasetDialog dialog = $(DatasetDialog.class).first();
-    view.datasets.setItems(mock(DataProvider.class));
+    view.datasets.setItems(datasetDataProvider);
     dialog.fireDeletedEvent();
     verify(view.datasets.getDataProvider()).refreshAll();
   }

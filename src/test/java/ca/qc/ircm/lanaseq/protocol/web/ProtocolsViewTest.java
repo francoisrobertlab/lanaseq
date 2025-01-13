@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +40,7 @@ import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
@@ -58,6 +57,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -84,6 +84,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   private ArgumentCaptor<Comparator<Protocol>> comparatorCaptor;
   @Autowired
   private ProtocolRepository repository;
+  @Mock
+  private ListDataProvider<Protocol> protocolDataProvider;
   private Locale locale = Locale.ENGLISH;
   private List<Protocol> protocols;
 
@@ -338,7 +340,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterName() {
-    view.protocols.setItems(mock(DataProvider.class));
+    view.protocols.setItems(protocolDataProvider);
 
     view.nameFilter.setValue("test");
 
@@ -348,7 +350,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterName_Empty() {
-    view.protocols.setItems(mock(DataProvider.class));
+    view.protocols.setItems(protocolDataProvider);
     view.nameFilter.setValue("test");
 
     view.nameFilter.setValue("");
@@ -359,7 +361,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterRange() {
-    view.protocols.setItems(mock(DataProvider.class));
+    view.protocols.setItems(protocolDataProvider);
 
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
@@ -371,7 +373,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterRange_All() {
-    view.protocols.setItems(mock(DataProvider.class));
+    view.protocols.setItems(protocolDataProvider);
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
     view.dateFilter.setValue(range);
@@ -384,7 +386,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner() {
-    view.protocols.setItems(mock(DataProvider.class));
+    view.protocols.setItems(protocolDataProvider);
 
     view.ownerFilter.setValue("test");
 
@@ -394,7 +396,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner_Empty() {
-    view.protocols.setItems(mock(DataProvider.class));
+    view.protocols.setItems(protocolDataProvider);
     view.ownerFilter.setValue("test");
 
     view.ownerFilter.setValue("");

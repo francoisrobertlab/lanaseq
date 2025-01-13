@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +15,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +38,10 @@ public class DeleteOldAnalysisFoldersTest {
 
   @BeforeEach
   public void beforeTest() {
-    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getAnalysis()).thenReturn(analysisFolder);
     when(configuration.getAnalysis().getFolder()).thenReturn(temporaryFolder);
     when(configuration.getAnalysisDeleteAge()).thenReturn(Duration.ofHours(24));
   }

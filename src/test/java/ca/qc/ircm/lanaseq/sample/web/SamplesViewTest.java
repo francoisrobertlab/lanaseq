@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -56,7 +55,7 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.testbench.unit.MetaKeys;
@@ -73,6 +72,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -98,6 +98,8 @@ public class SamplesViewTest extends SpringUIUnitTest {
   private ArgumentCaptor<Dataset> datasetCaptor;
   @Autowired
   private SampleRepository repository;
+  @Mock
+  private ListDataProvider<Sample> sampleDataProvider;
   private Locale locale = Locale.ENGLISH;
   private List<Sample> samples;
 
@@ -338,7 +340,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   public void view_RefreshOnSave() {
     Sample sample = samples.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(sample));
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     doubleClickItem(view.samples, sample);
 
@@ -351,7 +353,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   public void view_RefreshOnDelete() {
     Sample sample = samples.get(0);
     when(service.get(anyLong())).thenReturn(Optional.of(sample));
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     doubleClickItem(view.samples, sample);
 
@@ -384,7 +386,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterName() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     view.nameFilter.setValue("test");
 
@@ -394,7 +396,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterName_Empty() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
     view.nameFilter.setValue("test");
 
     view.nameFilter.setValue("");
@@ -405,7 +407,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterKeywords() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     view.keywordsFilter.setValue("test");
 
@@ -415,7 +417,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterKeywords_Empty() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
     view.keywordsFilter.setValue("test");
 
     view.keywordsFilter.setValue("");
@@ -426,7 +428,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterProtocol() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     view.protocolFilter.setValue("test");
 
@@ -436,7 +438,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterProtocol_Empty() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
     view.protocolFilter.setValue("test");
 
     view.protocolFilter.setValue("");
@@ -447,7 +449,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterDate() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     view.dateFilter.setValue(range);
@@ -458,7 +460,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterDate_All() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     view.dateFilter.setValue(range);
 
@@ -470,7 +472,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     view.ownerFilter.setValue("test");
 
@@ -480,7 +482,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner_Empty() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
     view.ownerFilter.setValue("test");
 
     view.ownerFilter.setValue("");
@@ -500,7 +502,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void add_RefreshOnSave() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     test(view.add).click();
 
@@ -511,7 +513,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
   @Test
   public void add_RefreshOnDelete() {
-    view.samples.setItems(mock(DataProvider.class));
+    view.samples.setItems(sampleDataProvider);
 
     test(view.add).click();
 

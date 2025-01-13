@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -151,7 +152,10 @@ public class AnalysisServiceTest {
     thirdBam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bam");
     thirdBam2 = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-test.bam");
     thirdRawbam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-raw.bam");
-    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getAnalysis()).thenReturn(analysisFolder);
     when(configuration.getAnalysis().folder(anyCollection())).then(i -> {
       Collection<?> collection = i.getArgument(0);
       if (collection == null || collection.isEmpty()) {

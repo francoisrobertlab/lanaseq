@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +38,7 @@ import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
@@ -78,6 +77,8 @@ public class DatasetGridTest extends SpringUIUnitTest {
   private ArgumentCaptor<EditEvent<DatasetGrid, Dataset>> editEventCaptor;
   @Autowired
   private DatasetRepository repository;
+  @Mock
+  private ListDataProvider<Dataset> datasetDataProvider;
   private Locale locale = Locale.ENGLISH;
   private List<Dataset> datasets;
 
@@ -266,7 +267,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterName() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
 
     grid.nameFilter.setValue("test");
 
@@ -276,7 +277,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterName_Empty() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
     grid.nameFilter.setValue("test");
 
     grid.nameFilter.setValue("");
@@ -287,7 +288,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterKeywords() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
 
     grid.keywordsFilter.setValue("test");
 
@@ -297,7 +298,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterKeywords_Empty() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
     grid.keywordsFilter.setValue("test");
 
     grid.keywordsFilter.setValue("");
@@ -308,7 +309,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterProtocol() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
 
     grid.protocolFilter.setValue("test");
 
@@ -318,7 +319,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterProtocol_Empty() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
     grid.protocolFilter.setValue("test");
 
     grid.protocolFilter.setValue("");
@@ -329,7 +330,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterDate() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
 
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(11), LocalDate.now().minusDays(3));
@@ -341,7 +342,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterDate_All() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
     Range<LocalDate> range =
         Range.closed(LocalDate.now().minusDays(11), LocalDate.now().minusDays(3));
     grid.dateFilter.setValue(range);
@@ -354,7 +355,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
 
     grid.ownerFilter.setValue("test");
 
@@ -364,7 +365,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner_Empty() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
     grid.ownerFilter.setValue("test");
 
     grid.ownerFilter.setValue("");
@@ -375,7 +376,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
 
   @Test
   public void refreshDataset() {
-    grid.setItems(mock(DataProvider.class));
+    grid.setItems(datasetDataProvider);
     grid.refreshDatasets();
     verify(grid.getDataProvider()).refreshAll();
   }

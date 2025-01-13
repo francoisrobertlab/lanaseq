@@ -143,6 +143,10 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   @Captor
   private ArgumentCaptor<Comparator<EditableFile>> comparatorCaptor;
   @Mock
+  private Grid<EditableFile> filesGrid;
+  @Mock
+  private Editor<EditableFile> filesGridEditor;
+  @Mock
   private ComponentEventListener<SavedEvent<SampleDialog>> savedListener;
   @Mock
   private ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener;
@@ -175,14 +179,23 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     labels.add("\\\\lanaseq01\\archives");
     labels.add("\\\\lanaseq02\\archives2");
     when(service.folderLabels(any(), anyBoolean())).thenReturn(labels);
-    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? Paths.get(sample.getName()) : null;
     });
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
-    archives.add(mock(AppConfiguration.NetworkDrive.class));
-    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 =
+        mock(AppConfiguration.NetworkDrive.class);
+    archives.add(archiveFolder1);
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 =
+        mock(AppConfiguration.NetworkDrive.class);
+    archives.add(archiveFolder2);
     when(configuration.getArchives()).thenReturn(archives);
     when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
@@ -192,7 +205,10 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve("archives2").resolve(sample.getName()) : null;
     });
-    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve("upload").resolve(sample.getName()) : null;
@@ -473,8 +489,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
     Files.createFile(temporaryFolder.resolve("abc.txt"));
     EditableFile file = new EditableFile(path);
-    dialog.files = mock(Grid.class);
-    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    dialog.files = filesGrid;
+    when(dialog.files.getEditor()).thenReturn(filesGridEditor);
     when(dialog.files.getEditor().getItem()).thenReturn(file);
 
     dialog.filenameEdit.setValue("abc.txt");
@@ -492,8 +508,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void filenameEdit_ExistsSameFile() throws Throwable {
     Files.createFile(temporaryFolder.resolve("abc.txt"));
-    dialog.files = mock(Grid.class);
-    when(dialog.files.getEditor()).thenReturn(mock(Editor.class));
+    dialog.files = filesGrid;
+    when(dialog.files.getEditor()).thenReturn(filesGridEditor);
     when(dialog.files.getEditor().getItem()).thenReturn(null);
 
     dialog.filenameEdit.setValue("abc.txt");
@@ -524,7 +540,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Files.write(path, fileContent);
     Path sibling = path.resolveSibling("new_name.txt");
     file.setFilename(sibling.getFileName().toString());
-    EditorImpl<EditableFile> editor = (EditorImpl) dialog.files.getEditor();
+    EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
     Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
     method.setAccessible(true);
 

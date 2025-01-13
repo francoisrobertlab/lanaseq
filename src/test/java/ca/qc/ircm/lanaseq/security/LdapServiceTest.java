@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
@@ -55,7 +56,8 @@ public class LdapServiceTest {
   @Test
   public void getEmail_NullElementSearch() {
     LdapTemplate ldapTemplate = mock(LdapTemplate.class);
-    when(ldapTemplate.search(any(LdapQuery.class), any(AttributesMapper.class)))
+    when(
+        ldapTemplate.search(any(LdapQuery.class), ArgumentMatchers.<AttributesMapper<String>>any()))
         .thenReturn(Collections.nCopies(1, (String) null));
     ldapService = new LdapService(ldapTemplate, ldapConfiguration);
 
@@ -75,7 +77,8 @@ public class LdapServiceTest {
   @Test
   public void getUsername_NullElementSearch() {
     LdapTemplate ldapTemplate = mock(LdapTemplate.class);
-    when(ldapTemplate.search(any(LdapQuery.class), any(AttributesMapper.class)))
+    when(
+        ldapTemplate.search(any(LdapQuery.class), ArgumentMatchers.<AttributesMapper<String>>any()))
         .thenReturn(Collections.nCopies(1, (String) null));
     ldapService = new LdapService(ldapTemplate, ldapConfiguration);
 

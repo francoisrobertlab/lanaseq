@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -122,10 +123,16 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       writeFile(file.toPath(), random.nextInt(10) * 1024 ^ 2);
     }
     folder = temporaryFolder.resolve("sample");
-    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().folder(any(Sample.class)))
         .thenReturn(temporaryFolder.resolve("home"));
-    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Sample.class))).thenReturn(folder);
     when(configuration.getUpload().label(any(Sample.class), anyBoolean())).then(i -> {
       Sample sample = i.getArgument(0);

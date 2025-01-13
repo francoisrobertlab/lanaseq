@@ -99,7 +99,10 @@ public class DatasetServiceTest {
   @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    when(configuration.getHome()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().getFolder()).thenReturn(temporaryFolder.resolve("home"));
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
@@ -112,8 +115,14 @@ public class DatasetServiceTest {
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
-    archives.add(mock(AppConfiguration.NetworkDrive.class));
-    archives.add(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 =
+        mock(AppConfiguration.NetworkDrive.class);
+    archives.add(archiveFolder1);
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 =
+        mock(AppConfiguration.NetworkDrive.class);
+    archives.add(archiveFolder2);
     when(configuration.getArchives()).thenReturn(archives);
     when(configuration.getArchives().get(0).getFolder())
         .thenReturn(temporaryFolder.resolve("archives"));
@@ -141,7 +150,10 @@ public class DatasetServiceTest {
       String label = "\\\\lanaseq02\\archives2\\" + (dataset != null ? dataset.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
-    when(configuration.getUpload()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? temporaryFolder.resolve(dataset.getName()) : null;

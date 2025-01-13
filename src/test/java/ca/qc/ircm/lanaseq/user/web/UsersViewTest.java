@@ -50,7 +50,7 @@ import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -64,6 +64,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -88,6 +89,8 @@ public class UsersViewTest extends SpringUIUnitTest {
   private ArgumentCaptor<ComponentEventListener<SavedEvent<UserDialog>>> userSavedListenerCaptor;
   @Autowired
   private UserRepository repository;
+  @Mock
+  private ListDataProvider<User> userDataProvider;
   private Locale locale = Locale.ENGLISH;
   private List<User> users;
 
@@ -341,7 +344,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterEmail() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.emailFilter.setValue("test");
 
@@ -360,7 +363,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterEmail_Empty() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.emailFilter.setValue("test");
     view.emailFilter.setValue("");
@@ -377,7 +380,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterName() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.nameFilter.setValue("test");
 
@@ -387,7 +390,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterName_Empty() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.nameFilter.setValue("test");
     view.nameFilter.setValue("");
@@ -409,7 +412,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterActive_False() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.activeFilter.setValue(Optional.of(false));
 
@@ -419,7 +422,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterActive_True() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.activeFilter.setValue(Optional.of(true));
 
@@ -429,7 +432,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void filterActive_Empty() {
-    view.users.setItems(mock(DataProvider.class));
+    view.users.setItems(userDataProvider);
 
     view.activeFilter.setValue(Optional.of(false));
     view.activeFilter.setValue(Optional.empty());

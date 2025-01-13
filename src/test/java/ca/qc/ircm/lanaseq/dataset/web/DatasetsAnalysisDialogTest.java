@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.analysis.AnalysisService;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
@@ -78,7 +79,10 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   public void beforeTest() {
     when(service.get(anyLong())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
-    when(configuration.getAnalysis()).thenReturn(mock(AppConfiguration.NetworkDrive.class));
+    @SuppressWarnings("unchecked")
+    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
+        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getAnalysis()).thenReturn(analysisFolder);
     datasets.add(repository.findById(6L).get());
     datasets.add(repository.findById(7L).get());
     UI.getCurrent().setLocale(locale);

@@ -81,6 +81,7 @@ public class UserFormTest extends SpringUIUnitTest {
     form.passwords = mock(PasswordsForm.class);
     form.passwords.password = new PasswordField();
     form.passwords.passwordConfirm = new PasswordField();
+    @SuppressWarnings("unchecked")
     BinderValidationStatus<Passwords> passwordsValidationStatus =
         mock(BinderValidationStatus.class);
     when(form.passwords.validate()).thenReturn(passwordsValidationStatus);

@@ -40,7 +40,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.selection.SelectionModel;
@@ -87,6 +87,8 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
   private SampleRepository repository;
   @Autowired
   private DatasetRepository datasetRepository;
+  @Mock
+  private ListDataProvider<Sample> sampleDataProvider;
   private Locale locale = Locale.ENGLISH;
   private List<Sample> samples;
 
@@ -99,6 +101,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
     when(service.all()).thenReturn(samples);
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
+    @SuppressWarnings("unchecked")
     Grid<Dataset> datasetGrid = $(Grid.class).first();
     datasetGrid.setItems(datasetRepository.findAll());
     test(datasetGrid).doubleClickRow(1);
@@ -254,7 +257,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filterName() {
-    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.samples.setItems(sampleDataProvider);
 
     dialog.nameFilter.setValue("test");
 
@@ -264,7 +267,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filterName_Empty() {
-    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.samples.setItems(sampleDataProvider);
     dialog.nameFilter.setValue("test");
 
     dialog.nameFilter.setValue("");
@@ -275,7 +278,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filterDate() {
-    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.samples.setItems(sampleDataProvider);
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
 
     dialog.dateFilter.setValue(range);
@@ -286,7 +289,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filterDate_All() {
-    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.samples.setItems(sampleDataProvider);
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     dialog.dateFilter.setValue(range);
 
@@ -298,7 +301,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner() {
-    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.samples.setItems(sampleDataProvider);
 
     dialog.ownerFilter.setValue("test");
 
@@ -308,7 +311,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filterOwner_Empty() {
-    dialog.samples.setItems(mock(DataProvider.class));
+    dialog.samples.setItems(sampleDataProvider);
     dialog.ownerFilter.setValue("test");
 
     dialog.ownerFilter.setValue("");
