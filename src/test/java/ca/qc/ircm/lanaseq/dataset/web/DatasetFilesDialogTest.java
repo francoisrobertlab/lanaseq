@@ -55,6 +55,7 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
@@ -179,7 +180,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? Paths.get(dataset.getName()) : null;
     });
-    List archives = new ArrayList();
+    List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getArchives()).thenReturn(archives);
@@ -544,7 +545,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
     method.setAccessible(true);
 
-    method.invoke(editor, new EditorCloseEvent(editor, file));
+    method.invoke(editor, new EditorCloseEvent<>(editor, file));
 
     assertTrue(Files.exists(sibling));
     assertFalse(Files.exists(path));

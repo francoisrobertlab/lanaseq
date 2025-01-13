@@ -346,7 +346,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.assay.isAllowCustomValue());
     dialog.assay.setItems("Test", "Test2");
     fireEvent(dialog.assay,
-        new ComboBoxBase.CustomValueSetEvent(dialog.assay, false, "new_assay_type"));
+        new ComboBoxBase.CustomValueSetEvent<>(dialog.assay, false, "new_assay_type"));
     assertEquals("new_assay_type", dialog.assay.getValue());
     assertEquals("ChIP-chip", dialog.assay.getItemLabelGenerator().apply("ChIP-chip"));
   }
@@ -361,7 +361,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     }
     assertTrue(dialog.type.isAllowCustomValue());
     dialog.type.setItems("Test", "Test2");
-    fireEvent(dialog.type, new ComboBoxBase.CustomValueSetEvent(dialog.type, false, "new_type"));
+    fireEvent(dialog.type, new ComboBoxBase.CustomValueSetEvent<>(dialog.type, false, "new_type"));
     assertEquals("new_type", dialog.type.getValue());
     assertEquals("Input", dialog.type.getItemLabelGenerator().apply("Input"));
   }

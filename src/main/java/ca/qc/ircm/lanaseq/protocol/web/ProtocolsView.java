@@ -153,7 +153,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   }
 
   private void loadProtocols() {
-    GridListDataView dataView = protocols.setItems(service.all());
+    GridListDataView<Protocol> dataView = protocols.setItems(service.all());
     dataView.setFilter(filter);
   }
 

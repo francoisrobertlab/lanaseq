@@ -50,7 +50,7 @@ public class VaadinLicenseExecutionListener implements TestExecutionListener, In
 
   private boolean isTestBenchTest(TestContext testContext) {
     boolean isTestBenchClass = false;
-    for (Class testBenchClass : TEST_BENCH_CLASSES) {
+    for (Class<?> testBenchClass : TEST_BENCH_CLASSES) {
       isTestBenchClass |= testBenchClass.isAssignableFrom(testContext.getTestClass());
     }
     return isTestBenchClass;

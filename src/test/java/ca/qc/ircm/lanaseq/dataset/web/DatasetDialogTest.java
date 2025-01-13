@@ -410,7 +410,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     for (int i = 2; i < samples.size(); i++) {
       assertEquals(this.samples.get(i), samples.get(i));
     }
-    GridDragEndEvent dragEndEvent = new GridDragEndEvent(dialog.samples, false);
+    GridDragEndEvent<Sample> dragEndEvent = new GridDragEndEvent<>(dialog.samples, false);
     fireEvent(dialog.samples, dragEndEvent);
     assertNull(dialog.samples.getDropMode());
 
@@ -449,7 +449,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     for (int i = 3; i < samples.size(); i++) {
       assertEquals(this.samples.get(i), samples.get(i));
     }
-    GridDragEndEvent dragEndEvent = new GridDragEndEvent(dialog.samples, false);
+    GridDragEndEvent<Sample> dragEndEvent = new GridDragEndEvent<>(dialog.samples, false);
     fireEvent(dialog.samples, dragEndEvent);
     assertNull(dialog.samples.getDropMode());
 

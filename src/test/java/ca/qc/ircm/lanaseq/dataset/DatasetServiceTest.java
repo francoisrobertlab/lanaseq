@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
@@ -110,7 +111,7 @@ public class DatasetServiceTest {
       String label = "\\\\lanaseq01\\home\\" + (dataset != null ? dataset.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
-    List archives = new ArrayList();
+    List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getArchives()).thenReturn(archives);
