@@ -66,13 +66,16 @@ public class MailServiceTest {
       return Optional.of(part.getContent().toString());
     } else if (part.getContent() instanceof Multipart) {
       Multipart mp = (Multipart) part.getContent();
-      return (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
-        try {
-          return plainContent((MimeBodyPart) mp.getBodyPart(i));
-        } catch (MessagingException | IOException e) {
-          return Optional.empty();
-        }
-      }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+      @SuppressWarnings("unchecked")
+      Optional<String> content =
+          (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
+            try {
+              return plainContent((MimeBodyPart) mp.getBodyPart(i));
+            } catch (MessagingException | IOException e) {
+              return Optional.empty();
+            }
+          }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+      return content;
     } else {
       return Optional.empty();
     }
@@ -84,13 +87,16 @@ public class MailServiceTest {
       return Optional.of(part.getContent().toString());
     } else if (part.getContent() instanceof Multipart) {
       Multipart mp = (Multipart) part.getContent();
-      return (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
-        try {
-          return htmlContent((MimeBodyPart) mp.getBodyPart(i));
-        } catch (MessagingException | IOException e) {
-          return Optional.empty();
-        }
-      }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+      @SuppressWarnings("unchecked")
+      Optional<String> content =
+          (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
+            try {
+              return htmlContent((MimeBodyPart) mp.getBodyPart(i));
+            } catch (MessagingException | IOException e) {
+              return Optional.empty();
+            }
+          }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+      return content;
     } else {
       return Optional.empty();
     }

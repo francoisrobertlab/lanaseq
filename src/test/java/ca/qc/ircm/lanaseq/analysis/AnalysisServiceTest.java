@@ -158,9 +158,11 @@ public class AnalysisServiceTest {
         return null;
       }
       if (collection.stream().findFirst().get() instanceof Dataset) {
+        @SuppressWarnings("unchecked")
         Collection<Dataset> datasets = (Collection<Dataset>) collection;
         return temporaryFolder.resolve(datasets.iterator().next().getName());
       } else {
+        @SuppressWarnings("unchecked")
         Collection<Sample> samples = (Collection<Sample>) collection;
         return temporaryFolder.resolve(samples.iterator().next().getName());
       }

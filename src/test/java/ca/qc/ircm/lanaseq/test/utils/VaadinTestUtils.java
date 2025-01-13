@@ -193,7 +193,10 @@ public class VaadinTestUtils {
     try {
       Field field = LitRenderer.class.getDeclaredField("valueProviders");
       field.setAccessible(true);
-      return (Map<String, ValueProvider<SOURCE, ?>>) field.get(renderer);
+      @SuppressWarnings("unchecked")
+      Map<String, ValueProvider<SOURCE, ?>> properties =
+          (Map<String, ValueProvider<SOURCE, ?>>) field.get(renderer);
+      return properties;
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
         | IllegalAccessException e) {
       throw new IllegalStateException(e);
@@ -213,7 +216,10 @@ public class VaadinTestUtils {
     try {
       Field field = LitRenderer.class.getDeclaredField("clientCallables");
       field.setAccessible(true);
-      return (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(renderer);
+      @SuppressWarnings("unchecked")
+      Map<String, SerializableBiConsumer<SOURCE, JsonArray>> functions =
+          (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(renderer);
+      return functions;
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
         | IllegalAccessException e) {
       throw new IllegalStateException(e);
