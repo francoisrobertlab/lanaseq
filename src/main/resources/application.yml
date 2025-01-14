@@ -60,6 +60,12 @@ server:
 vaadin:
   productionMode: false
   closeIdleSessions: true
+  license:
+    assume: false
+    paths:
+      - '${user.home}/.vaadin/offlineKey'
+      - '${user.home}/.vaadin/proKey'
+      - '${user.home}/.vaadin/userKey'
 
 mail:
   enabled: true
