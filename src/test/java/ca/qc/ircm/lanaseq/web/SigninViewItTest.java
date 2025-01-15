@@ -8,6 +8,7 @@ import static ca.qc.ircm.lanaseq.web.SigninView.FAIL;
 import static ca.qc.ircm.lanaseq.web.SigninView.LOCKED;
 import static ca.qc.ircm.lanaseq.web.SigninView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -65,9 +66,11 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getUsernameField().setValue("olivia.brown@ircm.qc.ca");
     view.getPasswordField().setValue("notright");
     view.getSubmitButton().click();
-    waitUntil(driver -> driver != null && driver.getCurrentUrl().endsWith("?" + FAIL));
+    waitUntil(driver -> driver != null && driver.getCurrentUrl() != null
+        && driver.getCurrentUrl().endsWith("?" + FAIL));
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
         view.getErrorMessage());
+    assertNotNull(getDriver().getCurrentUrl());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
@@ -80,6 +83,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getSubmitButton().click();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DISABLED, null, currentLocale()),
         view.getErrorMessage());
+    assertNotNull(getDriver().getCurrentUrl());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
@@ -101,6 +105,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
         messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
             new Object[] { configuration.lockDuration().getSeconds() / 60 }, currentLocale()),
         view.getErrorMessage());
+    assertNotNull(getDriver().getCurrentUrl());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
