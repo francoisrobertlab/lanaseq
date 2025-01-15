@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
-import ca.qc.ircm.lanaseq.test.config.SmtpPortRandomizer;
 import ca.qc.ircm.lanaseq.user.User;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -40,7 +39,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 /**
  * Tests for {@link MailService}.
  */
-@ContextConfiguration(initializers = SmtpPortRandomizer.class)
+@ContextConfiguration
 @NonTransactionalTestAnnotations
 public class MailServiceTest {
   @RegisterExtension
