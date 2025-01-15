@@ -82,7 +82,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void files() throws Throwable {
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
     Files.createDirectories(home);
     Path file1 = home.resolve("R1.fastq");
@@ -111,7 +111,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void rename() throws Throwable {
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -142,7 +142,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("R1.fastq");
     Files.deleteIfExists(downloaded);
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -170,7 +170,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void delete() throws Throwable {
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -206,7 +206,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
 
     dialog.upload().upload(file1.toFile());
 

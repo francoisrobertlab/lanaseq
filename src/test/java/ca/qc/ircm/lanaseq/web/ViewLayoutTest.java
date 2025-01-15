@@ -220,7 +220,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void tabs_SelectExitSwitchUser() {
-    switchUserService.switchUser(userRepository.findById(3L).get(),
+    switchUserService.switchUser(userRepository.findById(3L).orElseThrow(),
         VaadinServletRequest.getCurrent());
     navigate(SamplesView.class);
     view = $(ViewLayout.class).first();

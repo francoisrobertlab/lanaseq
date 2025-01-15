@@ -94,7 +94,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     assertEquals(0, dialog.files().getRowCount());
     copyFiles(sample);
     Thread.sleep(2500);
@@ -117,7 +117,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SampleFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
     final AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     copyFiles(sample);
     String filenameInRoot = "prefix_" + sample.getName() + "_R1";
     Files.copy(

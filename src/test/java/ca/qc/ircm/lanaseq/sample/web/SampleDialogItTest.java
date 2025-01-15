@@ -75,7 +75,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
    */
   @BeforeEach
   public void beforeTest() throws Throwable {
-    protocol = protocolRepository.findById(1L).get();
+    protocol = protocolRepository.findById(1L).orElseThrow();
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
   }
 
@@ -240,7 +240,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_Update() throws Throwable {
     open();
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     Path oldFolder = configuration.getHome().folder(sample);
     Files.createDirectories(oldFolder);
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -258,7 +258,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
         notification.getText());
-    sample = repository.findById(4L).get();
+    sample = repository.findById(4L).orElseThrow();
     assertEquals(name, sample.getName());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
     assertEquals((Long) 3L, sample.getOwner().getId());
@@ -280,9 +280,9 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
     assertTrue(sample.getFilenames().contains(filename));
     assertEquals(note, sample.getNote());
-    Dataset dataset = datasetRepository.findById(2L).get();
+    Dataset dataset = datasetRepository.findById(2L).orElseThrow();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
-    dataset = datasetRepository.findById(6L).get();
+    dataset = datasetRepository.findById(6L).orElseThrow();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.getHome().folder(sample);
@@ -306,7 +306,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
     assertEquals((Long) 3L, sample.getOwner().getId());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());

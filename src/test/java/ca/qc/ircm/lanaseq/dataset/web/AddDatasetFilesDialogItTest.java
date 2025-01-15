@@ -94,7 +94,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
     AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     assertEquals(0, dialog.files().getRowCount());
     copyFiles(dataset);
     Thread.sleep(2500);
@@ -117,7 +117,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
     final AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     copyFiles(dataset);
     String filenameInRoot = "prefix_" + dataset.getName() + "_R1";
     Files.copy(

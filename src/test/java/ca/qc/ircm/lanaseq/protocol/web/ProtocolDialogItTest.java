@@ -160,7 +160,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
         notification.getText());
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     assertEquals(name, protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());
@@ -194,7 +194,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     assertEquals("FLAG", protocol.getName());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), protocol.getCreationDate());
     assertEquals((Long) 3L, protocol.getOwner().getId());

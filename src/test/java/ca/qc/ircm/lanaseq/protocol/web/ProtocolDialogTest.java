@@ -193,7 +193,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
         dialog.getHeaderTitle());
     assertEquals(dialog.getTranslation(PROTOCOL_PREFIX + NAME), dialog.name.getLabel());
@@ -219,7 +219,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, protocol.getName()),
         dialog.getHeaderTitle());
     assertEquals(dialog.getTranslation(PROTOCOL_PREFIX + NAME), dialog.name.getLabel());
@@ -369,7 +369,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocolId() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     dialog.setProtocolId(1L);
 
@@ -396,7 +396,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocolId_ReadOnly() {
-    Protocol protocol = repository.findById(2L).get();
+    Protocol protocol = repository.findById(2L).orElseThrow();
 
     dialog.setProtocolId(2L);
 
@@ -424,7 +424,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   @Test
   public void setProtocolId_Deletable() {
     when(service.isDeletable(any())).thenReturn(true);
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     dialog.setProtocolId(1L);
 
@@ -451,7 +451,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocolId_DeletedFiles() {
-    Protocol protocol = repository.findById(3L).get();
+    Protocol protocol = repository.findById(3L).orElseThrow();
 
     dialog.setProtocolId(3L);
 
@@ -541,7 +541,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExistsSameProtocol() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
     fillFields();
@@ -563,7 +563,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExistsSameProtocolDifferentCase() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
     fillFields();
@@ -585,7 +585,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExistsDifferentProtocol() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     when(service.nameExists(any())).thenReturn(true);
     dialog.addSavedListener(savedListener);
     fillFields();
@@ -610,7 +610,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_EmptyNote() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     dialog.addSavedListener(savedListener);
     fillFields();
     dialog.note.setValue("");
@@ -755,7 +755,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
   @Test
   public void delete_Confirm() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     dialog.addDeletedListener(deletedListener);
 
     clickButton(dialog.delete);

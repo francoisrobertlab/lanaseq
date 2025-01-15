@@ -101,12 +101,12 @@ public class AnalysisServiceTest {
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
     when(permissionEvaluator.hasCollectionPermission(any(), any(), any())).thenReturn(true);
-    dataset = datasetRepository.findById(2L).get();
-    datasets.add(datasetRepository.findById(7L).get());
+    dataset = datasetRepository.findById(2L).orElseThrow();
+    datasets.add(datasetRepository.findById(7L).orElseThrow());
     datasets.add(dataset);
     datasets.forEach(ds -> samples.addAll(ds.getSamples()));
-    sample = sampleRepository.findById(4L).get();
-    sample2 = sampleRepository.findById(5L).get();
+    sample = sampleRepository.findById(4L).orElseThrow();
+    sample2 = sampleRepository.findById(5L).orElseThrow();
     paired1 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R1.fastq");
     paired2 = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022_R2.fastq");
     pairedPaths.add(temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bed"));
@@ -566,8 +566,8 @@ public class AnalysisServiceTest {
   @Test
   public void copyDatasetsResources_SameSamples() throws Throwable {
     List<Dataset> datasets = new ArrayList<>();
-    datasets.add(datasetRepository.findById(2L).get());
-    datasets.add(datasetRepository.findById(6L).get());
+    datasets.add(datasetRepository.findById(2L).orElseThrow());
+    datasets.add(datasetRepository.findById(6L).orElseThrow());
 
     Path folder = service.copyDatasetsResources(datasets, new ArrayList<>());
 

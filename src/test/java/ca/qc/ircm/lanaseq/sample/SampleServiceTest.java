@@ -812,7 +812,7 @@ public class SampleServiceTest {
 
   @Test
   public void isDeletable_FalseNotEditable() {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     sample.setEditable(false);
     assertFalse(service.isDeletable(sample));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
@@ -820,14 +820,14 @@ public class SampleServiceTest {
 
   @Test
   public void isDeletable_FalseLinkedToDataset() {
-    Sample sample = repository.findById(1L).get();
+    Sample sample = repository.findById(1L).orElseThrow();
     assertFalse(service.isDeletable(sample));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }
 
   @Test
   public void isDeletable_True() {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     assertTrue(service.isDeletable(sample));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
   }
@@ -840,16 +840,16 @@ public class SampleServiceTest {
   @Test
   public void isMergable_False() {
     List<Sample> samples = new ArrayList<>();
-    samples.add(repository.findById(1L).get());
-    samples.add(repository.findById(4L).get());
+    samples.add(repository.findById(1L).orElseThrow());
+    samples.add(repository.findById(4L).orElseThrow());
     assertFalse(service.isMergable(samples));
   }
 
   @Test
   public void isMergable_True() {
     List<Sample> samples = new ArrayList<>();
-    samples.add(repository.findById(1L).get());
-    samples.add(repository.findById(2L).get());
+    samples.add(repository.findById(1L).orElseThrow());
+    samples.add(repository.findById(2L).orElseThrow());
     assertTrue(service.isMergable(samples));
   }
 
@@ -1031,7 +1031,7 @@ public class SampleServiceTest {
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
-    sample.setProtocol(protocolRepository.findById(1L).get());
+    sample.setProtocol(protocolRepository.findById(1L).orElseThrow());
     sample.setDate(LocalDate.of(2020, 7, 21));
     sample.setNote("test note");
     sample.setKeywords(new HashSet<>());
@@ -1078,7 +1078,7 @@ public class SampleServiceTest {
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
-    sample.setProtocol(protocolRepository.findById(1L).get());
+    sample.setProtocol(protocolRepository.findById(1L).orElseThrow());
     sample.setDate(LocalDate.of(2020, 7, 21));
     sample.setNote("test note");
 
@@ -1099,7 +1099,7 @@ public class SampleServiceTest {
     sample.setStrain("yFR213");
     sample.setStrainDescription("F56G");
     sample.setTreatment("37C");
-    sample.setProtocol(protocolRepository.findById(3L).get());
+    sample.setProtocol(protocolRepository.findById(3L).orElseThrow());
     sample.setDate(LocalDate.of(2020, 7, 21));
     sample.setNote("test note");
     sample.getKeywords().remove("ip");
@@ -1136,7 +1136,7 @@ public class SampleServiceTest {
 
   @Test
   public void save_DontRenameDatasets() throws Throwable {
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     sample.setSampleId("sample1");
     sample.setReplicate("r1");
     sample.generateName();
@@ -1144,14 +1144,14 @@ public class SampleServiceTest {
     service.save(sample);
 
     repository.flush();
-    Dataset dataset = datasetRepository.findById(2L).get();
+    Dataset dataset = datasetRepository.findById(2L).orElseThrow();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     assertEquals(2, dataset.getSamples().size());
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
     assertEquals((Long) 5L, dataset.getSamples().get(1).getId());
     assertEquals((Long) 3L, dataset.getOwner().getId());
     assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
-    dataset = datasetRepository.findById(6L).get();
+    dataset = datasetRepository.findById(6L).orElseThrow();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
     assertEquals(1, dataset.getSamples().size());
     assertEquals((Long) 4L, dataset.getSamples().get(0).getId());
@@ -1477,7 +1477,7 @@ public class SampleServiceTest {
   @Test
   public void delete_LinkedToDataset() {
     assertThrows(IllegalArgumentException.class, () -> {
-      Sample sample = repository.findById(1L).get();
+      Sample sample = repository.findById(1L).orElseThrow();
       service.delete(sample);
     });
   }
@@ -1485,7 +1485,7 @@ public class SampleServiceTest {
   @Test
   public void delete_NotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
-      Sample sample = repository.findById(9L).get();
+      Sample sample = repository.findById(9L).orElseThrow();
       sample.setEditable(false);
       service.delete(sample);
     });
@@ -1493,7 +1493,7 @@ public class SampleServiceTest {
 
   @Test
   public void deleteFile() throws Throwable {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("test.txt");
@@ -1521,7 +1521,7 @@ public class SampleServiceTest {
 
   @Test
   public void deleteFile_RelativePath() throws Throwable {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
@@ -1536,7 +1536,7 @@ public class SampleServiceTest {
 
   @Test
   public void deleteFile_Archives() throws Throwable {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     Path folder = configuration.getArchives().get(0).folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
@@ -1551,7 +1551,7 @@ public class SampleServiceTest {
 
   @Test
   public void deleteFile_NotInSampleFolder() throws Throwable {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     Path file = temporaryFolder.resolve("test.txt");
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
@@ -1564,7 +1564,7 @@ public class SampleServiceTest {
 
   @Test
   public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
-    Sample sample = repository.findById(9L).get();
+    Sample sample = repository.findById(9L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = Paths.get("../test.txt");

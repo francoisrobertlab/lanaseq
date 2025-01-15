@@ -63,7 +63,7 @@ public class ProtocolServiceTest {
   @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    currentUser = userRepository.findById(3L).get();
+    currentUser = userRepository.findById(3L).orElseThrow();
     when(authenticatedUser.getUser()).thenReturn(Optional.of(currentUser));
   }
 
@@ -125,7 +125,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void files() throws Throwable {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     List<ProtocolFile> files = service.files(protocol);
 
     assertEquals(1, files.size());
@@ -144,7 +144,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void files_WithDeleted() throws Throwable {
-    Protocol protocol = repository.findById(3L).get();
+    Protocol protocol = repository.findById(3L).orElseThrow();
     List<ProtocolFile> files = service.files(protocol);
 
     assertEquals(1, files.size());
@@ -170,7 +170,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser(authorities = { UserRole.USER, UserRole.ADMIN })
   public void deletedFiles_Admin() throws Throwable {
-    Protocol protocol = repository.findById(3L).get();
+    Protocol protocol = repository.findById(3L).orElseThrow();
     List<ProtocolFile> files = service.deletedFiles(protocol);
 
     assertEquals(1, files.size());
@@ -188,7 +188,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser(authorities = { UserRole.USER, UserRole.MANAGER })
   public void deletedFiles_Manager() throws Throwable {
-    Protocol protocol = repository.findById(3L).get();
+    Protocol protocol = repository.findById(3L).orElseThrow();
     List<ProtocolFile> files = service.deletedFiles(protocol);
 
     assertEquals(1, files.size());
@@ -207,7 +207,7 @@ public class ProtocolServiceTest {
   @WithMockUser
   public void deletedFiles_User() throws Throwable {
     assertThrows(AccessDeniedException.class, () -> {
-      Protocol protocol = repository.findById(3L).get();
+      Protocol protocol = repository.findById(3L).orElseThrow();
       service.deletedFiles(protocol);
     });
   }
@@ -215,7 +215,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void isDeletable_False() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     assertFalse(service.isDeletable(protocol));
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
   }
@@ -223,7 +223,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void isDeletable_True() {
-    Protocol protocol = repository.findById(4L).get();
+    Protocol protocol = repository.findById(4L).orElseThrow();
     assertTrue(service.isDeletable(protocol));
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
   }
@@ -318,8 +318,8 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void recover() throws Throwable {
-    Protocol protocol = repository.findById(3L).get();
-    ProtocolFile file = fileRepository.findById(3L).get();
+    Protocol protocol = repository.findById(3L).orElseThrow();
+    ProtocolFile file = fileRepository.findById(3L).orElseThrow();
 
     service.recover(file);
 

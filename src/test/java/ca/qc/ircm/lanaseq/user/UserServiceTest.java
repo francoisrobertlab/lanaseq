@@ -168,7 +168,7 @@ public class UserServiceTest {
     service.save(user, "password");
 
     assertNotEquals(0, user.getId());
-    user = repository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).orElseThrow();
     assertNotNull(user);
     assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
@@ -196,7 +196,7 @@ public class UserServiceTest {
     service.save(user, "password");
 
     assertNotEquals(0, user.getId());
-    user = repository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).orElseThrow();
     assertNotNull(user);
     assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
@@ -224,7 +224,7 @@ public class UserServiceTest {
     service.save(user, "password");
 
     assertNotEquals(0, user.getId());
-    user = repository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).orElseThrow();
     assertNotNull(user);
     assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
@@ -252,7 +252,7 @@ public class UserServiceTest {
     service.save(user, null);
 
     assertNotEquals(0, user.getId());
-    user = repository.findById(user.getId()).get();
+    user = repository.findById(user.getId()).orElseThrow();
     assertNotNull(user);
     assertNotEquals(0, user.getId());
     assertEquals("Test User", user.getName());
@@ -270,14 +270,14 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_Update() {
-    User user = repository.findById(6L).get();
+    User user = repository.findById(6L).orElseThrow();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
 
     service.save(user, "newpassword");
 
-    user = repository.findById(6L).get();
+    user = repository.findById(6L).orElseThrow();
     assertEquals((Long) 6L, user.getId());
     assertEquals("Test User", user.getName());
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
@@ -301,7 +301,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_UpdateKeepPassword() {
-    User user = repository.findById(6L).get();
+    User user = repository.findById(6L).orElseThrow();
     user.setName("Test User");
     user.setEmail("test.user@ircm.qc.ca");
     user.setLocale(Locale.CHINESE);
@@ -332,7 +332,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_UpdateFirstUserRemoveAdmin() {
     assertThrows(AccessDeniedException.class, () -> {
-      User user = repository.findById(1L).get();
+      User user = repository.findById(1L).orElseThrow();
       user.setAdmin(false);
 
       service.save(user, "newpassword");
@@ -343,7 +343,7 @@ public class UserServiceTest {
   @WithMockUser
   public void save_UpdateFirstUserRemoveActive() {
     assertThrows(AccessDeniedException.class, () -> {
-      User user = repository.findById(1L).get();
+      User user = repository.findById(1L).orElseThrow();
       user.setActive(false);
 
       service.save(user, "newpassword");
@@ -353,12 +353,12 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_Password() {
-    User user = repository.findById(6L).get();
+    User user = repository.findById(6L).orElseThrow();
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
     service.save("newpassword");
 
-    user = repository.findById(6L).get();
+    user = repository.findById(6L).orElseThrow();
     assertEquals("Christian Poitras", user.getName());
     assertEquals("christian.poitras@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("newpassword");
@@ -380,12 +380,12 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void save_PasswordNoAuthorityChange() {
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
     service.save("newpassword");
 
-    user = repository.findById(3L).get();
+    user = repository.findById(3L).orElseThrow();
     assertEquals("Jonh Smith", user.getName());
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     verify(passwordEncoder).encode("newpassword");
@@ -408,7 +408,7 @@ public class UserServiceTest {
   @WithAnonymousUser
   public void save_PasswordAnonymousDenied() {
     assertThrows(AccessDeniedException.class, () -> {
-      User user = repository.findById(3L).get();
+      User user = repository.findById(3L).orElseThrow();
       when(authenticatedUser.getUser()).thenReturn(Optional.of(user));
 
       service.save("new password");

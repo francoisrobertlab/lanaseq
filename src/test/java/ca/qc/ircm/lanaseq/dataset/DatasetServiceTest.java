@@ -757,14 +757,14 @@ public class DatasetServiceTest {
 
   @Test
   public void isDeletable_False() {
-    Dataset dataset = repository.findById(5L).get();
+    Dataset dataset = repository.findById(5L).orElseThrow();
     assertFalse(service.isDeletable(dataset));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
 
   @Test
   public void isDeletable_True() {
-    Dataset dataset = repository.findById(1L).get();
+    Dataset dataset = repository.findById(1L).orElseThrow();
     assertTrue(service.isDeletable(dataset));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
   }
@@ -783,8 +783,8 @@ public class DatasetServiceTest {
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     dataset.setNote("test note");
-    dataset.getSamples().add(sampleRepository.findById(1L).get());
-    dataset.getSamples().add(sampleRepository.findById(2L).get());
+    dataset.getSamples().add(sampleRepository.findById(1L).orElseThrow());
+    dataset.getSamples().add(sampleRepository.findById(2L).orElseThrow());
     dataset.generateName();
 
     service.save(dataset);
@@ -827,7 +827,7 @@ public class DatasetServiceTest {
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
-    sample1.setProtocol(protocolRepository.findById(1L).get());
+    sample1.setProtocol(protocolRepository.findById(1L).orElseThrow());
     sample1.setDate(LocalDate.of(2020, 7, 21));
     sample1.setNote("test note");
     dataset.getSamples().add(sample1);
@@ -847,7 +847,7 @@ public class DatasetServiceTest {
     dataset.setDate(LocalDate.of(2020, 7, 21));
     dataset.setSamples(new ArrayList<>());
     dataset.setNote("test note");
-    dataset.getSamples().add(sampleRepository.findById(1L).get());
+    dataset.getSamples().add(sampleRepository.findById(1L).orElseThrow());
 
     assertThrows(NullPointerException.class, () -> {
       service.save(dataset);
@@ -872,11 +872,11 @@ public class DatasetServiceTest {
     sample1.setStrain("yFR213");
     sample1.setStrainDescription("F56G");
     sample1.setTreatment("37C");
-    sample1.setProtocol(protocolRepository.findById(3L).get());
+    sample1.setProtocol(protocolRepository.findById(3L).orElseThrow());
     sample1.setDate(LocalDate.of(2020, 7, 21));
     sample1.setNote("test note");
     final Sample removed = dataset.getSamples().remove(1);
-    dataset.getSamples().add(sampleRepository.findById(4L).get());
+    dataset.getSamples().add(sampleRepository.findById(4L).orElseThrow());
     dataset.generateName();
 
     service.save(dataset);
@@ -922,7 +922,7 @@ public class DatasetServiceTest {
     newSample.setStrain("yFR213");
     newSample.setStrainDescription("F56G");
     newSample.setTreatment("37C");
-    newSample.setProtocol(protocolRepository.findById(1L).get());
+    newSample.setProtocol(protocolRepository.findById(1L).orElseThrow());
     newSample.setDate(LocalDate.of(2020, 7, 21));
     newSample.setNote("test note");
     dataset.getSamples().add(newSample);
@@ -1291,14 +1291,14 @@ public class DatasetServiceTest {
   @Test
   public void delete_NotEditable() {
     assertThrows(IllegalArgumentException.class, () -> {
-      Dataset dataset = repository.findById(5L).get();
+      Dataset dataset = repository.findById(5L).orElseThrow();
       service.delete(dataset);
     });
   }
 
   @Test
   public void deleteFile() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
+    Dataset dataset = repository.findById(4L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("test.txt");
@@ -1326,7 +1326,7 @@ public class DatasetServiceTest {
 
   @Test
   public void deleteFile_RelativePath() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
+    Dataset dataset = repository.findById(4L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
@@ -1341,7 +1341,7 @@ public class DatasetServiceTest {
 
   @Test
   public void deleteFile_Archives() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
+    Dataset dataset = repository.findById(4L).orElseThrow();
     Path folder = configuration.getArchives().get(0).folder(dataset);
     Files.createDirectories(folder);
     Path file = Paths.get("test.txt");
@@ -1356,7 +1356,7 @@ public class DatasetServiceTest {
 
   @Test
   public void deleteFile_NotInSampleFolder() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
+    Dataset dataset = repository.findById(4L).orElseThrow();
     Path file = temporaryFolder.resolve("test.txt");
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
@@ -1369,7 +1369,7 @@ public class DatasetServiceTest {
 
   @Test
   public void deleteFile_RelativePathNotInSampleFolder() throws Throwable {
-    Dataset dataset = repository.findById(4L).get();
+    Dataset dataset = repository.findById(4L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = Paths.get("../test.txt");

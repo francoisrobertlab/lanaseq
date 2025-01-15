@@ -83,8 +83,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
     AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
         mock(AppConfiguration.NetworkDrive.class);
     when(configuration.getAnalysis()).thenReturn(analysisFolder);
-    datasets.add(repository.findById(6L).get());
-    datasets.add(repository.findById(7L).get());
+    datasets.add(repository.findById(6L).orElseThrow());
+    datasets.add(repository.findById(7L).orElseThrow());
     UI.getCurrent().setLocale(locale);
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());
@@ -247,7 +247,7 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setDatasetId() {
-    Dataset dataset = repository.findById(6L).get();
+    Dataset dataset = repository.findById(6L).orElseThrow();
     dialog.setDatasetId(6L);
     assertEquals(
         dialog.getTranslation(MESSAGE_PREFIX + SamplesAnalysisDialog.HEADER, 1, dataset.getName()),

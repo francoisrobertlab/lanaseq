@@ -82,8 +82,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
     AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
         mock(AppConfiguration.NetworkDrive.class);
     when(configuration.getAnalysis()).thenReturn(analysisFolder);
-    samples.add(repository.findById(10L).get());
-    samples.add(repository.findById(11L).get());
+    samples.add(repository.findById(10L).orElseThrow());
+    samples.add(repository.findById(11L).orElseThrow());
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
@@ -246,7 +246,7 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setSampleId() {
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     dialog.setSampleId(10L);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
         dialog.getHeaderTitle());

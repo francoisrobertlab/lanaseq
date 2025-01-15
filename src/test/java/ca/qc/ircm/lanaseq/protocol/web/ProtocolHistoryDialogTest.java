@@ -107,7 +107,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, protocol.getName()),
         dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
@@ -121,7 +121,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    Protocol protocol = repository.findById(dialog.getProtocolId()).get();
+    Protocol protocol = repository.findById(dialog.getProtocolId()).orElseThrow();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, protocol.getName()),
         dialog.getHeaderTitle());
     HeaderRow headerRow = dialog.files.getHeaderRows().get(0);
@@ -158,7 +158,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void files_RecoverFile() {
-    ProtocolFile file = dialog.files.getListDataView().getItems().findFirst().get();
+    ProtocolFile file = dialog.files.getListDataView().getItems().findFirst().orElseThrow();
     LitRenderer<ProtocolFile> recoverRenderer =
         (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
     functions(recoverRenderer).get("recoverFile").accept(file, null);
@@ -187,7 +187,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocolId_Protocol() {
-    Protocol protocol = repository.findById(3L).get();
+    Protocol protocol = repository.findById(3L).orElseThrow();
 
     dialog.setProtocolId(3L);
 
@@ -198,7 +198,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocol_NoFiles() {
-    Protocol protocol = repository.findById(2L).get();
+    Protocol protocol = repository.findById(2L).orElseThrow();
 
     dialog.setProtocolId(2L);
 

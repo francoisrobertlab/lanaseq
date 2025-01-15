@@ -109,7 +109,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { email }, currentLocale()),
         notification.getText());
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     assertEquals(email, user.getEmail());
     assertEquals(name, user.getName());
     assertFalse(user.isAdmin());
@@ -133,7 +133,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
 
     assertTrue(optional(() -> view.dialog()).isPresent());
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     assertEquals("Jonh Smith", user.getName());
     assertFalse(user.isAdmin());
@@ -155,7 +155,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());
     assertEquals("Jonh Smith", user.getName());
     assertFalse(user.isAdmin());

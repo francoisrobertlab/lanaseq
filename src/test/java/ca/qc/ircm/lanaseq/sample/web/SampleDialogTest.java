@@ -154,7 +154,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     topTypes = jpaQueryFactory.select(sample.type).from(sample).fetch();
     when(service.topTypes(anyInt())).thenReturn(topTypes);
     when(protocolService.all()).thenReturn(protocolRepository.findAll());
-    protocol = protocolRepository.findById(1L).get();
+    protocol = protocolRepository.findById(1L).orElseThrow();
     topKeywords.add("input");
     topKeywords.add("chip");
     topTypes.add("ip_ms");
@@ -219,7 +219,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void labels() {
-    Sample sample = repository.findById(dialog.getSampleId()).get();
+    Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
         dialog.getHeaderTitle());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + DATE), dialog.date.getLabel());
@@ -263,7 +263,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void localeChange() {
     Locale locale = Locale.FRENCH;
     UI.getCurrent().setLocale(locale);
-    Sample sample = repository.findById(dialog.getSampleId()).get();
+    Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 1, sample.getName()),
         dialog.getHeaderTitle());
     assertEquals(dialog.getTranslation(SAMPLE_PREFIX + DATE), dialog.date.getLabel());
@@ -416,7 +416,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setSampleId() {
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
 
     dialog.setSampleId(4L);
 
@@ -432,7 +432,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertFalse(dialog.sampleId.isReadOnly());
     assertEquals("R1", dialog.replicate.getValue());
     assertFalse(dialog.replicate.isReadOnly());
-    assertEquals(protocolRepository.findById(3L).get(), dialog.protocol.getValue());
+    assertEquals(protocolRepository.findById(3L).orElseThrow(), dialog.protocol.getValue());
     assertFalse(dialog.protocol.isReadOnly());
     assertEquals("ChIP-seq", dialog.assay.getValue());
     assertFalse(dialog.assay.isReadOnly());
@@ -457,7 +457,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setSampleId_ReadOnly() {
-    Sample sample = repository.findById(2L).get();
+    Sample sample = repository.findById(2L).orElseThrow();
 
     dialog.setSampleId(2L);
 
@@ -473,7 +473,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.sampleId.isReadOnly());
     assertEquals("R2", dialog.replicate.getValue());
     assertTrue(dialog.replicate.isReadOnly());
-    assertEquals(protocolRepository.findById(1L).get(), dialog.protocol.getValue());
+    assertEquals(protocolRepository.findById(1L).orElseThrow(), dialog.protocol.getValue());
     assertTrue(dialog.protocol.isReadOnly());
     assertEquals("MNase-seq", dialog.assay.getValue());
     assertTrue(dialog.assay.isReadOnly());
@@ -499,7 +499,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void setSampleId_NotEditable() {
-    Sample sample = repository.findById(8L).get();
+    Sample sample = repository.findById(8L).orElseThrow();
 
     dialog.setSampleId(8L);
 
@@ -535,7 +535,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void setSampleId_DeletableSample() {
     when(service.isDeletable(any())).thenReturn(true);
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
 
     dialog.setSampleId(4L);
 
@@ -939,7 +939,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_NameExistsSameSample() {
-    Sample sample = repository.findById(2L).get();
+    Sample sample = repository.findById(2L).orElseThrow();
     when(service.exists(any())).thenReturn(true);
     when(service.get(anyLong())).thenReturn(Optional.of(sample));
     dialog.addSavedListener(savedListener);
@@ -997,7 +997,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_UpdateSample() {
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
@@ -1035,7 +1035,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
   @Test
   public void cancel() {
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
@@ -1054,7 +1054,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void delete_Confirm() {
     when(service.isDeletable(any())).thenReturn(true);
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);
@@ -1077,7 +1077,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void delete_Cancel() {
     when(service.isDeletable(any())).thenReturn(true);
-    Sample sample = repository.findById(4L).get();
+    Sample sample = repository.findById(4L).orElseThrow();
     dialog.setSampleId(sample.getId());
     dialog.addSavedListener(savedListener);
     dialog.addDeletedListener(deletedListener);

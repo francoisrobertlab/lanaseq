@@ -87,7 +87,7 @@ public class ProfileViewTest extends SpringUIUnitTest {
 
   @Test
   public void form_DefaultUser() {
-    assertEquals(authenticatedUser.getUser().get(), view.form.getUser());
+    assertEquals(authenticatedUser.getUser().orElseThrow(), view.form.getUser());
   }
 
   @Test

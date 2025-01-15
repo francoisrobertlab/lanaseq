@@ -350,8 +350,8 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   @Test
   public void merge_DuplicatedSample() {
     when(sampleService.isMergable(any())).thenReturn(true);
-    Dataset dataset1 = find(datasets, 2L).get();
-    Dataset dataset2 = find(datasets, 6L).get();
+    Dataset dataset1 = find(datasets, 2L).orElseThrow();
+    Dataset dataset2 = find(datasets, 6L).orElseThrow();
     dataset1.getSamples();
     dataset1.getSamples().forEach(sample -> entityManager.detach(sample));
     dataset2.getSamples();

@@ -71,7 +71,7 @@ public class UserDialogTest extends SpringUIUnitTest {
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     UI.getCurrent().setLocale(locale);
     UsersView view = navigate(UsersView.class);
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     doubleClickItem(view.users, user);
     dialog = $(UserDialog.class).first();
   }
@@ -131,7 +131,7 @@ public class UserDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setUser_User() {
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     dialog.form = mock(UserForm.class);
     when(dialog.form.getUser()).thenReturn(user);
 

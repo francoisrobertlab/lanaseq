@@ -365,7 +365,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void viewFiles_Control() {
     view.samples.setItems(samples);
-    Sample sample = view.samples.getListDataView().getItems().findFirst().get();
+    Sample sample = view.samples.getListDataView().getItems().findFirst().orElseThrow();
     test(view.samples).clickRow(0, new MetaKeys().ctrl());
 
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();
@@ -376,7 +376,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   @Test
   public void addFiles_Meta() {
     view.samples.setItems(samples);
-    Sample sample = view.samples.getListDataView().getItems().findFirst().get();
+    Sample sample = view.samples.getListDataView().getItems().findFirst().orElseThrow();
     test(view.samples).clickRow(0, new MetaKeys().meta());
 
     SampleFilesDialog dialog = $(SampleFilesDialog.class).first();

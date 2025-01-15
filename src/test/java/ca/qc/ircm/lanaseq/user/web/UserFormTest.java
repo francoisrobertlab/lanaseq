@@ -187,7 +187,7 @@ public class UserFormTest extends SpringUIUnitTest {
 
   @Test
   public void setUser_User() {
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     mockPasswordForm();
 
     form.setUser(user);
@@ -207,7 +207,7 @@ public class UserFormTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void setUser_UserCanWrite() {
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     mockPasswordForm();
 
     form.setUser(user);
@@ -229,7 +229,7 @@ public class UserFormTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void setUser_UserAdmin() {
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     mockPasswordForm();
 
     form.setUser(user);
@@ -326,7 +326,7 @@ public class UserFormTest extends SpringUIUnitTest {
 
   @Test
   public void isValid_EmailExistsSameUser() {
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     form.setUser(user);
     when(service.exists(any())).thenReturn(true);
     when(service.get(anyLong())).thenReturn(Optional.of(user));
@@ -404,7 +404,7 @@ public class UserFormTest extends SpringUIUnitTest {
   public void isValid_UpdateUser() {
     mockPasswordForm();
     when(form.passwords.getPassword()).thenReturn(password);
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     form.setUser(user);
     fillForm();
 
@@ -421,7 +421,7 @@ public class UserFormTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void isValid_UpdateUserNoPassword() {
-    User user = repository.findById(2L).get();
+    User user = repository.findById(2L).orElseThrow();
     form.setUser(user);
     fillForm();
 
@@ -459,7 +459,7 @@ public class UserFormTest extends SpringUIUnitTest {
   public void isValid_UpdateAdmin() {
     mockPasswordForm();
     when(form.passwords.getPassword()).thenReturn(password);
-    User user = repository.findById(1L).get();
+    User user = repository.findById(1L).orElseThrow();
     form.setUser(user);
     fillForm();
 
@@ -476,7 +476,7 @@ public class UserFormTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void isValid_UpdateAdminNoPassword() {
-    User user = repository.findById(1L).get();
+    User user = repository.findById(1L).orElseThrow();
     form.setUser(user);
     fillForm();
 
@@ -493,7 +493,7 @@ public class UserFormTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void isValid_UpdateAdmin_RemoveAdminAddManager() {
-    User user = repository.findById(1L).get();
+    User user = repository.findById(1L).orElseThrow();
     form.setUser(user);
     fillForm();
     form.admin.setValue(false);

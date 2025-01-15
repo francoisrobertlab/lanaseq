@@ -83,7 +83,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void files() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
     Files.createDirectories(home);
     Path file1 = home.resolve("R1.fastq");
@@ -112,7 +112,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void rename() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -143,7 +143,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.createDirectories(downloadHome);
     Path downloaded = downloadHome.resolve("R1.fastq");
     Files.deleteIfExists(downloaded);
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -171,7 +171,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void delete() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     Files.createDirectories(folder);
     Path file = folder.resolve("R1.fastq");
@@ -218,7 +218,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
 
     dialog.upload().upload(file1.toFile());
 

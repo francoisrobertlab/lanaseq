@@ -72,7 +72,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
 
   @Test
   public void switchUser() {
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     service.switchUser(user, VaadinServletRequest.getCurrent());
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
@@ -107,7 +107,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   @Test
   @WithAnonymousUser
   public void switchUser_AccessDenied_Anonymous() {
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     assertThrows(AccessDeniedException.class, () -> {
       service.switchUser(user, VaadinServletRequest.getCurrent());
     });
@@ -116,7 +116,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   @Test
   @WithMockUser(authorities = { USER, UserRole.MANAGER })
   public void switchUser_AccessDenied() {
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     assertThrows(AccessDeniedException.class, () -> {
       service.switchUser(user, VaadinServletRequest.getCurrent());
     });
@@ -124,7 +124,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
 
   @Test
   public void exitSwitchUser() {
-    User user = repository.findById(3L).get();
+    User user = repository.findById(3L).orElseThrow();
     service.switchUser(user, VaadinServletRequest.getCurrent());
     service.exitSwitchUser(VaadinServletRequest.getCurrent());
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

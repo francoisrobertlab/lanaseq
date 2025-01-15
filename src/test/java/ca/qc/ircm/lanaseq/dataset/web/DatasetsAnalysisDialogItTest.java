@@ -72,7 +72,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void create_One() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample1 = dataset.getSamples().get(0);
     Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);
@@ -129,8 +129,8 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void create_Many() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
-    Dataset dataset2 = repository.findById(7L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
+    Dataset dataset2 = repository.findById(7L).orElseThrow();
     List<Dataset> datasets = Arrays.asList(dataset, dataset2);
     Sample sample1 = dataset.getSamples().get(0);
     Path sample1Folder = configuration.getHome().folder(sample1);
@@ -204,7 +204,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void create_NoFilenamePattern() throws Throwable {
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample1 = dataset.getSamples().get(0);
     Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);

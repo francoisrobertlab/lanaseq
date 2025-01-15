@@ -240,7 +240,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void protocols_EditAndSave() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     test(view.protocols).doubleClickRow(0);
 
@@ -253,7 +253,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void protocols_EditAndDelete() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     test(view.protocols).doubleClickRow(0);
 
@@ -283,7 +283,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void doubleClick_Save() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     test(view.protocols).doubleClickRow(0);
 
@@ -296,7 +296,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void doubleClick_Delete() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     test(view.protocols).doubleClickRow(0);
 
@@ -317,7 +317,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void altClick_Manager() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     test(view.protocols).clickRow(0, new MetaKeys().alt());
 
@@ -329,7 +329,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void altClick_Admin() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
 
     test(view.protocols).clickRow(0, new MetaKeys().alt());
 
@@ -418,7 +418,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   public void edit_Enabled() {
     assertFalse(view.edit.isEnabled());
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     view.protocols.select(protocol);
     assertTrue(view.edit.isEnabled());
     view.protocols.deselectAll();
@@ -427,7 +427,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void edit() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     view.protocols.select(protocol);
 
     test(view.edit).click();
@@ -451,7 +451,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   public void history_Enabled() {
     assertFalse(view.history.isEnabled());
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     view.protocols.select(protocol);
     assertTrue(view.history.isEnabled());
     view.protocols.deselectAll();
@@ -460,7 +460,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
 
   @Test
   public void history_User() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     view.protocols.select(protocol);
     assertFalse(view.history.isVisible());
 
@@ -472,7 +472,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void history_Manager() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     view.protocols.select(protocol);
 
     test(view.history).click();
@@ -485,7 +485,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void history_Admin() {
-    Protocol protocol = repository.findById(1L).get();
+    Protocol protocol = repository.findById(1L).orElseThrow();
     view.protocols.select(protocol);
 
     test(view.history).click();

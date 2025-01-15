@@ -71,7 +71,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void create_One() throws Throwable {
-    Sample sample = repository.findById(10L).get();
+    Sample sample = repository.findById(10L).orElseThrow();
     Path sampleFolder = configuration.getHome().folder(sample);
     Files.createDirectories(sampleFolder);
     Path fastq1 = sampleFolder.resolve(sample.getName() + "_R1.fastq");
@@ -111,8 +111,8 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void create_Many() throws Throwable {
-    Sample sample1 = repository.findById(4L).get();
-    Sample sample2 = repository.findById(10L).get();
+    Sample sample1 = repository.findById(4L).orElseThrow();
+    Sample sample2 = repository.findById(10L).orElseThrow();
     List<Sample> samples = Arrays.asList(sample1, sample2);
     Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);
@@ -165,8 +165,8 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   public void create_NoFilenamePattern() throws Throwable {
-    Sample sample1 = repository.findById(10L).get();
-    Sample sample2 = repository.findById(11L).get();
+    Sample sample1 = repository.findById(10L).orElseThrow();
+    Sample sample2 = repository.findById(11L).orElseThrow();
     List<Sample> samples = Arrays.asList(sample1, sample2);
     Path sample1Folder = configuration.getHome().folder(sample1);
     Files.createDirectories(sample1Folder);

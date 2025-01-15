@@ -117,7 +117,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void save_Update() throws Throwable {
     open();
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Path oldFolder = configuration.getHome().folder(dataset);
     Files.createDirectories(oldFolder);
     Path oldSampleFolder = configuration.getHome().folder(dataset.getSamples().get(0));
@@ -137,7 +137,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
         notification.getText());
-    dataset = repository.findById(2L).get();
+    dataset = repository.findById(2L).orElseThrow();
     assertEquals(name, dataset.getName());
     assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
@@ -175,7 +175,8 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
     assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
-    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", repository.findById(6L).get().getName());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208",
+        repository.findById(6L).orElseThrow().getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.getHome().folder(dataset);
     Path sampleFolder = configuration.getHome().folder(dataset.getSamples().get(0));
@@ -207,7 +208,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
         notification.getText());
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     assertEquals(name, dataset.getName());
     assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
@@ -251,7 +252,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   @Test
   public void addSample() throws Throwable {
     open();
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     Path oldFolder = configuration.getHome().folder(dataset);
     Files.createDirectories(oldFolder);
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -268,7 +269,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    dataset = repository.findById(2L).get();
+    dataset = repository.findById(2L).orElseThrow();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
         new Object[] { dataset.getName() }, currentLocale()), notification.getText());
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
@@ -344,7 +345,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
-    Dataset dataset = repository.findById(2L).get();
+    Dataset dataset = repository.findById(2L).orElseThrow();
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
