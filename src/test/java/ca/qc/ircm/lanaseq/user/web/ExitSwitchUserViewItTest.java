@@ -58,6 +58,7 @@ public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
     usersView.users().select(2);
     usersView.switchUser().click();
+    $(DatasetsViewElement.class).waitForFirst();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.profile().click();
     openView(ExitSwitchUserView.VIEW_NAME);

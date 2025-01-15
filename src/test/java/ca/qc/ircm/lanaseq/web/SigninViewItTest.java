@@ -65,7 +65,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getUsernameField().setValue("olivia.brown@ircm.qc.ca");
     view.getPasswordField().setValue("notright");
     view.getSubmitButton().click();
-    waitUntil(driver -> driver != null && driver.getCurrentUrl().endsWith("?" + FAIL)); // Otherwise Firefox will not find elements.
+    waitUntil(driver -> driver != null && driver.getCurrentUrl().endsWith("?" + FAIL));
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
         view.getErrorMessage());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
@@ -92,7 +92,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
       view.getPasswordField().setValue("notright");
       view.getSubmitButton().click();
       try {
-        Thread.sleep(1000); // Otherwise Firefox will not find elements.
+        Thread.sleep(1000); // Wait for page to load.
       } catch (InterruptedException e) {
         throw new IllegalStateException("Sleep was interrupted", e);
       }
