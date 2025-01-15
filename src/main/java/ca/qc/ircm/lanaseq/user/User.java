@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Objects;
 import org.springframework.lang.Nullable;
 
 /**
@@ -131,18 +132,10 @@ public class User implements Data, Owned, Serializable {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof User)) {
+    if (!(obj instanceof User other)) {
       return false;
     }
-    User other = (User) obj;
-    if (email == null) {
-      if (other.email != null) {
-        return false;
-      }
-    } else if (!email.equals(other.email)) {
-      return false;
-    }
-    return true;
+    return Objects.equals(email, other.email);
   }
 
   @Override

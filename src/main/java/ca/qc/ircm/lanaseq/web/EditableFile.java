@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.web;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.File;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * File with editable name.
@@ -43,14 +44,7 @@ public class EditableFile implements Serializable {
       return false;
     }
     EditableFile other = (EditableFile) obj;
-    if (file == null) {
-      if (other.file != null) {
-        return false;
-      }
-    } else if (!file.equals(other.file)) {
-      return false;
-    }
-    return true;
+    return Objects.equals(file, other.file);
   }
 
   public File getFile() {
