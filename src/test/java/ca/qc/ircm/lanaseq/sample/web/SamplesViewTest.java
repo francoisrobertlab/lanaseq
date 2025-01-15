@@ -228,21 +228,21 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(5, view.samples.getColumns().size());
     assertNotNull(view.samples.getColumnByKey(NAME));
     assertEquals(NAME, view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING)
-        .findFirst().map(so -> so.getSorted()).orElse(null));
+        .findFirst().map(so -> so.getSorted()).orElseThrow());
     assertTrue(view.name.isSortable());
     assertNotNull(view.samples.getColumnByKey(KEYWORDS));
     assertFalse(view.keywords.isSortable());
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
     assertEquals(PROTOCOL + "." + NAME, view.samples.getColumnByKey(PROTOCOL)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElseThrow());
     assertTrue(view.protocol.isSortable());
     assertNotNull(view.samples.getColumnByKey(DATE));
     assertEquals(DATE, view.samples.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING)
-        .findFirst().map(so -> so.getSorted()).orElse(null));
+        .findFirst().map(so -> so.getSorted()).orElseThrow());
     assertNotNull(view.samples.getColumnByKey(OWNER));
     assertTrue(view.date.isSortable());
     assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElseThrow());
     assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
     assertTrue(view.owner.isSortable());

@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.protocol.Protocol;
@@ -126,8 +125,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
         notification.getText());
-    Protocol protocol = repository.findByName(name).orElse(null);
-    assertNotNull(protocol);
+    Protocol protocol = repository.findByName(name).orElseThrow();
     assertNotEquals(0, protocol.getId());
     assertEquals(name, protocol.getName());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(protocol.getCreationDate()));

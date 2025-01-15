@@ -453,7 +453,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   @Test
   public void edit_Enabled() throws Throwable {
     assertFalse(view.edit.isEnabled());
-    User user = repository.findById(3L).orElse(null);
+    User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
     assertTrue(view.edit.isEnabled());
     view.users.deselectAll();

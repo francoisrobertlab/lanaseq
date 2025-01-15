@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -192,8 +191,7 @@ public class DatasetServiceTest {
 
   @Test
   public void get_0() {
-    Dataset dataset = service.get(0).orElse(null);
-    assertNull(dataset);
+    assertFalse(service.get(0).isPresent());
   }
 
   @Test

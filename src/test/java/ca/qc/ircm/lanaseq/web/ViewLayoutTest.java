@@ -158,7 +158,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     test(view.sideNav).clickItem(view.datasets.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.datasets, view.selectedSideNavItem().orElse(null));
+    assertEquals(view.datasets, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.datasets.getLabel(), view.header.getText());
     assertTrue($(DatasetsView.class).exists());
     assertNoExecuteJs();
@@ -171,7 +171,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     test(view.sideNav).clickItem(view.samples.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.samples, view.selectedSideNavItem().orElse(null));
+    assertEquals(view.samples, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.samples.getLabel(), view.header.getText());
     assertTrue($(SamplesView.class).exists());
     assertNoExecuteJs();
@@ -184,7 +184,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     test(view.sideNav).clickItem(view.protocols.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.protocols, view.selectedSideNavItem().orElse(null));
+    assertEquals(view.protocols, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.protocols.getLabel(), view.header.getText());
     assertTrue($(ProtocolsView.class).exists());
     assertNoExecuteJs();
@@ -197,7 +197,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     test(view.sideNav).clickItem(view.profile.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.profile, view.selectedSideNavItem().orElse(null));
+    assertEquals(view.profile, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.profile.getLabel(), view.header.getText());
     assertTrue($(ProfileView.class).exists());
     assertNoExecuteJs();
@@ -211,7 +211,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     test(view.sideNav).clickItem(view.users.getLabel());
 
     verify(navigationListener).afterNavigation(any());
-    assertEquals(view.users, view.selectedSideNavItem().orElse(null));
+    assertEquals(view.users, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.users.getLabel(), view.header.getText());
     assertTrue($(UsersView.class).exists());
     assertNoExecuteJs();

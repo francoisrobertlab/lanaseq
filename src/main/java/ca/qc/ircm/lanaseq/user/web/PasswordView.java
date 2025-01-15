@@ -88,7 +88,7 @@ public class PasswordView extends VerticalLayout
 
   void save() {
     if (validate()) {
-      User user = authenticatedUser.getUser().orElse(null);
+      User user = authenticatedUser.getUser().orElseThrow();
       String password = passwords.getPassword();
       assert password != null;
       logger.debug("save new password for user {}", user);

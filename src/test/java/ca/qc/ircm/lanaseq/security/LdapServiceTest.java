@@ -45,7 +45,7 @@ public class LdapServiceTest {
 
   @Test
   public void getEmail() {
-    assertEquals("francois.robert@ircm.qc.ca", ldapService.getEmail("robertf").orElse(null));
+    assertEquals("francois.robert@ircm.qc.ca", ldapService.getEmail("robertf").orElseThrow());
   }
 
   @Test
@@ -66,7 +66,7 @@ public class LdapServiceTest {
 
   @Test
   public void getUsername() {
-    assertEquals("robertf", ldapService.getUsername("francois.robert@ircm.qc.ca").orElse(null));
+    assertEquals("robertf", ldapService.getUsername("francois.robert@ircm.qc.ca").orElseThrow());
   }
 
   @Test

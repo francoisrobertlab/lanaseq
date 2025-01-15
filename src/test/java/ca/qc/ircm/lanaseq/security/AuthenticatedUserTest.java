@@ -112,8 +112,7 @@ public class AuthenticatedUserTest {
     User user = repository.findById(1L).orElseThrow();
     user.setEmail("other_email@ircm.qc.ca");
     repository.save(user);
-    user = authenticatedUser.getUser().orElse(null);
-    assertNotNull(user);
+    user = authenticatedUser.getUser().orElseThrow();
     assertEquals((Long) 1L, user.getId());
   }
 

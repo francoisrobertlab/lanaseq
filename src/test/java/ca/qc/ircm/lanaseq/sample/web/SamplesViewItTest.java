@@ -8,7 +8,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -114,8 +113,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
         notification.getText());
     List<Dataset> datasets = datasetRepository.findByOwner(new User(3L));
     Dataset dataset =
-        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElse(null);
-    assertNotNull(dataset);
+        datasets.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElseThrow();
     assertNotEquals(0, dataset.getId());
     assertEquals(name, dataset.getName());
     assertEquals(4, dataset.getKeywords().size());

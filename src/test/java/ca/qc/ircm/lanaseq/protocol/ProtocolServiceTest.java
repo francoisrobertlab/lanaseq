@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,8 +82,7 @@ public class ProtocolServiceTest {
   @Test
   @WithMockUser
   public void get_0() {
-    Protocol protocol = service.get(0).orElse(null);
-    assertNull(protocol);
+    assertFalse(service.get(0).isPresent());
   }
 
   @Test

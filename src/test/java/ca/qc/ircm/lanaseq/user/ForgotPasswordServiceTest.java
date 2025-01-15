@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -81,7 +80,7 @@ public class ForgotPasswordServiceTest {
    */
   @BeforeEach
   public void beforeTest() throws Throwable {
-    user = userRepository.findById(9L).orElse(null);
+    user = userRepository.findById(9L).orElseThrow();
     when(appConfiguration.getUrl(any(String.class))).thenAnswer(new Answer<String>() {
       @Override
       public String answer(InvocationOnMock invocation) throws Throwable {
@@ -110,35 +109,27 @@ public class ForgotPasswordServiceTest {
 
   @Test
   public void get_Expired() throws Exception {
-    ForgotPassword forgotPassword = service.get(7L, "803369922").orElse(null);
-
-    assertNull(forgotPassword);
+    assertFalse(service.get(7L, "803369922").isPresent());
   }
 
   @Test
   public void get_Invalid() throws Exception {
-    ForgotPassword forgotPassword = service.get(20L, "435FA").orElse(null);
-
-    assertNull(forgotPassword);
+    assertFalse(service.get(20L, "435FA").isPresent());
   }
 
   @Test
   public void get_Id0() throws Exception {
-    ForgotPassword forgotPassword = service.get(0, confirmNumber).orElse(null);
-
-    assertNull(forgotPassword);
+    assertFalse(service.get(0, confirmNumber).isPresent());
   }
 
   @Test
   public void get_Used() throws Exception {
-    ForgotPassword forgotPassword = service.get(10L, "460559412").orElse(null);
-
-    assertNull(forgotPassword);
+    assertFalse(service.get(10L, "460559412").isPresent());
   }
 
   @Test
   public void insert_Robot() throws Exception {
-    user = userRepository.findById(1L).orElse(null);
+    user = userRepository.findById(1L).orElseThrow();
 
     assertThrows(AccessDeniedException.class, () -> {
       service.insert(user.getEmail(), forgotPasswordWebContext);
@@ -224,7 +215,7 @@ public class ForgotPasswordServiceTest {
     service.updatePassword(forgotPassword, "abc");
 
     repository.flush();
-    assertNull(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()).orElse(null));
+    assertFalse(service.get(forgotPassword.getId(), forgotPassword.getConfirmNumber()).isPresent());
     verify(passwordEncoder).encode("abc");
     User user = userRepository.findById(9L).orElseThrow();
     assertEquals(hashedPassword, user.getHashedPassword());

@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -202,8 +201,7 @@ public class SampleServiceTest {
 
   @Test
   public void get_invalid() {
-    Sample sample = service.get(0).orElse(null);
-    assertNull(sample);
+    assertFalse(service.get(0).isPresent());
   }
 
   @Test

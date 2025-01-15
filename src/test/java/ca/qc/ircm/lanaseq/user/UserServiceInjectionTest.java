@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,9 +23,8 @@ public class UserServiceInjectionTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void get() {
-    User user = userService.get(1L).orElse(null);
+    User user = userService.get(1L).orElseThrow();
 
-    assertNotNull(user);
     assertEquals((Long) 1L, user.getId());
     assertEquals("LANAseq Administrator", user.getName());
     assertEquals("lanaseq@ircm.qc.ca", user.getEmail());

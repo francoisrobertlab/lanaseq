@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.user;
 
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -87,9 +88,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void get_0() {
-    User user = service.get(0).orElse(null);
-
-    assertNull(user);
+    assertFalse(service.get(0).isPresent());
   }
 
   @Test
@@ -118,9 +117,7 @@ public class UserServiceTest {
   @Test
   @WithMockUser
   public void getByEmail_Invalid() {
-    User user = service.getByEmail("a").orElse(null);
-
-    assertNull(user);
+    assertFalse(service.getByEmail("a").isPresent());
   }
 
   @Test

@@ -188,7 +188,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertNotNull(grid.getColumnByKey(NAME));
     assertTrue(grid.name.isSortable());
     assertEquals(NAME, grid.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
-        .map(so -> so.getSorted()).orElse(null));
+        .map(so -> so.getSorted()).orElseThrow());
     assertNotNull(grid.getColumnByKey(KEYWORDS));
     assertFalse(grid.keywords.isSortable());
     assertNotNull(grid.getColumnByKey(PROTOCOL));
@@ -196,11 +196,11 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertNotNull(grid.getColumnByKey(DATE));
     assertTrue(grid.date.isSortable());
     assertEquals(DATE, grid.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING).findFirst()
-        .map(so -> so.getSorted()).orElse(null));
+        .map(so -> so.getSorted()).orElseThrow());
     assertNotNull(grid.getColumnByKey(OWNER));
     assertTrue(grid.owner.isSortable());
     assertEquals(OWNER + "." + EMAIL, grid.getColumnByKey(OWNER)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElse(null));
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElseThrow());
     assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
     List<Dataset> datasets = items(grid);
     verify(service, atLeastOnce()).all(grid.filter());

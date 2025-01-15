@@ -191,7 +191,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
               .equals(getDriver().getTitle()))
           .findAny();
     }
-    return optlocale.orElse(null);
+    return optlocale.orElse(Constants.DEFAULT_LOCALE);
   }
 
   protected <T> Optional<T> optional(Supplier<T> supplier) {
