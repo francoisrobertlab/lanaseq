@@ -1,7 +1,7 @@
 package ca.qc.ircm.lanaseq.test.config;
 
 import static ca.qc.ircm.lanaseq.test.config.AnnotationFinder.findAnnotation;
-import static org.junit.jupiter.api.Assumptions.abort;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.TestBenchTestCase;
@@ -47,9 +47,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   public void beforeTestClass(TestContext testContext) throws Exception {
     injectDependencies(testContext.getApplicationContext());
     if (isTestBenchTest(testContext)) {
-      if (isSkipTestBenchTests()) {
-        abort(SKIP_TESTS_ERROR_MESSAGE);
-      }
+      assumeFalse(isSkipTestBenchTests(), SKIP_TESTS_ERROR_MESSAGE);
 
       setRetries();
     }
