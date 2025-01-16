@@ -405,7 +405,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     assertEquals(Optional.empty(), view.activeFilter.getValue());
     List<Optional<Boolean>> values = items(view.activeFilter);
     assertEquals(3, values.size());
-    assertTrue(values.contains(Optional.empty()));
+    assertTrue(values.contains(Optional.<Boolean>empty()));
     assertTrue(values.contains(Optional.of(false)));
     assertTrue(values.contains(Optional.of(true)));
   }
