@@ -243,7 +243,6 @@ public class SampleServiceTest {
 
     List<Sample> samples = service.all(filter);
 
-    samples.stream().forEach(sample -> sample.getKeywords().size());
     assertEquals(11, samples.size());
     assertEquals((Long) 1L, samples.get(0).getId());
     assertEquals((Long) 2L, samples.get(1).getId());

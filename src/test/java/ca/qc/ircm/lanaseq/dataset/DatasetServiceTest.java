@@ -163,7 +163,6 @@ public class DatasetServiceTest {
   }
 
   private void detach(Dataset dataset) {
-    dataset.getKeywords().size();
     dataset.getSamples().forEach(sample -> entityManager.detach(sample));
     entityManager.detach(dataset);
   }
@@ -230,9 +229,6 @@ public class DatasetServiceTest {
 
     List<Dataset> datasets = service.all(filter);
 
-    datasets.stream().forEach(dataset -> dataset.getKeywords().size());
-    datasets.stream().forEach(
-        dataset -> dataset.getSamples().stream().forEach(sample -> sample.getProtocol().getName()));
     assertEquals(8, datasets.size());
     assertEquals((Long) 1L, datasets.get(0).getId());
     assertEquals((Long) 2L, datasets.get(1).getId());
@@ -856,9 +852,9 @@ public class DatasetServiceTest {
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void save_Update() {
     Dataset dataset = repository.findById(1L).orElseThrow();
-    detach(dataset);
     dataset.getKeywords().remove("rappa");
     dataset.getKeywords().add("keyword1");
+    detach(dataset);
     dataset.setNote("test note");
     dataset.setDate(LocalDate.of(2020, 7, 21));
     Sample sample1 = dataset.getSamples().get(0);

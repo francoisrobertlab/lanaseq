@@ -352,9 +352,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     when(sampleService.isMergable(any())).thenReturn(true);
     Dataset dataset1 = find(datasets, 2L).orElseThrow();
     Dataset dataset2 = find(datasets, 6L).orElseThrow();
-    dataset1.getSamples();
     dataset1.getSamples().forEach(sample -> entityManager.detach(sample));
-    dataset2.getSamples();
     dataset2.getSamples().forEach(sample -> entityManager.detach(sample));
     view.datasets.select(dataset1);
     view.datasets.select(dataset2);
