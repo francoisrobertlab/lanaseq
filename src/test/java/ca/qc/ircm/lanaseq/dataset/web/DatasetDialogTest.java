@@ -992,14 +992,13 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void save_UpdateDataset() {
     dialog.addSavedListener(savedListener);
-    Dataset dataset = repository.findById(2L).orElseThrow();
     dialog.setDatasetId(2L);
     fillForm();
 
     clickButton(dialog.save);
 
     verify(service).save(datasetCaptor.capture());
-    dataset = datasetCaptor.getValue();
+    Dataset dataset = datasetCaptor.getValue();
     assertEquals(namePrefix + "_" + nameDateFormatter.format(date), dataset.getName());
     assertEquals(2, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains(keyword1));
