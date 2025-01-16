@@ -301,8 +301,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
 
   boolean isValid() {
     filesError.setVisible(false);
-    boolean valid = true;
-    valid = validateProtocol().isOk() && valid;
+    boolean valid = validateProtocol().isOk();
     if (files.getListDataView().getItemCount() == 0) {
       valid = false;
       filesError.setVisible(true);
