@@ -39,9 +39,6 @@ public class DeleteOldAnalysisFolders {
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
   public void deleteOldAnalysisFolders() {
     Path analysis = configuration.getAnalysis().getFolder();
-    if (analysis == null) {
-      return;
-    }
     logger.debug("deleting old folders in analysis {}", analysis);
     Duration deleteAge = configuration.getAnalysisDeleteAge();
     Instant now = Instant.now();

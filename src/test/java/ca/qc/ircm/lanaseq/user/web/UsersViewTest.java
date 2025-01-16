@@ -241,9 +241,9 @@ public class UsersViewTest extends SpringUIUnitTest {
     when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     for (int i = 0; i < users.size(); i++) {
       User user = users.get(i);
-      assertEquals(user.getEmail() != null ? user.getEmail() : "",
+      assertEquals(user.getEmail(),
           test(view.users).getCellText(i, view.users.getColumns().indexOf(view.email)));
-      assertEquals(user.getName() != null ? user.getName() : "",
+      assertEquals(user.getName(),
           test(view.users).getCellText(i, view.users.getColumns().indexOf(view.name)));
       Button activeButton = (Button) test(view.users).getCellComponent(i, view.active.getKey());
       assertTrue(activeButton.hasClassName(ACTIVE));

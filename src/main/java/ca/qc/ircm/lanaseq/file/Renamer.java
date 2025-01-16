@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,32 +60,30 @@ public class Renamer {
       files = new ArrayList<>();
     }
     for (Path file : files) {
-      String filename = Optional.of(file.getFileName()).map(fn -> fn.toString()).orElse(null);
-      if (filename != null) {
-        if (filename.endsWith(".md5")) {
-          try {
-            List<String> lines = Files.readAllLines(file);
-            List<String> newlines = new ArrayList<>();
-            for (String line : lines) {
-              if (line.contains(oldName)) {
-                line = line.replaceFirst(Pattern.quote(oldName), newName);
-              }
-              newlines.add(line);
+      String filename = file.getFileName().toString();
+      if (filename.endsWith(".md5")) {
+        try {
+          List<String> lines = Files.readAllLines(file);
+          List<String> newlines = new ArrayList<>();
+          for (String line : lines) {
+            if (line.contains(oldName)) {
+              line = line.replaceFirst(Pattern.quote(oldName), newName);
             }
-            Files.write(file, newlines);
-          } catch (IOException e) {
-            throw new IllegalStateException("could not rename files in md5 file " + file, e);
+            newlines.add(line);
           }
+          Files.write(file, newlines);
+        } catch (IOException e) {
+          throw new IllegalStateException("could not rename files in md5 file " + file, e);
         }
-        if (filename.contains(oldName)) {
-          String newFilename = filename.replaceFirst(Pattern.quote(oldName), newName);
-          Path newFile = file.resolveSibling(newFilename);
-          try {
-            logger.debug("renaming file {} to {}", file, newFile);
-            Files.move(file, newFile);
-          } catch (IOException e) {
-            throw new IllegalStateException("could not move file " + file + " to " + newFile, e);
-          }
+      }
+      if (filename.contains(oldName)) {
+        String newFilename = filename.replaceFirst(Pattern.quote(oldName), newName);
+        Path newFile = file.resolveSibling(newFilename);
+        try {
+          logger.debug("renaming file {} to {}", file, newFile);
+          Files.move(file, newFile);
+        } catch (IOException e) {
+          throw new IllegalStateException("could not move file " + file + " to " + newFile, e);
         }
       }
     }
