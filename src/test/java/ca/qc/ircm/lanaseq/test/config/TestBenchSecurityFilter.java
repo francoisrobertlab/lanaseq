@@ -44,20 +44,19 @@ public class TestBenchSecurityFilter extends GenericFilterBean
       throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest) req;
     HttpServletResponse response = (HttpServletResponse) res;
-    if (copyAuthenticationOnFilter && authentication != null) {
-      logger.debug("set authentication {} in security context", authentication);
-      copyAuthenticationOnFilter = false;
-      SecurityContext securityContext = repo.loadDeferredContext(request).get();
-      securityContext.setAuthentication(authentication);
-      repo.saveContext(securityContext, request, response);
-      copyAuthenticationOnFilter = false;
-      filterChain.doFilter(request, response);
-    } else {
-      if (copyAuthenticationOnFilter && authentication == null) {
+    if (copyAuthenticationOnFilter) {
+      if (authentication != null) {
+        logger.debug("set authentication {} in security context", authentication);
+        copyAuthenticationOnFilter = false;
+        SecurityContext securityContext = repo.loadDeferredContext(request).get();
+        securityContext.setAuthentication(authentication);
+        repo.saveContext(securityContext, request, response);
+        copyAuthenticationOnFilter = false;
+      } else {
         logger.warn("authentication is null in test bench test");
       }
-      filterChain.doFilter(request, response);
     }
+    filterChain.doFilter(request, response);
   }
 
   @Override
