@@ -235,7 +235,7 @@ public class DatasetService {
       if (Files.exists(upload)) {
         try (Stream<Path> uploadFiles = Files.list(upload)) {
           uploadFiles.filter(file -> file.toFile().isFile()).filter(file -> {
-            String filename = Optional.ofNullable(file.getFileName().toString()).orElse("");
+            String filename = file.getFileName().toString();
             return filename.contains(dataset.getName());
           }).filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
         }
