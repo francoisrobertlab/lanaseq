@@ -17,7 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -241,6 +243,23 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void ownerFilter_Admin() {
     assertEquals("", dialog.ownerFilter.getValue());
+  }
+
+  @Test
+  public void selectListener() {
+    Sample sample = samples.get(0);
+    dialog.addSelectedListener(listener);
+    dialog.fireSelectedEvent(sample);
+    verify(listener).onComponentEvent(selectedEventCaptor.capture());
+    assertEquals(sample, selectedEventCaptor.getValue().getSelection());
+  }
+
+  @Test
+  public void selectListener_Remove() {
+    Sample sample = samples.get(0);
+    dialog.addSelectedListener(listener).remove();
+    dialog.fireSelectedEvent(sample);
+    verify(listener, never()).onComponentEvent(any());
   }
 
   @Test
