@@ -16,7 +16,7 @@ public class Strings {
    * @return properties separated by dots
    */
   public static String property(Object... names) {
-    return Arrays.asList(names).stream().map(name -> String.valueOf(name))
+    return Arrays.asList(names).stream().map(String::valueOf)
         .collect(Collectors.joining("."));
   }
 
@@ -28,7 +28,7 @@ public class Strings {
    * @return valid CSS class name based on names
    */
   public static String styleName(Object... names) {
-    return Arrays.asList(names).stream().map(name -> String.valueOf(name))
+    return Arrays.asList(names).stream().map(String::valueOf)
         .map(name -> name.replaceAll("\\.", "-")).collect(Collectors.joining("-"));
   }
 

@@ -210,10 +210,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.setMinHeight("11em");
     samples.setHeight("11em");
     samples.setSelectionMode(SelectionMode.NONE);
-    sampleName = samples.addColumn(sample -> sample.getName(), SampleProperties.NAME)
+    sampleName = samples.addColumn(Sample::getName, SampleProperties.NAME)
         .setKey(SampleProperties.NAME)
-        .setComparator(NormalizedComparator.of(sample -> sample.getName()));
-    sampleRemove = samples.addColumn(new ComponentRenderer<>(sample -> sampleDelete(sample)))
+        .setComparator(NormalizedComparator.of(Sample::getName));
+    sampleRemove = samples.addColumn(new ComponentRenderer<>(this::sampleDelete))
         .setKey(REMOVE).setSortable(false);
     samples.setRowsDraggable(true);
     samples.addDragStartListener(e -> {
@@ -276,7 +276,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         .withConverter(
             namePrefix -> namePrefix
                 + date.getOptionalValue().map(date -> "_" + dateFormatter.format(date)).orElse(""),
-            name -> nameToNamePrefix(name))
+                this::nameToNamePrefix)
         .bind(NAME);
     date.addValueChangeListener(e -> {
       // Force update of dataset name.

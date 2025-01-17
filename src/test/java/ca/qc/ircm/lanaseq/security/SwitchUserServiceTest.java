@@ -63,7 +63,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   private org.springframework.security.core.userdetails.User userDetails(User user,
       String... roles) {
     Collection<GrantedAuthority> authorities =
-        Stream.of(roles).map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+        Stream.of(roles).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     org.springframework.security.core.userdetails.User userDetails =
         new org.springframework.security.core.userdetails.User(user.getEmail(),
             user.getHashedPassword(), authorities);

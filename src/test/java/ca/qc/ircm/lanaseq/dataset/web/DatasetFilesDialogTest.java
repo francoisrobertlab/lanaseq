@@ -175,7 +175,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     files.add(new File("archives", "sample.png"));
     samples = sampleRepository.findAll();
     when(service.files(any()))
-        .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
+        .thenReturn(files.stream().map(File::toPath).collect(Collectors.toList()));
     labels.add("\\\\lanaseq01\\lanaseq");
     labels.add("\\\\lanaseq01\\archives");
     labels.add("\\\\lanaseq02\\archives2");

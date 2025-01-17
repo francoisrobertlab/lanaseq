@@ -114,10 +114,10 @@ public class AddSampleFilesDialog extends Dialog
     getFooter().add(save);
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
-    filename = files.addColumn(new ComponentRenderer<>(file -> filename(file))).setKey(FILENAME)
-        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(file -> file.getName()))
+    filename = files.addColumn(new ComponentRenderer<>(this::filename)).setKey(FILENAME)
+        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(File::getName))
         .setFlexGrow(10);
-    overwrite = files.addColumn(new ComponentRenderer<>(file -> overwrite(file))).setKey(OVERWRITE)
+    overwrite = files.addColumn(new ComponentRenderer<>(this::overwrite)).setKey(OVERWRITE)
         .setSortable(false);
     files.appendHeaderRow(); // Headers.
     HeaderRow headerRow = files.appendHeaderRow();
@@ -260,7 +260,7 @@ public class AddSampleFilesDialog extends Dialog
   void updateFiles() {
     existingFilenames =
         service.files(sample).stream().map(f -> f.toFile().getName()).collect(Collectors.toSet());
-    files.setItems(service.uploadFiles(sample).stream().map(file -> file.toFile())
+    files.setItems(service.uploadFiles(sample).stream().map(Path::toFile)
         .collect(Collectors.toList()));
   }
 

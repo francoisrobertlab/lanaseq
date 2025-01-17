@@ -138,7 +138,7 @@ public class SamplesView extends VerticalLayout
     samples.setId(SAMPLES);
     samples.setMinHeight("30em");
     samples.setSelectionMode(SelectionMode.MULTI);
-    name = samples.addColumn(sample -> sample.getName(), NAME).setKey(NAME).setSortProperty(NAME)
+    name = samples.addColumn(Sample::getName, NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
     keywords =
         samples.addColumn(sample -> sample.getKeywords().stream().collect(Collectors.joining(", ")),

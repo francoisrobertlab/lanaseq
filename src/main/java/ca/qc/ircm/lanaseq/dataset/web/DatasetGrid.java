@@ -73,7 +73,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   @PostConstruct
   void init() {
     setId(ID);
-    name = addColumn(dataset -> dataset.getName(), NAME).setKey(NAME).setSortProperty(NAME)
+    name = addColumn(Dataset::getName, NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
     keywords =
         addColumn(dataset -> dataset.getKeywords().stream().collect(Collectors.joining(", ")),

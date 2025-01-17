@@ -64,10 +64,10 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().select(0);
     view.analyze().click();
     DatasetsAnalysisDialogElement dialog = view.analyzeDialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.message()).isPresent());
-    assertTrue(optional(() -> dialog.filenamePatterns()).isPresent());
-    assertTrue(optional(() -> dialog.create()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::message).isPresent());
+    assertTrue(optional(dialog::filenamePatterns).isPresent());
+    assertTrue(optional(dialog::create).isPresent());
   }
 
   @Test

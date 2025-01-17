@@ -158,12 +158,12 @@ public class SampleFilesDialog extends Dialog
     filename = files
         .addColumn(LitRenderer.<EditableFile>of(FILENAME_HTML)
             .withProperty("filename", file -> shortFilename(file.getFilename()))
-            .withProperty("title", file -> file.getFilename()))
+            .withProperty("title", EditableFile::getFilename))
         .setKey(FILENAME).setComparator(Comparator.comparing(EditableFile::getFilename))
         .setFlexGrow(10);
-    download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)))
+    download = files.addColumn(new ComponentRenderer<>(this::downloadButton))
         .setKey(DOWNLOAD).setSortable(false);
-    delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file))).setKey(DELETE)
+    delete = files.addColumn(new ComponentRenderer<>(this::deleteButton)).setKey(DELETE)
         .setSortable(false);
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));

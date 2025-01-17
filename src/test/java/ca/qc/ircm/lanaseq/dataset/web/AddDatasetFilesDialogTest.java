@@ -151,7 +151,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     when(service.uploadFiles(any())).thenReturn(
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     when(service.files(any())).thenReturn(
-        files.subList(0, 2).stream().map(file -> file.toPath()).collect(Collectors.toList()));
+        files.subList(0, 2).stream().map(File::toPath).collect(Collectors.toList()));
     UI.getCurrent().setLocale(locale);
     DatasetsView view = navigate(DatasetsView.class);
     view.datasets.setItems(repository.findAll());

@@ -119,11 +119,11 @@ public class UsersView extends VerticalLayout
       edit.setEnabled(e.getAllSelectedItems().size() == 1);
       switchUser.setEnabled(e.getAllSelectedItems().size() == 1);
     });
-    email = users.addColumn(user -> user.getEmail(), EMAIL).setKey(EMAIL)
+    email = users.addColumn(User::getEmail, EMAIL).setKey(EMAIL)
         .setComparator(NormalizedComparator.of(User::getEmail));
-    name = users.addColumn(user -> user.getName(), NAME).setKey(NAME)
+    name = users.addColumn(User::getName, NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(User::getName));
-    active = users.addColumn(new ComponentRenderer<>(user -> activeButton(user))).setKey(ACTIVE)
+    active = users.addColumn(new ComponentRenderer<>(this::activeButton)).setKey(ACTIVE)
         .setSortProperty(ACTIVE)
         .setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
     active.setVisible(authenticatedUser.hasAnyRole(ADMIN, MANAGER));

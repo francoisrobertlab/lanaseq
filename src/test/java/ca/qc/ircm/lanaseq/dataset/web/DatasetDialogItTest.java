@@ -91,27 +91,27 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     view.datasets().select(0);
     view.edit().click();
     DatasetDialogElement dialog = view.dialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.namePrefix()).isPresent());
-    assertTrue(optional(() -> dialog.generateName()).isPresent());
-    assertTrue(optional(() -> dialog.keywords()).isPresent());
-    assertTrue(optional(() -> dialog.filenames()).isPresent());
-    assertTrue(optional(() -> dialog.protocol()).isPresent());
-    assertTrue(optional(() -> dialog.assay()).isPresent());
-    assertTrue(optional(() -> dialog.type()).isPresent());
-    assertTrue(optional(() -> dialog.target()).isPresent());
-    assertTrue(optional(() -> dialog.strain()).isPresent());
-    assertTrue(optional(() -> dialog.strainDescription()).isPresent());
-    assertTrue(optional(() -> dialog.treatment()).isPresent());
-    assertTrue(optional(() -> dialog.note()).isPresent());
-    assertTrue(optional(() -> dialog.date()).isPresent());
-    assertTrue(optional(() -> dialog.samplesHeader()).isPresent());
-    assertTrue(optional(() -> dialog.samples()).isPresent());
-    assertTrue(optional(() -> dialog.addSample()).isPresent());
-    assertFalse(optional(() -> dialog.error()).isPresent());
-    assertTrue(optional(() -> dialog.save()).isPresent());
-    assertTrue(optional(() -> dialog.cancel()).isPresent());
-    assertTrue(optional(() -> dialog.delete()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::namePrefix).isPresent());
+    assertTrue(optional(dialog::generateName).isPresent());
+    assertTrue(optional(dialog::keywords).isPresent());
+    assertTrue(optional(dialog::filenames).isPresent());
+    assertTrue(optional(dialog::protocol).isPresent());
+    assertTrue(optional(dialog::assay).isPresent());
+    assertTrue(optional(dialog::type).isPresent());
+    assertTrue(optional(dialog::target).isPresent());
+    assertTrue(optional(dialog::strain).isPresent());
+    assertTrue(optional(dialog::strainDescription).isPresent());
+    assertTrue(optional(dialog::treatment).isPresent());
+    assertTrue(optional(dialog::note).isPresent());
+    assertTrue(optional(dialog::date).isPresent());
+    assertTrue(optional(dialog::samplesHeader).isPresent());
+    assertTrue(optional(dialog::samples).isPresent());
+    assertTrue(optional(dialog::addSample).isPresent());
+    assertFalse(optional(dialog::error).isPresent());
+    assertTrue(optional(dialog::save).isPresent());
+    assertTrue(optional(dialog::cancel).isPresent());
+    assertTrue(optional(dialog::delete).isPresent());
   }
 
   @Test

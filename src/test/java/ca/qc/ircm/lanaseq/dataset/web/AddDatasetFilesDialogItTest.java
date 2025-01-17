@@ -78,10 +78,10 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     DatasetFilesDialogElement filesDialog = view.filesDialog();
     filesDialog.addLargeFiles().click();
     AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.message()).isPresent());
-    assertTrue(optional(() -> dialog.files()).isPresent());
-    assertTrue(optional(() -> dialog.save()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::message).isPresent());
+    assertTrue(optional(dialog::files).isPresent());
+    assertTrue(optional(dialog::save).isPresent());
   }
 
   @Test

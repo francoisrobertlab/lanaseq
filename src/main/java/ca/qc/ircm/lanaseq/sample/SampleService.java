@@ -239,13 +239,13 @@ public class SampleService {
           uploadFiles.filter(file -> file.toFile().isFile()).filter(file -> {
             String filename = file.getFileName().toString();
             return filename.contains(sample.getName());
-          }).filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+          }).filter(file -> !file.toFile().isHidden()).forEach(files::add);
         }
       }
       if (Files.exists(sampleUpload)) {
         try (Stream<Path> uploadFiles = Files.list(sampleUpload)) {
           uploadFiles.filter(file -> file.toFile().isFile())
-              .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+              .filter(file -> !file.toFile().isHidden()).forEach(files::add);
         }
       }
       return files;

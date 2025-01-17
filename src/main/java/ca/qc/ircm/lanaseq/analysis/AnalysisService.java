@@ -82,7 +82,7 @@ public class AnalysisService {
     LinkedHashSet<String> datasetLines = new LinkedHashSet<>();
     datasetLines.add("#merge\tsamples");
     datasets.forEach(dataset -> datasetLines.add(dataset.getName() + "\t" + dataset.getSamples()
-        .stream().map(sample -> sample.getName()).collect(Collectors.joining("\t"))));
+        .stream().map(Sample::getName).collect(Collectors.joining("\t"))));
     Files.write(datasetFile, datasetLines, StandardOpenOption.CREATE);
     List<PathMatcher> pathMatchers = filenamePatterns.stream()
         .map(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern))

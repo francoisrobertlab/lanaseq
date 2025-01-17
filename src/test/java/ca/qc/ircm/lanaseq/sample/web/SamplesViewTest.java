@@ -57,6 +57,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.provider.SortOrder;
 import com.vaadin.flow.data.selection.SelectionModel;
 import com.vaadin.testbench.unit.MetaKeys;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
@@ -228,21 +229,21 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(5, view.samples.getColumns().size());
     assertNotNull(view.samples.getColumnByKey(NAME));
     assertEquals(NAME, view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING)
-        .findFirst().map(so -> so.getSorted()).orElseThrow());
+        .findFirst().map(SortOrder::getSorted).orElseThrow());
     assertTrue(view.name.isSortable());
     assertNotNull(view.samples.getColumnByKey(KEYWORDS));
     assertFalse(view.keywords.isSortable());
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
     assertEquals(PROTOCOL + "." + NAME, view.samples.getColumnByKey(PROTOCOL)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElseThrow());
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
     assertTrue(view.protocol.isSortable());
     assertNotNull(view.samples.getColumnByKey(DATE));
     assertEquals(DATE, view.samples.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING)
-        .findFirst().map(so -> so.getSorted()).orElseThrow());
+        .findFirst().map(SortOrder::getSorted).orElseThrow());
     assertNotNull(view.samples.getColumnByKey(OWNER));
     assertTrue(view.date.isSortable());
     assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElseThrow());
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
     assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
     assertTrue(view.owner.isSortable());
@@ -250,7 +251,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     verify(service).all(view.filter());
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
-      assertTrue(samples.contains(sample), () -> sample.toString());
+      assertTrue(samples.contains(sample), sample::toString);
     }
     assertEquals(0, view.samples.getSelectedItems().size());
     samples.forEach(dataset -> view.samples.select(dataset));

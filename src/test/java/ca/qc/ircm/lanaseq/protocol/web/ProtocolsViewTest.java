@@ -196,7 +196,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     verify(service).all();
     assertEquals(this.protocols.size(), protocols.size());
     for (Protocol protocol : this.protocols) {
-      assertTrue(protocols.contains(protocol), () -> protocol.toString());
+      assertTrue(protocols.contains(protocol), protocol::toString);
     }
     view.ownerFilter.setValue("jonh.smith@ircm.qc.ca");
     assertEquals(1, view.protocols.getListDataView().getItemCount());

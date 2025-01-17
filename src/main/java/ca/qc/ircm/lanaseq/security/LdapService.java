@@ -4,6 +4,7 @@ import static ca.qc.ircm.lanaseq.FindbugsExplanations.SPRING_BOOT_EI_EXPOSE_REP;
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
 import java.util.Optional;
 import javax.naming.NamingException;
 import org.slf4j.Logger;
@@ -71,9 +72,9 @@ public class LdapService {
           } catch (NamingException e) {
             return null;
           }
-        }).map(value -> value.toString()).orElse(null);
+        }).map(Object::toString).orElse(null);
     Optional<String> email =
-        ldapOperations.search(query, mapper).stream().filter(value -> value != null).findFirst();
+        ldapOperations.search(query, mapper).stream().filter(Objects::nonNull).findFirst();
     logger.debug("Found LDAP email {} for user [{}]", email, username);
     return email;
   }
@@ -97,9 +98,9 @@ public class LdapService {
           } catch (NamingException e) {
             return null;
           }
-        }).map(value -> value.toString()).orElse(null);
+        }).map(Object::toString).orElse(null);
     Optional<String> username =
-        ldapOperations.search(query, mapper).stream().filter(value -> value != null).findFirst();
+        ldapOperations.search(query, mapper).stream().filter(Objects::nonNull).findFirst();
     logger.debug("Found LDAP username {} for user [{}]", username, email);
     return username;
   }

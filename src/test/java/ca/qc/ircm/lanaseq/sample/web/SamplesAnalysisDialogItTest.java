@@ -63,10 +63,10 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     view.samples().select(0);
     view.analyze().click();
     SamplesAnalysisDialogElement dialog = view.analyzeDialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.message()).isPresent());
-    assertTrue(optional(() -> dialog.filenamePatterns()).isPresent());
-    assertTrue(optional(() -> dialog.create()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::message).isPresent());
+    assertTrue(optional(dialog::filenamePatterns).isPresent());
+    assertTrue(optional(dialog::create).isPresent());
   }
 
   @Test

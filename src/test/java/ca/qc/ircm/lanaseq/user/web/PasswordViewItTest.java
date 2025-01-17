@@ -66,10 +66,10 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(view::header).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test
@@ -81,30 +81,30 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     signinView.getPasswordField().setValue("pass1");
     signinView.getSubmitButton().click();
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(view::header).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test
   public void mainView() {
     openView(MainView.VIEW_NAME);
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(view::header).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test
   public void datasetsView() {
     openView(DatasetsView.VIEW_NAME);
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
+    assertTrue(optional(view::header).isPresent());
     assertTrue(optional(() -> view.passwords().password()).isPresent());
     assertTrue(optional(() -> view.passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test

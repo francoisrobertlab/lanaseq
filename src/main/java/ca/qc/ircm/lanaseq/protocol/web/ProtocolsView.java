@@ -105,7 +105,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     expand(protocolsLayout);
     protocols.setId(PROTOCOLS);
     protocols.setMinHeight("30em");
-    name = protocols.addColumn(protocol -> protocol.getName(), NAME).setKey(NAME)
+    name = protocols.addColumn(Protocol::getName, NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Protocol::getName));
     date = protocols
         .addColumn(new LocalDateTimeRenderer<>(Protocol::getCreationDate,

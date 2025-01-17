@@ -174,7 +174,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         new File(defaultSample.getName(), "FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020.bw"));
     files.add(new File("archives", "sample.png"));
     when(service.files(any()))
-        .thenReturn(files.stream().map(file -> file.toPath()).collect(Collectors.toList()));
+        .thenReturn(files.stream().map(File::toPath).collect(Collectors.toList()));
     labels.add("\\\\lanaseq01\\lanaseq");
     labels.add("\\\\lanaseq01\\archives");
     labels.add("\\\\lanaseq02\\archives2");

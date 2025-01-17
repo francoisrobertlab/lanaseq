@@ -82,11 +82,11 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.users()).isPresent());
-    assertFalse(optional(() -> view.switchFailed()).isPresent());
-    assertTrue(optional(() -> view.add()).isPresent());
-    assertTrue(optional(() -> view.edit()).isPresent());
-    assertTrue(optional(() -> view.switchUser()).isPresent());
+    assertTrue(optional(view::users).isPresent());
+    assertFalse(optional(view::switchFailed).isPresent());
+    assertTrue(optional(view::add).isPresent());
+    assertTrue(optional(view::edit).isPresent());
+    assertTrue(optional(view::switchUser).isPresent());
   }
 
   @Test
@@ -120,8 +120,8 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     $(DatasetsViewElement.class).waitForFirst();
     ViewLayoutElement viewReload = $(ViewLayoutElement.class).waitForFirst();
-    assertTrue(optional(() -> viewReload.exitSwitchUser()).isPresent());
-    assertFalse(optional(() -> viewReload.users()).isPresent());
+    assertTrue(optional(viewReload::exitSwitchUser).isPresent());
+    assertFalse(optional(viewReload::users).isPresent());
   }
 
   @Test
@@ -133,6 +133,6 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     view.switchUser().click();
 
-    assertTrue(optional(() -> view.switchFailed()).isPresent());
+    assertTrue(optional(view::switchFailed).isPresent());
   }
 }

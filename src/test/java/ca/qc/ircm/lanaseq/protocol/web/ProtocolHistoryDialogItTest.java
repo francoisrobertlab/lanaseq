@@ -52,8 +52,8 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     view.protocols().select(2);
     view.history().click();
     ProtocolHistoryDialogElement dialog = view.historyDialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.files()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::files).isPresent());
   }
 
   @Test

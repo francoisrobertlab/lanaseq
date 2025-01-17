@@ -73,7 +73,7 @@ public class MailServiceTest {
             } catch (MessagingException | IOException e) {
               return Optional.empty();
             }
-          }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+          }).filter(Optional::isPresent).findAny().orElse(Optional.empty());
       return content;
     } else {
       return Optional.empty();
@@ -94,7 +94,7 @@ public class MailServiceTest {
             } catch (MessagingException | IOException e) {
               return Optional.empty();
             }
-          }).filter(opt -> opt.isPresent()).findAny().orElse(Optional.empty());
+          }).filter(Optional::isPresent).findAny().orElse(Optional.empty());
       return content;
     } else {
       return Optional.empty();

@@ -25,7 +25,7 @@ public abstract class AbstractPermissionEvaluator implements PermissionEvaluator
 
   protected Optional<User> getUser(Authentication authentication) {
     return getUserDetails(authentication).filter(ud -> ud instanceof UserDetailsWithId)
-        .map(ud -> (UserDetailsWithId) ud).map(au -> au.getId())
+        .map(ud -> (UserDetailsWithId) ud).map(UserDetailsWithId::getId)
         .map(id -> userRepository.findById(id).orElseThrow());
   }
 

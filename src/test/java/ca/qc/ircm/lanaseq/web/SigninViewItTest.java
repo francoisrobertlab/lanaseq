@@ -53,10 +53,10 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.getUsernameField()).isPresent());
-    assertTrue(optional(() -> view.getPasswordField()).isPresent());
-    assertTrue(optional(() -> view.getSubmitButton()).isPresent());
-    assertTrue(optional(() -> view.getForgotPasswordButton()).isPresent());
+    assertTrue(optional(view::getUsernameField).isPresent());
+    assertTrue(optional(view::getPasswordField).isPresent());
+    assertTrue(optional(view::getSubmitButton).isPresent());
+    assertTrue(optional(view::getForgotPasswordButton).isPresent());
   }
 
   @Test

@@ -142,7 +142,7 @@ public class DatasetService {
     Path folder = configuration.getHome().folder(dataset);
     try (Stream<Path> homeFiles = Files.list(folder)) {
       homeFiles.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
-          .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+          .filter(file -> !file.toFile().isHidden()).forEach(files::add);
     } catch (IOException e) {
       // Ignore since folder probably does not exist.
     }
@@ -150,7 +150,7 @@ public class DatasetService {
       folder = drive.folder(dataset);
       try (Stream<Path> archiveFiles = Files.list(folder)) {
         archiveFiles.filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
-            .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+            .filter(file -> !file.toFile().isHidden()).forEach(files::add);
       } catch (IOException e) {
         // Ignore since folder probably does not exist.
       }
@@ -237,13 +237,13 @@ public class DatasetService {
           uploadFiles.filter(file -> file.toFile().isFile()).filter(file -> {
             String filename = file.getFileName().toString();
             return filename.contains(dataset.getName());
-          }).filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+          }).filter(file -> !file.toFile().isHidden()).forEach(files::add);
         }
       }
       if (Files.exists(datasetUpload)) {
         try (Stream<Path> uploadFiles = Files.list(datasetUpload)) {
           uploadFiles.filter(file -> file.toFile().isFile())
-              .filter(file -> !file.toFile().isHidden()).forEach(file -> files.add(file));
+              .filter(file -> !file.toFile().isHidden()).forEach(files::add);
         }
       }
       return files;

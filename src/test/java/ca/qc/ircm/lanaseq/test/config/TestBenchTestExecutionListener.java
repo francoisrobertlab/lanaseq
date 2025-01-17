@@ -101,7 +101,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   private WebDriver driver(TestContext testContext) {
     final boolean headless =
         findAnnotation(testContext.getTestClass(), testContext.getTestMethod(), Headless.class)
-            .map(an -> an.value()).orElse(false);
+            .map(Headless::value).orElse(false);
     String driverClass = System.getProperty(DRIVER_SYSTEM_PROPERTY);
     if (driverClass == null) {
       driverClass = DEFAULT_DRIVER;

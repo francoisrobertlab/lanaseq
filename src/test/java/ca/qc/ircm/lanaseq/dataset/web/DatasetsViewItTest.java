@@ -64,10 +64,10 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.datasets()).isPresent());
-    assertTrue(optional(() -> view.edit()).isPresent());
-    assertTrue(optional(() -> view.merge()).isPresent());
-    assertTrue(optional(() -> view.files()).isPresent());
+    assertTrue(optional(view::datasets).isPresent());
+    assertTrue(optional(view::edit).isPresent());
+    assertTrue(optional(view::merge).isPresent());
+    assertTrue(optional(view::files).isPresent());
   }
 
   @Test

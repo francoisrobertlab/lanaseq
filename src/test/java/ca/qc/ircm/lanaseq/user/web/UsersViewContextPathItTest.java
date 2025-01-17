@@ -31,7 +31,7 @@ public class UsersViewContextPathItTest extends AbstractTestBenchTestCase {
 
     $(DatasetsViewElement.class).waitForFirst();
     ViewLayoutElement viewReload = $(ViewLayoutElement.class).waitForFirst();
-    assertTrue(optional(() -> viewReload.exitSwitchUser()).isPresent());
-    assertFalse(optional(() -> viewReload.users()).isPresent());
+    assertTrue(optional(viewReload::exitSwitchUser).isPresent());
+    assertFalse(optional(viewReload::users).isPresent());
   }
 }

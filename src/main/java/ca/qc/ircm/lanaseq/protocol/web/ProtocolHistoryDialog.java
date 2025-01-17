@@ -73,11 +73,11 @@ public class ProtocolHistoryDialog extends Dialog
     layout.setSizeFull();
     layout.expand(files);
     files.setId(id(FILES));
-    filename = files.addColumn(new ComponentRenderer<>(file -> filenameAnchor(file)))
+    filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor))
         .setKey(FILENAME).setSortProperty(FILENAME)
         .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
     recover = files.addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
-        .withFunction("recoverFile", file -> recoverFile(file))).setKey(RECOVER);
+        .withFunction("recoverFile", this::recoverFile)).setKey(RECOVER);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {

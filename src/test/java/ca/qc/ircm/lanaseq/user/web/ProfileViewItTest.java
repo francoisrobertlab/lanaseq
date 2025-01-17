@@ -69,7 +69,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_User() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.form()).isPresent());
+    assertTrue(optional(view::form).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
     assertTrue(optional(() -> view.form().name()).isPresent());
     assertFalse(optional(() -> view.form().admin()).isPresent());
@@ -77,7 +77,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.form().passwords()).isPresent());
     assertTrue(optional(() -> view.form().passwords().password()).isPresent());
     assertTrue(optional(() -> view.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test
@@ -85,7 +85,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Manager() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.form()).isPresent());
+    assertTrue(optional(view::form).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
     assertTrue(optional(() -> view.form().name()).isPresent());
     assertFalse(optional(() -> view.form().admin()).isPresent());
@@ -93,7 +93,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.form().passwords()).isPresent());
     assertTrue(optional(() -> view.form().passwords().password()).isPresent());
     assertTrue(optional(() -> view.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test
@@ -101,7 +101,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Admin() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.form()).isPresent());
+    assertTrue(optional(view::form).isPresent());
     assertTrue(optional(() -> view.form().email()).isPresent());
     assertTrue(optional(() -> view.form().name()).isPresent());
     assertTrue(optional(() -> view.form().admin()).isPresent());
@@ -109,7 +109,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> view.form().passwords()).isPresent());
     assertTrue(optional(() -> view.form().passwords().password()).isPresent());
     assertTrue(optional(() -> view.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test

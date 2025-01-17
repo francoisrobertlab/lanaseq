@@ -64,12 +64,12 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.samples()).isPresent());
-    assertTrue(optional(() -> view.add()).isPresent());
-    assertTrue(optional(() -> view.edit()).isPresent());
-    assertTrue(optional(() -> view.merge()).isPresent());
-    assertTrue(optional(() -> view.files()).isPresent());
-    assertTrue(optional(() -> view.analyze()).isPresent());
+    assertTrue(optional(view::samples).isPresent());
+    assertTrue(optional(view::add).isPresent());
+    assertTrue(optional(view::edit).isPresent());
+    assertTrue(optional(view::merge).isPresent());
+    assertTrue(optional(view::files).isPresent());
+    assertTrue(optional(view::analyze).isPresent());
   }
 
   @Test

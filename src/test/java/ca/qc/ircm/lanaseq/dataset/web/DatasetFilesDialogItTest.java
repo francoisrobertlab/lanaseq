@@ -72,13 +72,13 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);
     DatasetFilesDialogElement dialog = view.filesDialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.message()).isPresent());
-    assertTrue(optional(() -> dialog.folders()).isPresent());
-    assertTrue(optional(() -> dialog.files()).isPresent());
-    assertTrue(optional(() -> dialog.samples()).isPresent());
-    assertTrue(optional(() -> dialog.upload()).isPresent());
-    assertTrue(optional(() -> dialog.addLargeFiles()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::message).isPresent());
+    assertTrue(optional(dialog::folders).isPresent());
+    assertTrue(optional(dialog::files).isPresent());
+    assertTrue(optional(dialog::samples).isPresent());
+    assertTrue(optional(dialog::upload).isPresent());
+    assertTrue(optional(dialog::addLargeFiles).isPresent());
   }
 
   @Test

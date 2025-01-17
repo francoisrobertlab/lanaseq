@@ -176,12 +176,12 @@ public class DatasetFilesDialog extends Dialog
     filename = files
         .addColumn(LitRenderer.<EditableFile>of(FILENAME_HTML)
             .withProperty("filename", file -> shortFilename(file.getFilename()))
-            .withProperty("title", file -> file.getFilename()))
+            .withProperty("title", EditableFile::getFilename))
         .setKey(FILENAME).setComparator(Comparator.comparing(EditableFile::getFilename))
         .setFlexGrow(10);
-    download = files.addColumn(new ComponentRenderer<>(file -> downloadButton(file)))
+    download = files.addColumn(new ComponentRenderer<>(this::downloadButton))
         .setKey(DOWNLOAD).setSortable(false);
-    delete = files.addColumn(new ComponentRenderer<>(file -> deleteButton(file))).setKey(DELETE)
+    delete = files.addColumn(new ComponentRenderer<>(this::deleteButton)).setKey(DELETE)
         .setSortable(false);
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
@@ -189,9 +189,9 @@ public class DatasetFilesDialog extends Dialog
     filenameEdit.setWidthFull();
     samples.setId(id(SAMPLES));
     samples.addItemDoubleClickListener(e -> viewFiles(e.getItem()));
-    name = samples.addColumn(sa -> sa.getName(), NAME).setKey(NAME)
+    name = samples.addColumn(Sample::getName, NAME).setKey(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(10);
-    fileCount = samples.addColumn(sa -> fileCount(sa), FILE_COUNT).setKey(FILE_COUNT);
+    fileCount = samples.addColumn(this::fileCount, FILE_COUNT).setKey(FILE_COUNT);
     upload.setId(id(UPLOAD));
     upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);

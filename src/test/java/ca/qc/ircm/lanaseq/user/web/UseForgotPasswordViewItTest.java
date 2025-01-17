@@ -67,10 +67,10 @@ public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     UseForgotPasswordViewElement view = $(UseForgotPasswordViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.header()).isPresent());
-    assertTrue(optional(() -> view.message()).isPresent());
-    assertTrue(optional(() -> view.passwordsForm()).isPresent());
-    assertTrue(optional(() -> view.save()).isPresent());
+    assertTrue(optional(view::header).isPresent());
+    assertTrue(optional(view::message).isPresent());
+    assertTrue(optional(view::passwordsForm).isPresent());
+    assertTrue(optional(view::save).isPresent());
   }
 
   @Test

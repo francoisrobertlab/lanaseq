@@ -183,7 +183,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
     verify(service).all();
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
-      assertTrue(samples.contains(sample), () -> sample.toString());
+      assertTrue(samples.contains(sample), sample::toString);
     }
     assertEquals(4, dialog.samples.getListDataView().getItemCount());
     samples = dialog.samples.getListDataView().getItems().toList();

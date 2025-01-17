@@ -200,7 +200,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
-      assertTrue(users.contains(user), () -> user.toString());
+      assertTrue(users.contains(user), user::toString);
     }
     assertTrue(view.active.isVisible());
     assertTrue(view.add.isVisible());
@@ -213,7 +213,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     List<User> users = items(view.users);
     assertEquals(this.users.size(), users.size());
     for (User user : this.users) {
-      assertTrue(users.contains(user), () -> user.toString());
+      assertTrue(users.contains(user), user::toString);
     }
     assertTrue(view.active.isVisible());
     assertTrue(view.add.isVisible());

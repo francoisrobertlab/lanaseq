@@ -55,10 +55,10 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.protocols()).isPresent());
-    assertTrue(optional(() -> view.add()).isPresent());
-    assertTrue(optional(() -> view.edit()).isPresent());
-    assertFalse(optional(() -> view.history()).isPresent());
+    assertTrue(optional(view::protocols).isPresent());
+    assertTrue(optional(view::add).isPresent());
+    assertTrue(optional(view::edit).isPresent());
+    assertFalse(optional(view::history).isPresent());
   }
 
   @Test
@@ -66,10 +66,10 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   public void fieldsExistence_Manager() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    assertTrue(optional(() -> view.protocols()).isPresent());
-    assertTrue(optional(() -> view.add()).isPresent());
-    assertTrue(optional(() -> view.edit()).isPresent());
-    assertTrue(optional(() -> view.history()).isPresent());
+    assertTrue(optional(view::protocols).isPresent());
+    assertTrue(optional(view::add).isPresent());
+    assertTrue(optional(view::edit).isPresent());
+    assertTrue(optional(view::history).isPresent());
   }
 
   @Test

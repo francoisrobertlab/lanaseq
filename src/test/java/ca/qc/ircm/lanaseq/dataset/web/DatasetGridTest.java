@@ -40,6 +40,7 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.provider.SortOrder;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -188,7 +189,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertNotNull(grid.getColumnByKey(NAME));
     assertTrue(grid.name.isSortable());
     assertEquals(NAME, grid.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
-        .map(so -> so.getSorted()).orElseThrow());
+        .map(SortOrder::getSorted).orElseThrow());
     assertNotNull(grid.getColumnByKey(KEYWORDS));
     assertFalse(grid.keywords.isSortable());
     assertNotNull(grid.getColumnByKey(PROTOCOL));
@@ -196,17 +197,17 @@ public class DatasetGridTest extends SpringUIUnitTest {
     assertNotNull(grid.getColumnByKey(DATE));
     assertTrue(grid.date.isSortable());
     assertEquals(DATE, grid.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING).findFirst()
-        .map(so -> so.getSorted()).orElseThrow());
+        .map(SortOrder::getSorted).orElseThrow());
     assertNotNull(grid.getColumnByKey(OWNER));
     assertTrue(grid.owner.isSortable());
     assertEquals(OWNER + "." + EMAIL, grid.getColumnByKey(OWNER)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(so -> so.getSorted()).orElseThrow());
+        .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
     assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
     List<Dataset> datasets = items(grid);
     verify(service, atLeastOnce()).all(grid.filter());
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
-      assertTrue(datasets.contains(dataset), () -> dataset.toString());
+      assertTrue(datasets.contains(dataset), dataset::toString);
     }
   }
 

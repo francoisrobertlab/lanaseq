@@ -57,8 +57,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     view.edit().click();
 
     UserDialogElement dialog = view.dialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.form()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::form).isPresent());
     assertTrue(optional(() -> dialog.form().email()).isPresent());
     assertTrue(optional(() -> dialog.form().name()).isPresent());
     assertFalse(optional(() -> dialog.form().admin()).isPresent());
@@ -66,8 +66,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.form().passwords()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().password()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> dialog.save()).isPresent());
-    assertTrue(optional(() -> dialog.cancel()).isPresent());
+    assertTrue(optional(dialog::save).isPresent());
+    assertTrue(optional(dialog::cancel).isPresent());
   }
 
   @Test
@@ -79,8 +79,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     view.edit().click();
 
     UserDialogElement dialog = view.dialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.form()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::form).isPresent());
     assertTrue(optional(() -> dialog.form().email()).isPresent());
     assertTrue(optional(() -> dialog.form().name()).isPresent());
     assertTrue(optional(() -> dialog.form().admin()).isPresent());
@@ -88,8 +88,8 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(() -> dialog.form().passwords()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().password()).isPresent());
     assertTrue(optional(() -> dialog.form().passwords().passwordConfirm()).isPresent());
-    assertTrue(optional(() -> dialog.save()).isPresent());
-    assertTrue(optional(() -> dialog.cancel()).isPresent());
+    assertTrue(optional(dialog::save).isPresent());
+    assertTrue(optional(dialog::cancel).isPresent());
   }
 
   @Test
@@ -131,7 +131,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
     dialog.save().click();
     TestTransaction.end();
 
-    assertTrue(optional(() -> view.dialog()).isPresent());
+    assertTrue(optional(view::dialog).isPresent());
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     User user = repository.findById(3L).orElseThrow();
     assertEquals("jonh.smith@ircm.qc.ca", user.getEmail());

@@ -79,15 +79,15 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     view.protocols().select(0);
     view.edit().click();
     ProtocolDialogElement dialog = view.dialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.name()).isPresent());
-    assertTrue(optional(() -> dialog.note()).isPresent());
-    assertTrue(optional(() -> dialog.upload()).isPresent());
-    assertTrue(optional(() -> dialog.files()).isPresent());
-    assertTrue(optional(() -> dialog.save()).isPresent());
-    assertTrue(optional(() -> dialog.cancel()).isPresent());
-    assertFalse(optional(() -> dialog.delete()).isPresent());
-    assertTrue(optional(() -> dialog.confirm()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::name).isPresent());
+    assertTrue(optional(dialog::note).isPresent());
+    assertTrue(optional(dialog::upload).isPresent());
+    assertTrue(optional(dialog::files).isPresent());
+    assertTrue(optional(dialog::save).isPresent());
+    assertTrue(optional(dialog::cancel).isPresent());
+    assertFalse(optional(dialog::delete).isPresent());
+    assertTrue(optional(dialog::confirm).isPresent());
   }
 
   @Test
@@ -98,15 +98,15 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
     view.protocols().select(3);
     view.edit().click();
     ProtocolDialogElement dialog = view.dialog();
-    assertTrue(optional(() -> dialog.header()).isPresent());
-    assertTrue(optional(() -> dialog.name()).isPresent());
-    assertTrue(optional(() -> dialog.note()).isPresent());
-    assertTrue(optional(() -> dialog.upload()).isPresent());
-    assertTrue(optional(() -> dialog.files()).isPresent());
-    assertTrue(optional(() -> dialog.save()).isPresent());
-    assertTrue(optional(() -> dialog.cancel()).isPresent());
-    assertTrue(optional(() -> dialog.delete()).isPresent());
-    assertTrue(optional(() -> dialog.confirm()).isPresent());
+    assertTrue(optional(dialog::header).isPresent());
+    assertTrue(optional(dialog::name).isPresent());
+    assertTrue(optional(dialog::note).isPresent());
+    assertTrue(optional(dialog::upload).isPresent());
+    assertTrue(optional(dialog::files).isPresent());
+    assertTrue(optional(dialog::save).isPresent());
+    assertTrue(optional(dialog::cancel).isPresent());
+    assertTrue(optional(dialog::delete).isPresent());
+    assertTrue(optional(dialog::confirm).isPresent());
   }
 
   @Test
