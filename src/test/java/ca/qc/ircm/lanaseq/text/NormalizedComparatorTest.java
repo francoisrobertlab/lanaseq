@@ -102,17 +102,17 @@ public class NormalizedComparatorTest {
   @Test
   public void getConverter_Identity() {
     NormalizedComparator<String> comparator = new NormalizedComparator<>(s -> s);
-    assertEquals("test", comparator.getConverter().apply("test"));
-    assertEquals("abc", comparator.getConverter().apply("abc"));
-    assertEquals("pépîn", comparator.getConverter().apply("pépîn"));
+    assertEquals("test", comparator.converter().apply("test"));
+    assertEquals("abc", comparator.converter().apply("abc"));
+    assertEquals("pépîn", comparator.converter().apply("pépîn"));
   }
 
   @Test
   public void getConverter_DatasetName() {
     NormalizedComparator<TestName> comparator = new NormalizedComparator<>(TestName::getName);
-    assertEquals("test", comparator.getConverter().apply(name("test")));
-    assertEquals("abc", comparator.getConverter().apply(name("abc")));
-    assertEquals("pépîn", comparator.getConverter().apply(name("pépîn")));
+    assertEquals("test", comparator.converter().apply(name("test")));
+    assertEquals("abc", comparator.converter().apply(name("abc")));
+    assertEquals("pépîn", comparator.converter().apply(name("pépîn")));
   }
 
   private TestName name(String name) {

@@ -10,13 +10,9 @@ import java.util.Objects;
 /**
  * Comparator that normalizes string before comparison.
  */
-public class NormalizedComparator<T> implements Comparator<T>, Serializable {
+public record NormalizedComparator<T>(SerializableFunction<T, String> converter)
+    implements Comparator<T>, Serializable {
   private static final long serialVersionUID = -1607340161804603169L;
-  private final SerializableFunction<T, String> converter;
-
-  public NormalizedComparator(SerializableFunction<T, String> converter) {
-    this.converter = converter;
-  }
 
   public static <T> NormalizedComparator<T> of(SerializableFunction<T, String> converter) {
     return new NormalizedComparator<>(converter);
@@ -35,9 +31,5 @@ public class NormalizedComparator<T> implements Comparator<T>, Serializable {
     } catch (Throwable e) {
       return "";
     }
-  }
-
-  public SerializableFunction<T, String> getConverter() {
-    return converter;
   }
 }
