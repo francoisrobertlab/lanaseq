@@ -38,12 +38,9 @@ public class SignoutViewTest extends SpringUIUnitTest {
   @Test
   public void beforeEnter() {
     // Invalidated session.
-    assertThrows(IllegalStateException.class, () -> {
-      view.beforeEnter(event);
-    });
-    assertThrows(IllegalStateException.class, () -> {
-      VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames();
-    });
+    assertThrows(IllegalStateException.class, () -> view.beforeEnter(event));
+    assertThrows(IllegalStateException.class,
+        () -> VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames());
 
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
         .anyMatch(i -> i.getInvocation().getExpression().contains("window.open($0, $1)")

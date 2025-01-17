@@ -100,9 +100,7 @@ public class ProtocolServiceTest {
   @Test
   @WithAnonymousUser
   public void nameExists_Anonymous() {
-    assertThrows(AccessDeniedException.class, () -> {
-      service.nameExists("test protocol");
-    });
+    assertThrows(AccessDeniedException.class, () -> service.nameExists("test protocol"));
   }
 
   @Test

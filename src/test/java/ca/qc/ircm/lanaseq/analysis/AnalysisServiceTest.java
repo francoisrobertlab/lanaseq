@@ -597,9 +597,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_EmptyDatasets() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      service.copyDatasetsResources(new ArrayList<>(), new ArrayList<>());
-    });
+    assertThrows(IllegalArgumentException.class,
+        () -> service.copyDatasetsResources(new ArrayList<>(), new ArrayList<>()));
   }
 
   @Test
@@ -986,9 +985,8 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_EmptySamples() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      service.copySamplesResources(new ArrayList<>(), new ArrayList<>());
-    });
+    assertThrows(IllegalArgumentException.class,
+        () -> service.copySamplesResources(new ArrayList<>(), new ArrayList<>()));
   }
 
   @Test

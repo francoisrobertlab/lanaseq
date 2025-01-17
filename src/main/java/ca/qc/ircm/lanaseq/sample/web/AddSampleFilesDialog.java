@@ -182,10 +182,8 @@ public class AddSampleFilesDialog extends Dialog
       files.removeColumn(size);
     }
     NumberFormat sizeFormat = NumberFormat.getIntegerInstance(getLocale());
-    size = files.addColumn(file -> {
-      return getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
-          sizeFormat.format(file.length() / Math.pow(1024, 2)));
-    }, SIZE).setKey(SIZE);
+    size = files.addColumn(file -> getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
+        sizeFormat.format(file.length() / Math.pow(1024, 2))), SIZE).setKey(SIZE);
     @SuppressWarnings("unchecked")
     Column<File>[] sortOrder = new Column[] { filename, size, overwrite };
     files.setColumnOrder(sortOrder);
@@ -260,8 +258,8 @@ public class AddSampleFilesDialog extends Dialog
   void updateFiles() {
     existingFilenames =
         service.files(sample).stream().map(f -> f.toFile().getName()).collect(Collectors.toSet());
-    files.setItems(service.uploadFiles(sample).stream().map(Path::toFile)
-        .collect(Collectors.toList()));
+    files.setItems(
+        service.uploadFiles(sample).stream().map(Path::toFile).collect(Collectors.toList()));
   }
 
   boolean exists(File file) {

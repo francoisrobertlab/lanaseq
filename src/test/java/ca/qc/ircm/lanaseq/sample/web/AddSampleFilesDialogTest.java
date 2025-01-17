@@ -141,8 +141,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     });
     when(service.uploadFiles(any())).thenReturn(
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
-    when(service.files(any())).thenReturn(
-        files.subList(0, 2).stream().map(File::toPath).collect(Collectors.toList()));
+    when(service.files(any()))
+        .thenReturn(files.subList(0, 2).stream().map(File::toPath).collect(Collectors.toList()));
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
@@ -381,9 +381,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setSampleId_0() {
-    assertThrows(NoSuchElementException.class, () -> {
-      dialog.setSampleId(0);
-    });
+    assertThrows(NoSuchElementException.class, () -> dialog.setSampleId(0));
   }
 
   @Test

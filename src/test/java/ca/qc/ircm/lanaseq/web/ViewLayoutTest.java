@@ -237,12 +237,10 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   @Test
   public void tabs_SelectSignout() {
     // Invalidated session.
-    assertThrows(InvocationTargetException.class, () -> {
-      test(view.sideNav).clickItem(view.signout.getLabel());
-    });
-    assertThrows(IllegalStateException.class, () -> {
-      VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames();
-    });
+    assertThrows(InvocationTargetException.class,
+        () -> test(view.sideNav).clickItem(view.signout.getLabel()));
+    assertThrows(IllegalStateException.class,
+        () -> VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames());
 
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
         .anyMatch(i -> i.getInvocation().getExpression().contains("window.open($0, $1)")

@@ -147,9 +147,7 @@ public class SampleServiceTest {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve(sample.getName()) : null;
     });
-    when(configuration.getUpload().getFolder()).then(i -> {
-      return temporaryFolder.resolve("upload");
-    });
+    when(configuration.getUpload().getFolder()).then(i -> temporaryFolder.resolve("upload"));
   }
 
   private void detach(Sample sample) {
@@ -1012,9 +1010,8 @@ public class SampleServiceTest {
   @Test
   @WithAnonymousUser
   public void isMergable_Anonymous() {
-    assertThrows(AccessDeniedException.class, () -> {
-      assertFalse(service.isMergable(new ArrayList<>()));
-    });
+    assertThrows(AccessDeniedException.class,
+        () -> assertFalse(service.isMergable(new ArrayList<>())));
   }
 
   @Test
@@ -1079,9 +1076,7 @@ public class SampleServiceTest {
     sample.setDate(LocalDate.of(2020, 7, 21));
     sample.setNote("test note");
 
-    assertThrows(NullPointerException.class, () -> {
-      service.save(sample);
-    });
+    assertThrows(NullPointerException.class, () -> service.save(sample));
   }
 
   @Test

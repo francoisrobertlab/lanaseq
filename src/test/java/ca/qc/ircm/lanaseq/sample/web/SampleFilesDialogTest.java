@@ -695,9 +695,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setSampleId_0() {
-    assertThrows(NoSuchElementException.class, () -> {
-      dialog.setSampleId(0);
-    });
+    assertThrows(NoSuchElementException.class, () -> dialog.setSampleId(0));
   }
 
   @Test

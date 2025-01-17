@@ -124,9 +124,8 @@ public class ForgotPasswordServiceTest {
   public void insert_Robot() {
     user = userRepository.findById(1L).orElseThrow();
 
-    assertThrows(AccessDeniedException.class, () -> {
-      service.insert(user.getEmail(), forgotPasswordWebContext);
-    });
+    assertThrows(AccessDeniedException.class,
+        () -> service.insert(user.getEmail(), forgotPasswordWebContext));
   }
 
   @Test

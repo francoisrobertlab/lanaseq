@@ -91,9 +91,7 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
         .setKey(DATE).setSortProperty(DATE).setComparator(Comparator.comparing(Sample::getDate));
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
-    samples.addItemDoubleClickListener(e -> {
-      select(e.getItem());
-    });
+    samples.addItemDoubleClickListener(e -> select(e.getItem()));
     samples.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = samples.appendHeaderRow();
     filtersRow.getCell(name).setComponent(nameFilter);

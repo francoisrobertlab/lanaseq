@@ -782,9 +782,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setDatasetId_0() {
-    assertThrows(NoSuchElementException.class, () -> {
-      dialog.setDatasetId(0);
-    });
+    assertThrows(NoSuchElementException.class, () -> dialog.setDatasetId(0));
   }
 
   @Test

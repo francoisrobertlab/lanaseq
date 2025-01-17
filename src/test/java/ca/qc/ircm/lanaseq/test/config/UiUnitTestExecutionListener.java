@@ -12,8 +12,6 @@ public class UiUnitTestExecutionListener implements TestExecutionListener {
   public void beforeTestMethod(TestContext testContext) {
     AnnotationFinder
         .findAnnotation(testContext.getTestClass(), testContext.getTestMethod(), UserAgent.class)
-        .ifPresent(ua -> {
-          MockVaadin.INSTANCE.setUserAgent(ua.value());
-        });
+        .ifPresent(ua -> MockVaadin.INSTANCE.setUserAgent(ua.value()));
   }
 }

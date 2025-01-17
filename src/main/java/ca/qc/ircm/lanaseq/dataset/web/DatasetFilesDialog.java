@@ -179,8 +179,8 @@ public class DatasetFilesDialog extends Dialog
             .withProperty("title", EditableFile::getFilename))
         .setKey(FILENAME).setComparator(Comparator.comparing(EditableFile::getFilename))
         .setFlexGrow(10);
-    download = files.addColumn(new ComponentRenderer<>(this::downloadButton))
-        .setKey(DOWNLOAD).setSortable(false);
+    download = files.addColumn(new ComponentRenderer<>(this::downloadButton)).setKey(DOWNLOAD)
+        .setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(this::deleteButton)).setKey(DELETE)
         .setSortable(false);
     filename.setEditorComponent(filenameEdit);
@@ -359,9 +359,8 @@ public class DatasetFilesDialog extends Dialog
   }
 
   StreamResource download(EditableFile file) {
-    return new StreamResource(file.getFilename(), (output, session) -> {
-      Files.copy(file.getFile().toPath(), output);
-    });
+    return new StreamResource(file.getFilename(),
+        (output, session) -> Files.copy(file.getFile().toPath(), output));
   }
 
   void deleteFile(EditableFile file) {

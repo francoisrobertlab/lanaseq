@@ -157,9 +157,7 @@ public class DatasetServiceTest {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? temporaryFolder.resolve(dataset.getName()) : null;
     });
-    when(configuration.getUpload().getFolder()).then(i -> {
-      return temporaryFolder.resolve("upload");
-    });
+    when(configuration.getUpload().getFolder()).then(i -> temporaryFolder.resolve("upload"));
   }
 
   private void detach(Dataset dataset) {
@@ -827,9 +825,7 @@ public class DatasetServiceTest {
     dataset.getSamples().add(sample1);
     dataset.generateName();
 
-    assertThrows(IllegalArgumentException.class, () -> {
-      service.save(dataset);
-    });
+    assertThrows(IllegalArgumentException.class, () -> service.save(dataset));
   }
 
   @Test
@@ -843,9 +839,7 @@ public class DatasetServiceTest {
     dataset.setNote("test note");
     dataset.getSamples().add(sampleRepository.findById(1L).orElseThrow());
 
-    assertThrows(NullPointerException.class, () -> {
-      service.save(dataset);
-    });
+    assertThrows(NullPointerException.class, () -> service.save(dataset));
   }
 
   @Test
@@ -921,9 +915,7 @@ public class DatasetServiceTest {
     newSample.setNote("test note");
     dataset.getSamples().add(newSample);
 
-    assertThrows(IllegalArgumentException.class, () -> {
-      service.save(dataset);
-    });
+    assertThrows(IllegalArgumentException.class, () -> service.save(dataset));
   }
 
   @Test

@@ -209,8 +209,6 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setProtocol_0() {
-    assertThrows(NoSuchElementException.class, () -> {
-      dialog.setProtocolId(0);
-    });
+    assertThrows(NoSuchElementException.class, () -> dialog.setProtocolId(0));
   }
 }

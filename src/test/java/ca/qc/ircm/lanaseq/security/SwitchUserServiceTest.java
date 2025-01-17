@@ -108,18 +108,16 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
   @WithAnonymousUser
   public void switchUser_AccessDenied_Anonymous() {
     User user = repository.findById(3L).orElseThrow();
-    assertThrows(AccessDeniedException.class, () -> {
-      service.switchUser(user, VaadinServletRequest.getCurrent());
-    });
+    assertThrows(AccessDeniedException.class,
+        () -> service.switchUser(user, VaadinServletRequest.getCurrent()));
   }
 
   @Test
   @WithMockUser(authorities = { USER, UserRole.MANAGER })
   public void switchUser_AccessDenied() {
     User user = repository.findById(3L).orElseThrow();
-    assertThrows(AccessDeniedException.class, () -> {
-      service.switchUser(user, VaadinServletRequest.getCurrent());
-    });
+    assertThrows(AccessDeniedException.class,
+        () -> service.switchUser(user, VaadinServletRequest.getCurrent()));
   }
 
   @Test
