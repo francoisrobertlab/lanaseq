@@ -33,7 +33,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import jakarta.persistence.EntityManager;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1068,44 +1067,40 @@ public class DatasetServiceTest {
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.write(
+    Files.writeString(
         beforeFolder
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
-        ("e254a11d5102c5555232c3d7d0a53a0b  "
-            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
-            .getBytes(StandardCharsets.UTF_8));
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq");
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.write(
+    Files.writeString(
         beforeFolder
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq.md5"),
-        ("c0f5c3b76104640e306fce3c669f300e  "
-            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq")
-            .getBytes(StandardCharsets.UTF_8));
+        "c0f5c3b76104640e306fce3c669f300e  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq");
     Files.createDirectories(beforeArchive1);
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive1.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.write(
+    Files.writeString(
         beforeArchive1
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
-        ("e254a11d5102c5555232c3d7d0a53a0b  "
-            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
-            .getBytes(StandardCharsets.UTF_8));
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq");
     Files.createDirectories(beforeArchive2);
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive2.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.write(
+    Files.writeString(
         beforeArchive2
             .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
-        ("e254a11d5102c5555232c3d7d0a53a0b  "
-            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq")
-            .getBytes(StandardCharsets.UTF_8));
+        "e254a11d5102c5555232c3d7d0a53a0b  "
+            + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq");
 
     service.save(dataset);
 
