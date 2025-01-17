@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SwitchUserService {
   public static final String ROLE_PREVIOUS_ADMINISTRATOR = "ROLE_PREVIOUS_ADMINISTRATOR";
-  private static final Logger logger = LoggerFactory.getLogger(AuthenticatedUser.class);
+  private static final Logger logger = LoggerFactory.getLogger(SwitchUserService.class);
   private String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
   private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource =
       new WebAuthenticationDetailsSource();

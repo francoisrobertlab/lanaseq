@@ -111,7 +111,7 @@ public class ForgotPasswordService {
       try {
         this.sendMail(email, forgotPassword, locale, webContext);
       } catch (Throwable e) {
-        logger.error("Could not send email to user " + email + " that forgot his password", e);
+        logger.error("Could not send email to user {} that forgot his password", email, e);
       }
 
       logger.info("Forgot password request {} added to database", forgotPassword);
