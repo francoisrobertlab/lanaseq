@@ -91,7 +91,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.getAnalysis().folder(Arrays.asList(sample));
+    Path folder = configuration.getAnalysis().folder(List.of(sample));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,

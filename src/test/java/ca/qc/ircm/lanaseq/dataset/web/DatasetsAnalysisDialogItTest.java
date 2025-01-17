@@ -100,7 +100,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.getAnalysis().folder(Arrays.asList(dataset));
+    Path folder = configuration.getAnalysis().folder(List.of(dataset));
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
     assertArrayEquals(fastq1Content,
@@ -230,7 +230,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(dialog.isOpen());
     dialog.confirm().getConfirmButton().click();
     assertFalse(dialog.isOpen());
-    Path folder = configuration.getAnalysis().folder(Arrays.asList(dataset));
+    Path folder = configuration.getAnalysis().folder(List.of(dataset));
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(folder.resolve(sample1.getName() + "_R1.fastq")));
     assertFalse(Files.exists(folder.resolve(sample1.getName() + "_R2.fastq")));

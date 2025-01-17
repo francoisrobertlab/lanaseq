@@ -191,7 +191,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
 
-    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+    Path folder = service.copyDatasetsResources(datasets, List.of("*.fastq"));
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
@@ -241,7 +241,7 @@ public class AnalysisServiceTest {
 
   @Test
   public void copyDatasetsResources_NoFastq() throws Throwable {
-    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+    Path folder = service.copyDatasetsResources(datasets, List.of("*.fastq"));
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
@@ -278,7 +278,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
 
-    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+    Path folder = service.copyDatasetsResources(datasets, List.of("*.fastq"));
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
@@ -337,7 +337,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPairedZip1);
     final byte[] fastq6Content = writeRandom(thirdPairedZip2);
 
-    Path folder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq*"));
+    Path folder = service.copyDatasetsResources(datasets, List.of("*.fastq*"));
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
@@ -514,7 +514,7 @@ public class AnalysisServiceTest {
     Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
     Files.write(folder.resolve(extraFilename), fastq1Content);
 
-    Path copyFolder = service.copyDatasetsResources(datasets, Arrays.asList("*.fastq"));
+    Path copyFolder = service.copyDatasetsResources(datasets, List.of("*.fastq"));
 
     assertEquals(folder, copyFolder);
     assertFalse(Files.exists(folder.resolve(extraFilename)));
@@ -647,7 +647,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
 
-    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+    Path folder = service.copySamplesResources(samples, List.of("*.fastq"));
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
@@ -691,7 +691,7 @@ public class AnalysisServiceTest {
 
   @Test
   public void copySamplesResources_NoFastq() throws Throwable {
-    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+    Path folder = service.copySamplesResources(samples, List.of("*.fastq"));
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
@@ -722,7 +722,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPaired1);
     final byte[] fastq6Content = writeRandom(thirdPaired2);
 
-    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+    Path folder = service.copySamplesResources(samples, List.of("*.fastq"));
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
@@ -775,7 +775,7 @@ public class AnalysisServiceTest {
     final byte[] fastq5Content = writeRandom(thirdPairedZip1);
     final byte[] fastq6Content = writeRandom(thirdPairedZip2);
 
-    Path folder = service.copySamplesResources(samples, Arrays.asList("*.fastq*"));
+    Path folder = service.copySamplesResources(samples, List.of("*.fastq*"));
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
@@ -940,7 +940,7 @@ public class AnalysisServiceTest {
     Files.write(folder.resolve(paired1.getFileName()), fastq2Content);
     Files.write(folder.resolve(extraFilename), fastq1Content);
 
-    Path copyFolder = service.copySamplesResources(samples, Arrays.asList("*.fastq"));
+    Path copyFolder = service.copySamplesResources(samples, List.of("*.fastq"));
 
     assertEquals(folder, copyFolder);
     assertFalse(Files.exists(folder.resolve(extraFilename)));
