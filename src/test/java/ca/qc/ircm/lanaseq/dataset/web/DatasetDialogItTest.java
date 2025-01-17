@@ -63,7 +63,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private String keyword2 = "ip";
   private String filename = "OF_20241120_ROB_01";
   private String note = "test note\nsecond line";
-  private LocalDate date = LocalDate.of(2020, 07, 20);
+  private LocalDate date = LocalDate.of(2020, 7, 20);
 
   @BeforeEach
   public void beforeTest() throws Throwable {

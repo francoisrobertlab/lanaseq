@@ -616,7 +616,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.strain.isReadOnly());
     assertTrue(dialog.strainDescription.isReadOnly());
     assertTrue(dialog.treatment.isReadOnly());
-    assertEquals(LocalDate.of(2018, 12, 05), dialog.date.getValue());
+    assertEquals(LocalDate.of(2018, 12, 5), dialog.date.getValue());
     assertTrue(dialog.date.isReadOnly());
     assertEquals("", dialog.note.getValue());
     assertTrue(dialog.note.isReadOnly());
@@ -710,7 +710,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void generateName() {
     dialog.namePrefix.setValue("test");
-    dialog.date.setValue(LocalDate.of(2022, 05, 02));
+    dialog.date.setValue(LocalDate.of(2022, 5, 2));
     assertEquals("test", dialog.namePrefix.getValue());
 
     clickButton(dialog.generateName);
@@ -721,7 +721,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   @Test
   public void generateName_NewSample() {
     dialog.namePrefix.setValue("test");
-    dialog.date.setValue(LocalDate.of(2022, 05, 02));
+    dialog.date.setValue(LocalDate.of(2022, 5, 2));
     dialog.samples.getListDataView().addItem(samples.get(0));
     assertEquals("test", dialog.namePrefix.getValue());
 

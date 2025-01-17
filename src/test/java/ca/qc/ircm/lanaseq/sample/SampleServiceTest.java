@@ -1245,7 +1245,7 @@ public class SampleServiceTest {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("sample_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
-    sample.setDate(LocalDate.of(2020, 01, 12));
+    sample.setDate(LocalDate.of(2020, 1, 12));
     Files.createDirectories(beforeArchive1);
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
@@ -1261,7 +1261,7 @@ public class SampleServiceTest {
     sample = repository.findById(1L).orElseThrow();
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
-    assertEquals(LocalDate.of(2020, 01, 12), sample.getDate());
+    assertEquals(LocalDate.of(2020, 1, 12), sample.getDate());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
     assertArrayEquals(

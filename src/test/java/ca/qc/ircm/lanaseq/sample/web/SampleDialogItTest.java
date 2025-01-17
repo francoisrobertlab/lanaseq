@@ -56,7 +56,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private MessageSource messageSource;
   private Protocol protocol;
-  private LocalDate date = LocalDate.of(2020, 07, 20);
+  private LocalDate date = LocalDate.of(2020, 7, 20);
   private String assay = "RNA-seq";
   private String type = "IP";
   private String target = "polr3a";

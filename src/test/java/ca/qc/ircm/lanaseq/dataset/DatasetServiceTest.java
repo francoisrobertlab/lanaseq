@@ -1019,7 +1019,7 @@ public class DatasetServiceTest {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("dataset_R2.fastq"), StandardCopyOption.REPLACE_EXISTING);
-    dataset.setDate(LocalDate.of(2020, 01, 12));
+    dataset.setDate(LocalDate.of(2020, 1, 12));
     Files.createDirectories(beforeArchive1);
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
