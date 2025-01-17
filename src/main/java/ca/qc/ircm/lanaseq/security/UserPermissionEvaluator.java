@@ -37,11 +37,10 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if (!(targetDomainObject instanceof User)
+    if (!(targetDomainObject instanceof User user)
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
-    User user = (User) targetDomainObject;
     User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(user, currentUser, realPermission);

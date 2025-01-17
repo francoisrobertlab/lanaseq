@@ -63,8 +63,7 @@ public class MailServiceTest {
   private Optional<String> plainContent(MimePart part) throws MessagingException, IOException {
     if (part.isMimeType("text/plain") && part.getContent() instanceof String) {
       return Optional.of(part.getContent().toString());
-    } else if (part.getContent() instanceof Multipart) {
-      Multipart mp = (Multipart) part.getContent();
+    } else if (part.getContent() instanceof Multipart mp) {
       @SuppressWarnings("unchecked")
       Optional<String> content =
           (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
@@ -84,8 +83,7 @@ public class MailServiceTest {
     if (part.isMimeType("text/html")
         || part.getDataHandler().getContentType().startsWith("text/html")) {
       return Optional.of(part.getContent().toString());
-    } else if (part.getContent() instanceof Multipart) {
-      Multipart mp = (Multipart) part.getContent();
+    } else if (part.getContent() instanceof Multipart mp) {
       @SuppressWarnings("unchecked")
       Optional<String> content =
           (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {

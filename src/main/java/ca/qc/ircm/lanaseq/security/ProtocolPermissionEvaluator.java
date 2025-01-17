@@ -35,11 +35,10 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if (!(targetDomainObject instanceof Protocol)
+    if (!(targetDomainObject instanceof Protocol protocol)
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
-    Protocol protocol = (Protocol) targetDomainObject;
     User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(protocol, currentUser, realPermission);

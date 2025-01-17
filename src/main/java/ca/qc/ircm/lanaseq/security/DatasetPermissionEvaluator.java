@@ -35,11 +35,10 @@ public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if (!(targetDomainObject instanceof Dataset)
+    if (!(targetDomainObject instanceof Dataset dataset)
         || (!(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
-    Dataset dataset = (Dataset) targetDomainObject;
     User currentUser = getUser(authentication).orElse(null);
     Permission realPermission = resolvePermission(permission);
     return hasPermission(dataset, currentUser, realPermission);
