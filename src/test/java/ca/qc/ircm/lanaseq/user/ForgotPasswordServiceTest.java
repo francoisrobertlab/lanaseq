@@ -27,8 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,12 +79,7 @@ public class ForgotPasswordServiceTest {
   @BeforeEach
   public void beforeTest() throws Throwable {
     user = userRepository.findById(9L).orElseThrow();
-    when(appConfiguration.getUrl(any(String.class))).thenAnswer(new Answer<String>() {
-      @Override
-      public String answer(InvocationOnMock invocation) {
-        return forgotPasswordUrl;
-      }
-    });
+    when(appConfiguration.getUrl(any(String.class))).thenReturn(forgotPasswordUrl);
     hashedPassword = "da78f3a74658706/4ae8470fc73a83f369fed012";
     when(passwordEncoder.encode(any(String.class))).thenReturn(hashedPassword);
     when(mailService.htmlEmail()).thenReturn(email);
