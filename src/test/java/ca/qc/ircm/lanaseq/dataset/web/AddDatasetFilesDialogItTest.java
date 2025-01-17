@@ -58,8 +58,8 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void copyFiles(Dataset dataset)
-      throws IOException, URISyntaxException, NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      throws IOException, URISyntaxException, SecurityException,
+          IllegalArgumentException {
     Path folder = configuration.getUpload().folder(dataset);
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
@@ -73,7 +73,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);

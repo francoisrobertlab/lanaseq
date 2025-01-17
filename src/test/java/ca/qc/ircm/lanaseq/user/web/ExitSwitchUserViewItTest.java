@@ -22,7 +22,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     openView(ExitSwitchUserView.VIEW_NAME);
 
     $(SigninViewElement.class).waitForFirst();
@@ -30,7 +30,7 @@ public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void security_User() throws Throwable {
+  public void security_User() {
     openView(ExitSwitchUserView.VIEW_NAME);
 
     $(AccessDeniedViewElement.class).waitForFirst();
@@ -38,21 +38,21 @@ public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void security_Manager() throws Throwable {
+  public void security_Manager() {
     openView(ExitSwitchUserView.VIEW_NAME);
 
     $(AccessDeniedViewElement.class).waitForFirst();
   }
 
   @Test
-  public void security_Admin() throws Throwable {
+  public void security_Admin() {
     openView(ExitSwitchUserView.VIEW_NAME);
 
     $(AccessDeniedViewElement.class).waitForFirst();
   }
 
   @Test
-  public void exitSwitchUser() throws Throwable {
+  public void exitSwitchUser() {
     openView(DatasetsView.VIEW_NAME);
     $(ViewLayoutElement.class).waitForFirst().users().click();
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();

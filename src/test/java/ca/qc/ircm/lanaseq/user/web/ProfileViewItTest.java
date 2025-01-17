@@ -49,14 +49,14 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void title() throws Throwable {
+  public void title() {
     open();
 
     String applicationName =
@@ -66,7 +66,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence_User() throws Throwable {
+  public void fieldsExistence_User() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.form()).isPresent());
@@ -82,7 +82,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void fieldsExistence_Manager() throws Throwable {
+  public void fieldsExistence_Manager() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.form()).isPresent());
@@ -98,7 +98,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void fieldsExistence_Admin() throws Throwable {
+  public void fieldsExistence_Admin() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.form()).isPresent());
@@ -113,7 +113,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void save() throws Throwable {
+  public void save() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
     view.form().email().setValue(email);

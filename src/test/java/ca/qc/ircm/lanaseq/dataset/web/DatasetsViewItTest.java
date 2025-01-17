@@ -46,13 +46,13 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void title() throws Throwable {
+  public void title() {
     open();
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
@@ -61,7 +61,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.datasets()).isPresent());
@@ -71,7 +71,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void view_Files() throws Throwable {
+  public void view_Files() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);
@@ -79,7 +79,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void edit() throws Throwable {
+  public void edit() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
@@ -88,7 +88,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void merge() throws Throwable {
+  public void merge() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
@@ -123,7 +123,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void files() throws Throwable {
+  public void files() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
@@ -132,7 +132,7 @@ public class DatasetsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void analyze() throws Throwable {
+  public void analyze() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);

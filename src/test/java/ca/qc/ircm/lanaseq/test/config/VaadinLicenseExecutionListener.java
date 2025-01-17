@@ -28,7 +28,7 @@ public class VaadinLicenseExecutionListener implements TestExecutionListener, In
   private VaadinLicenseConfiguration configuration;
 
   @Override
-  public void beforeTestClass(TestContext testContext) throws Exception {
+  public void beforeTestClass(TestContext testContext) {
     injectDependencies(testContext.getApplicationContext());
     if (isTestBenchTest(testContext)) {
       boolean licenseFileExists = configuration.assume();

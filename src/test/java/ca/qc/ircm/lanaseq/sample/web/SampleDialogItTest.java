@@ -83,7 +83,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  private void fill(SampleDialogElement dialog) throws InterruptedException {
+  private void fill(SampleDialogElement dialog) {
     dialog.date().setDate(date);
     dialog.sampleId().setValue(sampleId);
     dialog.replicate().setValue(replicate);
@@ -111,7 +111,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence_Add() throws Throwable {
+  public void fieldsExistence_Add() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.add().click();
@@ -137,7 +137,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence_Update() throws Throwable {
+  public void fieldsExistence_Update() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
@@ -165,7 +165,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void fieldsExistence_Deletable() throws Throwable {
+  public void fieldsExistence_Deletable() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
@@ -193,7 +193,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void save_New() throws Throwable {
+  public void save_New() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.add().click();
@@ -293,7 +293,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void cancel() throws Throwable {
+  public void cancel() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);

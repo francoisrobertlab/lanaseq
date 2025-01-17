@@ -502,7 +502,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void save() throws Throwable {
+  public void save() {
     when(service.files(any())).thenReturn(new ArrayList<>());
     when(service.uploadFiles(any())).thenReturn(files.subList(0, 2).stream()
         .map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));

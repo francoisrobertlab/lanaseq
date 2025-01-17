@@ -226,7 +226,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void files_ColumnsValueProvider() throws Throwable {
+  public void files_ColumnsValueProvider() {
     when(service.uploadFiles(any())).thenReturn(files.stream().map(File::toPath).toList());
     when(service.files(any())).thenReturn(Collections.nCopies(1, files.get(0).toPath()));
     dialog.updateFiles();
@@ -484,7 +484,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void save() throws Throwable {
+  public void save() {
     when(service.files(any())).thenReturn(new ArrayList<>());
     when(service.uploadFiles(any())).thenReturn(files.subList(0, 2).stream()
         .map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));

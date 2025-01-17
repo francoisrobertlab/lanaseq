@@ -47,7 +47,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_NoLdap() throws Throwable {
+  public void authenticate_NoLdap() {
     Authentication authentication =
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass1");
     ldapDaoAuthenticationProvider.authenticate(authentication);
@@ -60,7 +60,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test()
-  public void authenticate_NoLdapFail() throws Throwable {
+  public void authenticate_NoLdapFail() {
     Authentication authentication =
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass");
 
@@ -80,7 +80,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_LdapSuccess() throws Throwable {
+  public void authenticate_LdapSuccess() {
     when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.of("frobert"));
     when(ldapService.isPasswordValid(any(), any())).thenReturn(true);
@@ -98,7 +98,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_LdapFail() throws Throwable {
+  public void authenticate_LdapFail() {
     when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.of("frobert"));
 
@@ -120,7 +120,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_LdapFailPasswordEncoderSuccess() throws Throwable {
+  public void authenticate_LdapFailPasswordEncoderSuccess() {
     when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.of("frobert"));
 
@@ -135,7 +135,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_NotAnLdapUser() throws Throwable {
+  public void authenticate_NotAnLdapUser() {
     when(ldapConfiguration.enabled()).thenReturn(true);
     when(ldapService.getUsername(any())).thenReturn(Optional.empty());
 
@@ -157,7 +157,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_Inactive() throws Throwable {
+  public void authenticate_Inactive() {
     Authentication authentication =
         new UsernamePasswordAuthenticationToken("inactive.user@ircm.qc.ca", "pass1");
     try {
@@ -176,7 +176,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   }
 
   @Test
-  public void authenticate_Disable() throws Throwable {
+  public void authenticate_Disable() {
     Authentication authentication =
         new UsernamePasswordAuthenticationToken("jonh.smith@ircm.qc.ca", "pass");
     User user = userRepository.findById(3L).orElseThrow();

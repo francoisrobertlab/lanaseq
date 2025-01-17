@@ -74,7 +74,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  private void fill(DatasetDialogElement dialog) throws InterruptedException {
+  private void fill(DatasetDialogElement dialog) {
     dialog.keywords().deselectByText("G24D");
     dialog.namePrefix().setValue(namePrefix);
     dialog.keywords().selectByText(keyword1);
@@ -85,7 +85,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);
@@ -187,7 +187,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   @Disabled("Drag and drop function moves to random element instead of the right location")
-  public void save_ReorderSamples() throws Throwable {
+  public void save_ReorderSamples() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(3);
@@ -332,7 +332,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void cancel() throws Throwable {
+  public void cancel() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);

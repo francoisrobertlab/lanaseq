@@ -16,7 +16,7 @@ public class LdapConfigurationTest {
   private LdapConfiguration ldapConfiguration;
 
   @Test
-  public void defaultProperties() throws Throwable {
+  public void defaultProperties() {
     assertTrue(ldapConfiguration.enabled());
     assertEquals("uid", ldapConfiguration.idAttribute());
     assertEquals("mail", ldapConfiguration.mailAttribute());

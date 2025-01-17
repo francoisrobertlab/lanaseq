@@ -57,7 +57,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);

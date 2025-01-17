@@ -60,12 +60,12 @@ public class TestBenchSecurityFilter extends GenericFilterBean
   }
 
   @Override
-  public void beforeTestClass(TestContext testContext) throws Exception {
+  public void beforeTestClass(TestContext testContext) {
     testContext.getApplicationContext().getAutowireCapableBeanFactory().autowireBean(this);
   }
 
   @Override
-  public void beforeTestMethod(TestContext testContext) throws Exception {
+  public void beforeTestMethod(TestContext testContext) {
     copyAuthenticationOnFilter = isTestBenchTest(testContext);
     authentication = SecurityContextHolder.getContext().getAuthentication();
     logger.trace("saving authentication {}", authentication);

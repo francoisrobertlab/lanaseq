@@ -49,7 +49,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void fieldsExistence_Manager() throws Throwable {
+  public void fieldsExistence_Manager() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
@@ -71,7 +71,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence_Admin() throws Throwable {
+  public void fieldsExistence_Admin() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
 
@@ -93,7 +93,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void save() throws Throwable {
+  public void save() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().select(2);
@@ -118,7 +118,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void save_Fail() throws Throwable {
+  public void save_Fail() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().select(2);
@@ -142,7 +142,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void cancel() throws Throwable {
+  public void cancel() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
     view.users().select(2);

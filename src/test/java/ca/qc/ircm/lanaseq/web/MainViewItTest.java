@@ -21,14 +21,14 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void userRedirected() throws Throwable {
+  public void userRedirected() {
     open();
 
     $(DatasetsViewElement.class).waitForFirst();
@@ -36,7 +36,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void managerRedirected() throws Throwable {
+  public void managerRedirected() {
     open();
 
     $(DatasetsViewElement.class).waitForFirst();
@@ -44,7 +44,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void adminRedirected() throws Throwable {
+  public void adminRedirected() {
     open();
 
     $(DatasetsViewElement.class).waitForFirst();

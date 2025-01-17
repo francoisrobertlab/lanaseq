@@ -67,7 +67,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);
@@ -222,7 +222,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void addLargeFiles() throws Throwable {
+  public void addLargeFiles() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);

@@ -47,14 +47,14 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void title() throws Throwable {
+  public void title() {
     open();
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
@@ -63,7 +63,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
@@ -74,7 +74,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void sign_ForceChangePassword() throws Throwable {
+  public void sign_ForceChangePassword() {
     openView(SigninView.VIEW_NAME);
     SigninViewElement signinView = $(SigninViewElement.class).waitForFirst();
     signinView.getUsernameField().setValue("christian.poitras@ircm.qc.ca");
@@ -88,7 +88,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void mainView() throws Throwable {
+  public void mainView() {
     openView(MainView.VIEW_NAME);
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
@@ -98,7 +98,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void datasetsView() throws Throwable {
+  public void datasetsView() {
     openView(DatasetsView.VIEW_NAME);
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.header()).isPresent());
@@ -108,7 +108,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void save() throws Throwable {
+  public void save() {
     open();
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
     view.passwords().password().setValue(password);

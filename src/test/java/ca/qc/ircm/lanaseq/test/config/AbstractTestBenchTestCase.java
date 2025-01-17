@@ -60,7 +60,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
    * Saves home folder to reset its value upon test completion.
    */
   @BeforeEach
-  public void saveHomeFolder() throws Throwable {
+  public void saveHomeFolder() {
     home = configuration.getHome().getFolder();
   }
 
@@ -68,7 +68,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
    * Saves archive folder to reset its value upon test completion.
    */
   @BeforeEach
-  public void saveArchiveFolder() throws Throwable {
+  public void saveArchiveFolder() {
     archive = configuration.getArchives().get(0).getFolder();
   }
 
@@ -76,7 +76,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
    * Saves analysis folder to reset its value upon test completion.
    */
   @BeforeEach
-  public void saveAnalysisFolder() throws Throwable {
+  public void saveAnalysisFolder() {
     analysis = configuration.getAnalysis().getFolder();
   }
 
@@ -84,7 +84,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
    * Saves upload folder to reset its value upon test completion.
    */
   @BeforeEach
-  public void saveUploadFolder() throws Throwable {
+  public void saveUploadFolder() {
     upload = configuration.getUpload().getFolder();
   }
 

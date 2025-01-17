@@ -432,7 +432,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void files_FolderNotExists() throws Throwable {
+  public void files_FolderNotExists() {
     Sample sample = repository.findById(1L).orElseThrow();
 
     List<Path> files = service.files(sample);
@@ -562,7 +562,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void files_NewSample() throws Throwable {
+  public void files_NewSample() {
     List<Path> files = service.files(new Sample());
 
     assertTrue(files.isEmpty());
@@ -629,7 +629,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void folderLabels_FoldersNotExists() throws Throwable {
+  public void folderLabels_FoldersNotExists() {
     Sample sample = repository.findById(1L).orElseThrow();
 
     List<String> labels = service.folderLabels(sample, false);
@@ -638,7 +638,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void folderLabels_NullId() throws Throwable {
+  public void folderLabels_NullId() {
     List<String> labels = service.folderLabels(new Sample(), false);
 
     assertTrue(labels.isEmpty());
@@ -761,7 +761,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void uploadFiles_NewSample() throws Throwable {
+  public void uploadFiles_NewSample() {
     List<Path> files = service.uploadFiles(new Sample());
 
     assertTrue(files.isEmpty());
@@ -1132,7 +1132,7 @@ public class SampleServiceTest {
   }
 
   @Test
-  public void save_DontRenameDatasets() throws Throwable {
+  public void save_DontRenameDatasets() {
     Sample sample = repository.findById(4L).orElseThrow();
     sample.setSampleId("sample1");
     sample.setReplicate("r1");

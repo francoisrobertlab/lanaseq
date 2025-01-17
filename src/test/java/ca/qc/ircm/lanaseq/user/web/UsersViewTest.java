@@ -451,7 +451,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void edit_Enabled() throws Throwable {
+  public void edit_Enabled() {
     assertFalse(view.edit.isEnabled());
     User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
@@ -461,7 +461,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void edit() throws Throwable {
+  public void edit() {
     User user = repository.findById(3L).orElseThrow();
     when(service.get(anyLong())).thenReturn(Optional.of(user));
     view.users.select(user);
@@ -472,7 +472,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void edit_EmptySelection() throws Throwable {
+  public void edit_EmptySelection() {
     view.edit();
     Notification error = $(Notification.class).first();
     assertTrue(error instanceof ErrorNotification);
@@ -483,7 +483,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void switchUser_Enabled() throws Throwable {
+  public void switchUser_Enabled() {
     assertFalse(view.switchUser.isEnabled());
     User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
@@ -493,7 +493,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void switchUser() throws Throwable {
+  public void switchUser() {
     User user = repository.findById(3L).orElseThrow();
     view.users.select(user);
     view.switchUser.click();
@@ -506,7 +506,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void switchUser_EmptySelection() throws Throwable {
+  public void switchUser_EmptySelection() {
     view.switchUser();
     Notification error = $(Notification.class).first();
     assertTrue(error instanceof ErrorNotification);

@@ -35,14 +35,14 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void title() throws Throwable {
+  public void title() {
     open();
 
     String applicationName =
@@ -52,7 +52,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.protocols()).isPresent());
@@ -63,7 +63,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void fieldsExistence_Manager() throws Throwable {
+  public void fieldsExistence_Manager() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.protocols()).isPresent());
@@ -73,7 +73,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void edit() throws Throwable {
+  public void edit() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 
@@ -85,7 +85,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void history() throws Throwable {
+  public void history() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 
@@ -96,7 +96,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void add() throws Throwable {
+  public void add() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
 

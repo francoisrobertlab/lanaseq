@@ -405,7 +405,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void files_FolderNotExists() throws Throwable {
+  public void files_FolderNotExists() {
     Dataset dataset = repository.findById(1L).orElseThrow();
 
     List<Path> files = service.files(dataset);
@@ -534,7 +534,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void files_NewDataset() throws Throwable {
+  public void files_NewDataset() {
     List<Path> files = service.files(new Dataset());
 
     assertTrue(files.isEmpty());
@@ -601,7 +601,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void folderLabels_FoldersNotExists() throws Throwable {
+  public void folderLabels_FoldersNotExists() {
     Dataset dataset = repository.findById(1L).orElseThrow();
 
     List<String> labels = service.folderLabels(dataset, false);
@@ -610,7 +610,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void folderLabels_NewDataset() throws Throwable {
+  public void folderLabels_NewDataset() {
     List<String> labels = service.folderLabels(new Dataset(), false);
 
     assertTrue(labels.isEmpty());
@@ -733,7 +733,7 @@ public class DatasetServiceTest {
   }
 
   @Test
-  public void uploadFiles_NullId() throws Throwable {
+  public void uploadFiles_NullId() {
     List<Path> files = service.uploadFiles(new Dataset());
 
     assertTrue(files.isEmpty());

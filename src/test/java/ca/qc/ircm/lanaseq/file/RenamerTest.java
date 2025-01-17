@@ -55,7 +55,7 @@ public class RenamerTest {
   }
 
   @Test
-  public void moveFolder_FromDoesNotExists() throws Throwable {
+  public void moveFolder_FromDoesNotExists() {
     Path from = tempDir.resolve("from");
     Path to = tempDir.resolve("to");
     Renamer.moveFolder(from, to);

@@ -27,14 +27,14 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void fieldsExistence_User() throws Throwable {
+  public void fieldsExistence_User() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
@@ -52,7 +52,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
-  public void fieldsExistence_Manager() throws Throwable {
+  public void fieldsExistence_Manager() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
@@ -70,7 +70,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void fieldsExistence_Admin() throws Throwable {
+  public void fieldsExistence_Admin() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     assertTrue(optional(() -> view.applicationName()).isPresent());
@@ -88,7 +88,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void fieldsExistence_Runas() throws Throwable {
+  public void fieldsExistence_Runas() {
     open();
     $(ViewLayoutElement.class).waitForFirst().users().click();
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
@@ -110,7 +110,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void datasets() throws Throwable {
+  public void datasets() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.datasets().click();
@@ -118,7 +118,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void samples() throws Throwable {
+  public void samples() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.samples().click();
@@ -126,7 +126,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void protocols() throws Throwable {
+  public void protocols() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.protocols().click();
@@ -134,7 +134,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void profile() throws Throwable {
+  public void profile() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.profile().click();
@@ -143,7 +143,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void users() throws Throwable {
+  public void users() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.users().click();
@@ -152,7 +152,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void exitSwitchUser() throws Throwable {
+  public void exitSwitchUser() {
     open();
     $(ViewLayoutElement.class).waitForFirst().users().click();
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
@@ -169,7 +169,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void signout() throws Throwable {
+  public void signout() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.signout().click();

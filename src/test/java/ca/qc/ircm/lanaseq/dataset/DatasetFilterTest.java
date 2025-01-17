@@ -273,14 +273,14 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Default() throws Exception {
+  public void predicate_Default() {
     Predicate predicate = filter.predicate();
 
     assertEquals(Expressions.asBoolean(true).isTrue(), predicate);
   }
 
   @Test
-  public void predicate_NameContains() throws Exception {
+  public void predicate_NameContains() {
     filter.nameContains = "test";
 
     Predicate predicate = filter.predicate();
@@ -289,7 +289,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_KeywordsContains() throws Exception {
+  public void predicate_KeywordsContains() {
     filter.keywordsContains = "test";
 
     Predicate predicate = filter.predicate();
@@ -298,7 +298,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_ProtocolContains() throws Exception {
+  public void predicate_ProtocolContains() {
     filter.protocolContains = "test";
 
     Predicate predicate = filter.predicate();
@@ -307,7 +307,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_OpenRange() throws Exception {
+  public void predicate_Date_OpenRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
     filter.dateRange = Range.open(start, end);
@@ -318,7 +318,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_ClosedRange() throws Exception {
+  public void predicate_Date_ClosedRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
     filter.dateRange = Range.closed(start, end);
@@ -329,7 +329,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_OpenClosedRange() throws Exception {
+  public void predicate_Date_OpenClosedRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
     filter.dateRange = Range.openClosed(start, end);
@@ -341,7 +341,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_ClosedOpenRange() throws Exception {
+  public void predicate_Date_ClosedOpenRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
     filter.dateRange = Range.closedOpen(start, end);
@@ -352,7 +352,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_AtLeast() throws Exception {
+  public void predicate_Date_AtLeast() {
     LocalDate start = LocalDate.now().minusDays(10);
     filter.dateRange = Range.atLeast(start);
 
@@ -362,7 +362,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_GreaterThan() throws Exception {
+  public void predicate_Date_GreaterThan() {
     LocalDate start = LocalDate.now().minusDays(10);
     filter.dateRange = Range.greaterThan(start);
 
@@ -372,7 +372,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_AtMost() throws Exception {
+  public void predicate_Date_AtMost() {
     LocalDate end = LocalDate.now();
     filter.dateRange = Range.atMost(end);
 
@@ -382,7 +382,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_Date_LessThan() throws Exception {
+  public void predicate_Date_LessThan() {
     LocalDate end = LocalDate.now();
     filter.dateRange = Range.lessThan(end);
 
@@ -392,7 +392,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_OwnerContains() throws Exception {
+  public void predicate_OwnerContains() {
     filter.ownerContains = "test";
 
     Predicate predicate = filter.predicate();
@@ -402,7 +402,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void predicate_NameAndOwnerContains() throws Exception {
+  public void predicate_NameAndOwnerContains() {
     filter.nameContains = "test1";
     filter.ownerContains = "test2";
 
@@ -415,14 +415,14 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void pageable_Default() throws Exception {
+  public void pageable_Default() {
     Pageable pageable = filter.pageable();
 
     assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Direction.ASC, ID)), pageable);
   }
 
   @Test
-  public void pageable_Page() throws Exception {
+  public void pageable_Page() {
     filter.page = 2;
     filter.size = 5;
 
@@ -432,7 +432,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void pageable_Sort() throws Exception {
+  public void pageable_Sort() {
     filter.sort = Sort.by(Order.asc(NAME), Order.desc(DATE));
 
     Pageable pageable = filter.pageable();
@@ -442,7 +442,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void pageable_NullSort() throws Exception {
+  public void pageable_NullSort() {
     filter.sort = null;
 
     Pageable pageable = filter.pageable();
@@ -451,7 +451,7 @@ public class DatasetFilterTest {
   }
 
   @Test
-  public void pageable_PageAndSort() throws Exception {
+  public void pageable_PageAndSort() {
     filter.page = 2;
     filter.size = 5;
     filter.sort = Sort.by(Order.asc(NAME), Order.desc(DATE));

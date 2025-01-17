@@ -68,7 +68,7 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
-  public void get() throws Throwable {
+  public void get() {
     Protocol protocol = service.get(1L).orElseThrow();
 
     assertEquals((Long) 1L, protocol.getId());
@@ -159,7 +159,7 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
-  public void files_NewProtocol() throws Throwable {
+  public void files_NewProtocol() {
     List<ProtocolFile> files = service.files(new Protocol());
 
     assertTrue(files.isEmpty());
@@ -203,7 +203,7 @@ public class ProtocolServiceTest {
 
   @Test
   @WithMockUser
-  public void deletedFiles_User() throws Throwable {
+  public void deletedFiles_User() {
     assertThrows(AccessDeniedException.class, () -> {
       Protocol protocol = repository.findById(3L).orElseThrow();
       service.deletedFiles(protocol);

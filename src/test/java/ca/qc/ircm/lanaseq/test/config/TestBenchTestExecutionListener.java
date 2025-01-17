@@ -44,7 +44,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   protected File downloadHome;
 
   @Override
-  public void beforeTestClass(TestContext testContext) throws Exception {
+  public void beforeTestClass(TestContext testContext) {
     injectDependencies(testContext.getApplicationContext());
     if (isTestBenchTest(testContext)) {
       assumeFalse(isSkipTestBenchTests(), SKIP_TESTS_ERROR_MESSAGE);
@@ -54,7 +54,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   @Override
-  public void beforeTestMethod(@NotNull TestContext testContext) throws Exception {
+  public void beforeTestMethod(@NotNull TestContext testContext) {
     if (isTestBenchTest(testContext)) {
       WebDriver driver = driver(testContext);
       TestBenchTestCase target = getInstance(testContext);
@@ -68,7 +68,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   @Override
-  public void afterTestMethod(@NotNull TestContext testContext) throws Exception {
+  public void afterTestMethod(@NotNull TestContext testContext) {
     if (isTestBenchTest(testContext)) {
       TestBenchTestCase target = getInstance(testContext);
       target.getDriver().manage().deleteAllCookies();

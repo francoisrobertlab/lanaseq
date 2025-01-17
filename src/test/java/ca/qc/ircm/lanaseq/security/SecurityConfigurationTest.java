@@ -16,7 +16,7 @@ public class SecurityConfigurationTest {
   private SecurityConfiguration securityConfiguration;
 
   @Test
-  public void defaultProperties() throws Throwable {
+  public void defaultProperties() {
     assertEquals(5, securityConfiguration.lockAttemps());
     assertEquals(Duration.ofMinutes(3), securityConfiguration.lockDuration());
     assertEquals(20, securityConfiguration.disableSignAttemps());

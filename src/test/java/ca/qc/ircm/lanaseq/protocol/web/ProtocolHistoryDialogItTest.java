@@ -46,7 +46,7 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(2);

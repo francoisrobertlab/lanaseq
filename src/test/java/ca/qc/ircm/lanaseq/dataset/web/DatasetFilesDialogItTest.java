@@ -67,7 +67,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(0);
@@ -202,7 +202,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void viewFiles_Sample() throws Throwable {
+  public void viewFiles_Sample() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);
@@ -234,7 +234,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void addLargeFiles() throws Throwable {
+  public void addLargeFiles() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(3);

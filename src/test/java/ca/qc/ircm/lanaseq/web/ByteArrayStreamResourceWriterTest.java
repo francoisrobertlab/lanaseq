@@ -25,7 +25,7 @@ public class ByteArrayStreamResourceWriterTest {
    * Before test.
    */
   @BeforeEach
-  public void beforeTest() throws Throwable {
+  public void beforeTest() {
     random.nextBytes(content);
     writer = new ByteArrayStreamResourceWriter(content);
   }

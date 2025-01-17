@@ -464,7 +464,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filenameEdit_Invalid() throws Throwable {
+  public void filenameEdit_Invalid() {
     filenameEdit_Invalid("abc#.txt");
     filenameEdit_Invalid("abc%.txt");
     filenameEdit_Invalid("abc&.txt");
@@ -588,7 +588,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
       int count = 0;
 
       @Override
-      public List<File> answer(InvocationOnMock invocation) throws Throwable {
+      public List<File> answer(InvocationOnMock invocation) {
         List<File> files = new ArrayList<>();
         IntStream.range(0, count++).forEach(i -> files.add(new File(i + ".txt")));
         return files;

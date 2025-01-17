@@ -15,21 +15,21 @@ import org.springframework.security.test.context.support.WithUserDetails;
 public class SignoutViewItTest extends AbstractTestBenchTestCase {
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     openView(SignoutView.VIEW_NAME);
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void security_User() throws Throwable {
+  public void security_User() {
     openView(SignoutView.VIEW_NAME);
 
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void signout() throws Throwable {
+  public void signout() {
     openView(DatasetsView.VIEW_NAME);
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     openView(SignoutView.VIEW_NAME);

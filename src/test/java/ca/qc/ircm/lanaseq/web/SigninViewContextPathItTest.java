@@ -19,7 +19,7 @@ public class SigninViewContextPathItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void sign() throws Throwable {
+  public void sign() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
     view.getUsernameField().setValue("jonh.smith@ircm.qc.ca");

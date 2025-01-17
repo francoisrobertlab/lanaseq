@@ -58,8 +58,8 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void copyFiles(Sample sample)
-      throws IOException, URISyntaxException, NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      throws IOException, URISyntaxException, SecurityException,
+          IllegalArgumentException {
     Path folder = configuration.getUpload().folder(sample);
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
@@ -73,7 +73,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);

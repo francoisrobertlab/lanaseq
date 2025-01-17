@@ -73,7 +73,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(0);
@@ -92,7 +92,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void fieldsExistence_Deletable() throws Throwable {
+  public void fieldsExistence_Deletable() {
     open();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
     view.protocols().select(3);
@@ -234,7 +234,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void delete() throws Throwable {
+  public void delete() {
     open();
     Protocol protocol = repository.findById(4L).get();
     ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();

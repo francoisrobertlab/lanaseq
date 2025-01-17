@@ -58,7 +58,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().select(0);

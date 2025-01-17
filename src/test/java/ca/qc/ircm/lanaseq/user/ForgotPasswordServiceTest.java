@@ -83,7 +83,7 @@ public class ForgotPasswordServiceTest {
     user = userRepository.findById(9L).orElseThrow();
     when(appConfiguration.getUrl(any(String.class))).thenAnswer(new Answer<String>() {
       @Override
-      public String answer(InvocationOnMock invocation) throws Throwable {
+      public String answer(InvocationOnMock invocation) {
         return forgotPasswordUrl;
       }
     });
@@ -96,7 +96,7 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void get() throws Exception {
+  public void get() {
     ForgotPassword forgotPassword = service.get(9L, "174407008").orElseThrow();
 
     assertEquals((Long) 9L, forgotPassword.getId());
@@ -108,27 +108,27 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void get_Expired() throws Exception {
+  public void get_Expired() {
     assertFalse(service.get(7L, "803369922").isPresent());
   }
 
   @Test
-  public void get_Invalid() throws Exception {
+  public void get_Invalid() {
     assertFalse(service.get(20L, "435FA").isPresent());
   }
 
   @Test
-  public void get_Id0() throws Exception {
+  public void get_Id0() {
     assertFalse(service.get(0, confirmNumber).isPresent());
   }
 
   @Test
-  public void get_Used() throws Exception {
+  public void get_Used() {
     assertFalse(service.get(10L, "460559412").isPresent());
   }
 
   @Test
-  public void insert_Robot() throws Exception {
+  public void insert_Robot() {
     user = userRepository.findById(1L).orElseThrow();
 
     assertThrows(AccessDeniedException.class, () -> {
@@ -200,7 +200,7 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void insert_NotExists() throws Exception {
+  public void insert_NotExists() {
     service.insert("test@ircm.qc.ca", forgotPasswordWebContext);
 
     assertEquals(4, repository.findAll().size());
@@ -209,7 +209,7 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void updatePassword() throws Exception {
+  public void updatePassword() {
     ForgotPassword forgotPassword = repository.findById(9L).orElseThrow();
 
     service.updatePassword(forgotPassword, "abc");
@@ -222,7 +222,7 @@ public class ForgotPasswordServiceTest {
   }
 
   @Test
-  public void updatePassword_Expired() throws Exception {
+  public void updatePassword_Expired() {
     ForgotPassword forgotPassword = repository.findById(7L).orElseThrow();
 
     try {

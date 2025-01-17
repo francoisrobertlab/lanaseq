@@ -40,7 +40,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_ReadProtocol_Anonymous() throws Throwable {
+  public void hasPermission_ReadProtocol_Anonymous() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
@@ -52,7 +52,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_Owner() throws Throwable {
+  public void hasPermission_ReadProtocol_Owner() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
@@ -64,7 +64,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_NotOwner() throws Throwable {
+  public void hasPermission_ReadProtocol_NotOwner() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
@@ -76,7 +76,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_Manager() throws Throwable {
+  public void hasPermission_ReadProtocol_Manager() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
@@ -88,7 +88,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasPermission_ReadProtocol_Admin() throws Throwable {
+  public void hasPermission_ReadProtocol_Admin() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
@@ -100,7 +100,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteNewProtocol_Anonymous() throws Throwable {
+  public void hasPermission_WriteNewProtocol_Anonymous() {
     Protocol protocol = new Protocol("new protocol");
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -108,7 +108,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteNewProtocol() throws Throwable {
+  public void hasPermission_WriteNewProtocol() {
     Protocol protocol = new Protocol("new protocol");
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -116,7 +116,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithAnonymousUser
-  public void hasPermission_WriteProtocol_Anonymous() throws Throwable {
+  public void hasPermission_WriteProtocol_Anonymous() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -128,7 +128,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("jonh.smith@ircm.qc.ca")
-  public void hasPermission_WriteProtocol_Owner() throws Throwable {
+  public void hasPermission_WriteProtocol_Owner() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -140,7 +140,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("olivia.brown@ircm.qc.ca")
-  public void hasPermission_WriteProtocol_NotOwner() throws Throwable {
+  public void hasPermission_WriteProtocol_NotOwner() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -152,7 +152,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("francois.robert@ircm.qc.ca")
-  public void hasPermission_WriteProtocol_Manager() throws Throwable {
+  public void hasPermission_WriteProtocol_Manager() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -164,7 +164,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasPermission_WriteProtocol_Admin() throws Throwable {
+  public void hasPermission_WriteProtocol_Admin() {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertTrue(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
@@ -176,7 +176,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasPermission_NotProtocol() throws Throwable {
+  public void hasPermission_NotProtocol() {
     assertFalse(permissionEvaluator.hasPermission(authentication(), new User(1L), READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), new User(1L), WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), new User(1L), BASE_READ));
@@ -193,7 +193,7 @@ public class ProtocolPermissionEvaluatorTest {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void hasPermission_NotLongId() throws Throwable {
+  public void hasPermission_NotLongId() {
     assertFalse(
         permissionEvaluator.hasPermission(authentication(), "Informatics", PROTOCOL_CLASS, READ));
     assertFalse(

@@ -36,13 +36,13 @@ public class InitializeDatabaseExecutionListener
   private UserRepository userRepository;
 
   @Override
-  public void beforeTestClass(TestContext testContext) throws Exception {
+  public void beforeTestClass(TestContext testContext) {
     injectDependencies(testContext.getApplicationContext());
   }
 
   @Override
   @SuppressWarnings("checkstyle:linelength")
-  public void beforeTestMethod(@NotNull TestContext testContext) throws Exception {
+  public void beforeTestMethod(@NotNull TestContext testContext) {
     logger.debug("Initializes database");
 
     User user = userRepository.findById(1L).orElseThrow();

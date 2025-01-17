@@ -25,7 +25,7 @@ public class ViewLayoutContextPathItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
-  public void exitSwitchUser() throws Throwable {
+  public void exitSwitchUser() {
     open();
     $(ViewLayoutElement.class).waitForFirst().users().click();
     UsersViewElement usersView = $(UsersViewElement.class).waitForFirst();
@@ -42,7 +42,7 @@ public class ViewLayoutContextPathItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void signout() throws Throwable {
+  public void signout() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.signout().click();

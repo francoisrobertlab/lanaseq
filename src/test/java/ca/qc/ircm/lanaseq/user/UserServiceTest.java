@@ -121,7 +121,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void exists_Email_True() throws Throwable {
+  public void exists_Email_True() {
     boolean exists = service.exists("christian.poitras@ircm.qc.ca");
 
     assertEquals(true, exists);
@@ -130,7 +130,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void exists_Email_False() throws Throwable {
+  public void exists_Email_False() {
     boolean exists = service.exists("abc@ircm.qc.ca");
 
     assertEquals(false, exists);

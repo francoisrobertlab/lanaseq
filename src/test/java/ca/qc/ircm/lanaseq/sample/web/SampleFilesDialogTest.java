@@ -446,7 +446,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void filenameEdit_Invalid() throws Throwable {
+  public void filenameEdit_Invalid() {
     filenameEdit_Invalid("abc#.txt");
     filenameEdit_Invalid("abc%.txt");
     filenameEdit_Invalid("abc&.txt");

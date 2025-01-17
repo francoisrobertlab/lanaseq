@@ -46,13 +46,13 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
 
   @Test
   @WithAnonymousUser
-  public void security_Anonymous() throws Throwable {
+  public void security_Anonymous() {
     open();
     $(SigninViewElement.class).waitForFirst();
   }
 
   @Test
-  public void title() throws Throwable {
+  public void title() {
     open();
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
@@ -61,7 +61,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void fieldsExistence() throws Throwable {
+  public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     assertTrue(optional(() -> view.samples()).isPresent());
@@ -73,7 +73,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void viewFiles() throws Throwable {
+  public void viewFiles() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(0);
@@ -81,7 +81,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void edit() throws Throwable {
+  public void edit() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
@@ -90,7 +90,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void add() throws Throwable {
+  public void add() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.add().click();
@@ -98,7 +98,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void merge() throws Throwable {
+  public void merge() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(1);
@@ -132,7 +132,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void files() throws Throwable {
+  public void files() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
@@ -141,7 +141,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
   }
 
   @Test
-  public void analyze() throws Throwable {
+  public void analyze() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().select(0);
