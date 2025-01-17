@@ -15,7 +15,6 @@ import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,8 +57,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
   }
 
   private void copyFiles(Dataset dataset)
-      throws IOException, URISyntaxException, SecurityException,
-          IllegalArgumentException {
+      throws IOException, URISyntaxException, SecurityException, IllegalArgumentException {
     Path folder = configuration.getUpload().folder(dataset);
     Files.createDirectories(folder);
     file1 = folder.resolve("R1.fastq");
