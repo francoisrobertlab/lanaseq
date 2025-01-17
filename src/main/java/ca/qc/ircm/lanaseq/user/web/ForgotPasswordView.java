@@ -62,7 +62,7 @@ public class ForgotPasswordView extends VerticalLayout
   protected TextField email = new TextField();
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
-  private Binder<User> binder = new BeanValidationBinder<User>(User.class);
+  private Binder<User> binder = new BeanValidationBinder<>(User.class);
   private transient ForgotPasswordService service;
   private transient UserService userService;
 
