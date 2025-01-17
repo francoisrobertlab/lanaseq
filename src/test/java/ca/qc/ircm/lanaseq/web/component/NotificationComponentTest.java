@@ -47,6 +47,6 @@ public class NotificationComponentTest extends SpringUIUnitTest {
     assertEquals(Position.TOP_END, notification.getPosition());
   }
 
-  private class NotificationComponentForTest implements NotificationComponent {
+  private static class NotificationComponentForTest implements NotificationComponent {
   }
 }
