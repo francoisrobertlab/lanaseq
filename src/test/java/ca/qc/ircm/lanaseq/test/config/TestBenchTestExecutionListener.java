@@ -87,7 +87,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   private boolean isSkipTestBenchTests() {
-    return Boolean.valueOf(System.getProperty(SKIP_TESTS_SYSTEM_PROPERTY));
+    return Boolean.parseBoolean(System.getProperty(SKIP_TESTS_SYSTEM_PROPERTY));
   }
 
   private boolean isTestBenchTest(TestContext testContext) {
