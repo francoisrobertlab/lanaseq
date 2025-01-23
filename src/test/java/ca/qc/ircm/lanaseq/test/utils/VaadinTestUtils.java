@@ -24,7 +24,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.BasicRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.SerializableBiConsumer;
 import com.vaadin.flow.function.ValueProvider;
 import elemental.json.JsonArray;
@@ -165,14 +164,9 @@ public class VaadinTestUtils {
    *          renderer
    * @return renderer's template
    */
-  public static String rendererTemplate(Renderer<?> renderer) {
+  public static String rendererTemplate(LitRenderer<?> renderer) {
     try {
-      Field field;
-      if (renderer instanceof LitRenderer) {
-        field = LitRenderer.class.getDeclaredField("templateExpression");
-      } else {
-        field = Renderer.class.getDeclaredField("template");
-      }
+      Field field = LitRenderer.class.getDeclaredField("templateExpression");
       field.setAccessible(true);
       return (String) field.get(renderer);
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
