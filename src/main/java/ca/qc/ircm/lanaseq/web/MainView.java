@@ -10,6 +10,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.Serial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @RolesAllowed({ USER })
 public class MainView extends Composite<VerticalLayout> implements BeforeEnterObserver {
   public static final String VIEW_NAME = "";
+  @Serial
   private static final long serialVersionUID = -8440231785563887343L;
   private static final Logger logger = LoggerFactory.getLogger(MainView.class);
   private transient AuthenticatedUser authenticatedUser;

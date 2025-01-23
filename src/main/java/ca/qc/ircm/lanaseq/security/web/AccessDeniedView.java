@@ -21,6 +21,7 @@ import com.vaadin.flow.router.HasErrorParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.Serial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -38,6 +39,7 @@ public class AccessDeniedView extends Composite<VerticalLayout>
   public static final String HOME = "home";
   private static final String MESSAGE_PREFIX = messagePrefix(AccessDeniedView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = -5974627607641654031L;
   private static final Logger logger = LoggerFactory.getLogger(AccessDeniedView.class);
   protected H2 header = new H2();

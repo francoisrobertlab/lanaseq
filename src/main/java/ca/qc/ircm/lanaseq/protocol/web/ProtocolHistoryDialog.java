@@ -23,6 +23,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ public class ProtocolHistoryDialog extends Dialog
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
   private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private static final Logger logger = LoggerFactory.getLogger(ProtocolHistoryDialog.class);
+  @Serial
   private static final long serialVersionUID = -7797831034001410430L;
   protected Grid<ProtocolFile> files = new Grid<>();
   protected Column<ProtocolFile> filename;
@@ -73,11 +75,12 @@ public class ProtocolHistoryDialog extends Dialog
     layout.setSizeFull();
     layout.expand(files);
     files.setId(id(FILES));
-    filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor))
-        .setKey(FILENAME).setSortProperty(FILENAME)
-        .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
-    recover = files.addColumn(LitRenderer.<ProtocolFile>of(RECOVER_BUTTON)
-        .withFunction("recoverFile", this::recoverFile)).setKey(RECOVER);
+    filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor)).setKey(FILENAME)
+        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
+        .setFlexGrow(10);
+    recover = files.addColumn(
+        LitRenderer.<ProtocolFile>of(RECOVER_BUTTON).withFunction("recoverFile", this::recoverFile))
+        .setKey(RECOVER);
   }
 
   private Anchor filenameAnchor(ProtocolFile file) {

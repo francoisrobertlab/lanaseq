@@ -50,6 +50,7 @@ import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -91,6 +92,7 @@ public class SampleFilesDialog extends Dialog
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(SampleFilesDialog.class);
+  @Serial
   private static final long serialVersionUID = 166699830639260659L;
   protected Div message = new Div();
   protected VerticalLayout folders = new VerticalLayout();

@@ -73,6 +73,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -112,6 +113,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialog.class);
+  @Serial
   private static final long serialVersionUID = 3285639770914046262L;
   protected TextField namePrefix = new TextField();
   protected Button generateName = new Button();
@@ -211,10 +213,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.setHeight("11em");
     samples.setSelectionMode(SelectionMode.NONE);
     sampleName = samples.addColumn(Sample::getName, SampleProperties.NAME)
-        .setKey(SampleProperties.NAME)
-        .setComparator(NormalizedComparator.of(Sample::getName));
-    sampleRemove = samples.addColumn(new ComponentRenderer<>(this::sampleDelete))
-        .setKey(REMOVE).setSortable(false);
+        .setKey(SampleProperties.NAME).setComparator(NormalizedComparator.of(Sample::getName));
+    sampleRemove = samples.addColumn(new ComponentRenderer<>(this::sampleDelete)).setKey(REMOVE)
+        .setSortable(false);
     samples.setRowsDraggable(true);
     samples.addDragStartListener(e -> {
       draggedSample = e.getDraggedItems().get(0);
@@ -276,7 +277,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         .withConverter(
             namePrefix -> namePrefix
                 + date.getOptionalValue().map(date -> "_" + dateFormatter.format(date)).orElse(""),
-                this::nameToNamePrefix)
+            this::nameToNamePrefix)
         .bind(NAME);
     date.addValueChangeListener(e -> {
       // Force update of dataset name.

@@ -35,6 +35,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
@@ -73,6 +74,7 @@ public class AddDatasetFilesDialog extends Dialog
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
   private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = 166699830639260659L;
   private static final Logger logger = LoggerFactory.getLogger(AddDatasetFilesDialog.class);
   protected Div message = new Div();

@@ -17,6 +17,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import java.io.Serial;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Set;
@@ -32,6 +33,7 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
   public static final String TO = "to";
   public static final String HELPER = "helper";
   private static final String MESSAGE_PREFIX = messagePrefix(DateRangeField.class);
+  @Serial
   private static final long serialVersionUID = -4145468405854590525L;
   protected FormLayout layout = new FormLayout();
   protected DatePicker from = new DatePicker();

@@ -46,6 +46,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinServletRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -71,6 +72,7 @@ public class UsersView extends VerticalLayout
   private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(UsersView.class);
   protected Grid<User> users = new Grid<>();

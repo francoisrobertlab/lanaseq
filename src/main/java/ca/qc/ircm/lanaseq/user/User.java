@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -25,6 +26,7 @@ import org.springframework.lang.Nullable;
 public class User implements Data, Owned, Serializable {
   public static final String TABLE_NAME = "users";
   public static final long ROBOT_ID = 1;
+  @Serial
   private static final long serialVersionUID = -3200958473089020837L;
   /**
    * Database identifier.

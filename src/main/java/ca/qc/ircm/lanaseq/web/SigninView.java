@@ -27,6 +27,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -57,6 +58,7 @@ public class SigninView extends LoginOverlay
   private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = 638443368018456019L;
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;

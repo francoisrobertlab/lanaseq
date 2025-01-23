@@ -32,6 +32,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = -3052158575710045415L;
   protected Column<Dataset> name;
   protected Column<Dataset> keywords;

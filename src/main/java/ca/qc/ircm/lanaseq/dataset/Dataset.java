@@ -24,6 +24,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.validation.constraints.Size;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
     justification = ENTITY_EI_EXPOSE_REP)
 public class Dataset implements Data, DataWithFiles, Owned, Serializable {
   public static final String NAME_ALREADY_EXISTS = property(DatasetProperties.NAME, ALREADY_EXISTS);
+  @Serial
   private static final long serialVersionUID = -8296884268335212959L;
   /**
    * Database identifier.

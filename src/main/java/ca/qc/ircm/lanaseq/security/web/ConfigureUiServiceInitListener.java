@@ -13,6 +13,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.io.Serial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.security.access.AccessDeniedException;
 @SpringComponent
 public class ConfigureUiServiceInitListener implements VaadinServiceInitListener {
   private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
+  @Serial
   private static final long serialVersionUID = 1796331428220223698L;
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListener.class);

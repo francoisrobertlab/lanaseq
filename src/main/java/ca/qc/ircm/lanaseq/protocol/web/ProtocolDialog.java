@@ -60,6 +60,7 @@ import jakarta.annotation.PostConstruct;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -96,6 +97,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(ProtocolDialog.class);
+  @Serial
   private static final long serialVersionUID = -7797831034001410430L;
   protected TextField name = new TextField();
   protected TextArea note = new TextArea();
@@ -145,11 +147,12 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
         event -> addFile(event.getFileName(), uploadBuffer.getInputStream(event.getFileName())));
     upload.addFailedListener(event -> failedFile(event.getFileName()));
     files.setId(id(FILES));
-    filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor))
-        .setKey(FILENAME).setSortProperty(FILENAME)
-        .setComparator(NormalizedComparator.of(ProtocolFile::getFilename)).setFlexGrow(10);
-    remove = files.addColumn(LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile",
-            this::removeFile)).setKey(REMOVE);
+    filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor)).setKey(FILENAME)
+        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
+        .setFlexGrow(10);
+    remove = files.addColumn(
+        LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile", this::removeFile))
+        .setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
     save.setId(id(SAVE));

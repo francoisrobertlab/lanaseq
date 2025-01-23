@@ -32,6 +32,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -52,6 +53,7 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   private static final Logger logger = LoggerFactory.getLogger(SelectSampleDialog.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = -1701490833972618304L;
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;

@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.web;
 
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import java.io.File;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -10,6 +11,7 @@ import java.util.Objects;
  */
 @GeneratePropertyNames
 public class EditableFile implements Serializable {
+  @Serial
   private static final long serialVersionUID = -3555492104705517702L;
   private File file;
   private String filename;

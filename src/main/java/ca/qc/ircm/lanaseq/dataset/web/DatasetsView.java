@@ -29,6 +29,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -63,6 +64,7 @@ public class DatasetsView extends VerticalLayout
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = 2568742367790329628L;
   private static final Logger logger = LoggerFactory.getLogger(DatasetsView.class);
   protected Button edit = new Button();

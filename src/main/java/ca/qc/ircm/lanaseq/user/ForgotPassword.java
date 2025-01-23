@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import java.util.Objects;
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
 public class ForgotPassword implements Data, Serializable {
+  @Serial
   private static final long serialVersionUID = -2805056622482303376L;
   /**
    * Database identifier.

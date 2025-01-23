@@ -60,6 +60,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = 166699830639260659L;
   private static final Logger logger = LoggerFactory.getLogger(SampleDialog.class);
   protected DatePicker date = new DatePicker();

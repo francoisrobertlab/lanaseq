@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Size;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import org.springframework.lang.Nullable;
@@ -28,6 +29,7 @@ import org.springframework.lang.Nullable;
     value = { "EI_EXPOSE_REP", "EI_EXPOSE_REP2" },
     justification = ENTITY_EI_EXPOSE_REP)
 public class Protocol implements Data, Owned, Serializable {
+  @Serial
   private static final long serialVersionUID = 5424531974394821303L;
   /**
    * Database identifier.

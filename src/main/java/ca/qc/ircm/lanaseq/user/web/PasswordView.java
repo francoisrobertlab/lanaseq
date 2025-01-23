@@ -25,6 +25,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.Serial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class PasswordView extends VerticalLayout
   public static final String HEADER = "header";
   private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = -8554355390432590290L;
   private static final Logger logger = LoggerFactory.getLogger(PasswordView.class);
   protected H2 header = new H2();

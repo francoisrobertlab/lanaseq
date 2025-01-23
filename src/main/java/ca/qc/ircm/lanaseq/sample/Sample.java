@@ -21,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Size;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ import org.springframework.lang.Nullable;
     justification = ENTITY_EI_EXPOSE_REP)
 public class Sample implements Data, DataWithFiles, Owned, Serializable {
   public static final String NAME_ALREADY_EXISTS = property(SampleProperties.NAME, ALREADY_EXISTS);
+  @Serial
   private static final long serialVersionUID = -6336061129214438932L;
   /**
    * Database identifier.

@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.security;
 
 import ca.qc.ircm.lanaseq.Data;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Objects;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.User;
  * An authenticated user.
  */
 public class UserDetailsWithId extends User implements Data {
+  @Serial
   private static final long serialVersionUID = -5167464958438112402L;
   private final long id;
 

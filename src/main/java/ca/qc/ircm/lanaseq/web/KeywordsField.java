@@ -9,6 +9,7 @@ import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class KeywordsField extends MultiSelectComboBox<String> implements Locale
   public static final String NEW_KEYWORD_REGEX = "[\\w-]*";
   public static final String NEW_KEYWORD_REGEX_ERROR = "regex";
   private static final String MESSAGE_PREFIX = messagePrefix(KeywordsField.class);
+  @Serial
   private static final long serialVersionUID = -1880458092354113415L;
   private Validator<String> validator;
 

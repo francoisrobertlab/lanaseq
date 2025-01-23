@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.text;
 import static ca.qc.ircm.lanaseq.text.Strings.normalize;
 
 import com.vaadin.flow.function.SerializableFunction;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
@@ -12,6 +13,7 @@ import java.util.Objects;
  */
 public record NormalizedComparator<T>(SerializableFunction<T, String> converter)
     implements Comparator<T>, Serializable {
+  @Serial
   private static final long serialVersionUID = -1607340161804603169L;
 
   public static <T> NormalizedComparator<T> of(SerializableFunction<T, String> converter) {

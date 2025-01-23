@@ -29,6 +29,7 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
 import jakarta.annotation.PostConstruct;
+import java.io.Serial;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,7 @@ public class ViewLayout extends AppLayout
   public static final String NAV = "nav";
   private static final String MESSAGE_PREFIX = messagePrefix(ViewLayout.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = 710800815636494374L;
   private static final Logger logger = LoggerFactory.getLogger(ViewLayout.class);
   protected H1 applicationName = new H1();

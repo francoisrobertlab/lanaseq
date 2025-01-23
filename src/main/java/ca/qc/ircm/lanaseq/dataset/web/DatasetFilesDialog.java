@@ -54,6 +54,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -98,6 +99,7 @@ public class DatasetFilesDialog extends Dialog
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetFilesDialog.class);
+  @Serial
   private static final long serialVersionUID = 166699830639260659L;
   protected Div message = new Div();
   protected VerticalLayout folders = new VerticalLayout();

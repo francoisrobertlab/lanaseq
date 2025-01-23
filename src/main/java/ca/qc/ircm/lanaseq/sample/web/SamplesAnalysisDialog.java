@@ -22,6 +22,7 @@ import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +49,7 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
   public static final String CREATE_FOLDER_EXCEPTION = property(CREATE_FOLDER, "exception");
   private static final String MESSAGE_PREFIX = messagePrefix(SamplesAnalysisDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(SamplesAnalysisDialog.class);
+  @Serial
   private static final long serialVersionUID = 3521519771905055445L;
   protected Div message = new Div();
   protected MultiSelectComboBox<String> filenamePatterns = new MultiSelectComboBox<>();

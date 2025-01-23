@@ -50,6 +50,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -83,6 +84,7 @@ public class SamplesView extends VerticalLayout
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = -6945706067250351889L;
   private static final Logger logger = LoggerFactory.getLogger(SamplesView.class);
   protected Grid<Sample> samples = new Grid<>();

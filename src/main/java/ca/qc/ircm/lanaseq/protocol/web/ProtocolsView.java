@@ -40,6 +40,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
   private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @Serial
   private static final long serialVersionUID = -2370599174391239721L;
   private static final Logger logger = LoggerFactory.getLogger(ProtocolsView.class);
   protected Grid<Protocol> protocols = new Grid<>();
