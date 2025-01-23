@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Dataset or group of samples.
@@ -117,26 +119,27 @@ public class Dataset implements Data, DataWithFiles, Owned, Serializable {
    */
   public void generateName() {
     StringBuilder builder = new StringBuilder();
+    Consumer<String> appendNotNull = value -> {
+      if (value != null) {
+        builder.append(value).append("_");
+      }
+    };
     if (!samples.isEmpty()) {
       Sample first = samples.get(0);
-      builder.append(first.getAssay().replaceAll("[^\\w]", "") + "_");
-      builder.append(first.getType() != null ? first.getType().replaceAll("[^\\w]", "") + "_" : "");
-      builder.append(first.getTarget() != null ? first.getTarget() + "_" : "");
-      builder.append(first.getStrain() + "_");
-      builder
-          .append(first.getStrainDescription() != null ? first.getStrainDescription() + "_" : "");
-      builder.append(first.getTreatment() != null ? first.getTreatment() + "_" : "");
+      builder.append(first.getAssay().replaceAll("\\W", "")).append("_");
+      if (first.getType() != null) {
+        builder.append(first.getType().replaceAll("\\W", "")).append("_");
+      }
+      appendNotNull.accept(first.getTarget());
+      appendNotNull.accept(first.getStrain());
+      appendNotNull.accept(first.getStrainDescription());
+      appendNotNull.accept(first.getTreatment());
     }
-    StringBuilder samplesBuilder = new StringBuilder();
-    for (Sample sample : samples) {
-      samplesBuilder.append(sample.getSampleId() + "-");
+    builder.append(samples.stream().map(Sample::getSampleId).collect(Collectors.joining("-")))
+        .append("_");
+    if (date != null) {
+      builder.append(DateTimeFormatter.BASIC_ISO_DATE.format(date)).append("_");
     }
-    if (!samplesBuilder.isEmpty()) {
-      samplesBuilder.setCharAt(samplesBuilder.length() - 1, '_');
-    }
-    builder.append(samplesBuilder);
-    DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
-    builder.append(date != null ? formatter.format(date) + "_" : "");
     if (!builder.isEmpty()) {
       builder.deleteCharAt(builder.length() - 1);
     }

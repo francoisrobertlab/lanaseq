@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.springframework.lang.Nullable;
 
 /**
@@ -170,16 +171,25 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
    */
   public void generateName() {
     StringBuilder builder = new StringBuilder();
-    builder.append(sampleId != null ? sampleId + "_" : "");
-    builder.append(assay != null ? assay.replaceAll("[^\\w]", "") + "_" : "");
-    builder.append(type != null ? type.replaceAll("[^\\w]", "") + "_" : "");
-    builder.append(target != null ? target + "_" : "");
-    builder.append(strain != null ? strain + "_" : "");
-    builder.append(strainDescription != null ? strainDescription + "_" : "");
-    builder.append(treatment != null ? treatment + "_" : "");
-    builder.append(replicate != null ? replicate + "_" : "");
+    Consumer<String> appendNotNull = value -> {
+      if (value != null) {
+        builder.append(value).append("_");
+      }
+    };
+    appendNotNull.accept(sampleId);
+    if (assay != null) {
+      builder.append(assay.replaceAll("\\W", "")).append("_");
+    }
+    if (type != null) {
+      builder.append(type.replaceAll("\\W", "")).append("_");
+    }
+    appendNotNull.accept(target);
+    appendNotNull.accept(strain);
+    appendNotNull.accept(strainDescription);
+    appendNotNull.accept(treatment);
+    appendNotNull.accept(replicate);
     if (date != null) {
-      builder.append(DateTimeFormatter.BASIC_ISO_DATE.format(date) + "_");
+      builder.append(DateTimeFormatter.BASIC_ISO_DATE.format(date)).append("_");
     }
     if (!builder.isEmpty()) {
       builder.deleteCharAt(builder.length() - 1);
