@@ -398,7 +398,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
       EditableFile file = new EditableFile(path);
       Renderer<EditableFile> filenameRawRenderer =
           dialog.files.getColumnByKey(SampleFilesDialog.FILENAME).getRenderer();
-      assertInstanceOf(LitRenderer<EditableFile>.class, filenameRawRenderer);
+      assertInstanceOf(LitRenderer.class, filenameRawRenderer);
       LitRenderer<EditableFile> filenameRenderer = (LitRenderer<EditableFile>) filenameRawRenderer;
       assertEquals(FILENAME_HTML, rendererTemplate(filenameRenderer));
       assertTrue(properties(filenameRenderer).containsKey("title"));
