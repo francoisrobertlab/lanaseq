@@ -14,6 +14,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -178,7 +179,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
     assertNotNull(dialog.samples.getColumnByKey(NAME));
     assertNotNull(dialog.samples.getColumnByKey(DATE));
     assertNotNull(dialog.samples.getColumnByKey(OWNER));
-    assertTrue(dialog.samples.getSelectionModel() instanceof SelectionModel.Single);
+    assertInstanceOf(SelectionModel.Single.class, dialog.samples.getSelectionModel());
     List<Sample> samples = items(dialog.samples);
     verify(service).all();
     assertEquals(this.samples.size(), samples.size());
@@ -335,7 +336,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
 
     dialog.ownerFilter.setValue("");
 
-    assertEquals(null, dialog.filter().ownerContains);
+    assertNull(dialog.filter().ownerContains);
     verify(dialog.samples.getDataProvider(), times(2)).refreshAll();
   }
 }

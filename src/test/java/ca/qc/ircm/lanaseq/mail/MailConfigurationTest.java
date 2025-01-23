@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.mail;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ public class MailConfigurationTest {
 
   @Test
   public void defaultValues() {
-    assertEquals(true, mailConfiguration.enabled());
+    assertTrue(mailConfiguration.enabled());
     assertEquals("lanaseq@ircm.qc.ca", mailConfiguration.from());
     assertEquals("christian.poitras@ircm.qc.ca", mailConfiguration.to());
     assertEquals("lanaseq", mailConfiguration.subject());

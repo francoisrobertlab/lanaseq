@@ -27,6 +27,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -244,7 +245,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertTrue(view.date.isSortable());
     assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
         .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
-    assertTrue(view.samples.getSelectionModel() instanceof SelectionModel.Multi);
+    assertInstanceOf(SelectionModel.Multi.class, view.samples.getSelectionModel());
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
     assertTrue(view.owner.isSortable());
     List<Sample> samples = items(view.samples);
@@ -551,7 +552,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.edit();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(SampleFilesDialog.class).exists());
@@ -565,7 +566,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.edit();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
     assertFalse($(SampleFilesDialog.class).exists());
@@ -641,7 +642,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.merge();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
     verify(service, never()).isMergable(any());
@@ -657,7 +658,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     test(view.merge).click();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR),
         ((ErrorNotification) error).getText());
     verify(service).isMergable(samplesCaptor.capture());
@@ -677,7 +678,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     test(view.merge).click();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(
         view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"),
@@ -714,7 +715,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.viewFiles();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(SampleFilesDialog.class).exists());
@@ -728,7 +729,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.viewFiles();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
     assertFalse($(SampleFilesDialog.class).exists());
@@ -763,7 +764,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     view.analyze();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(SamplesAnalysisDialog.class).exists());

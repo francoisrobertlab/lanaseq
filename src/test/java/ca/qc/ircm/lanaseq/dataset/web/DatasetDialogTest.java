@@ -44,6 +44,7 @@ import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.englishDateP
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.frenchDatePickerI18n;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -328,7 +329,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     assertTrue(dialog.sampleName.isSortable());
     assertNotNull(dialog.samples.getColumnByKey(REMOVE));
     assertFalse(dialog.sampleRemove.isSortable());
-    assertTrue(dialog.samples.getSelectionModel() instanceof GridNoneSelectionModel);
+    assertInstanceOf(GridNoneSelectionModel.class, dialog.samples.getSelectionModel());
     assertTrue(dialog.samples.isRowsDraggable());
     Dataset dataset = service.get(2L).orElseThrow();
     assertEquals(dataset.getSamples().size(), dialog.samples.getListDataView().getItemCount());

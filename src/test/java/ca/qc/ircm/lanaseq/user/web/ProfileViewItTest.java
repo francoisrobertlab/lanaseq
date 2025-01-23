@@ -7,6 +7,7 @@ import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -133,7 +134,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertEquals(name, user.getName());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
     assertEquals(LocalDateTime.of(2018, 12, 7, 15, 40, 12), user.getLastSignAttempt());
-    assertEquals(null, user.getLocale());
+    assertNull(user.getLocale());
     $(ProfileViewElement.class).waitForFirst();
   }
 }

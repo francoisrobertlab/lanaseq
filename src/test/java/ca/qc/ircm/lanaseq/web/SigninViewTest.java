@@ -89,7 +89,7 @@ public class SigninViewTest extends SpringUIUnitTest {
 
   @Test
   public void styles() {
-    assertTrue(view.getId().orElse("").equals(ID));
+    assertEquals(ID, view.getId().orElse(""));
     assertTrue(view.isForgotPasswordButtonVisible());
   }
 

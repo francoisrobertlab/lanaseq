@@ -4,6 +4,7 @@ import static ca.qc.ircm.lanaseq.security.SwitchUserService.ROLE_PREVIOUS_ADMINI
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -75,7 +76,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
     User user = repository.findById(3L).orElseThrow();
     service.switchUser(user, VaadinServletRequest.getCurrent());
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, authentication.getPrincipal());
     UserDetailsWithId userDetails = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals(3L, userDetails.getId());
     assertEquals("jonh.smith@ircm.qc.ca", userDetails.getUsername());
@@ -91,7 +92,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
     assertEquals(ROLE_PREVIOUS_ADMINISTRATOR, switchUserGrantedAuthority.getAuthority());
     assertNotNull(switchUserGrantedAuthority.getSource());
     Authentication previousAuthentication = switchUserGrantedAuthority.getSource();
-    assertTrue(previousAuthentication.getPrincipal() instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, previousAuthentication.getPrincipal());
     UserDetailsWithId previousUserDetails =
         (UserDetailsWithId) previousAuthentication.getPrincipal();
     assertEquals(1L, previousUserDetails.getId());
@@ -126,7 +127,7 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
     service.switchUser(user, VaadinServletRequest.getCurrent());
     service.exitSwitchUser(VaadinServletRequest.getCurrent());
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, authentication.getPrincipal());
     UserDetailsWithId userDetails = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals(1L, userDetails.getId());
     assertEquals("lanaseq@ircm.qc.ca", userDetails.getUsername());

@@ -34,9 +34,9 @@ public class UserServiceInjectionTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(true, user.isManager());
-    assertEquals(true, user.isAdmin());
+    assertTrue(user.isActive());
+    assertTrue(user.isManager());
+    assertTrue(user.isAdmin());
     assertNull(user.getLocale());
   }
 }

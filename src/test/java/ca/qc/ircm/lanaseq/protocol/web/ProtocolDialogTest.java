@@ -41,6 +41,7 @@ import static ca.qc.ircm.lanaseq.web.UploadInternationalization.frenchUploadI18N
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -301,7 +302,7 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     assertEquals(2, dialog.files.getColumns().size());
     assertNotNull(dialog.files.getColumnByKey(FILENAME));
     assertNotNull(dialog.files.getColumnByKey(REMOVE));
-    assertTrue(dialog.files.getSelectionModel() instanceof SelectionModel.Single);
+    assertInstanceOf(SelectionModel.Single.class, dialog.files.getSelectionModel());
   }
 
   @Test

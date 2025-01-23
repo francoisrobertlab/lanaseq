@@ -32,6 +32,7 @@ import static ca.qc.ircm.lanaseq.web.UploadInternationalization.frenchUploadI18N
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -295,7 +296,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
-      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertInstanceOf(Span.class, dialog.folders.getComponentAt(i));
       assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
     });
   }
@@ -310,7 +311,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
-      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertInstanceOf(Span.class, dialog.folders.getComponentAt(i));
       assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
     });
   }
@@ -325,7 +326,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
-      assertTrue(dialog.folders.getComponentAt(i) instanceof Span);
+      assertInstanceOf(Span.class, dialog.folders.getComponentAt(i));
       assertEquals(labels.get(i), dialog.folders.getComponentAt(i).getElement().getText());
     });
   }
@@ -339,7 +340,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     verify(service).folderLabels(sample, false);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, 1), dialog.message.getText());
     assertEquals(1, dialog.folders.getComponentCount());
-    assertTrue(dialog.folders.getComponentAt(0) instanceof Span);
+    assertInstanceOf(Span.class, dialog.folders.getComponentAt(0));
     assertEquals(labels.get(0), dialog.folders.getComponentAt(0).getElement().getText());
   }
 
@@ -379,7 +380,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       EditableFile file = new EditableFile(path);
       Renderer<EditableFile> filenameRawRenderer =
           dialog.files.getColumnByKey(FILENAME).getRenderer();
-      assertTrue(filenameRawRenderer instanceof LitRenderer<EditableFile>);
+      assertInstanceOf(LitRenderer<EditableFile>.class, filenameRawRenderer);
       LitRenderer<EditableFile> filenameRenderer = (LitRenderer<EditableFile>) filenameRawRenderer;
       assertEquals(FILENAME_HTML, rendererTemplate(filenameRenderer));
       assertTrue(properties(filenameRenderer).containsKey("title"));
@@ -400,7 +401,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       assertNotEquals("", downloadAnchor.getHref());
       assertEquals(1, downloadAnchor.getChildren().toArray().length);
       Component downloadAnchorChild = downloadAnchor.getChildren().findFirst().orElseThrow();
-      assertTrue(downloadAnchorChild instanceof Button);
+      assertInstanceOf(Button.class, downloadAnchorChild);
       Button downloadButton = (Button) downloadAnchorChild;
       validateIcon(VaadinIcon.DOWNLOAD.create(), downloadButton.getIcon());
       assertEquals("", downloadButton.getText());
@@ -416,7 +417,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void files_FilenameColumnComparator() {
     Comparator<EditableFile> comparator = dialog.filename.getComparator(SortDirection.ASCENDING);
-    assertTrue(comparator.compare(editableFile("a"), editableFile("a")) == 0);
+    assertEquals(0, comparator.compare(editableFile("a"), editableFile("a")));
     assertTrue(comparator.compare(editableFile("a"), editableFile("e")) < 0);
     assertTrue(comparator.compare(editableFile("e"), editableFile("a")) > 0);
   }

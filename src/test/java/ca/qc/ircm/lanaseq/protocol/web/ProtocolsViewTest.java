@@ -18,6 +18,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -191,7 +192,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     assertTrue(view.date.isSortable());
     assertNotNull(view.protocols.getColumnByKey(OWNER));
     assertTrue(view.owner.isSortable());
-    assertTrue(view.protocols.getSelectionModel() instanceof SelectionModel.Single);
+    assertInstanceOf(SelectionModel.Single.class, view.protocols.getSelectionModel());
     List<Protocol> protocols = items(view.protocols);
     verify(service).all();
     assertEquals(this.protocols.size(), protocols.size());
@@ -442,7 +443,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     view.edit();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(ProtocolHistoryDialog.class).exists());
@@ -501,7 +502,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
     view.history();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(ProtocolHistoryDialog.class).exists());

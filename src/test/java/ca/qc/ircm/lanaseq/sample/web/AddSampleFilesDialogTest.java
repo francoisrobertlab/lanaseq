@@ -18,6 +18,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -239,8 +240,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
           dialog.getTranslation(MESSAGE_PREFIX + AddSampleFilesDialog.SIZE_VALUE,
               file.length() / 1048576),
           test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
-      assertTrue(
-          test(dialog.files).getCellComponent(i, dialog.overwrite.getKey()) instanceof Checkbox);
+      assertInstanceOf(Checkbox.class,
+          test(dialog.files).getCellComponent(i, dialog.overwrite.getKey()));
     }
   }
 

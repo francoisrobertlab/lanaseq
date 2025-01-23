@@ -5,6 +5,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -87,7 +88,7 @@ public class AuthenticatedUserTest {
   @Test
   @WithAnonymousUser
   public void getUser_Anonymous() {
-    assertTrue(!authenticatedUser.getUser().isPresent());
+    assertFalse(authenticatedUser.getUser().isPresent());
   }
 
   @Test
@@ -190,7 +191,7 @@ public class AuthenticatedUserTest {
     assertTrue(
         findAuthority(oldAuthentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
             .isPresent());
-    assertTrue(oldAuthentication.getPrincipal() instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, oldAuthentication.getPrincipal());
     UserDetailsWithId user = (UserDetailsWithId) oldAuthentication.getPrincipal();
     assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getPassword());
@@ -217,7 +218,7 @@ public class AuthenticatedUserTest {
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
     assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
         .isPresent());
-    assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, authentication.getPrincipal());
     user = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getPassword());
@@ -252,7 +253,7 @@ public class AuthenticatedUserTest {
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.ADMIN).isPresent());
     assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
         .isPresent());
-    assertTrue(authentication.getPrincipal() instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, authentication.getPrincipal());
     UserDetailsWithId user = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals("lanaseq@ircm.qc.ca", user.getUsername());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getPassword());

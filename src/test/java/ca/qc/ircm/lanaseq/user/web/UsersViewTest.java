@@ -20,6 +20,7 @@ import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.USERS_REQUIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -222,7 +223,7 @@ public class UsersViewTest extends SpringUIUnitTest {
 
   @Test
   public void users_SelectionMode() {
-    assertTrue(view.users.getSelectionModel() instanceof SelectionModel.Single);
+    assertInstanceOf(SelectionModel.Single.class, view.users.getSelectionModel());
   }
 
   @Test
@@ -292,8 +293,8 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void users_ActiveColumnComparator() {
     Comparator<User> comparator = view.active.getComparator(SortDirection.ASCENDING);
     assertTrue(comparator.compare(active(false), active(true)) < 0);
-    assertTrue(comparator.compare(active(false), active(false)) == 0);
-    assertTrue(comparator.compare(active(true), active(true)) == 0);
+    assertEquals(0, comparator.compare(active(false), active(false)));
+    assertEquals(0, comparator.compare(active(true), active(true)));
     assertTrue(comparator.compare(active(true), active(false)) > 0);
   }
 
@@ -475,7 +476,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void edit_EmptySelection() {
     view.edit();
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
     verify(switchUserService, never()).switchUser(any(), any());
@@ -509,7 +510,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   public void switchUser_EmptySelection() {
     view.switchUser();
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS_REQUIRED),
         ((ErrorNotification) error).getText());
     verify(switchUserService, never()).switchUser(any(), any());

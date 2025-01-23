@@ -19,6 +19,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -132,7 +133,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
   @Test
   public void datasets() {
-    assertTrue(view.datasets.getSelectionModel() instanceof SelectionModel.Multi);
+    assertInstanceOf(SelectionModel.Multi.class, view.datasets.getSelectionModel());
   }
 
   @Test
@@ -222,7 +223,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.edit();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(DatasetFilesDialog.class).exists());
@@ -236,7 +237,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.edit();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
     assertFalse($(DatasetFilesDialog.class).exists());
@@ -340,7 +341,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.merge();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
     verify(sampleService, never()).isMergable(any());
@@ -388,7 +389,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.merge.click();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + MERGE_ERROR),
         ((ErrorNotification) error).getText());
     verify(sampleService).isMergable(samplesCaptor.capture());
@@ -411,7 +412,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.merge.click();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(
         view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
@@ -447,7 +448,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.viewFiles();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
     assertFalse($(DatasetFilesDialog.class).exists());
@@ -461,7 +462,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
     view.viewFiles();
 
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_MORE_THAN_ONE),
         ((ErrorNotification) error).getText());
     assertFalse($(DatasetFilesDialog.class).exists());
@@ -511,7 +512,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     assertFalse($(DatasetsAnalysisDialog.class).exists());
     Notification error = $(Notification.class).first();
-    assertTrue(error instanceof ErrorNotification);
+    assertInstanceOf(ErrorNotification.class, error);
     assertEquals(view.getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED),
         ((ErrorNotification) error).getText());
   }

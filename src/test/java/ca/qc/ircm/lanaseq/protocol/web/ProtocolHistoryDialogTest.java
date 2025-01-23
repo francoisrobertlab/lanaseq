@@ -13,6 +13,7 @@ import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.functions;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.rendererTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -136,7 +137,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
     assertEquals(2, dialog.files.getColumns().size());
     assertNotNull(dialog.files.getColumnByKey(FILENAME));
     assertNotNull(dialog.files.getColumnByKey(RECOVER));
-    assertTrue(dialog.files.getSelectionModel() instanceof SelectionModel.Single);
+    assertInstanceOf(SelectionModel.Single.class, dialog.files.getSelectionModel());
   }
 
   @Test

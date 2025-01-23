@@ -5,6 +5,7 @@ import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,14 +68,14 @@ public class SpringDataUserDetailsServiceTest {
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(1, authorities.size());
     for (GrantedAuthority authority : authorities) {
-      assertTrue(authority instanceof SimpleGrantedAuthority);
+      assertInstanceOf(SimpleGrantedAuthority.class, authority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isCredentialsNonExpired());
     assertTrue(userDetails.isAccountNonLocked());
-    assertTrue(userDetails instanceof UserDetailsWithId);
+    assertInstanceOf(UserDetailsWithId.class, userDetails);
     UserDetailsWithId userDetailsWithId = (UserDetailsWithId) userDetails;
     assertEquals((Long) 2L, userDetailsWithId.getId());
   }
@@ -88,7 +89,7 @@ public class SpringDataUserDetailsServiceTest {
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(2, authorities.size());
     for (GrantedAuthority authority : authorities) {
-      assertTrue(authority instanceof SimpleGrantedAuthority);
+      assertInstanceOf(SimpleGrantedAuthority.class, authority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
     assertTrue(findAuthority(authorities, ADMIN).isPresent());
@@ -103,7 +104,7 @@ public class SpringDataUserDetailsServiceTest {
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(2, authorities.size());
     for (GrantedAuthority authority : authorities) {
-      assertTrue(authority instanceof SimpleGrantedAuthority);
+      assertInstanceOf(SimpleGrantedAuthority.class, authority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
     assertTrue(findAuthority(authorities, MANAGER).isPresent());
@@ -119,7 +120,7 @@ public class SpringDataUserDetailsServiceTest {
     Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
     assertEquals(3, authorities.size());
     for (GrantedAuthority authority : authorities) {
-      assertTrue(authority instanceof SimpleGrantedAuthority);
+      assertInstanceOf(SimpleGrantedAuthority.class, authority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
     assertTrue(findAuthority(authorities, ADMIN).isPresent());
@@ -146,7 +147,7 @@ public class SpringDataUserDetailsServiceTest {
     List<? extends GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
     assertEquals(2, authorities.size());
     for (GrantedAuthority authority : authorities) {
-      assertTrue(authority instanceof SimpleGrantedAuthority);
+      assertInstanceOf(SimpleGrantedAuthority.class, authority);
     }
     assertTrue(findAuthority(authorities, USER).isPresent());
     assertTrue(findAuthority(authorities, FORCE_CHANGE_PASSWORD).isPresent());

@@ -12,27 +12,27 @@ public class NormalizedComparatorTest {
   @Test
   public void compare_Identity() {
     NormalizedComparator<String> comparator = new NormalizedComparator<>(s -> s);
-    assertTrue(comparator.compare("bateau", "bàteau") == 0);
-    assertTrue(comparator.compare("bateau", "bàteau") == 0);
-    assertTrue(comparator.compare("bateau", "BÀTEAU") == 0);
-    assertTrue(comparator.compare("BATEAU", "BÀTEAU") == 0);
-    assertTrue(comparator.compare("bateau", "bâteau") == 0);
-    assertTrue(comparator.compare("BATEAU", "BÂTEAU") == 0);
-    assertTrue(comparator.compare("bateau", "bäteau") == 0);
-    assertTrue(comparator.compare("BATEAU", "BÄTEAU") == 0);
-    assertTrue(comparator.compare("pepin", "pépin") == 0);
-    assertTrue(comparator.compare("pepin", "pèpin") == 0);
-    assertTrue(comparator.compare("pepin", "pêpin") == 0);
-    assertTrue(comparator.compare("pepin", "pëpin") == 0);
-    assertTrue(comparator.compare("pepin", "pepîn") == 0);
-    assertTrue(comparator.compare("pepin", "pepïn") == 0);
-    assertTrue(comparator.compare("pepin", "PÉPIN") == 0);
-    assertTrue(comparator.compare("pepon", "pepôn") == 0);
-    assertTrue(comparator.compare("pepon", "pepön") == 0);
-    assertTrue(comparator.compare("pepun", "pepùn") == 0);
-    assertTrue(comparator.compare("pepun", "pepûn") == 0);
-    assertTrue(comparator.compare("pepun", "pepün") == 0);
-    assertTrue(comparator.compare("pepin", "pépîn") == 0);
+    assertEquals(0, comparator.compare("bateau", "bàteau"));
+    assertEquals(0, comparator.compare("bateau", "bàteau"));
+    assertEquals(0, comparator.compare("bateau", "BÀTEAU"));
+    assertEquals(0, comparator.compare("BATEAU", "BÀTEAU"));
+    assertEquals(0, comparator.compare("bateau", "bâteau"));
+    assertEquals(0, comparator.compare("BATEAU", "BÂTEAU"));
+    assertEquals(0, comparator.compare("bateau", "bäteau"));
+    assertEquals(0, comparator.compare("BATEAU", "BÄTEAU"));
+    assertEquals(0, comparator.compare("pepin", "pépin"));
+    assertEquals(0, comparator.compare("pepin", "pèpin"));
+    assertEquals(0, comparator.compare("pepin", "pêpin"));
+    assertEquals(0, comparator.compare("pepin", "pëpin"));
+    assertEquals(0, comparator.compare("pepin", "pepîn"));
+    assertEquals(0, comparator.compare("pepin", "pepïn"));
+    assertEquals(0, comparator.compare("pepin", "PÉPIN"));
+    assertEquals(0, comparator.compare("pepon", "pepôn"));
+    assertEquals(0, comparator.compare("pepon", "pepön"));
+    assertEquals(0, comparator.compare("pepun", "pepùn"));
+    assertEquals(0, comparator.compare("pepun", "pepûn"));
+    assertEquals(0, comparator.compare("pepun", "pepün"));
+    assertEquals(0, comparator.compare("pepin", "pépîn"));
     assertTrue(comparator.compare("pepin", "peqin") < 0);
     assertTrue(comparator.compare("peqin", "pepin") > 0);
     assertTrue(comparator.compare("pepin", "pepin1") < 0);
@@ -42,42 +42,42 @@ public class NormalizedComparatorTest {
     assertTrue(comparator.compare("", "pepin") < 0);
     assertTrue(comparator.compare("pepin", "") > 0);
     // Test Polish, out of curiosity.
-    assertTrue(comparator.compare("a", "ą") == 0);
-    assertTrue(comparator.compare("c", "ć") == 0);
-    assertTrue(comparator.compare("e", "ę") == 0);
+    assertEquals(0, comparator.compare("a", "ą"));
+    assertEquals(0, comparator.compare("c", "ć"));
+    assertEquals(0, comparator.compare("e", "ę"));
     // Doesn't work because ł in Unicode is not l with a slash, but its own character.
     //assertTrue(comparator.compare("l", "ł") == 0);
-    assertTrue(comparator.compare("n", "ń") == 0);
-    assertTrue(comparator.compare("o", "ó") == 0);
-    assertTrue(comparator.compare("s", "ś") == 0);
-    assertTrue(comparator.compare("z", "ź") == 0);
-    assertTrue(comparator.compare("z", "ż") == 0);
+    assertEquals(0, comparator.compare("n", "ń"));
+    assertEquals(0, comparator.compare("o", "ó"));
+    assertEquals(0, comparator.compare("s", "ś"));
+    assertEquals(0, comparator.compare("z", "ź"));
+    assertEquals(0, comparator.compare("z", "ż"));
   }
 
   @Test
   public void compare_DatasetName() {
     NormalizedComparator<TestName> comparator = new NormalizedComparator<>(TestName::getName);
-    assertTrue(comparator.compare(name("bateau"), name("bàteau")) == 0);
-    assertTrue(comparator.compare(name("bateau"), name("bàteau")) == 0);
-    assertTrue(comparator.compare(name("bateau"), name("BÀTEAU")) == 0);
-    assertTrue(comparator.compare(name("BATEAU"), name("BÀTEAU")) == 0);
-    assertTrue(comparator.compare(name("bateau"), name("bâteau")) == 0);
-    assertTrue(comparator.compare(name("BATEAU"), name("BÂTEAU")) == 0);
-    assertTrue(comparator.compare(name("bateau"), name("bäteau")) == 0);
-    assertTrue(comparator.compare(name("BATEAU"), name("BÄTEAU")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pépin")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pèpin")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pêpin")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pëpin")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pepîn")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pepïn")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("PÉPIN")) == 0);
-    assertTrue(comparator.compare(name("pepon"), name("pepôn")) == 0);
-    assertTrue(comparator.compare(name("pepon"), name("pepön")) == 0);
-    assertTrue(comparator.compare(name("pepun"), name("pepùn")) == 0);
-    assertTrue(comparator.compare(name("pepun"), name("pepûn")) == 0);
-    assertTrue(comparator.compare(name("pepun"), name("pepün")) == 0);
-    assertTrue(comparator.compare(name("pepin"), name("pépîn")) == 0);
+    assertEquals(0, comparator.compare(name("bateau"), name("bàteau")));
+    assertEquals(0, comparator.compare(name("bateau"), name("bàteau")));
+    assertEquals(0, comparator.compare(name("bateau"), name("BÀTEAU")));
+    assertEquals(0, comparator.compare(name("BATEAU"), name("BÀTEAU")));
+    assertEquals(0, comparator.compare(name("bateau"), name("bâteau")));
+    assertEquals(0, comparator.compare(name("BATEAU"), name("BÂTEAU")));
+    assertEquals(0, comparator.compare(name("bateau"), name("bäteau")));
+    assertEquals(0, comparator.compare(name("BATEAU"), name("BÄTEAU")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pépin")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pèpin")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pêpin")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pëpin")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pepîn")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pepïn")));
+    assertEquals(0, comparator.compare(name("pepin"), name("PÉPIN")));
+    assertEquals(0, comparator.compare(name("pepon"), name("pepôn")));
+    assertEquals(0, comparator.compare(name("pepon"), name("pepön")));
+    assertEquals(0, comparator.compare(name("pepun"), name("pepùn")));
+    assertEquals(0, comparator.compare(name("pepun"), name("pepûn")));
+    assertEquals(0, comparator.compare(name("pepun"), name("pepün")));
+    assertEquals(0, comparator.compare(name("pepin"), name("pépîn")));
     assertTrue(comparator.compare(name("pepin"), name("peqin")) < 0);
     assertTrue(comparator.compare(name("peqin"), name("pepin")) > 0);
     assertTrue(comparator.compare(name("pepin"), name("pepin1")) < 0);
@@ -87,16 +87,16 @@ public class NormalizedComparatorTest {
     assertTrue(comparator.compare(name(""), name("pepin")) < 0);
     assertTrue(comparator.compare(name("pepin"), name("")) > 0);
     // Test Polish, out of curiosity.
-    assertTrue(comparator.compare(name("a"), name("ą")) == 0);
-    assertTrue(comparator.compare(name("c"), name("ć")) == 0);
-    assertTrue(comparator.compare(name("e"), name("ę")) == 0);
+    assertEquals(0, comparator.compare(name("a"), name("ą")));
+    assertEquals(0, comparator.compare(name("c"), name("ć")));
+    assertEquals(0, comparator.compare(name("e"), name("ę")));
     // Doesn't work because ł in Unicode is not l with a slash, but its own character.
     //assertTrue(comparator.compare(name("l"), name("ł")) == 0);
-    assertTrue(comparator.compare(name("n"), name("ń")) == 0);
-    assertTrue(comparator.compare(name("o"), name("ó")) == 0);
-    assertTrue(comparator.compare(name("s"), name("ś")) == 0);
-    assertTrue(comparator.compare(name("z"), name("ź")) == 0);
-    assertTrue(comparator.compare(name("z"), name("ż")) == 0);
+    assertEquals(0, comparator.compare(name("n"), name("ń")));
+    assertEquals(0, comparator.compare(name("o"), name("ó")));
+    assertEquals(0, comparator.compare(name("s"), name("ś")));
+    assertEquals(0, comparator.compare(name("z"), name("ź")));
+    assertEquals(0, comparator.compare(name("z"), name("ż")));
   }
 
   @Test

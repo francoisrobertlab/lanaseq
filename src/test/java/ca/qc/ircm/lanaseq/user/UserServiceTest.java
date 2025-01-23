@@ -76,10 +76,10 @@ public class UserServiceTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(true, user.isManager());
-    assertEquals(true, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertTrue(user.isManager());
+    assertTrue(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertNull(user.getLocale());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 30, 0), user.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
@@ -106,10 +106,10 @@ public class UserServiceTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(2, ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(true, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertTrue(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertEquals(Locale.ENGLISH, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(READ));
   }
@@ -124,7 +124,7 @@ public class UserServiceTest {
   public void exists_Email_True() {
     boolean exists = service.exists("christian.poitras@ircm.qc.ca");
 
-    assertEquals(true, exists);
+    assertTrue(exists);
 
     verifyNoInteractions(authenticatedUser);
   }
@@ -133,7 +133,7 @@ public class UserServiceTest {
   public void exists_Email_False() {
     boolean exists = service.exists("abc@ircm.qc.ca");
 
-    assertEquals(false, exists);
+    assertFalse(exists);
 
     verifyNoInteractions(authenticatedUser);
   }
@@ -174,10 +174,10 @@ public class UserServiceTest {
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(true, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertTrue(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertNull(user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
@@ -202,10 +202,10 @@ public class UserServiceTest {
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertEquals(Locale.ENGLISH, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
@@ -230,10 +230,10 @@ public class UserServiceTest {
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
-    assertEquals(true, user.isActive());
-    assertEquals(true, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertTrue(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertNull(user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
   }
@@ -257,10 +257,10 @@ public class UserServiceTest {
     assertNull(user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
     assertNull(user.getLastSignAttempt());
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertEquals(Locale.ENGLISH, user.getLocale());
   }
 
@@ -285,10 +285,10 @@ public class UserServiceTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
@@ -315,10 +315,10 @@ public class UserServiceTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(true, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertFalse(user.isAdmin());
+    assertTrue(user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertEquals(Locale.CHINESE, user.getLocale());
     verify(permissionEvaluator).hasPermission(any(), eq(user), eq(WRITE));
@@ -365,10 +365,10 @@ public class UserServiceTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 21, 10, 14, 53), user.getCreationDate());
     assertNull(user.getLocale());
     verify(authenticatedUser).reloadAuthorities();
@@ -392,10 +392,10 @@ public class UserServiceTest {
         .isAfter(user.getLastSignAttempt()));
     assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
         .isBefore(user.getLastSignAttempt()));
-    assertEquals(true, user.isActive());
-    assertEquals(false, user.isManager());
-    assertEquals(false, user.isAdmin());
-    assertEquals(false, user.isExpiredPassword());
+    assertTrue(user.isActive());
+    assertFalse(user.isManager());
+    assertFalse(user.isAdmin());
+    assertFalse(user.isExpiredPassword());
     assertEquals(LocalDateTime.of(2018, 11, 20, 9, 48, 47), user.getCreationDate());
     assertNull(user.getLocale());
     verify(authenticatedUser, never()).reloadAuthorities();

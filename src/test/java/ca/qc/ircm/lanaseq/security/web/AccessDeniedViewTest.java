@@ -41,7 +41,7 @@ public class AccessDeniedViewTest extends SpringUIUnitTest {
 
   @Test
   public void styles() {
-    assertTrue(view.getContent().getId().orElse("").equals(VIEW_NAME));
+    assertEquals(VIEW_NAME, view.getContent().getId().orElse(""));
     assertTrue(view.header.hasClassName(HEADER));
     assertTrue(view.message.hasClassName(MESSAGE));
     assertTrue(view.home.hasClassName(HOME));
