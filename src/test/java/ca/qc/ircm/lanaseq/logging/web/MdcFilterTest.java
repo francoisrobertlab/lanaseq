@@ -61,7 +61,7 @@ public class MdcFilterTest {
 
   @Test
   public void doFilter_User() throws Throwable {
-    Long userId = 3L;
+    long userId = 3L;
     String email = "test@ircm.qc.ca";
     when(authenticatedUser.getUser()).thenReturn(Optional.of(new User(userId, email)));
     doAnswer(i -> {
