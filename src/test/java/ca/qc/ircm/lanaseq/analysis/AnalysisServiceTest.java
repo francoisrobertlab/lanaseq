@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -195,7 +196,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(8, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(8, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -245,7 +248,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(2, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(2, files.count());
+    }
     Sample sample3 = datasets.get(0).getSamples().get(0);
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
@@ -282,7 +287,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(8, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(8, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertTrue(Files.isSymbolicLink(fastq1));
@@ -341,7 +348,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(8, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(8, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -418,7 +427,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(17, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(17, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -519,7 +530,9 @@ public class AnalysisServiceTest {
     assertEquals(folder, copyFolder);
     assertFalse(Files.exists(folder.resolve(extraFilename)));
     assertTrue(Files.exists(folder));
-    assertEquals(8, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(8, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -573,7 +586,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(2, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(2, files.count());
+    }
     Sample sample3 = datasets.get(0).getSamples().get(0);
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
@@ -616,7 +631,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(datasets), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(2, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(2, files.count());
+    }
     Sample sample3 = datasets.get(0).getSamples().get(0);
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
@@ -651,7 +668,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(7, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(7, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -695,7 +714,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(1, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(1, files.count());
+    }
     Sample sample3 = samples.get(0);
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
@@ -726,7 +747,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(7, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(7, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertTrue(Files.isSymbolicLink(fastq1));
@@ -779,7 +802,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(7, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(7, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq.gz");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -850,7 +875,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(16, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(16, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -945,7 +972,9 @@ public class AnalysisServiceTest {
     assertEquals(folder, copyFolder);
     assertFalse(Files.exists(folder.resolve(extraFilename)));
     assertTrue(Files.exists(folder));
-    assertEquals(7, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(7, files.count());
+    }
     Path fastq1 = folder.resolve(sample.getName() + "_R1.fastq");
     assertTrue(Files.exists(fastq1));
     assertFalse(Files.isSymbolicLink(fastq1));
@@ -1004,7 +1033,9 @@ public class AnalysisServiceTest {
 
     assertEquals(configuration.getAnalysis().folder(samples), folder);
     assertTrue(Files.exists(folder));
-    assertEquals(1, Files.list(folder).count());
+    try (Stream<Path> files = Files.list(folder)) {
+      assertEquals(1, files.count());
+    }
     Sample sample3 = samples.get(0);
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
