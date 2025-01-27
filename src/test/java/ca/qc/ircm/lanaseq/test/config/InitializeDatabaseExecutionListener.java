@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.test.config;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,22 +45,22 @@ public class InitializeDatabaseExecutionListener
     logger.debug("Initializes database");
 
     User user = userRepository.findById(1L).orElseThrow();
-    user.setLastSignAttempt(LocalDateTime.now().minus(4, ChronoUnit.DAYS));
+    user.setLastSignAttempt(LocalDateTime.now().minusDays(4));
     userRepository.save(user);
     user = userRepository.findById(2L).orElseThrow();
-    user.setLastSignAttempt(LocalDateTime.now().minus(2, ChronoUnit.HOURS));
+    user.setLastSignAttempt(LocalDateTime.now().minusHours(2));
     userRepository.save(user);
     user = userRepository.findById(3L).orElseThrow();
-    user.setLastSignAttempt(LocalDateTime.now().minus(10, ChronoUnit.DAYS));
+    user.setLastSignAttempt(LocalDateTime.now().minusDays(10));
     userRepository.save(user);
     user = userRepository.findById(4L).orElseThrow();
-    user.setLastSignAttempt(LocalDateTime.now().minus(21, ChronoUnit.DAYS));
+    user.setLastSignAttempt(LocalDateTime.now().minusDays(21));
     userRepository.save(user);
     user = userRepository.findById(5L).orElseThrow();
-    user.setLastSignAttempt(LocalDateTime.now().minus(20, ChronoUnit.MINUTES));
+    user.setLastSignAttempt(LocalDateTime.now().minusMinutes(20));
     userRepository.save(user);
     user = userRepository.findById(6L).orElseThrow();
-    user.setLastSignAttempt(LocalDateTime.now().minus(20, ChronoUnit.MINUTES));
+    user.setLastSignAttempt(LocalDateTime.now().minusMinutes(20));
     userRepository.save(user);
   }
 

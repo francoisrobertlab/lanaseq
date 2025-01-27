@@ -14,7 +14,6 @@ import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,10 +168,8 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     User user = userRepository.findById(6L).orElseThrow();
     assertEquals(3, user.getSignAttempts());
-    assertTrue(
-        LocalDateTime.now().minus(19, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
-    assertTrue(
-        LocalDateTime.now().minus(30, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusMinutes(19).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusMinutes(30).isBefore(user.getLastSignAttempt()));
   }
 
   @Test
@@ -218,7 +215,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   public void loadUserByUsername_NotLockedLastSignAttemp() {
     User user = userRepository.findById(3L).orElseThrow();
     user.setSignAttempts(5);
-    user.setLastSignAttempt(LocalDateTime.now().minus(6, ChronoUnit.MINUTES));
+    user.setLastSignAttempt(LocalDateTime.now().minusMinutes(6));
     userRepository.save(user);
 
     Authentication authentication =
@@ -235,7 +232,7 @@ public class DaoAuthenticationProviderWithLdapTest {
   public void loadUserByUsername_Locked() {
     User user = userRepository.findById(3L).orElseThrow();
     user.setSignAttempts(5);
-    user.setLastSignAttempt(LocalDateTime.now().minus(1, ChronoUnit.MINUTES));
+    user.setLastSignAttempt(LocalDateTime.now().minusMinutes(1));
     userRepository.save(user);
 
     Authentication authentication =
@@ -249,8 +246,7 @@ public class DaoAuthenticationProviderWithLdapTest {
 
     user = userRepository.findById(3L).orElseThrow();
     assertEquals(5, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(1, ChronoUnit.MINUTES).isAfter(user.getLastSignAttempt()));
-    assertTrue(
-        LocalDateTime.now().minus(2, ChronoUnit.MINUTES).isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusMinutes(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(user.getLastSignAttempt()));
   }
 }

@@ -19,7 +19,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.InitializeDatabaseExecutionListener;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -72,10 +71,8 @@ public class UserServiceTest {
     assertEquals("lanaseq@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS2, user.getHashedPassword());
     assertEquals(1, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
-        .isAfter(user.getLastSignAttempt()));
-    assertTrue(LocalDateTime.now().minus(4, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
-        .isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusDays(4).plusHours(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusDays(4).minusHours(1).isBefore(user.getLastSignAttempt()));
     assertTrue(user.isActive());
     assertTrue(user.isManager());
     assertTrue(user.isAdmin());
@@ -102,10 +99,8 @@ public class UserServiceTest {
     assertEquals("francois.robert@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(0, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(2, ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS)
-        .isAfter(user.getLastSignAttempt()));
-    assertTrue(LocalDateTime.now().minus(2, ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS)
-        .isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusHours(2).plusHours(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusHours(2).minusHours(1).isBefore(user.getLastSignAttempt()));
     assertTrue(user.isActive());
     assertTrue(user.isManager());
     assertFalse(user.isAdmin());
@@ -281,10 +276,10 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(3, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
-        .isAfter(user.getLastSignAttempt()));
-    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
-        .isBefore(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minusMinutes(20).plusHours(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minusMinutes(20).minusHours(1).isBefore(user.getLastSignAttempt()));
     assertTrue(user.isActive());
     assertFalse(user.isManager());
     assertFalse(user.isAdmin());
@@ -311,10 +306,10 @@ public class UserServiceTest {
     assertEquals("test.user@ircm.qc.ca", user.getEmail());
     assertEquals(InitializeDatabaseExecutionListener.PASSWORD_PASS1, user.getHashedPassword());
     assertEquals(3, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
-        .isAfter(user.getLastSignAttempt()));
-    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
-        .isBefore(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minusMinutes(20).plusHours(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minusMinutes(20).minusHours(1).isBefore(user.getLastSignAttempt()));
     assertTrue(user.isActive());
     assertFalse(user.isManager());
     assertFalse(user.isAdmin());
@@ -361,10 +356,10 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(3, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).plus(1, ChronoUnit.HOURS)
-        .isAfter(user.getLastSignAttempt()));
-    assertTrue(LocalDateTime.now().minus(20, ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS)
-        .isBefore(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minusMinutes(20).plusHours(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(
+        LocalDateTime.now().minusMinutes(20).minusHours(1).isBefore(user.getLastSignAttempt()));
     assertTrue(user.isActive());
     assertFalse(user.isManager());
     assertFalse(user.isAdmin());
@@ -388,10 +383,8 @@ public class UserServiceTest {
     verify(passwordEncoder).encode("newpassword");
     assertEquals(hashedPassword, user.getHashedPassword());
     assertEquals(2, user.getSignAttempts());
-    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).plus(1, ChronoUnit.HOURS)
-        .isAfter(user.getLastSignAttempt()));
-    assertTrue(LocalDateTime.now().minus(10, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS)
-        .isBefore(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusDays(10).plusHours(1).isAfter(user.getLastSignAttempt()));
+    assertTrue(LocalDateTime.now().minusDays(10).minusHours(1).isBefore(user.getLastSignAttempt()));
     assertTrue(user.isActive());
     assertFalse(user.isManager());
     assertFalse(user.isAdmin());
