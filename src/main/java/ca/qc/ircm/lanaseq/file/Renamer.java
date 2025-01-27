@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class Renamer {
   public static void renameFiles(String oldName, String newName, Path folder) {
     List<Path> files;
     try (Stream<Path> stream = Files.list(folder)) {
-      files = stream.collect(Collectors.toList());
+      files = stream.toList();
     } catch (IOException e) {
       files = new ArrayList<>();
     }

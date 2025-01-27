@@ -69,7 +69,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -267,7 +266,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
       Sample sample = samples.get(i);
       assertEquals(sample.getName(),
           test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.name)));
-      assertEquals(sample.getKeywords().stream().collect(Collectors.joining(", ")),
+      assertEquals(String.join(", ", sample.getKeywords()),
           test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.keywords)));
       assertEquals(sample.getProtocol().getName(),
           test(view.samples).getCellText(i, view.samples.getColumns().indexOf(view.protocol)));

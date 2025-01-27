@@ -37,8 +37,7 @@ public class SampleFilter implements Predicate<Sample> {
     }
     if (keywordsContains != null) {
       test &= sample.getKeywords().stream()
-          .filter(keyword -> comparable(keyword).contains(comparable(keywordsContains))).findAny()
-          .isPresent();
+          .anyMatch(keyword -> comparable(keyword).contains(comparable(keywordsContains)));
     }
     if (protocolContains != null) {
       test &= comparable(replaceNull(sample.getProtocol().getName()))

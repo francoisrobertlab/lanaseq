@@ -369,8 +369,8 @@ public class SampleService {
     } else {
       final String oldName = old.getName();
       final Path oldFolder = configuration.getHome().folder(old);
-      List<Path> oldArchives = configuration.getArchives().stream().map(drive -> drive.folder(old))
-          .collect(Collectors.toList());
+      List<Path> oldArchives =
+          configuration.getArchives().stream().map(drive -> drive.folder(old)).toList();
       repository.save(sample);
       Path folder = configuration.getHome().folder(sample);
       Renamer.moveFolder(oldFolder, folder);

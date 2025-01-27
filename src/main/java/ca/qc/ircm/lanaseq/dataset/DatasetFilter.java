@@ -40,8 +40,7 @@ public class DatasetFilter implements Predicate<Dataset> {
     }
     if (keywordsContains != null) {
       test &= dataset.getKeywords().stream()
-          .filter(keyword -> comparable(keyword).contains(comparable(keywordsContains))).findAny()
-          .isPresent();
+          .anyMatch(keyword -> comparable(keyword).contains(comparable(keywordsContains)));
     }
     if (protocolContains != null) {
       String protocol = !dataset.getSamples().isEmpty() ? Optional.of(dataset.getSamples().get(0))

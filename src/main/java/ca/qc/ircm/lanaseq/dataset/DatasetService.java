@@ -299,7 +299,7 @@ public class DatasetService {
     if (dataset.getId() != 0 && !dataset.isEditable()) {
       throw new IllegalArgumentException("dataset " + dataset + " cannot be edited");
     }
-    if (dataset.getSamples().stream().filter(sample -> sample.getId() == 0).findAny().isPresent()) {
+    if (dataset.getSamples().stream().anyMatch(sample -> sample.getId() == 0)) {
       throw new IllegalArgumentException("all dataset's samples must already be in database");
     }
     LocalDateTime now = LocalDateTime.now();
@@ -315,8 +315,8 @@ public class DatasetService {
     } else {
       final String oldName = old.getName();
       Path oldFolder = configuration.getHome().folder(old);
-      List<Path> oldArchives = configuration.getArchives().stream().map(drive -> drive.folder(old))
-          .collect(Collectors.toList());
+      List<Path> oldArchives =
+          configuration.getArchives().stream().map(drive -> drive.folder(old)).toList();
       repository.save(dataset);
       Path folder = configuration.getHome().folder(dataset);
       Renamer.moveFolder(oldFolder, folder);

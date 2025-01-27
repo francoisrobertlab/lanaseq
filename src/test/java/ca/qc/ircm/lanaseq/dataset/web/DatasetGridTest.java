@@ -48,7 +48,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -218,7 +217,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
       Dataset dataset = datasets.get(i);
       assertEquals(dataset.getName(),
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.name)));
-      assertEquals(dataset.getKeywords().stream().collect(Collectors.joining(", ")),
+      assertEquals(String.join(", ", dataset.getKeywords()),
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.keywords)));
       assertEquals(protocol(dataset).map(Protocol::getName).orElse(""),
           test(grid).getCellText(i, grid.getColumns().indexOf(grid.protocol)));

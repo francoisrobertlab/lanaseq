@@ -208,7 +208,7 @@ public class DatasetsView extends VerticalLayout
 
   void merge() {
     List<Dataset> datasets = this.datasets.getSelectedItems().stream()
-        .sorted(Comparator.comparingLong(Dataset::getId)).collect(Collectors.toList());
+        .sorted(Comparator.comparingLong(Dataset::getId)).toList();
     Set<String> keywords = datasets.stream().flatMap(dataset -> dataset.getKeywords().stream())
         .collect(Collectors.toSet());
     List<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())

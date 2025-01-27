@@ -142,9 +142,8 @@ public class SamplesView extends VerticalLayout
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(Sample::getName, NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
-    keywords =
-        samples.addColumn(sample -> sample.getKeywords().stream().collect(Collectors.joining(", ")),
-            KEYWORDS).setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
+    keywords = samples.addColumn(sample -> String.join(", ", sample.getKeywords()), KEYWORDS)
+        .setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
     protocol = samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL)
         .setKey(PROTOCOL).setSortProperty(PROTOCOL + "." + NAME)
         .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))

@@ -216,7 +216,7 @@ public class PermissionEvaluatorDelegatorTest {
     verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, BASE_READ);
     verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, WRITE);
     verify(datasetPermissionEvaluator).hasPermission(authentication(), dataset, BASE_WRITE);
-    datasets.stream().forEach(ds -> {
+    datasets.forEach(ds -> {
       verify(datasetPermissionEvaluator).hasPermission(authentication(), ds, READ);
       verify(datasetPermissionEvaluator).hasPermission(authentication(), ds, BASE_READ);
       verify(datasetPermissionEvaluator).hasPermission(authentication(), ds, WRITE);
@@ -299,7 +299,7 @@ public class PermissionEvaluatorDelegatorTest {
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_READ);
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, WRITE);
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_WRITE);
-    protocols.stream().forEach(pr -> {
+    protocols.forEach(pr -> {
       verify(protocolPermissionEvaluator).hasPermission(authentication(), pr, READ);
       verify(protocolPermissionEvaluator).hasPermission(authentication(), pr, BASE_READ);
       verify(protocolPermissionEvaluator).hasPermission(authentication(), pr, WRITE);
@@ -379,7 +379,7 @@ public class PermissionEvaluatorDelegatorTest {
     verify(samplePermissionEvaluator).hasPermission(authentication(), sample, BASE_READ);
     verify(samplePermissionEvaluator).hasPermission(authentication(), sample, WRITE);
     verify(samplePermissionEvaluator).hasPermission(authentication(), sample, BASE_WRITE);
-    samples.stream().forEach(sa -> {
+    samples.forEach(sa -> {
       verify(samplePermissionEvaluator).hasPermission(authentication(), sa, READ);
       verify(samplePermissionEvaluator).hasPermission(authentication(), sa, BASE_READ);
       verify(samplePermissionEvaluator).hasPermission(authentication(), sa, WRITE);

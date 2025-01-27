@@ -324,8 +324,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void protocol() {
     verify(protocolService).all();
     List<Protocol> expectedProtocols = protocolRepository.findAll();
-    List<Protocol> protocols =
-        dialog.protocol.getListDataView().getItems().collect(Collectors.toList());
+    List<Protocol> protocols = dialog.protocol.getListDataView().getItems().toList();
     assertEquals(expectedProtocols.size(), protocols.size());
     for (int i = 0; i < protocols.size(); i++) {
       assertEquals(expectedProtocols.get(i), protocols.get(i));
@@ -338,7 +337,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void assay() {
     verify(service).topAssays(50);
-    List<String> assays = dialog.assay.getListDataView().getItems().collect(Collectors.toList());
+    List<String> assays = dialog.assay.getListDataView().getItems().toList();
     assertEquals(topAssays.size(), assays.size());
     for (String assay : topAssays) {
       assertTrue(assays.contains(assay));
@@ -354,7 +353,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   @Test
   public void type() {
     verify(service).topTypes(50);
-    List<String> types = dialog.type.getListDataView().getItems().collect(Collectors.toList());
+    List<String> types = dialog.type.getListDataView().getItems().toList();
     assertEquals(topTypes.size(), types.size());
     for (String type : topTypes) {
       assertTrue(types.contains(type));

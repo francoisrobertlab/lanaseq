@@ -125,7 +125,7 @@ public class AddSampleFilesDialog extends Dialog
     HeaderRow headerRow = files.appendHeaderRow();
     headerRow.getCell(overwrite).setComponent(overwriteAll);
     overwriteAll.addValueChangeListener(
-        e -> overwriteFields.values().stream().forEach(c -> c.setValue(e.getValue())));
+        e -> overwriteFields.values().forEach(c -> c.setValue(e.getValue())));
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
@@ -274,9 +274,8 @@ public class AddSampleFilesDialog extends Dialog
 
   private boolean validate(Collection<Path> files) {
     error.setVisible(false);
-    boolean anyExists =
-        files.stream().filter(file -> exists(file.toFile()) && !overwrite(file.toFile()).getValue())
-            .findAny().isPresent();
+    boolean anyExists = files.stream()
+        .anyMatch(file -> exists(file.toFile()) && !overwrite(file.toFile()).getValue());
     if (anyExists) {
       error.setVisible(true);
       error.setText(getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR));

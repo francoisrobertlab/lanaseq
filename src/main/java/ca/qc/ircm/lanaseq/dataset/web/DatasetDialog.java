@@ -394,8 +394,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   }
 
   private void addSample(Sample sample) {
-    if (!samples.getListDataView().getItems()
-        .anyMatch(sa -> sa.getId() != 0 && sa.getId() == sample.getId())) {
+    if (samples.getListDataView().getItems()
+        .noneMatch(sa -> sa.getId() != 0 && sa.getId() == sample.getId())) {
       samples.getListDataView().addItem(sample);
       updateSamplesFields();
     }

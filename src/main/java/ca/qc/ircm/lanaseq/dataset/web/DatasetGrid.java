@@ -35,7 +35,6 @@ import jakarta.annotation.PostConstruct;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -77,9 +76,8 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
     setId(ID);
     name = addColumn(Dataset::getName, NAME).setKey(NAME).setSortProperty(NAME)
         .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
-    keywords =
-        addColumn(dataset -> dataset.getKeywords().stream().collect(Collectors.joining(", ")),
-            KEYWORDS).setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
+    keywords = addColumn(dataset -> String.join(", ", dataset.getKeywords()), KEYWORDS)
+        .setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setSortable(false).setFlexGrow(1);
     date =
