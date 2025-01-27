@@ -92,7 +92,7 @@ public class MailService {
       if (email.isMultipart()) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         StreamUtils.copy(email.getMimeMultipart().getBodyPart(0).getInputStream(), output);
-        return new String(output.toByteArray(), StandardCharsets.UTF_8);
+        return output.toString(StandardCharsets.UTF_8);
       } else {
         return String.valueOf(email.getMimeMessage().getContent());
       }
