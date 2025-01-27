@@ -76,7 +76,7 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
 
   public boolean hasCollectionPermission(Authentication authentication,
       Collection<?> targetDomainObjects, Object permission) {
-    return !targetDomainObjects.stream().map(ob -> hasPermission(authentication, ob, permission))
-        .filter(allowed -> !allowed).findFirst().isPresent();
+    return targetDomainObjects.stream().map(ob -> hasPermission(authentication, ob, permission))
+        .filter(allowed -> !allowed).findFirst().isEmpty();
   }
 }

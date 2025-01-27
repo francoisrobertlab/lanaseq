@@ -105,7 +105,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
       try {
         long id = Long.parseLong(parameters[0]);
         String confirmNumber = parameters[1];
-        if (!service.get(id, confirmNumber).isPresent()) {
+        if (service.get(id, confirmNumber).isEmpty()) {
           valid = false;
         }
       } catch (NumberFormatException e) {

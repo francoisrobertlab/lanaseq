@@ -74,7 +74,7 @@ public class AuthenticatedUser {
    * @return true if authenticated user is anonymous, false otherwise
    */
   public boolean isAnonymous() {
-    return !getUserDetails().isPresent();
+    return getUserDetails().isEmpty();
   }
 
   /**
