@@ -58,7 +58,7 @@ public class LdapServiceTest {
     LdapTemplate ldapTemplate = mock(LdapTemplate.class);
     when(
         ldapTemplate.search(any(LdapQuery.class), ArgumentMatchers.<AttributesMapper<String>>any()))
-        .thenReturn(Collections.nCopies(1, (String) null));
+        .thenReturn(Collections.nCopies(1, null));
     ldapService = new LdapService(ldapTemplate, ldapConfiguration);
 
     assertFalse(ldapService.getEmail("robertf").isPresent());
@@ -79,7 +79,7 @@ public class LdapServiceTest {
     LdapTemplate ldapTemplate = mock(LdapTemplate.class);
     when(
         ldapTemplate.search(any(LdapQuery.class), ArgumentMatchers.<AttributesMapper<String>>any()))
-        .thenReturn(Collections.nCopies(1, (String) null));
+        .thenReturn(Collections.nCopies(1, null));
     ldapService = new LdapService(ldapTemplate, ldapConfiguration);
 
     assertFalse(ldapService.getUsername("francois.robert@ircm.qc.ca").isPresent());
