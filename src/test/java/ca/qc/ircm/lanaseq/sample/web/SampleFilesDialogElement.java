@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ADD_LARGE_FILES;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILENAME;
@@ -45,6 +46,10 @@ public class SampleFilesDialogElement extends DialogElement {
 
   public TextFieldElement filenameEdit() {
     return $(TextFieldElement.class).id(id(FILENAME));
+  }
+
+  public ButtonElement refresh() {
+    return $(ButtonElement.class).id(id(REFRESH));
   }
 
   public UploadElement upload() {

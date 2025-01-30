@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -46,6 +47,7 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -233,6 +235,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     assertEquals(id(FOLDERS), dialog.folders.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
     assertEquals(id(FILENAME), dialog.filenameEdit.getId().orElse(""));
+    assertEquals(id(REFRESH), dialog.refresh.getId().orElse(""));
+    validateIcon(VaadinIcon.REFRESH.create(), dialog.refresh.getIcon());
     assertEquals(id(UPLOAD), dialog.upload.getId().orElse(""));
     assertEquals(id(ADD_LARGE_FILES), dialog.addLargeFiles.getId().orElse(""));
     validateIcon(VaadinIcon.PLUS.create(), dialog.addLargeFiles.getIcon());
@@ -256,6 +260,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.download).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         headerRow.getCell(dialog.delete).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
     validateEquals(englishUploadI18N(), dialog.upload.getI18n());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + ADD_LARGE_FILES),
         dialog.addLargeFiles.getText());
@@ -281,6 +286,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.download).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         headerRow.getCell(dialog.delete).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
     validateEquals(frenchUploadI18N(), dialog.upload.getI18n());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + ADD_LARGE_FILES),
         dialog.addLargeFiles.getText());
@@ -550,6 +556,21 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     assertTrue(Files.exists(sibling));
     assertFalse(Files.exists(path));
     assertArrayEquals(fileContent, Files.readAllBytes(sibling));
+  }
+
+  @Test
+  public void refresh() {
+    Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
+    files.add(new File("new_file_refresh.txt"));
+    when(service.files(any()))
+        .thenReturn(files.stream().map(File::toPath).collect(Collectors.toList()));
+    test(dialog.refresh).click();
+    verify(service, times(2)).files(sample);
+    List<EditableFile> files = dialog.files.getListDataView().getItems().toList();
+    assertEquals(this.files.size(), files.size());
+    for (File file : this.files) {
+      assertTrue(files.stream().anyMatch(ef -> ef.getFile().equals(file)));
+    }
   }
 
   @Test

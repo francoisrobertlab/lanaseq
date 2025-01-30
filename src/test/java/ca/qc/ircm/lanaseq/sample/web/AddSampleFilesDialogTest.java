@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.FILENAME;
@@ -175,6 +176,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
+    assertEquals(id(REFRESH), dialog.refresh.getId().orElse(""));
+    validateIcon(VaadinIcon.REFRESH.create(), dialog.refresh.getIcon());
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -195,6 +198,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.size).getText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
         headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
@@ -215,6 +219,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.size).getText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
         headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
@@ -230,7 +235,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   public void files_ColumnsValueProvider() {
     when(service.uploadFiles(any())).thenReturn(files.stream().map(File::toPath).toList());
     when(service.files(any())).thenReturn(Collections.nCopies(1, files.get(0).toPath()));
-    dialog.updateFiles();
+    test(dialog.refresh).click();
     for (int i = 0; i < files.size(); i++) {
       File file = files.get(i);
       Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
@@ -394,7 +399,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
             files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
 
-    dialog.updateFiles();
+    test(dialog.refresh).click();
 
     verify(service, times(2)).uploadFiles(sample);
     List<File> files = items(dialog.files);
@@ -402,7 +407,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(0).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath()).toFile()));
 
-    dialog.updateFiles();
+    test(dialog.refresh).click();
 
     verify(service, times(3)).uploadFiles(sample);
     files = items(dialog.files);
@@ -411,26 +416,6 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(1).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(2).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(sample).resolve(this.files.get(3).toPath()).toFile()));
-  }
-
-  @Test
-  public void updateFiles_StopThreadOnClose() throws Throwable {
-    assertTrue(dialog.updateFilesThread().isDaemon());
-    Thread.sleep(500);
-    assertTrue(dialog.updateFilesThread().isAlive());
-    dialog.close();
-    Thread.sleep(500);
-    assertFalse(dialog.updateFilesThread().isAlive());
-  }
-
-  @Test
-  public void updateFiles_StopThreadOnInterrupt() throws Throwable {
-    assertTrue(dialog.updateFilesThread().isDaemon());
-    Thread.sleep(500);
-    assertTrue(dialog.updateFilesThread().isAlive());
-    dialog.updateFilesThread().interrupt();
-    Thread.sleep(500);
-    assertFalse(dialog.updateFilesThread().isAlive());
   }
 
   @Test

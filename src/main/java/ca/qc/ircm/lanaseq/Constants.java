@@ -37,6 +37,8 @@ public class Constants {
   public static final String UPLOAD = "upload";
   public static final String DOWNLOAD = "download";
   public static final String CONFIRM = "confirm";
+  public static final String REFRESH = "refresh";
+
   /**
    * Strip this key from class name, if it matches.
    */

@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
@@ -14,7 +15,6 @@ import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -39,7 +39,6 @@ import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,8 +50,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Add dataset files dialog.
@@ -84,11 +81,11 @@ public class AddDatasetFilesDialog extends Dialog
   protected Column<File> overwrite;
   protected Checkbox overwriteAll = new Checkbox();
   protected Div error = new Div();
+  protected Button refresh = new Button();
   protected Button save = new Button();
   private Map<File, Checkbox> overwriteFields = new HashMap<>();
   private Dataset dataset;
   private Set<String> existingFilenames = new HashSet<>();
-  private transient Thread updateFilesThread;
   private transient DatasetService service;
   private transient AppConfiguration configuration;
 
@@ -112,7 +109,7 @@ public class AddDatasetFilesDialog extends Dialog
     layout.add(message, files, error);
     layout.setSizeFull();
     layout.expand(files);
-    getFooter().add(save);
+    getFooter().add(refresh, save);
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(this::filename)).setKey(FILENAME)
@@ -125,29 +122,13 @@ public class AddDatasetFilesDialog extends Dialog
     headerRow.getCell(overwrite).setComponent(overwriteAll);
     overwriteAll.addValueChangeListener(
         e -> overwriteFields.values().forEach(c -> c.setValue(e.getValue())));
+    refresh.setId(id(REFRESH));
+    refresh.setIcon(VaadinIcon.REFRESH.create());
+    refresh.addClickListener(e -> updateFiles());
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
     save.addClickListener(e -> save());
-    addOpenedChangeListener(event -> {
-      if (event.isOpened()) {
-        if (updateFilesThread != null) {
-          updateFilesThread.interrupt();
-        }
-        updateFilesThread = createUpdateFilesThread();
-        updateFilesThread.start();
-      } else {
-        if (updateFilesThread != null) {
-          updateFilesThread.interrupt();
-          try {
-            updateFilesThread.join(5000);
-          } catch (InterruptedException e) {
-            // Assume interrupted.
-          }
-        }
-        files.setItems(new ArrayList<>());
-      }
-    });
   }
 
   private Span filename(File file) {
@@ -189,6 +170,7 @@ public class AddDatasetFilesDialog extends Dialog
     files.setColumnOrder(sortOrder);
     size.setHeader(getTranslation(MESSAGE_PREFIX + SIZE));
     overwrite.setHeader(getTranslation(MESSAGE_PREFIX + OVERWRITE));
+    refresh.setText(getTranslation(CONSTANTS_PREFIX + REFRESH));
     save.setText(getTranslation(CONSTANTS_PREFIX + SAVE));
     updateHeader();
   }
@@ -226,36 +208,7 @@ public class AddDatasetFilesDialog extends Dialog
     fireEvent(new SavedEvent<>(this, true));
   }
 
-  private Thread createUpdateFilesThread() {
-    Runnable updateFilesRunnable = () -> {
-      logger.debug("start checking files in dataset upload folder {}", folder());
-      while (true) {
-        getUI().ifPresent(ui -> {
-          try {
-            ui.access(() -> {
-              updateFiles();
-              ui.push();
-            });
-          } catch (IllegalStateException | UIDetachedException e) {
-            return;
-          }
-        });
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException e) {
-          logger.debug("stop checking files in dataset upload folder {}", folder());
-          return;
-        }
-      }
-    };
-    DelegatingSecurityContextRunnable wrappedRunnable = new DelegatingSecurityContextRunnable(
-        updateFilesRunnable, SecurityContextHolder.getContext());
-    Thread thread = new Thread(wrappedRunnable);
-    thread.setDaemon(true);
-    return thread;
-  }
-
-  void updateFiles() {
+  private void updateFiles() {
     existingFilenames = service.files(dataset).stream().map(file -> file.toFile().getName())
         .collect(Collectors.toSet());
     files.setItems(
@@ -311,9 +264,5 @@ public class AddDatasetFilesDialog extends Dialog
     } catch (IOException e) {
       showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
     }
-  }
-
-  Thread updateFilesThread() {
-    return updateFilesThread;
   }
 }

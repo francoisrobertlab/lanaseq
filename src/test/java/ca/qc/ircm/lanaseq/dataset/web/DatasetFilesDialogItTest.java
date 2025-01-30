@@ -77,6 +77,7 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::folders).isPresent());
     assertTrue(optional(dialog::files).isPresent());
     assertTrue(optional(dialog::samples).isPresent());
+    assertTrue(optional(dialog::refresh).isPresent());
     assertTrue(optional(dialog::upload).isPresent());
     assertTrue(optional(dialog::addLargeFiles).isPresent());
   }
@@ -210,6 +211,27 @@ public class DatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     dialog.samples().getCell(0, 0).doubleClick();
 
     assertTrue(dialog.sampleFilesDialog().isOpen());
+  }
+
+  @Test
+  public void refresh() throws Throwable {
+    open();
+    DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
+    view.datasets().controlClick(3);
+    DatasetFilesDialogElement dialog = view.filesDialog();
+    Dataset dataset = repository.findById(2L).orElseThrow();
+    Path home = configuration.getHome().folder(dataset);
+    Files.createDirectories(home);
+    Path file1 = home.resolve("R1.fastq");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file1);
+    assertEquals(0, dialog.files().getRowCount());
+
+    dialog.refresh().click();
+
+    assertEquals(1, dialog.files().getRowCount());
+    assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
   }
 
   @Test

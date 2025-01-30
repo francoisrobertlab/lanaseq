@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.FILENAME;
@@ -66,14 +67,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -162,17 +161,6 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     dialog = $(AddDatasetFilesDialog.class).first();
   }
 
-  /**
-   * After test.
-   */
-  @AfterEach
-  public void afterTest() {
-    if (dialog != null) {
-      Thread thread = dialog.updateFilesThread();
-      thread.interrupt();
-    }
-  }
-
   private void writeFile(Path file, long size) throws IOException {
     try (OutputStream output =
         new BufferedOutputStream(Files.newOutputStream(file, StandardOpenOption.CREATE))) {
@@ -195,6 +183,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     assertEquals(ID, dialog.getId().orElse(""));
     assertEquals(id(MESSAGE), dialog.message.getId().orElse(""));
     assertEquals(id(FILES), dialog.files.getId().orElse(""));
+    assertEquals(id(REFRESH), dialog.refresh.getId().orElse(""));
+    validateIcon(VaadinIcon.REFRESH.create(), dialog.refresh.getIcon());
     assertEquals(id(SAVE), dialog.save.getId().orElse(""));
     assertTrue(dialog.save.hasThemeName(ButtonVariant.LUMO_PRIMARY.getVariantName()));
     validateIcon(VaadinIcon.CHECK.create(), dialog.save.getIcon());
@@ -215,6 +205,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.size).getText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
         headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
@@ -235,6 +226,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.size).getText());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE),
         headerRow.getCell(dialog.overwrite).getText());
+    assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + SAVE), dialog.save.getText());
   }
 
@@ -249,8 +241,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void files_ColumnsValueProvider() {
     when(service.uploadFiles(any())).thenReturn(files.stream().map(File::toPath).toList());
-    when(service.files(any())).thenReturn(Collections.nCopies(1, files.get(0).toPath()));
-    dialog.updateFiles();
+    when(service.files(any())).thenReturn(List.of(files.get(0).toPath()));
+    test(dialog.refresh).click();
     for (int i = 0; i < files.size(); i++) {
       File file = files.get(i);
       Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
@@ -404,7 +396,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
-  public void updateFiles() {
+  public void refresh() {
     when(service.uploadFiles(any()))
         .thenReturn(files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
             .collect(Collectors.toList()))
@@ -412,7 +404,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
             files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     Dataset dataset = repository.findById(dialog.getDatasetId()).orElseThrow();
 
-    dialog.updateFiles();
+    test(dialog.refresh).click();
 
     verify(service, times(2)).uploadFiles(dataset);
     List<File> files = items(dialog.files);
@@ -420,7 +412,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath()).toFile()));
 
-    dialog.updateFiles();
+    test(dialog.refresh).click();
 
     verify(service, times(3)).uploadFiles(dataset);
     files = items(dialog.files);
@@ -429,26 +421,6 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(2).toPath()).toFile()));
     assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(3).toPath()).toFile()));
-  }
-
-  @Test
-  public void updateFiles_StopThreadOnClose() throws Throwable {
-    assertTrue(dialog.updateFilesThread().isDaemon());
-    Thread.sleep(500);
-    assertTrue(dialog.updateFilesThread().isAlive());
-    dialog.close();
-    Thread.sleep(500);
-    assertFalse(dialog.updateFilesThread().isAlive());
-  }
-
-  @Test
-  public void updateFiles_StopThreadOnInterrupt() throws Throwable {
-    assertTrue(dialog.updateFilesThread().isDaemon());
-    Thread.sleep(500);
-    assertTrue(dialog.updateFilesThread().isAlive());
-    dialog.updateFilesThread().interrupt();
-    Thread.sleep(500);
-    assertFalse(dialog.updateFilesThread().isAlive());
   }
 
   @Test
