@@ -76,6 +76,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::message).isPresent());
     assertTrue(optional(dialog::folders).isPresent());
     assertTrue(optional(dialog::files).isPresent());
+    assertTrue(optional(dialog::refresh).isPresent());
     assertTrue(optional(dialog::upload).isPresent());
     assertTrue(optional(dialog::addLargeFiles).isPresent());
   }
@@ -198,6 +199,27 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
+  }
+
+  @Test
+  public void refresh() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
+    view.samples().controlClick(1);
+    SampleFilesDialogElement dialog = view.filesDialog();
+    Sample sample = repository.findById(10L).orElseThrow();
+    Path home = configuration.getHome().folder(sample);
+    Files.createDirectories(home);
+    Path file1 = home.resolve("R1.fastq");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file1);
+    assertEquals(0, dialog.files().getRowCount());
+
+    dialog.refresh().click();
+
+    assertEquals(1, dialog.files().getRowCount());
+    assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
   }
 
   @Test

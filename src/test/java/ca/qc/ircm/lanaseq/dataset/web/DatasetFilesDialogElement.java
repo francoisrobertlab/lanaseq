@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.ADD_LARGE_FILES;
@@ -53,6 +54,10 @@ public class DatasetFilesDialogElement extends DialogElement {
 
   public TextFieldElement filenameEdit() {
     return $(TextFieldElement.class).id(id(FILENAME));
+  }
+
+  public ButtonElement refresh() {
+    return $(ButtonElement.class).id(id(REFRESH));
   }
 
   public UploadElement upload() {

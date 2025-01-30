@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
 import static ca.qc.ircm.lanaseq.Constants.DOWNLOAD;
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -102,6 +103,7 @@ public class SampleFilesDialog extends Dialog
   protected Column<EditableFile> delete;
   protected TextField filenameEdit = new TextField();
   protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
+  protected Button refresh = new Button();
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
   private Sample sample;
@@ -145,7 +147,7 @@ public class SampleFilesDialog extends Dialog
     layout.add(messageAndFolders, files);
     layout.setSizeFull();
     layout.expand(files);
-    getFooter().add(upload, addLargeFiles);
+    getFooter().add(refresh, upload, addLargeFiles);
     message.setId(id(MESSAGE));
     folders.setId(id(FOLDERS));
     folders.setPadding(false);
@@ -171,6 +173,9 @@ public class SampleFilesDialog extends Dialog
     filenameEdit.setId(id(FILENAME));
     filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
     filenameEdit.setWidthFull();
+    refresh.setId(id(REFRESH));
+    refresh.setIcon(VaadinIcon.REFRESH.create());
+    refresh.addClickListener(e -> updateFiles());
     upload.setId(id(UPLOAD));
     upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
@@ -226,6 +231,7 @@ public class SampleFilesDialog extends Dialog
     filename.setHeader(getTranslation(MESSAGE_PREFIX + FILENAME));
     download.setHeader(getTranslation(CONSTANTS_PREFIX + DOWNLOAD));
     delete.setHeader(getTranslation(CONSTANTS_PREFIX + DELETE));
+    refresh.setText(getTranslation(CONSTANTS_PREFIX + REFRESH));
     addLargeFiles.setText(getTranslation(MESSAGE_PREFIX + ADD_LARGE_FILES));
     upload.setI18n(uploadI18N(getLocale()));
     updateHeader();

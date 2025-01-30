@@ -81,11 +81,12 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::header).isPresent());
     assertTrue(optional(dialog::message).isPresent());
     assertTrue(optional(dialog::files).isPresent());
+    assertTrue(optional(dialog::refresh).isPresent());
     assertTrue(optional(dialog::save).isPresent());
   }
 
   @Test
-  public void refresh_Files() throws Throwable {
+  public void refresh() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
@@ -95,7 +96,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Sample sample = repository.findById(10L).orElseThrow();
     assertEquals(0, dialog.files().getRowCount());
     copyFiles(sample);
-    Thread.sleep(2500);
+
+    dialog.refresh().click();
+
     assertEquals(2, dialog.files().getRowCount());
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
@@ -103,7 +106,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         configuration.getUpload().getFolder().resolve("prefix_" + sample.getName() + "_R1"));
-    Thread.sleep(2500);
+
+    dialog.refresh().click();
+
     assertEquals(4, dialog.files().getRowCount());
   }
 

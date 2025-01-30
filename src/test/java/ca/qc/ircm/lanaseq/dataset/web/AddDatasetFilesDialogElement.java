@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
+import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.FILES;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
@@ -29,6 +30,10 @@ public class AddDatasetFilesDialogElement extends DialogElement {
 
   public GridElement files() {
     return $(GridElement.class).id(id(FILES));
+  }
+
+  public ButtonElement refresh() {
+    return $(ButtonElement.class).id(id(REFRESH));
   }
 
   public ButtonElement save() {
