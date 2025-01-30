@@ -40,8 +40,9 @@ public class Renamer {
   }
 
   /**
-   * Renames all files in folder that contains the old name to the new name. <br> Also fixes the
-   * filenames present in <code>.md5</code> files.
+   * Renames all files in folder that contains the old name to the new name.
+   *
+   * <p>Also fixes the filenames present in <code>.md5</code> files.</p>
    *
    * @param oldName old name
    * @param newName new name

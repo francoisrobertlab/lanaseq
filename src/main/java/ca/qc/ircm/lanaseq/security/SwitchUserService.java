@@ -34,9 +34,9 @@ import org.springframework.stereotype.Service;
 
 /**
  * Switch user service.
- * <p>
- * <br/> Most code was copied from
- * org.springframework.security.web.authentication.switchuser.SwitchUserFilter.
+ *
+ * <p>Most code was copied from
+ * org.springframework.security.web.authentication.switchuser.SwitchUserFilter.</p>
  */
 @Service
 public class SwitchUserService {

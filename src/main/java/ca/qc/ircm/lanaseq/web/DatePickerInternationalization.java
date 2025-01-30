@@ -12,8 +12,9 @@ import java.util.Locale;
 public class DatePickerInternationalization {
 
   /**
-   * Returns {@link DatePickerI18n} for specified locale. <br> Falls back to English if no instance
-   * exists for specified locale.
+   * Returns {@link DatePickerI18n} for specified locale.
+   *
+   * <p>Falls back to English if no instance exists for specified locale.</p>
    *
    * @param locale locale
    * @return {@link DatePickerI18n} for specified locale, never null
