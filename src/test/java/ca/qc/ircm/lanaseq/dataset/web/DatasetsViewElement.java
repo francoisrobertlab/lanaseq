@@ -18,6 +18,7 @@ import org.openqa.selenium.By;
 @Element("vaadin-vertical-layout")
 @Attribute(name = "id", value = DatasetsView.ID)
 public class DatasetsViewElement extends VerticalLayoutElement {
+
   public DatasetGridElement datasets() {
     return $(DatasetGridElement.class).first();
   }

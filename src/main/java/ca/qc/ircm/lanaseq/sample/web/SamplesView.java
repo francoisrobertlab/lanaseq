@@ -66,9 +66,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Samples view.
  */
 @Route(value = SamplesView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ USER })
+@RolesAllowed({USER})
 public class SamplesView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+
   public static final String VIEW_NAME = "samples";
   public static final String ID = "samples-view";
   public static final String SAMPLES = "samples";

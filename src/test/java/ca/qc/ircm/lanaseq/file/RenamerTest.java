@@ -16,6 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
  * Tests for {@link Renamer}.
  */
 public class RenamerTest {
+
   @TempDir
   Path tempDir;
   private Random random = new Random();

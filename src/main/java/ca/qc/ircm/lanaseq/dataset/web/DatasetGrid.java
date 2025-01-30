@@ -45,6 +45,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
+
   public static final String ID = "datasets-grid";
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RoleValidator {
+
   protected RoleValidator() {
   }
 
@@ -22,8 +23,7 @@ public class RoleValidator {
   /**
    * Returns true if current user has specified role, false otherwise.
    *
-   * @param role
-   *          role
+   * @param role role
    * @return true if current user has specified role, false otherwise
    */
   public boolean hasRole(String role) {
@@ -44,8 +44,7 @@ public class RoleValidator {
   /**
    * Returns true if current user has any of the specified roles, false otherwise.
    *
-   * @param roles
-   *          roles
+   * @param roles roles
    * @return true if current user has any of the specified roles, false otherwise
    */
   public boolean hasAnyRole(String... roles) {
@@ -59,8 +58,7 @@ public class RoleValidator {
   /**
    * Returns true if current user has all of the specified roles, false otherwise.
    *
-   * @param roles
-   *          roles
+   * @param roles roles
    * @return true if current user has all of the specified roles, false otherwise
    */
   public boolean hasAllRoles(String... roles) {

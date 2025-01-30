@@ -9,6 +9,7 @@ import java.util.function.Predicate;
  * Filters users.
  */
 public class UserFilter implements Predicate<User> {
+
   public String emailContains;
   public String nameContains;
   public Boolean active;

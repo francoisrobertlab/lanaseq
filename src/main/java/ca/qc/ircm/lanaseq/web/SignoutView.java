@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 @Route(value = SignoutView.VIEW_NAME)
 @AnonymousAllowed
 public class SignoutView extends VerticalLayout implements BeforeEnterObserver, UrlComponent {
+
   public static final String VIEW_NAME = "signout";
   private static final Logger logger = LoggerFactory.getLogger(SignoutView.class);
   private transient AuthenticatedUser authenticatedUser;

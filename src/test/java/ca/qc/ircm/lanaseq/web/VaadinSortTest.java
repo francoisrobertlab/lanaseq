@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
  */
 @NonTransactionalTestAnnotations
 public class VaadinSortTest {
+
   @Test
   public void sort() {
     List<QuerySortOrder> vaadinSorts = new ArrayList<>();

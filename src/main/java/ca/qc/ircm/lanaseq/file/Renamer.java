@@ -14,15 +14,14 @@ import org.slf4j.LoggerFactory;
  * Renames files and folders.
  */
 public class Renamer {
+
   private static final Logger logger = LoggerFactory.getLogger(Renamer.class);
 
   /**
    * Renames oldFolder to folder and creates parent directories if necessary.
    *
-   * @param oldFolder
-   *          old folder
-   * @param newFolder
-   *          new folder
+   * @param oldFolder old folder
+   * @param newFolder new folder
    */
   public static void moveFolder(Path oldFolder, Path newFolder) {
     if (Files.exists(oldFolder) && !oldFolder.equals(newFolder)) {
@@ -41,15 +40,12 @@ public class Renamer {
   }
 
   /**
-   * Renames all files in folder that contains the old name to the new name. <br>
-   * Also fixes the filenames present in <code>.md5</code> files.
+   * Renames all files in folder that contains the old name to the new name. <br> Also fixes the
+   * filenames present in <code>.md5</code> files.
    *
-   * @param oldName
-   *          old name
-   * @param newName
-   *          new name
-   * @param folder
-   *          folder
+   * @param oldName old name
+   * @param newName new name
+   * @param folder  folder
    */
   public static void renameFiles(String oldName, String newName, Path folder) {
     List<Path> files;

@@ -39,15 +39,16 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolDialog.class);
+  @Value("${download-home}")
+  protected Path downloadHome;
   @Autowired
   private ProtocolRepository repository;
   @Autowired
   private ProtocolFileRepository fileRepository;
   @Autowired
   private MessageSource messageSource;
-  @Value("${download-home}")
-  protected Path downloadHome;
   private String name = "test protocol";
   private String note = "test note\nsecond line";
   private Path file1;
@@ -123,7 +124,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     Protocol protocol = repository.findByName(name).orElseThrow();
     assertNotEquals(0, protocol.getId());
@@ -156,7 +157,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     Protocol protocol = repository.findById(1L).orElseThrow();
     assertEquals(name, protocol.getName());
@@ -250,7 +251,7 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name}, currentLocale()),
         notification.getText());
     assertFalse(repository.findById(4L).isPresent());
   }

@@ -28,6 +28,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 public class PermissionEvaluatorDelegatorTest {
+
   private static final String USER_CLASS = User.class.getName();
   private static final String DATASET_CLASS = Dataset.class.getName();
   private static final String PROTOCOL_CLASS = Protocol.class.getName();

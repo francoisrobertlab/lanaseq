@@ -21,6 +21,7 @@ import org.springframework.ldap.query.LdapQuery;
  */
 @ServiceTestAnnotations
 public class LdapServiceTest {
+
   @Autowired
   private LdapService ldapService;
   @Autowired

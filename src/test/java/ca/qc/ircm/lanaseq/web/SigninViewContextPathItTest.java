@@ -12,8 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
  * Integration tests for {@link SigninView}.
  */
 @TestBenchTestAnnotations
-@ActiveProfiles({ "integration-test", "context-path" })
+@ActiveProfiles({"integration-test", "context-path"})
 public class SigninViewContextPathItTest extends AbstractTestBenchTestCase {
+
   private void open() {
     openView(VIEW_NAME);
   }

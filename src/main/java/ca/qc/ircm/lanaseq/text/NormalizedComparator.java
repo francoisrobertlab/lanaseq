@@ -13,6 +13,7 @@ import java.util.Objects;
  */
 public record NormalizedComparator<T>(SerializableFunction<T, String> converter)
     implements Comparator<T>, Serializable {
+
   @Serial
   private static final long serialVersionUID = -1607340161804603169L;
 

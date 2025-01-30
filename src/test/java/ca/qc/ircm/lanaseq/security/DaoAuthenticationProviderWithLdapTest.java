@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
  */
 @ServiceTestAnnotations
 public class DaoAuthenticationProviderWithLdapTest {
+
   @Autowired
   private DaoAuthenticationProviderWithLdap ldapDaoAuthenticationProvider;
   @Mock

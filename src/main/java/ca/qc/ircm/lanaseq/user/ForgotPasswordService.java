@@ -30,6 +30,7 @@ import org.thymeleaf.context.Context;
 @Service
 @Transactional
 public class ForgotPasswordService {
+
   /**
    * Period for which {@link ForgotPassword} instances are valid.
    */
@@ -62,10 +63,8 @@ public class ForgotPasswordService {
   /**
    * Returns ForgotPassword having this id.
    *
-   * @param id
-   *          Database identifier of ForgotPassword.
-   * @param confirmNumber
-   *          The confirm number of ForgotPassword.
+   * @param id            Database identifier of ForgotPassword.
+   * @param confirmNumber The confirm number of ForgotPassword.
    * @return ForgotPassword having this id.
    */
   public Optional<ForgotPassword> get(final long id, final String confirmNumber) {
@@ -84,10 +83,8 @@ public class ForgotPasswordService {
   /**
    * Inserts a new forgot password request for user into the database.
    *
-   * @param email
-   *          user's email
-   * @param webContext
-   *          web context used to send email to user
+   * @param email      user's email
+   * @param webContext web context used to send email to user
    */
   public void insert(String email, ForgotPasswordWebContext webContext) {
     Objects.requireNonNull(email, "email parameter cannot be null");
@@ -129,7 +126,7 @@ public class ForgotPasswordService {
     String applicationName =
         messageSource.getMessage(CONSTANT_PREFIX + "application.name", null, locale);
     String subject = messageSource.getMessage(MESSAGE_PREFIX + "subject",
-        new Object[] { applicationName }, locale);
+        new Object[]{applicationName}, locale);
     email.setSubject(subject);
     email.addTo(emailAddress);
     Context context = new Context(locale);
@@ -148,12 +145,9 @@ public class ForgotPasswordService {
    * in it's valid period before this method is called or an {@link IllegalArgumentException} will
    * be raised.
    *
-   * @param forgotPassword
-   *          The ForgotPassword request.
-   * @param newPassword
-   *          The new password of User.
-   * @throws IllegalArgumentException
-   *           if forgotPassword has expired
+   * @param forgotPassword The ForgotPassword request.
+   * @param newPassword    The new password of User.
+   * @throws IllegalArgumentException if forgotPassword has expired
    */
   public synchronized void updatePassword(ForgotPassword forgotPassword, String newPassword) {
     Objects.requireNonNull(forgotPassword, "forgotPassword parameter cannot be null");

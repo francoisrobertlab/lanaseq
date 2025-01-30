@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserver {
+
   public static final String ID = "analysis-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
@@ -141,15 +142,15 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
     return datasets.stream().map(Dataset::getId).collect(Collectors.toList());
   }
 
-  public void setDatasetId(Long id) {
-    this.datasets = Collections.nCopies(1, service.get(id).orElseThrow());
-    updateHeader();
-  }
-
   public void setDatasetIds(List<Long> ids) {
     Objects.requireNonNull(ids, "ids parameter cannot be null");
     this.datasets =
         ids.stream().map(id -> service.get(id).orElseThrow()).collect(Collectors.toList());
+    updateHeader();
+  }
+
+  public void setDatasetId(Long id) {
+    this.datasets = Collections.nCopies(1, service.get(id).orElseThrow());
     updateHeader();
   }
 }

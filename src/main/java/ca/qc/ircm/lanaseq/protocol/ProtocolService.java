@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ProtocolService {
+
   private final ProtocolRepository repository;
   private final ProtocolFileRepository fileRepository;
   private final SampleRepository sampleRepository;
@@ -43,8 +44,7 @@ public class ProtocolService {
   /**
    * Returns protocol having specified id.
    *
-   * @param id
-   *          protocol's id
+   * @param id protocol's id
    * @return protocol having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
@@ -55,8 +55,7 @@ public class ProtocolService {
   /**
    * Returns true if a protocol of the same name exists in user's laboratory, false otherwise.
    *
-   * @param name
-   *          protocol's name
+   * @param name protocol's name
    * @return true if a protocol of the same name exists in user's laboratory, false otherwise
    */
   @PreAuthorize("hasRole('" + USER + "')")
@@ -78,8 +77,7 @@ public class ProtocolService {
   /**
    * Returns all files linked to protocol.
    *
-   * @param protocol
-   *          protocol
+   * @param protocol protocol
    * @return all files linked to protocol
    */
   @PreAuthorize("hasPermission(#protocol, 'read')")
@@ -94,8 +92,7 @@ public class ProtocolService {
   /**
    * Returns all deleted files linked to protocol.
    *
-   * @param protocol
-   *          protocol
+   * @param protocol protocol
    * @return all deleted files linked to protocol
    */
   @PreAuthorize("hasPermission(#protocol, 'read') && hasAnyRole('" + MANAGER + "', '" + ADMIN
@@ -108,8 +105,7 @@ public class ProtocolService {
   /**
    * Returns true if protocol can be deleted, false otherwise.
    *
-   * @param protocol
-   *          protocol
+   * @param protocol protocol
    * @return true if protocol can be deleted, false otherwise
    */
   @PreAuthorize("hasPermission(#protocol, 'read')")
@@ -121,10 +117,8 @@ public class ProtocolService {
   /**
    * Saves protocol into database.
    *
-   * @param protocol
-   *          protocol
-   * @param files
-   *          files protocol's files
+   * @param protocol protocol
+   * @param files    files protocol's files
    */
   @PreAuthorize("hasPermission(#protocol, 'write')")
   public void save(Protocol protocol, Collection<ProtocolFile> files) {
@@ -160,8 +154,7 @@ public class ProtocolService {
   /**
    * Recovers protocol file.
    *
-   * @param file
-   *          protocol file
+   * @param file protocol file
    */
   @PreAuthorize("hasPermission(#file.protocol, 'write')")
   public void recover(ProtocolFile file) {
@@ -173,8 +166,7 @@ public class ProtocolService {
   /**
    * Deletes protocol.
    *
-   * @param protocol
-   *          protocol
+   * @param protocol protocol
    */
   @PreAuthorize("hasPermission(#protocol, 'write')")
   public void delete(Protocol protocol) {

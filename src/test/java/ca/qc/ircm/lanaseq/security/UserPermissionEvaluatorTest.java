@@ -19,6 +19,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 public class UserPermissionEvaluatorTest {
+
   private static final String USER_CLASS = User.class.getName();
   private static final String READ = "read";
   private static final Permission BASE_READ = Permission.READ;

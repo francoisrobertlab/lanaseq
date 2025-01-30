@@ -26,6 +26,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AppConfigurationTest {
+
   @Autowired
   private AppConfiguration appConfiguration;
 

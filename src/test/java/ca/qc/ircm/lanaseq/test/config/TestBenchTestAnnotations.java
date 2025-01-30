@@ -16,20 +16,21 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Configuration for {@link TestBench} tests.
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
 @TestExecutionListeners(
-    value = { InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
+    value = {InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
         FixSecurityContextHolderStrategyExecutionListener.class,
-        TestBenchTestExecutionListener.class, TestBenchSecurityFilter.class },
+        TestBenchTestExecutionListener.class, TestBenchSecurityFilter.class},
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Headless
 @Transactional
-@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
-    "/fix-it-tests.sql" })
+@Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
+    "/fix-it-tests.sql"})
 public @interface TestBenchTestAnnotations {
+
   /**
    * Returns true if ScreenshotOnFailureRule is used, false otherwise.
    *

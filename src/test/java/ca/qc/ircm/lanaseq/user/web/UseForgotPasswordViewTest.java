@@ -49,6 +49,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithAnonymousUser
 public class UseForgotPasswordViewTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(UseForgotPasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private UseForgotPasswordView view;

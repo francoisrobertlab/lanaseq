@@ -75,6 +75,7 @@ import org.springframework.util.FileSystemUtils;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SampleFilesDialog extends Dialog
     implements LocaleChangeObserver, NotificationComponent {
+
   public static final String ID = "sample-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
@@ -282,7 +283,8 @@ public class SampleFilesDialog extends Dialog
   void addSmallFile(String filename, InputStream inputStream) {
     logger.debug("saving file {} to dataset {}", filename, sample);
     try {
-      SecurityContextHolder.getContext().setAuthentication(authentication); // Sets user for current thread.
+      SecurityContextHolder.getContext()
+          .setAuthentication(authentication); // Sets user for current thread.
       try {
         Path folder = Files.createTempDirectory("lanaseq-dataset-");
         try {

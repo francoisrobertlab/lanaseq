@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
  */
 @NonTransactionalTestAnnotations
 public class ProtocolFilterTest {
+
   private ProtocolFilter filter = new ProtocolFilter();
 
   @Test

@@ -9,6 +9,7 @@ import com.vaadin.testbench.elementsbase.Element;
  */
 @Element("vaadin-grid")
 public class MultiSelectGridElement extends GridElement {
+
   @Override
   public void select(int rowIndex) {
     getCell(rowIndex, 0).$(CheckboxElement.class).first().click();

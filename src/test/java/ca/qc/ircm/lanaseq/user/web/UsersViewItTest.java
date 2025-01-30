@@ -28,6 +28,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
@@ -74,7 +75,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
 
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
         currentLocale()), getDriver().getTitle());
   }
 

@@ -10,6 +10,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-dialog")
 @Attribute(name = "id", value = SelectSampleDialog.ID)
 public class SelectSampleDialogElement extends DialogElement {
+
   public SelectSampleGridElement samples() {
     return $(SelectSampleGridElement.class).first();
   }

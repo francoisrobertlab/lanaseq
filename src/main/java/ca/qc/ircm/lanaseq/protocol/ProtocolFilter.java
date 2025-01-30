@@ -11,6 +11,7 @@ import java.util.function.Predicate;
  * Filters protocols.
  */
 public class ProtocolFilter implements Predicate<Protocol> {
+
   public String nameContains;
   public Range<LocalDate> dateRange;
   public String ownerContains;
@@ -28,7 +29,7 @@ public class ProtocolFilter implements Predicate<Protocol> {
       test &= comparable(replaceNull(protocol.getOwner().getEmail()))
           .contains(comparable(ownerContains))
           || comparable(replaceNull(protocol.getOwner().getName()))
-              .contains(comparable(ownerContains));
+          .contains(comparable(ownerContains));
     }
     return test;
   }

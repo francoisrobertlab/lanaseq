@@ -17,9 +17,8 @@ import org.springframework.test.context.TestExecutionListener;
 @Order(InitializeDatabaseExecutionListener.ORDER)
 public class InitializeDatabaseExecutionListener
     implements TestExecutionListener, InjectDependencies {
+
   public static final int ORDER = 5001;
-  private static final Logger logger =
-      LoggerFactory.getLogger(InitializeDatabaseExecutionListener.class);
   /**
    * Matches pass1.
    */
@@ -32,6 +31,8 @@ public class InitializeDatabaseExecutionListener
   @SuppressWarnings("checkstyle:linelength")
   public static final String PASSWORD_PASS2 =
       "$2a$10$JU0aj7Cc/7sWVkFXoHbWTuvVWEAwXFT1EhCX4S6Aa9JfSsKqLP8Tu";
+  private static final Logger logger =
+      LoggerFactory.getLogger(InitializeDatabaseExecutionListener.class);
   private UserRepository userRepository;
 
   @Override

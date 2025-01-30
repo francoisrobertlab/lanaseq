@@ -16,6 +16,7 @@ import java.util.List;
  * List of keywords field.
  */
 public class KeywordsField extends MultiSelectComboBox<String> implements LocaleChangeObserver {
+
   public static final String CLASS_NAME = "keywords-field";
   public static final String NEW_KEYWORD_REGEX = "[\\w-]*";
   public static final String NEW_KEYWORD_REGEX_ERROR = "regex";

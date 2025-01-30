@@ -10,11 +10,11 @@ import org.springframework.data.domain.Sort;
  * Vaadin sort utilities.
  */
 public class VaadinSort {
+
   /**
    * Converts Vaadin sort order into Spring Data sort order.
    *
-   * @param vaadinSortOrders
-   *          Vaadin sort order
+   * @param vaadinSortOrders Vaadin sort order
    * @return Spring Data sort order
    */
   public static Sort springDataSort(List<QuerySortOrder> vaadinSortOrders) {

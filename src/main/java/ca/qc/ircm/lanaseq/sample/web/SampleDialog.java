@@ -74,6 +74,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SampleDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+
   public static final String ID = "sample-dialog";
   public static final String HEADER = "header";
   public static final String SAVED = "saved";
@@ -247,11 +248,10 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   /**
    * Adds listener to be informed when a sample was saved.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration addSavedListener(ComponentEventListener<SavedEvent<SampleDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
@@ -263,13 +263,12 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   /**
    * Adds listener to be informed when a sample was saved.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration
-      addDeletedListener(ComponentEventListener<DeletedEvent<SampleDialog>> listener) {
+  addDeletedListener(ComponentEventListener<DeletedEvent<SampleDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 

@@ -31,6 +31,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 public class FixFilesDateFolderTest {
+
+  private final Map<DataWithFiles, List<Path>> files = new HashMap<>();
+  @TempDir
+  Path tempDir;
   private FixFilesDateFolder fixFilesDateFolder;
   @Autowired
   private DatasetRepository datasetRepository;
@@ -40,11 +44,8 @@ public class FixFilesDateFolderTest {
   private AppConfiguration configuration;
   @Mock
   private AppConfiguration.NetworkDrive<DataWithFiles> home;
-  @TempDir
-  Path tempDir;
   private List<Dataset> datasets;
   private List<Sample> samples;
-  private final Map<DataWithFiles, List<Path>> files = new HashMap<>();
 
   @BeforeEach
   public void beforeTest() {

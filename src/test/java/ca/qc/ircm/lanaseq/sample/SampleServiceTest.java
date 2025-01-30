@@ -69,8 +69,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleServiceTest {
+
   private static final String READ = "read";
   private static final String WRITE = "write";
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private SampleService service;
   @Autowired
@@ -91,8 +94,6 @@ public class SampleServiceTest {
   private PermissionEvaluator permissionEvaluator;
   @Autowired
   private AuthenticatedUser authenticatedUser;
-  @TempDir
-  Path temporaryFolder;
 
   /**
    * Before test.

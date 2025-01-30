@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProtocolHistoryDialog extends Dialog
     implements LocaleChangeObserver, NotificationComponent {
+
   public static final String ID = "protocols-history-dialog";
   public static final String HEADER = "header";
   public static final String FILES = "files";
@@ -79,7 +80,7 @@ public class ProtocolHistoryDialog extends Dialog
         .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
         .setFlexGrow(10);
     recover = files.addColumn(
-        LitRenderer.<ProtocolFile>of(RECOVER_BUTTON).withFunction("recoverFile", this::recoverFile))
+            LitRenderer.<ProtocolFile>of(RECOVER_BUTTON).withFunction("recoverFile", this::recoverFile))
         .setKey(RECOVER);
   }
 

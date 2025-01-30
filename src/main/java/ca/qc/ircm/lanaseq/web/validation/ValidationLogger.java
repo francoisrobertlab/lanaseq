@@ -9,13 +9,13 @@ import org.slf4j.LoggerFactory;
  * Logs validation information.
  */
 public class ValidationLogger {
+
   private static final Logger logger = LoggerFactory.getLogger(ValidationLogger.class);
 
   /**
    * Logs binder's validation errors.
    *
-   * @param status
-   *          binder's validation status
+   * @param status binder's validation status
    */
   public static void logValidation(BinderValidationStatus<?> status) {
     status.getFieldValidationErrors().forEach(error -> {

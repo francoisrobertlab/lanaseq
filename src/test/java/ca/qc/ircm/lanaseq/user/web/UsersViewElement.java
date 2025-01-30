@@ -19,6 +19,7 @@ import org.openqa.selenium.By;
 @Element("vaadin-vertical-layout")
 @Attribute(name = "id", value = UsersView.ID)
 public class UsersViewElement extends VerticalLayoutElement {
+
   public UsersGridElement users() {
     return $(UsersGridElement.class).first();
   }

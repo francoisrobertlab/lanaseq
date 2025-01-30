@@ -37,6 +37,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 public class UserServiceTest {
+
   private static final String READ = "read";
   private static final String WRITE = "write";
   @Autowired

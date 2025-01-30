@@ -32,6 +32,7 @@ import org.openqa.selenium.By;
 @Element("vaadin-dialog")
 @Attribute(name = "id", value = DatasetFilesDialog.ID)
 public class DatasetFilesDialogElement extends DialogElement {
+
   public H2Element header() {
     return $(H2Element.class).first();
   }
@@ -80,6 +81,7 @@ public class DatasetFilesDialogElement extends DialogElement {
 
   @Attribute(name = "id", value = DatasetFilesDialog.ID + "-" + FOLDERS)
   public static class FoldersElement extends VerticalLayoutElement {
+
     public List<SpanElement> labels() {
       return $(SpanElement.class).all();
     }

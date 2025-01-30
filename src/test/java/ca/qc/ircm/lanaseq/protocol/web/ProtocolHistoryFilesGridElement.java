@@ -12,6 +12,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = ProtocolHistoryDialog.ID + "-" + ProtocolHistoryDialog.FILES)
 public class ProtocolHistoryFilesGridElement extends GridElement {
+
   private static final int FILENAME_COLUMN = 0;
   private static final int RECOVER_COLUMN = 1;
 

@@ -8,6 +8,7 @@ import java.io.Serial;
  * Saved event.
  */
 public class SavedEvent<V extends Component> extends ComponentEvent<V> {
+
   @Serial
   private static final long serialVersionUID = 1558070508317511253L;
 

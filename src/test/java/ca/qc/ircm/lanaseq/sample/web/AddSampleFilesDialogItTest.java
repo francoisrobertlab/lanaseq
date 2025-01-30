@@ -34,6 +34,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
   @TempDir
   Path temporaryFolder;
@@ -133,7 +134,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
-        new Object[] { 3, sample.getName() }, currentLocale()), notification.getText());
+        new Object[]{3, sample.getName()}, currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(sample);
     Path upload = configuration.getUpload().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));

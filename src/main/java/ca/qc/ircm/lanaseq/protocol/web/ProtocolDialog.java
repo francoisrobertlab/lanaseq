@@ -76,6 +76,7 @@ import org.springframework.util.FileCopyUtils;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProtocolDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+
   public static final String ID = "protocols-dialog";
   public static final String HEADER = "header";
   public static final String FILES = "files";
@@ -151,7 +152,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
         .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
         .setFlexGrow(10);
     remove = files.addColumn(
-        LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile", this::removeFile))
+            LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile", this::removeFile))
         .setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
     filesError.addClassName(ERROR_TEXT);
@@ -226,13 +227,12 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   /**
    * Adds listener to be informed when a protocol was saved.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration
-      addSavedListener(ComponentEventListener<SavedEvent<ProtocolDialog>> listener) {
+  addSavedListener(ComponentEventListener<SavedEvent<ProtocolDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 
@@ -243,13 +243,12 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   /**
    * Adds listener to be informed when a sample was saved.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration
-      addDeletedListener(ComponentEventListener<DeletedEvent<ProtocolDialog>> listener) {
+  addDeletedListener(ComponentEventListener<DeletedEvent<ProtocolDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 

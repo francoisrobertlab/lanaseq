@@ -39,6 +39,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 public class ProtocolServiceTest {
+
   private static final String READ = "read";
   private static final String WRITE = "write";
   @Autowired
@@ -148,7 +149,7 @@ public class ProtocolServiceTest {
     assertEquals((Long) 4L, file.getId());
     assertEquals("Histone Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
+            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 21, 9, 58, 12), file.getCreationDate());
@@ -164,7 +165,7 @@ public class ProtocolServiceTest {
   }
 
   @Test
-  @WithMockUser(authorities = { UserRole.USER, UserRole.ADMIN })
+  @WithMockUser(authorities = {UserRole.USER, UserRole.ADMIN})
   public void deletedFiles_Admin() throws Throwable {
     Protocol protocol = repository.findById(3L).orElseThrow();
     List<ProtocolFile> files = service.deletedFiles(protocol);
@@ -174,7 +175,7 @@ public class ProtocolServiceTest {
     assertEquals((Long) 3L, file.getId());
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
+            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertTrue(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
@@ -182,7 +183,7 @@ public class ProtocolServiceTest {
   }
 
   @Test
-  @WithMockUser(authorities = { UserRole.USER, UserRole.MANAGER })
+  @WithMockUser(authorities = {UserRole.USER, UserRole.MANAGER})
   public void deletedFiles_Manager() throws Throwable {
     Protocol protocol = repository.findById(3L).orElseThrow();
     List<ProtocolFile> files = service.deletedFiles(protocol);
@@ -192,7 +193,7 @@ public class ProtocolServiceTest {
     assertEquals((Long) 3L, file.getId());
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
+            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertTrue(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
@@ -323,7 +324,7 @@ public class ProtocolServiceTest {
     assertEquals((Long) 3L, file.getId());
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
+            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());

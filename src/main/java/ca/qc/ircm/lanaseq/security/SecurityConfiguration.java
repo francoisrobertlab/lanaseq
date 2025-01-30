@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = SecurityConfiguration.PREFIX)
 public record SecurityConfiguration(int lockAttemps, Duration lockDuration, int disableSignAttemps,
-    String rememberMeKey) {
+                                    String rememberMeKey) {
+
   public static final String PREFIX = "security";
 }

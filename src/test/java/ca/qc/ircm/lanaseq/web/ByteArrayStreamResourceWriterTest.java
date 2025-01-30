@@ -15,6 +15,7 @@ import org.mockito.Mock;
  */
 @NonTransactionalTestAnnotations
 public class ByteArrayStreamResourceWriterTest {
+
   private ByteArrayStreamResourceWriter writer;
   private byte[] content = new byte[5120];
   @Mock

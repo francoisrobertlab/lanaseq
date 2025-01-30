@@ -21,9 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Exit switch user view.
  */
 @Route(value = ExitSwitchUserView.VIEW_NAME)
-@RolesAllowed({ ROLE_PREVIOUS_ADMINISTRATOR })
+@RolesAllowed({ROLE_PREVIOUS_ADMINISTRATOR})
 public class ExitSwitchUserView extends VerticalLayout
     implements BeforeEnterObserver, UrlComponent {
+
   public static final String VIEW_NAME = "exitSwitchUser";
   private static final Logger logger = LoggerFactory.getLogger(ExitSwitchUserView.class);
   private transient SwitchUserService switchUserService;

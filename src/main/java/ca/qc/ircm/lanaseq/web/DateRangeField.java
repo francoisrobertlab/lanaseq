@@ -28,6 +28,7 @@ import java.util.stream.Stream;
  * Date range.
  */
 public class DateRangeField extends CustomField<Range<LocalDate>> implements LocaleChangeObserver {
+
   public static final String CLASS_NAME = "date-range";
   public static final String FROM = "from";
   public static final String TO = "to";
@@ -134,6 +135,7 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
    * From and to dates to allow date range.
    */
   protected static class Dates {
+
     private LocalDate from;
     private LocalDate to;
 

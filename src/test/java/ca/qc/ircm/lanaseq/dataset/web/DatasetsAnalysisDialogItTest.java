@@ -32,6 +32,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
+
   @TempDir
   Path temporaryFolder;
   @Autowired

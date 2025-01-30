@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort.Direction;
  * Filters datasets.
  */
 public class DatasetFilter implements Predicate<Dataset> {
+
   public String nameContains;
   public String keywordsContains;
   public String protocolContains;
@@ -54,7 +55,7 @@ public class DatasetFilter implements Predicate<Dataset> {
       test &=
           comparable(replaceNull(dataset.getOwner().getEmail())).contains(comparable(ownerContains))
               || comparable(replaceNull(dataset.getOwner().getName()))
-                  .contains(comparable(ownerContains));
+              .contains(comparable(ownerContains));
     }
     return test;
   }

@@ -13,6 +13,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = DatasetDialog.ID + "-" + DatasetProperties.SAMPLES)
 public class DatasetSamplesGridElement extends GridElement {
+
   private static final int SAMPLE_ID_COLUMN = 0;
   private static final int REPLICATE_COLUMN = 1;
   private static final int REMOVE_COLUMN = 3;

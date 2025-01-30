@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProc
  */
 @Configuration
 public class UnregisterScheduledProcessor implements BeanFactoryPostProcessor {
+
   @Override
   public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
       throws BeansException {

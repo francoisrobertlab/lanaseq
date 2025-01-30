@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
+
   private DatasetRepository repository;
   private RoleValidator roleValidator;
 

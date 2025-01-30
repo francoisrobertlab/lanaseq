@@ -13,6 +13,7 @@ import org.openqa.selenium.Keys;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = SamplesView.SAMPLES)
 public class SamplesGridElement extends MultiSelectGridElement {
+
   private static final int NAME_COLUMN = 1;
   private static final int KEYWORDS_COLUMN = 2;
   private static final int PROTOCOL_COLUMN = 3;
@@ -41,8 +42,7 @@ public class SamplesGridElement extends MultiSelectGridElement {
   /**
    * Control click sample.
    *
-   * @param row
-   *          row index
+   * @param row row index
    */
   public void controlClick(int row) {
     Keys key = Keys.CONTROL;

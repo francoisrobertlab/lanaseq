@@ -48,9 +48,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Datasets view.
  */
 @Route(value = DatasetsView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ USER })
+@RolesAllowed({USER})
 public class DatasetsView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+
   public static final String VIEW_NAME = "datasets";
   public static final String ID = "datasets-view";
   public static final String DATASETS = "datasets";

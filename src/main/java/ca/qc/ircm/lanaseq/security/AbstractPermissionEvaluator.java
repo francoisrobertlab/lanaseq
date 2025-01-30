@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * Implements common methods to use for {@link PermissionEvaluator} implementations.
  */
 public abstract class AbstractPermissionEvaluator implements PermissionEvaluator {
+
   private UserRepository userRepository;
 
   protected AbstractPermissionEvaluator(UserRepository userRepository) {

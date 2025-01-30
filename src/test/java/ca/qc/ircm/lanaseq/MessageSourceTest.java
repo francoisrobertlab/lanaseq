@@ -15,6 +15,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class MessageSourceTest {
+
   @Autowired
   private MessageSource messageSource;
 

@@ -20,6 +20,7 @@ import org.springframework.util.FileSystemUtils;
  */
 @Component
 public class DeleteOldAnalysisFolders {
+
   private static final Logger logger = LoggerFactory.getLogger(DeleteOldAnalysisFolders.class);
 
   private AppConfiguration configuration;

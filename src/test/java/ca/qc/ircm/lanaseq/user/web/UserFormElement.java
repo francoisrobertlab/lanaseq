@@ -18,6 +18,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-form-layout")
 @Attribute(name = "id", value = UserForm.ID)
 public class UserFormElement extends FormLayoutElement {
+
   public TextFieldElement email() {
     return $(TextFieldElement.class).id(id(EMAIL));
   }

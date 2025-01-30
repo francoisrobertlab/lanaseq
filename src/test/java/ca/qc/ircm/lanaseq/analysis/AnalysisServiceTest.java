@@ -45,6 +45,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithMockUser
 public class AnalysisServiceTest {
+
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private AnalysisService service;
   @MockitoBean
@@ -59,8 +62,6 @@ public class AnalysisServiceTest {
   private SampleRepository sampleRepository;
   @MockitoBean
   private PermissionEvaluatorDelegator permissionEvaluator;
-  @TempDir
-  Path temporaryFolder;
   private List<Dataset> datasets = new ArrayList<>();
   private List<Sample> samples = new ArrayList<>();
   private Dataset dataset;

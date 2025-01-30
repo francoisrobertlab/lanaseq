@@ -8,6 +8,7 @@ import org.springframework.test.context.TestExecutionListener;
  * Configures UI unit tests.
  */
 public class UiUnitTestExecutionListener implements TestExecutionListener {
+
   @Override
   public void beforeTestMethod(TestContext testContext) {
     AnnotationFinder

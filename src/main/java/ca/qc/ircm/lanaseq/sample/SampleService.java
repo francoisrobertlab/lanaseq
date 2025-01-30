@@ -50,6 +50,7 @@ import org.springframework.util.FileSystemUtils;
 @Service
 @Transactional
 public class SampleService {
+
   private static final Logger logger = LoggerFactory.getLogger(SampleService.class);
   private SampleRepository repository;
   private DatasetRepository datasetRepository;
@@ -71,8 +72,7 @@ public class SampleService {
   /**
    * Returns sample with id.
    *
-   * @param id
-   *          sample's id
+   * @param id sample's id
    * @return sample with id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
@@ -83,8 +83,7 @@ public class SampleService {
   /**
    * Returns true if a dataset with specified name exists, false otherwise.
    *
-   * @param name
-   *          name
+   * @param name name
    * @return true if a dataset with specified name exists, false otherwise
    */
   public boolean exists(String name) {
@@ -105,8 +104,7 @@ public class SampleService {
   /**
    * Returns all samples passing filter.
    *
-   * @param filter
-   *          filter
+   * @param filter filter
    * @return all samples passing filter
    */
   @PostFilter("hasPermission(filterObject, 'read')")
@@ -118,8 +116,7 @@ public class SampleService {
   /**
    * Returns number of samples passing filter.
    *
-   * @param filter
-   *          filter
+   * @param filter filter
    * @return number of samples passing filter
    */
   public long count(SampleFilter filter) {
@@ -130,8 +127,7 @@ public class SampleService {
   /**
    * Returns all sample's files.
    *
-   * @param sample
-   *          sample
+   * @param sample sample
    * @return all sample's files
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
@@ -191,10 +187,8 @@ public class SampleService {
    * Only returns label for folders that exist.
    * </p>
    *
-   * @param sample
-   *          sample
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
+   * @param sample sample
+   * @param unix   true if path elements should be separated by slashes instead of backslashes
    * @return all sample's folder labels
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
@@ -220,8 +214,7 @@ public class SampleService {
   /**
    * Returns all sample's upload files.
    *
-   * @param sample
-   *          sample
+   * @param sample sample
    * @return all sample's upload files
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
@@ -257,8 +250,7 @@ public class SampleService {
   /**
    * Returns most recent keywords.
    *
-   * @param limit
-   *          maximum number of keywords to return
+   * @param limit maximum number of keywords to return
    * @return most recent keywords
    */
   public List<String> topKeywords(int limit) {
@@ -277,8 +269,7 @@ public class SampleService {
   /**
    * Returns most recent assays.
    *
-   * @param limit
-   *          maximum number of assays to return
+   * @param limit maximum number of assays to return
    * @return most recent assays
    */
   public List<String> topAssays(int limit) {
@@ -289,8 +280,7 @@ public class SampleService {
   /**
    * Returns most recent types.
    *
-   * @param limit
-   *          maximum number of types to return
+   * @param limit maximum number of types to return
    * @return most recent types
    */
   public List<String> topTypes(int limit) {
@@ -301,8 +291,7 @@ public class SampleService {
   /**
    * Returns true if sample can be deleted, false otherwise.
    *
-   * @param sample
-   *          sample
+   * @param sample sample
    * @return true if sample can be deleted, false otherwise
    */
   @PreAuthorize("hasPermission(#sample, 'read')")
@@ -314,8 +303,7 @@ public class SampleService {
   /**
    * Returns true if samples can be merged, false otherwise.
    *
-   * @param samples
-   *          samples
+   * @param samples samples
    * @return true if samples can be merged, false otherwise
    */
   @PreAuthorize("hasRole('USER')")
@@ -346,8 +334,7 @@ public class SampleService {
   /**
    * Saves sample into database.
    *
-   * @param sample
-   *          sample
+   * @param sample sample
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void save(Sample sample) {
@@ -396,10 +383,8 @@ public class SampleService {
   /**
    * Save files to sample folder.
    *
-   * @param sample
-   *          sample
-   * @param files
-   *          files to save
+   * @param sample sample
+   * @param files  files to save
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void saveFiles(Sample sample, Collection<Path> files) {
@@ -424,8 +409,7 @@ public class SampleService {
   /**
    * Deletes sample from database.
    *
-   * @param sample
-   *          sample
+   * @param sample sample
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
   public void delete(Sample sample) {
@@ -444,10 +428,8 @@ public class SampleService {
   /**
    * Deletes sample file.
    *
-   * @param sample
-   *          sample
-   * @param file
-   *          file to delete
+   * @param sample sample
+   * @param file   file to delete
    */
   public void deleteFile(Sample sample, Path file) {
     Path filename = file.getFileName();

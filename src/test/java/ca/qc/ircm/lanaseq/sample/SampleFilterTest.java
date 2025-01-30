@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort.Order;
  */
 @NonTransactionalTestAnnotations
 public class SampleFilterTest {
+
   private SampleFilter filter = new SampleFilter();
 
   @Test

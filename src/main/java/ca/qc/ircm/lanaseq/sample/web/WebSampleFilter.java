@@ -9,6 +9,7 @@ import java.io.Serial;
  * Serializable {@link SampleFilter}.
  */
 public class WebSampleFilter extends SampleFilter implements SerializablePredicate<Sample> {
+
   @Serial
   private static final long serialVersionUID = 2610000381544515210L;
 }

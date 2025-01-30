@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
+
   @Test
   @WithAnonymousUser
   public void security_Anonymous() {

@@ -51,6 +51,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 @NonTransactionalTestAnnotations
 @WithAnonymousUser
 public class SigninViewTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

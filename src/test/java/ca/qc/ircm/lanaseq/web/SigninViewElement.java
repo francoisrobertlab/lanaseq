@@ -10,4 +10,5 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-login-overlay")
 @Attribute(name = "id", value = SigninView.ID)
 public class SigninViewElement extends LoginOverlayElement {
+
 }

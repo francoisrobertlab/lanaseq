@@ -18,9 +18,10 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 @EnableTransactionManagement
 @EnableScheduling
 public class SpringConfiguration {
+
   /**
    * Creates {@link MessageSource} instance.
-   * 
+   *
    * @return {@link MessageSource} instance.
    */
   @Bean

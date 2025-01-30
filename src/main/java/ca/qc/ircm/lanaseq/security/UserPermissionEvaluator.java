@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
+
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(UserPermissionEvaluator.class);
   private UserRepository repository;

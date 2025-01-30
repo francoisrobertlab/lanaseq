@@ -46,6 +46,7 @@ import org.openqa.selenium.By;
 @Element("vaadin-dialog")
 @Attribute(name = "id", value = DatasetDialog.ID)
 public class DatasetDialogElement extends DialogElement {
+
   public H2Element header() {
     return $(H2Element.class).first();
   }

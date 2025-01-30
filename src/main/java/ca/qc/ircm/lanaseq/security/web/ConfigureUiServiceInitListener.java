@@ -24,6 +24,7 @@ import org.springframework.security.access.AccessDeniedException;
  */
 @SpringComponent
 public class ConfigureUiServiceInitListener implements VaadinServiceInitListener {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
   @Serial
   private static final long serialVersionUID = 1796331428220223698L;
@@ -48,8 +49,7 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
   /**
    * Reroutes the user if she is not authorized to access the view.
    *
-   * @param event
-   *          event
+   * @param event event
    */
   private void beforeEnter(BeforeEnterEvent event) {
     if (!authenticatedUser.isAuthorized(event.getNavigationTarget())) {
@@ -71,8 +71,7 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
   /**
    * Reroutes the user to change password, if they are forced to.
    *
-   * @param event
-   *          event
+   * @param event event
    */
   private void afterNavigation(AfterNavigationEvent event) {
     if (authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)

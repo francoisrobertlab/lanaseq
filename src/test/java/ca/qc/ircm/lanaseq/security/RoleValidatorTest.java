@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserGran
  */
 @ServiceTestAnnotations
 public class RoleValidatorTest {
+
   private static final String ADMIN = UserRole.ADMIN;
   private static final String MANAGER = UserRole.MANAGER;
   private static final String USER = UserRole.USER;
@@ -120,7 +121,7 @@ public class RoleValidatorTest {
   }
 
   @Test
-  @WithMockUser(roles = { "USER", "ADMIN" })
+  @WithMockUser(roles = {"USER", "ADMIN"})
   public void hasAllRoles_True() {
     assertTrue(roleValidator.hasAllRoles(ADMIN, DEFAULT_ROLE));
   }

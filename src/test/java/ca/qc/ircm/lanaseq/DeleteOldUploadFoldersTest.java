@@ -26,14 +26,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @NonTransactionalTestAnnotations
 public class DeleteOldUploadFoldersTest {
+
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private DeleteOldUploadFolders task;
   @MockitoBean
   private AppConfiguration configuration;
   @Mock
   private AppConfiguration.NetworkDrive<DataWithFiles> upload;
-  @TempDir
-  Path temporaryFolder;
 
   @BeforeEach
   public void beforeTest() {

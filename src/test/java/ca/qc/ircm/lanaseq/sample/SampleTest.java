@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link Sample}.
  */
 public class SampleTest {
+
   @Test
   public void generateName() {
     Sample sample = new Sample();

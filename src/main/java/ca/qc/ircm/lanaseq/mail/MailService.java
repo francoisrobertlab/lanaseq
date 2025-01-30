@@ -23,6 +23,7 @@ import org.springframework.util.StreamUtils;
  */
 @Component
 public class MailService {
+
   private final Logger logger = LoggerFactory.getLogger(MailService.class);
   private final MailConfiguration mailConfiguration;
   private final JavaMailSender mailSender;
@@ -40,8 +41,7 @@ public class MailService {
    * Creates a plain text email.
    *
    * @return plain text email
-   * @throws MessagingException
-   *           could not create email
+   * @throws MessagingException could not create email
    */
   public MimeMessageHelper textEmail() throws MessagingException {
     MimeMessage message = mailSender.createMimeMessage();
@@ -56,8 +56,7 @@ public class MailService {
    * Creates a multipart email.
    *
    * @return multipart email
-   * @throws MessagingException
-   *           could not create email
+   * @throws MessagingException could not create email
    */
   public MimeMessageHelper htmlEmail() throws MessagingException {
     MimeMessage message = mailSender.createMimeMessage();
@@ -70,10 +69,8 @@ public class MailService {
   /**
    * Sends an email.
    *
-   * @param email
-   *          email with text content only
-   * @throws MessagingException
-   *           could not send email
+   * @param email email with text content only
+   * @throws MessagingException could not send email
    */
   public void send(MimeMessageHelper email) throws MessagingException {
     if (!mailConfiguration.enabled()) {
@@ -104,8 +101,7 @@ public class MailService {
   /**
    * Sends an email to the system administrator containing error.
    *
-   * @param error
-   *          error to send
+   * @param error error to send
    */
   public void sendError(Throwable error) {
     if (!mailConfiguration.enabled()) {

@@ -7,6 +7,7 @@ import com.vaadin.flow.component.notification.Notification.Position;
  * Shows notification.
  */
 public interface NotificationComponent {
+
   int DEFAULT_DURATION = 5000;
 
   default void showNotification(String text) {

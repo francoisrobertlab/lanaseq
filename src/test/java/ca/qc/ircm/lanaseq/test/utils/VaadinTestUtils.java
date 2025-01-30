@@ -43,16 +43,15 @@ import org.slf4j.LoggerFactory;
  * Utility methods for presenter testign.
  */
 public class VaadinTestUtils {
+
   private static final String ICON_ATTRIBUTE = "icon";
   private static final Logger logger = LoggerFactory.getLogger(VaadinTestUtils.class);
 
   /**
    * Fires an event on component.
    *
-   * @param component
-   *          component
-   * @param event
-   *          event
+   * @param component component
+   * @param event     event
    */
   public static <C extends Component> void fireEvent(C component, ComponentEvent<C> event) {
     try {
@@ -61,7 +60,7 @@ public class VaadinTestUtils {
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(component);
       eventBus.fireEvent(event);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+             | IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -69,8 +68,7 @@ public class VaadinTestUtils {
   /**
    * Simulates a click on button.
    *
-   * @param button
-   *          button
+   * @param button button
    */
   public static void clickButton(Button button) {
     try {
@@ -79,7 +77,7 @@ public class VaadinTestUtils {
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
       eventBus.fireEvent(new ClickEvent<>(button));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+             | IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -87,24 +85,18 @@ public class VaadinTestUtils {
   /**
    * Simulates an item click on grid.
    *
-   * @param grid
-   *          grid
-   * @param item
-   *          item
-   * @param column
-   *          grid column
-   * @param ctrlKey
-   *          <code>true</code> if the control key was down when the event was fired,
-   *          <code>false</code> otherwise
-   * @param shiftKey
-   *          <code>true</code> if the shift key was down when the event was fired,
-   *          <code>false</code> otherwise
-   * @param altKey
-   *          <code>true</code> if the alt key was down when the event was fired, <code>false</code>
-   *          otherwise
-   * @param metaKey
-   *          <code>true</code> if the meta key was down when the event was fired,
-   *          <code>false</code> otherwise
+   * @param grid     grid
+   * @param item     item
+   * @param column   grid column
+   * @param ctrlKey  <code>true</code> if the control key was down when the event was fired,
+   *                 <code>false</code> otherwise
+   * @param shiftKey <code>true</code> if the shift key was down when the event was fired,
+   *                 <code>false</code> otherwise
+   * @param altKey   <code>true</code> if the alt key was down when the event was fired,
+   *                 <code>false</code>
+   *                 otherwise
+   * @param metaKey  <code>true</code> if the meta key was down when the event was fired,
+   *                 <code>false</code> otherwise
    */
   public static <E> void clickItem(Grid<E> grid, E item, Grid.Column<E> column, boolean ctrlKey,
       boolean shiftKey, boolean altKey, boolean metaKey) {
@@ -117,7 +109,7 @@ public class VaadinTestUtils {
           column != null ? column.getElement().getProperty("_flowId") : null, -1, -1, -1, -1, 2, 0,
           ctrlKey, shiftKey, altKey, metaKey));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+             | IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -125,10 +117,8 @@ public class VaadinTestUtils {
   /**
    * Simulates an item click on grid.
    *
-   * @param grid
-   *          grid
-   * @param item
-   *          item
+   * @param grid grid
+   * @param item item
    */
   public static <E> void doubleClickItem(Grid<E> grid, E item) {
     doubleClickItem(grid, item, null);
@@ -137,10 +127,8 @@ public class VaadinTestUtils {
   /**
    * Simulates an item click on grid.
    *
-   * @param grid
-   *          grid
-   * @param item
-   *          item
+   * @param grid grid
+   * @param item item
    */
   public static <E> void doubleClickItem(Grid<E> grid, E item, Grid.Column<E> column) {
     try {
@@ -152,7 +140,7 @@ public class VaadinTestUtils {
           column != null ? column.getElement().getProperty("_flowId") : null, -1, -1, -1, -1, 2, 0,
           false, false, false, false));
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+             | IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -160,8 +148,7 @@ public class VaadinTestUtils {
   /**
    * Returns renderer's template.
    *
-   * @param renderer
-   *          renderer
+   * @param renderer renderer
    * @return renderer's template
    */
   public static String rendererTemplate(LitRenderer<?> renderer) {
@@ -170,7 +157,7 @@ public class VaadinTestUtils {
       field.setAccessible(true);
       return (String) field.get(renderer);
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-        | IllegalAccessException e) {
+             | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -178,14 +165,12 @@ public class VaadinTestUtils {
   /**
    * Returns all registered properties of this renderer.
    *
-   * @param <SOURCE>
-   *          renderer source type
-   * @param renderer
-   *          renderer
+   * @param <SOURCE> renderer source type
+   * @param renderer renderer
    * @return all registered properties of this renderer
    */
   public static <SOURCE> Map<String, ValueProvider<SOURCE, ?>>
-      properties(LitRenderer<SOURCE> renderer) {
+  properties(LitRenderer<SOURCE> renderer) {
     try {
       Field field = LitRenderer.class.getDeclaredField("valueProviders");
       field.setAccessible(true);
@@ -194,7 +179,7 @@ public class VaadinTestUtils {
           (Map<String, ValueProvider<SOURCE, ?>>) field.get(renderer);
       return properties;
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-        | IllegalAccessException e) {
+             | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -202,14 +187,12 @@ public class VaadinTestUtils {
   /**
    * Returns all registered functions of this renderer.
    *
-   * @param <SOURCE>
-   *          renderer source type
-   * @param renderer
-   *          renderer
+   * @param <SOURCE> renderer source type
+   * @param renderer renderer
    * @return all registered functions of this renderer
    */
   public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, JsonArray>>
-      functions(LitRenderer<SOURCE> renderer) {
+  functions(LitRenderer<SOURCE> renderer) {
     try {
       Field field = LitRenderer.class.getDeclaredField("clientCallables");
       field.setAccessible(true);
@@ -218,7 +201,7 @@ public class VaadinTestUtils {
           (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(renderer);
       return functions;
     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-        | IllegalAccessException e) {
+             | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -226,8 +209,7 @@ public class VaadinTestUtils {
   /**
    * Returns items in grid, unsorted and non-filtered.
    *
-   * @param grid
-   *          grid
+   * @param grid grid
    * @return items in grid, unsorted and non-filtered
    */
   @SuppressWarnings("unchecked")
@@ -244,8 +226,7 @@ public class VaadinTestUtils {
   /**
    * Returns items in combo box, unsorted and non-filtered.
    *
-   * @param comboBox
-   *          combo box
+   * @param comboBox combo box
    * @return items in combo box, unsorted and non-filtered
    */
   @SuppressWarnings("unchecked")
@@ -261,8 +242,7 @@ public class VaadinTestUtils {
   /**
    * Returns items in select, unsorted and non-filtered.
    *
-   * @param select
-   *          select
+   * @param select select
    * @return items in select, unsorted and non-filtered
    */
   @SuppressWarnings("unchecked")
@@ -276,27 +256,25 @@ public class VaadinTestUtils {
   }
 
   public static Optional<BindingValidationStatus<?>>
-      findValidationStatusByField(BinderValidationStatus<?> statuses, HasValue<?, ?> field) {
+  findValidationStatusByField(BinderValidationStatus<?> statuses, HasValue<?, ?> field) {
     return findValidationStatusByField(statuses.getFieldValidationErrors(), field);
   }
 
   public static Optional<BindingValidationStatus<?>>
-      findValidationStatusByField(ValidationException e, HasValue<?, ?> field) {
+  findValidationStatusByField(ValidationException e, HasValue<?, ?> field) {
     return findValidationStatusByField(e.getFieldValidationErrors(), field);
   }
 
   public static Optional<BindingValidationStatus<?>>
-      findValidationStatusByField(List<BindingValidationStatus<?>> statuses, HasValue<?, ?> field) {
+  findValidationStatusByField(List<BindingValidationStatus<?>> statuses, HasValue<?, ?> field) {
     return statuses.stream().filter(ve -> ve.getField().equals(field)).findFirst();
   }
 
   /**
    * Validates that actual icon is the same as the expected icon.
    *
-   * @param expected
-   *          expected icon
-   * @param actual
-   *          actual icon
+   * @param expected expected icon
+   * @param actual   actual icon
    */
   public static void validateIcon(Icon expected, Component actual) {
     assertEquals(expected.getElement().getAttribute(ICON_ATTRIBUTE),
@@ -306,12 +284,9 @@ public class VaadinTestUtils {
   /**
    * Returns the renderer's formatted value for item.
    *
-   * @param <T>
-   *          item's type
-   * @param renderer
-   *          renderer
-   * @param item
-   *          item
+   * @param <T>      item's type
+   * @param renderer renderer
+   * @param item     item
    * @return the renderer's formatted value for item
    */
   @SuppressWarnings("unchecked")
@@ -326,7 +301,7 @@ public class VaadinTestUtils {
       getFormattedValue.setAccessible(true);
       return (String) getFormattedValue.invoke(renderer, value);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
+             | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Cannot get formatted value for renderer {} and item {}", renderer, item, e);
     }
     return null;
@@ -335,10 +310,8 @@ public class VaadinTestUtils {
   /**
    * Validates that two {@link DatePickerI18n} are identical.
    *
-   * @param expected
-   *          expected
-   * @param actual
-   *          actual
+   * @param expected expected
+   * @param actual   actual
    */
   public static void validateEquals(DatePickerI18n expected, DatePickerI18n actual) {
     assertEquals(expected.getToday(), actual.getToday());
@@ -352,10 +325,8 @@ public class VaadinTestUtils {
   /**
    * Validates that two {@link UploadI18N} are identical.
    *
-   * @param expected
-   *          expected
-   * @param actual
-   *          actual
+   * @param expected expected
+   * @param actual   actual
    */
   public static void validateEquals(UploadI18N expected, UploadI18N actual) {
     assertEquals(expected.getAddFiles().getOne(), actual.getAddFiles().getOne());

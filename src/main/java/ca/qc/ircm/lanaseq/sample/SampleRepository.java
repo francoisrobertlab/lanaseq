@@ -15,6 +15,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
  */
 public interface SampleRepository
     extends JpaRepository<Sample, Long>, QuerydslPredicateExecutor<Sample> {
+
   boolean existsByName(String name);
 
   Page<Sample> findAllByOrderByIdDesc(Pageable pageable);
@@ -24,6 +25,6 @@ public interface SampleRepository
   boolean existsByProtocol(Protocol protocol);
 
   @Override
-  @EntityGraph(attributePaths = { "protocol", "owner" })
+  @EntityGraph(attributePaths = {"protocol", "owner"})
   Page<Sample> findAll(Predicate predicate, Pageable pageable);
 }

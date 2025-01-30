@@ -23,6 +23,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ExitSwitchUserViewTest extends SpringUIUnitTest {
+
   private ExitSwitchUserView view;
   @MockitoBean
   private SwitchUserService switchUserService;

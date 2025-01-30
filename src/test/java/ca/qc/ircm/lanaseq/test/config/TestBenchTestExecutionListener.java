@@ -29,6 +29,7 @@ import org.springframework.test.context.TestExecutionListener;
  */
 @Order(0)
 public class TestBenchTestExecutionListener implements TestExecutionListener, InjectDependencies {
+
   private static final String SKIP_TESTS_ERROR_MESSAGE = "TestBench tests are skipped";
   private static final String SKIP_TESTS_SYSTEM_PROPERTY = "testbench.skip";
   private static final String DRIVER_SYSTEM_PROPERTY = "testbench.driver";
@@ -75,8 +76,8 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       boolean useScreenshotRule = false;
       TestBenchTestAnnotations testBenchTestAnnotations = findAnnotation(target.getClass(),
           testContext.getTestMethod(), TestBenchTestAnnotations.class).orElseThrow(
-              () -> new IllegalStateException(TestBenchTestAnnotations.class.getSimpleName()
-                  + " must be present on TestBench tests."));
+          () -> new IllegalStateException(TestBenchTestAnnotations.class.getSimpleName()
+              + " must be present on TestBench tests."));
       if (testBenchTestAnnotations != null) {
         useScreenshotRule = testBenchTestAnnotations.useScreenshotRule();
       }
@@ -139,7 +140,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       try {
         return (WebDriver) Class.forName(driverClass).getDeclaredConstructor().newInstance();
       } catch (InstantiationException | IllegalAccessException | ClassNotFoundException
-          | NoSuchMethodException | InvocationTargetException e) {
+               | NoSuchMethodException | InvocationTargetException e) {
         logger.error("Could not instantiate WebDriver class {}", driverClass);
         throw new IllegalStateException("Could not instantiate WebDriver class " + driverClass, e);
       }

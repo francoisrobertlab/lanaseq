@@ -10,12 +10,12 @@ import java.util.Locale;
  * Date picker internationalization.
  */
 public class DatePickerInternationalization {
+
   /**
-   * Returns {@link DatePickerI18n} for specified locale. <br>
-   * Falls back to English if no instance exists for specified locale.
+   * Returns {@link DatePickerI18n} for specified locale. <br> Falls back to English if no instance
+   * exists for specified locale.
    *
-   * @param locale
-   *          locale
+   * @param locale locale
    * @return {@link DatePickerI18n} for specified locale, never null
    */
   public static DatePickerI18n datePickerI18n(Locale locale) {

@@ -42,6 +42,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
   @TempDir
   Path temporaryFolder;
@@ -207,7 +208,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     String name = name() + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     List<Sample> samples = repository.findByOwner(new User(3L));
     Sample sample =
@@ -256,7 +257,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     String name = name() + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     sample = repository.findById(4L).orElseThrow();
     assertEquals(name, sample.getName());
@@ -350,7 +351,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name}, currentLocale()),
         notification.getText());
     assertFalse(repository.findById(9L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.

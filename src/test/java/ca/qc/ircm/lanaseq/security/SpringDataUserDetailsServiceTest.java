@@ -33,6 +33,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  */
 @NonTransactionalTestAnnotations
 public class SpringDataUserDetailsServiceTest {
+
   private SpringDataUserDetailsService userDetailsService;
   @Mock
   private UserRepository userRepository;
@@ -54,7 +55,7 @@ public class SpringDataUserDetailsServiceTest {
   }
 
   private Optional<? extends GrantedAuthority>
-      findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
+  findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
     return authorities.stream().filter(autho -> autho.getAuthority().equals(authority)).findFirst();
   }
 

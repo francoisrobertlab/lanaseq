@@ -31,6 +31,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class KeywordsFieldTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(KeywordsField.class);
   private KeywordsField keywordsField;
   @Mock

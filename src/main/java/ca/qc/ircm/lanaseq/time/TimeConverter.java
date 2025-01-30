@@ -9,6 +9,7 @@ import java.time.ZoneId;
  * Converts time instance to other time instance.
  */
 public class TimeConverter {
+
   public static Instant toInstant(LocalDateTime dateTime) {
     return dateTime.atZone(ZoneId.systemDefault()).toInstant();
   }

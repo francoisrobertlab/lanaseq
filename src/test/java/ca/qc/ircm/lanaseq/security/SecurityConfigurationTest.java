@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @NonTransactionalTestAnnotations
 public class SecurityConfigurationTest {
+
   @Autowired
   private SecurityConfiguration securityConfiguration;
 

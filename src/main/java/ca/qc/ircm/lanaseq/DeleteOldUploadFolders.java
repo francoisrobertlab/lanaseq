@@ -19,6 +19,7 @@ import org.springframework.util.FileSystemUtils;
  */
 @Component
 public class DeleteOldUploadFolders {
+
   private static final Logger logger = LoggerFactory.getLogger(DeleteOldUploadFolders.class);
 
   private final AppConfiguration configuration;

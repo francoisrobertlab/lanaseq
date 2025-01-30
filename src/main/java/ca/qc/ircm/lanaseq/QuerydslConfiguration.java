@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class QuerydslConfiguration {
+
   private final EntityManager entityManager;
 
   @Autowired

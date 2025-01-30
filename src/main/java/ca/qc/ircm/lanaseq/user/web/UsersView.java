@@ -60,9 +60,10 @@ import org.springframework.lang.Nullable;
  * Users view.
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ MANAGER, ADMIN })
+@RolesAllowed({MANAGER, ADMIN})
 public class UsersView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent, UrlComponent {
+
   public static final String VIEW_NAME = "users";
   public static final String ID = "users-view";
   public static final String USERS = "users";
