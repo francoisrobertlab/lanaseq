@@ -145,10 +145,11 @@ public class AppConfiguration implements InitializingBean {
 
   /**
    * Returns urlEnd with prefix that allows to access application from anywhere.
-   * <p>
-   * For example, to obtain the full URL <code><a href=
-   * "http://myserver.com/lanaseq/myurl?param1=abc">http://myserver.com/lanaseq/myurl?param1=abc</a></code>
-   * , the urlEnd parameter should be <code>/lanaseq/myurl?param1=abc</code>
+   *
+   * <p>For example, to obtain the full URL <code><a href=
+   * "http://myserver.com/lanaseq/myurl?param1=abc">
+   * http://myserver.com/lanaseq/myurl?param1=abc</a></code> , the urlEnd parameter should be
+   * <code>/lanaseq/myurl?param1=abc</code>
    * </p>
    *
    * @param urlEnd end portion of URL
