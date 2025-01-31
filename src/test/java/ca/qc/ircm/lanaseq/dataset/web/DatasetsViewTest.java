@@ -80,7 +80,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   private EntityManager entityManager;
   @Mock
   private ListDataProvider<Dataset> datasetDataProvider;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<Dataset> datasets;
 
   /**

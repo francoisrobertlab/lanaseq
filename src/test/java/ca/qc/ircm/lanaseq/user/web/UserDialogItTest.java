@@ -33,9 +33,9 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
   private PasswordEncoder passwordEncoder;
   @Autowired
   private MessageSource messageSource;
-  private String email = "it_test@ircm.qc.ca";
-  private String name = "test_name";
-  private String password = "test_password";
+  private final String email = "it_test@ircm.qc.ca";
+  private final String name = "test_name";
+  private final String password = "test_password";
 
   private void open() {
     openView(VIEW_NAME);

@@ -33,7 +33,7 @@ public class PasswordsForm extends FormLayout implements LocaleChangeObserver {
   private static final long serialVersionUID = -2396373044368644264L;
   protected PasswordField password = new PasswordField();
   protected PasswordField passwordConfirm = new PasswordField();
-  private Binder<Passwords> passwordBinder = new BeanValidationBinder<>(Passwords.class);
+  private final Binder<Passwords> passwordBinder = new BeanValidationBinder<>(Passwords.class);
   private boolean required;
 
   /**

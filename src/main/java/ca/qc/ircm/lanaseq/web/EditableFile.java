@@ -14,7 +14,7 @@ public class EditableFile implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -3555492104705517702L;
-  private File file;
+  private final File file;
   private String filename;
 
   public EditableFile(File file) {

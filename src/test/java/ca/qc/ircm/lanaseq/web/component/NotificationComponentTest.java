@@ -16,7 +16,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class NotificationComponentTest extends SpringUIUnitTest {
 
-  private NotificationComponentForTest notificationComponent = new NotificationComponentForTest();
+  private final NotificationComponentForTest notificationComponent = new NotificationComponentForTest();
 
   @Test
   public void showNotification_Text() {

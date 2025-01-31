@@ -52,11 +52,11 @@ import org.springframework.util.FileSystemUtils;
 public class SampleService {
 
   private static final Logger logger = LoggerFactory.getLogger(SampleService.class);
-  private SampleRepository repository;
-  private DatasetRepository datasetRepository;
-  private AppConfiguration configuration;
-  private AuthenticatedUser authenticatedUser;
-  private JPAQueryFactory queryFactory;
+  private final SampleRepository repository;
+  private final DatasetRepository datasetRepository;
+  private final AppConfiguration configuration;
+  private final AuthenticatedUser authenticatedUser;
+  private final JPAQueryFactory queryFactory;
 
   @Autowired
   protected SampleService(SampleRepository repository, DatasetRepository datasetRepository,

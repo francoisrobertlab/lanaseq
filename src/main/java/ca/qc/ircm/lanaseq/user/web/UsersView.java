@@ -86,12 +86,12 @@ public class UsersView extends VerticalLayout
   protected Button add = new Button();
   protected Button edit = new Button();
   protected Button switchUser = new Button();
-  private WebUserFilter filter = new WebUserFilter();
-  private Map<User, Button> actives = new HashMap<>();
-  private transient ObjectFactory<UserDialog> dialogFactory;
-  private transient UserService service;
-  private transient SwitchUserService switchUserService;
-  private transient AuthenticatedUser authenticatedUser;
+  private final WebUserFilter filter = new WebUserFilter();
+  private final Map<User, Button> actives = new HashMap<>();
+  private final transient ObjectFactory<UserDialog> dialogFactory;
+  private final transient UserService service;
+  private final transient SwitchUserService switchUserService;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected UsersView(UserService service, SwitchUserService switchUserService,

@@ -70,8 +70,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   private DatasetRepository repository;
   @Captor
   private ArgumentCaptor<Collection<String>> filenamePatternsCaptor;
-  private Locale locale = Locale.ENGLISH;
-  private List<Dataset> datasets = new ArrayList<>();
+  private final Locale locale = Locale.ENGLISH;
+  private final List<Dataset> datasets = new ArrayList<>();
 
   /**
    * Before test.

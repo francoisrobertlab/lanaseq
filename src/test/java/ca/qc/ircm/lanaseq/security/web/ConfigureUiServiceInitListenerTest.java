@@ -57,8 +57,8 @@ public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
   private ArgumentCaptor<AfterNavigationEvent> afterNavigationEventCaptor;
   @Mock
   private Location location;
-  private Locale locale = Locale.ENGLISH;
-  private User user = new User(1L, "myuser");
+  private final Locale locale = Locale.ENGLISH;
+  private final User user = new User(1L, "myuser");
 
   /**
    * Before test.

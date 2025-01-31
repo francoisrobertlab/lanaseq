@@ -84,11 +84,11 @@ public class AddSampleFilesDialog extends Dialog
   protected Div error = new Div();
   protected Button refresh = new Button();
   protected Button save = new Button();
-  private Map<File, Checkbox> overwriteFields = new HashMap<>();
+  private final Map<File, Checkbox> overwriteFields = new HashMap<>();
   private Sample sample;
   private Set<String> existingFilenames = new HashSet<>();
-  private transient SampleService service;
-  private transient AppConfiguration configuration;
+  private final transient SampleService service;
+  private final transient AppConfiguration configuration;
 
   @Autowired
   protected AddSampleFilesDialog(SampleService service, AppConfiguration configuration) {

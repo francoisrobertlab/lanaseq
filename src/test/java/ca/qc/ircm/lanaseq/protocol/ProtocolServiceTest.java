@@ -54,7 +54,7 @@ public class ProtocolServiceTest {
   private AuthenticatedUser authenticatedUser;
   @MockitoBean
   private PermissionEvaluator permissionEvaluator;
-  private Random random = new Random();
+  private final Random random = new Random();
   private User currentUser;
 
   /**

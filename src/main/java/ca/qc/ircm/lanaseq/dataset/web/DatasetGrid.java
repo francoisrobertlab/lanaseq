@@ -62,9 +62,9 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   protected TextField protocolFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
-  private WebDatasetFilter filter = new WebDatasetFilter();
-  private transient DatasetService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final WebDatasetFilter filter = new WebDatasetFilter();
+  private final transient DatasetService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected DatasetGrid(DatasetService service, AuthenticatedUser authenticatedUser) {

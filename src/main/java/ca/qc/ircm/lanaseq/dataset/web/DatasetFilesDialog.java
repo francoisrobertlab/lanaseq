@@ -118,7 +118,7 @@ public class DatasetFilesDialog extends Dialog
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
   private Dataset dataset;
-  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
+  private final Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
   private transient ObjectFactory<AddDatasetFilesDialog> addFilesDialogFactory;
   private transient ObjectFactory<SampleFilesDialog> sampleFilesDialogFactory;
   private transient DatasetService service;

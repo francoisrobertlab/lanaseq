@@ -108,11 +108,11 @@ public class SampleFilesDialog extends Dialog
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
   private Sample sample;
-  private Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
-  private transient ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
-  private transient SampleService service;
-  private transient AuthenticatedUser authenticatedUser;
-  private transient AppConfiguration configuration;
+  private final Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
+  private final transient ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory;
+  private final transient SampleService service;
+  private final transient AuthenticatedUser authenticatedUser;
+  private final transient AppConfiguration configuration;
   /**
    * Currently authenticated user.
    * <p>

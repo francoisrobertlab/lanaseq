@@ -112,9 +112,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   protected Button cancel = new Button();
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
-  private Binder<Protocol> binder = new BeanValidationBinder<>(Protocol.class);
-  private transient ProtocolService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final Binder<Protocol> binder = new BeanValidationBinder<>(Protocol.class);
+  private final transient ProtocolService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   ProtocolDialog(ProtocolService service, AuthenticatedUser authenticatedUser) {

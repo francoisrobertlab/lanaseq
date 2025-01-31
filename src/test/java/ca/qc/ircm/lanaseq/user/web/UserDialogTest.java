@@ -61,7 +61,7 @@ public class UserDialogTest extends SpringUIUnitTest {
   private ArgumentCaptor<User> userCaptor;
   @Autowired
   private UserRepository repository;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
 
   /**
    * Before test.

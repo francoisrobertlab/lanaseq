@@ -53,10 +53,10 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   protected Checkbox admin = new Checkbox();
   protected Checkbox manager = new Checkbox();
   protected PasswordsForm passwords = new PasswordsForm();
-  private Binder<User> binder = new BeanValidationBinder<>(User.class);
+  private final Binder<User> binder = new BeanValidationBinder<>(User.class);
   private User user;
-  private transient UserService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient UserService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected UserForm(UserService service, AuthenticatedUser authenticatedUser) {

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 @NonTransactionalTestAnnotations
 public class UserFilterTest {
 
-  private UserFilter filter = new UserFilter();
+  private final UserFilter filter = new UserFilter();
 
   @Test
   public void test_EmailContains() {

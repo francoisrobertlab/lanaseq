@@ -88,7 +88,7 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   private ProtocolRepository repository;
   @Mock
   private ListDataProvider<Protocol> protocolDataProvider;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<Protocol> protocols;
 
   /**

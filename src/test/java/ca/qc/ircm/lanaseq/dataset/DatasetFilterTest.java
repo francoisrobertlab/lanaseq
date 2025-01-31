@@ -32,7 +32,7 @@ import org.springframework.data.domain.Sort.Order;
 @NonTransactionalTestAnnotations
 public class DatasetFilterTest {
 
-  private DatasetFilter filter = new DatasetFilter();
+  private final DatasetFilter filter = new DatasetFilter();
 
   @Test
   public void test_NameContains() {

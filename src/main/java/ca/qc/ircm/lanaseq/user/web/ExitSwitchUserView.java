@@ -27,8 +27,8 @@ public class ExitSwitchUserView extends VerticalLayout
 
   public static final String VIEW_NAME = "exitSwitchUser";
   private static final Logger logger = LoggerFactory.getLogger(ExitSwitchUserView.class);
-  private transient SwitchUserService switchUserService;
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient SwitchUserService switchUserService;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected ExitSwitchUserView(SwitchUserService switchUserService,

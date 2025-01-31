@@ -50,7 +50,7 @@ public class UserServiceTest {
   private AuthenticatedUser authenticatedUser;
   @MockitoBean
   private PermissionEvaluator permissionEvaluator;
-  private String hashedPassword = "4k7GCUVUzV5zL74V867q";
+  private final String hashedPassword = "4k7GCUVUzV5zL74V867q";
 
   /**
    * Before test.

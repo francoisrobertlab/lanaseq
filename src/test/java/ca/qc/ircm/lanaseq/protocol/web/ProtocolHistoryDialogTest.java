@@ -70,7 +70,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   private ProtocolRepository repository;
   @Autowired
   private ProtocolFileRepository fileRepository;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<ProtocolFile> protocolFiles;
 
   /**

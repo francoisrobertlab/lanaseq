@@ -19,7 +19,7 @@ public class RenamerTest {
 
   @TempDir
   Path tempDir;
-  private Random random = new Random();
+  private final Random random = new Random();
 
   @Test
   public void moveFolder() throws Throwable {

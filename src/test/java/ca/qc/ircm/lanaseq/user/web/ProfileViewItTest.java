@@ -41,9 +41,9 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
   private PasswordEncoder passwordEncoder;
   @Autowired
   private MessageSource messageSource;
-  private String email = "test@ircm.qc.ca";
-  private String name = "Test User";
-  private String password = "test_password";
+  private final String email = "test@ircm.qc.ca";
+  private final String name = "Test User";
+  private final String password = "test_password";
 
   private void open() {
     openView(VIEW_NAME);

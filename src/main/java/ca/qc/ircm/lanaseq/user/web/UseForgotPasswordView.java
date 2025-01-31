@@ -59,7 +59,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
   protected Button save = new Button();
   protected PasswordsForm form = new PasswordsForm();
   private ForgotPassword forgotPassword;
-  private transient ForgotPasswordService service;
+  private final transient ForgotPasswordService service;
 
   @Autowired
   protected UseForgotPasswordView(ForgotPasswordService service) {

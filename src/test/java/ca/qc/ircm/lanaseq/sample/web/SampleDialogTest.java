@@ -122,25 +122,25 @@ public class SampleDialogTest extends SpringUIUnitTest {
   private ProtocolRepository protocolRepository;
   @Autowired
   private JPAQueryFactory jpaQueryFactory;
-  private Locale locale = Locale.ENGLISH;
-  private List<String> topKeywords = new ArrayList<>();
+  private final Locale locale = Locale.ENGLISH;
+  private final List<String> topKeywords = new ArrayList<>();
   private List<String> topAssays = new ArrayList<>();
   private List<String> topTypes = new ArrayList<>();
-  private String sampleId = "Test Sample";
-  private String replicate = "Test Replicate";
+  private final String sampleId = "Test Sample";
+  private final String replicate = "Test Replicate";
   private Protocol protocol;
-  private String assay = "ChIP-seq";
-  private String type = "IP";
-  private String target = "polr3a";
-  private String strain = "yFR20";
-  private String strainDescription = "WT";
-  private String treatment = "37C";
-  private LocalDate date = LocalDate.of(2020, 7, 20);
-  private String keyword1 = "Keyword 1";
-  private String keyword2 = "Keyword 2";
-  private String filename1 = "OF_20241120_ROB_01";
-  private String filename2 = "OF_20241120_ROB_02";
-  private String note = "test note\nsecond line";
+  private final String assay = "ChIP-seq";
+  private final String type = "IP";
+  private final String target = "polr3a";
+  private final String strain = "yFR20";
+  private final String strainDescription = "WT";
+  private final String treatment = "37C";
+  private final LocalDate date = LocalDate.of(2020, 7, 20);
+  private final String keyword1 = "Keyword 1";
+  private final String keyword2 = "Keyword 2";
+  private final String filename1 = "OF_20241120_ROB_01";
+  private final String filename2 = "OF_20241120_ROB_02";
+  private final String note = "test note\nsecond line";
 
   /**
    * Before test.

@@ -43,12 +43,12 @@ public class SwitchUserService {
 
   public static final String ROLE_PREVIOUS_ADMINISTRATOR = "ROLE_PREVIOUS_ADMINISTRATOR";
   private static final Logger logger = LoggerFactory.getLogger(SwitchUserService.class);
-  private String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
+  private final String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
   private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource =
       new WebAuthenticationDetailsSource();
   private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
-  private UserDetailsService userDetailsService;
-  private ApplicationEventPublisher eventPublisher;
+  private final UserDetailsService userDetailsService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Autowired
   public SwitchUserService(UserDetailsService userDetailsService,

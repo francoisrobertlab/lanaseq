@@ -30,7 +30,7 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
   private static final long serialVersionUID = 1796331428220223698L;
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListener.class);
-  private AuthenticatedUser authenticatedUser;
+  private final AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected ConfigureUiServiceInitListener(AuthenticatedUser authenticatedUser) {

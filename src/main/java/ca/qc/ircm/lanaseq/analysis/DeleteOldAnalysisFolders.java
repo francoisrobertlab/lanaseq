@@ -23,7 +23,7 @@ public class DeleteOldAnalysisFolders {
 
   private static final Logger logger = LoggerFactory.getLogger(DeleteOldAnalysisFolders.class);
 
-  private AppConfiguration configuration;
+  private final AppConfiguration configuration;
 
   @Autowired
   protected DeleteOldAnalysisFolders(AppConfiguration configuration) {

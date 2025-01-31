@@ -49,7 +49,7 @@ public class ProfileViewTest extends SpringUIUnitTest {
   private UserService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;
-  private Locale locale = ENGLISH;
+  private final Locale locale = ENGLISH;
 
   /**
    * Before test.

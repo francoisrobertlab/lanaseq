@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public abstract class AbstractPermissionEvaluator implements PermissionEvaluator {
 
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
 
   protected AbstractPermissionEvaluator(UserRepository userRepository) {
     this.userRepository = userRepository;

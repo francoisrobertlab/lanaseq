@@ -71,7 +71,7 @@ public class ForgotPasswordServiceTest {
   private String hashedPassword;
   private User user;
   private String confirmNumber;
-  private String forgotPasswordUrl = "/validate/user";
+  private final String forgotPasswordUrl = "/validate/user";
 
   /**
    * Before test.

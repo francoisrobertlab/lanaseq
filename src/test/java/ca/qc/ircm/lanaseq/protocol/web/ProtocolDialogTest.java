@@ -124,13 +124,13 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
   private ProtocolFileRepository fileRepository;
   @Autowired
   private AuthenticatedUser authenticatedUser;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<ProtocolFile> protocolFiles;
-  private String name = "test protocol";
-  private String note = "test note\nsecond line";
-  private String filename = "test file";
-  private byte[] fileContent = new byte[5120];
-  private Random random = new Random();
+  private final String name = "test protocol";
+  private final String note = "test note\nsecond line";
+  private final String filename = "test file";
+  private final byte[] fileContent = new byte[5120];
+  private final Random random = new Random();
 
   /**
    * Before test.

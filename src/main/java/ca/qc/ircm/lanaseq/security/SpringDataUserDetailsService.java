@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SpringDataUserDetailsService implements UserDetailsService {
 
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
 
   @Autowired
   protected SpringDataUserDetailsService(UserRepository userRepository) {

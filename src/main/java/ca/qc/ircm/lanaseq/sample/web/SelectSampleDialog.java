@@ -63,9 +63,9 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   protected TextField nameFilter = new TextField();
   protected DateRangeField dateFilter = new DateRangeField();
   protected TextField ownerFilter = new TextField();
-  private WebSampleFilter filter = new WebSampleFilter();
-  private transient SampleService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final WebSampleFilter filter = new WebSampleFilter();
+  private final transient SampleService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   SelectSampleDialog(SampleService service, AuthenticatedUser authenticatedUser) {

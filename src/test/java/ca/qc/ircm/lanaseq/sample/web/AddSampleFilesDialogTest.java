@@ -104,12 +104,12 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   private ArgumentCaptor<Collection<Path>> filesCaptor;
   @Autowired
   private SampleRepository repository;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private Path folder;
-  private List<File> files = new ArrayList<>();
-  private Random random = new Random();
-  private String uploadLabelLinux = "lanaseq/upload";
-  private String uploadLabelWindows = "lanaseq\\upload";
+  private final List<File> files = new ArrayList<>();
+  private final Random random = new Random();
+  private final String uploadLabelLinux = "lanaseq/upload";
+  private final String uploadLabelWindows = "lanaseq\\upload";
 
   /**
    * Before test.

@@ -59,12 +59,12 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
-  private String namePrefix = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2";
-  private String keyword1 = "mnase";
-  private String keyword2 = "ip";
-  private String filename = "OF_20241120_ROB_01";
-  private String note = "test note\nsecond line";
-  private LocalDate date = LocalDate.of(2020, 7, 20);
+  private final String namePrefix = "ChIPseq_Spt16_yFR101_G24D_JS1-JS2";
+  private final String keyword1 = "mnase";
+  private final String keyword2 = "ip";
+  private final String filename = "OF_20241120_ROB_01";
+  private final String note = "test note\nsecond line";
+  private final LocalDate date = LocalDate.of(2020, 7, 20);
 
   @BeforeEach
   public void beforeTest() throws Throwable {

@@ -58,9 +58,9 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
   protected ConfirmDialog confirm = new ConfirmDialog();
   protected ConfirmDialog errors = new ConfirmDialog();
   private List<Dataset> datasets = new ArrayList<>();
-  private transient DatasetService service;
-  private transient AnalysisService analysisService;
-  private transient AppConfiguration configuration;
+  private final transient DatasetService service;
+  private final transient AnalysisService analysisService;
+  private final transient AppConfiguration configuration;
 
   @Autowired
   protected DatasetsAnalysisDialog(DatasetService service, AnalysisService analysisService,

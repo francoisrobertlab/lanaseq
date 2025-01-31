@@ -15,7 +15,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class UrlComponentTest extends SpringUIUnitTest {
 
-  private UrlComponentForTest urlComponent = new UrlComponentForTest();
+  private final UrlComponentForTest urlComponent = new UrlComponentForTest();
 
   @Test
   public void getUrl() {

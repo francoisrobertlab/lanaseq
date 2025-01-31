@@ -17,10 +17,10 @@ import org.mockito.Mock;
 public class ByteArrayStreamResourceWriterTest {
 
   private ByteArrayStreamResourceWriter writer;
-  private byte[] content = new byte[5120];
+  private final byte[] content = new byte[5120];
   @Mock
   private VaadinSession session;
-  private Random random = new Random();
+  private final Random random = new Random();
 
   /**
    * Before test.

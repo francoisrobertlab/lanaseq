@@ -104,13 +104,13 @@ public class SamplesView extends VerticalLayout
   protected Button merge = new Button();
   protected Button files = new Button();
   protected Button analyze = new Button();
-  private WebSampleFilter filter = new WebSampleFilter();
-  private transient ObjectFactory<SampleDialog> dialogFactory;
-  private transient ObjectFactory<SampleFilesDialog> filesDialogFactory;
-  private transient ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
-  private transient SampleService service;
-  private transient DatasetService datasetService;
-  private transient AuthenticatedUser authenticatedUser;
+  private final WebSampleFilter filter = new WebSampleFilter();
+  private final transient ObjectFactory<SampleDialog> dialogFactory;
+  private final transient ObjectFactory<SampleFilesDialog> filesDialogFactory;
+  private final transient ObjectFactory<SamplesAnalysisDialog> analysisDialogFactory;
+  private final transient SampleService service;
+  private final transient DatasetService datasetService;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SamplesView(ObjectFactory<SampleDialog> dialogFactory,

@@ -30,9 +30,9 @@ import org.springframework.util.FileSystemUtils;
 @Service
 public class AnalysisService {
 
-  private DatasetService datasetService;
-  private SampleService sampleService;
-  private AppConfiguration configuration;
+  private final DatasetService datasetService;
+  private final SampleService sampleService;
+  private final AppConfiguration configuration;
 
   @Autowired
   protected AnalysisService(DatasetService datasetService, SampleService sampleService,

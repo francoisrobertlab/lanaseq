@@ -57,19 +57,19 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
   @Autowired
   private MessageSource messageSource;
   private Protocol protocol;
-  private LocalDate date = LocalDate.of(2020, 7, 20);
-  private String assay = "RNA-seq";
-  private String type = "IP";
-  private String target = "polr3a";
-  private String strain = "yFR20";
-  private String strainDescription = "WT";
-  private String treatment = "37C";
-  private String sampleId = "FR3";
-  private String replicate = "R3";
-  private String keyword1 = "mnase";
-  private String keyword2 = "ip";
-  private String filename = "OF_20241120_ROB_01";
-  private String note = "test note\nsecond line";
+  private final LocalDate date = LocalDate.of(2020, 7, 20);
+  private final String assay = "RNA-seq";
+  private final String type = "IP";
+  private final String target = "polr3a";
+  private final String strain = "yFR20";
+  private final String strainDescription = "WT";
+  private final String treatment = "37C";
+  private final String sampleId = "FR3";
+  private final String replicate = "R3";
+  private final String keyword1 = "mnase";
+  private final String keyword2 = "ip";
+  private final String filename = "OF_20241120_ROB_01";
+  private final String note = "test note\nsecond line";
 
   /**
    * Before test.

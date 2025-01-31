@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
 
-  private SampleRepository repository;
-  private RoleValidator roleValidator;
+  private final SampleRepository repository;
+  private final RoleValidator roleValidator;
 
   @Autowired
   protected SamplePermissionEvaluator(UserRepository userRepository, SampleRepository repository,

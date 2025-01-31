@@ -39,7 +39,7 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
   protected FormLayout layout = new FormLayout();
   protected DatePicker from = new DatePicker();
   protected DatePicker to = new DatePicker();
-  private Binder<Dates> binder = new BeanValidationBinder<>(Dates.class);
+  private final Binder<Dates> binder = new BeanValidationBinder<>(Dates.class);
 
   /**
    * Creates a new date range field.

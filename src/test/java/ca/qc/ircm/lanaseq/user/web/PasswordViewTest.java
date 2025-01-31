@@ -46,7 +46,7 @@ public class PasswordViewTest extends SpringUIUnitTest {
   private UserService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
 
   /**
    * Before test.

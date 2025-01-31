@@ -49,8 +49,8 @@ public class ProtocolDialogItTest extends AbstractTestBenchTestCase {
   private ProtocolFileRepository fileRepository;
   @Autowired
   private MessageSource messageSource;
-  private String name = "test protocol";
-  private String note = "test note\nsecond line";
+  private final String name = "test protocol";
+  private final String note = "test note\nsecond line";
   private Path file1;
   private Path file2;
 

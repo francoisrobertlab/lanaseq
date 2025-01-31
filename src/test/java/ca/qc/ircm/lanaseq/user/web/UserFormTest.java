@@ -58,10 +58,10 @@ public class UserFormTest extends SpringUIUnitTest {
   private UserRepository repository;
   @Captor
   private ArgumentCaptor<Boolean> booleanCaptor;
-  private Locale locale = Locale.ENGLISH;
-  private String email = "test@ircm.qc.ca";
-  private String name = "Test User";
-  private String password = "test_password";
+  private final Locale locale = Locale.ENGLISH;
+  private final String email = "test@ircm.qc.ca";
+  private final String name = "Test User";
+  private final String password = "test_password";
 
   /**
    * Before test.

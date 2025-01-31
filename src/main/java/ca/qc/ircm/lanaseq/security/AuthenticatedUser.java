@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 public class AuthenticatedUser {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthenticatedUser.class);
-  private UserRepository repository;
-  private UserDetailsService userDetailsService;
-  private RoleValidator roleValidator;
-  private PermissionEvaluator permissionEvaluator;
+  private final UserRepository repository;
+  private final UserDetailsService userDetailsService;
+  private final RoleValidator roleValidator;
+  private final PermissionEvaluator permissionEvaluator;
 
   @Autowired
   protected AuthenticatedUser(UserRepository repository, UserDetailsService userDetailsService,

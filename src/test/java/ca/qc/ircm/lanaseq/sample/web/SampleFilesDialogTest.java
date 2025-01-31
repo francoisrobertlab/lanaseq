@@ -156,11 +156,11 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   private ComponentEventListener<DeletedEvent<SampleDialog>> deletedListener;
   @Autowired
   private SampleRepository repository;
-  private Locale locale = Locale.ENGLISH;
-  private List<File> files = new ArrayList<>();
-  private List<String> labels = new ArrayList<>();
-  private byte[] fileContent = new byte[5120];
-  private Random random = new Random();
+  private final Locale locale = Locale.ENGLISH;
+  private final List<File> files = new ArrayList<>();
+  private final List<String> labels = new ArrayList<>();
+  private final byte[] fileContent = new byte[5120];
+  private final Random random = new Random();
 
   /**
    * Before test.

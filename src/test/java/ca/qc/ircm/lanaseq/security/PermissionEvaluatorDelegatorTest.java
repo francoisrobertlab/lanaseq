@@ -49,16 +49,16 @@ public class PermissionEvaluatorDelegatorTest {
   private SamplePermissionEvaluator samplePermissionEvaluator;
   @Mock
   private User user;
-  private Collection<User> users = new ArrayList<>();
+  private final Collection<User> users = new ArrayList<>();
   @Mock
   private Dataset dataset;
-  private Collection<Dataset> datasets = new ArrayList<>();
+  private final Collection<Dataset> datasets = new ArrayList<>();
   @Mock
   private Protocol protocol;
-  private Collection<Protocol> protocols = new ArrayList<>();
+  private final Collection<Protocol> protocols = new ArrayList<>();
   @Mock
   private Sample sample;
-  private Collection<Sample> samples = new ArrayList<>();
+  private final Collection<Sample> samples = new ArrayList<>();
 
   private Authentication authentication() {
     return SecurityContextHolder.getContext().getAuthentication();

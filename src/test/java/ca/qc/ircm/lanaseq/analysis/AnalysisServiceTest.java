@@ -62,29 +62,29 @@ public class AnalysisServiceTest {
   private SampleRepository sampleRepository;
   @MockitoBean
   private PermissionEvaluatorDelegator permissionEvaluator;
-  private List<Dataset> datasets = new ArrayList<>();
-  private List<Sample> samples = new ArrayList<>();
+  private final List<Dataset> datasets = new ArrayList<>();
+  private final List<Sample> samples = new ArrayList<>();
   private Dataset dataset;
   private Sample sample;
   private Sample sample2;
   private Path paired1;
   private Path paired2;
-  private List<Path> pairedPaths = new ArrayList<>();
+  private final List<Path> pairedPaths = new ArrayList<>();
   private Path pairedZip1;
   private Path pairedZip2;
-  private List<Path> pairedZipPaths = new ArrayList<>();
+  private final List<Path> pairedZipPaths = new ArrayList<>();
   private Path secondPaired1;
   private Path secondPaired2;
-  private List<Path> secondPairedPaths = new ArrayList<>();
+  private final List<Path> secondPairedPaths = new ArrayList<>();
   private Path secondPairedZip1;
   private Path secondPairedZip2;
-  private List<Path> secondPairedZipPaths = new ArrayList<>();
+  private final List<Path> secondPairedZipPaths = new ArrayList<>();
   private Path thirdPaired1;
   private Path thirdPaired2;
-  private List<Path> thirdPairedPaths = new ArrayList<>();
+  private final List<Path> thirdPairedPaths = new ArrayList<>();
   private Path thirdPairedZip1;
   private Path thirdPairedZip2;
-  private List<Path> thirdPairedZipPaths = new ArrayList<>();
+  private final List<Path> thirdPairedZipPaths = new ArrayList<>();
   private Path bam;
   private Path bam2;
   private Path rawbam;
@@ -94,7 +94,7 @@ public class AnalysisServiceTest {
   private Path thirdBam;
   private Path thirdBam2;
   private Path thirdRawbam;
-  private Random random = new Random();
+  private final Random random = new Random();
 
   /**
    * Before test.

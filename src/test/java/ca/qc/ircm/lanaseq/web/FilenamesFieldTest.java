@@ -36,7 +36,7 @@ public class FilenamesFieldTest extends SpringUIUnitTest {
   private FilenamesField filenamesField;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
-  private Locale locale = ENGLISH;
+  private final Locale locale = ENGLISH;
 
   /**
    * Before test.

@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
 
-  private ProtocolRepository repository;
-  private RoleValidator roleValidator;
+  private final ProtocolRepository repository;
+  private final RoleValidator roleValidator;
 
   @Autowired
   protected ProtocolPermissionEvaluator(UserRepository userRepository,

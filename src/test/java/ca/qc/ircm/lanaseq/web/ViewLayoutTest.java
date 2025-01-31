@@ -69,8 +69,8 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   private AfterNavigationListener navigationListener;
   @Captor
   private ArgumentCaptor<AfterNavigationEvent> afterNavigationEventCaptor;
-  private Locale locale = Locale.ENGLISH;
-  private User user = new User(1L, "myuser");
+  private final Locale locale = Locale.ENGLISH;
+  private final User user = new User(1L, "myuser");
 
   /**
    * Before test.

@@ -38,7 +38,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
   private SampleRepository repository;
   @Autowired
   private AppConfiguration configuration;
-  private Random random = new Random();
+  private final Random random = new Random();
 
   @BeforeEach
   public void beforeTest() throws Throwable {

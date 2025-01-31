@@ -49,8 +49,8 @@ public class PasswordView extends VerticalLayout
   protected H2 header = new H2();
   protected PasswordsForm passwords = new PasswordsForm();
   protected Button save = new Button();
-  private transient UserService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient UserService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected PasswordView(UserService service, AuthenticatedUser authenticatedUser) {

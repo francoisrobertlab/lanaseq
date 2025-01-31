@@ -138,17 +138,17 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   private ProtocolRepository protocolRepository;
   @Autowired
   private SampleRepository sampleRepository;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<Sample> samples;
-  private List<String> topKeywords = new ArrayList<>();
-  private DateTimeFormatter nameDateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
-  private String namePrefix = "ChIPseq_IP_polr3a_yFR20_WT_37C_testsample1-testsample2";
-  private String keyword1 = "Keyword 1";
-  private String keyword2 = "Keyword 2";
-  private String filename1 = "OF_20241120_ROB_01";
-  private String filename2 = "OF_20241120_ROB_02";
-  private LocalDate date = LocalDate.of(2020, 7, 20);
-  private String note = "test note\nsecond line";
+  private final List<String> topKeywords = new ArrayList<>();
+  private final DateTimeFormatter nameDateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
+  private final String namePrefix = "ChIPseq_IP_polr3a_yFR20_WT_37C_testsample1-testsample2";
+  private final String keyword1 = "Keyword 1";
+  private final String keyword2 = "Keyword 2";
+  private final String filename1 = "OF_20241120_ROB_01";
+  private final String filename2 = "OF_20241120_ROB_02";
+  private final LocalDate date = LocalDate.of(2020, 7, 20);
+  private final String note = "test note\nsecond line";
 
   /**
    * Before test.

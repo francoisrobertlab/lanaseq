@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 public class LdapService {
 
   private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
-  private LdapOperations ldapOperations;
-  private LdapConfiguration ldapConfiguration;
+  private final LdapOperations ldapOperations;
+  private final LdapConfiguration ldapConfiguration;
 
   @Autowired
   @SuppressFBWarnings(value = {"EI_EXPOSE_REP2"}, justification = SPRING_BOOT_EI_EXPOSE_REP)

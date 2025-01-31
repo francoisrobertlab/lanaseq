@@ -47,8 +47,8 @@ public class ProfileView extends VerticalLayout
   protected UserForm form;
   protected HorizontalLayout buttonsLayout = new HorizontalLayout();
   protected Button save = new Button();
-  private transient UserService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient UserService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected ProfileView(UserService service, AuthenticatedUser authenticatedUser, UserForm form) {

@@ -66,8 +66,8 @@ public class SigninViewTest extends SpringUIUnitTest {
   private Location location;
   @Mock
   private QueryParameters queryParameters;
-  private Locale locale = Locale.ENGLISH;
-  private Map<String, List<String>> parameters = new HashMap<>();
+  private final Locale locale = Locale.ENGLISH;
+  private final Map<String, List<String>> parameters = new HashMap<>();
 
   /**
    * Before test.

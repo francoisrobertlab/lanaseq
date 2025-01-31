@@ -24,8 +24,8 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
 
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(UserPermissionEvaluator.class);
-  private UserRepository repository;
-  private RoleValidator roleValidator;
+  private final UserRepository repository;
+  private final RoleValidator roleValidator;
 
   @Autowired
   protected UserPermissionEvaluator(UserRepository userRepository, UserRepository repository,

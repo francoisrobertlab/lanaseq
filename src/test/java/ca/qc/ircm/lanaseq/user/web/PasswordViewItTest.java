@@ -40,7 +40,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
   private PasswordEncoder passwordEncoder;
   @Autowired
   private MessageSource messageSource;
-  private String password = "test_password";
+  private final String password = "test_password";
 
   private void open() {
     openView(VIEW_NAME);

@@ -105,10 +105,10 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   protected Button cancel = new Button();
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
-  private Binder<Sample> binder = new BeanValidationBinder<>(Sample.class);
-  private transient SampleService service;
-  private transient ProtocolService protocolService;
-  private transient AuthenticatedUser authenticatedUser;
+  private final Binder<Sample> binder = new BeanValidationBinder<>(Sample.class);
+  private final transient SampleService service;
+  private final transient ProtocolService protocolService;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SampleDialog(SampleService service, ProtocolService protocolService,

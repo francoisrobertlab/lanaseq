@@ -64,8 +64,8 @@ public class SigninView extends LoginOverlay
   private static final Logger logger = LoggerFactory.getLogger(SigninView.class);
   protected LoginI18n i18n;
   protected String error;
-  private transient SecurityConfiguration configuration;
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient SecurityConfiguration configuration;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SigninView(SecurityConfiguration configuration, AuthenticatedUser authenticatedUser) {

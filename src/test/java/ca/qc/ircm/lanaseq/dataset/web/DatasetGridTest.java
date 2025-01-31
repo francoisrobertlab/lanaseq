@@ -80,7 +80,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
   private DatasetRepository repository;
   @Mock
   private ListDataProvider<Dataset> datasetDataProvider;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<Dataset> datasets;
 
   /**

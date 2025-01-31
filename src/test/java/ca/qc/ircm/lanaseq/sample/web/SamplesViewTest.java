@@ -102,7 +102,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
   private SampleRepository repository;
   @Mock
   private ListDataProvider<Sample> sampleDataProvider;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<Sample> samples;
 
   /**

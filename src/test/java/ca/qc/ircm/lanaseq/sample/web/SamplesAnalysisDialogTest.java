@@ -69,8 +69,8 @@ public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
   private SampleRepository repository;
   @Captor
   private ArgumentCaptor<Collection<String>> filenamePatternsCaptor;
-  private Locale locale = Locale.ENGLISH;
-  private List<Sample> samples = new ArrayList<>();
+  private final Locale locale = Locale.ENGLISH;
+  private final List<Sample> samples = new ArrayList<>();
 
   /**
    * Before test.

@@ -65,7 +65,7 @@ public class ForgotPasswordViewTest extends SpringUIUnitTest {
   private UserService userService;
   @Captor
   private ArgumentCaptor<ForgotPasswordWebContext> webContextCaptor;
-  private Locale locale = ENGLISH;
+  private final Locale locale = ENGLISH;
 
   /**
    * Before test.

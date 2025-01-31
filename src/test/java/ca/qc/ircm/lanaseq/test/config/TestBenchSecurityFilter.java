@@ -30,7 +30,7 @@ public class TestBenchSecurityFilter extends GenericFilterBean
   private static final Logger logger = LoggerFactory.getLogger(TestBenchSecurityFilter.class);
   private static boolean copyAuthenticationOnFilter;
   private static Authentication authentication;
-  private SecurityContextRepository repo;
+  private final SecurityContextRepository repo;
 
   public TestBenchSecurityFilter() {
     this(new HttpSessionSecurityContextRepository());

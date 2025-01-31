@@ -36,7 +36,7 @@ public class KeywordsFieldTest extends SpringUIUnitTest {
   private KeywordsField keywordsField;
   @Mock
   private LocaleChangeEvent localeChangeEvent;
-  private Locale locale = ENGLISH;
+  private final Locale locale = ENGLISH;
 
   /**
    * Before test.

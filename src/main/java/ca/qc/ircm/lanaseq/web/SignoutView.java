@@ -26,7 +26,7 @@ public class SignoutView extends VerticalLayout implements BeforeEnterObserver, 
 
   public static final String VIEW_NAME = "signout";
   private static final Logger logger = LoggerFactory.getLogger(SignoutView.class);
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected SignoutView(AuthenticatedUser authenticatedUser) {

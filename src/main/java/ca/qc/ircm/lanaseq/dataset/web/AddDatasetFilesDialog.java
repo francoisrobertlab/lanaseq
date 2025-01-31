@@ -84,11 +84,11 @@ public class AddDatasetFilesDialog extends Dialog
   protected Div error = new Div();
   protected Button refresh = new Button();
   protected Button save = new Button();
-  private Map<File, Checkbox> overwriteFields = new HashMap<>();
+  private final Map<File, Checkbox> overwriteFields = new HashMap<>();
   private Dataset dataset;
   private Set<String> existingFilenames = new HashSet<>();
-  private transient DatasetService service;
-  private transient AppConfiguration configuration;
+  private final transient DatasetService service;
+  private final transient AppConfiguration configuration;
 
   @Autowired
   protected AddDatasetFilesDialog(DatasetService service, AppConfiguration configuration) {

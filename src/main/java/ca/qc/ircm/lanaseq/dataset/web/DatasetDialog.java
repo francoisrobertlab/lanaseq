@@ -139,11 +139,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   protected Button cancel = new Button();
   protected Button delete = new Button();
   protected ConfirmDialog confirm = new ConfirmDialog();
-  private Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
+  private final Binder<Dataset> binder = new BeanValidationBinder<>(Dataset.class);
   private Sample draggedSample;
-  private transient ObjectFactory<SelectSampleDialog> selectSampleDialogFactory;
-  private transient DatasetService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final transient ObjectFactory<SelectSampleDialog> selectSampleDialogFactory;
+  private final transient DatasetService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected DatasetDialog(ObjectFactory<SelectSampleDialog> selectSampleDialogFactory,

@@ -46,9 +46,9 @@ public class UseForgotPasswordViewItTest extends AbstractTestBenchTestCase {
   private EntityManager entityManager;
   @Autowired
   private MessageSource messageSource;
-  private String password = "test_password";
-  private long id = 9;
-  private String confirm = "174407008";
+  private final String password = "test_password";
+  private final long id = 9;
+  private final String confirm = "174407008";
 
   private void open() {
     openView(VIEW_NAME, id + SEPARATOR + confirm);

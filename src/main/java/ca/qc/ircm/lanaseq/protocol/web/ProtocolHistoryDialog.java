@@ -55,7 +55,7 @@ public class ProtocolHistoryDialog extends Dialog
   protected Column<ProtocolFile> filename;
   protected Column<ProtocolFile> recover;
   private Protocol protocol;
-  private transient ProtocolService service;
+  private final transient ProtocolService service;
 
   @Autowired
   protected ProtocolHistoryDialog(ProtocolService service) {

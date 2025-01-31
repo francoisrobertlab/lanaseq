@@ -93,7 +93,7 @@ public class UsersViewTest extends SpringUIUnitTest {
   private UserRepository repository;
   @Mock
   private ListDataProvider<User> userDataProvider;
-  private Locale locale = Locale.ENGLISH;
+  private final Locale locale = Locale.ENGLISH;
   private List<User> users;
 
   /**

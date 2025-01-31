@@ -36,7 +36,7 @@ public class ErrorNotificationTest extends SpringUIUnitTest {
   private static final String MESSAGE_PREFIX = messagePrefix(ErrorNotification.class);
   private ErrorNotification errorNotification;
   private Locale locale = ENGLISH;
-  private String errorText = "error text";
+  private final String errorText = "error text";
 
   /**
    * Before test.

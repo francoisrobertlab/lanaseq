@@ -152,12 +152,12 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   private Grid<EditableFile> filesGrid;
   @Mock
   private Editor<EditableFile> filesGridEditor;
-  private Locale locale = Locale.ENGLISH;
-  private List<File> files = new ArrayList<>();
-  private List<String> labels = new ArrayList<>();
+  private final Locale locale = Locale.ENGLISH;
+  private final List<File> files = new ArrayList<>();
+  private final List<String> labels = new ArrayList<>();
   private List<Sample> samples = new ArrayList<>();
-  private byte[] fileContent = new byte[5120];
-  private Random random = new Random();
+  private final byte[] fileContent = new byte[5120];
+  private final Random random = new Random();
 
   /**
    * Before test.

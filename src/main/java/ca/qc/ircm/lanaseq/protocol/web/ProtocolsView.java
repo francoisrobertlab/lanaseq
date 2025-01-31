@@ -77,11 +77,11 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
   protected Button add = new Button();
   protected Button edit = new Button();
   protected Button history = new Button();
-  private WebProtocolFilter filter = new WebProtocolFilter();
-  private transient ObjectFactory<ProtocolDialog> dialogFactory;
-  private transient ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
-  private transient ProtocolService service;
-  private transient AuthenticatedUser authenticatedUser;
+  private final WebProtocolFilter filter = new WebProtocolFilter();
+  private final transient ObjectFactory<ProtocolDialog> dialogFactory;
+  private final transient ObjectFactory<ProtocolHistoryDialog> historyDialogFactory;
+  private final transient ProtocolService service;
+  private final transient AuthenticatedUser authenticatedUser;
 
   @Autowired
   protected ProtocolsView(ObjectFactory<ProtocolDialog> dialogFactory,
