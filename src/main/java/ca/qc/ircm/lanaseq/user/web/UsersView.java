@@ -198,8 +198,8 @@ public class UsersView extends VerticalLayout
     activeFilter.setItemLabelGenerator(
         value -> value.map(bv -> getTranslation(USER_PREFIX + property(ACTIVE, bv)))
             .orElse(getTranslation(CONSTANTS_PREFIX + ALL)));
-    actives.entrySet().forEach(entry -> entry.getValue()
-        .setText(getTranslation(USER_PREFIX + property(ACTIVE, entry.getKey().isActive()))));
+    actives.forEach((key, value) -> value
+        .setText(getTranslation(USER_PREFIX + property(ACTIVE, key.isActive()))));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
     edit.setText(getTranslation(CONSTANTS_PREFIX + EDIT));
     switchUser.setText(getTranslation(MESSAGE_PREFIX + SWITCH_USER));
