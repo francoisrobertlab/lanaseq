@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AuthenticatedUser {
+
   private static final Logger logger = LoggerFactory.getLogger(AuthenticatedUser.class);
   private UserRepository repository;
   private UserDetailsService userDetailsService;
@@ -80,8 +81,7 @@ public class AuthenticatedUser {
   /**
    * Returns true if authenticated user has specified role, false otherwise.
    *
-   * @param role
-   *          role
+   * @param role role
    * @return true if authenticated user has specified role, false otherwise
    */
   public boolean hasRole(String role) {
@@ -91,8 +91,7 @@ public class AuthenticatedUser {
   /**
    * Returns true if authenticated user has any of the specified roles, false otherwise.
    *
-   * @param roles
-   *          roles
+   * @param roles roles
    * @return true if authenticated user has any of the specified roles, false otherwise
    */
   public boolean hasAnyRole(String... roles) {
@@ -102,8 +101,7 @@ public class AuthenticatedUser {
   /**
    * Returns true if authenticated user has all of the specified roles, false otherwise.
    *
-   * @param roles
-   *          roles
+   * @param roles roles
    * @return true if authenticated user has all of the specified roles, false otherwise
    */
   public boolean hasAllRoles(String... roles) {
@@ -130,8 +128,7 @@ public class AuthenticatedUser {
   /**
    * Returns true if authenticated user is authorized to access class, false otherwise.
    *
-   * @param type
-   *          class
+   * @param type class
    * @return true if authenticated user is authorized to access class, false otherwise
    */
   public boolean isAuthorized(Class<?> type) {
@@ -147,10 +144,8 @@ public class AuthenticatedUser {
   /**
    * Returns true if authenticated user has permission on object, false otherwise.
    *
-   * @param object
-   *          object
-   * @param permission
-   *          permission
+   * @param object     object
+   * @param permission permission
    * @return true if authenticated user has permission on object, false otherwise
    */
   public boolean hasPermission(Object object, Permission permission) {

@@ -33,6 +33,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesViewItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(SamplesView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
@@ -56,7 +57,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     open();
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
         currentLocale()), getDriver().getTitle());
   }
 
@@ -109,7 +110,7 @@ public class SamplesViewItTest extends AbstractTestBenchTestCase {
     String name = "ChIPseq_Spt16_yFR101_G24D_JS2-JS1_20181022";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + MERGED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + MERGED, new Object[]{name}, currentLocale()),
         notification.getText());
     List<Dataset> datasets = datasetRepository.findByOwner(new User(3L));
     Dataset dataset =

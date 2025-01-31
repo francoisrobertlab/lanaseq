@@ -19,8 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Main view.
  */
 @Route(value = MainView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ USER })
+@RolesAllowed({USER})
 public class MainView extends Composite<VerticalLayout> implements BeforeEnterObserver {
+
   public static final String VIEW_NAME = "";
   @Serial
   private static final long serialVersionUID = -8440231785563887343L;

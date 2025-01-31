@@ -11,6 +11,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = ProtocolDialog.ID + "-" + ProtocolDialog.FILES)
 public class ProtocolFilesGridElement extends GridElement {
+
   private static final int FILENAME_COLUMN = 0;
 
   public AnchorElement filename(int row) {

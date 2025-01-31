@@ -17,6 +17,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewContextPathItTest extends AbstractTestBenchTestCase {
+
   private void open() {
     openView(VIEW_NAME);
   }

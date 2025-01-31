@@ -56,6 +56,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SamplesAnalysisDialogTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(SamplesAnalysisDialog.class);
   private SamplesAnalysisDialog dialog;
   @MockitoBean

@@ -19,10 +19,11 @@ import org.springframework.test.context.TestExecutionListener;
  */
 @Order(0)
 public class VaadinLicenseExecutionListener implements TestExecutionListener, InjectDependencies {
+
   private static final String LICENSE_ERROR_MESSAGE =
       "License for Vaadin TestBench not found. Skipping test class {0} .";
   private static final Class<?>[] TEST_BENCH_CLASSES =
-      new Class[] { UIUnitTest.class, TestBenchTestCase.class };
+      new Class[]{UIUnitTest.class, TestBenchTestCase.class};
   private static final Logger logger =
       LoggerFactory.getLogger(VaadinLicenseExecutionListener.class);
   private VaadinLicenseConfiguration configuration;

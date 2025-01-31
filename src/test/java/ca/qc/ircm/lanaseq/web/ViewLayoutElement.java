@@ -29,6 +29,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-app-layout")
 @Attribute(name = "id", value = ID)
 public class ViewLayoutElement extends AppLayoutElement {
+
   public H1Element applicationName() {
     return $(H1Element.class).id(styleName(APPLICATION_NAME));
   }

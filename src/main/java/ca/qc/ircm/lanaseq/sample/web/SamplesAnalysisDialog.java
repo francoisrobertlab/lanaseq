@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserver {
+
   public static final String ID = "sample-analysis-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
@@ -141,11 +142,6 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     return samples.stream().map(Sample::getId).collect(Collectors.toList());
   }
 
-  public void setSampleId(long id) {
-    this.samples = Collections.nCopies(1, service.get(id).orElseThrow());
-    updateHeader();
-  }
-
   public void setSampleIds(List<Long> ids) {
     Objects.requireNonNull(ids, "ids parameter cannot be null");
     if (ids.isEmpty()) {
@@ -153,6 +149,11 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     }
     this.samples =
         ids.stream().map(id -> service.get(id).orElseThrow()).collect(Collectors.toList());
+    updateHeader();
+  }
+
+  public void setSampleId(long id) {
+    this.samples = Collections.nCopies(1, service.get(id).orElseThrow());
     updateHeader();
   }
 }

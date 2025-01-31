@@ -43,6 +43,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
   private static final Logger logger =
       LoggerFactory.getLogger(ConfigureUiServiceInitListenerTest.class);

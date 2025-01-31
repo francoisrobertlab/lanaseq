@@ -14,6 +14,7 @@ import org.springframework.web.filter.GenericFilterBean;
  * Request filter that set MDC context for loggers.
  */
 public class MdcFilter extends GenericFilterBean {
+
   public static final String BEAN_NAME = "MdcFilter";
   public static final String USER_CONTEXT_KEY = "user";
   private final AuthenticatedUser authenticatedUser;

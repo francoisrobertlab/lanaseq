@@ -10,4 +10,5 @@ import com.vaadin.flow.shared.communication.PushMode;
 @Push(PushMode.MANUAL)
 @SuppressWarnings("unused")
 public class AppShell implements AppShellConfigurator {
+
 }

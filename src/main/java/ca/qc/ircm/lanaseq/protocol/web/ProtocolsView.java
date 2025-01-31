@@ -52,8 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Protocols view.
  */
 @Route(value = ProtocolsView.VIEW_NAME, layout = ViewLayout.class)
-@RolesAllowed({ USER })
+@RolesAllowed({USER})
 public class ProtocolsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
+
   public static final String VIEW_NAME = "protocols";
   public static final String ID = "protocols-view";
   public static final String PROTOCOLS = "protocols";

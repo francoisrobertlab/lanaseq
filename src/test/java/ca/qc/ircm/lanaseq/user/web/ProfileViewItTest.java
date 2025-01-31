@@ -32,6 +32,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProfileViewItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ProfileView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
@@ -62,7 +63,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
 
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
         currentLocale()), getDriver().getTitle());
   }
 

@@ -16,6 +16,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 public class UserServiceInjectionTest {
+
   @Autowired
   private UserService userService;
 

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link Strings}.
  */
 public class StringsTest {
+
   @Test
   public void property() {
     assertEquals("true", Strings.property(true));

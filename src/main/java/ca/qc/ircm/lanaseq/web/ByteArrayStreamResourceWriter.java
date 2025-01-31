@@ -11,6 +11,7 @@ import org.springframework.util.FileCopyUtils;
  * A {@link StreamResourceWriter} that sends a byte array.
  */
 public class ByteArrayStreamResourceWriter implements StreamResourceWriter {
+
   @Serial
   private static final long serialVersionUID = 673747187193922551L;
   private final byte[] content;

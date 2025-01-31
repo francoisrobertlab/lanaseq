@@ -96,6 +96,7 @@ import org.springframework.lang.Nullable;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
   public static final String NAME_PREFIX = "namePrefix";
@@ -345,11 +346,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   /**
    * Adds listener to be informed when an dataset was saved.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration addSavedListener(ComponentEventListener<SavedEvent<DatasetDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
@@ -357,13 +357,12 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   /**
    * Adds listener to be informed when an dataset was deleted.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration
-      addDeletedListener(ComponentEventListener<DeletedEvent<DatasetDialog>> listener) {
+  addDeletedListener(ComponentEventListener<DeletedEvent<DatasetDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 

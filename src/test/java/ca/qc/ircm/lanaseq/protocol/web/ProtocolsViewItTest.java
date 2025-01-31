@@ -24,6 +24,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Autowired
@@ -47,7 +48,7 @@ public class ProtocolsViewItTest extends AbstractTestBenchTestCase {
 
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
         currentLocale()), getDriver().getTitle());
   }
 

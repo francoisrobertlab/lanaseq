@@ -42,6 +42,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 @JsModule("./styles/shared-styles.js")
 public class ViewLayout extends AppLayout
     implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver, UrlComponent {
+
   public static final String ID = "view-layout";
   public static final String HEADER = "header";
   public static final String LABORATORY = "laboratory";

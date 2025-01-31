@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @AnonymousAllowed
 public class UseForgotPasswordView extends VerticalLayout implements LocaleChangeObserver,
     HasUrlParameter<String>, HasDynamicTitle, NotificationComponent {
+
   public static final String VIEW_NAME = "useforgotpassword";
   public static final String ID = "useforgotpassword-view";
   public static final String SEPARATOR = "/";

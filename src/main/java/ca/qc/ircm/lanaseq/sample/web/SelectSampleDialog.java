@@ -48,6 +48,7 @@ import org.springframework.context.annotation.Scope;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
+
   public static final String ID = "select-sample-dialog";
   public static final String SAMPLES = "samples";
   private static final Logger logger = LoggerFactory.getLogger(SelectSampleDialog.class);
@@ -135,11 +136,10 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
   /**
    * Adds listener to be informed when a sample was selected.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration addSelectedListener(
       ComponentEventListener<SelectedEvent<SelectSampleDialog, Sample>> listener) {
     return addListener((Class) SelectedEvent.class, listener);

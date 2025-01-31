@@ -61,6 +61,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetsViewTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetsView.class);
   private static final String DATASET_PREFIX = messagePrefix(Dataset.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

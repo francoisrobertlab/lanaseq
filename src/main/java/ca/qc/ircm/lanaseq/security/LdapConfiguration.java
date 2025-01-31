@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = LdapConfiguration.PREFIX)
 public record LdapConfiguration(boolean enabled, String idAttribute, String mailAttribute,
-    String objectClass) {
+                                String objectClass) {
+
   public static final String PREFIX = "ldap";
 }

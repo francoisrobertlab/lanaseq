@@ -19,6 +19,7 @@ import org.openqa.selenium.By;
 @Element("vaadin-vertical-layout")
 @Attribute(name = "id", value = SamplesView.ID)
 public class SamplesViewElement extends VerticalLayoutElement {
+
   public SamplesGridElement samples() {
     return $(SamplesGridElement.class).first();
   }

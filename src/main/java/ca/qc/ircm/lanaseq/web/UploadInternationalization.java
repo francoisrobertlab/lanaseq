@@ -10,12 +10,13 @@ import java.util.Locale;
  * Upload internationalization.
  */
 public class UploadInternationalization {
+
   /**
-   * Returns {@link UploadI18N} for specified locale. <br>
-   * Falls back to English if no instance exists for specified locale.
+   * Returns {@link UploadI18N} for specified locale.
    *
-   * @param locale
-   *          locale
+   * <p>Falls back to English if no instance exists for specified locale.</p>
+   *
+   * @param locale locale
    * @return {@link UploadI18N} for specified locale, never null
    */
   public static UploadI18N uploadI18N(Locale locale) {

@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort.Order;
  */
 @NonTransactionalTestAnnotations
 public class DatasetFilterTest {
+
   private DatasetFilter filter = new DatasetFilter();
 
   @Test

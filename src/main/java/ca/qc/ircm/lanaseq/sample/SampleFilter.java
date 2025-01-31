@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort.Direction;
  * Filters samples.
  */
 public class SampleFilter implements Predicate<Sample> {
+
   public String nameContains;
   public String keywordsContains;
   public String protocolContains;
@@ -50,7 +51,7 @@ public class SampleFilter implements Predicate<Sample> {
       test &=
           comparable(replaceNull(sample.getOwner().getEmail())).contains(comparable(ownerContains))
               || comparable(replaceNull(sample.getOwner().getName()))
-                  .contains(comparable(ownerContains));
+              .contains(comparable(ownerContains));
     }
     return test;
   }

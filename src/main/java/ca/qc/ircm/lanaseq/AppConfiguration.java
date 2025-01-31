@@ -27,6 +27,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = AppConfiguration.PREFIX)
 public class AppConfiguration implements InitializingBean {
+
   /**
    * Default name of application.
    */
@@ -43,6 +44,7 @@ public class AppConfiguration implements InitializingBean {
    * Year formatter.
    */
   private static final DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
+  private final AuthenticatedUser authenticatedUser;
   /**
    * Log file.
    */
@@ -64,6 +66,13 @@ public class AppConfiguration implements InitializingBean {
    * Where dataset files are stored.
    */
   private Path datasetFolder;
+  /**
+   * Location of files inside home folder.
+   */
+  private final Function<DataWithFiles, Path> subfolder = df -> {
+    Path base = df instanceof Dataset ? datasetFolder : sampleFolder;
+    return base.resolve(year.format(df.getDate())).resolve(df.getName());
+  };
   /**
    * Analysis network drive.
    */
@@ -88,14 +97,6 @@ public class AppConfiguration implements InitializingBean {
    * Server's actual URL, used in emails.
    */
   private String serverUrl;
-  private final AuthenticatedUser authenticatedUser;
-  /**
-   * Location of files inside home folder.
-   */
-  private final Function<DataWithFiles, Path> subfolder = df -> {
-    Path base = df instanceof Dataset ? datasetFolder : sampleFolder;
-    return base.resolve(year.format(df.getDate())).resolve(df.getName());
-  };
 
   @Autowired
   protected AppConfiguration(AuthenticatedUser authenticatedUser) {
@@ -150,8 +151,7 @@ public class AppConfiguration implements InitializingBean {
    * , the urlEnd parameter should be <code>/lanaseq/myurl?param1=abc</code>
    * </p>
    *
-   * @param urlEnd
-   *          end portion of URL
+   * @param urlEnd end portion of URL
    * @return urlEnd with prefix that allows to access application from anywhere
    */
   public String getUrl(String urlEnd) {
@@ -248,6 +248,7 @@ public class AppConfiguration implements InitializingBean {
    * Folder that can be on a network drive.
    */
   public static class NetworkDrive<D> {
+
     private Path folder;
     private String windowsLabel;
     private String unixLabel;
@@ -256,8 +257,7 @@ public class AppConfiguration implements InitializingBean {
     /**
      * Returns data's files folder.
      *
-     * @param dataWithFiles
-     *          data with files
+     * @param dataWithFiles data with files
      * @return data's files folder
      */
     public Path folder(D dataWithFiles) {
@@ -267,10 +267,9 @@ public class AppConfiguration implements InitializingBean {
     /**
      * Returns label to be shown to user, so he can find the data's files folder on the network.
      *
-     * @param dataWithFiles
-     *          data with files
-     * @param unix
-     *          true if path elements should be separated by slashes instead of backslashes
+     * @param dataWithFiles data with files
+     * @param unix          true if path elements should be separated by slashes instead of
+     *                      backslashes
      * @return label to be shown to user, so he can find the data's files folder on the network
      */
     public String label(D dataWithFiles, boolean unix) {

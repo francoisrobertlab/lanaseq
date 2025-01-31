@@ -8,6 +8,7 @@ import java.io.Serial;
  * Select event.
  */
 public class SelectedEvent<V extends Component, E> extends ComponentEvent<V> {
+
   @Serial
   private static final long serialVersionUID = -9036570365228629040L;
   private final E selection;

@@ -10,6 +10,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = UsersView.USERS)
 public class UsersGridElement extends GridElement {
+
   private static final int EMAIL_COLUMN = 0;
 
   public void doubleClick(int row) {

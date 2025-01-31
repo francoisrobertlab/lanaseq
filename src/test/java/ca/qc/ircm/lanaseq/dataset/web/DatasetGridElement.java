@@ -14,6 +14,7 @@ import org.openqa.selenium.Keys;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = DatasetGrid.ID)
 public class DatasetGridElement extends GridElement {
+
   private static final int NAME_COLUMN = 0;
   private static final int PROTOCOL_COLUMN = 2;
   private static final int OWNER_COLUMN = 4;
@@ -37,8 +38,7 @@ public class DatasetGridElement extends GridElement {
   /**
    * Control click dataset.
    *
-   * @param row
-   *          row index
+   * @param row row index
    */
   public void controlClick(int row) {
     Keys key = Keys.CONTROL;

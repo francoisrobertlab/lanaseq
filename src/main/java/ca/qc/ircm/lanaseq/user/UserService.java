@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService {
+
   private final UserRepository repository;
   private final PasswordEncoder passwordEncoder;
   private final AuthenticatedUser authenticatedUser;
@@ -38,8 +39,7 @@ public class UserService {
   /**
    * Returns user having specified id.
    *
-   * @param id
-   *          user's id
+   * @param id user's id
    * @return user having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
@@ -50,8 +50,7 @@ public class UserService {
   /**
    * Returns user having specified email.
    *
-   * @param email
-   *          user's email
+   * @param email user's email
    * @return user having specified email
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
@@ -63,8 +62,7 @@ public class UserService {
   /**
    * Returns true if a user exists with this email.
    *
-   * @param email
-   *          email
+   * @param email email
    * @return true if a user exists with this email
    */
   public boolean exists(String email) {
@@ -91,11 +89,9 @@ public class UserService {
    * If user is a manager, his laboratory will be created.
    * </p>
    *
-   * @param user
-   *          user
-   * @param password
-   *          user's unhashed password; required for new users; can be null to keep previous
-   *          password
+   * @param user     user
+   * @param password user's unhashed password; required for new users; can be null to keep previous
+   *                 password
    */
   @PreAuthorize("hasPermission(#user, 'write')")
   public void save(User user, @Nullable String password) {
@@ -123,8 +119,7 @@ public class UserService {
   /**
    * Saves new password for current user.
    *
-   * @param password
-   *          user's unhashed password
+   * @param password user's unhashed password
    */
   @PreAuthorize("hasAuthority('" + USER + "')")
   public void save(String password) {

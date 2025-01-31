@@ -17,6 +17,7 @@ import org.openqa.selenium.By;
 @Element("vaadin-vertical-layout")
 @Attribute(name = "id", value = ProtocolsView.ID)
 public class ProtocolsViewElement extends VerticalLayoutElement {
+
   public ProtocolsGridElement protocols() {
     return $(ProtocolsGridElement.class).first();
   }

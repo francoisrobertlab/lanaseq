@@ -49,6 +49,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ServiceTestAnnotations
 public class AuthenticatedUserTest {
+
   private static final String DEFAULT_ROLE = USER;
   @Autowired
   private AuthenticatedUser authenticatedUser;
@@ -81,7 +82,7 @@ public class AuthenticatedUserTest {
   }
 
   private Optional<? extends GrantedAuthority>
-      findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
+  findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
     return authorities.stream().filter(autho -> autho.getAuthority().equals(authority)).findFirst();
   }
 
@@ -293,7 +294,7 @@ public class AuthenticatedUserTest {
   }
 
   @Test
-  @WithMockUser(authorities = { MANAGER })
+  @WithMockUser(authorities = {MANAGER})
   public void isAuthorized_ManagerRole_True() {
     when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authenticatedUser.isAuthorized(ManagerRoleTest.class));
@@ -308,7 +309,7 @@ public class AuthenticatedUserTest {
   }
 
   @Test
-  @WithMockUser(authorities = { ADMIN })
+  @WithMockUser(authorities = {ADMIN})
   public void isAuthorized_AdminRole_True() {
     when(roleValidator.hasAnyRole(any())).thenReturn(true);
     assertTrue(authenticatedUser.isAuthorized(AdminRoleTest.class));
@@ -323,7 +324,7 @@ public class AuthenticatedUserTest {
   }
 
   @Test
-  @WithMockUser(authorities = { MANAGER })
+  @WithMockUser(authorities = {MANAGER})
   public void isAuthorized_ManagerOrAdminRole_True() {
     when(roleValidator.hasAnyRole(any(String[].class))).thenReturn(true);
     assertTrue(authenticatedUser.isAuthorized(ManagerOrAdminRoleTest.class));
@@ -373,6 +374,7 @@ public class AuthenticatedUserTest {
    * Class with no {@link RolesAllowed} annotation.
    */
   public static final class NoRoleTest {
+
   }
 
   /**
@@ -380,6 +382,7 @@ public class AuthenticatedUserTest {
    */
   @RolesAllowed(USER)
   public static final class UserRoleTest {
+
   }
 
   /**
@@ -387,6 +390,7 @@ public class AuthenticatedUserTest {
    */
   @RolesAllowed(MANAGER)
   public static final class ManagerRoleTest {
+
   }
 
   /**
@@ -394,12 +398,14 @@ public class AuthenticatedUserTest {
    */
   @RolesAllowed(ADMIN)
   public static final class AdminRoleTest {
+
   }
 
   /**
    * Class accessible only by managers or administrators.
    */
-  @RolesAllowed({ MANAGER, ADMIN })
+  @RolesAllowed({MANAGER, ADMIN})
   public static final class ManagerOrAdminRoleTest {
+
   }
 }

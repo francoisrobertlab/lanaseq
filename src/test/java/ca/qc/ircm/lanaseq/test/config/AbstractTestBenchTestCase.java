@@ -37,6 +37,7 @@ import org.springframework.context.MessageSource;
  * Additional functions for TestBenchTestCase.
  */
 public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
+
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final String LAYOUT_PREFIX = messagePrefix(ViewLayout.class);
   private static final String SIGNIN_PREFIX = messagePrefix(SigninView.class);
@@ -162,7 +163,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     if (optlocale.isEmpty()) {
       optlocale = locales.stream()
           .filter(locale -> messageSource.getMessage(SIGNIN_PREFIX + TITLE,
-              new Object[] { applicationName.apply(locale) }, locale)
+                  new Object[]{applicationName.apply(locale)}, locale)
               .equals(getDriver().getTitle()))
           .findAny();
     }
@@ -170,7 +171,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
       optlocale = locales.stream()
           .filter(locale -> messageSource
               .getMessage(USE_FORGOT_PASSWORD_PREFIX + TITLE,
-                  new Object[] { applicationName.apply(locale) }, locale)
+                  new Object[]{applicationName.apply(locale)}, locale)
               .equals(getDriver().getTitle()))
           .findAny();
     }
@@ -179,7 +180,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
           locales.stream()
               .filter(locale -> messageSource
                   .getMessage(PASSWORD_PREFIX + TITLE,
-                      new Object[] { applicationName.apply(locale) }, locale)
+                      new Object[]{applicationName.apply(locale)}, locale)
                   .equals(getDriver().getTitle()))
               .findAny();
     }
@@ -187,7 +188,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
       optlocale = locales.stream()
           .filter(locale -> messageSource
               .getMessage(ACCESS_DENIED_PREFIX + TITLE,
-                  new Object[] { applicationName.apply(locale) }, locale)
+                  new Object[]{applicationName.apply(locale)}, locale)
               .equals(getDriver().getTitle()))
           .findAny();
     }

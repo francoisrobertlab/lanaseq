@@ -8,7 +8,8 @@ import java.lang.annotation.Target;
 /**
  * Test type/method is downloading a file.
  */
-@Target({ ElementType.TYPE, ElementType.METHOD })
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Download {
+
 }

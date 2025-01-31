@@ -22,6 +22,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @ServiceTestAnnotations
 public class DatasetPermissionEvaluatorTest {
+
   private static final String DATASET_CLASS = Dataset.class.getName();
   private static final String READ = "read";
   private static final Permission BASE_READ = Permission.READ;

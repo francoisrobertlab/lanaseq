@@ -33,13 +33,14 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("francois.robert@ircm.qc.ca")
 public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
+  @Value("${download-home}")
+  protected Path downloadHome;
   @Autowired
   private ProtocolFileRepository fileRepository;
   @Autowired
   private MessageSource messageSource;
-  @Value("${download-home}")
-  protected Path downloadHome;
 
   private void open() {
     openView(VIEW_NAME);
@@ -71,12 +72,12 @@ public class ProtocolHistoryDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + RECOVERED,
-            new Object[] { "Histone FLAG Protocol.docx" }, currentLocale()),
+            new Object[]{"Histone FLAG Protocol.docx"}, currentLocale()),
         notification.getText());
     ProtocolFile file = fileRepository.findById(3L).orElseThrow();
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
     assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-        .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
+            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());

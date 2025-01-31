@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Repository for {@link Protocol}.
  */
 public interface ProtocolRepository extends JpaRepository<Protocol, Long> {
+
   boolean existsByName(String name);
 
   Optional<Protocol> findByName(String name);

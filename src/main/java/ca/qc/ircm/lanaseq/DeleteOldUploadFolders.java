@@ -19,6 +19,7 @@ import org.springframework.util.FileSystemUtils;
  */
 @Component
 public class DeleteOldUploadFolders {
+
   private static final Logger logger = LoggerFactory.getLogger(DeleteOldUploadFolders.class);
 
   private final AppConfiguration configuration;
@@ -31,9 +32,8 @@ public class DeleteOldUploadFolders {
   /**
    * Deletes old upload folders.
    *
-   * <br>
-   * This method is executed every hour with an initial delay of 2 minutes to let the application
-   * start.
+   * <p>This method is executed every hour with an initial delay of 2 minutes to let the application
+   * start.</p>
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
   public void deleteOldUploadFolders() {

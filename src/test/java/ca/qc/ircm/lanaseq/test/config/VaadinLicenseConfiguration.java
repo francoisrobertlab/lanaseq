@@ -8,5 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = VaadinLicenseConfiguration.PREFIX)
 public record VaadinLicenseConfiguration(boolean assume, List<String> paths) {
+
   public static final String PREFIX = "vaadin.license";
 }

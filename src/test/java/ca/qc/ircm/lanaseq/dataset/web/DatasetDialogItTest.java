@@ -44,6 +44,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogItTest.class);
   @TempDir
@@ -135,7 +136,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     dataset = repository.findById(2L).orElseThrow();
     assertEquals(name, dataset.getName());
@@ -206,7 +207,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     Dataset dataset = repository.findById(2L).orElseThrow();
     assertEquals(name, dataset.getName());
@@ -271,7 +272,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     dataset = repository.findById(2L).orElseThrow();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
-        new Object[] { dataset.getName() }, currentLocale()), notification.getText());
+        new Object[]{dataset.getName()}, currentLocale()), notification.getText());
     assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
     assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
@@ -405,7 +406,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[] { name }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name}, currentLocale()),
         notification.getText());
     assertFalse(repository.findById(4L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.

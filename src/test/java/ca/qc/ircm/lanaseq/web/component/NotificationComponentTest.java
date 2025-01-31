@@ -15,6 +15,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class NotificationComponentTest extends SpringUIUnitTest {
+
   private NotificationComponentForTest notificationComponent = new NotificationComponentForTest();
 
   @Test
@@ -48,5 +49,6 @@ public class NotificationComponentTest extends SpringUIUnitTest {
   }
 
   private static class NotificationComponentForTest implements NotificationComponent {
+
   }
 }

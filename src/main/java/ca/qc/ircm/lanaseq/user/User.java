@@ -24,6 +24,7 @@ import org.springframework.lang.Nullable;
 @Table(name = User.TABLE_NAME)
 @GeneratePropertyNames
 public class User implements Data, Owned, Serializable {
+
   public static final String TABLE_NAME = "users";
   public static final long ROBOT_ID = 1;
   @Serial

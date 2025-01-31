@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
  */
 @NonTransactionalTestAnnotations
 public class MailConfigurationTest {
+
   @Autowired
   private MailConfiguration mailConfiguration;
   @Autowired

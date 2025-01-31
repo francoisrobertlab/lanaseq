@@ -58,6 +58,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
   private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
   private ProtocolHistoryDialog dialog;

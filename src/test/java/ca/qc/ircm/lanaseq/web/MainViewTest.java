@@ -18,6 +18,7 @@ import org.mockito.Mock;
  */
 @NonTransactionalTestAnnotations
 public class MainViewTest {
+
   private MainView view;
   @Mock
   private AuthenticatedUser authenticatedUser;

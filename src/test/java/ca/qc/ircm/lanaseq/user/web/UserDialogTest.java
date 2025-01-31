@@ -49,6 +49,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UserDialogTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(UserDialog.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private UserDialog dialog;

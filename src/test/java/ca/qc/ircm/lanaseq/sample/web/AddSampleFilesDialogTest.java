@@ -88,6 +88,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class AddSampleFilesDialogTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @TempDir

@@ -24,8 +24,9 @@ import org.springframework.stereotype.Component;
  * Fixes the location of samples and dataset files.
  */
 @Component
-@Profile({ "!test & !integration-test" })
+@Profile({"!test & !integration-test"})
 public class FixFilesDateFolder {
+
   private static final Logger logger = LoggerFactory.getLogger(FixFilesDateFolder.class);
   private final AppConfiguration configuration;
   private final DatasetRepository datasetRepository;

@@ -42,11 +42,12 @@ import org.springframework.lang.Nullable;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserForm extends FormLayout implements LocaleChangeObserver {
+
+  public static final String ID = "user-form";
   private static final String USER_PREFIX = messagePrefix(User.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Serial
   private static final long serialVersionUID = 3285639770914046262L;
-  public static final String ID = "user-form";
   protected TextField email = new TextField();
   protected TextField name = new TextField();
   protected Checkbox admin = new Checkbox();

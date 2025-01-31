@@ -11,6 +11,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = ProtocolsView.PROTOCOLS)
 public class ProtocolsGridElement extends GridElement {
+
   private static final int NAME_COLUMN = 0;
   private static final int OWNER_COLUMN = 2;
 

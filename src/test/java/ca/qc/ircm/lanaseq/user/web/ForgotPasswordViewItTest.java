@@ -27,6 +27,7 @@ import org.springframework.context.MessageSource;
  */
 @TestBenchTestAnnotations
 public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
+
   @SuppressWarnings("unused")
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -46,7 +47,7 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
     open();
     String applicationName =
         messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[] { applicationName },
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
         currentLocale()), getDriver().getTitle());
   }
 
@@ -69,7 +70,7 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { email }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email}, currentLocale()),
         notification.getText());
     List<ForgotPassword> forgotPasswords = repository.findByUserEmail(email);
     assertEquals(4, forgotPasswords.size());

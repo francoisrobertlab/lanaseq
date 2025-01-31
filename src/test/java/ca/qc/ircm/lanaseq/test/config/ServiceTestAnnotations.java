@@ -15,18 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Configuration for tests using the database.
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(
-    value = { InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
+    value = {InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
         FixSecurityContextHolderStrategyExecutionListener.class,
-        UiUnitTestExecutionListener.class },
+        UiUnitTestExecutionListener.class},
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional
-@Sql({ "/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql" })
+@Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql"})
 public @interface ServiceTestAnnotations {
 
 }

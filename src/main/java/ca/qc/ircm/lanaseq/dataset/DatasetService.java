@@ -48,6 +48,7 @@ import org.springframework.util.FileSystemUtils;
 @Service
 @Transactional
 public class DatasetService {
+
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
   private AppConfiguration configuration;
@@ -69,8 +70,7 @@ public class DatasetService {
   /**
    * Returns dataset having specified id.
    *
-   * @param id
-   *          dataset's id
+   * @param id dataset's id
    * @return dataset having specified id
    */
   @PostAuthorize("!returnObject.isPresent() || hasPermission(returnObject.get(), 'read')")
@@ -81,8 +81,7 @@ public class DatasetService {
   /**
    * Returns true if a dataset with specified name exists, false otherwise.
    *
-   * @param name
-   *          name
+   * @param name name
    * @return true if a dataset with specified name exists, false otherwise
    */
   public boolean exists(String name) {
@@ -103,8 +102,7 @@ public class DatasetService {
   /**
    * Returns all datasets passing filter.
    *
-   * @param filter
-   *          filter
+   * @param filter filter
    * @return all datasets passing filter
    */
   @PostFilter("hasPermission(filterObject, 'read')")
@@ -116,8 +114,7 @@ public class DatasetService {
   /**
    * Returns number of datasets passing filter.
    *
-   * @param filter
-   *          filter
+   * @param filter filter
    * @return number of datasets passing filter
    */
   public long count(DatasetFilter filter) {
@@ -128,8 +125,7 @@ public class DatasetService {
   /**
    * Returns all dataset's files.
    *
-   * @param dataset
-   *          dataset
+   * @param dataset dataset
    * @return all dataset's files
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
@@ -188,11 +184,9 @@ public class DatasetService {
    * <p>
    * Only returns label for folders that exist.
    * </p>
-   * 
-   * @param dataset
-   *          dataset
-   * @param unix
-   *          true if path elements should be separated by slashes instead of backslashes
+   *
+   * @param dataset dataset
+   * @param unix    true if path elements should be separated by slashes instead of backslashes
    * @return all dataset's folder labels
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
@@ -218,8 +212,7 @@ public class DatasetService {
   /**
    * Returns all dataset's upload files.
    *
-   * @param dataset
-   *          dataset
+   * @param dataset dataset
    * @return all dataset's upload files
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
@@ -255,8 +248,7 @@ public class DatasetService {
   /**
    * Returns most recent keywords.
    *
-   * @param limit
-   *          maximum number of keywords to return
+   * @param limit maximum number of keywords to return
    * @return most recent keywords
    */
   public List<String> topKeywords(int limit) {
@@ -275,8 +267,7 @@ public class DatasetService {
   /**
    * Returns true if dataset can be deleted, false otherwise.
    *
-   * @param dataset
-   *          dataset
+   * @param dataset dataset
    * @return true if dataset can be deleted, false otherwise
    */
   @PreAuthorize("hasPermission(#dataset, 'read')")
@@ -288,8 +279,7 @@ public class DatasetService {
   /**
    * Saves dataset into database.
    *
-   * @param dataset
-   *          dataset
+   * @param dataset dataset
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void save(Dataset dataset) {
@@ -342,10 +332,8 @@ public class DatasetService {
   /**
    * Save files to dataset folder.
    *
-   * @param dataset
-   *          dataset
-   * @param files
-   *          files to save
+   * @param dataset dataset
+   * @param files   files to save
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void saveFiles(Dataset dataset, Collection<Path> files) {
@@ -370,8 +358,7 @@ public class DatasetService {
   /**
    * Deletes dataset from database.
    *
-   * @param dataset
-   *          dataset
+   * @param dataset dataset
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   public void delete(Dataset dataset) {
@@ -390,10 +377,8 @@ public class DatasetService {
   /**
    * Deletes dataset file.
    *
-   * @param dataset
-   *          dataset
-   * @param file
-   *          file to delete
+   * @param dataset dataset
+   * @param file    file to delete
    */
   public void deleteFile(Dataset dataset, Path file) {
     Path filename = file.getFileName();

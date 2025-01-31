@@ -7,6 +7,7 @@ import com.vaadin.flow.component.ComponentEvent;
  * Edit event.
  */
 public class EditEvent<V extends Component, E> extends ComponentEvent<V> {
+
   private final E item;
 
   public EditEvent(V source, boolean fromClient, E item) {

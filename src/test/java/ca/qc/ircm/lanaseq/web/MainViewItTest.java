@@ -15,6 +15,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class MainViewItTest extends AbstractTestBenchTestCase {
+
   private void open() {
     openView(VIEW_NAME);
   }

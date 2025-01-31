@@ -16,6 +16,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-dialog")
 @Attribute(name = "id", value = UserDialog.ID)
 public class UserDialogElement extends DialogElement {
+
   public H2Element header() {
     return $(H2Element.class).first();
   }

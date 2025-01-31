@@ -10,4 +10,5 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-multi-select-combo-box")
 @Attribute(name = "class", value = FilenamesField.CLASS_NAME)
 public class FilenamesFieldElement extends MultiSelectComboBoxElement {
+
 }

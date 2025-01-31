@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @RolesAllowed(USER)
 public class ProfileView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+
   public static final String VIEW_NAME = "profile";
   public static final String ID = "profile-view";
   public static final String SAVED = "saved";

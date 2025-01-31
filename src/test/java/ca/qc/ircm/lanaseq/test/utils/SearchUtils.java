@@ -8,6 +8,7 @@ import java.util.Optional;
  * Search utilities.
  */
 public class SearchUtils {
+
   public static <D extends Data> Optional<D> find(Collection<D> datas, long id) {
     return datas.stream().filter(data -> id == data.getId()).findFirst();
   }

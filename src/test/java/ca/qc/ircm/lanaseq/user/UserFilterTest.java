@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
  */
 @NonTransactionalTestAnnotations
 public class UserFilterTest {
+
   private UserFilter filter = new UserFilter();
 
   @Test

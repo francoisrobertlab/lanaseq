@@ -25,6 +25,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UserDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(UserDialog.class);
   @Autowired
   private UserRepository repository;
@@ -107,7 +108,7 @@ public class UserDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[] { email }, currentLocale()),
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email}, currentLocale()),
         notification.getText());
     User user = repository.findById(3L).orElseThrow();
     assertEquals(email, user.getEmail());

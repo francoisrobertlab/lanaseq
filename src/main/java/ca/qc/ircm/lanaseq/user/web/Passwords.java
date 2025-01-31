@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
  * Stores password and a confirmation that should match the password.
  */
 public class Passwords {
+
   private String password;
   private String confirmPassword;
 

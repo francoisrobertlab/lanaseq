@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link NormalizedComparator}.
  */
 public class NormalizedComparatorTest {
+
   @Test
   public void compare_Identity() {
     NormalizedComparator<String> comparator = new NormalizedComparator<>(s -> s);
@@ -122,6 +123,7 @@ public class NormalizedComparatorTest {
   }
 
   private static class TestName {
+
     private String name;
 
     public String getName() {

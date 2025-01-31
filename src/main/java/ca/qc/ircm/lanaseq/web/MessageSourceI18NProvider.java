@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MessageSourceI18NProvider implements I18NProvider {
+
   private static final Logger logger = LoggerFactory.getLogger(MessageSourceI18NProvider.class);
   /**
    * {@link MessageSource} from Spring.

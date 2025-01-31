@@ -129,6 +129,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class DatasetFilesDialogTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetFilesDialog.class);
   private static final String SAMPLE_PREFIX = messagePrefix(Sample.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

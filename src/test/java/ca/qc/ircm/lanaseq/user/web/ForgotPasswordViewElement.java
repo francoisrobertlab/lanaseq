@@ -19,6 +19,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-vertical-layout")
 @Attribute(name = "id", value = ForgotPasswordView.ID)
 public class ForgotPasswordViewElement extends VerticalLayoutElement {
+
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }

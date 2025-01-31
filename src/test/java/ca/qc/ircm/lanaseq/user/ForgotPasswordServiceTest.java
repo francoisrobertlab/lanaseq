@@ -41,6 +41,7 @@ import org.thymeleaf.util.StringUtils;
  */
 @ServiceTestAnnotations
 public class ForgotPasswordServiceTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordService.class);
   private static final String CONSTANT_PREFIX = messagePrefix(Constants.class);
   @SuppressWarnings("unused")
@@ -166,7 +167,7 @@ public class ForgotPasswordServiceTest {
         messageSource.getMessage(CONSTANT_PREFIX + "application.name", null, locale);
     ResourceBundle mailResources = ResourceBundle.getBundle("user.forgotpassword", locale);
     verify(email).setSubject(messageSource.getMessage(MESSAGE_PREFIX + "subject",
-        new Object[] { applicationName }, locale));
+        new Object[]{applicationName}, locale));
     verify(email).setText(stringCaptor.capture(), stringCaptor.capture());
     String textContent = stringCaptor.getAllValues().get(0);
     String htmlContent = stringCaptor.getAllValues().get(1);

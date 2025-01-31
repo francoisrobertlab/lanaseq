@@ -16,6 +16,7 @@ import java.util.List;
  * Field containing list of filenames.
  */
 public class FilenamesField extends MultiSelectComboBox<String> implements LocaleChangeObserver {
+
   public static final String CLASS_NAME = "filenames-field";
   public static final String NEW_FILENAME_REGEX = "[\\w-\\.]*";
   public static final String NEW_FILENAME_REGEX_ERROR = "regex";

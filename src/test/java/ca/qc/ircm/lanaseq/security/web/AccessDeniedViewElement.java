@@ -17,6 +17,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-vertical-layout")
 @Attribute(name = "id", value = AccessDeniedView.VIEW_NAME)
 public class AccessDeniedViewElement extends VerticalLayoutElement {
+
   public H2Element header() {
     return $(H2Element.class).id(HEADER);
   }

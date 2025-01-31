@@ -29,12 +29,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @NonTransactionalTestAnnotations
 public class DeleteOldAnalysisFoldersTest {
+
+  @TempDir
+  Path temporaryFolder;
   @Autowired
   private DeleteOldAnalysisFolders task;
   @MockitoBean
   private AppConfiguration configuration;
-  @TempDir
-  Path temporaryFolder;
 
   @BeforeEach
   public void beforeTest() {

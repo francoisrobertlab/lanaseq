@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link TimeConverter}.
  */
 public class TimeConverterTest {
+
   @Test
   public void toInstant_LocalDateTime() {
     LocalDateTime dateTime1 = LocalDateTime.now();

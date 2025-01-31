@@ -35,12 +35,12 @@ import org.springframework.stereotype.Service;
 /**
  * Switch user service.
  *
- * <br/>
- * Most code was copied from
- * org.springframework.security.web.authentication.switchuser.SwitchUserFilter.
+ * <p>Most code was copied from
+ * org.springframework.security.web.authentication.switchuser.SwitchUserFilter.</p>
  */
 @Service
 public class SwitchUserService {
+
   public static final String ROLE_PREVIOUS_ADMINISTRATOR = "ROLE_PREVIOUS_ADMINISTRATOR";
   private static final Logger logger = LoggerFactory.getLogger(SwitchUserService.class);
   private String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
@@ -60,10 +60,8 @@ public class SwitchUserService {
   /**
    * Switches to switchTo user.
    *
-   * @param switchTo
-   *          user to switch to
-   * @param request
-   *          HTTP request
+   * @param switchTo user to switch to
+   * @param request  HTTP request
    */
   @PreAuthorize("hasAuthority('" + ADMIN + "')")
   public void switchUser(User switchTo, HttpServletRequest request) {
@@ -116,9 +114,8 @@ public class SwitchUserService {
 
   /**
    * Exits switch user.
-   * 
-   * @param request
-   *          HTTP request
+   *
+   * @param request HTTP request
    */
   public void exitSwitchUser(HttpServletRequest request) {
     // get the original authentication object (if exists)

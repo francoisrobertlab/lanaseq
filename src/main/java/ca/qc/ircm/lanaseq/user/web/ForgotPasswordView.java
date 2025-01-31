@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @AnonymousAllowed
 public class ForgotPasswordView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent, UrlComponent {
+
   public static final String VIEW_NAME = "forgotpassword";
   public static final String ID = "forgotpassword-view";
   public static final String SEPARATOR = "/";

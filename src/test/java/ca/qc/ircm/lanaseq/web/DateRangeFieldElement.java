@@ -14,6 +14,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-custom-field")
 @Attribute(name = "class", value = DateRangeField.CLASS_NAME)
 public class DateRangeFieldElement extends CustomFieldElement {
+
   public DatePickerElement form() {
     return $(DatePickerElement.class).withAttribute("class", FROM).first();
   }

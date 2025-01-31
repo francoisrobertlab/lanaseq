@@ -11,6 +11,7 @@ import com.vaadin.testbench.elementsbase.Element;
 @Element("vaadin-grid")
 @Attribute(name = "id", value = SampleFilesDialog.ID + "-" + SampleFilesDialog.FILES)
 public class SampleFilesGridElement extends GridElement {
+
   private static final int FILE_COLUMN = 0;
   private static final int DOWNLOAD_COLUMN = 1;
   private static final int DELETE_COLUMN = 2;

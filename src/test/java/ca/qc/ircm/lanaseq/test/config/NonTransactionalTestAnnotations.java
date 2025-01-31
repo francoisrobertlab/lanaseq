@@ -13,15 +13,15 @@ import org.springframework.test.context.web.WebAppConfiguration;
 /**
  * Configuration for tests not requiring access to database.
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
 @ActiveProfiles("test")
 @WebAppConfiguration
 @TestExecutionListeners(
-    value = { VaadinLicenseExecutionListener.class,
+    value = {VaadinLicenseExecutionListener.class,
         FixSecurityContextHolderStrategyExecutionListener.class,
-        UiUnitTestExecutionListener.class },
+        UiUnitTestExecutionListener.class},
     mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 public @interface NonTransactionalTestAnnotations {
 

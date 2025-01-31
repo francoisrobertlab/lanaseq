@@ -25,6 +25,7 @@ import org.springframework.web.filter.GenericFilterBean;
  */
 public class TestBenchSecurityFilter extends GenericFilterBean
     implements TestExecutionListener, Ordered {
+
   public static final String BEAN_NAME = "TestBenchSecurityFilter";
   private static final Logger logger = LoggerFactory.getLogger(TestBenchSecurityFilter.class);
   private static boolean copyAuthenticationOnFilter;

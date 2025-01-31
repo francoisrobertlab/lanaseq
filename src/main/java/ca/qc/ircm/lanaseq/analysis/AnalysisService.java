@@ -29,6 +29,7 @@ import org.springframework.util.FileSystemUtils;
  */
 @Service
 public class AnalysisService {
+
   private DatasetService datasetService;
   private SampleService sampleService;
   private AppConfiguration configuration;
@@ -48,15 +49,11 @@ public class AnalysisService {
    * one of its samples will have its name compared with specified filename patterns.
    * </p>
    *
-   * @param datasets
-   *          datasets
-   * @param filenamePatterns
-   *          filename patterns linked to dataset or samples to include in analysis
+   * @param datasets         datasets
+   * @param filenamePatterns filename patterns linked to dataset or samples to include in analysis
    * @return folder the folder containing analysis files
-   * @throws IOException
-   *           could not copy analysis files to folder
-   * @throws IllegalArgumentException
-   *           dataset analysis validation failed
+   * @throws IOException              could not copy analysis files to folder
+   * @throws IllegalArgumentException dataset analysis validation failed
    */
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #datasets, 'read')")
   public Path copyDatasetsResources(Collection<Dataset> datasets,
@@ -88,9 +85,9 @@ public class AnalysisService {
         .map(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern)).toList();
     Function<List<Path>,
         List<Path>> matchAnyPattern = files -> files.stream()
-            .filter(file -> pathMatchers.stream()
-                .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
-            .collect(Collectors.toList());
+        .filter(file -> pathMatchers.stream()
+            .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
+        .collect(Collectors.toList());
     List<Path> filesToCopy = new ArrayList<>();
     for (Sample sample : samples) {
       List<Path> files = sampleService.files(sample);
@@ -115,15 +112,11 @@ public class AnalysisService {
    * will have its name compared with specified filename patterns.
    * </p>
    *
-   * @param samples
-   *          samples
-   * @param filenamePatterns
-   *          filename patterns linked to samples to include in analysis
+   * @param samples          samples
+   * @param filenamePatterns filename patterns linked to samples to include in analysis
    * @return folder the folder containing analysis files
-   * @throws IOException
-   *           could not copy analysis files to folder
-   * @throws IllegalArgumentException
-   *           sample analysis validation failed
+   * @throws IOException              could not copy analysis files to folder
+   * @throws IllegalArgumentException sample analysis validation failed
    */
   @PreAuthorize("@permissionEvaluator.hasCollectionPermission(authentication, #samples, 'read')")
   public Path copySamplesResources(Collection<Sample> samples, Collection<String> filenamePatterns)
@@ -147,9 +140,9 @@ public class AnalysisService {
         .map(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern)).toList();
     Function<List<Path>,
         List<Path>> matchAnyPattern = files -> files.stream()
-            .filter(file -> pathMatchers.stream()
-                .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
-            .collect(Collectors.toList());
+        .filter(file -> pathMatchers.stream()
+            .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
+        .collect(Collectors.toList());
     List<Path> filesToCopy = new ArrayList<>();
     for (Sample sample : samples) {
       List<Path> files = sampleService.files(sample);

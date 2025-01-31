@@ -69,6 +69,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ServiceTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class ProtocolsViewTest extends SpringUIUnitTest {
+
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
   private static final String PROTOCOL_PREFIX = messagePrefix(Protocol.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

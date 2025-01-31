@@ -41,7 +41,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
+
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
+  @Value("${download-home}")
+  protected Path downloadHome;
   @TempDir
   Path temporaryFolder;
   @Autowired
@@ -50,8 +53,6 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
-  @Value("${download-home}")
-  protected Path downloadHome;
   private Path file1;
 
   @BeforeEach
@@ -234,7 +235,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS,
-        new Object[] { file1.getFileName() }, currentLocale()), notification.getText());
+        new Object[]{file1.getFileName()}, currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
     assertArrayEquals(

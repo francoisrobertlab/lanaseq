@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
  * Utilities for strings.
  */
 public class Strings {
+
   /**
    * Concatenates properties separating them by dots.
    *
-   * @param names
-   *          property names
+   * @param names property names
    * @return properties separated by dots
    */
   public static String property(Object... names) {
@@ -22,8 +22,7 @@ public class Strings {
   /**
    * Concatenates names to create a valid CSS class name.
    *
-   * @param names
-   *          class names
+   * @param names class names
    * @return valid CSS class name based on names
    */
   public static String styleName(Object... names) {
@@ -34,8 +33,7 @@ public class Strings {
   /**
    * Removes accents from characters.
    *
-   * @param value
-   *          value
+   * @param value value
    * @return value without accents
    */
   public static String normalize(String value) {
@@ -46,8 +44,7 @@ public class Strings {
   /**
    * Removes accents from characters and change string to lower case.
    *
-   * @param value
-   *          value
+   * @param value value
    * @return value without accents and lower case
    */
   public static String comparable(String value) {

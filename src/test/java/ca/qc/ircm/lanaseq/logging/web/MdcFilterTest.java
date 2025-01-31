@@ -26,6 +26,7 @@ import org.slf4j.MDC;
  */
 @NonTransactionalTestAnnotations
 public class MdcFilterTest {
+
   private MdcFilter mdcFilter;
   @Mock
   private AuthenticatedUser authenticatedUser;

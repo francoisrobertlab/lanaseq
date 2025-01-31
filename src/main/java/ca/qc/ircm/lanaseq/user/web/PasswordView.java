@@ -34,9 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Change password view.
  */
 @Route(value = PasswordView.VIEW_NAME)
-@RolesAllowed({ USER })
+@RolesAllowed({USER})
 public class PasswordView extends VerticalLayout
     implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+
   public static final String VIEW_NAME = "password";
   public static final String ID = "password-view";
   public static final String HEADER = "header";

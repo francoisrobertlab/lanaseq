@@ -15,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * Notification with {@code LUMO_ERROR} variant and a close button on the right.
  */
 public class ErrorNotification extends Notification {
+
   public static final String STYLE = "error-notification";
   public static final String ERROR = "error";
   public static final String CLOSE = "close";

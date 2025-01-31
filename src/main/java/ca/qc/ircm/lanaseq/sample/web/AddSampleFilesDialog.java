@@ -58,6 +58,7 @@ import org.springframework.context.annotation.Scope;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AddSampleFilesDialog extends Dialog
     implements LocaleChangeObserver, NotificationComponent {
+
   public static final String ID = "add-sample-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
@@ -167,7 +168,7 @@ public class AddSampleFilesDialog extends Dialog
     size = files.addColumn(file -> getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
         sizeFormat.format(file.length() / Math.pow(1024, 2))), SIZE).setKey(SIZE);
     @SuppressWarnings("unchecked")
-    Column<File>[] sortOrder = new Column[] { filename, size, overwrite };
+    Column<File>[] sortOrder = new Column[]{filename, size, overwrite};
     files.setColumnOrder(sortOrder);
     size.setHeader(getTranslation(MESSAGE_PREFIX + SIZE));
     overwrite.setHeader(getTranslation(MESSAGE_PREFIX + OVERWRITE));
@@ -195,13 +196,12 @@ public class AddSampleFilesDialog extends Dialog
   /**
    * Adds listener to be informed when sample files were saved.
    *
-   * @param listener
-   *          listener
+   * @param listener listener
    * @return listener registration
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Registration
-      addSavedListener(ComponentEventListener<SavedEvent<AddSampleFilesDialog>> listener) {
+  addSavedListener(ComponentEventListener<SavedEvent<AddSampleFilesDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 
