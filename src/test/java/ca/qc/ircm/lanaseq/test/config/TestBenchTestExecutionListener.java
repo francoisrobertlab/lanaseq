@@ -8,7 +8,6 @@ import com.vaadin.testbench.TestBenchTestCase;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -55,7 +54,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   @Override
-  public void beforeTestMethod(@NotNull TestContext testContext) {
+  public void beforeTestMethod(TestContext testContext) {
     if (isTestBenchTest(testContext)) {
       WebDriver driver = driver(testContext);
       TestBenchTestCase target = getInstance(testContext);
@@ -69,7 +68,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   @Override
-  public void afterTestMethod(@NotNull TestContext testContext) {
+  public void afterTestMethod(TestContext testContext) {
     if (isTestBenchTest(testContext)) {
       TestBenchTestCase target = getInstance(testContext);
       target.getDriver().manage().deleteAllCookies();

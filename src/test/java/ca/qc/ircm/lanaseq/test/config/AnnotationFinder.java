@@ -20,7 +20,8 @@ public class AnnotationFinder {
    */
   public static <A extends Annotation> Optional<A> findAnnotation(Class<?> type,
       Class<A> annotationClass) {
-    return findAnnotation(type, null, annotationClass);
+    A annotation = AnnotationUtils.findAnnotation(type, annotationClass);
+    return Optional.ofNullable(annotation);
   }
 
   /**
@@ -35,7 +36,7 @@ public class AnnotationFinder {
    */
   public static <A extends Annotation> Optional<A> findAnnotation(Class<?> type, Method method,
       Class<A> annotationClass) {
-    A annotation = method != null ? AnnotationUtils.findAnnotation(method, annotationClass) : null;
+    A annotation = AnnotationUtils.findAnnotation(method, annotationClass);
     if (annotation == null) {
       annotation = AnnotationUtils.findAnnotation(type, annotationClass);
     }
