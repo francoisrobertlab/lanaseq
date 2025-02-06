@@ -7,7 +7,7 @@ import static ca.qc.ircm.lanaseq.time.TimeConverter.toLocalDateTime;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.file.Renamer;
+import ca.qc.ircm.lanaseq.files.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;

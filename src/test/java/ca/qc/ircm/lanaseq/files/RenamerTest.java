@@ -1,4 +1,4 @@
-package ca.qc.ircm.lanaseq.file;
+package ca.qc.ircm.lanaseq.files;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

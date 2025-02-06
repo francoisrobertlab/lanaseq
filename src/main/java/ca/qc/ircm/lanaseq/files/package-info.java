@@ -1,4 +1,4 @@
 @NonNullApi
-package ca.qc.ircm.lanaseq.file;
+package ca.qc.ircm.lanaseq.files;
 
 import org.springframework.lang.NonNullApi;

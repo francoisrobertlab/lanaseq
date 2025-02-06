@@ -1,4 +1,4 @@
-package ca.qc.ircm.lanaseq.file;
+package ca.qc.ircm.lanaseq.files;
 
 import java.io.IOException;
 import java.nio.file.Files;
