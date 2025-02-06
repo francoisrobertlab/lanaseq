@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 
 /**
  * Utility methods for presenter testign.
@@ -98,7 +99,8 @@ public class VaadinTestUtils {
    * @param metaKey  <code>true</code> if the meta key was down when the event was fired,
    *                 <code>false</code> otherwise
    */
-  public static <E> void clickItem(Grid<E> grid, E item, Grid.Column<E> column, boolean ctrlKey,
+  public static <E> void clickItem(Grid<E> grid, E item, @Nullable Grid.Column<E> column,
+      boolean ctrlKey,
       boolean shiftKey, boolean altKey, boolean metaKey) {
     try {
       String key = grid.getDataCommunicator().getKeyMapper().key(item);
@@ -130,7 +132,7 @@ public class VaadinTestUtils {
    * @param grid grid
    * @param item item
    */
-  public static <E> void doubleClickItem(Grid<E> grid, E item, Grid.Column<E> column) {
+  public static <E> void doubleClickItem(Grid<E> grid, E item, @Nullable Grid.Column<E> column) {
     try {
       String itemKey = grid.getDataCommunicator().getKeyMapper().key(item);
       Method method = Component.class.getDeclaredMethod("getEventBus");
@@ -303,8 +305,9 @@ public class VaadinTestUtils {
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
              | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Cannot get formatted value for renderer {} and item {}", renderer, item, e);
+      throw new IllegalArgumentException(
+          "Cannot get formatted value for renderer " + renderer + " and item " + item, e);
     }
-    return null;
   }
 
   /**

@@ -85,10 +85,8 @@ public class SwitchUserService {
     // OK, create the switch user token
     UsernamePasswordAuthenticationToken targetUserRequest = createSwitchUserToken(targetUser);
     // publish event
-    if (eventPublisher != null) {
-      eventPublisher.publishEvent(new AuthenticationSwitchUserEvent(
-          SecurityContextHolder.getContext().getAuthentication(), targetUser));
-    }
+    eventPublisher.publishEvent(new AuthenticationSwitchUserEvent(
+        SecurityContextHolder.getContext().getAuthentication(), targetUser));
     // set details
     targetUserRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     return targetUserRequest;
@@ -150,9 +148,7 @@ public class SwitchUserService {
       originalUser = (UserDetails) obj;
     }
     // publish event
-    if (eventPublisher != null) {
-      eventPublisher.publishEvent(new AuthenticationSwitchUserEvent(current, originalUser));
-    }
+    eventPublisher.publishEvent(new AuthenticationSwitchUserEvent(current, originalUser));
     return original;
   }
 

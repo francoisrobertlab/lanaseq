@@ -139,18 +139,22 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
     private LocalDate from;
     private LocalDate to;
 
+    @SuppressWarnings("unused")
     public LocalDate getFrom() {
       return from;
     }
 
+    @SuppressWarnings("unused")
     public void setFrom(LocalDate from) {
       this.from = from;
     }
 
+    @SuppressWarnings("unused")
     public LocalDate getTo() {
       return to;
     }
 
+    @SuppressWarnings("unused")
     public void setTo(LocalDate to) {
       this.to = to;
     }

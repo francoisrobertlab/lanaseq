@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.lang.Nullable;
 
 /**
  * Additional functions for TestBenchTestCase.
@@ -137,7 +138,7 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     openView(view, null);
   }
 
-  protected void openView(String view, String parameters) {
+  protected void openView(String view, @Nullable String parameters) {
     String url = viewUrl(view);
     if (parameters != null && !parameters.isEmpty()) {
       url += "/" + parameters;
