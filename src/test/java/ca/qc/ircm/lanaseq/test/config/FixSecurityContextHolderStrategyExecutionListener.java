@@ -1,5 +1,8 @@
 package ca.qc.ircm.lanaseq.test.config;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
+import ca.qc.ircm.lanaseq.UsedBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ public class FixSecurityContextHolderStrategyExecutionListener
   }
 
   @Autowired
+  @UsedBy(SPRING)
   public void setInjectedStrategy(SecurityContextHolderStrategy injectedStrategy) {
     this.injectedStrategy = injectedStrategy;
   }

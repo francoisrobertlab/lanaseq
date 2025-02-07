@@ -1,9 +1,11 @@
 package ca.qc.ircm.lanaseq.protocol;
 
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
+import static ca.qc.ircm.lanaseq.UsedBy.HIBERNATE;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.user.Owned;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.processing.GeneratePropertyNames;
@@ -88,6 +90,7 @@ public class Protocol implements Data, Owned, Serializable {
     return id;
   }
 
+  @UsedBy(HIBERNATE)
   public void setId(long id) {
     this.id = id;
   }

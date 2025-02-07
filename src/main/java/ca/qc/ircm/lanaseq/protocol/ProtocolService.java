@@ -1,9 +1,11 @@
 package ca.qc.ircm.lanaseq.protocol;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
@@ -33,6 +35,7 @@ public class ProtocolService {
   private final AuthenticatedUser authenticatedUser;
 
   @Autowired
+  @UsedBy(SPRING)
   protected ProtocolService(ProtocolRepository repository, ProtocolFileRepository fileRepository,
       SampleRepository sampleRepository, AuthenticatedUser authenticatedUser) {
     this.repository = repository;

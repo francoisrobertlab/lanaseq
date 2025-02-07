@@ -1,5 +1,8 @@
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -28,6 +31,7 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   private final SamplePermissionEvaluator samplePermissionEvaluator;
 
   @Autowired
+  @UsedBy(SPRING)
   protected PermissionEvaluatorDelegator(UserPermissionEvaluator userPermissionEvaluator,
       DatasetPermissionEvaluator datasetPermissionEvaluator,
       ProtocolPermissionEvaluator protocolPermissionEvaluator,

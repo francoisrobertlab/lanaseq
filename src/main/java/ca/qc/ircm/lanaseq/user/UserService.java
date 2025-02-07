@@ -1,7 +1,9 @@
 package ca.qc.ircm.lanaseq.user;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +31,7 @@ public class UserService {
   private final AuthenticatedUser authenticatedUser;
 
   @Autowired
+  @UsedBy(SPRING)
   protected UserService(UserRepository repository, PasswordEncoder passwordEncoder,
       AuthenticatedUser authenticatedUser) {
     this.repository = repository;

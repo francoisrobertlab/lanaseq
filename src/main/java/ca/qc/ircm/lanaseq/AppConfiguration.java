@@ -101,6 +101,7 @@ public class AppConfiguration implements InitializingBean {
   private String serverUrl;
 
   @Autowired
+  @UsedBy(SPRING)
   protected AppConfiguration(AuthenticatedUser authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
     home.subfolder = subfolder;

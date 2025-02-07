@@ -1,5 +1,7 @@
 package ca.qc.ircm.lanaseq;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,10 +34,12 @@ public class DeleteOldUploadFolders {
   /**
    * Deletes old upload folders.
    *
-   * <p>This method is executed every hour with an initial delay of 2 minutes to let the application
+   * <p>This method is executed every hour with an initial delay of 2 minutes to let the
+   * application
    * start.</p>
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
+  @UsedBy(SPRING)
   public void deleteOldUploadFolders() {
     Path upload = configuration.getUpload().getFolder();
     logger.debug("deleting old folders in upload {}", upload);

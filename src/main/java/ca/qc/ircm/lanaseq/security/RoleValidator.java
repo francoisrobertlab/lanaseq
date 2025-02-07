@@ -1,5 +1,8 @@
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
+import ca.qc.ircm.lanaseq.UsedBy;
 import java.util.Collection;
 import java.util.Optional;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoleValidator {
 
+  @UsedBy(SPRING)
   protected RoleValidator() {
   }
 

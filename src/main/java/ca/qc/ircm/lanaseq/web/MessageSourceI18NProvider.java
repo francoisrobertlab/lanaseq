@@ -1,6 +1,9 @@
 package ca.qc.ircm.lanaseq.web;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.UsedBy;
 import com.vaadin.flow.i18n.I18NProvider;
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +27,7 @@ public class MessageSourceI18NProvider implements I18NProvider {
   private final MessageSource messageSource;
 
   @Autowired
+  @UsedBy(SPRING)
   protected MessageSourceI18NProvider(MessageSource messageSource) {
     this.messageSource = messageSource;
   }

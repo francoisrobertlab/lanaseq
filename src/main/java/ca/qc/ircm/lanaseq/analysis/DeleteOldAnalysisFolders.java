@@ -1,6 +1,9 @@
 package ca.qc.ircm.lanaseq.analysis;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.UsedBy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +40,7 @@ public class DeleteOldAnalysisFolders {
    * start.</p>
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
+  @UsedBy(SPRING)
   public void deleteOldAnalysisFolders() {
     Path analysis = configuration.getAnalysis().getFolder();
     logger.debug("deleting old folders in analysis {}", analysis);

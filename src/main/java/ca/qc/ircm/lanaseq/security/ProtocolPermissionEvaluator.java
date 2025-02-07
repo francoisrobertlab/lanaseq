@@ -1,10 +1,12 @@
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 import static ca.qc.ircm.lanaseq.security.Permission.READ;
 import static ca.qc.ircm.lanaseq.security.Permission.WRITE;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.user.User;
@@ -26,6 +28,7 @@ public class ProtocolPermissionEvaluator extends AbstractPermissionEvaluator {
   private final RoleValidator roleValidator;
 
   @Autowired
+  @UsedBy(SPRING)
   protected ProtocolPermissionEvaluator(UserRepository userRepository,
       ProtocolRepository repository, RoleValidator roleValidator) {
     super(userRepository);

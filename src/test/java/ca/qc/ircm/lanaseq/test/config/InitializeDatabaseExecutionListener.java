@@ -1,5 +1,8 @@
 package ca.qc.ircm.lanaseq.test.config;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import java.time.LocalDateTime;
@@ -66,6 +69,7 @@ public class InitializeDatabaseExecutionListener
   }
 
   @Autowired
+  @UsedBy(SPRING)
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
   }

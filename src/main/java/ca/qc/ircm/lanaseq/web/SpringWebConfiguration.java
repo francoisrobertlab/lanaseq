@@ -1,7 +1,9 @@
 package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.DEFAULT_LOCALE;
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.logging.web.MdcFilter;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ public class SpringWebConfiguration implements WebMvcConfigurer {
   private final AuthenticatedUser authenticatedUser;
 
   @Autowired
+  @UsedBy(SPRING)
   protected SpringWebConfiguration(AuthenticatedUser authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
   }

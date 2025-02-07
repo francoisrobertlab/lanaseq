@@ -1,10 +1,12 @@
 package ca.qc.ircm.lanaseq.security;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 import static ca.qc.ircm.lanaseq.security.Permission.READ;
 import static ca.qc.ircm.lanaseq.security.Permission.WRITE;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
 
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.user.User;
@@ -26,6 +28,7 @@ public class SamplePermissionEvaluator extends AbstractPermissionEvaluator {
   private final RoleValidator roleValidator;
 
   @Autowired
+  @UsedBy(SPRING)
   protected SamplePermissionEvaluator(UserRepository userRepository, SampleRepository repository,
       RoleValidator roleValidator) {
     super(userRepository);

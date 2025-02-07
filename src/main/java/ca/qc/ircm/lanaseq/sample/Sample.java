@@ -2,11 +2,13 @@ package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
+import static ca.qc.ircm.lanaseq.UsedBy.HIBERNATE;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
 import ca.qc.ircm.lanaseq.DataWithFiles;
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.text.Strings;
 import ca.qc.ircm.lanaseq.user.Owned;
@@ -208,6 +210,7 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     return id;
   }
 
+  @UsedBy(HIBERNATE)
   public void setId(long id) {
     this.id = id;
   }
@@ -350,6 +353,7 @@ public class Sample implements Data, DataWithFiles, Owned, Serializable {
     return filenames;
   }
 
+  @UsedBy(HIBERNATE)
   public void setFilenames(Set<String> filenames) {
     this.filenames = filenames;
   }

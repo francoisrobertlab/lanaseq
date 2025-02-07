@@ -1,9 +1,11 @@
 package ca.qc.ircm.lanaseq.protocol;
 
 import static ca.qc.ircm.lanaseq.FindbugsExplanations.ENTITY_EI_EXPOSE_REP;
+import static ca.qc.ircm.lanaseq.UsedBy.HIBERNATE;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import ca.qc.ircm.lanaseq.Data;
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.processing.GeneratePropertyNames;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
@@ -90,10 +92,12 @@ public class ProtocolFile implements Data, Serializable {
     return id;
   }
 
+  @UsedBy(HIBERNATE)
   public void setId(long id) {
     this.id = id;
   }
 
+  @UsedBy(HIBERNATE)
   public Protocol getProtocol() {
     return protocol;
   }

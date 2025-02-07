@@ -1,6 +1,9 @@
 package ca.qc.ircm.lanaseq.analysis;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
 import ca.qc.ircm.lanaseq.AppConfiguration;
+import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.sample.Sample;
@@ -35,6 +38,7 @@ public class AnalysisService {
   private final AppConfiguration configuration;
 
   @Autowired
+  @UsedBy(SPRING)
   protected AnalysisService(DatasetService datasetService, SampleService sampleService,
       AppConfiguration configuration) {
     this.datasetService = datasetService;
