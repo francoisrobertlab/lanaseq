@@ -28,9 +28,9 @@ import org.springframework.context.MessageSource;
 @TestBenchTestAnnotations
 public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
 
-  @SuppressWarnings("unused")
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
+  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordViewItTest.class);
   @Autowired
   private ForgotPasswordRepository repository;
