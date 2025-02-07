@@ -1,5 +1,7 @@
 package ca.qc.ircm.lanaseq;
 
+import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
+
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
@@ -163,7 +165,7 @@ public class AppConfiguration implements InitializingBean {
     return home;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setHome(NetworkDrive<DataWithFiles> home) {
     this.home = home;
   }
@@ -172,7 +174,7 @@ public class AppConfiguration implements InitializingBean {
     return archives;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setArchives(List<NetworkDrive<DataWithFiles>> archives) {
     this.archives = archives;
   }
@@ -181,7 +183,7 @@ public class AppConfiguration implements InitializingBean {
     return sampleFolder;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setSampleFolder(Path sampleFolder) {
     this.sampleFolder = sampleFolder;
   }
@@ -190,7 +192,7 @@ public class AppConfiguration implements InitializingBean {
     return datasetFolder;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setDatasetFolder(Path datasetFolder) {
     this.datasetFolder = datasetFolder;
   }
@@ -199,12 +201,12 @@ public class AppConfiguration implements InitializingBean {
     return upload;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   public void setUpload(NetworkDrive<DataWithFiles> upload) {
     this.upload = upload;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setServerUrl(String serverUrl) {
     this.serverUrl = serverUrl;
   }
@@ -213,7 +215,7 @@ public class AppConfiguration implements InitializingBean {
     return uploadDeleteAge;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setUploadDeleteAge(Duration uploadDeleteAge) {
     this.uploadDeleteAge = uploadDeleteAge;
   }
@@ -222,7 +224,7 @@ public class AppConfiguration implements InitializingBean {
     return analysis;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   public void setAnalysis(NetworkDrive<Collection<? extends DataWithFiles>> analysis) {
     this.analysis = analysis;
   }
@@ -231,7 +233,7 @@ public class AppConfiguration implements InitializingBean {
     return analysisSymlinks;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setAnalysisSymlinks(boolean analysisSymlinks) {
     this.analysisSymlinks = analysisSymlinks;
   }
@@ -240,7 +242,7 @@ public class AppConfiguration implements InitializingBean {
     return analysisDeleteAge;
   }
 
-  @SuppressWarnings("unused")
+  @UsedBy(SPRING)
   void setAnalysisDeleteAge(Duration analysisDeleteAge) {
     this.analysisDeleteAge = analysisDeleteAge;
   }
@@ -286,7 +288,7 @@ public class AppConfiguration implements InitializingBean {
       return folder;
     }
 
-    @SuppressWarnings("unused")
+    @UsedBy(SPRING)
     void setFolder(Path folder) {
       this.folder = folder;
     }
@@ -295,7 +297,7 @@ public class AppConfiguration implements InitializingBean {
       return windowsLabel;
     }
 
-    @SuppressWarnings("unused")
+    @UsedBy(SPRING)
     void setWindowsLabel(String windowsLabel) {
       this.windowsLabel = windowsLabel;
     }
@@ -304,7 +306,7 @@ public class AppConfiguration implements InitializingBean {
       return unixLabel;
     }
 
-    @SuppressWarnings("unused")
+    @UsedBy(SPRING)
     void setUnixLabel(String unixLabel) {
       this.unixLabel = unixLabel;
     }

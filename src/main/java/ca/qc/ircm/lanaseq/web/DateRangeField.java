@@ -2,9 +2,11 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.PLACEHOLDER;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
+import static ca.qc.ircm.lanaseq.UsedBy.VAADIN;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
 
+import ca.qc.ircm.lanaseq.UsedBy;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
@@ -139,22 +141,22 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
     private LocalDate from;
     private LocalDate to;
 
-    @SuppressWarnings("unused")
+    @UsedBy(VAADIN)
     public LocalDate getFrom() {
       return from;
     }
 
-    @SuppressWarnings("unused")
+    @UsedBy(VAADIN)
     public void setFrom(LocalDate from) {
       this.from = from;
     }
 
-    @SuppressWarnings("unused")
+    @UsedBy(VAADIN)
     public LocalDate getTo() {
       return to;
     }
 
-    @SuppressWarnings("unused")
+    @UsedBy(VAADIN)
     public void setTo(LocalDate to) {
       this.to = to;
     }
