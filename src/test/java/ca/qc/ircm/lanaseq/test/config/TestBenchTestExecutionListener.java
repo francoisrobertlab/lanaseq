@@ -36,7 +36,6 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   @SuppressWarnings("unused")
   private static final String FIREFOX_DRIVER = FirefoxDriver.class.getName();
   private static final String CHROME_DRIVER = ChromeDriver.class.getName();
-  @SuppressWarnings("unused")
   private static final String DEFAULT_DRIVER = CHROME_DRIVER;
   private static final Logger logger =
       LoggerFactory.getLogger(TestBenchTestExecutionListener.class);
