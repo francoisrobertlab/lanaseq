@@ -47,7 +47,7 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
    * Creates a new date range field.
    */
   public DateRangeField() {
-    layout.setResponsiveSteps(new ResponsiveStep("20em", 1), new ResponsiveStep("20em", 2));
+    layout.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     layout.add(from, to);
     layout.addClassName(CLASS_NAME);
     add(layout);
