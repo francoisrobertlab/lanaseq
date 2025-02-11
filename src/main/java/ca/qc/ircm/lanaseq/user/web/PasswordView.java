@@ -15,7 +15,6 @@ import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -35,8 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = PasswordView.VIEW_NAME)
 @RolesAllowed({USER})
-public class PasswordView extends VerticalLayout
-    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+public class PasswordView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
+    NotificationComponent {
 
   public static final String VIEW_NAME = "password";
   public static final String ID = "password-view";
@@ -64,7 +63,6 @@ public class PasswordView extends VerticalLayout
     setId(ID);
     add(header, passwords, save);
     header.setId(HEADER);
-    passwords.setResponsiveSteps(new ResponsiveStep("30em", 1));
     passwords.setMaxWidth("30em");
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
