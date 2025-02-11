@@ -34,6 +34,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
@@ -86,9 +87,10 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   public static final String FILES_OVER_MAXIMUM = property(FILES, "overmaximum");
   public static final int MAXIMUM_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_FILES_COUNT = 6;
-  public static final String REMOVE_BUTTON = "<vaadin-button class='" + REMOVE + "' theme='"
-      + ButtonVariant.LUMO_ERROR.getVariantName() + "' @click='${removeFile}'>"
-      + "<vaadin-icon icon='vaadin:trash' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
+  public static final String REMOVE_BUTTON =
+      "<vaadin-button class='" + REMOVE + "' theme='" + ButtonVariant.LUMO_ERROR.getVariantName()
+          + "' @click='${removeFile}'>"
+          + "<vaadin-icon icon='vaadin:trash' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
@@ -133,6 +135,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     VerticalLayout layout = new VerticalLayout();
     add(layout);
     FormLayout form = new FormLayout(name, note);
+    form.setResponsiveSteps(new ResponsiveStep("0", 1));
     layout.add(form, upload, files, filesError, confirm);
     layout.setSizeFull();
     layout.expand(files);
@@ -231,8 +234,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
    * @return listener registration
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public Registration
-  addSavedListener(ComponentEventListener<SavedEvent<ProtocolDialog>> listener) {
+  public Registration addSavedListener(
+      ComponentEventListener<SavedEvent<ProtocolDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 
@@ -247,8 +250,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
    * @return listener registration
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public Registration
-  addDeletedListener(ComponentEventListener<DeletedEvent<ProtocolDialog>> listener) {
+  public Registration addDeletedListener(
+      ComponentEventListener<DeletedEvent<ProtocolDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 
