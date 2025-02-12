@@ -125,15 +125,15 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
   @PostConstruct
   void init() {
     setId(ID);
-    setWidth("1000px");
+    setWidth("1100px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
     FormLayout sampleForm = new FormLayout(date, sampleId, replicate, protocol, assay, type);
-    sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    sampleForm.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     FormLayout strainForm = new FormLayout(target, strain, strainDescription, treatment);
-    strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    strainForm.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     FormLayout form = new FormLayout(sampleForm, strainForm, keywords, filenames, note);
-    form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
+    form.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     form.setColspan(keywords, 2);
     form.setColspan(filenames, 2);
     form.setColspan(note, 2);
@@ -218,8 +218,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     strain.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN));
     strain.setHelperText(getTranslation(SAMPLE_PREFIX + property(STRAIN, HELPER)));
     strainDescription.setLabel(getTranslation(SAMPLE_PREFIX + STRAIN_DESCRIPTION));
-    strainDescription
-        .setHelperText(getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, HELPER)));
+    strainDescription.setHelperText(
+        getTranslation(SAMPLE_PREFIX + property(STRAIN_DESCRIPTION, HELPER)));
     treatment.setLabel(getTranslation(SAMPLE_PREFIX + TREATMENT));
     treatment.setHelperText(getTranslation(SAMPLE_PREFIX + property(TREATMENT, HELPER)));
     keywords.setLabel(getTranslation(SAMPLE_PREFIX + KEYWORDS));
@@ -267,8 +267,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
    * @return listener registration
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public Registration
-  addDeletedListener(ComponentEventListener<DeletedEvent<SampleDialog>> listener) {
+  public Registration addDeletedListener(
+      ComponentEventListener<DeletedEvent<SampleDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 
@@ -333,8 +333,9 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
       sample = service.get(id).orElseThrow();
     }
     binder.setBean(sample);
-    boolean readOnly = !authenticatedUser.hasPermission(sample, Permission.WRITE)
-        || (sample.getId() != 0 && !sample.isEditable());
+    boolean readOnly =
+        !authenticatedUser.hasPermission(sample, Permission.WRITE) || (sample.getId() != 0
+            && !sample.isEditable());
     binder.setReadOnly(readOnly);
     save.setVisible(!readOnly);
     cancel.setVisible(!readOnly);

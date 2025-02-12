@@ -77,6 +77,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
     buttonsLayout.add(save);
     header.setId(HEADER);
     message.setId(MESSAGE);
+    form.setMaxWidth("30em");
     form.setRequired(true);
     save.setId(SAVE);
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

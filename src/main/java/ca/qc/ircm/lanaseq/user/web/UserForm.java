@@ -74,7 +74,9 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
   @PostConstruct
   protected void init() {
     setId(ID);
-    add(new FormLayout(email, name, admin, manager, passwords));
+    add(email, name, admin, manager, passwords);
+    setResponsiveSteps(new ResponsiveStep("0", 1));
+    passwords.setResponsiveSteps(new ResponsiveStep("0", 1));
     email.setId(id(EMAIL));
     name.setId(id(NAME));
     admin.setId(id(ADMIN));
@@ -102,8 +104,8 @@ public class UserForm extends FormLayout implements LocaleChangeObserver {
 
   private Validator<String> emailExists() {
     return (value, context) -> {
-      if (service.exists(value) && (user.getId() == 0
-          || !value.equalsIgnoreCase(service.get(user.getId()).map(User::getEmail).orElse("")))) {
+      if (service.exists(value) && (user.getId() == 0 || !value.equalsIgnoreCase(
+          service.get(user.getId()).map(User::getEmail).orElse("")))) {
         return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
       return ValidationResult.ok();

@@ -59,6 +59,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -160,22 +161,25 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   @PostConstruct
   void init() {
     setId(ID);
-    setWidth("1000px");
+    setWidth("1100px");
     VerticalLayout layout = new VerticalLayout();
     add(layout);
-    FormLayout datasetForm =
-        new FormLayout(namePrefix, generateName, date, keywords, filenames, note);
-    datasetForm.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("15em", 4));
-    datasetForm.setColspan(namePrefix, 3);
+    HorizontalLayout nameFields = new HorizontalLayout(namePrefix, generateName);
+    nameFields.setDefaultVerticalComponentAlignment(Alignment.END);
+    nameFields.expand(namePrefix);
+    FormLayout datasetForm = new FormLayout(nameFields, date, keywords, filenames, note);
+    datasetForm.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2),
+        new ResponsiveStep("60em", 4));
+    datasetForm.setColspan(nameFields, 4);
     datasetForm.setColspan(keywords, 3);
     datasetForm.setColspan(filenames, 4);
     datasetForm.setColspan(note, 4);
     FormLayout sampleForm = new FormLayout(protocol, assay, type, target);
-    sampleForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    sampleForm.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     FormLayout strainForm = new FormLayout(strain, strainDescription, treatment);
-    strainForm.setResponsiveSteps(new ResponsiveStep("30em", 1));
+    strainForm.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     FormLayout form = new FormLayout(sampleForm, strainForm);
-    form.setResponsiveSteps(new ResponsiveStep("30em", 1), new ResponsiveStep("30em", 2));
+    form.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("20em", 2));
     HorizontalLayout samplesHeaderLayout = new HorizontalLayout(samplesHeader, addSample);
     samplesHeaderLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
     samplesHeaderLayout.setWidthFull();
@@ -272,13 +276,10 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   public void localeChange(LocaleChangeEvent event) {
     DateTimeFormatter dateFormatter = DateTimeFormatter.BASIC_ISO_DATE;
     binder.forField(namePrefix).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
-        .withNullRepresentation("")
-        .withValidator(new RegexpValidator(getTranslation(MESSAGE_PREFIX + NAME_PREFIX_REGEX_ERROR),
-            NAME_PREFIX_REGEX))
-        .withConverter(
-            namePrefix -> namePrefix
-                + date.getOptionalValue().map(date -> "_" + dateFormatter.format(date)).orElse(""),
-            this::nameToNamePrefix)
+        .withNullRepresentation("").withValidator(
+            new RegexpValidator(getTranslation(MESSAGE_PREFIX + NAME_PREFIX_REGEX_ERROR),
+                NAME_PREFIX_REGEX)).withConverter(namePrefix -> namePrefix + date.getOptionalValue()
+            .map(date -> "_" + dateFormatter.format(date)).orElse(""), this::nameToNamePrefix)
         .bind(NAME);
     date.addValueChangeListener(e -> {
       // Force update of dataset name.
@@ -361,8 +362,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
    * @return listener registration
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public Registration
-  addDeletedListener(ComponentEventListener<DeletedEvent<DatasetDialog>> listener) {
+  public Registration addDeletedListener(
+      ComponentEventListener<DeletedEvent<DatasetDialog>> listener) {
     return addListener((Class) DeletedEvent.class, listener);
   }
 
@@ -406,8 +407,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
   }
 
   void dropSample(Sample dragged, Sample drop, GridDropLocation dropLocation) {
-    if (!dragged.equals(drop)
-        && (dropLocation == GridDropLocation.ABOVE || dropLocation == GridDropLocation.BELOW)) {
+    if (!dragged.equals(drop) && (dropLocation == GridDropLocation.ABOVE
+        || dropLocation == GridDropLocation.BELOW)) {
       samples.getListDataView().removeItem(dragged);
       switch (dropLocation) {
         case ABOVE -> samples.getListDataView().addItemBefore(dragged, drop);
@@ -473,8 +474,9 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       dataset = service.get(id).orElseThrow();
     }
     binder.setBean(dataset);
-    boolean readOnly = !authenticatedUser.hasPermission(dataset, Permission.WRITE)
-        || (dataset.getId() != 0 && !dataset.isEditable());
+    boolean readOnly =
+        !authenticatedUser.hasPermission(dataset, Permission.WRITE) || (dataset.getId() != 0
+            && !dataset.isEditable());
     binder.setReadOnly(readOnly);
     samples.setItems(dataset.getSamples());
     generateName.setVisible(!readOnly);
@@ -500,9 +502,11 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
         .collect(Collectors.joining(", ")));
     strain.setValue(
         samples.stream().map(Sample::getStrain).distinct().collect(Collectors.joining(", ")));
-    strainDescription.setValue(samples.stream().map(Sample::getStrainDescription)
-        .filter(Objects::nonNull).distinct().collect(Collectors.joining(", ")));
-    treatment.setValue(samples.stream().map(Sample::getTreatment).filter(Objects::nonNull)
-        .distinct().collect(Collectors.joining(", ")));
+    strainDescription.setValue(
+        samples.stream().map(Sample::getStrainDescription).filter(Objects::nonNull).distinct()
+            .collect(Collectors.joining(", ")));
+    treatment.setValue(
+        samples.stream().map(Sample::getTreatment).filter(Objects::nonNull).distinct()
+            .collect(Collectors.joining(", ")));
   }
 }
