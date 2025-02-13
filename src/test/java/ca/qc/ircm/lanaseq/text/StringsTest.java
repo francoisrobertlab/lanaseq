@@ -61,6 +61,9 @@ public class StringsTest {
     assertEquals("pepun", Strings.normalize("pepûn"));
     assertEquals("pepun", Strings.normalize("pepün"));
     assertEquals("pepin", Strings.normalize("pépîn"));
+    assertEquals("fijn", Strings.normalize("fĳn"));
+    assertEquals("aequo", Strings.normalize("æquo"));
+    assertEquals("oeuf", Strings.normalize("œuf"));
     // Test Polish, out of curiosity.
     assertEquals("a", Strings.normalize("ą"));
     assertEquals("A", Strings.normalize("Ą"));

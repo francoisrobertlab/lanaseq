@@ -1,6 +1,7 @@
 package ca.qc.ircm.lanaseq.text;
 
 import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -31,13 +32,15 @@ public class Strings {
   }
 
   /**
-   * Removes accents from characters.
+   * Normalize value by, among other things, removing accents from characters.
    *
    * @param value value
-   * @return value without accents
+   * @return value normalized string representation of value
    */
   public static String normalize(String value) {
-    return Normalizer.normalize(value, Normalizer.Form.NFD)
+    value = value.replaceAll("œ", "oe");
+    value = value.replaceAll("æ", "ae");
+    return Normalizer.normalize(value, Form.NFKD)
         .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
   }
 
