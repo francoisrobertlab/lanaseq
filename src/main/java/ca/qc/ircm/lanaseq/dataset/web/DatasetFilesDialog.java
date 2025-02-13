@@ -9,6 +9,7 @@ import static ca.qc.ircm.lanaseq.Constants.UPLOAD;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.SAMPLES;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
@@ -22,7 +23,6 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.Key;
@@ -78,8 +78,8 @@ import org.springframework.util.FileSystemUtils;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DatasetFilesDialog extends Dialog
-    implements LocaleChangeObserver, NotificationComponent {
+public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
+    NotificationComponent {
 
   public static final String ID = "dataset-files-dialog";
   public static final String HEADER = "header";
@@ -178,12 +178,10 @@ public class DatasetFilesDialog extends Dialog
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
     });
-    filename = files
-        .addColumn(LitRenderer.<EditableFile>of(FILENAME_HTML)
+    filename = files.addColumn(LitRenderer.<EditableFile>of(FILENAME_HTML)
             .withProperty("filename", file -> shortFilename(file.getFilename()))
-            .withProperty("title", EditableFile::getFilename))
-        .setKey(FILENAME).setComparator(Comparator.comparing(EditableFile::getFilename))
-        .setFlexGrow(10);
+            .withProperty("title", EditableFile::getFilename)).setKey(FILENAME)
+        .setComparator(Comparator.comparing(EditableFile::getFilename)).setFlexGrow(10);
     download = files.addColumn(new ComponentRenderer<>(this::downloadButton)).setKey(DOWNLOAD)
         .setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(this::deleteButton)).setKey(DELETE)
@@ -195,7 +193,7 @@ public class DatasetFilesDialog extends Dialog
     samples.setId(id(SAMPLES));
     samples.addItemDoubleClickListener(e -> viewFiles(e.getItem()));
     name = samples.addColumn(Sample::getName, NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(10);
+        .setComparator(Comparator.comparing(Sample::getName, normalizedCollator())).setFlexGrow(10);
     fileCount = samples.addColumn(this::fileCount, FILE_COUNT).setKey(FILE_COUNT);
     refresh.setId(id(REFRESH));
     refresh.setIcon(VaadinIcon.REFRESH.create());
@@ -247,9 +245,8 @@ public class DatasetFilesDialog extends Dialog
   @Override
   public void localeChange(LocaleChangeEvent event) {
     fileBinder.forField(filenameEdit).asRequired(getTranslation(CONSTANTS_PREFIX + REQUIRED))
-        .withNullRepresentation("")
-        .withValidator(new RegexpValidator(getTranslation(MESSAGE_PREFIX + FILENAME_REGEX_ERROR),
-            FILENAME_REGEX))
+        .withNullRepresentation("").withValidator(
+            new RegexpValidator(getTranslation(MESSAGE_PREFIX + FILENAME_REGEX_ERROR), FILENAME_REGEX))
         .withValidator(exists()).bind(FILENAME);
     setHeaderTitle(getTranslation(MESSAGE_PREFIX + HEADER, 0));
     message.setText("");
@@ -269,8 +266,8 @@ public class DatasetFilesDialog extends Dialog
   private Validator<String> exists() {
     return (value, context) -> {
       EditableFile item = files.getEditor().getItem();
-      if (value != null && item != null && !value.equals(item.getFile().getName())
-          && Files.exists(item.getFile().toPath().resolveSibling(value))) {
+      if (value != null && item != null && !value.equals(item.getFile().getName()) && Files.exists(
+          item.getFile().toPath().resolveSibling(value))) {
         return ValidationResult.error(getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS));
       }
       return ValidationResult.ok();

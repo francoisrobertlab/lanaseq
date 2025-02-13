@@ -2,12 +2,12 @@ package ca.qc.ircm.lanaseq.protocol.web;
 
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -24,6 +24,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.Serial;
+import java.util.Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,16 +36,18 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ProtocolHistoryDialog extends Dialog
-    implements LocaleChangeObserver, NotificationComponent {
+public class ProtocolHistoryDialog extends Dialog implements LocaleChangeObserver,
+    NotificationComponent {
 
   public static final String ID = "protocols-history-dialog";
   public static final String HEADER = "header";
   public static final String FILES = "files";
   public static final String RECOVER = "recover";
-  public static final String RECOVER_BUTTON = "<vaadin-button class='" + RECOVER + "' theme='"
-      + ButtonVariant.LUMO_SUCCESS.getVariantName() + "' @click='${recoverFile}'>"
-      + "<vaadin-icon icon='vaadin:ambulance' slot='prefix'></vaadin-icon>" + "</vaadin-button>";
+  public static final String RECOVER_BUTTON =
+      "<vaadin-button class='" + RECOVER + "' theme='" + ButtonVariant.LUMO_SUCCESS.getVariantName()
+          + "' @click='${recoverFile}'>"
+          + "<vaadin-icon icon='vaadin:ambulance' slot='prefix'></vaadin-icon>"
+          + "</vaadin-button>";
   public static final String RECOVERED = "recovered";
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
   private static final String PROTOCOL_FILE_PREFIX = messagePrefix(ProtocolFile.class);
@@ -77,7 +80,8 @@ public class ProtocolHistoryDialog extends Dialog
     layout.expand(files);
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor)).setKey(FILENAME)
-        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
+        .setSortProperty(FILENAME)
+        .setComparator(Comparator.comparing(ProtocolFile::getFilename, normalizedCollator()))
         .setFlexGrow(10);
     recover = files.addColumn(
             LitRenderer.<ProtocolFile>of(RECOVER_BUTTON).withFunction("recoverFile", this::recoverFile))

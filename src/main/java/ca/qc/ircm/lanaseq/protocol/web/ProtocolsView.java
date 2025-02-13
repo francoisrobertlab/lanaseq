@@ -10,6 +10,7 @@ import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.CREATION_DATE;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.OWNER;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -17,7 +18,6 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
@@ -43,6 +43,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
@@ -109,13 +110,12 @@ public class ProtocolsView extends VerticalLayout implements LocaleChangeObserve
     protocols.setId(PROTOCOLS);
     protocols.setMinHeight("30em");
     name = protocols.addColumn(Protocol::getName, NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Protocol::getName));
-    date = protocols
-        .addColumn(new LocalDateTimeRenderer<>(Protocol::getCreationDate,
-            () -> DateTimeFormatter.ISO_LOCAL_DATE))
-        .setKey(CREATION_DATE).setSortProperty(CREATION_DATE);
+        .setComparator(Comparator.comparing(Protocol::getName, normalizedCollator()));
+    date = protocols.addColumn(new LocalDateTimeRenderer<>(Protocol::getCreationDate,
+            () -> DateTimeFormatter.ISO_LOCAL_DATE)).setKey(CREATION_DATE)
+        .setSortProperty(CREATION_DATE);
     owner = protocols.addColumn(protocol -> protocol.getOwner().getEmail(), OWNER).setKey(OWNER)
-        .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
+        .setComparator(Comparator.comparing(p -> p.getOwner().getEmail(), normalizedCollator()));
     protocols.addItemDoubleClickListener(e -> edit(e.getItem()));
     protocols.addItemClickListener(e -> {
       if (e.isAltKey()) {

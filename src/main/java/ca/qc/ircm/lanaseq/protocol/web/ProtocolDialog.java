@@ -13,6 +13,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolFileProperties.FILENAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NAME;
 import static ca.qc.ircm.lanaseq.protocol.ProtocolProperties.NOTE;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
@@ -23,7 +24,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serial;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +153,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     upload.addFailedListener(event -> failedFile(event.getFileName()));
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor)).setKey(FILENAME)
-        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(ProtocolFile::getFilename))
+        .setSortProperty(FILENAME)
+        .setComparator(Comparator.comparing(ProtocolFile::getFilename, normalizedCollator()))
         .setFlexGrow(10);
     remove = files.addColumn(
             LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile", this::removeFile))

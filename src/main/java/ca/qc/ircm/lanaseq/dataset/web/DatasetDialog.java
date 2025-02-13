@@ -23,6 +23,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.STRAIN_DESCRIPTION;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TARGET;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TREATMENT;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.TYPE;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
@@ -36,7 +37,6 @@ import ca.qc.ircm.lanaseq.sample.SampleProperties;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialog;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.FilenamesField;
 import ca.qc.ircm.lanaseq.web.KeywordsField;
@@ -76,6 +76,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.Serial;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -218,7 +219,8 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     samples.setHeight("11em");
     samples.setSelectionMode(SelectionMode.NONE);
     sampleName = samples.addColumn(Sample::getName, SampleProperties.NAME)
-        .setKey(SampleProperties.NAME).setComparator(NormalizedComparator.of(Sample::getName));
+        .setKey(SampleProperties.NAME)
+        .setComparator(Comparator.comparing(Sample::getName, normalizedCollator()));
     sampleRemove = samples.addColumn(new ComponentRenderer<>(this::sampleDelete)).setKey(REMOVE)
         .setSortable(false);
     samples.setRowsDraggable(true);

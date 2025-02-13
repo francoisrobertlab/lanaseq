@@ -7,6 +7,7 @@ import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NAME;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -16,7 +17,6 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
@@ -35,6 +35,7 @@ import jakarta.annotation.PostConstruct;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -76,17 +77,18 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   void init() {
     setId(ID);
     name = addColumn(Dataset::getName, NAME).setKey(NAME).setSortProperty(NAME)
-        .setComparator(NormalizedComparator.of(Dataset::getName)).setFlexGrow(3);
-    keywords = addColumn(dataset -> String.join(", ", dataset.getKeywords()), KEYWORDS)
-        .setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
+        .setComparator(Comparator.comparing(Dataset::getName, normalizedCollator())).setFlexGrow(3);
+    keywords = addColumn(dataset -> String.join(", ", dataset.getKeywords()), KEYWORDS).setKey(
+        KEYWORDS).setSortable(false).setFlexGrow(1);
     protocol = addColumn(dataset -> protocol(dataset).getName(), PROTOCOL).setKey(PROTOCOL)
         .setSortable(false).setFlexGrow(1);
-    date =
-        addColumn(new LocalDateRenderer<>(Dataset::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
-            .setKey(DATE).setSortProperty(DATE).setFlexGrow(1);
+    date = addColumn(
+        new LocalDateRenderer<>(Dataset::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE)).setKey(
+        DATE).setSortProperty(DATE).setFlexGrow(1);
     owner = addColumn(dataset -> dataset.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
-        .setComparator(NormalizedComparator.of(e -> e.getOwner().getEmail())).setFlexGrow(1);
+        .setComparator(Comparator.comparing(e -> e.getOwner().getEmail(), normalizedCollator()))
+        .setFlexGrow(1);
     sort(GridSortOrder.desc(date).build());
     appendHeaderRow(); // Headers.
     HeaderRow filtersRow = appendHeaderRow();

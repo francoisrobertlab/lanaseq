@@ -9,6 +9,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.UserRole.ADMIN;
 import static ca.qc.ircm.lanaseq.security.UserRole.MANAGER;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.ACTIVE;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
@@ -17,7 +18,6 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
@@ -47,6 +47,7 @@ import com.vaadin.flow.server.VaadinServletRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -61,8 +62,8 @@ import org.springframework.lang.Nullable;
  */
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({MANAGER, ADMIN})
-public class UsersView extends VerticalLayout
-    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent, UrlComponent {
+public class UsersView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
+    NotificationComponent, UrlComponent {
 
   public static final String VIEW_NAME = "users";
   public static final String ID = "users-view";
@@ -123,9 +124,9 @@ public class UsersView extends VerticalLayout
       switchUser.setEnabled(e.getAllSelectedItems().size() == 1);
     });
     email = users.addColumn(User::getEmail, EMAIL).setKey(EMAIL)
-        .setComparator(NormalizedComparator.of(User::getEmail));
+        .setComparator(Comparator.comparing(User::getEmail, normalizedCollator()));
     name = users.addColumn(User::getName, NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(User::getName));
+        .setComparator(Comparator.comparing(User::getName, normalizedCollator()));
     active = users.addColumn(new ComponentRenderer<>(this::activeButton)).setKey(ACTIVE)
         .setSortProperty(ACTIVE)
         .setComparator((u1, u2) -> Boolean.compare(u1.isActive(), u2.isActive()));
@@ -176,8 +177,8 @@ public class UsersView extends VerticalLayout
   private void updateActiveButton(Button button, User user) {
     button.setIcon(user.isActive() ? VaadinIcon.EYE.create() : VaadinIcon.EYE_SLASH.create());
     button.setText(getTranslation(USER_PREFIX + property(ACTIVE, user.isActive())));
-    button
-        .addThemeVariants(user.isActive() ? ButtonVariant.LUMO_SUCCESS : ButtonVariant.LUMO_ERROR);
+    button.addThemeVariants(
+        user.isActive() ? ButtonVariant.LUMO_SUCCESS : ButtonVariant.LUMO_ERROR);
   }
 
   private void loadUsers() {
@@ -198,8 +199,8 @@ public class UsersView extends VerticalLayout
     activeFilter.setItemLabelGenerator(
         value -> value.map(bv -> getTranslation(USER_PREFIX + property(ACTIVE, bv)))
             .orElse(getTranslation(CONSTANTS_PREFIX + ALL)));
-    actives.forEach((key, value) -> value
-        .setText(getTranslation(USER_PREFIX + property(ACTIVE, key.isActive()))));
+    actives.forEach((key, value) -> value.setText(
+        getTranslation(USER_PREFIX + property(ACTIVE, key.isActive()))));
     add.setText(getTranslation(MESSAGE_PREFIX + ADD));
     edit.setText(getTranslation(CONSTANTS_PREFIX + EDIT));
     switchUser.setText(getTranslation(MESSAGE_PREFIX + SWITCH_USER));

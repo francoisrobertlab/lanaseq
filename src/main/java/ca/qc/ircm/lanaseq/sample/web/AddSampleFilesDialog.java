@@ -4,6 +4,7 @@ import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
@@ -11,7 +12,6 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -40,6 +40,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,8 +57,8 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AddSampleFilesDialog extends Dialog
-    implements LocaleChangeObserver, NotificationComponent {
+public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver,
+    NotificationComponent {
 
   public static final String ID = "add-sample-files-dialog";
   public static final String HEADER = "header";
@@ -115,8 +116,8 @@ public class AddSampleFilesDialog extends Dialog
     message.setId(id(MESSAGE));
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(this::filename)).setKey(FILENAME)
-        .setSortProperty(FILENAME).setComparator(NormalizedComparator.of(File::getName))
-        .setFlexGrow(10);
+        .setSortProperty(FILENAME)
+        .setComparator(Comparator.comparing(File::getName, normalizedCollator())).setFlexGrow(10);
     overwrite = files.addColumn(new ComponentRenderer<>(this::overwrite)).setKey(OVERWRITE)
         .setSortable(false);
     files.appendHeaderRow(); // Headers.
@@ -167,8 +168,8 @@ public class AddSampleFilesDialog extends Dialog
     NumberFormat sizeFormat = NumberFormat.getIntegerInstance(getLocale());
     size = files.addColumn(file -> getTranslation(MESSAGE_PREFIX + SIZE_VALUE,
         sizeFormat.format(file.length() / Math.pow(1024, 2))), SIZE).setKey(SIZE);
-    @SuppressWarnings("unchecked")
-    Column<File>[] sortOrder = new Column[]{filename, size, overwrite};
+    @SuppressWarnings("unchecked") Column<File>[] sortOrder = new Column[]{filename, size,
+        overwrite};
     files.setColumnOrder(sortOrder);
     size.setHeader(getTranslation(MESSAGE_PREFIX + SIZE));
     overwrite.setHeader(getTranslation(MESSAGE_PREFIX + OVERWRITE));
@@ -200,8 +201,8 @@ public class AddSampleFilesDialog extends Dialog
    * @return listener registration
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public Registration
-  addSavedListener(ComponentEventListener<SavedEvent<AddSampleFilesDialog>> listener) {
+  public Registration addSavedListener(
+      ComponentEventListener<SavedEvent<AddSampleFilesDialog>> listener) {
     return addListener((Class) SavedEvent.class, listener);
   }
 
@@ -210,8 +211,8 @@ public class AddSampleFilesDialog extends Dialog
   }
 
   private void updateFiles() {
-    existingFilenames =
-        service.files(sample).stream().map(f -> f.toFile().getName()).collect(Collectors.toSet());
+    existingFilenames = service.files(sample).stream().map(f -> f.toFile().getName())
+        .collect(Collectors.toSet());
     files.setItems(
         service.uploadFiles(sample).stream().map(Path::toFile).collect(Collectors.toList()));
   }

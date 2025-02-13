@@ -5,6 +5,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.Constants;
@@ -12,7 +13,6 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.SelectedEvent;
 import com.google.common.collect.Range;
@@ -88,12 +88,12 @@ public class SelectSampleDialog extends Dialog implements LocaleChangeObserver {
     layout.expand(samples);
     samples.setId(id(SAMPLES));
     name = samples.addColumn(Sample::getName, NAME).setKey(NAME)
-        .setComparator(NormalizedComparator.of(Sample::getName));
-    date = samples
-        .addColumn(new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
+        .setComparator(Comparator.comparing(Sample::getName, normalizedCollator()));
+    date = samples.addColumn(
+            new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
         .setKey(DATE).setSortProperty(DATE).setComparator(Comparator.comparing(Sample::getDate));
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
-        .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail()));
+        .setComparator(Comparator.comparing(p -> p.getOwner().getEmail(), normalizedCollator()));
     samples.addItemDoubleClickListener(e -> select(e.getItem()));
     samples.appendHeaderRow(); // Headers.
     HeaderRow filtersRow = samples.appendHeaderRow();

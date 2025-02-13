@@ -13,6 +13,7 @@ import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.OWNER;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.PROTOCOL;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
+import static ca.qc.ircm.lanaseq.text.Strings.normalizedCollator;
 import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 
@@ -23,7 +24,6 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
-import ca.qc.ircm.lanaseq.text.NormalizedComparator;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.VaadinSort;
@@ -67,8 +67,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = SamplesView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({USER})
-public class SamplesView extends VerticalLayout
-    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+public class SamplesView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
+    NotificationComponent {
 
   public static final String VIEW_NAME = "samples";
   public static final String ID = "samples-view";
@@ -142,20 +142,21 @@ public class SamplesView extends VerticalLayout
     samples.setMinHeight("30em");
     samples.setSelectionMode(SelectionMode.MULTI);
     name = samples.addColumn(Sample::getName, NAME).setKey(NAME).setSortProperty(NAME)
-        .setComparator(NormalizedComparator.of(Sample::getName)).setFlexGrow(2);
+        .setComparator(Comparator.comparing(Sample::getName, normalizedCollator())).setFlexGrow(2);
     keywords = samples.addColumn(sample -> String.join(", ", sample.getKeywords()), KEYWORDS)
         .setKey(KEYWORDS).setSortable(false).setFlexGrow(1);
     protocol = samples.addColumn(sample -> sample.getProtocol().getName(), PROTOCOL)
-        .setKey(PROTOCOL).setSortProperty(PROTOCOL + "." + NAME)
-        .setComparator(NormalizedComparator.of(sample -> sample.getProtocol().getName()))
+        .setKey(PROTOCOL).setSortProperty(PROTOCOL + "." + NAME).setComparator(
+            Comparator.comparing(sample -> sample.getProtocol().getName(), normalizedCollator()))
         .setFlexGrow(1);
-    date = samples
-        .addColumn(new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
+    date = samples.addColumn(
+            new LocalDateRenderer<>(Sample::getDate, () -> DateTimeFormatter.ISO_LOCAL_DATE))
         .setKey(DATE).setSortProperty(DATE).setComparator(Comparator.comparing(Sample::getDate))
         .setFlexGrow(1);
     owner = samples.addColumn(sample -> sample.getOwner().getEmail(), OWNER).setKey(OWNER)
         .setSortProperty(OWNER + "." + EMAIL)
-        .setComparator(NormalizedComparator.of(p -> p.getOwner().getEmail())).setFlexGrow(1);
+        .setComparator(Comparator.comparing(p -> p.getOwner().getEmail(), normalizedCollator()))
+        .setFlexGrow(1);
     samples.sort(GridSortOrder.desc(date).build());
     samples.addItemDoubleClickListener(e -> edit(e.getItem()));
     samples.addItemClickListener(e -> {
