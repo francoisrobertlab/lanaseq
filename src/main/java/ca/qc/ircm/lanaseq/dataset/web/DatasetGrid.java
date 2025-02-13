@@ -18,7 +18,6 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
-import ca.qc.ircm.lanaseq.web.VaadinSort;
 import com.google.common.collect.Range;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -31,6 +30,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.PostConstruct;
 import java.io.Serial;
 import java.time.LocalDate;
@@ -125,7 +125,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
 
   private void loadDataset() {
     CallbackDataProvider.FetchCallback<Dataset, Void> fetchCallback = query -> {
-      filter.sort = VaadinSort.springDataSort(query.getSortOrders());
+      filter.sort = VaadinSpringDataHelpers.toSpringDataSort(query);
       filter.page = query.getOffset() / getPageSize();
       filter.size = query.getLimit();
       return service.all(filter).stream();

@@ -26,7 +26,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
-import ca.qc.ircm.lanaseq.web.VaadinSort;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.google.common.collect.Range;
@@ -48,6 +47,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import java.io.Serial;
@@ -247,7 +247,7 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
 
   private void loadSamples() {
     CallbackDataProvider.FetchCallback<Sample, Void> fetchCallback = query -> {
-      filter.sort = VaadinSort.springDataSort(query.getSortOrders());
+      filter.sort = VaadinSpringDataHelpers.toSpringDataSort(query);
       filter.page = query.getOffset() / samples.getPageSize();
       filter.size = query.getLimit();
       return service.all(filter).stream();
