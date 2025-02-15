@@ -6,16 +6,16 @@ import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import com.google.common.collect.BoundType;
-import com.google.common.collect.Range;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
@@ -49,13 +49,13 @@ public class DatasetFilter implements Predicate<Dataset> {
       test &= comparable(protocol).contains(comparable(protocolContains));
     }
     if (dateRange != null) {
-      test &= dateRange.contains(dataset.getDate());
+      test &= dateRange.contains(dataset.getDate(), Comparator.naturalOrder());
     }
     if (ownerContains != null) {
       test &=
           comparable(replaceNull(dataset.getOwner().getEmail())).contains(comparable(ownerContains))
-              || comparable(replaceNull(dataset.getOwner().getName()))
-              .contains(comparable(ownerContains));
+              || comparable(replaceNull(dataset.getOwner().getName())).contains(
+              comparable(ownerContains));
     }
     return test;
   }
@@ -77,16 +77,16 @@ public class DatasetFilter implements Predicate<Dataset> {
       predicate.and(dataset.samples.any().protocol.name.contains(protocolContains));
     }
     if (dateRange != null) {
-      if (dateRange.hasLowerBound()) {
-        LocalDate date = dateRange.lowerEndpoint();
-        if (dateRange.lowerBoundType() == BoundType.OPEN) {
-          date = date.plusDays(1);
+      if (dateRange.getLowerBound().isBounded()) {
+        LocalDate date = dateRange.getLowerBound().getValue().orElseThrow();
+        if (dateRange.getLowerBound().isInclusive()) {
+          date = date.minusDays(1);
         }
-        predicate.and(dataset.date.goe(date));
+        predicate.and(dataset.date.after(date));
       }
-      if (dateRange.hasUpperBound()) {
-        LocalDate date = dateRange.upperEndpoint();
-        if (dateRange.upperBoundType() == BoundType.CLOSED) {
+      if (dateRange.getUpperBound().isBounded()) {
+        LocalDate date = dateRange.getUpperBound().getValue().orElseThrow();
+        if (dateRange.getUpperBound().isInclusive()) {
           date = date.plusDays(1);
         }
         predicate.and(dataset.date.before(date));

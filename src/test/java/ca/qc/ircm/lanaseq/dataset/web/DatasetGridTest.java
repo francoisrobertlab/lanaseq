@@ -31,7 +31,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.EditEvent;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
@@ -54,6 +53,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Range;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -200,8 +200,9 @@ public class DatasetGridTest extends SpringUIUnitTest {
         .map(SortOrder::getSorted).orElseThrow());
     assertNotNull(grid.getColumnByKey(OWNER));
     assertTrue(grid.owner.isSortable());
-    assertEquals(OWNER + "." + EMAIL, grid.getColumnByKey(OWNER)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
+    assertEquals(OWNER + "." + EMAIL,
+        grid.getColumnByKey(OWNER).getSortOrder(SortDirection.ASCENDING).findFirst()
+            .map(SortOrder::getSorted).orElseThrow());
     assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
     List<Dataset> datasets = items(grid);
     verify(service, atLeastOnce()).all(grid.filter());
@@ -333,8 +334,8 @@ public class DatasetGridTest extends SpringUIUnitTest {
   public void filterDate() {
     grid.setItems(datasetDataProvider);
 
-    Range<LocalDate> range =
-        Range.closed(LocalDate.now().minusDays(11), LocalDate.now().minusDays(3));
+    Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(11),
+        LocalDate.now().minusDays(3));
     grid.dateFilter.setValue(range);
 
     verify(grid.getDataProvider()).refreshAll();
@@ -344,14 +345,14 @@ public class DatasetGridTest extends SpringUIUnitTest {
   @Test
   public void filterDate_All() {
     grid.setItems(datasetDataProvider);
-    Range<LocalDate> range =
-        Range.closed(LocalDate.now().minusDays(11), LocalDate.now().minusDays(3));
+    Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(11),
+        LocalDate.now().minusDays(3));
     grid.dateFilter.setValue(range);
 
-    grid.dateFilter.setValue(Range.all());
+    grid.dateFilter.setValue(Range.unbounded());
 
     verify(grid.getDataProvider(), times(2)).refreshAll();
-    assertEquals(Range.all(), grid.filter().dateRange);
+    assertEquals(Range.unbounded(), grid.filter().dateRange);
   }
 
   @Test

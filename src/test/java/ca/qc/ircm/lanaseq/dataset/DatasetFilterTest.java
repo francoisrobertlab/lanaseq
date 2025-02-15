@@ -12,7 +12,6 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import com.google.common.collect.Range;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import java.time.LocalDate;
@@ -22,6 +21,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -315,7 +316,7 @@ public class DatasetFilterTest {
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.date.goe(start.plusDays(1)).and(dataset.date.before(end)), predicate);
+    assertEquals(dataset.date.gt(start).and(dataset.date.before(end)), predicate);
   }
 
   @Test
@@ -326,56 +327,56 @@ public class DatasetFilterTest {
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.date.goe(start).and(dataset.date.before(end.plusDays(1))), predicate);
+    assertEquals(dataset.date.gt(start.minusDays(1)).and(dataset.date.before(end.plusDays(1))),
+        predicate);
   }
 
   @Test
   public void predicate_Date_OpenClosedRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.openClosed(start, end);
+    filter.dateRange = Range.leftOpen(start, end);
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.date.goe(start.plusDays(1)).and(dataset.date.before(end.plusDays(1))),
-        predicate);
+    assertEquals(dataset.date.gt(start).and(dataset.date.before(end.plusDays(1))), predicate);
   }
 
   @Test
   public void predicate_Date_ClosedOpenRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.closedOpen(start, end);
+    filter.dateRange = Range.rightOpen(start, end);
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.date.goe(start).and(dataset.date.before(end)), predicate);
+    assertEquals(dataset.date.gt(start.minusDays(1)).and(dataset.date.before(end)), predicate);
   }
 
   @Test
   public void predicate_Date_AtLeast() {
     LocalDate start = LocalDate.now().minusDays(10);
-    filter.dateRange = Range.atLeast(start);
+    filter.dateRange = Range.rightUnbounded(Bound.inclusive(start));
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.date.goe(start), predicate);
+    assertEquals(dataset.date.gt(start.minusDays(1)), predicate);
   }
 
   @Test
   public void predicate_Date_GreaterThan() {
     LocalDate start = LocalDate.now().minusDays(10);
-    filter.dateRange = Range.greaterThan(start);
+    filter.dateRange = Range.rightUnbounded(Bound.exclusive(start));
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(dataset.date.goe(start.plusDays(1)), predicate);
+    assertEquals(dataset.date.gt(start), predicate);
   }
 
   @Test
   public void predicate_Date_AtMost() {
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.atMost(end);
+    filter.dateRange = Range.leftUnbounded(Bound.inclusive(end));
 
     Predicate predicate = filter.predicate();
 
@@ -385,7 +386,7 @@ public class DatasetFilterTest {
   @Test
   public void predicate_Date_LessThan() {
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.lessThan(end);
+    filter.dateRange = Range.leftUnbounded(Bound.exclusive(end));
 
     Predicate predicate = filter.predicate();
 
@@ -409,8 +410,7 @@ public class DatasetFilterTest {
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(
-        dataset.name.contains("test1")
+    assertEquals(dataset.name.contains("test1")
             .and(dataset.owner.email.contains("test2").or(dataset.owner.name.contains("test2"))),
         predicate);
   }

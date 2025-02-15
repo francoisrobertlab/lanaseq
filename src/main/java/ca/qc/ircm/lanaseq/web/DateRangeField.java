@@ -7,7 +7,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.property;
 import static ca.qc.ircm.lanaseq.web.DatePickerInternationalization.datePickerI18n;
 
 import ca.qc.ircm.lanaseq.UsedBy;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -25,6 +24,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 
 /**
  * Date range.
@@ -85,35 +86,37 @@ public class DateRangeField extends CustomField<Range<LocalDate>> implements Loc
     Range<LocalDate> range;
     if (from != null && to != null) {
       if (from.isAfter(to)) {
-        range = Range.atMost(to);
+        range = Range.leftUnbounded(Bound.inclusive(to));
       } else if (from.equals(to)) {
-        range = Range.singleton(from);
+        range = Range.just(from);
       } else {
         range = Range.closed(from, to);
       }
     } else if (from != null) {
-      range = Range.atLeast(from);
+      range = Range.rightUnbounded(Bound.inclusive(from));
     } else if (to != null) {
-      range = Range.atMost(to);
+      range = Range.leftUnbounded(Bound.inclusive(to));
     } else {
-      range = Range.all();
+      range = Range.unbounded();
     }
     return range;
   }
 
   @Override
   protected void setPresentationValue(Range<LocalDate> range) {
-    from.setValue(range.hasLowerBound() ? range.lowerEndpoint() : null);
-    to.setValue(range.hasUpperBound() ? range.upperEndpoint() : null);
+    from.setValue(
+        range.getLowerBound().isBounded() ? range.getLowerBound().getValue().orElseThrow() : null);
+    to.setValue(
+        range.getUpperBound().isBounded() ? range.getUpperBound().getValue().orElseThrow() : null);
   }
 
   private DatePickerVariant[] datePickerVariants(CustomFieldVariant[] variants) {
     Set<String> datePickerVariantNames = Stream.of(DatePickerVariant.values())
         .map(DatePickerVariant::name).collect(Collectors.toSet());
-    DatePickerVariant[] datePickerVariants =
-        Stream.of(variants).filter(variant -> datePickerVariantNames.contains(variant.name()))
-            .map(variant -> DatePickerVariant.valueOf(variant.name()))
-            .toArray(DatePickerVariant[]::new);
+    DatePickerVariant[] datePickerVariants = Stream.of(variants)
+        .filter(variant -> datePickerVariantNames.contains(variant.name()))
+        .map(variant -> DatePickerVariant.valueOf(variant.name()))
+        .toArray(DatePickerVariant[]::new);
     return datePickerVariants;
   }
 

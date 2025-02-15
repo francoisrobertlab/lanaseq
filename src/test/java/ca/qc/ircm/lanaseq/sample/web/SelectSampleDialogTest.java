@@ -36,7 +36,6 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.SelectedEvent;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -62,6 +61,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Range;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -105,8 +105,7 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
     when(service.all()).thenReturn(samples);
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
-    @SuppressWarnings("unchecked")
-    Grid<Dataset> datasetGrid = $(Grid.class).first();
+    @SuppressWarnings("unchecked") Grid<Dataset> datasetGrid = $(Grid.class).first();
     datasetGrid.setItems(datasetRepository.findAll());
     test(datasetGrid).doubleClickRow(1);
     if ($(Button.class).withId(DatasetDialog.id(ADD_SAMPLE)).exists()) {
@@ -314,9 +313,9 @@ public class SelectSampleDialogTest extends SpringUIUnitTest {
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     dialog.dateFilter.setValue(range);
 
-    dialog.dateFilter.setValue(Range.all());
+    dialog.dateFilter.setValue(Range.unbounded());
 
-    assertEquals(Range.all(), dialog.filter().dateRange);
+    assertEquals(Range.unbounded(), dialog.filter().dateRange);
     verify(dialog.samples.getDataProvider(), times(2)).refreshAll();
   }
 

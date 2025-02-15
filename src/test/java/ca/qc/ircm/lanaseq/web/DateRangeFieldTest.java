@@ -23,7 +23,6 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetGrid;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DateRangeField.Dates;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.datepicker.DatePickerVariant;
@@ -36,6 +35,8 @@ import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
@@ -58,9 +59,9 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     navigate(DatasetsView.class);
     DatasetGrid datasetGrid = $(DatasetGrid.class).first();
     HeaderRow filtersRow = datasetGrid.getHeaderRows().get(1);
-    dateRange =
-        test(filtersRow.getCell(datasetGrid.getColumnByKey(DatasetProperties.DATE)).getComponent())
-            .find(DateRangeField.class).first();
+    dateRange = test(
+        filtersRow.getCell(datasetGrid.getColumnByKey(DatasetProperties.DATE)).getComponent()).find(
+        DateRangeField.class).first();
   }
 
   @Test
@@ -138,15 +139,15 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     dateRange.to.setValue(to);
     BinderValidationStatus<Dates> status = dateRange.validateDates();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dateRange.from);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dateRange.from);
     assertTrue(optionalError.isPresent());
   }
 
   @Test
   public void generateModelValue_Empty() {
     Range<LocalDate> range = dateRange.generateModelValue();
-    assertEquals(Range.all(), range);
+    assertEquals(Range.unbounded(), range);
   }
 
   @Test
@@ -154,7 +155,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     LocalDate from = LocalDate.now().minusDays(10);
     dateRange.from.setValue(from);
     Range<LocalDate> range = dateRange.generateModelValue();
-    assertEquals(Range.atLeast(from), range);
+    assertEquals(Range.rightUnbounded(Bound.inclusive(from)), range);
   }
 
   @Test
@@ -162,7 +163,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     LocalDate to = LocalDate.now().minusDays(1);
     dateRange.to.setValue(to);
     Range<LocalDate> range = dateRange.generateModelValue();
-    assertEquals(Range.atMost(to), range);
+    assertEquals(Range.leftUnbounded(Bound.inclusive(to)), range);
   }
 
   @Test
@@ -182,7 +183,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     LocalDate to = LocalDate.now().minusDays(10);
     dateRange.to.setValue(to);
     Range<LocalDate> range = dateRange.generateModelValue();
-    assertEquals(Range.atMost(to), range);
+    assertEquals(Range.leftUnbounded(Bound.inclusive(to)), range);
   }
 
   @Test
@@ -192,7 +193,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     LocalDate to = LocalDate.now().minusDays(2);
     dateRange.to.setValue(to);
     Range<LocalDate> range = dateRange.generateModelValue();
-    assertEquals(Range.singleton(to), range);
+    assertEquals(Range.just(to), range);
   }
 
   @Test
@@ -200,12 +201,12 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     dateRange.from.setValue(null);
     dateRange.to.setValue(null);
     Range<LocalDate> range = dateRange.generateModelValue();
-    assertEquals(Range.all(), range);
+    assertEquals(Range.unbounded(), range);
   }
 
   @Test
   public void setPresentationValue_Empty() {
-    dateRange.setPresentationValue(Range.all());
+    dateRange.setPresentationValue(Range.unbounded());
     assertNull(dateRange.from.getValue());
     assertNull(dateRange.to.getValue());
   }
@@ -216,7 +217,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
     dateRange.from.setValue(from);
     LocalDate to = LocalDate.now().minusDays(1);
     dateRange.to.setValue(to);
-    dateRange.setPresentationValue(Range.all());
+    dateRange.setPresentationValue(Range.unbounded());
     assertNull(dateRange.from.getValue());
     assertNull(dateRange.to.getValue());
   }
@@ -224,7 +225,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
   @Test
   public void setPresentationValue_From() {
     LocalDate from = LocalDate.now().minusDays(10);
-    dateRange.setPresentationValue(Range.atLeast(from));
+    dateRange.setPresentationValue(Range.rightUnbounded(Bound.inclusive(from)));
     assertEquals(from, dateRange.from.getValue());
     assertNull(dateRange.to.getValue());
   }
@@ -232,7 +233,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
   @Test
   public void setPresentationValue_To() {
     LocalDate to = LocalDate.now().minusDays(1);
-    dateRange.setPresentationValue(Range.atMost(to));
+    dateRange.setPresentationValue(Range.leftUnbounded(Bound.inclusive(to)));
     assertNull(dateRange.from.getValue());
     assertEquals(to, dateRange.to.getValue());
   }

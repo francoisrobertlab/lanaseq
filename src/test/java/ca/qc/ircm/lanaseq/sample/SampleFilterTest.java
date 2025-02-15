@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.test.config.NonTransactionalTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
-import com.google.common.collect.Range;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import java.time.LocalDate;
@@ -20,6 +19,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -310,7 +311,7 @@ public class SampleFilterTest {
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(sample.date.goe(start.plusDays(1)).and(sample.date.before(end)), predicate);
+    assertEquals(sample.date.gt(start).and(sample.date.before(end)), predicate);
   }
 
   @Test
@@ -321,56 +322,56 @@ public class SampleFilterTest {
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(sample.date.goe(start).and(sample.date.before(end.plusDays(1))), predicate);
+    assertEquals(sample.date.gt(start.minusDays(1)).and(sample.date.before(end.plusDays(1))),
+        predicate);
   }
 
   @Test
   public void predicate_Date_OpenClosedRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.openClosed(start, end);
+    filter.dateRange = Range.leftOpen(start, end);
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(sample.date.goe(start.plusDays(1)).and(sample.date.before(end.plusDays(1))),
-        predicate);
+    assertEquals(sample.date.gt(start).and(sample.date.before(end.plusDays(1))), predicate);
   }
 
   @Test
   public void predicate_Date_ClosedOpenRange() {
     LocalDate start = LocalDate.now().minusDays(10);
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.closedOpen(start, end);
+    filter.dateRange = Range.rightOpen(start, end);
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(sample.date.goe(start).and(sample.date.before(end)), predicate);
+    assertEquals(sample.date.gt(start.minusDays(1)).and(sample.date.before(end)), predicate);
   }
 
   @Test
   public void predicate_Date_AtLeast() {
     LocalDate start = LocalDate.now().minusDays(10);
-    filter.dateRange = Range.atLeast(start);
+    filter.dateRange = Range.rightUnbounded(Bound.inclusive(start));
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(sample.date.goe(start), predicate);
+    assertEquals(sample.date.gt(start.minusDays(1)), predicate);
   }
 
   @Test
   public void predicate_Date_GreaterThan() {
     LocalDate start = LocalDate.now().minusDays(10);
-    filter.dateRange = Range.greaterThan(start);
+    filter.dateRange = Range.rightUnbounded(Bound.exclusive(start));
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(sample.date.goe(start.plusDays(1)), predicate);
+    assertEquals(sample.date.gt(start), predicate);
   }
 
   @Test
   public void predicate_Date_AtMost() {
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.atMost(end);
+    filter.dateRange = Range.leftUnbounded(Bound.inclusive(end));
 
     Predicate predicate = filter.predicate();
 
@@ -380,7 +381,7 @@ public class SampleFilterTest {
   @Test
   public void predicate_Date_LessThan() {
     LocalDate end = LocalDate.now();
-    filter.dateRange = Range.lessThan(end);
+    filter.dateRange = Range.leftUnbounded(Bound.exclusive(end));
 
     Predicate predicate = filter.predicate();
 
@@ -404,8 +405,7 @@ public class SampleFilterTest {
 
     Predicate predicate = filter.predicate();
 
-    assertEquals(
-        sample.name.contains("test1")
+    assertEquals(sample.name.contains("test1")
             .and(sample.owner.email.contains("test2").or(sample.owner.name.contains("test2"))),
         predicate);
   }

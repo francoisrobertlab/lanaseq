@@ -48,7 +48,6 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.FooterRow;
@@ -75,6 +74,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Range;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -229,22 +229,26 @@ public class SamplesViewTest extends SpringUIUnitTest {
   public void samples() {
     assertEquals(5, view.samples.getColumns().size());
     assertNotNull(view.samples.getColumnByKey(NAME));
-    assertEquals(NAME, view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING)
-        .findFirst().map(SortOrder::getSorted).orElseThrow());
+    assertEquals(NAME,
+        view.samples.getColumnByKey(NAME).getSortOrder(SortDirection.ASCENDING).findFirst()
+            .map(SortOrder::getSorted).orElseThrow());
     assertTrue(view.name.isSortable());
     assertNotNull(view.samples.getColumnByKey(KEYWORDS));
     assertFalse(view.keywords.isSortable());
     assertNotNull(view.samples.getColumnByKey(PROTOCOL));
-    assertEquals(PROTOCOL + "." + NAME, view.samples.getColumnByKey(PROTOCOL)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
+    assertEquals(PROTOCOL + "." + NAME,
+        view.samples.getColumnByKey(PROTOCOL).getSortOrder(SortDirection.ASCENDING).findFirst()
+            .map(SortOrder::getSorted).orElseThrow());
     assertTrue(view.protocol.isSortable());
     assertNotNull(view.samples.getColumnByKey(DATE));
-    assertEquals(DATE, view.samples.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING)
-        .findFirst().map(SortOrder::getSorted).orElseThrow());
+    assertEquals(DATE,
+        view.samples.getColumnByKey(DATE).getSortOrder(SortDirection.ASCENDING).findFirst()
+            .map(SortOrder::getSorted).orElseThrow());
     assertNotNull(view.samples.getColumnByKey(OWNER));
     assertTrue(view.date.isSortable());
-    assertEquals(OWNER + "." + EMAIL, view.samples.getColumnByKey(OWNER)
-        .getSortOrder(SortDirection.ASCENDING).findFirst().map(SortOrder::getSorted).orElseThrow());
+    assertEquals(OWNER + "." + EMAIL,
+        view.samples.getColumnByKey(OWNER).getSortOrder(SortDirection.ASCENDING).findFirst()
+            .map(SortOrder::getSorted).orElseThrow());
     assertInstanceOf(SelectionModel.Multi.class, view.samples.getSelectionModel());
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
     assertTrue(view.owner.isSortable());
@@ -466,9 +470,9 @@ public class SamplesViewTest extends SpringUIUnitTest {
     Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10), LocalDate.now());
     view.dateFilter.setValue(range);
 
-    view.dateFilter.setValue(Range.all());
+    view.dateFilter.setValue(Range.unbounded());
 
-    assertEquals(Range.all(), view.filter().dateRange);
+    assertEquals(Range.unbounded(), view.filter().dateRange);
     verify(view.samples.getDataProvider(), times(2)).refreshAll();
   }
 
@@ -679,8 +683,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
 
     Notification error = $(Notification.class).first();
     assertInstanceOf(ErrorNotification.class, error);
-    assertEquals(
-        view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
+    assertEquals(view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020"),
         ((ErrorNotification) error).getText());
     verify(datasetService).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2_20181020");

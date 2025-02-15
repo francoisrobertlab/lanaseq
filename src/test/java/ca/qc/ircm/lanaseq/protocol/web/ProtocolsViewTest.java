@@ -34,7 +34,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
-import com.google.common.collect.Range;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.FooterRow;
@@ -60,6 +59,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Range;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -365,8 +365,8 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   public void filterRange() {
     view.protocols.setItems(protocolDataProvider);
 
-    Range<LocalDate> range =
-        Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
+    Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10),
+        LocalDate.now().minusDays(1));
     view.dateFilter.setValue(range);
 
     assertEquals(range, view.filter().dateRange);
@@ -376,13 +376,13 @@ public class ProtocolsViewTest extends SpringUIUnitTest {
   @Test
   public void filterRange_All() {
     view.protocols.setItems(protocolDataProvider);
-    Range<LocalDate> range =
-        Range.closed(LocalDate.now().minusDays(10), LocalDate.now().minusDays(1));
+    Range<LocalDate> range = Range.closed(LocalDate.now().minusDays(10),
+        LocalDate.now().minusDays(1));
     view.dateFilter.setValue(range);
 
-    view.dateFilter.setValue(Range.all());
+    view.dateFilter.setValue(Range.unbounded());
 
-    assertEquals(Range.all(), view.filter().dateRange);
+    assertEquals(Range.unbounded(), view.filter().dateRange);
     verify(view.protocols.getDataProvider(), times(2)).refreshAll();
   }
 
