@@ -1,7 +1,8 @@
 <configuration>
-  <property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t][%.-15mdc{user}] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+  <property name="FILE_LOG_PATTERN"
+    value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t][%.-15mdc{user}] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
-  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
 
   <logger name="ca.qc.ircm.lanaseq" level="DEBUG"/>
   <logger name="ca.qc.ircm.lanaseq.security.web.ShiroViewAccessControl" level="INFO"/>
@@ -18,5 +19,6 @@
   <!-- Show SQL and parameters.
   <logger name="org.hibernate.SQL" level="DEBUG"/>
   <logger name="org.hibernate.type.descriptor.sql" level="TRACE"/>
+  <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
   -->
 </configuration>
