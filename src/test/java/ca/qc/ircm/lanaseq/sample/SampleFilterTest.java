@@ -1,9 +1,6 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.sample.QSample.sample;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,13 +14,8 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Range.Bound;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 
 /**
  * Tests for {@link SampleFilter}.
@@ -408,52 +400,5 @@ public class SampleFilterTest {
     assertEquals(sample.name.contains("test1")
             .and(sample.owner.email.contains("test2").or(sample.owner.name.contains("test2"))),
         predicate);
-  }
-
-  @Test
-  public void pageable_Default() {
-    Pageable pageable = filter.pageable();
-
-    assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Direction.ASC, ID)), pageable);
-  }
-
-  @Test
-  public void pageable_Page() {
-    filter.page = 2;
-    filter.size = 5;
-
-    Pageable pageable = filter.pageable();
-
-    assertEquals(PageRequest.of(2, 5, Sort.by(Direction.ASC, ID)), pageable);
-  }
-
-  @Test
-  public void pageable_Sort() {
-    filter.sort = Sort.by(Order.asc(NAME), Order.desc(DATE));
-
-    Pageable pageable = filter.pageable();
-
-    assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Order.asc(NAME), Order.desc(DATE))),
-        pageable);
-  }
-
-  @Test
-  public void pageable_NullSort() {
-    filter.sort = null;
-
-    Pageable pageable = filter.pageable();
-
-    assertEquals(PageRequest.of(0, Integer.MAX_VALUE, Sort.unsorted()), pageable);
-  }
-
-  @Test
-  public void pageable_PageAndSort() {
-    filter.page = 2;
-    filter.size = 5;
-    filter.sort = Sort.by(Order.asc(NAME), Order.desc(DATE));
-
-    Pageable pageable = filter.pageable();
-
-    assertEquals(PageRequest.of(2, 5, Sort.by(Order.asc(NAME), Order.desc(DATE))), pageable);
   }
 }

@@ -246,12 +246,8 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
   }
 
   private void loadSamples() {
-    CallbackDataProvider.FetchCallback<Sample, Void> fetchCallback = query -> {
-      filter.sort = VaadinSpringDataHelpers.toSpringDataSort(query);
-      filter.page = query.getOffset() / samples.getPageSize();
-      filter.size = query.getLimit();
-      return service.all(filter).stream();
-    };
+    CallbackDataProvider.FetchCallback<Sample, Void> fetchCallback = query -> service.all(filter,
+        VaadinSpringDataHelpers.toSpringPageRequest(query));
     samples.setItems(fetchCallback);
   }
 

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -104,13 +105,14 @@ public class SampleService {
   /**
    * Returns all samples passing filter.
    *
-   * @param filter filter
+   * @param filter   filter
+   * @param pageable sorts and limits number of results
    * @return all samples passing filter
    */
   @PostFilter("hasPermission(filterObject, 'read')")
-  public List<Sample> all(SampleFilter filter) {
+  public Stream<Sample> all(SampleFilter filter, Pageable pageable) {
     Objects.requireNonNull(filter, "filter parameter cannot be null");
-    return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
+    return repository.findAll(filter.predicate(), pageable).stream();
   }
 
   /**
@@ -157,8 +159,8 @@ public class SampleService {
       List<PathMatcher> matchers = sample.getFilenames().stream()
           .map(filename -> FileSystems.getDefault().getPathMatcher("glob:**/*" + filename + "*"))
           .toList();
-      try (Stream<Path> filenamesFiles =
-          Files.walk(configuration.getHome().getFolder(), FileVisitOption.FOLLOW_LINKS)) {
+      try (Stream<Path> filenamesFiles = Files.walk(configuration.getHome().getFolder(),
+          FileVisitOption.FOLLOW_LINKS)) {
         filenamesFiles.filter(Files::isRegularFile)
             .filter(file -> matchers.stream().anyMatch(matcher -> matcher.matches(file)))
             .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
@@ -167,8 +169,8 @@ public class SampleService {
         // Ignore since folder probably does not exist.
       }
       for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
-        try (Stream<Path> filenamesFiles =
-            Files.walk(drive.getFolder(), FileVisitOption.FOLLOW_LINKS)) {
+        try (Stream<Path> filenamesFiles = Files.walk(drive.getFolder(),
+            FileVisitOption.FOLLOW_LINKS)) {
           filenamesFiles.filter(Files::isRegularFile)
               .filter(file -> matchers.stream().anyMatch(matcher -> matcher.matches(file)))
               .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
@@ -322,9 +324,8 @@ public class SampleService {
       mergable &= first.getTarget() != null ? first.getTarget().equals(sample.getTarget())
           : sample.getTarget() == null;
       mergable &= first.getStrain().equals(sample.getStrain());
-      mergable &= first.getStrainDescription() != null
-          ? first.getStrainDescription().equals(sample.getStrainDescription())
-          : sample.getStrainDescription() == null;
+      mergable &= first.getStrainDescription() != null ? first.getStrainDescription()
+          .equals(sample.getStrainDescription()) : sample.getStrainDescription() == null;
       mergable &= first.getTreatment() != null ? first.getTreatment().equals(sample.getTreatment())
           : sample.getTreatment() == null;
     }
@@ -356,8 +357,8 @@ public class SampleService {
     } else {
       final String oldName = old.getName();
       final Path oldFolder = configuration.getHome().folder(old);
-      List<Path> oldArchives =
-          configuration.getArchives().stream().map(drive -> drive.folder(old)).toList();
+      List<Path> oldArchives = configuration.getArchives().stream().map(drive -> drive.folder(old))
+          .toList();
       repository.save(sample);
       Path folder = configuration.getHome().folder(sample);
       Renamer.moveFolder(oldFolder, folder);
@@ -441,8 +442,8 @@ public class SampleService {
       throw new IllegalArgumentException("file " + file + " not in folder " + folder);
     }
     Path deleted = folder.resolve(DELETED_FILENAME);
-    try (Writer writer =
-        Files.newBufferedWriter(deleted, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+    try (Writer writer = Files.newBufferedWriter(deleted, StandardOpenOption.APPEND,
+        StandardOpenOption.CREATE)) {
       writer.write(filename.toString());
       writer.write("\t");
       DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;

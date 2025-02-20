@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -113,7 +114,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     when(service.get(anyLong())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
     samples = repository.findAll();
-    when(service.all(any())).thenReturn(samples);
+    when(service.all(any(), any())).then(i -> samples.stream());
     UI.getCurrent().setLocale(locale);
     view = navigate(SamplesView.class);
   }
@@ -253,7 +254,7 @@ public class SamplesViewTest extends SpringUIUnitTest {
     assertEquals(GridSortOrder.desc(view.date).build(), view.samples.getSortOrder());
     assertTrue(view.owner.isSortable());
     List<Sample> samples = items(view.samples);
-    verify(service).all(view.filter());
+    verify(service).all(eq(view.filter()), any());
     assertEquals(this.samples.size(), samples.size());
     for (Sample sample : this.samples) {
       assertTrue(samples.contains(sample), sample::toString);
