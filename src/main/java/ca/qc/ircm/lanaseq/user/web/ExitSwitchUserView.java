@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = ExitSwitchUserView.VIEW_NAME)
 @RolesAllowed({ROLE_PREVIOUS_ADMINISTRATOR})
-public class ExitSwitchUserView extends VerticalLayout
-    implements BeforeEnterObserver, UrlComponent {
+public class ExitSwitchUserView extends VerticalLayout implements BeforeEnterObserver,
+    UrlComponent {
 
   public static final String VIEW_NAME = "exitSwitchUser";
   private static final Logger logger = LoggerFactory.getLogger(ExitSwitchUserView.class);
@@ -41,6 +41,6 @@ public class ExitSwitchUserView extends VerticalLayout
   public void beforeEnter(BeforeEnterEvent event) {
     logger.debug("Exit switch user {}", authenticatedUser.getUser());
     switchUserService.exitSwitchUser(VaadinServletRequest.getCurrent());
-    UI.getCurrent().getPage().setLocation(getUrl(MainView.VIEW_NAME));
+    UI.getCurrent().getPage().setLocation(getUrl(MainView.class));
   }
 }

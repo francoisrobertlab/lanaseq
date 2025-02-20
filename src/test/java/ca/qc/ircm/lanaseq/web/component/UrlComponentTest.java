@@ -18,7 +18,13 @@ public class UrlComponentTest extends SpringUIUnitTest {
   private final UrlComponentForTest urlComponent = new UrlComponentForTest();
 
   @Test
-  public void getUrl() {
+  public void getUrl_Class() {
+    String url = urlComponent.getUrl(DatasetsView.class);
+    assertEquals("/" + DatasetsView.VIEW_NAME, url);
+  }
+
+  @Test
+  public void getUrl_String() {
     String url = urlComponent.getUrl(DatasetsView.VIEW_NAME);
     assertEquals("/" + DatasetsView.VIEW_NAME, url);
   }

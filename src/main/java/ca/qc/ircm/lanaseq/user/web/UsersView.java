@@ -264,7 +264,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED)).open();
     } else {
       switchUserService.switchUser(user, VaadinServletRequest.getCurrent());
-      UI.getCurrent().getPage().setLocation(getUrl(MainView.VIEW_NAME));
+      UI.getCurrent().getPage().setLocation(getUrl(MainView.class));
     }
   }
 
