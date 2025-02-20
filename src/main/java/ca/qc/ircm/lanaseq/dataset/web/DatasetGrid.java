@@ -124,12 +124,8 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   }
 
   private void loadDataset() {
-    CallbackDataProvider.FetchCallback<Dataset, Void> fetchCallback = query -> {
-      filter.sort = VaadinSpringDataHelpers.toSpringDataSort(query);
-      filter.page = query.getOffset() / getPageSize();
-      filter.size = query.getLimit();
-      return service.all(filter).stream();
-    };
+    CallbackDataProvider.FetchCallback<Dataset, Void> fetchCallback = query -> service.all(filter,
+        VaadinSpringDataHelpers.toSpringPageRequest(query));
     setItems(fetchCallback);
   }
 

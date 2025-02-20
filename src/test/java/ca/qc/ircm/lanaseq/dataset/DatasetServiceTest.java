@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.dataset;
 
-import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
@@ -53,6 +52,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -98,9 +100,8 @@ public class DatasetServiceTest {
   @BeforeEach
   public void beforeTest() {
     when(permissionEvaluator.hasPermission(any(), any(), any())).thenReturn(true);
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> homeFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().getFolder()).thenReturn(temporaryFolder.resolve("home"));
     when(configuration.getHome().folder(any(Dataset.class))).then(i -> {
@@ -114,17 +115,15 @@ public class DatasetServiceTest {
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 = mock(
+        AppConfiguration.NetworkDrive.class);
     archives.add(archiveFolder1);
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 = mock(
+        AppConfiguration.NetworkDrive.class);
     archives.add(archiveFolder2);
     when(configuration.getArchives()).thenReturn(archives);
-    when(configuration.getArchives().get(0).getFolder())
-        .thenReturn(temporaryFolder.resolve("archives"));
+    when(configuration.getArchives().get(0).getFolder()).thenReturn(
+        temporaryFolder.resolve("archives"));
     when(configuration.getArchives().get(0).folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? temporaryFolder.resolve("archives").resolve(dataset.getName())
@@ -136,8 +135,8 @@ public class DatasetServiceTest {
       String label = "\\\\lanaseq01\\archives\\" + (dataset != null ? dataset.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
-    when(configuration.getArchives().get(1).getFolder())
-        .thenReturn(temporaryFolder.resolve("archives2"));
+    when(configuration.getArchives().get(1).getFolder()).thenReturn(
+        temporaryFolder.resolve("archives2"));
     when(configuration.getArchives().get(1).folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
       return dataset != null ? temporaryFolder.resolve("archives2").resolve(dataset.getName())
@@ -149,9 +148,8 @@ public class DatasetServiceTest {
       String label = "\\\\lanaseq02\\archives2\\" + (dataset != null ? dataset.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Dataset.class))).then(i -> {
       Dataset dataset = i.getArgument(0);
@@ -221,21 +219,19 @@ public class DatasetServiceTest {
 
   @Test
   public void all_Filter() {
-    DatasetFilter filter = mock(DatasetFilter.class);
-    when(filter.predicate()).thenReturn(dataset.isNotNull());
-    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+    DatasetFilter filter = new DatasetFilter();
 
-    List<Dataset> datasets = service.all(filter);
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
 
     assertEquals(8, datasets.size());
-    assertEquals((Long) 1L, datasets.get(0).getId());
-    assertEquals((Long) 2L, datasets.get(1).getId());
-    assertEquals((Long) 3L, datasets.get(2).getId());
-    assertEquals((Long) 4L, datasets.get(3).getId());
-    assertEquals((Long) 5L, datasets.get(4).getId());
-    assertEquals((Long) 6L, datasets.get(5).getId());
-    assertEquals((Long) 7L, datasets.get(6).getId());
-    assertEquals((Long) 8L, datasets.get(7).getId());
+    assertEquals(1L, datasets.get(0).getId());
+    assertEquals(2L, datasets.get(1).getId());
+    assertEquals(3L, datasets.get(2).getId());
+    assertEquals(4L, datasets.get(3).getId());
+    assertEquals(5L, datasets.get(4).getId());
+    assertEquals(6L, datasets.get(5).getId());
+    assertEquals(7L, datasets.get(6).getId());
+    assertEquals(8L, datasets.get(7).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -246,12 +242,220 @@ public class DatasetServiceTest {
     DatasetFilter filter = new DatasetFilter();
     filter.nameContains = "JS";
 
-    List<Dataset> datasets = service.all(filter);
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
 
     assertEquals(3, datasets.size());
-    assertEquals((Long) 2L, datasets.get(0).getId());
-    assertEquals((Long) 6L, datasets.get(1).getId());
-    assertEquals((Long) 7L, datasets.get(2).getId());
+    assertEquals(2L, datasets.get(0).getId());
+    assertEquals(6L, datasets.get(1).getId());
+    assertEquals(7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterKeywords() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.keywordsContains = "IP";
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+    System.out.println(datasets);
+
+    assertEquals(4, datasets.size());
+    assertEquals(1L, datasets.get(0).getId());
+    assertEquals(2L, datasets.get(1).getId());
+    assertEquals(4L, datasets.get(2).getId());
+    assertEquals(5L, datasets.get(3).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterProtocol() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.protocolContains = "tone";
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, datasets.size());
+    assertEquals(2L, datasets.get(0).getId());
+    assertEquals(6L, datasets.get(1).getId());
+    assertEquals(7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterOwner() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.ownerContains = "smith";
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(5, datasets.size());
+    assertEquals(2L, datasets.get(0).getId());
+    assertEquals(3L, datasets.get(1).getId());
+    assertEquals(6L, datasets.get(2).getId());
+    assertEquals(7L, datasets.get(3).getId());
+    assertEquals(8L, datasets.get(4).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterOwner_Email() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.ownerContains = "ombe@i";
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(2, datasets.size());
+    assertEquals(4L, datasets.get(0).getId());
+    assertEquals(5L, datasets.get(1).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterOwner_Name() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.ownerContains = "nh S";
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(5, datasets.size());
+    assertEquals(2L, datasets.get(0).getId());
+    assertEquals(3L, datasets.get(1).getId());
+    assertEquals(6L, datasets.get(2).getId());
+    assertEquals(7L, datasets.get(3).getId());
+    assertEquals(8L, datasets.get(4).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 1), LocalDate.of(2019, 1, 1));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, datasets.size());
+    assertEquals(5L, datasets.get(0).getId());
+    assertEquals(6L, datasets.get(1).getId());
+    assertEquals(7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_Closed() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, datasets.size());
+    assertEquals(5L, datasets.get(0).getId());
+    assertEquals(6L, datasets.get(1).getId());
+    assertEquals(7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_Open() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.open(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(1, datasets.size());
+    assertEquals(6L, datasets.get(0).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_LeftOnly_Inclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.inclusive(LocalDate.of(2018, 12, 5)));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, datasets.size());
+    assertEquals(5L, datasets.get(0).getId());
+    assertEquals(6L, datasets.get(1).getId());
+    assertEquals(7L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_LeftOnly_Exclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.exclusive(LocalDate.of(2018, 12, 5)));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(2, datasets.size());
+    assertEquals(6L, datasets.get(0).getId());
+    assertEquals(7L, datasets.get(1).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_RightOnly_Inclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.inclusive(LocalDate.of(2018, 10, 22)));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, datasets.size());
+    assertEquals(1L, datasets.get(0).getId());
+    assertEquals(2L, datasets.get(1).getId());
+    assertEquals(8L, datasets.get(2).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_RightOnly_Exclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.exclusive(LocalDate.of(2018, 10, 22)));
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(2, datasets.size());
+    assertEquals(1L, datasets.get(0).getId());
+    assertEquals(8L, datasets.get(1).getId());
+    for (Dataset dataset : datasets) {
+      verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterNameAndKeywords() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.nameContains = "js";
+    filter.keywordsContains = "ip";
+
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(1, datasets.size());
+    assertEquals(2L, datasets.get(0).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -260,15 +464,13 @@ public class DatasetServiceTest {
   @Test
   public void all_FilterPage() {
     DatasetFilter filter = new DatasetFilter();
-    filter.page = 1;
-    filter.size = 3;
 
-    List<Dataset> datasets = service.all(filter);
+    List<Dataset> datasets = service.all(filter, PageRequest.of(1, 3)).toList();
 
     assertEquals(3, datasets.size());
-    assertEquals((Long) 4L, datasets.get(0).getId());
-    assertEquals((Long) 5L, datasets.get(1).getId());
-    assertEquals((Long) 6L, datasets.get(2).getId());
+    assertEquals(4L, datasets.get(0).getId());
+    assertEquals(5L, datasets.get(1).getId());
+    assertEquals(6L, datasets.get(2).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -277,16 +479,14 @@ public class DatasetServiceTest {
   @Test
   public void all_FilterPageSort() {
     DatasetFilter filter = new DatasetFilter();
-    filter.page = 1;
-    filter.size = 3;
-    filter.sort = Sort.by(Direction.ASC, NAME);
 
-    List<Dataset> datasets = service.all(filter);
+    List<Dataset> datasets = service.all(filter, PageRequest.of(1, 3, Sort.by(Direction.ASC, NAME)))
+        .toList();
 
     assertEquals(3, datasets.size());
-    assertEquals((Long) 4L, datasets.get(0).getId());
-    assertEquals((Long) 2L, datasets.get(1).getId());
-    assertEquals((Long) 6L, datasets.get(2).getId());
+    assertEquals(4L, datasets.get(0).getId());
+    assertEquals(2L, datasets.get(1).getId());
+    assertEquals(6L, datasets.get(2).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -296,14 +496,14 @@ public class DatasetServiceTest {
   public void all_FilterSortName() {
     DatasetFilter filter = new DatasetFilter();
     filter.nameContains = "JS";
-    filter.sort = Sort.by(Direction.ASC, NAME);
 
-    List<Dataset> datasets = service.all(filter);
+    List<Dataset> datasets = service.all(filter, Pageable.unpaged(Sort.by(Direction.ASC, NAME)))
+        .toList();
 
     assertEquals(3, datasets.size());
-    assertEquals((Long) 2L, datasets.get(0).getId());
-    assertEquals((Long) 6L, datasets.get(1).getId());
-    assertEquals((Long) 7L, datasets.get(2).getId());
+    assertEquals(2L, datasets.get(0).getId());
+    assertEquals(6L, datasets.get(1).getId());
+    assertEquals(7L, datasets.get(2).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -312,19 +512,20 @@ public class DatasetServiceTest {
   @Test
   public void all_FilterSortOwnerAndDate() {
     DatasetFilter filter = new DatasetFilter();
-    filter.sort = Sort.by(Order.asc(OWNER + "." + EMAIL), Order.desc(DATE), Order.asc(ID));
 
-    List<Dataset> datasets = service.all(filter);
+    List<Dataset> datasets = service.all(filter,
+            Pageable.unpaged(Sort.by(Order.asc(OWNER + "." + EMAIL), Order.desc(DATE), Order.asc(ID))))
+        .toList();
 
     assertEquals(8, datasets.size());
-    assertEquals((Long) 5L, datasets.get(0).getId());
-    assertEquals((Long) 4L, datasets.get(1).getId());
-    assertEquals((Long) 1L, datasets.get(2).getId());
-    assertEquals((Long) 7L, datasets.get(3).getId());
-    assertEquals((Long) 6L, datasets.get(4).getId());
-    assertEquals((Long) 3L, datasets.get(5).getId());
-    assertEquals((Long) 2L, datasets.get(6).getId());
-    assertEquals((Long) 8L, datasets.get(7).getId());
+    assertEquals(5L, datasets.get(0).getId());
+    assertEquals(4L, datasets.get(1).getId());
+    assertEquals(1L, datasets.get(2).getId());
+    assertEquals(7L, datasets.get(3).getId());
+    assertEquals(6L, datasets.get(4).getId());
+    assertEquals(3L, datasets.get(5).getId());
+    assertEquals(2L, datasets.get(6).getId());
+    assertEquals(8L, datasets.get(7).getId());
     for (Dataset dataset : datasets) {
       verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(READ));
     }
@@ -332,9 +533,7 @@ public class DatasetServiceTest {
 
   @Test
   public void count_Filter() {
-    DatasetFilter filter = mock(DatasetFilter.class);
-    when(filter.predicate()).thenReturn(dataset.isNotNull());
-    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+    DatasetFilter filter = new DatasetFilter();
 
     long count = service.count(filter);
 
@@ -349,6 +548,137 @@ public class DatasetServiceTest {
     long count = service.count(filter);
 
     assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterKeywords() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.keywordsContains = "IP";
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterProtocol() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.protocolContains = "tone";
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterOwner() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.ownerContains = "smith";
+
+    long count = service.count(filter);
+
+    assertEquals(5, count);
+  }
+
+  @Test
+  public void count_FilterOwner_Email() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.ownerContains = "ombe@i";
+
+    long count = service.count(filter);
+
+    assertEquals(2, count);
+  }
+
+  @Test
+  public void count_FilterOwner_Name() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.ownerContains = "nh S";
+
+    long count = service.count(filter);
+
+    assertEquals(5, count);
+  }
+
+  @Test
+  public void count_FilterDate() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 1), LocalDate.of(2019, 1, 1));
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterDate_Closed() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterDate_Open() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.open(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    long count = service.count(filter);
+
+    assertEquals(1, count);
+  }
+
+  @Test
+  public void count_FilterDate_LeftOnly_Inclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.inclusive(LocalDate.of(2018, 12, 5)));
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterDate_LeftOnly_Exclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.exclusive(LocalDate.of(2018, 12, 5)));
+
+    long count = service.count(filter);
+
+    assertEquals(2, count);
+  }
+
+  @Test
+  public void count_FilterDate_RightOnly_Inclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.inclusive(LocalDate.of(2018, 10, 22)));
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterDate_RightOnly_Exclusive() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.exclusive(LocalDate.of(2018, 10, 22)));
+
+    long count = service.count(filter);
+
+    assertEquals(2, count);
+  }
+
+  @Test
+  public void count_FilterNameAndKeywords() {
+    DatasetFilter filter = new DatasetFilter();
+    filter.nameContains = "js";
+    filter.keywordsContains = "ip";
+
+    long count = service.count(filter);
+
+    assertEquals(1, count);
   }
 
   @Test
@@ -964,27 +1294,23 @@ public class DatasetServiceTest {
     Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder));
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(dataset);
     assertTrue(Files.exists(archive1.resolve("dataset_a1_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1.resolve("dataset_a1_R1.fastq")));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(dataset);
     assertTrue(Files.exists(archive2.resolve("dataset_a2_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2.resolve("dataset_a2_R1.fastq")));
     assertFalse(Files.exists(beforeArchive2));
@@ -1028,27 +1354,23 @@ public class DatasetServiceTest {
     dataset = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(dataset);
     assertTrue(Files.exists(archive1.resolve("dataset_a1_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1.resolve("dataset_a1_R1.fastq")));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(dataset);
     assertTrue(Files.exists(archive2.resolve("dataset_a2_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2.resolve("dataset_a2_R1.fastq")));
     assertFalse(Files.exists(beforeArchive2));
@@ -1068,18 +1390,16 @@ public class DatasetServiceTest {
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.writeString(
-        beforeFolder
-            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
+    Files.writeString(beforeFolder.resolve(
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
         "e254a11d5102c5555232c3d7d0a53a0b  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq");
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
         beforeFolder.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.writeString(
-        beforeFolder
-            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq.md5"),
+    Files.writeString(beforeFolder.resolve(
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq.md5"),
         "c0f5c3b76104640e306fce3c669f300e  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R2.fastq");
     Files.createDirectories(beforeArchive1);
@@ -1087,9 +1407,8 @@ public class DatasetServiceTest {
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive1.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.writeString(
-        beforeArchive1
-            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
+    Files.writeString(beforeArchive1.resolve(
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
         "e254a11d5102c5555232c3d7d0a53a0b  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq");
     Files.createDirectories(beforeArchive2);
@@ -1097,9 +1416,8 @@ public class DatasetServiceTest {
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         beforeArchive2.resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq"),
         StandardCopyOption.REPLACE_EXISTING);
-    Files.writeString(
-        beforeArchive2
-            .resolve("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
+    Files.writeString(beforeArchive2.resolve(
+            "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq.md5"),
         "e254a11d5102c5555232c3d7d0a53a0b  "
             + "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3_20181020_R1.fastq");
 
@@ -1111,72 +1429,64 @@ public class DatasetServiceTest {
     assertEquals("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020",
         dataset.getName());
     Path folder = configuration.getHome().folder(dataset);
-    assertTrue(Files.exists(folder
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(folder.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(folder
-            .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
-    assertTrue(Files.exists(folder
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
-    List<String> md5Lines = Files.readAllLines(folder
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
+        Files.readAllBytes(folder.resolve(
+            "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
+    List<String> md5Lines = Files.readAllLines(folder.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "e254a11d5102c5555232c3d7d0a53a0b  "
+    assertEquals("e254a11d5102c5555232c3d7d0a53a0b  "
             + "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq",
         md5Lines.get(0));
-    assertTrue(Files.exists(folder
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(folder.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
-        Files.readAllBytes(folder
-            .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq")));
-    assertTrue(Files.exists(folder
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq.md5")));
-    md5Lines = Files.readAllLines(folder
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq.md5"));
+        Files.readAllBytes(folder.resolve(
+            "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq")));
+    assertTrue(Files.exists(folder.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq.md5")));
+    md5Lines = Files.readAllLines(folder.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "c0f5c3b76104640e306fce3c669f300e  "
+    assertEquals("c0f5c3b76104640e306fce3c669f300e  "
             + "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R2.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(dataset);
-    assertTrue(Files.exists(archive1
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(archive1.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(archive1
-            .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
-    assertTrue(Files.exists(archive1
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
-    md5Lines = Files.readAllLines(archive1
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
+        Files.readAllBytes(archive1.resolve(
+            "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertTrue(Files.exists(archive1.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
+    md5Lines = Files.readAllLines(archive1.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "e254a11d5102c5555232c3d7d0a53a0b  "
+    assertEquals("e254a11d5102c5555232c3d7d0a53a0b  "
             + "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(dataset);
-    assertTrue(Files.exists(archive2
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(archive2.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(archive2
-            .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
-    assertTrue(Files.exists(archive2
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
-    md5Lines = Files.readAllLines(archive2
-        .resolve("ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
+        Files.readAllBytes(archive2.resolve(
+            "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq")));
+    assertTrue(Files.exists(archive2.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5")));
+    md5Lines = Files.readAllLines(archive2.resolve(
+        "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "e254a11d5102c5555232c3d7d0a53a0b  "
+    assertEquals("e254a11d5102c5555232c3d7d0a53a0b  "
             + "ChIPseq_Input_mytarget_yFR213_F56G_37C_sample1-FR2-FR3_20181020_R1.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeArchive2));
@@ -1240,13 +1550,11 @@ public class DatasetServiceTest {
     verify(configuration.getArchives().get(1), never()).folder(dataset);
     Path folder = configuration.getHome().folder(dataset);
     assertTrue(Files.exists(folder.resolve("dataset_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("dataset_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
