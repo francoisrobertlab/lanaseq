@@ -90,7 +90,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
   public void beforeTest() {
     when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     datasets = repository.findAll();
-    when(service.all(any())).thenReturn(datasets);
+    when(service.all(any(), any())).then(i -> datasets.stream());
     UI.getCurrent().setLocale(locale);
     view = navigate(DatasetsView.class);
   }
@@ -414,8 +414,7 @@ public class DatasetsViewTest extends SpringUIUnitTest {
 
     Notification error = $(Notification.class).first();
     assertInstanceOf(ErrorNotification.class, error);
-    assertEquals(
-        view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
+    assertEquals(view.getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS,
             "MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020"),
         ((ErrorNotification) error).getText());
     verify(service).exists("MNaseseq_IP_polr2a_yFR100_WT_Rappa_FR1-FR2-FR3-JS1-JS2_20181020");

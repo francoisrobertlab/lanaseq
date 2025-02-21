@@ -149,7 +149,7 @@ public class SampleDialogTest extends SpringUIUnitTest {
   public void beforeTest() {
     when(service.get(anyLong())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
-    when(service.all(any())).thenReturn(repository.findAll());
+    when(service.all(any(), any())).then(i -> repository.findAll().stream());
     topAssays = jpaQueryFactory.select(sample.assay).from(sample).fetch();
     when(service.topAssays(anyInt())).thenReturn(topAssays);
     topTypes = jpaQueryFactory.select(sample.type).from(sample).fetch();
@@ -554,8 +554,9 @@ public class SampleDialogTest extends SpringUIUnitTest {
     dialog.setSampleId(0);
 
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + HEADER, 0), dialog.getHeaderTitle());
-    assertTrue(LocalDate.now().minusDays(2).isBefore(dialog.date.getValue())
-        && LocalDate.now().plusDays(1).isAfter(dialog.date.getValue()));
+    assertTrue(
+        LocalDate.now().minusDays(2).isBefore(dialog.date.getValue()) && LocalDate.now().plusDays(1)
+            .isAfter(dialog.date.getValue()));
     assertFalse(dialog.date.isReadOnly());
     assertEquals("", dialog.sampleId.getValue());
     assertFalse(dialog.sampleId.isReadOnly());
@@ -595,8 +596,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Sample> status = dialog.validateSample();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.date);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.date);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -620,8 +621,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Sample> status = dialog.validateSample();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.sampleId);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.sampleId);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -645,8 +646,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Sample> status = dialog.validateSample();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.replicate);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.replicate);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -670,8 +671,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Sample> status = dialog.validateSample();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.protocol);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.protocol);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -695,8 +696,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Sample> status = dialog.validateSample();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.assay);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.assay);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -789,8 +790,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Sample> status = dialog.validateSample();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.strain);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.strain);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -928,8 +929,8 @@ public class SampleDialogTest extends SpringUIUnitTest {
 
     verify(service).exists(
         (sampleId + "_" + "ChIPseq_IP_" + target + "_" + strain + "_" + strainDescription + "_"
-            + treatment + "_" + replicate + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date))
-            .replaceAll("[^\\w-]", ""));
+            + treatment + "_" + replicate + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(
+            date)).replaceAll("[^\\w-]", ""));
     verify(service, never()).save(any());
     assertFalse($(Notification.class).exists());
     assertTrue(dialog.isOpened());

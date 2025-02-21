@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.dataset;
 
-import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.ID;
 import static ca.qc.ircm.lanaseq.dataset.QDataset.dataset;
 import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 
@@ -13,11 +12,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 
 /**
  * Filters datasets.
@@ -29,9 +24,6 @@ public class DatasetFilter implements Predicate<Dataset> {
   public String protocolContains;
   public Range<LocalDate> dateRange;
   public String ownerContains;
-  public Sort sort = Sort.by(Direction.ASC, ID);
-  public Integer page = 0;
-  public Integer size = Integer.MAX_VALUE;
 
   @Override
   public boolean test(Dataset dataset) {
@@ -98,10 +90,6 @@ public class DatasetFilter implements Predicate<Dataset> {
     }
     return predicate.getValue() != null ? predicate.getValue()
         : Expressions.asBoolean(true).isTrue();
-  }
-
-  public Pageable pageable() {
-    return PageRequest.of(page, size, sort != null ? sort : Sort.unsorted());
   }
 
   private String replaceNull(String value) {

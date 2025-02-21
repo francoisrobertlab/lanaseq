@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -90,7 +91,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
   public void beforeTest() {
     when(service.get(anyLong())).then(i -> repository.findById(i.getArgument(0)));
     datasets = repository.findAll();
-    when(service.all(any())).thenReturn(datasets);
+    when(service.all(any(), any())).then(i -> datasets.stream());
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
     grid = $(DatasetGrid.class).first();
@@ -205,7 +206,7 @@ public class DatasetGridTest extends SpringUIUnitTest {
             .map(SortOrder::getSorted).orElseThrow());
     assertEquals(GridSortOrder.desc(grid.date).build(), grid.getSortOrder());
     List<Dataset> datasets = items(grid);
-    verify(service, atLeastOnce()).all(grid.filter());
+    verify(service, atLeastOnce()).all(eq(grid.filter()), any());
     assertEquals(this.datasets.size(), datasets.size());
     for (Dataset dataset : this.datasets) {
       assertTrue(datasets.contains(dataset), dataset::toString);

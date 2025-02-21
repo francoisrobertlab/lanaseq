@@ -1,7 +1,6 @@
 package ca.qc.ircm.lanaseq.sample;
 
 import static ca.qc.ircm.lanaseq.sample.QSample.sample;
-import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.text.Strings.comparable;
 
 import com.querydsl.core.BooleanBuilder;
@@ -10,11 +9,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Predicate;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 
 /**
  * Filters samples.
@@ -26,9 +21,6 @@ public class SampleFilter implements Predicate<Sample> {
   public String protocolContains;
   public Range<LocalDate> dateRange;
   public String ownerContains;
-  public Sort sort = Sort.by(Direction.ASC, ID);
-  public int page = 0;
-  public int size = Integer.MAX_VALUE;
 
   @Override
   public boolean test(Sample sample) {
@@ -94,10 +86,6 @@ public class SampleFilter implements Predicate<Sample> {
     }
     return predicate.getValue() != null ? predicate.getValue()
         : Expressions.asBoolean(true).isTrue();
-  }
-
-  public Pageable pageable() {
-    return PageRequest.of(page, size, sort != null ? sort : Sort.unsorted());
   }
 
   private String replaceNull(String value) {

@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -102,13 +103,14 @@ public class DatasetService {
   /**
    * Returns all datasets passing filter.
    *
-   * @param filter filter
+   * @param filter   filter
+   * @param pageable sorts and limits number of results
    * @return all datasets passing filter
    */
   @PostFilter("hasPermission(filterObject, 'read')")
-  public List<Dataset> all(DatasetFilter filter) {
+  public Stream<Dataset> all(DatasetFilter filter, Pageable pageable) {
     Objects.requireNonNull(filter, "filter parameter cannot be null");
-    return new ArrayList<>(repository.findAll(filter.predicate(), filter.pageable()).getContent());
+    return repository.findAll(filter.predicate(), pageable).stream();
   }
 
   /**
@@ -155,8 +157,8 @@ public class DatasetService {
       List<PathMatcher> matchers = dataset.getFilenames().stream()
           .map(filename -> FileSystems.getDefault().getPathMatcher("glob:**/*" + filename + "*"))
           .toList();
-      try (Stream<Path> filenamesFiles =
-          Files.walk(configuration.getHome().getFolder(), FileVisitOption.FOLLOW_LINKS)) {
+      try (Stream<Path> filenamesFiles = Files.walk(configuration.getHome().getFolder(),
+          FileVisitOption.FOLLOW_LINKS)) {
         filenamesFiles.filter(Files::isRegularFile)
             .filter(file -> matchers.stream().anyMatch(matcher -> matcher.matches(file)))
             .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
@@ -165,8 +167,8 @@ public class DatasetService {
         // Ignore since folder probably does not exist.
       }
       for (AppConfiguration.NetworkDrive<DataWithFiles> drive : configuration.getArchives()) {
-        try (Stream<Path> filenamesFiles =
-            Files.walk(drive.getFolder(), FileVisitOption.FOLLOW_LINKS)) {
+        try (Stream<Path> filenamesFiles = Files.walk(drive.getFolder(),
+            FileVisitOption.FOLLOW_LINKS)) {
           filenamesFiles.filter(Files::isRegularFile)
               .filter(file -> matchers.stream().anyMatch(matcher -> matcher.matches(file)))
               .filter(file -> !DELETED_FILENAME.equals(file.getFileName().toString()))
@@ -305,8 +307,8 @@ public class DatasetService {
     } else {
       final String oldName = old.getName();
       Path oldFolder = configuration.getHome().folder(old);
-      List<Path> oldArchives =
-          configuration.getArchives().stream().map(drive -> drive.folder(old)).toList();
+      List<Path> oldArchives = configuration.getArchives().stream().map(drive -> drive.folder(old))
+          .toList();
       repository.save(dataset);
       Path folder = configuration.getHome().folder(dataset);
       Renamer.moveFolder(oldFolder, folder);
@@ -390,8 +392,8 @@ public class DatasetService {
       throw new IllegalArgumentException("file " + file + " not in folder " + folder);
     }
     Path deleted = folder.resolve(DELETED_FILENAME);
-    try (Writer writer =
-        Files.newBufferedWriter(deleted, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+    try (Writer writer = Files.newBufferedWriter(deleted, StandardOpenOption.APPEND,
+        StandardOpenOption.CREATE)) {
       writer.write(filename.toString());
       writer.write("\t");
       DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;

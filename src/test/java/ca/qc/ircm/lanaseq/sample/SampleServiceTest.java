@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.sample;
 
-import static ca.qc.ircm.lanaseq.sample.QSample.sample;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.DATE;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.ID;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
@@ -54,6 +53,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -118,8 +120,8 @@ public class SampleServiceTest {
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     archives.add(mock(AppConfiguration.NetworkDrive.class));
     when(configuration.getArchives()).thenReturn(archives);
-    when(configuration.getArchives().get(0).getFolder())
-        .thenReturn(temporaryFolder.resolve("archives"));
+    when(configuration.getArchives().get(0).getFolder()).thenReturn(
+        temporaryFolder.resolve("archives"));
     when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve("archives").resolve(sample.getName()) : null;
@@ -130,8 +132,8 @@ public class SampleServiceTest {
       String label = "\\\\lanaseq01\\archives\\" + (sample != null ? sample.getName() : "");
       return unix ? FilenameUtils.separatorsToUnix(label) : label;
     });
-    when(configuration.getArchives().get(1).getFolder())
-        .thenReturn(temporaryFolder.resolve("archives2"));
+    when(configuration.getArchives().get(1).getFolder()).thenReturn(
+        temporaryFolder.resolve("archives2"));
     when(configuration.getArchives().get(1).folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve("archives2").resolve(sample.getName()) : null;
@@ -235,11 +237,9 @@ public class SampleServiceTest {
 
   @Test
   public void all_Filter() {
-    SampleFilter filter = mock(SampleFilter.class);
-    when(filter.predicate()).thenReturn(sample.isNotNull());
-    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+    SampleFilter filter = new SampleFilter();
 
-    List<Sample> samples = service.all(filter);
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
 
     assertEquals(11, samples.size());
     assertEquals((Long) 1L, samples.get(0).getId());
@@ -263,7 +263,7 @@ public class SampleServiceTest {
     SampleFilter filter = new SampleFilter();
     filter.nameContains = "BC";
 
-    List<Sample> samples = service.all(filter);
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
 
     assertEquals(4, samples.size());
     assertEquals((Long) 6L, samples.get(0).getId());
@@ -276,12 +276,231 @@ public class SampleServiceTest {
   }
 
   @Test
+  public void all_FilterKeywords() {
+    SampleFilter filter = new SampleFilter();
+    filter.keywordsContains = "IP";
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(8, samples.size());
+    assertEquals(1L, samples.get(0).getId());
+    assertEquals(2L, samples.get(1).getId());
+    assertEquals(3L, samples.get(2).getId());
+    assertEquals(4L, samples.get(3).getId());
+    assertEquals(5L, samples.get(4).getId());
+    assertEquals(6L, samples.get(5).getId());
+    assertEquals(7L, samples.get(6).getId());
+    assertEquals(8L, samples.get(7).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterProtocol() {
+    SampleFilter filter = new SampleFilter();
+    filter.protocolContains = "tone";
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(4L, samples.get(0).getId());
+    assertEquals(5L, samples.get(1).getId());
+    assertEquals(10L, samples.get(2).getId());
+    assertEquals(11L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterOwner() {
+    SampleFilter filter = new SampleFilter();
+    filter.ownerContains = "smith";
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(4L, samples.get(0).getId());
+    assertEquals(5L, samples.get(1).getId());
+    assertEquals(10L, samples.get(2).getId());
+    assertEquals(11L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterOwner_Email() {
+    SampleFilter filter = new SampleFilter();
+    filter.ownerContains = "ombe@i";
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(6L, samples.get(0).getId());
+    assertEquals(7L, samples.get(1).getId());
+    assertEquals(8L, samples.get(2).getId());
+    assertEquals(9L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterOwner_Name() {
+    SampleFilter filter = new SampleFilter();
+    filter.ownerContains = "nh S";
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(4L, samples.get(0).getId());
+    assertEquals(5L, samples.get(1).getId());
+    assertEquals(10L, samples.get(2).getId());
+    assertEquals(11L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 1), LocalDate.of(2019, 1, 1));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(8L, samples.get(0).getId());
+    assertEquals(9L, samples.get(1).getId());
+    assertEquals(10L, samples.get(2).getId());
+    assertEquals(11L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_Closed() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(8L, samples.get(0).getId());
+    assertEquals(9L, samples.get(1).getId());
+    assertEquals(10L, samples.get(2).getId());
+    assertEquals(11L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_Open() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.open(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(2, samples.size());
+    assertEquals(9L, samples.get(0).getId());
+    assertEquals(10L, samples.get(1).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_LeftOnly_Inclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.inclusive(LocalDate.of(2018, 12, 5)));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(4, samples.size());
+    assertEquals(8L, samples.get(0).getId());
+    assertEquals(9L, samples.get(1).getId());
+    assertEquals(10L, samples.get(2).getId());
+    assertEquals(11L, samples.get(3).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_LeftOnly_Exclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.exclusive(LocalDate.of(2018, 12, 5)));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, samples.size());
+    assertEquals(9L, samples.get(0).getId());
+    assertEquals(10L, samples.get(1).getId());
+    assertEquals(11L, samples.get(2).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_RightOnly_Inclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.inclusive(LocalDate.of(2018, 10, 22)));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(5, samples.size());
+    assertEquals(1L, samples.get(0).getId());
+    assertEquals(2L, samples.get(1).getId());
+    assertEquals(3L, samples.get(2).getId());
+    assertEquals(4L, samples.get(3).getId());
+    assertEquals(5L, samples.get(4).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterDate_RightOnly_Exclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.exclusive(LocalDate.of(2018, 10, 22)));
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(3, samples.size());
+    assertEquals(1L, samples.get(0).getId());
+    assertEquals(2L, samples.get(1).getId());
+    assertEquals(3L, samples.get(2).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
+  public void all_FilterNameAndKeywords() {
+    SampleFilter filter = new SampleFilter();
+    filter.nameContains = "js";
+    filter.keywordsContains = "ip";
+
+    List<Sample> samples = service.all(filter, Pageable.unpaged()).toList();
+
+    assertEquals(2, samples.size());
+    assertEquals((Long) 4L, samples.get(0).getId());
+    assertEquals((Long) 5L, samples.get(1).getId());
+    for (Sample sample : samples) {
+      verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(READ));
+    }
+  }
+
+  @Test
   public void all_FilterPage() {
     SampleFilter filter = new SampleFilter();
-    filter.page = 1;
-    filter.size = 5;
 
-    List<Sample> samples = service.all(filter);
+    List<Sample> samples = service.all(filter, PageRequest.of(1, 5)).toList();
 
     assertEquals(5, samples.size());
     assertEquals((Long) 6L, samples.get(0).getId());
@@ -297,11 +516,9 @@ public class SampleServiceTest {
   @Test
   public void all_FilterPageSort() {
     SampleFilter filter = new SampleFilter();
-    filter.page = 1;
-    filter.size = 5;
-    filter.sort = Sort.by(Direction.ASC, NAME);
 
-    List<Sample> samples = service.all(filter);
+    List<Sample> samples = service.all(filter, PageRequest.of(1, 5, Sort.by(Direction.ASC, NAME)))
+        .toList();
 
     assertEquals(5, samples.size());
     assertEquals((Long) 2L, samples.get(0).getId());
@@ -318,9 +535,9 @@ public class SampleServiceTest {
   public void all_FilterSortName() {
     SampleFilter filter = new SampleFilter();
     filter.nameContains = "BC";
-    filter.sort = Sort.by(Direction.ASC, NAME);
 
-    List<Sample> samples = service.all(filter);
+    List<Sample> samples = service.all(filter, Pageable.unpaged(Sort.by(Direction.ASC, NAME)))
+        .toList();
 
     assertEquals(4, samples.size());
     assertEquals((Long) 9L, samples.get(0).getId());
@@ -335,9 +552,10 @@ public class SampleServiceTest {
   @Test
   public void all_FilterSortOwnerAndDate() {
     SampleFilter filter = new SampleFilter();
-    filter.sort = Sort.by(Order.asc(OWNER + "." + EMAIL), Order.desc(DATE), Order.asc(ID));
 
-    List<Sample> samples = service.all(filter);
+    List<Sample> samples = service.all(filter,
+            Pageable.unpaged(Sort.by(Order.asc(OWNER + "." + EMAIL), Order.desc(DATE), Order.asc(ID))))
+        .toList();
 
     assertEquals(11, samples.size());
     assertEquals((Long) 9L, samples.get(0).getId());
@@ -358,9 +576,7 @@ public class SampleServiceTest {
 
   @Test
   public void count_Filter() {
-    SampleFilter filter = mock(SampleFilter.class);
-    when(filter.predicate()).thenReturn(sample.isNotNull());
-    when(filter.pageable()).thenReturn(PageRequest.of(0, 100));
+    SampleFilter filter = new SampleFilter();
 
     long count = service.count(filter);
 
@@ -375,6 +591,137 @@ public class SampleServiceTest {
     long count = service.count(filter);
 
     assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterKeywords() {
+    SampleFilter filter = new SampleFilter();
+    filter.keywordsContains = "IP";
+
+    long count = service.count(filter);
+
+    assertEquals(8, count);
+  }
+
+  @Test
+  public void count_FilterProtocol() {
+    SampleFilter filter = new SampleFilter();
+    filter.protocolContains = "tone";
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterOwner() {
+    SampleFilter filter = new SampleFilter();
+    filter.ownerContains = "smith";
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterOwner_Email() {
+    SampleFilter filter = new SampleFilter();
+    filter.ownerContains = "ombe@i";
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterOwner_Name() {
+    SampleFilter filter = new SampleFilter();
+    filter.ownerContains = "nh S";
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterDate() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 1), LocalDate.of(2019, 1, 1));
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterDate_Closed() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.closed(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterDate_Open() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.open(LocalDate.of(2018, 12, 5), LocalDate.of(2018, 12, 11));
+
+    long count = service.count(filter);
+
+    assertEquals(2, count);
+  }
+
+  @Test
+  public void count_FilterDate_LeftOnly_Inclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.inclusive(LocalDate.of(2018, 12, 5)));
+
+    long count = service.count(filter);
+
+    assertEquals(4, count);
+  }
+
+  @Test
+  public void count_FilterDate_LeftOnly_Exclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.rightUnbounded(Bound.exclusive(LocalDate.of(2018, 12, 5)));
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterDate_RightOnly_Inclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.inclusive(LocalDate.of(2018, 10, 22)));
+
+    long count = service.count(filter);
+
+    assertEquals(5, count);
+  }
+
+  @Test
+  public void count_FilterDate_RightOnly_Exclusive() {
+    SampleFilter filter = new SampleFilter();
+    filter.dateRange = Range.leftUnbounded(Bound.exclusive(LocalDate.of(2018, 10, 22)));
+
+    long count = service.count(filter);
+
+    assertEquals(3, count);
+  }
+
+  @Test
+  public void count_FilterNameAndKeywords() {
+    SampleFilter filter = new SampleFilter();
+    filter.nameContains = "js";
+    filter.keywordsContains = "ip";
+
+    long count = service.count(filter);
+
+    assertEquals(2, count);
   }
 
   @Test
@@ -1193,27 +1540,23 @@ public class SampleServiceTest {
         sample.getName());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(sample);
     assertTrue(Files.exists(archive1.resolve("sample_a1_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1.resolve("sample_a1_R1.fastq")));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(sample);
     assertTrue(Files.exists(archive2.resolve("sample_a2_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2.resolve("sample_a2_R1.fastq")));
     assertFalse(Files.exists(beforeArchive2));
@@ -1259,27 +1602,23 @@ public class SampleServiceTest {
     assertEquals(LocalDate.of(2020, 1, 12), sample.getDate());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(sample);
     assertTrue(Files.exists(archive1.resolve("sample_a1_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive1.resolve("sample_a1_R1.fastq")));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(sample);
     assertTrue(Files.exists(archive2.resolve("sample_a2_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(archive2.resolve("sample_a2_R1.fastq")));
     assertFalse(Files.exists(beforeArchive2));
@@ -1339,72 +1678,64 @@ public class SampleServiceTest {
     assertEquals("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020",
         sample.getName());
     Path folder = configuration.getHome().folder(sample);
-    assertTrue(Files.exists(folder
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(folder.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(folder
-            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
-    assertTrue(Files.exists(folder
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
-    List<String> md5Lines = Files.readAllLines(folder
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
+        Files.readAllBytes(folder.resolve(
+            "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
+    List<String> md5Lines = Files.readAllLines(folder.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "e254a11d5102c5555232c3d7d0a53a0b  "
+    assertEquals("e254a11d5102c5555232c3d7d0a53a0b  "
             + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq",
         md5Lines.get(0));
-    assertTrue(Files.exists(folder
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(folder.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
-        Files.readAllBytes(folder
-            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
-    assertTrue(Files.exists(folder
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq.md5")));
-    md5Lines = Files.readAllLines(folder
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq.md5"));
+        Files.readAllBytes(folder.resolve(
+            "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq")));
+    assertTrue(Files.exists(folder.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq.md5")));
+    md5Lines = Files.readAllLines(folder.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "c0f5c3b76104640e306fce3c669f300e  "
+    assertEquals("c0f5c3b76104640e306fce3c669f300e  "
             + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R2.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeFolder));
     Path archive1 = configuration.getArchives().get(0).folder(sample);
-    assertTrue(Files.exists(archive1
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(archive1.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(archive1
-            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
-    assertTrue(Files.exists(archive1
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
-    md5Lines = Files.readAllLines(archive1
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
+        Files.readAllBytes(archive1.resolve(
+            "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertTrue(Files.exists(archive1.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
+    md5Lines = Files.readAllLines(archive1.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "e254a11d5102c5555232c3d7d0a53a0b  "
+    assertEquals("e254a11d5102c5555232c3d7d0a53a0b  "
             + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeArchive1));
     Path archive2 = configuration.getArchives().get(1).folder(sample);
-    assertTrue(Files.exists(archive2
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertTrue(Files.exists(archive2.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(archive2
-            .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
-    assertTrue(Files.exists(archive2
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
-    md5Lines = Files.readAllLines(archive2
-        .resolve("mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
+        Files.readAllBytes(archive2.resolve(
+            "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq")));
+    assertTrue(Files.exists(archive2.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5")));
+    md5Lines = Files.readAllLines(archive2.resolve(
+        "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq.md5"));
     assertEquals(1, md5Lines.size());
-    assertEquals(
-        "e254a11d5102c5555232c3d7d0a53a0b  "
+    assertEquals("e254a11d5102c5555232c3d7d0a53a0b  "
             + "mysample_MNaseseq_IP_polr2a_yFR100_WT_Rappa_myreplicate_20181020_R1.fastq",
         md5Lines.get(0));
     assertFalse(Files.exists(beforeArchive2));
@@ -1432,13 +1763,11 @@ public class SampleServiceTest {
     verify(configuration.getArchives().get(1), never()).folder(sample);
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve("sample_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R1.fastq")));
     assertTrue(Files.exists(folder.resolve("sample_R2.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
