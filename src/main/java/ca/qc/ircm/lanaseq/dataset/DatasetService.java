@@ -9,6 +9,7 @@ import ca.qc.ircm.lanaseq.files.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 import java.io.IOException;
@@ -20,10 +21,12 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,6 +57,7 @@ public class DatasetService {
 
   private static final Logger logger = LoggerFactory.getLogger(DatasetService.class);
   private DatasetRepository repository;
+  private DatasetPublicFileRepository datasetPublicFileRepository;
   private AppConfiguration configuration;
   private AuthenticatedUser authenticatedUser;
   private JPAQueryFactory queryFactory;
@@ -60,9 +66,11 @@ public class DatasetService {
   }
 
   @Autowired
-  protected DatasetService(DatasetRepository repository, AppConfiguration configuration,
+  protected DatasetService(DatasetRepository repository,
+      DatasetPublicFileRepository datasetPublicFileRepository, AppConfiguration configuration,
       AuthenticatedUser authenticatedUser, JPAQueryFactory queryFactory) {
     this.repository = repository;
+    this.datasetPublicFileRepository = datasetPublicFileRepository;
     this.configuration = configuration;
     this.authenticatedUser = authenticatedUser;
     this.queryFactory = queryFactory;
@@ -181,6 +189,14 @@ public class DatasetService {
     return files;
   }
 
+  private Path relativize(Dataset dataset, Path path) {
+    return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
+        .map(drive -> drive.folder(dataset)).filter(path::startsWith)
+        .map(folder -> folder.relativize(path)).findFirst()
+        // No parent found in home or archives folders.
+        .orElse(path);
+  }
+
   /**
    * Returns all dataset's folder labels.
    * <p>
@@ -245,6 +261,45 @@ public class DatasetService {
     } catch (IOException e) {
       return new ArrayList<>();
     }
+  }
+
+  /**
+   * Returns Dataset's file if it is accessible to the public.
+   *
+   * @param name     dataset's name
+   * @param filename filename of dataset's file
+   * @return Dataset's file if it is accessible to the public
+   */
+  @AnonymousAllowed
+  public Optional<Path> publicFile(String name, String filename) {
+    Objects.requireNonNull(name, "name parameter cannot be null");
+    Objects.requireNonNull(filename, "filename parameter cannot be null");
+    Optional<Dataset> optionalDataset = repository.findByName(name);
+    if (optionalDataset.isEmpty() || !isFilePublic(optionalDataset.orElseThrow(), filename)) {
+      return Optional.empty();
+    }
+    Dataset dataset = optionalDataset.orElseThrow();
+    return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
+        .map(drive -> drive.folder(dataset).resolve(filename)).filter(Files::isRegularFile)
+        .findFirst();
+  }
+
+  private boolean isFilePublic(Dataset dataset, String filename) {
+    Optional<DatasetPublicFile> optionalDatasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(
+        dataset, filename);
+    return optionalDatasetPublicFile.isPresent() && Range.leftUnbounded(
+            Bound.inclusive(optionalDatasetPublicFile.orElseThrow().getExpiryDate()))
+        .contains(LocalDate.now(), Comparator.naturalOrder());
+  }
+
+  /**
+   * Returns all files accessible to the public.
+   *
+   * @return all files accessible to the public
+   */
+  @PreAuthorize("hasRole('USER')")
+  public List<DatasetPublicFile> publicFiles() {
+    return datasetPublicFileRepository.findByExpiryDateGreaterThanEqual(LocalDate.now());
   }
 
   /**
@@ -356,6 +411,41 @@ public class DatasetService {
       }
     }
   }
+
+  /**
+   * Allows file to be accessible by anyone.
+   *
+   * @param dataset    file's dataset
+   * @param file       file
+   * @param expiryDate date when file stops being public
+   */
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public void allowPublicFileAccess(Dataset dataset, Path file, LocalDate expiryDate) {
+    Path relative = relativize(dataset, file);
+    DatasetPublicFile datasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        relative.toString()).orElseGet(() -> {
+      DatasetPublicFile newDatasetPublicFile = new DatasetPublicFile();
+      newDatasetPublicFile.setDataset(dataset);
+      newDatasetPublicFile.setPath(relative.toString());
+      return newDatasetPublicFile;
+    });
+    datasetPublicFile.setExpiryDate(expiryDate);
+    datasetPublicFileRepository.save(datasetPublicFile);
+  }
+
+  /**
+   * Revoke public access to file.
+   *
+   * @param dataset file's dataset
+   * @param file    file
+   */
+  @PreAuthorize("hasPermission(#dataset, 'write')")
+  public void revokePublicFileAccess(Dataset dataset, Path file) {
+    Path relative = relativize(dataset, file);
+    datasetPublicFileRepository.findByDatasetAndPath(dataset, relative.toString())
+        .ifPresent(datasetPublicFileRepository::delete);
+  }
+
 
   /**
    * Deletes dataset from database.

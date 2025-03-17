@@ -32,6 +32,8 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import jakarta.persistence.EntityManager;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +61,9 @@ import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -83,6 +88,8 @@ public class DatasetServiceTest {
   private ProtocolRepository protocolRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private DatasetPublicFileRepository datasetPublicFileRepository;
   @Autowired
   private EntityManager entityManager;
   @MockitoBean
@@ -1068,6 +1075,163 @@ public class DatasetServiceTest {
   }
 
   @Test
+  @WithAnonymousUser
+  public void publicFile_Home() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getHome().folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    Optional<Path> optionalPath = service.publicFile(dataset.getName(),
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertTrue(optionalPath.isPresent());
+    Path path = optionalPath.orElseThrow();
+    assertEquals(file, path);
+    assertTrue(Files.isRegularFile(path));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void publicFile_Archive() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getArchives().get(0).folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    Optional<Path> optionalPath = service.publicFile(dataset.getName(),
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertTrue(optionalPath.isPresent());
+    Path path = optionalPath.orElseThrow();
+    assertEquals(file, path);
+    assertTrue(Files.isRegularFile(path));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void publicFile_NotExist() throws IOException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getHome().folder(dataset);
+    Files.createDirectories(folder);
+
+    Optional<Path> optionalPath = service.publicFile(dataset.getName(),
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertFalse(optionalPath.isPresent());
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void publicFile_NotPublic() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("R1.fastq");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    Optional<Path> optionalPath = service.publicFile(dataset.getName(), "R1.fastq");
+
+    assertFalse(optionalPath.isPresent());
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void publicFile_NotPublicExpired() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    Optional<Path> optionalPath = service.publicFile(dataset.getName(),
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertFalse(optionalPath.isPresent());
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void publicFile_NotPublicExpiryDateToday() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now()));
+    Path folder = configuration.getHome().folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    Optional<Path> optionalPath = service.publicFile(dataset.getName(),
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertTrue(optionalPath.isPresent());
+    Path path = optionalPath.orElseThrow();
+    assertEquals(file, path);
+    assertTrue(Files.isRegularFile(path));
+  }
+
+  @Test
+  public void publicFiles() {
+    LocalDate expiryDate1 = LocalDate.now();
+    LocalDate expiryDate2 = LocalDate.now().plusDays(2);
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(expiryDate1));
+    datasetPublicFileRepository.findById(2L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(expiryDate2));
+
+    List<DatasetPublicFile> publicFiles = service.publicFiles();
+
+    assertEquals(2, publicFiles.size());
+    assertEquals(1, publicFiles.get(0).getId());
+    assertEquals(6, publicFiles.get(0).getDataset().getId());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw", publicFiles.get(0).getPath());
+    assertEquals(expiryDate1, publicFiles.get(0).getExpiryDate());
+    assertEquals(2, publicFiles.get(1).getId());
+    assertEquals(7, publicFiles.get(1).getDataset().getId());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw", publicFiles.get(1).getPath());
+    assertEquals(expiryDate2, publicFiles.get(1).getExpiryDate());
+  }
+
+  @Test
+  public void publicFiles_SomeExpired() {
+    LocalDate expiryDate1 = LocalDate.now();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(expiryDate1));
+
+    List<DatasetPublicFile> publicFiles = service.publicFiles();
+
+    assertEquals(1, publicFiles.size());
+    assertEquals(1, publicFiles.get(0).getId());
+    assertEquals(6, publicFiles.get(0).getDataset().getId());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw", publicFiles.get(0).getPath());
+    assertEquals(expiryDate1, publicFiles.get(0).getExpiryDate());
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void publicFiles_Anonymous() {
+    assertThrows(AccessDeniedException.class, () -> service.publicFiles());
+  }
+
+  @Test
   public void topKeywords() {
     List<String> keywords = service.topKeywords(4);
     assertEquals(4, keywords.size());
@@ -1557,6 +1721,103 @@ public class DatasetServiceTest {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void allowPublicFileAccess_NewFullPath() {
+    Dataset dataset = repository.findById(2L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+    Path file = folder.resolve("R1.fastq");
+    LocalDate expiryDate = LocalDate.now().plusDays(20);
+
+    service.allowPublicFileAccess(dataset, file, expiryDate);
+
+    DatasetPublicFile datasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "R1.fastq").orElseThrow();
+    assertNotEquals(0, datasetPublicFile.getId());
+    assertEquals(dataset, datasetPublicFile.getDataset());
+    assertEquals("R1.fastq", datasetPublicFile.getPath());
+    assertEquals(expiryDate, datasetPublicFile.getExpiryDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void allowPublicFileAccess_NewFilename() {
+    Dataset dataset = repository.findById(2L).orElseThrow();
+    LocalDate expiryDate = LocalDate.now().plusDays(20);
+
+    service.allowPublicFileAccess(dataset, Paths.get("R1.fastq"), expiryDate);
+
+    DatasetPublicFile datasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "R1.fastq").orElseThrow();
+    assertNotEquals(0, datasetPublicFile.getId());
+    assertEquals(dataset, datasetPublicFile.getDataset());
+    assertEquals("R1.fastq", datasetPublicFile.getPath());
+    assertEquals(expiryDate, datasetPublicFile.getExpiryDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void allowPublicFileAccess_ExistingFullPath() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    LocalDate expiryDate = LocalDate.now().plusDays(20);
+
+    service.allowPublicFileAccess(dataset, file, expiryDate);
+
+    DatasetPublicFile datasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw").orElseThrow();
+    assertEquals(1, datasetPublicFile.getId());
+    assertEquals(dataset, datasetPublicFile.getDataset());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw", datasetPublicFile.getPath());
+    assertEquals(expiryDate, datasetPublicFile.getExpiryDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void allowPublicFileAccess_ExistingFilename() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    LocalDate expiryDate = LocalDate.now().plusDays(20);
+
+    service.allowPublicFileAccess(dataset, Paths.get("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw"),
+        expiryDate);
+
+    DatasetPublicFile datasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw").orElseThrow();
+    assertEquals(1, datasetPublicFile.getId());
+    assertEquals(dataset, datasetPublicFile.getDataset());
+    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw", datasetPublicFile.getPath());
+    assertEquals(expiryDate, datasetPublicFile.getExpiryDate());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void revokePublicFileAccess_FullPath() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    assertTrue(datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw").isPresent());
+    Path folder = configuration.getHome().folder(dataset);
+
+    service.revokePublicFileAccess(dataset,
+        folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw"));
+
+    assertFalse(datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw").isPresent());
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void revokePublicFileAccess_Filename() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    assertTrue(datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw").isPresent());
+
+    service.revokePublicFileAccess(dataset, Paths.get("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw"));
+
+    assertFalse(datasetPublicFileRepository.findByDatasetAndPath(dataset,
+        "ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw").isPresent());
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 

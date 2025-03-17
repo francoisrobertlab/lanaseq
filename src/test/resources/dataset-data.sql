@@ -99,6 +99,11 @@ ALTER TABLE dataset_keywords ALTER COLUMN id RESTART WITH 9;
 INSERT INTO dataset_filenames (id,dataset_id,filenames)
 VALUES (1,2,'OF_20241118_ROB');
 ALTER TABLE dataset_filenames ALTER COLUMN id RESTART WITH 2;
+INSERT INTO dataset_public_file (id,dataset_id,path,expiry_date)
+VALUES (1,6,'ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw','2025-01-10');
+INSERT INTO dataset_public_file (id,dataset_id,path,expiry_date)
+VALUES (2,7,'ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw','2025-01-12');
+ALTER TABLE dataset_public_file ALTER COLUMN id RESTART WITH 3;
 INSERT INTO sample_keywords (id,sample_id,keywords)
 VALUES (1,1,'mnase');
 INSERT INTO sample_keywords (id,sample_id,keywords)
