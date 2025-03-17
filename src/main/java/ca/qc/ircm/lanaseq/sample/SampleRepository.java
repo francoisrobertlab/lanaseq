@@ -4,6 +4,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.core.types.Predicate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,8 +14,16 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 /**
  * Repository for {@link Sample}.
  */
-public interface SampleRepository
-    extends JpaRepository<Sample, Long>, QuerydslPredicateExecutor<Sample> {
+public interface SampleRepository extends JpaRepository<Sample, Long>,
+    QuerydslPredicateExecutor<Sample> {
+
+  /**
+   * Returns sample with specified name.
+   *
+   * @param name name
+   * @return sample with specified name
+   */
+  Optional<Sample> findByName(String name);
 
   boolean existsByName(String name);
 

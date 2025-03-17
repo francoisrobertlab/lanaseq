@@ -139,3 +139,8 @@ VALUES (1,4,'OF_20241118_ROB_01');
 INSERT INTO sample_filenames (id,sample_id,filenames)
 VALUES (2,5,'OF_20241118_ROB_02');
 ALTER TABLE sample_filenames ALTER COLUMN id RESTART WITH 3;
+INSERT INTO sample_public_file (id,sample_id,path,expiry_date)
+VALUES (1,10,'JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw','2025-01-13');
+INSERT INTO sample_public_file (id,sample_id,path,expiry_date)
+VALUES (2,11,'JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw','2025-01-15');
+ALTER TABLE sample_public_file ALTER COLUMN id RESTART WITH 3;
