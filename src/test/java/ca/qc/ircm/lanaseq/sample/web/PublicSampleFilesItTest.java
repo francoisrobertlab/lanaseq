@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.PublicSampleFiles.REST_MAPPING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
@@ -61,7 +62,7 @@ public class PublicSampleFilesItTest extends AbstractTestBenchTestCase {
     samplePublicFileRepository.save(samplePublicFile);
     TestTransaction.end();
 
-    openView("sample-file/" + sample.getName() + "/R1.fastq");
+    openView(REST_MAPPING + "/" + sample.getName() + "/R1.fastq");
 
     assertEquals(Files.readString(file1).replaceAll("\n", " "), $("body").waitForFirst().getText());
   }

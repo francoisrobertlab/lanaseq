@@ -1,5 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
+import static ca.qc.ircm.lanaseq.sample.web.PublicSampleFiles.REST_MAPPING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -48,9 +49,8 @@ public class PublicSampleFilesTest {
     String content = RandomStringUtils.insecure().nextAlphanumeric(200);
     Files.writeString(path, content);
     when(service.publicFile(any(), any())).thenReturn(Optional.of(path));
-    MvcTestResultAssert resultAssert = mvc.get()
-        .uri("/sample-file/" + sample.getName() + "/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw")
-        .assertThat();
+    MvcTestResultAssert resultAssert = mvc.get().uri("/" + REST_MAPPING + "/" + sample.getName()
+        + "/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw").assertThat();
     resultAssert.doesNotHaveFailed();
     resultAssert.hasContentType(MediaType.APPLICATION_JSON);
     resultAssert.apply(result -> {
@@ -63,9 +63,8 @@ public class PublicSampleFilesTest {
   void requestProtectedUrlWithUser_Empty() {
     when(service.publicFile(any(), any())).thenReturn(Optional.empty());
     Sample sample = repository.findById(10L).orElseThrow();
-    MvcTestResultAssert resultAssert = mvc.get()
-        .uri("/sample-file/" + sample.getName() + "/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw")
-        .assertThat();
+    MvcTestResultAssert resultAssert = mvc.get().uri("/" + REST_MAPPING + "/" + sample.getName()
+        + "/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw").assertThat();
     resultAssert.hasFailed();
     resultAssert.failure().isInstanceOf(ResourceNotFoundException.class);
   }
