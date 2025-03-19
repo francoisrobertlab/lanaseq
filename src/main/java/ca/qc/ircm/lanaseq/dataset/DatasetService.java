@@ -19,6 +19,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
@@ -189,7 +190,15 @@ public class DatasetService {
     return files;
   }
 
-  private Path relativize(Dataset dataset, Path path) {
+  /**
+   * Returns a path that is relative to a configured network drive.
+   *
+   * @param dataset dataset
+   * @param path    path
+   * @return path that is relative to a configured network drive
+   */
+  @PreAuthorize("hasPermission(#dataset, 'read')")
+  public Path relativize(Dataset dataset, Path path) {
     return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
         .map(drive -> drive.folder(dataset)).filter(path::startsWith)
         .map(folder -> folder.relativize(path)).findFirst()
@@ -275,7 +284,8 @@ public class DatasetService {
     Objects.requireNonNull(name, "name parameter cannot be null");
     Objects.requireNonNull(filename, "filename parameter cannot be null");
     Optional<Dataset> optionalDataset = repository.findByName(name);
-    if (optionalDataset.isEmpty() || !isFilePublic(optionalDataset.orElseThrow(), filename)) {
+    if (optionalDataset.isEmpty() || !isFilePublic(optionalDataset.orElseThrow(),
+        Paths.get(filename))) {
       return Optional.empty();
     }
     Dataset dataset = optionalDataset.orElseThrow();
@@ -284,9 +294,18 @@ public class DatasetService {
         .findFirst();
   }
 
-  private boolean isFilePublic(Dataset dataset, String filename) {
+  /**
+   * Returns true if dataset's file is accessible to the public, false otherwise.
+   *
+   * @param dataset dataset
+   * @param path    file
+   * @return true if dataset's file is accessible to the public, false otherwise
+   */
+  @AnonymousAllowed
+  public boolean isFilePublic(Dataset dataset, Path path) {
+    path = relativize(dataset, path);
     Optional<DatasetPublicFile> optionalDatasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(
-        dataset, filename);
+        dataset, path.toString());
     return optionalDatasetPublicFile.isPresent() && Range.leftUnbounded(
             Bound.inclusive(optionalDatasetPublicFile.orElseThrow().getExpiryDate()))
         .contains(LocalDate.now(), Comparator.naturalOrder());

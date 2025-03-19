@@ -25,9 +25,11 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -35,6 +37,8 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -58,6 +62,7 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -72,6 +77,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.FileSystemUtils;
+import org.vaadin.olli.ClipboardHelper;
 
 /**
  * Dataset dialog.
@@ -79,13 +85,14 @@ import org.springframework.util.FileSystemUtils;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
-    NotificationComponent {
+    NotificationComponent, UrlComponent {
 
   public static final String ID = "dataset-files-dialog";
   public static final String HEADER = "header";
   public static final String MESSAGE = "message";
   public static final String FOLDERS = "folders";
   public static final String FILES = "files";
+  public static final String PUBLIC_FILE = "publicFile";
   public static final String FILENAME = "filename";
   public static final String FILENAME_REGEX = "[\\w-\\.]*";
   public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
@@ -108,6 +115,7 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
   protected Grid<EditableFile> files = new Grid<>();
   protected Column<EditableFile> filename;
   protected Column<EditableFile> download;
+  protected Column<EditableFile> publicFile;
   protected Column<EditableFile> delete;
   protected TextField filenameEdit = new TextField();
   protected Grid<Sample> samples = new Grid<>();
@@ -184,6 +192,8 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
         .setComparator(Comparator.comparing(EditableFile::getFilename)).setFlexGrow(10);
     download = files.addColumn(new ComponentRenderer<>(this::downloadButton)).setKey(DOWNLOAD)
         .setSortable(false);
+    publicFile = files.addColumn(new ComponentRenderer<>(this::publicFileButton))
+        .setKey(PUBLIC_FILE).setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(this::deleteButton)).setKey(DELETE)
         .setSortable(false);
     filename.setEditorComponent(filenameEdit);
@@ -232,6 +242,26 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
     return anchor;
   }
 
+  private HorizontalLayout publicFileButton(EditableFile file) {
+    HorizontalLayout layout = new HorizontalLayout();
+    layout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+    layout.setSpacing(false);
+    layout.addClassName(PUBLIC_FILE);
+    boolean fileIsPublic = service.isFilePublic(dataset, file.getFile().toPath());
+    Checkbox checkbox = new Checkbox();
+    checkbox.setValue(fileIsPublic);
+    checkbox.addValueChangeListener(e -> changePublicFile(file, e.getValue()));
+    String publicFileUrl = configuration.getUrl(getUrl(
+        PublicDatasetFiles.publicDatasetFileUrl(dataset,
+            service.relativize(dataset, file.getFile().toPath()).toString())));
+    Button button = new Button();
+    ClipboardHelper clipboardHelper = new ClipboardHelper(publicFileUrl, button);
+    clipboardHelper.setVisible(fileIsPublic);
+    button.setIcon(VaadinIcon.COPY.create());
+    layout.add(checkbox, clipboardHelper);
+    return layout;
+  }
+
   private Button deleteButton(EditableFile file) {
     Button button = new Button();
     button.addClassName(DELETE);
@@ -253,6 +283,7 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
     message.setTitle("");
     filename.setHeader(getTranslation(MESSAGE_PREFIX + FILENAME));
     download.setHeader(getTranslation(CONSTANTS_PREFIX + DOWNLOAD));
+    publicFile.setHeader(getTranslation(MESSAGE_PREFIX + PUBLIC_FILE));
     delete.setHeader(getTranslation(CONSTANTS_PREFIX + DELETE));
     name.setHeader(getTranslation(SAMPLE_PREFIX + NAME));
     fileCount.setHeader(getTranslation(MESSAGE_PREFIX + FILE_COUNT));
@@ -321,27 +352,23 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
 
   public void addSmallFile(String filename, InputStream inputStream) {
     logger.debug("saving file {} to dataset {}", filename, dataset);
+    SecurityContextHolder.getContext()
+        .setAuthentication(authentication); // Sets user for current thread.
     try {
-      SecurityContextHolder.getContext()
-          .setAuthentication(authentication); // Sets user for current thread.
+      Path folder = Files.createTempDirectory("lanaseq-dataset-");
       try {
-        Path folder = Files.createTempDirectory("lanaseq-dataset-");
-        try {
-          Path file = folder.resolve(filename);
-          Files.copy(inputStream, file);
-          service.saveFiles(dataset, Collections.nCopies(1, file));
-          showNotification(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
-        } finally {
-          FileSystemUtils.deleteRecursively(folder);
-        }
-      } catch (IOException | IllegalStateException e) {
-        showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
-        return;
+        Path file = folder.resolve(filename);
+        Files.copy(inputStream, file);
+        service.saveFiles(dataset, Collections.nCopies(1, file));
+        showNotification(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
+      } finally {
+        FileSystemUtils.deleteRecursively(folder);
       }
-      updateFiles();
-    } finally {
-      SecurityContextHolder.getContext().setAuthentication(null); // Unset user for current thread.
+    } catch (IOException | IllegalStateException e) {
+      showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
+      return;
     }
+    updateFiles();
   }
 
   void addLargeFiles() {
@@ -368,6 +395,16 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
   StreamResource download(EditableFile file) {
     return new StreamResource(file.getFilename(),
         (output, session) -> Files.copy(file.getFile().toPath(), output));
+  }
+
+  void changePublicFile(EditableFile file, boolean makePublic) {
+    if (makePublic) {
+      service.allowPublicFileAccess(dataset, file.getFile().toPath(),
+          LocalDate.now().plus(configuration.getPublicFilePeriod()));
+    } else {
+      service.revokePublicFileAccess(dataset, file.getFile().toPath());
+    }
+    files.getDataProvider().refreshItem(file);
   }
 
   void deleteFile(EditableFile file) {

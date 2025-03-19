@@ -51,7 +51,7 @@ public class PublicSampleFiles {
       return new FileSystemResource(optionalFile.orElseThrow());
     } else {
       throw new ResourceNotFoundException(
-          "Public file " + filename + " of dataset " + name + " not found");
+          "Public file " + filename + " of sample " + name + " not found");
     }
   }
 

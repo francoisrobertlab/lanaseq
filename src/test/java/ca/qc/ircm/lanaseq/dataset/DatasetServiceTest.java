@@ -876,6 +876,61 @@ public class DatasetServiceTest {
   }
 
   @Test
+  public void relativize_Home() {
+    Dataset dataset = repository.findById(1L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+
+    assertEquals(Paths.get("file.txt"), service.relativize(dataset, folder.resolve("file.txt")));
+    assertEquals(Paths.get("sub_folder/file.txt"),
+        service.relativize(dataset, folder.resolve("sub_folder/file.txt")));
+    verify(permissionEvaluator, times(2)).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void relativize_Archives1() {
+    Dataset dataset = repository.findById(1L).orElseThrow();
+    Path folder = configuration.getArchives().get(0).folder(dataset);
+
+    assertEquals(Paths.get("file.txt"), service.relativize(dataset, folder.resolve("file.txt")));
+    assertEquals(Paths.get("sub_folder/file.txt"),
+        service.relativize(dataset, folder.resolve("sub_folder/file.txt")));
+    verify(permissionEvaluator, times(2)).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void relativize_Archives2() {
+    Dataset dataset = repository.findById(1L).orElseThrow();
+    Path folder = configuration.getArchives().get(1).folder(dataset);
+
+    assertEquals(Paths.get("file.txt"), service.relativize(dataset, folder.resolve("file.txt")));
+    assertEquals(Paths.get("sub_folder/file.txt"),
+        service.relativize(dataset, folder.resolve("sub_folder/file.txt")));
+    verify(permissionEvaluator, times(2)).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void relativize_OutsideHomeAndArchive() {
+    Dataset dataset = repository.findById(1L).orElseThrow();
+    Path folder = temporaryFolder.resolve("unrelated_folder");
+
+    assertEquals(folder.resolve("file.txt"),
+        service.relativize(dataset, folder.resolve("file.txt")));
+    assertEquals(folder.resolve("sub_folder/file.txt"),
+        service.relativize(dataset, folder.resolve("sub_folder/file.txt")));
+    verify(permissionEvaluator, times(2)).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
+  public void relativize_RelativeAlready() {
+    Dataset dataset = repository.findById(1L).orElseThrow();
+
+    assertEquals(Paths.get("file.txt"), service.relativize(dataset, Paths.get("file.txt")));
+    assertEquals(Paths.get("sub_folder/file.txt"),
+        service.relativize(dataset, Paths.get("sub_folder/file.txt")));
+    verify(permissionEvaluator, times(2)).hasPermission(any(), eq(dataset), eq(READ));
+  }
+
+  @Test
   public void folderLabels() throws Throwable {
     Dataset dataset = repository.findById(1L).orElseThrow();
     Path folder = configuration.getHome().folder(dataset);
@@ -1186,6 +1241,101 @@ public class DatasetServiceTest {
     Path path = optionalPath.orElseThrow();
     assertEquals(file, path);
     assertTrue(Files.isRegularFile(path));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_Home_Exists() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getHome().folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    assertTrue(service.isFilePublic(dataset, file));
+    assertTrue(service.isFilePublic(dataset, file.getFileName()));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_Home_NotExists() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getHome().folder(dataset);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertTrue(service.isFilePublic(dataset, file));
+    assertTrue(service.isFilePublic(dataset, file.getFileName()));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_Archive_Exists() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getArchives().get(0).folder(dataset);
+    Files.createDirectories(folder);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
+        StandardCopyOption.REPLACE_EXISTING);
+
+    assertTrue(service.isFilePublic(dataset, file));
+    assertTrue(service.isFilePublic(dataset, file.getFileName()));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_Archive_NotExists() throws IOException, URISyntaxException {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
+    Path folder = configuration.getArchives().get(0).folder(dataset);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertTrue(service.isFilePublic(dataset, file));
+    assertTrue(service.isFilePublic(dataset, file.getFileName()));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_NotPublic() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+    Path file = folder.resolve("R1.fastq");
+
+    assertFalse(service.isFilePublic(dataset, file));
+    assertFalse(service.isFilePublic(dataset, file.getFileName()));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_NotPublicExpired() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    Path folder = configuration.getHome().folder(dataset);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertFalse(service.isFilePublic(dataset, file));
+    assertFalse(service.isFilePublic(dataset, file.getFileName()));
+  }
+
+  @Test
+  @WithAnonymousUser
+  public void isFilePublic_NotPublicExpiredToday() {
+    Dataset dataset = repository.findById(6L).orElseThrow();
+    datasetPublicFileRepository.findById(1L)
+        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now()));
+    Path folder = configuration.getHome().folder(dataset);
+    Path file = folder.resolve("ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
+
+    assertTrue(service.isFilePublic(dataset, file));
+    assertTrue(service.isFilePublic(dataset, file.getFileName()));
   }
 
   @Test
