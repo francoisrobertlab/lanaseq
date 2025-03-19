@@ -14,6 +14,7 @@ import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.UploadI18N;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
+import org.vaadin.olli.ClipboardHelper;
 
 /**
  * Utility methods for presenter testign.
@@ -60,8 +62,8 @@ public class VaadinTestUtils {
       method.setAccessible(true);
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(component);
       eventBus.fireEvent(event);
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-             | IllegalArgumentException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+             IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -77,8 +79,8 @@ public class VaadinTestUtils {
       method.setAccessible(true);
       ComponentEventBus eventBus = (ComponentEventBus) method.invoke(button);
       eventBus.fireEvent(new ClickEvent<>(button));
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-             | IllegalArgumentException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+             IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -100,8 +102,7 @@ public class VaadinTestUtils {
    *                 <code>false</code> otherwise
    */
   public static <E> void clickItem(Grid<E> grid, E item, @Nullable Grid.Column<E> column,
-      boolean ctrlKey,
-      boolean shiftKey, boolean altKey, boolean metaKey) {
+      boolean ctrlKey, boolean shiftKey, boolean altKey, boolean metaKey) {
     try {
       String key = grid.getDataCommunicator().getKeyMapper().key(item);
       Method method = Component.class.getDeclaredMethod("getEventBus");
@@ -110,8 +111,8 @@ public class VaadinTestUtils {
       eventBus.fireEvent(new ItemClickEvent<>(grid, false, key,
           column != null ? column.getElement().getProperty("_flowId") : null, -1, -1, -1, -1, 2, 0,
           ctrlKey, shiftKey, altKey, metaKey));
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-             | IllegalArgumentException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+             IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -141,8 +142,8 @@ public class VaadinTestUtils {
       eventBus.fireEvent(new ItemDoubleClickEvent<>(grid, false, itemKey,
           column != null ? column.getElement().getProperty("_flowId") : null, -1, -1, -1, -1, 2, 0,
           false, false, false, false));
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-             | IllegalArgumentException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+             IllegalArgumentException | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -158,8 +159,8 @@ public class VaadinTestUtils {
       Field field = LitRenderer.class.getDeclaredField("templateExpression");
       field.setAccessible(true);
       return (String) field.get(renderer);
-    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-             | IllegalAccessException e) {
+    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
+             IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -171,17 +172,16 @@ public class VaadinTestUtils {
    * @param renderer renderer
    * @return all registered properties of this renderer
    */
-  public static <SOURCE> Map<String, ValueProvider<SOURCE, ?>>
-  properties(LitRenderer<SOURCE> renderer) {
+  public static <SOURCE> Map<String, ValueProvider<SOURCE, ?>> properties(
+      LitRenderer<SOURCE> renderer) {
     try {
       Field field = LitRenderer.class.getDeclaredField("valueProviders");
       field.setAccessible(true);
-      @SuppressWarnings("unchecked")
-      Map<String, ValueProvider<SOURCE, ?>> properties =
-          (Map<String, ValueProvider<SOURCE, ?>>) field.get(renderer);
+      @SuppressWarnings("unchecked") Map<String, ValueProvider<SOURCE, ?>> properties = (Map<String, ValueProvider<SOURCE, ?>>) field.get(
+          renderer);
       return properties;
-    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-             | IllegalAccessException e) {
+    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
+             IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -193,17 +193,16 @@ public class VaadinTestUtils {
    * @param renderer renderer
    * @return all registered functions of this renderer
    */
-  public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, JsonArray>>
-  functions(LitRenderer<SOURCE> renderer) {
+  public static <SOURCE> Map<String, SerializableBiConsumer<SOURCE, JsonArray>> functions(
+      LitRenderer<SOURCE> renderer) {
     try {
       Field field = LitRenderer.class.getDeclaredField("clientCallables");
       field.setAccessible(true);
-      @SuppressWarnings("unchecked")
-      Map<String, SerializableBiConsumer<SOURCE, JsonArray>> functions =
-          (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(renderer);
+      @SuppressWarnings("unchecked") Map<String, SerializableBiConsumer<SOURCE, JsonArray>> functions = (Map<String, SerializableBiConsumer<SOURCE, JsonArray>>) field.get(
+          renderer);
       return functions;
-    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException
-             | IllegalAccessException e) {
+    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
+             IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -257,18 +256,18 @@ public class VaadinTestUtils {
     }
   }
 
-  public static Optional<BindingValidationStatus<?>>
-  findValidationStatusByField(BinderValidationStatus<?> statuses, HasValue<?, ?> field) {
+  public static Optional<BindingValidationStatus<?>> findValidationStatusByField(
+      BinderValidationStatus<?> statuses, HasValue<?, ?> field) {
     return findValidationStatusByField(statuses.getFieldValidationErrors(), field);
   }
 
-  public static Optional<BindingValidationStatus<?>>
-  findValidationStatusByField(ValidationException e, HasValue<?, ?> field) {
+  public static Optional<BindingValidationStatus<?>> findValidationStatusByField(
+      ValidationException e, HasValue<?, ?> field) {
     return findValidationStatusByField(e.getFieldValidationErrors(), field);
   }
 
-  public static Optional<BindingValidationStatus<?>>
-  findValidationStatusByField(List<BindingValidationStatus<?>> statuses, HasValue<?, ?> field) {
+  public static Optional<BindingValidationStatus<?>> findValidationStatusByField(
+      List<BindingValidationStatus<?>> statuses, HasValue<?, ?> field) {
     return statuses.stream().filter(ve -> ve.getField().equals(field)).findFirst();
   }
 
@@ -298,15 +297,32 @@ public class VaadinTestUtils {
       getValueProvider.setAccessible(true);
       ValueProvider<T, ?> vp = (ValueProvider<T, ?>) getValueProvider.invoke(renderer);
       Object value = vp.apply(item);
-      Method getFormattedValue =
-          BasicRenderer.class.getDeclaredMethod("getFormattedValue", Object.class);
+      Method getFormattedValue = BasicRenderer.class.getDeclaredMethod("getFormattedValue",
+          Object.class);
       getFormattedValue.setAccessible(true);
       return (String) getFormattedValue.invoke(renderer, value);
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-             | IllegalArgumentException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+             IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Cannot get formatted value for renderer {} and item {}", renderer, item, e);
       throw new IllegalArgumentException(
           "Cannot get formatted value for renderer " + renderer + " and item " + item, e);
+    }
+  }
+
+  /**
+   * Returns wrapper from ClipboardHelper instance.
+   *
+   * @param clipboardHelper ClipboardHelper instance
+   * @return wrapper from ClipboardHelper instance
+   */
+  public static Div clipboardHelperWrapper(ClipboardHelper clipboardHelper) {
+    try {
+      Field componentWrapperField = ClipboardHelper.class.getDeclaredField("componentWrapper");
+      componentWrapperField.setAccessible(true);
+      return (Div) componentWrapperField.get(clipboardHelper);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw new IllegalStateException(
+          "Could not get componentWrapper field value from " + clipboardHelper);
     }
   }
 

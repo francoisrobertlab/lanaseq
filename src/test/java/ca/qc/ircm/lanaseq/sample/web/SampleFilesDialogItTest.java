@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
+import ca.qc.ircm.lanaseq.sample.SamplePublicFile;
+import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
@@ -21,10 +23,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.transaction.TestTransaction;
 
 /**
  * Integration tests for {@link SampleFilesDialog}.
@@ -49,6 +54,8 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
   Path temporaryFolder;
   @Autowired
   private SampleRepository repository;
+  @Autowired
+  private SamplePublicFileRepository samplePublicFileRepository;
   @Autowired
   private AppConfiguration configuration;
   @Autowired
@@ -131,8 +138,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Thread.sleep(1000); // Allow time to apply changes to files.
 
     assertTrue(Files.exists(file.resolveSibling(sample.getName() + "_R1.fastq")));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(file.resolveSibling(sample.getName() + "_R1.fastq")));
     assertFalse(Files.exists(file));
@@ -168,6 +174,33 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     } finally {
       Files.delete(downloaded);
     }
+  }
+
+  @Test
+  public void publicFile() throws Throwable {
+    Sample sample = repository.findById(10L).orElseThrow();
+    Path home = configuration.getHome().folder(sample);
+    Files.createDirectories(home);
+    Path file1 = home.resolve("R1.fastq");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file1);
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
+    view.samples().controlClick(1);
+    SampleFilesDialogElement dialog = view.filesDialog();
+
+    TestTransaction.flagForCommit();
+    dialog.files().publicFileCheckbox(0).setChecked(true);
+    Thread.sleep(1000); // Wait for insert to complete.
+    TestTransaction.end();
+
+    Optional<SamplePublicFile> optionalSamplePublicFile = samplePublicFileRepository.findBySampleAndPath(
+        sample, "R1.fastq");
+    assertTrue(optionalSamplePublicFile.isPresent());
+    SamplePublicFile samplePublicFile = optionalSamplePublicFile.orElseThrow();
+    assertEquals(LocalDate.now().plus(configuration.getPublicFilePeriod()),
+        samplePublicFile.getExpiryDate());
   }
 
   @Test
@@ -234,12 +267,12 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     dialog.upload().upload(file1.toFile());
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS,
-        new Object[]{file1.getFileName()}, currentLocale()), notification.getText());
+    assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS, new Object[]{file1.getFileName()},
+            currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
   }

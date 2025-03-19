@@ -21,6 +21,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
@@ -190,7 +191,14 @@ public class SampleService {
     return files;
   }
 
-  private Path relativize(Sample sample, Path path) {
+  /**
+   * Returns a path that is relative to a configured network drive.
+   *
+   * @param sample sample
+   * @param path   path
+   * @return path that is relative to a configured network drive
+   */
+  public Path relativize(Sample sample, Path path) {
     return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
         .map(drive -> drive.folder(sample)).filter(path::startsWith)
         .map(folder -> folder.relativize(path)).findFirst()
@@ -276,7 +284,8 @@ public class SampleService {
     Objects.requireNonNull(name, "name parameter cannot be null");
     Objects.requireNonNull(filename, "filename parameter cannot be null");
     Optional<Sample> optionalSample = repository.findByName(name);
-    if (optionalSample.isEmpty() || !isFilePublic(optionalSample.orElseThrow(), filename)) {
+    if (optionalSample.isEmpty() || !isFilePublic(optionalSample.orElseThrow(),
+        Paths.get(filename))) {
       return Optional.empty();
     }
     Sample sample = optionalSample.orElseThrow();
@@ -285,9 +294,17 @@ public class SampleService {
         .findFirst();
   }
 
-  private boolean isFilePublic(Sample sample, String filename) {
+  /**
+   * Returns true if sample's file is accessible to the public, false otherwise.
+   *
+   * @param sample sample
+   * @param path   file
+   * @return true if sample's file is accessible to the public, false otherwise
+   */
+  public boolean isFilePublic(Sample sample, Path path) {
+    path = relativize(sample, path);
     Optional<SamplePublicFile> optionalSamplePublicFile = samplePublicFileRepository.findBySampleAndPath(
-        sample, filename);
+        sample, path.toString());
     return optionalSamplePublicFile.isPresent() && Range.leftUnbounded(
             Bound.inclusive(optionalSamplePublicFile.orElseThrow().getExpiryDate()))
         .contains(LocalDate.now(), Comparator.naturalOrder());

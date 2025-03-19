@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -232,8 +233,7 @@ public class AppConfigurationTest {
     String name = sample.getName();
     assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getSampleFolder())
         .resolve("2019/" + name), appConfiguration.getArchives().get(0).folder(sample));
-    assertEquals(
-        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
             .resolve(appConfiguration.getSampleFolder()).resolve("2019/" + name),
         appConfiguration.getArchives().get(1).folder(sample));
   }
@@ -252,8 +252,7 @@ public class AppConfigurationTest {
     String name = sample.getName();
     assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getSampleFolder())
         .resolve("2020/" + name), appConfiguration.getArchives().get(0).folder(sample));
-    assertEquals(
-        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
             .resolve(appConfiguration.getSampleFolder()).resolve("2020/" + name),
         appConfiguration.getArchives().get(1).folder(sample));
   }
@@ -264,8 +263,7 @@ public class AppConfigurationTest {
     String name = dataset.getName();
     assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getDatasetFolder())
         .resolve("2019/" + name), appConfiguration.getArchives().get(0).folder(dataset));
-    assertEquals(
-        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
             .resolve(appConfiguration.getDatasetFolder()).resolve("2019/" + name),
         appConfiguration.getArchives().get(1).folder(dataset));
   }
@@ -290,8 +288,7 @@ public class AppConfigurationTest {
     String name = dataset.getName();
     assertEquals(homeFolder().resolve("archives").resolve(appConfiguration.getDatasetFolder())
         .resolve("2020/" + name), appConfiguration.getArchives().get(0).folder(dataset));
-    assertEquals(
-        Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
+    assertEquals(Paths.get(System.getProperty("user.home"), "lanaseq2", "archives2")
             .resolve(appConfiguration.getDatasetFolder()).resolve("2020/" + name),
         appConfiguration.getArchives().get(1).folder(dataset));
   }
@@ -334,8 +331,7 @@ public class AppConfigurationTest {
 
   @Test
   public void getAnalysis() {
-    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysis =
-        appConfiguration.getAnalysis();
+    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysis = appConfiguration.getAnalysis();
     assertEquals(homeFolder().resolve("analysis"), analysis.getFolder());
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis", analysis.getWindowsLabel());
     assertEquals("smb://lanaseq01/lanaseq/analysis", analysis.getUnixLabel());
@@ -372,8 +368,8 @@ public class AppConfigurationTest {
 
   @Test
   public void analysis_Samples() {
-    Collection<Sample> samples =
-        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    Collection<Sample> samples = datasets().stream().flatMap(ds -> ds.getSamples().stream())
+        .collect(Collectors.toList());
     Path path = appConfiguration.getAnalysis().folder(samples);
     assertEquals(analysisFolder().resolve("jonh_ChIPseq_20191208"), path);
   }
@@ -431,16 +427,16 @@ public class AppConfigurationTest {
 
   @Test
   public void analysisLabel_Samples() {
-    Collection<Sample> samples =
-        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    Collection<Sample> samples = datasets().stream().flatMap(ds -> ds.getSamples().stream())
+        .collect(Collectors.toList());
     assertEquals("\\\\lanaseq01\\lanaseq\\analysis\\jonh_ChIPseq_20191208",
         appConfiguration.getAnalysis().label(samples, false));
   }
 
   @Test
   public void analysisLabel_SamplesUnix() {
-    Collection<Sample> samples =
-        datasets().stream().flatMap(ds -> ds.getSamples().stream()).collect(Collectors.toList());
+    Collection<Sample> samples = datasets().stream().flatMap(ds -> ds.getSamples().stream())
+        .collect(Collectors.toList());
     assertEquals("smb://lanaseq01/lanaseq/analysis/jonh_ChIPseq_20191208",
         appConfiguration.getAnalysis().label(samples, true));
   }
@@ -522,6 +518,11 @@ public class AppConfigurationTest {
   @Test
   public void getUploadDeleteAge() {
     assertEquals(Duration.ofHours(6), appConfiguration.getUploadDeleteAge());
+  }
+
+  @Test
+  public void getPublicFilePeriod() {
+    assertEquals(Period.ofDays(60), appConfiguration.getPublicFilePeriod());
   }
 
   @Test

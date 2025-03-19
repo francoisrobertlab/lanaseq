@@ -126,15 +126,13 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       writeFile(file.toPath(), random.nextInt(10) * 1024 ^ 2);
     }
     folder = temporaryFolder.resolve("sample");
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> homeFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getHome()).thenReturn(homeFolder);
-    when(configuration.getHome().folder(any(Sample.class)))
-        .thenReturn(temporaryFolder.resolve("home"));
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    when(configuration.getHome().folder(any(Sample.class))).thenReturn(
+        temporaryFolder.resolve("home"));
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Sample.class))).thenReturn(folder);
     when(configuration.getUpload().label(any(Sample.class), anyBoolean())).then(i -> {
@@ -144,8 +142,9 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
     });
     when(service.uploadFiles(any())).thenReturn(
         files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
-    when(service.files(any()))
-        .thenReturn(files.subList(0, 2).stream().map(File::toPath).collect(Collectors.toList()));
+    when(service.files(any())).thenReturn(
+        files.subList(0, 2).stream().map(File::toPath).collect(Collectors.toList()));
+    when(service.relativize(any(), any())).then(i -> i.getArgument(1));
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
     view.samples.setItems(repository.findAll());
@@ -156,8 +155,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   }
 
   private void writeFile(Path file, long size) throws IOException {
-    try (OutputStream output =
-        new BufferedOutputStream(Files.newOutputStream(file, StandardOpenOption.CREATE))) {
+    try (OutputStream output = new BufferedOutputStream(
+        Files.newOutputStream(file, StandardOpenOption.CREATE))) {
       long written = 0;
       byte[] buff = new byte[1024];
       while (written < size) {
@@ -242,8 +241,7 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
       assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
-      assertEquals(
-          dialog.getTranslation(MESSAGE_PREFIX + AddSampleFilesDialog.SIZE_VALUE,
+      assertEquals(dialog.getTranslation(MESSAGE_PREFIX + AddSampleFilesDialog.SIZE_VALUE,
               file.length() / 1048576),
           test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
       assertInstanceOf(Checkbox.class,
@@ -267,8 +265,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       dialog.overwrite(file);
     }
     dialog.overwriteAll.setValue(true);
-    ComponentValueChangeEvent<Checkbox, Boolean> event =
-        new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
+    ComponentValueChangeEvent<Checkbox, Boolean> event = new ComponentValueChangeEvent<>(
+        dialog.overwriteAll, dialog.overwriteAll, false, true);
     fireEvent(dialog.overwriteAll, event);
     for (File file : files) {
       Checkbox checkbox = dialog.overwrite(file);
@@ -283,8 +281,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       checkbox.setValue(true);
     }
     dialog.overwriteAll.setValue(true);
-    ComponentValueChangeEvent<Checkbox, Boolean> event =
-        new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
+    ComponentValueChangeEvent<Checkbox, Boolean> event = new ComponentValueChangeEvent<>(
+        dialog.overwriteAll, dialog.overwriteAll, false, true);
     fireEvent(dialog.overwriteAll, event);
     dialog.overwriteAll.setValue(false);
     event = new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, true, true);
@@ -301,8 +299,8 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
       dialog.overwrite(file);
     }
     dialog.overwriteAll.setValue(true);
-    ComponentValueChangeEvent<Checkbox, Boolean> event =
-        new ComponentValueChangeEvent<>(dialog.overwriteAll, dialog.overwriteAll, false, true);
+    ComponentValueChangeEvent<Checkbox, Boolean> event = new ComponentValueChangeEvent<>(
+        dialog.overwriteAll, dialog.overwriteAll, false, true);
     fireEvent(dialog.overwriteAll, event);
     dialog.overwrite(files.get(0)).setValue(false);
     assertFalse(dialog.overwriteAll.getValue());
@@ -393,11 +391,10 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void updateFiles() {
-    when(service.uploadFiles(any()))
-        .thenReturn(files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
-            .collect(Collectors.toList()))
-        .thenReturn(
-            files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    when(service.uploadFiles(any())).thenReturn(
+        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList())).thenReturn(
+        files.stream().map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
     Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
 
     test(dialog.refresh).click();
@@ -471,8 +468,9 @@ public class AddSampleFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void save() {
     when(service.files(any())).thenReturn(new ArrayList<>());
-    when(service.uploadFiles(any())).thenReturn(files.subList(0, 2).stream()
-        .map(file -> folder.resolve(file.toPath())).collect(Collectors.toList()));
+    when(service.uploadFiles(any())).thenReturn(
+        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList()));
     dialog.addSavedListener(savedListener);
     Sample sample = repository.findById(1L).orElseThrow();
     dialog.setSampleId(1L);
