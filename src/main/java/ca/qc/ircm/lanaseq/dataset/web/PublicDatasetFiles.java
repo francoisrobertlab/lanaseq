@@ -45,7 +45,7 @@ public class PublicDatasetFiles {
   @ResponseBody
   public FileSystemResource publicDatasetFile(@PathVariable String name,
       @PathVariable String filename) {
-    logger.debug("Trying to access public file {} of sample {}", filename, name);
+    logger.debug("Trying to access public file {} of dataset {}", filename, name);
     Optional<Path> optionalFile = service.publicFile(name, filename);
     if (optionalFile.isPresent()) {
       return new FileSystemResource(optionalFile.orElseThrow());

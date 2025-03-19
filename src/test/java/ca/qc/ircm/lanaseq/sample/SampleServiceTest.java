@@ -1177,8 +1177,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void publicFile_Home() throws IOException, URISyntaxException {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
@@ -1199,8 +1197,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void publicFile_Archive() throws IOException, URISyntaxException {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getArchives().get(0).folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
@@ -1221,8 +1217,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void publicFile_NotExist() throws IOException {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
 
@@ -1254,13 +1248,13 @@ public class SampleServiceTest {
     Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
-    Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
+    Path file = folder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_expired.bw");
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()), file,
         StandardCopyOption.REPLACE_EXISTING);
 
     Optional<Path> optionalPath = service.publicFile(sample.getName(),
-        "JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
+        "JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_expired.bw");
 
     assertFalse(optionalPath.isPresent());
   }
@@ -1291,8 +1285,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void isFilePublic_Home_Exists() throws IOException, URISyntaxException {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getHome().folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
@@ -1308,8 +1300,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void isFilePublic_Home_NotExists() {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getHome().folder(sample);
     Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
 
@@ -1321,8 +1311,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void isFilePublic_Archive_Exists() throws IOException, URISyntaxException {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getArchives().get(0).folder(sample);
     Files.createDirectories(folder);
     Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
@@ -1338,8 +1326,6 @@ public class SampleServiceTest {
   @WithAnonymousUser
   public void isFilePublic_Archive_NotExists() throws IOException, URISyntaxException {
     Sample sample = repository.findById(10L).orElseThrow();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(LocalDate.now().plusDays(2)));
     Path folder = configuration.getArchives().get(0).folder(sample);
     Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
 
@@ -1363,7 +1349,7 @@ public class SampleServiceTest {
   public void isFilePublic_NotPublicExpired() {
     Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
-    Path file = folder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
+    Path file = folder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_expired.bw");
 
     assertFalse(service.isFilePublic(sample, file));
     assertFalse(service.isFilePublic(sample, file.getFileName()));
@@ -1403,21 +1389,6 @@ public class SampleServiceTest {
     assertEquals(11, publicFiles.get(1).getSample().getId());
     assertEquals("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw", publicFiles.get(1).getPath());
     assertEquals(expiryDate2, publicFiles.get(1).getExpiryDate());
-  }
-
-  @Test
-  public void publicFiles_SomeExpired() {
-    LocalDate expiryDate1 = LocalDate.now();
-    samplePublicFileRepository.findById(1L)
-        .ifPresent(publicFile -> publicFile.setExpiryDate(expiryDate1));
-
-    List<SamplePublicFile> publicFiles = service.publicFiles();
-
-    assertEquals(1, publicFiles.size());
-    assertEquals(1, publicFiles.get(0).getId());
-    assertEquals(10, publicFiles.get(0).getSample().getId());
-    assertEquals("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw", publicFiles.get(0).getPath());
-    assertEquals(expiryDate1, publicFiles.get(0).getExpiryDate());
   }
 
   @Test

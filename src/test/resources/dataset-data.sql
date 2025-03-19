@@ -100,10 +100,12 @@ INSERT INTO dataset_filenames (id,dataset_id,filenames)
 VALUES (1,2,'OF_20241118_ROB');
 ALTER TABLE dataset_filenames ALTER COLUMN id RESTART WITH 2;
 INSERT INTO dataset_public_file (id,dataset_id,path,expiry_date)
-VALUES (1,6,'ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw','2025-01-10');
+VALUES (1,6,'ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw',DATEADD(DAY, 10, CURRENT_DATE));
 INSERT INTO dataset_public_file (id,dataset_id,path,expiry_date)
-VALUES (2,7,'ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw','2025-01-12');
-ALTER TABLE dataset_public_file ALTER COLUMN id RESTART WITH 3;
+VALUES (2,7,'ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw',DATEADD(DAY, 12, CURRENT_DATE));
+INSERT INTO dataset_public_file (id,dataset_id,path,expiry_date)
+VALUES (3,7,'ChIPseq_Spt16_yFR101_G24D_JS3_20181211_expired.bw','2024-12-19');
+ALTER TABLE dataset_public_file ALTER COLUMN id RESTART WITH 4;
 INSERT INTO sample_keywords (id,sample_id,keywords)
 VALUES (1,1,'mnase');
 INSERT INTO sample_keywords (id,sample_id,keywords)
@@ -145,7 +147,9 @@ INSERT INTO sample_filenames (id,sample_id,filenames)
 VALUES (2,5,'OF_20241118_ROB_02');
 ALTER TABLE sample_filenames ALTER COLUMN id RESTART WITH 3;
 INSERT INTO sample_public_file (id,sample_id,path,expiry_date)
-VALUES (1,10,'JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw','2025-01-13');
+VALUES (1,10,'JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw',DATEADD(DAY, 15, CURRENT_DATE));
 INSERT INTO sample_public_file (id,sample_id,path,expiry_date)
-VALUES (2,11,'JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw','2025-01-15');
-ALTER TABLE sample_public_file ALTER COLUMN id RESTART WITH 3;
+VALUES (2,11,'JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw',DATEADD(DAY, 17, CURRENT_DATE));
+INSERT INTO sample_public_file (id,sample_id,path,expiry_date)
+VALUES (3,11,'JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_expired.bw','2024-12-20');
+ALTER TABLE sample_public_file ALTER COLUMN id RESTART WITH 5;

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.sample.SamplePublicFile;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
@@ -13,14 +12,12 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.test.context.transaction.TestTransaction;
 
 /**
  * Integration tests for {@link PublicSampleFiles}.
@@ -50,19 +47,13 @@ public class PublicSampleFilesItTest extends AbstractTestBenchTestCase {
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
     Files.createDirectories(home);
-    Path file1 = home.resolve("R1.fastq");
+    Path file1 = home.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file1);
-    SamplePublicFile samplePublicFile = new SamplePublicFile();
-    samplePublicFile.setSample(sample);
-    samplePublicFile.setPath("R1.fastq");
-    samplePublicFile.setExpiryDate(LocalDate.now().plusDays(1));
-    TestTransaction.flagForCommit();
-    samplePublicFileRepository.save(samplePublicFile);
-    TestTransaction.end();
 
-    openView(REST_MAPPING + "/" + sample.getName() + "/R1.fastq");
+    openView(
+        REST_MAPPING + "/" + sample.getName() + "/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw");
 
     assertEquals(Files.readString(file1).replaceAll("\n", " "), $("body").waitForFirst().getText());
   }
