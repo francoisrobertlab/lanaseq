@@ -309,27 +309,23 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver,
 
   void addSmallFile(String filename, InputStream inputStream) {
     logger.debug("saving file {} to dataset {}", filename, sample);
+    SecurityContextHolder.getContext()
+        .setAuthentication(authentication); // Sets user for current thread.
     try {
-      SecurityContextHolder.getContext()
-          .setAuthentication(authentication); // Sets user for current thread.
+      Path folder = Files.createTempDirectory("lanaseq-dataset-");
       try {
-        Path folder = Files.createTempDirectory("lanaseq-dataset-");
-        try {
-          Path file = folder.resolve(filename);
-          Files.copy(inputStream, file);
-          service.saveFiles(sample, Collections.nCopies(1, file));
-          showNotification(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
-        } finally {
-          FileSystemUtils.deleteRecursively(folder);
-        }
-      } catch (IOException | IllegalStateException e) {
-        showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
-        return;
+        Path file = folder.resolve(filename);
+        Files.copy(inputStream, file);
+        service.saveFiles(sample, Collections.nCopies(1, file));
+        showNotification(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
+      } finally {
+        FileSystemUtils.deleteRecursively(folder);
       }
-      updateFiles();
-    } finally {
-      SecurityContextHolder.getContext().setAuthentication(null); // Unset user for current thread.
+    } catch (IOException | IllegalStateException e) {
+      showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
+      return;
     }
+    updateFiles();
   }
 
   void addLargeFiles() {

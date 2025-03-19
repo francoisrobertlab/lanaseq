@@ -198,6 +198,7 @@ public class SampleService {
    * @param path   path
    * @return path that is relative to a configured network drive
    */
+  @PreAuthorize("hasPermission(#sample, 'read')")
   public Path relativize(Sample sample, Path path) {
     return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
         .map(drive -> drive.folder(sample)).filter(path::startsWith)
@@ -301,6 +302,7 @@ public class SampleService {
    * @param path   file
    * @return true if sample's file is accessible to the public, false otherwise
    */
+  @AnonymousAllowed
   public boolean isFilePublic(Sample sample, Path path) {
     path = relativize(sample, path);
     Optional<SamplePublicFile> optionalSamplePublicFile = samplePublicFileRepository.findBySampleAndPath(

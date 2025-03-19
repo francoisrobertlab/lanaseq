@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -632,7 +631,6 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
@@ -655,7 +653,6 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
