@@ -126,6 +126,7 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
         rememberMe -> rememberMe.alwaysRemember(true).key(configuration.rememberMeKey()));
     http.authorizeHttpRequests(
         auth -> auth.requestMatchers(new AntPathRequestMatcher("/sample-file/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/dataset-file/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/error")).permitAll());
 
     super.configure(http);
