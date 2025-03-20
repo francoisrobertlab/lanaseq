@@ -9,6 +9,7 @@ import ca.qc.ircm.lanaseq.user.User;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,6 +100,10 @@ public class AppConfiguration implements InitializingBean {
    * Server's actual URL, used in emails.
    */
   private String serverUrl;
+  /**
+   * Time during which a public file link is valid.
+   */
+  private Period publicFilePeriod;
 
   @Autowired
   @UsedBy(SPRING)
@@ -246,6 +251,15 @@ public class AppConfiguration implements InitializingBean {
   @UsedBy(SPRING)
   void setAnalysisDeleteAge(Duration analysisDeleteAge) {
     this.analysisDeleteAge = analysisDeleteAge;
+  }
+
+  public Period getPublicFilePeriod() {
+    return publicFilePeriod;
+  }
+
+  @UsedBy(SPRING)
+  void setPublicFilePeriod(Period publicFilePeriod) {
+    this.publicFilePeriod = publicFilePeriod;
   }
 
   /**

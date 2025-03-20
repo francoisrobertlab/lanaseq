@@ -11,6 +11,7 @@ import ca.qc.ircm.lanaseq.files.Renamer;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 import java.io.IOException;
@@ -20,12 +21,15 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,16 +61,18 @@ public class SampleService {
   private static final Logger logger = LoggerFactory.getLogger(SampleService.class);
   private final SampleRepository repository;
   private final DatasetRepository datasetRepository;
+  private final SamplePublicFileRepository samplePublicFileRepository;
   private final AppConfiguration configuration;
   private final AuthenticatedUser authenticatedUser;
   private final JPAQueryFactory queryFactory;
 
   @Autowired
   protected SampleService(SampleRepository repository, DatasetRepository datasetRepository,
-      AppConfiguration configuration, AuthenticatedUser authenticatedUser,
-      JPAQueryFactory queryFactory) {
+      SamplePublicFileRepository samplePublicFileRepository, AppConfiguration configuration,
+      AuthenticatedUser authenticatedUser, JPAQueryFactory queryFactory) {
     this.repository = repository;
     this.datasetRepository = datasetRepository;
+    this.samplePublicFileRepository = samplePublicFileRepository;
     this.configuration = configuration;
     this.authenticatedUser = authenticatedUser;
     this.queryFactory = queryFactory;
@@ -184,6 +192,22 @@ public class SampleService {
   }
 
   /**
+   * Returns a path that is relative to a configured network drive.
+   *
+   * @param sample sample
+   * @param path   path
+   * @return path that is relative to a configured network drive
+   */
+  @PreAuthorize("hasPermission(#sample, 'read')")
+  public Path relativize(Sample sample, Path path) {
+    return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
+        .map(drive -> drive.folder(sample)).filter(path::startsWith)
+        .map(folder -> folder.relativize(path)).findFirst()
+        // No parent found in home or archives folders.
+        .orElse(path);
+  }
+
+  /**
    * Returns all sample's folder labels.
    * <p>
    * Only returns label for folders that exist.
@@ -247,6 +271,55 @@ public class SampleService {
     } catch (IOException e) {
       return new ArrayList<>();
     }
+  }
+
+  /**
+   * Returns sample's file if it is accessible to the public.
+   *
+   * @param name     sample's name
+   * @param filename filename of sample's file
+   * @return sample's file if it is accessible to the public
+   */
+  @AnonymousAllowed
+  public Optional<Path> publicFile(String name, String filename) {
+    Objects.requireNonNull(name, "name parameter cannot be null");
+    Objects.requireNonNull(filename, "filename parameter cannot be null");
+    Optional<Sample> optionalSample = repository.findByName(name);
+    if (optionalSample.isEmpty() || !isFilePublic(optionalSample.orElseThrow(),
+        Paths.get(filename))) {
+      return Optional.empty();
+    }
+    Sample sample = optionalSample.orElseThrow();
+    return Stream.concat(Stream.of(configuration.getHome()), configuration.getArchives().stream())
+        .map(drive -> drive.folder(sample).resolve(filename)).filter(Files::isRegularFile)
+        .findFirst();
+  }
+
+  /**
+   * Returns true if sample's file is accessible to the public, false otherwise.
+   *
+   * @param sample sample
+   * @param path   file
+   * @return true if sample's file is accessible to the public, false otherwise
+   */
+  @AnonymousAllowed
+  public boolean isFilePublic(Sample sample, Path path) {
+    path = relativize(sample, path);
+    Optional<SamplePublicFile> optionalSamplePublicFile = samplePublicFileRepository.findBySampleAndPath(
+        sample, path.toString());
+    return optionalSamplePublicFile.isPresent() && Range.leftUnbounded(
+            Bound.inclusive(optionalSamplePublicFile.orElseThrow().getExpiryDate()))
+        .contains(LocalDate.now(), Comparator.naturalOrder());
+  }
+
+  /**
+   * Returns all files accessible to the public.
+   *
+   * @return all files accessible to the public
+   */
+  @PreAuthorize("hasRole('USER')")
+  public List<SamplePublicFile> publicFiles() {
+    return samplePublicFileRepository.findByExpiryDateGreaterThanEqual(LocalDate.now());
   }
 
   /**
@@ -405,6 +478,40 @@ public class SampleService {
         throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
       }
     }
+  }
+
+  /**
+   * Allows file to be accessible by anyone.
+   *
+   * @param sample     file's sample
+   * @param file       file
+   * @param expiryDate date when file stops being public
+   */
+  @PreAuthorize("hasPermission(#sample, 'write')")
+  public void allowPublicFileAccess(Sample sample, Path file, LocalDate expiryDate) {
+    Path relative = relativize(sample, file);
+    SamplePublicFile samplePublicFile = samplePublicFileRepository.findBySampleAndPath(sample,
+        relative.toString()).orElseGet(() -> {
+      SamplePublicFile newSamplePublicFile = new SamplePublicFile();
+      newSamplePublicFile.setSample(sample);
+      newSamplePublicFile.setPath(relative.toString());
+      return newSamplePublicFile;
+    });
+    samplePublicFile.setExpiryDate(expiryDate);
+    samplePublicFileRepository.save(samplePublicFile);
+  }
+
+  /**
+   * Revoke public access to file.
+   *
+   * @param sample file's sample
+   * @param file   file
+   */
+  @PreAuthorize("hasPermission(#sample, 'write')")
+  public void revokePublicFileAccess(Sample sample, Path file) {
+    Path relative = relativize(sample, file);
+    samplePublicFileRepository.findBySampleAndPath(sample, relative.toString())
+        .ifPresent(samplePublicFileRepository::delete);
   }
 
   /**

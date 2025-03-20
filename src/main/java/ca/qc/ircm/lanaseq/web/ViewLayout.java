@@ -6,6 +6,7 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
+import ca.qc.ircm.lanaseq.files.web.PublicFilesView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
@@ -40,8 +41,8 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
  * Main layout.
  */
 @JsModule("./styles/shared-styles.js")
-public class ViewLayout extends AppLayout
-    implements RouterLayout, LocaleChangeObserver, AfterNavigationObserver, UrlComponent {
+public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeObserver,
+    AfterNavigationObserver, UrlComponent {
 
   public static final String ID = "view-layout";
   public static final String HEADER = "header";
@@ -50,6 +51,7 @@ public class ViewLayout extends AppLayout
   public static final String SIDE_NAV = styleName(ID, "sidenav");
   public static final String DATASETS = "datasets";
   public static final String SAMPLES = "samples";
+  public static final String PUBLIC_FILES = "publicFiles";
   public static final String PROTOCOLS = "protocols";
   public static final String PROFILE = "profile";
   public static final String USERS = "users";
@@ -70,6 +72,7 @@ public class ViewLayout extends AppLayout
   protected SideNavItem datasets;
   protected SideNavItem samples;
   protected SideNavItem protocols;
+  protected SideNavItem publicFiles;
   protected SideNavItem profile;
   protected SideNavItem users;
   protected SideNavItem exitSwitchUser;
@@ -106,6 +109,9 @@ public class ViewLayout extends AppLayout
     samples.setId(styleName(SAMPLES, NAV));
     protocols = new SideNavItem("Protocols", ProtocolsView.class, VaadinIcon.BOOK.create());
     protocols.setId(styleName(PROTOCOLS, NAV));
+    publicFiles = new SideNavItem("Public files", PublicFilesView.class,
+        VaadinIcon.UNLOCK.create());
+    publicFiles.setId(styleName(PUBLIC_FILES, NAV));
     profile = new SideNavItem("Profile", ProfileView.class, VaadinIcon.USER.create());
     profile.setId(styleName(PROFILE, NAV));
     users = new SideNavItem("Users", UsersView.class, VaadinIcon.GROUP.create());
@@ -117,7 +123,8 @@ public class ViewLayout extends AppLayout
     exitSwitchUser.setVisible(false);
     signout = new SideNavItem("Signout", SignoutView.class, VaadinIcon.SIGN_OUT.create());
     signout.setId(styleName(SIGNOUT, NAV));
-    sideNav.addItem(datasets, samples, protocols, profile, users, exitSwitchUser, signout);
+    sideNav.addItem(datasets, samples, protocols, publicFiles, profile, users, exitSwitchUser,
+        signout);
   }
 
   @Override
@@ -127,6 +134,7 @@ public class ViewLayout extends AppLayout
     datasets.setLabel(getTranslation(MESSAGE_PREFIX + DATASETS));
     samples.setLabel(getTranslation(MESSAGE_PREFIX + SAMPLES));
     protocols.setLabel(getTranslation(MESSAGE_PREFIX + PROTOCOLS));
+    publicFiles.setLabel(getTranslation(MESSAGE_PREFIX + PUBLIC_FILES));
     profile.setLabel(getTranslation(MESSAGE_PREFIX + PROFILE));
     users.setLabel(getTranslation(MESSAGE_PREFIX + USERS));
     exitSwitchUser.setLabel(getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER));
@@ -136,8 +144,8 @@ public class ViewLayout extends AppLayout
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
     users.setVisible(authenticatedUser.isAuthorized(UsersView.class));
-    exitSwitchUser
-        .setVisible(authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
+    exitSwitchUser.setVisible(
+        authenticatedUser.hasRole(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR));
     Optional<SideNavItem> currentNav = selectedSideNavItem();
     currentNav.ifPresentOrElse(item -> header.setText(item.getLabel()), () -> header.setText(""));
   }
@@ -150,6 +158,8 @@ public class ViewLayout extends AppLayout
       return Optional.of(samples);
     } else if (view instanceof ProtocolsView) {
       return Optional.of(protocols);
+    } else if (view instanceof PublicFilesView) {
+      return Optional.of(publicFiles);
     } else if (view instanceof ProfileView) {
       return Optional.of(profile);
     } else if (view instanceof UsersView) {

@@ -60,6 +60,7 @@
     <testbench.maxAttempts>3</testbench.maxAttempts>
     <!-- Dependencies -->
     <vaadin.version>24.4.21</vaadin.version>
+    <clipboardhelper.version>2.0.0</clipboardhelper.version>
     <generate-property-names.version>2.1</generate-property-names.version>
     <querydsl.version>5.1.0</querydsl.version>
     <guava.version>33.3.1-jre</guava.version>
@@ -211,6 +212,11 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-confirm-dialog-flow</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.vaadin.olli</groupId>
+      <artifactId>clipboardhelper</artifactId>
+      <version>${clipboardhelper.version}</version>
     </dependency>
     <dependency>
       <groupId>com.querydsl</groupId>

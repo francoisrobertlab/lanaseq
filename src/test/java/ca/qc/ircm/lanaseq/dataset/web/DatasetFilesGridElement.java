@@ -1,7 +1,9 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -14,7 +16,8 @@ public class DatasetFilesGridElement extends GridElement {
 
   private static final int FILE_COLUMN = 0;
   private static final int DOWNLOAD_COLUMN = 1;
-  private static final int DELETE_COLUMN = 2;
+  private static final int PUBLIC_FILE_COLUMN = 2;
+  private static final int DELETE_COLUMN = 3;
 
   public String filename(int row) {
     return getCell(row, FILE_COLUMN).getText();
@@ -22,6 +25,14 @@ public class DatasetFilesGridElement extends GridElement {
 
   public ButtonElement download(int row) {
     return getCell(row, DOWNLOAD_COLUMN).$(ButtonElement.class).first();
+  }
+
+  public CheckboxElement publicFileCheckbox(int row) {
+    return getCell(row, PUBLIC_FILE_COLUMN).$(CheckboxElement.class).first();
+  }
+
+  public TestBenchElement publicFileLink(int row) {
+    return getCell(row, PUBLIC_FILE_COLUMN).$("clipboard-helper").first();
   }
 
   public ButtonElement delete(int row) {

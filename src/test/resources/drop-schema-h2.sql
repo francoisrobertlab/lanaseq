@@ -1,5 +1,7 @@
+DROP TABLE IF EXISTS sample_public_file;
 DROP TABLE IF EXISTS sample_filenames;
 DROP TABLE IF EXISTS sample_keywords;
+DROP TABLE IF EXISTS dataset_public_file;
 DROP TABLE IF EXISTS dataset_filenames;
 DROP TABLE IF EXISTS dataset_keywords;
 DROP TABLE IF EXISTS dataset_samples;

@@ -38,6 +38,7 @@ app:
     unix-label: '${app.home.unix-label}/upload'
   upload-delete-age: PT6H
   serverUrl: http://localhost:8080
+  public-file-period: P60D
 
 security:
   lockAttemps: 5

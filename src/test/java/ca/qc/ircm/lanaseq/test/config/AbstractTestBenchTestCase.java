@@ -42,8 +42,8 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final String LAYOUT_PREFIX = messagePrefix(ViewLayout.class);
   private static final String SIGNIN_PREFIX = messagePrefix(SigninView.class);
-  private static final String USE_FORGOT_PASSWORD_PREFIX =
-      messagePrefix(UseForgotPasswordView.class);
+  private static final String USE_FORGOT_PASSWORD_PREFIX = messagePrefix(
+      UseForgotPasswordView.class);
   private static final String PASSWORD_PREFIX = messagePrefix(PasswordView.class);
   private static final String ACCESS_DENIED_PREFIX = messagePrefix(AccessDeniedView.class);
   private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchTestCase.class);
@@ -57,6 +57,14 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+
+  @BeforeEach
+  public void setServerUrl()
+      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    Method setServerUrl = AppConfiguration.class.getDeclaredMethod("setServerUrl", String.class);
+    setServerUrl.setAccessible(true);
+    setServerUrl.invoke(configuration, baseUrl);
+  }
 
   /**
    * Saves home folder to reset its value upon test completion.
@@ -152,45 +160,34 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
 
   protected Locale currentLocale() {
     List<Locale> locales = Constants.getLocales();
-    Function<Locale, String> applicationName =
-        locale -> messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, locale);
-    SideNavItemElement home =
-        optional(() -> $(SideNavElement.class).first().$(SideNavItemElement.class).first())
-            .orElse(null);
-    Optional<Locale> optlocale = locales.stream()
-        .filter(locale -> messageSource.getMessage(LAYOUT_PREFIX + DATASETS, null, locale)
-            .equals(home != null ? home.getLabel() : ""))
-        .findAny();
+    Function<Locale, String> applicationName = locale -> messageSource.getMessage(
+        CONSTANTS_PREFIX + APPLICATION_NAME, null, locale);
+    SideNavItemElement home = optional(
+        () -> $(SideNavElement.class).first().$(SideNavItemElement.class).first()).orElse(null);
+    Optional<Locale> optlocale = locales.stream().filter(
+        locale -> messageSource.getMessage(LAYOUT_PREFIX + DATASETS, null, locale)
+            .equals(home != null ? home.getLabel() : "")).findAny();
     if (optlocale.isEmpty()) {
-      optlocale = locales.stream()
-          .filter(locale -> messageSource.getMessage(SIGNIN_PREFIX + TITLE,
-                  new Object[]{applicationName.apply(locale)}, locale)
-              .equals(getDriver().getTitle()))
+      optlocale = locales.stream().filter(locale -> messageSource.getMessage(SIGNIN_PREFIX + TITLE,
+              new Object[]{applicationName.apply(locale)}, locale).equals(getDriver().getTitle()))
           .findAny();
     }
     if (optlocale.isEmpty()) {
-      optlocale = locales.stream()
-          .filter(locale -> messageSource
-              .getMessage(USE_FORGOT_PASSWORD_PREFIX + TITLE,
-                  new Object[]{applicationName.apply(locale)}, locale)
-              .equals(getDriver().getTitle()))
+      optlocale = locales.stream().filter(
+              locale -> messageSource.getMessage(USE_FORGOT_PASSWORD_PREFIX + TITLE,
+                  new Object[]{applicationName.apply(locale)}, locale).equals(getDriver().getTitle()))
           .findAny();
     }
     if (optlocale.isEmpty()) {
-      optlocale =
-          locales.stream()
-              .filter(locale -> messageSource
-                  .getMessage(PASSWORD_PREFIX + TITLE,
-                      new Object[]{applicationName.apply(locale)}, locale)
-                  .equals(getDriver().getTitle()))
-              .findAny();
+      optlocale = locales.stream().filter(
+              locale -> messageSource.getMessage(PASSWORD_PREFIX + TITLE,
+                  new Object[]{applicationName.apply(locale)}, locale).equals(getDriver().getTitle()))
+          .findAny();
     }
     if (optlocale.isEmpty()) {
-      optlocale = locales.stream()
-          .filter(locale -> messageSource
-              .getMessage(ACCESS_DENIED_PREFIX + TITLE,
-                  new Object[]{applicationName.apply(locale)}, locale)
-              .equals(getDriver().getTitle()))
+      optlocale = locales.stream().filter(
+              locale -> messageSource.getMessage(ACCESS_DENIED_PREFIX + TITLE,
+                  new Object[]{applicationName.apply(locale)}, locale).equals(getDriver().getTitle()))
           .findAny();
     }
     return optlocale.orElse(Constants.DEFAULT_LOCALE);
@@ -204,39 +201,38 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
     }
   }
 
-  protected void setHome(Path home) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder =
-        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+  protected void setHome(Path home)
+      throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
+        Path.class);
     setFolder.setAccessible(true);
     AppConfiguration.NetworkDrive<DataWithFiles> homeDrive = configuration.getHome();
     setFolder.invoke(homeDrive, home);
   }
 
-  protected void setArchive(Path archive) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder =
-        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+  protected void setArchive(Path archive)
+      throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
+        Path.class);
     setFolder.setAccessible(true);
-    AppConfiguration.NetworkDrive<DataWithFiles> firstArchiveDrive =
-        configuration.getArchives().get(0);
+    AppConfiguration.NetworkDrive<DataWithFiles> firstArchiveDrive = configuration.getArchives()
+        .get(0);
     setFolder.invoke(firstArchiveDrive, archive);
   }
 
-  protected void setAnalysis(Path analysis) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder =
-        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+  protected void setAnalysis(Path analysis)
+      throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
+        Path.class);
     setFolder.setAccessible(true);
-    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisDrive =
-        configuration.getAnalysis();
+    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisDrive = configuration.getAnalysis();
     setFolder.invoke(analysisDrive, analysis);
   }
 
-  protected void setUpload(Path upload) throws NoSuchMethodException, SecurityException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    Method setFolder =
-        AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder", Path.class);
+  protected void setUpload(Path upload)
+      throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Method setFolder = AppConfiguration.NetworkDrive.class.getDeclaredMethod("setFolder",
+        Path.class);
     setFolder.setAccessible(true);
     AppConfiguration.NetworkDrive<DataWithFiles> uploadDrive = configuration.getUpload();
     setFolder.invoke(uploadDrive, upload);

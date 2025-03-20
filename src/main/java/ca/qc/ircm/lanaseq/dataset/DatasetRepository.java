@@ -4,6 +4,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.user.User;
 import com.querydsl.core.types.Predicate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,8 +15,16 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 /**
  * Repository for {@link Dataset}.
  */
-public interface DatasetRepository
-    extends JpaRepository<Dataset, Long>, QuerydslPredicateExecutor<Dataset> {
+public interface DatasetRepository extends JpaRepository<Dataset, Long>,
+    QuerydslPredicateExecutor<Dataset> {
+
+  /**
+   * Returns dataset with specified name.
+   *
+   * @param name name
+   * @return dataset with specified name
+   */
+  Optional<Dataset> findByName(String name);
 
   boolean existsByName(String name);
 

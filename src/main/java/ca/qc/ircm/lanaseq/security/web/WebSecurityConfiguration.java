@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Security configuration.
@@ -66,8 +67,8 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     PasswordEncoder defaultPasswordEncoder = new BCryptPasswordEncoder();
     encoders.put(PASSWORD_ENCRYPTION, defaultPasswordEncoder);
 
-    DelegatingPasswordEncoder passworEncoder =
-        new DelegatingPasswordEncoder(PASSWORD_ENCRYPTION, encoders);
+    DelegatingPasswordEncoder passworEncoder = new DelegatingPasswordEncoder(PASSWORD_ENCRYPTION,
+        encoders);
     passworEncoder.setDefaultPasswordEncoderForMatches(defaultPasswordEncoder);
 
     return passworEncoder;
@@ -80,8 +81,7 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
    */
   @Bean
   public DaoAuthenticationProviderWithLdap authenticationProvider() {
-    DaoAuthenticationProviderWithLdap authenticationProvider =
-        new DaoAuthenticationProviderWithLdap();
+    DaoAuthenticationProviderWithLdap authenticationProvider = new DaoAuthenticationProviderWithLdap();
     authenticationProvider.setUserDetailsService(userDetailsService);
     authenticationProvider.setPasswordEncoder(passwordEncoder());
     authenticationProvider.setUserRepository(userRepository);
@@ -93,8 +93,7 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
 
   @Bean
   public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
-    DefaultMethodSecurityExpressionHandler expressionHandler =
-        new DefaultMethodSecurityExpressionHandler();
+    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
     expressionHandler.setPermissionEvaluator(permissionEvaluator);
     return expressionHandler;
   }
@@ -109,8 +108,7 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     final Map<String, String> failureUrlMap = new HashMap<>();
     failureUrlMap.put(LockedException.class.getName(), SIGNIN_LOCKED_URL);
     failureUrlMap.put(DisabledException.class.getName(), SIGNIN_DISABLED_URL);
-    ExceptionMappingAuthenticationFailureHandler authenticationFailureHandler =
-        new ExceptionMappingAuthenticationFailureHandler();
+    ExceptionMappingAuthenticationFailureHandler authenticationFailureHandler = new ExceptionMappingAuthenticationFailureHandler();
     authenticationFailureHandler.setDefaultFailureUrl(SIGNIN_DEFAULT_FAILURE_URL);
     authenticationFailureHandler.setExceptionMappings(failureUrlMap);
     return authenticationFailureHandler;
@@ -126,6 +124,10 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     // Remember me
     http.rememberMe(
         rememberMe -> rememberMe.alwaysRemember(true).key(configuration.rememberMeKey()));
+    http.authorizeHttpRequests(
+        auth -> auth.requestMatchers(new AntPathRequestMatcher("/sample-file/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/dataset-file/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/error")).permitAll());
 
     super.configure(http);
 

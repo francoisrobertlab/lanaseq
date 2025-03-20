@@ -20,8 +20,10 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.ID;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MAXIMUM_SMALL_FILES_COUNT;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MAXIMUM_SMALL_FILES_SIZE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.MESSAGE;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.PUBLIC_FILE;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.id;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clipboardHelperWrapper;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.properties;
@@ -36,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,6 +69,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.editor.Editor;
@@ -78,6 +80,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -95,6 +98,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -117,6 +122,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.vaadin.olli.ClipboardHelper;
 
 /**
  * Tests for {@link SampleFilesDialog}.
@@ -177,28 +183,25 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     files.add(
         new File(defaultSample.getName(), "FR2_MNaseseq_IP_polr2a_yFR100_WT_Rappa_R2_20181020.bw"));
     files.add(new File("archives", "sample.png"));
-    when(service.files(any()))
-        .thenReturn(files.stream().map(File::toPath).collect(Collectors.toList()));
+    when(service.files(any())).thenReturn(
+        files.stream().map(File::toPath).collect(Collectors.toList()));
     labels.add("\\\\lanaseq01\\lanaseq");
     labels.add("\\\\lanaseq01\\archives");
     labels.add("\\\\lanaseq02\\archives2");
     when(service.folderLabels(any(), anyBoolean())).thenReturn(labels);
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> homeFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> homeFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getHome()).thenReturn(homeFolder);
     when(configuration.getHome().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? Paths.get(sample.getName()) : null;
     });
     List<AppConfiguration.NetworkDrive<DataWithFiles>> archives = new ArrayList<>();
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder1 = mock(
+        AppConfiguration.NetworkDrive.class);
     archives.add(archiveFolder1);
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> archiveFolder2 = mock(
+        AppConfiguration.NetworkDrive.class);
     archives.add(archiveFolder2);
     when(configuration.getArchives()).thenReturn(archives);
     when(configuration.getArchives().get(0).folder(any(Sample.class))).then(i -> {
@@ -209,14 +212,16 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve("archives2").resolve(sample.getName()) : null;
     });
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<DataWithFiles> uploadFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getUpload()).thenReturn(uploadFolder);
     when(configuration.getUpload().folder(any(Sample.class))).then(i -> {
       Sample sample = i.getArgument(0);
       return sample != null ? temporaryFolder.resolve("upload").resolve(sample.getName()) : null;
     });
+    when(service.relativize(any(), any())).then(i -> i.getArgument(1));
+    when(configuration.getUrl(any())).then(i -> "https://localhost:8080/" + i.getArgument(0));
+    when(configuration.getPublicFilePeriod()).thenReturn(Period.ofDays(30));
     random.nextBytes(fileContent);
     UI.getCurrent().setLocale(locale);
     SamplesView view = navigate(SamplesView.class);
@@ -259,6 +264,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.filename).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DOWNLOAD),
         headerRow.getCell(dialog.download).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + PUBLIC_FILE),
+        headerRow.getCell(dialog.publicFile).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         headerRow.getCell(dialog.delete).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
@@ -285,6 +292,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
         headerRow.getCell(dialog.filename).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DOWNLOAD),
         headerRow.getCell(dialog.download).getText());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + PUBLIC_FILE),
+        headerRow.getCell(dialog.publicFile).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + DELETE),
         headerRow.getCell(dialog.delete).getText());
     assertEquals(dialog.getTranslation(CONSTANTS_PREFIX + REFRESH), dialog.refresh.getText());
@@ -364,11 +373,13 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void files() {
-    assertEquals(3, dialog.files.getColumns().size());
+    assertEquals(4, dialog.files.getColumns().size());
     assertNotNull(dialog.files.getColumnByKey(FILENAME));
     assertTrue(dialog.files.getColumnByKey(FILENAME).isSortable());
     assertNotNull(dialog.files.getColumnByKey(DOWNLOAD));
     assertFalse(dialog.files.getColumnByKey(DOWNLOAD).isSortable());
+    assertNotNull(dialog.files.getColumnByKey(PUBLIC_FILE));
+    assertFalse(dialog.files.getColumnByKey(PUBLIC_FILE).isSortable());
     assertNotNull(dialog.files.getColumnByKey(DELETE));
     assertFalse(dialog.files.getColumnByKey(DELETE).isSortable());
     List<EditableFile> files = dialog.files.getListDataView().getItems().toList();
@@ -382,11 +393,13 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   public void files_ColumnsValueProvider() {
     Sample sample = repository.findById(4L).orElseThrow();
     dialog.setSampleId(4L);
+    when(service.isFilePublic(any(), any())).then(
+        i -> files.indexOf(((Path) i.getArgument(1)).toFile()) > 2);
     for (int i = 0; i < files.size(); i++) {
       File path = files.get(i);
       EditableFile file = new EditableFile(path);
-      Renderer<EditableFile> filenameRawRenderer =
-          dialog.files.getColumnByKey(FILENAME).getRenderer();
+      Renderer<EditableFile> filenameRawRenderer = dialog.files.getColumnByKey(FILENAME)
+          .getRenderer();
       assertInstanceOf(LitRenderer.class, filenameRawRenderer);
       LitRenderer<EditableFile> filenameRenderer = (LitRenderer<EditableFile>) filenameRawRenderer;
       assertEquals(FILENAME_HTML, rendererTemplate(filenameRenderer));
@@ -400,8 +413,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       } else {
         assertEquals(file.getFilename(), properties(filenameRenderer).get("filename").apply(file));
       }
-      Anchor downloadAnchor =
-          (Anchor) test(dialog.files).getCellComponent(i, dialog.download.getKey());
+      Anchor downloadAnchor = (Anchor) test(dialog.files).getCellComponent(i,
+          dialog.download.getKey());
       assertTrue(downloadAnchor.hasClassName(DOWNLOAD));
       assertTrue(downloadAnchor.getElement().hasAttribute("download"));
       assertEquals("", downloadAnchor.getElement().getAttribute("download"));
@@ -412,6 +425,26 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       Button downloadButton = (Button) downloadAnchorChild;
       validateIcon(VaadinIcon.DOWNLOAD.create(), downloadButton.getIcon());
       assertEquals("", downloadButton.getText());
+      HorizontalLayout publicFileLayout = (HorizontalLayout) test(dialog.files).getCellComponent(i,
+          dialog.publicFile.getKey());
+      Checkbox publicFileCheckbox = test(publicFileLayout).find(Checkbox.class).first();
+      assertEquals(i > 2, publicFileCheckbox.getValue());
+      ClipboardHelper copyLinkHelper = (ClipboardHelper) publicFileLayout.getChildren()
+          .filter(co -> co instanceof ClipboardHelper).findFirst().orElseThrow();
+      assertEquals(publicFileCheckbox.getValue(), copyLinkHelper.isVisible());
+      assertEquals(configuration.getUrl(dialog.getUrl(PublicSampleFiles.publicSampleFileUrl(sample,
+              service.relativize(sample, path.toPath()).toString()))),
+          copyLinkHelper.getElement().getProperty("content"));
+      Button copyLink = (Button) clipboardHelperWrapper(copyLinkHelper).getChildren().findFirst()
+          .orElseThrow();
+      validateIcon(VaadinIcon.COPY.create(), copyLink.getIcon());
+      publicFileCheckbox.setValue(!publicFileCheckbox.getValue());
+      if (publicFileCheckbox.getValue()) {
+        verify(service).allowPublicFileAccess(sample, path.toPath(),
+            LocalDate.now().plus(configuration.getPublicFilePeriod()));
+      } else {
+        verify(service).revokePublicFileAccess(sample, path.toPath());
+      }
       Button deleteButton = (Button) test(dialog.files).getCellComponent(i, dialog.delete.getKey());
       assertTrue(deleteButton.hasClassName(DELETE));
       assertTrue(deleteButton.hasThemeName(ButtonVariant.LUMO_ERROR.getVariantName()));
@@ -445,8 +478,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<EditableFile> status = dialog.validateSampleFile();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.filenameEdit);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -484,8 +517,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<EditableFile> status = dialog.validateSampleFile();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.filenameEdit);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(MESSAGE_PREFIX + FILENAME_REGEX_ERROR)),
@@ -505,8 +538,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<EditableFile> status = dialog.validateSampleFile();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.filenameEdit);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
@@ -532,8 +565,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<EditableFile> status = dialog.validateSampleFile();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.filenameEdit);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.filenameEdit);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -563,8 +596,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   public void refresh() {
     Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
     files.add(new File("new_file_refresh.txt"));
-    when(service.files(any()))
-        .thenReturn(files.stream().map(File::toPath).collect(Collectors.toList()));
+    when(service.files(any())).thenReturn(
+        files.stream().map(File::toPath).collect(Collectors.toList()));
     test(dialog.refresh).click();
     verify(service, times(2)).files(sample);
     List<EditableFile> files = dialog.files.getListDataView().getItems().toList();
@@ -598,7 +631,6 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
@@ -621,7 +653,6 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(service).saveFiles(eq(sample), filesCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
