@@ -11,7 +11,7 @@
   <groupId>ca.qc.ircm</groupId>
   <artifactId>lanaseq</artifactId>
   <name>LANAseq</name>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.10</version>
   <inceptionYear>2018</inceptionYear>
   <packaging>war</packaging>
   <description>Location Analysis Net Application for High-throughput sequencing</description>
