@@ -46,6 +46,9 @@ public class PublicSampleFiles {
   public FileSystemResource publicSampleFile(@PathVariable String name,
       @PathVariable String filename) {
     logger.debug("Trying to access public file {} of sample {}", filename, name);
+    if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+      throw new IllegalArgumentException("Invalid filename");
+    }
     Optional<Path> optionalFile = service.publicFile(name, filename);
     if (optionalFile.isPresent()) {
       return new FileSystemResource(optionalFile.orElseThrow());
