@@ -66,7 +66,7 @@ public class DateRangeFieldTest extends SpringUIUnitTest {
 
   @Test
   public void styles() {
-    assertTrue(dateRange.layout.hasClassName(CLASS_NAME));
+    assertTrue(dateRange.hasClassName(CLASS_NAME));
     assertTrue(dateRange.from.hasClassName(FROM));
     assertTrue(dateRange.from.isClearButtonVisible());
     assertTrue(dateRange.to.hasClassName(TO));
