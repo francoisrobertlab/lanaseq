@@ -61,6 +61,7 @@ server:
 vaadin:
   productionMode: false
   closeIdleSessions: true
+  allowed-packages: 'ca.qc.ircm.lanaseq'
   license:
     assume: false
     paths:
