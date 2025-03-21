@@ -432,9 +432,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       ClipboardHelper copyLinkHelper = (ClipboardHelper) publicFileLayout.getChildren()
           .filter(co -> co instanceof ClipboardHelper).findFirst().orElseThrow();
       assertEquals(publicFileCheckbox.getValue(), copyLinkHelper.isVisible());
-      assertEquals(configuration.getUrl(dialog.prependContextPath(
-              PublicSampleFiles.publicSampleFileUrl(sample,
-                  service.relativize(sample, path.toPath()).toString()))),
+      assertEquals(configuration.getUrl(PublicSampleFiles.publicSampleFileUrl(sample,
+              service.relativize(sample, path.toPath()).toString())),
           copyLinkHelper.getElement().getProperty("content"));
       Button copyLink = (Button) clipboardHelperWrapper(copyLinkHelper).getChildren().findFirst()
           .orElseThrow();

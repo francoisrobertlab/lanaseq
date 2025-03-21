@@ -21,7 +21,6 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.sample.web.PublicSampleFiles;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
@@ -62,7 +61,7 @@ import org.springframework.data.domain.Range;
 @Route(value = PublicFilesView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({USER})
 public class PublicFilesView extends VerticalLayout implements LocaleChangeObserver,
-    HasDynamicTitle, UrlComponent {
+    HasDynamicTitle {
 
   public static final String VIEW_NAME = "public-files";
   public static final String ID = "public-files-view";
@@ -227,8 +226,7 @@ public class PublicFilesView extends VerticalLayout implements LocaleChangeObser
 
   StreamResource links() {
     String links = files.getListDataView().getItems()
-        .map(pf -> configuration.getUrl(prependContextPath(linkEnding(pf))))
-        .collect(Collectors.joining("\n"));
+        .map(pf -> configuration.getUrl(linkEnding(pf))).collect(Collectors.joining("\n"));
     return new StreamResource("links.txt",
         (output, session) -> output.write(links.getBytes(StandardCharsets.UTF_8)));
   }

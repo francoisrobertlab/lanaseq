@@ -47,8 +47,10 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private static final String PASSWORD_PREFIX = messagePrefix(PasswordView.class);
   private static final String ACCESS_DENIED_PREFIX = messagePrefix(AccessDeniedView.class);
   private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchTestCase.class);
-  @Value("http://localhost:${local.server.port}${server.servlet.context-path:}")
+  @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
+  @Value("${server.servlet.context-path:}")
+  protected String contextPath;
   private Path home;
   private Path archive;
   private Path analysis;
@@ -131,15 +133,15 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   }
 
   protected String homeUrl() {
-    return baseUrl + "/";
+    return baseUrl + contextPath + "/";
   }
 
   protected String viewUrl(String view) {
-    return baseUrl + "/" + view;
+    return baseUrl + contextPath + "/" + view;
   }
 
   protected String viewUrl(String view, String parameters) {
-    return baseUrl + "/" + view + "/" + parameters;
+    return baseUrl + contextPath + "/" + view + "/" + parameters;
   }
 
   protected void openView(String view) {

@@ -112,17 +112,17 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     try {
       List<String> lines = Files.readAllLines(downloaded);
       assertEquals(4, lines.size());
-      assertEquals(baseUrl
-              + "/sample-file/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw",
+      assertEquals(homeUrl()
+              + "sample-file/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw",
           lines.get(0));
-      assertEquals(baseUrl
-              + "/sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
+      assertEquals(homeUrl()
+              + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
           lines.get(1));
-      assertEquals(baseUrl
-              + "/dataset-file/ChIPseq_Spt16_yFR101_G24D_JS3_20181211/ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw",
+      assertEquals(homeUrl()
+              + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS3_20181211/ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw",
           lines.get(2));
-      assertEquals(baseUrl
-              + "/dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
+      assertEquals(homeUrl()
+              + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
           lines.get(3));
     } finally {
       Files.delete(downloaded);
@@ -147,11 +147,11 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     try {
       List<String> lines = Files.readAllLines(downloaded);
       assertEquals(2, lines.size());
-      assertEquals(baseUrl
-              + "/sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
+      assertEquals(homeUrl()
+              + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
           lines.get(0));
-      assertEquals(baseUrl
-              + "/dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
+      assertEquals(homeUrl()
+              + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
           lines.get(1));
     } finally {
       Files.delete(downloaded);

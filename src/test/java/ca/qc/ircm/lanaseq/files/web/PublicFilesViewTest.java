@@ -119,7 +119,7 @@ public class PublicFilesViewTest extends SpringUIUnitTest {
         "BC1_ChIPseq_Input_polr2c_yBC201_WT_R1_20181208-cov.bw", LocalDate.now().plusDays(12)));
     when(datasetService.publicFiles()).thenReturn(datasetPublicFiles);
     when(sampleService.publicFiles()).thenReturn(samplePublicFiles);
-    when(configuration.getUrl(any())).then(i -> "https://localhost" + i.getArgument(0));
+    when(configuration.getUrl(any())).then(i -> "https://localhost/" + i.getArgument(0));
     UI.getCurrent().setLocale(locale);
     view = navigate(PublicFilesView.class);
   }

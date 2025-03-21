@@ -25,7 +25,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
-import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -85,7 +84,7 @@ import org.vaadin.olli.ClipboardHelper;
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
-    NotificationComponent, UrlComponent {
+    NotificationComponent {
 
   public static final String ID = "dataset-files-dialog";
   public static final String HEADER = "header";
@@ -251,9 +250,8 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
     Checkbox checkbox = new Checkbox();
     checkbox.setValue(fileIsPublic);
     checkbox.addValueChangeListener(e -> changePublicFile(file, e.getValue()));
-    String publicFileUrl = configuration.getUrl(prependContextPath(
-        PublicDatasetFiles.publicDatasetFileUrl(dataset,
-            service.relativize(dataset, file.getFile().toPath()).toString())));
+    String publicFileUrl = configuration.getUrl(PublicDatasetFiles.publicDatasetFileUrl(dataset,
+        service.relativize(dataset, file.getFile().toPath()).toString()));
     Button button = new Button();
     ClipboardHelper clipboardHelper = new ClipboardHelper(publicFileUrl, button);
     clipboardHelper.setVisible(fileIsPublic);

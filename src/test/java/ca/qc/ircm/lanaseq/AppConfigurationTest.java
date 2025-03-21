@@ -528,6 +528,6 @@ public class AppConfigurationTest {
   @Test
   public void getUrl() {
     assertEquals("http://localhost:8080/myurl/subpath?param1=abc",
-        appConfiguration.getUrl("/myurl/subpath?param1=abc"));
+        appConfiguration.getUrl("myurl/subpath?param1=abc"));
   }
 }

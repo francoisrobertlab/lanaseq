@@ -101,6 +101,10 @@ public class AppConfiguration implements InitializingBean {
    */
   private String serverUrl;
   /**
+   * Context path, used with {@link #serverUrl}.
+   */
+  private String contextPath;
+  /**
    * Time during which a public file link is valid.
    */
   private Period publicFilePeriod;
@@ -164,7 +168,7 @@ public class AppConfiguration implements InitializingBean {
    * @return urlEnd with prefix that allows to access application from anywhere
    */
   public String getUrl(String urlEnd) {
-    return serverUrl + urlEnd;
+    return serverUrl + contextPath + "/" + urlEnd;
   }
 
   public NetworkDrive<DataWithFiles> getHome() {
@@ -215,6 +219,12 @@ public class AppConfiguration implements InitializingBean {
   @UsedBy(SPRING)
   void setServerUrl(String serverUrl) {
     this.serverUrl = serverUrl;
+  }
+
+  @Value("${server.servlet.context-path:}")
+  @UsedBy(SPRING)
+  void setContextPath(String contextPath) {
+    this.contextPath = contextPath;
   }
 
   public Duration getUploadDeleteAge() {
