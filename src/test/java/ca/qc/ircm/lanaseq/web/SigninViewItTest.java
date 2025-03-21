@@ -21,12 +21,14 @@ import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
  * Integration tests for {@link SigninView}.
  */
 @TestBenchTestAnnotations
+@WithAnonymousUser
 public class SigninViewItTest extends AbstractTestBenchTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
@@ -44,8 +46,8 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
   public void title() {
     open();
 
-    String applicationName =
-        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
+    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
+        currentLocale());
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
         currentLocale()), getDriver().getTitle());
   }
@@ -67,8 +69,8 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getUsernameField().setValue("olivia.brown@ircm.qc.ca");
     view.getPasswordField().setValue("notright");
     view.getSubmitButton().click();
-    waitUntil(driver -> driver != null && driver.getCurrentUrl() != null
-        && driver.getCurrentUrl().endsWith("?" + FAIL));
+    waitUntil(driver -> driver != null && driver.getCurrentUrl() != null && driver.getCurrentUrl()
+        .endsWith("?" + FAIL));
     assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
         view.getErrorMessage());
     assertNotNull(getDriver().getCurrentUrl());
@@ -102,8 +104,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
         throw new IllegalStateException("Sleep was interrupted", e);
       }
     }
-    assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
+    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
             new Object[]{configuration.lockDuration().getSeconds() / 60}, currentLocale()),
         view.getErrorMessage());
     assertNotNull(getDriver().getCurrentUrl());

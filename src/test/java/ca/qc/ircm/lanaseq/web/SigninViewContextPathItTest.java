@@ -6,6 +6,7 @@ import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
+@WithAnonymousUser
 public class SigninViewContextPathItTest extends AbstractTestBenchTestCase {
 
   private void open() {
