@@ -1,7 +1,5 @@
 package ca.qc.ircm.lanaseq.user.web;
 
-import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
-import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.VIEW_NAME;
@@ -33,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -40,15 +39,17 @@ import org.springframework.test.context.DynamicPropertySource;
  * Integration tests for {@link ForgotPasswordView}.
  */
 @TestBenchTestAnnotations
+@ActiveProfiles({"integration-test", "context-path"})
 @WithAnonymousUser
-public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
+public class ForgotPasswordViewContextPathItTest extends AbstractTestBenchTestCase {
 
   @RegisterExtension
   static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP);
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordView.class);
   private static final String SERVICE_PREFIX = messagePrefix(ForgotPasswordService.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
-  private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordViewItTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+      ForgotPasswordViewContextPathItTest.class);
   @Autowired
   private ForgotPasswordRepository repository;
   @Autowired
@@ -66,25 +67,6 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
 
   private void open() {
     openView(VIEW_NAME);
-  }
-
-  @Test
-  public void title() {
-    open();
-    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
-        currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
-  }
-
-  @Test
-  public void fieldsExistence() {
-    open();
-    ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
-    assertTrue(optional(view::header).isPresent());
-    assertTrue(optional(view::message).isPresent());
-    assertTrue(optional(view::email).isPresent());
-    assertTrue(optional(view::save).isPresent());
   }
 
   @Test

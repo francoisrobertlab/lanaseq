@@ -44,9 +44,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @NonTransactionalTestAnnotations
 public class MailServiceTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(MailServiceTest.class);
   @RegisterExtension
   static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP);
+  private static final Logger logger = LoggerFactory.getLogger(MailServiceTest.class);
   @Autowired
   private MailService mailService;
   @Autowired
@@ -66,15 +66,14 @@ public class MailServiceTest {
     if (part.isMimeType("text/plain") && part.getContent() instanceof String) {
       return Optional.of(part.getContent().toString());
     } else if (part.getContent() instanceof Multipart mp) {
-      @SuppressWarnings("unchecked")
-      Optional<String> content =
-          (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
-            try {
-              return plainContent((MimeBodyPart) mp.getBodyPart(i));
-            } catch (MessagingException | IOException e) {
-              return Optional.empty();
-            }
-          }).filter(Optional::isPresent).findAny().orElse(Optional.empty());
+      @SuppressWarnings("unchecked") Optional<String> content = (Optional<String>) IntStream.range(
+          0, mp.getCount()).mapToObj(i -> {
+        try {
+          return plainContent((MimeBodyPart) mp.getBodyPart(i));
+        } catch (MessagingException | IOException e) {
+          return Optional.empty();
+        }
+      }).filter(Optional::isPresent).findAny().orElse(Optional.empty());
       return content;
     } else {
       return Optional.empty();
@@ -82,19 +81,18 @@ public class MailServiceTest {
   }
 
   private Optional<String> htmlContent(MimePart part) throws MessagingException, IOException {
-    if (part.isMimeType("text/html")
-        || part.getDataHandler().getContentType().startsWith("text/html")) {
+    if (part.isMimeType("text/html") || part.getDataHandler().getContentType()
+        .startsWith("text/html")) {
       return Optional.of(part.getContent().toString());
     } else if (part.getContent() instanceof Multipart mp) {
-      @SuppressWarnings("unchecked")
-      Optional<String> content =
-          (Optional<String>) IntStream.range(0, mp.getCount()).mapToObj(i -> {
-            try {
-              return htmlContent((MimeBodyPart) mp.getBodyPart(i));
-            } catch (MessagingException | IOException e) {
-              return Optional.empty();
-            }
-          }).filter(Optional::isPresent).findAny().orElse(Optional.empty());
+      @SuppressWarnings("unchecked") Optional<String> content = (Optional<String>) IntStream.range(
+          0, mp.getCount()).mapToObj(i -> {
+        try {
+          return htmlContent((MimeBodyPart) mp.getBodyPart(i));
+        } catch (MessagingException | IOException e) {
+          return Optional.empty();
+        }
+      }).filter(Optional::isPresent).findAny().orElse(Optional.empty());
       return content;
     } else {
       return Optional.empty();

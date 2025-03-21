@@ -36,7 +36,7 @@ public class ForgotPasswordService {
    */
   public static final Period VALID_PERIOD = Period.ofDays(2);
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordService.class);
-  private static final String CONSTANT_PREFIX = messagePrefix(Constants.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private final Logger logger = LoggerFactory.getLogger(ForgotPasswordService.class);
   private final ForgotPasswordRepository repository;
   private final UserRepository userRepository;
@@ -72,8 +72,8 @@ public class ForgotPasswordService {
 
     ForgotPassword forgotPassword = repository.findById(id).orElse(null);
     if (forgotPassword != null && confirmNumber.equals(forgotPassword.getConfirmNumber())
-        && !forgotPassword.isUsed()
-        && forgotPassword.getRequestMoment().isAfter(LocalDateTime.now().minus(VALID_PERIOD))) {
+        && !forgotPassword.isUsed() && forgotPassword.getRequestMoment()
+        .isAfter(LocalDateTime.now().minus(VALID_PERIOD))) {
       return Optional.of(forgotPassword);
     } else {
       return Optional.empty();
@@ -118,13 +118,13 @@ public class ForgotPasswordService {
   private void sendMail(String emailAddress, ForgotPassword forgotPassword, Locale locale,
       ForgotPasswordWebContext webContext) throws MessagingException {
     // Prepare URL used to change password.
-    final String url =
-        appConfiguration.getUrl(webContext.getChangeForgottenPasswordUrl(forgotPassword, locale));
+    final String url = appConfiguration.getUrl(
+        webContext.getChangeForgottenPasswordUrl(forgotPassword, locale));
 
     // Prepare email content.
     MimeMessageHelper email = emailService.htmlEmail();
-    String applicationName =
-        messageSource.getMessage(CONSTANT_PREFIX + "application.name", null, locale);
+    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + "application.name", null,
+        locale);
     String subject = messageSource.getMessage(MESSAGE_PREFIX + "subject",
         new Object[]{applicationName}, locale);
     email.setSubject(subject);

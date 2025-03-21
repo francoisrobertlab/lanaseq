@@ -43,7 +43,7 @@ import org.thymeleaf.util.StringUtils;
 public class ForgotPasswordServiceTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ForgotPasswordService.class);
-  private static final String CONSTANT_PREFIX = messagePrefix(Constants.class);
+  private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @SuppressWarnings("unused")
   private final Logger logger = LoggerFactory.getLogger(ForgotPasswordServiceTest.class);
   @Autowired
@@ -83,8 +83,8 @@ public class ForgotPasswordServiceTest {
     hashedPassword = "da78f3a74658706/4ae8470fc73a83f369fed012";
     when(passwordEncoder.encode(any(String.class))).thenReturn(hashedPassword);
     when(mailService.htmlEmail()).thenReturn(email);
-    when(forgotPasswordWebContext.getChangeForgottenPasswordUrl(any(), any()))
-        .thenReturn(forgotPasswordUrl);
+    when(forgotPasswordWebContext.getChangeForgottenPasswordUrl(any(), any())).thenReturn(
+        forgotPasswordUrl);
     confirmNumber = "70987756";
   }
 
@@ -163,11 +163,12 @@ public class ForgotPasswordServiceTest {
     verify(mailService).htmlEmail();
     verify(mailService).send(email);
     verify(email).addTo(user.getEmail());
-    String applicationName =
-        messageSource.getMessage(CONSTANT_PREFIX + "application.name", null, locale);
+    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + "application.name", null,
+        locale);
     ResourceBundle mailResources = ResourceBundle.getBundle("user.forgotpassword", locale);
-    verify(email).setSubject(messageSource.getMessage(MESSAGE_PREFIX + "subject",
-        new Object[]{applicationName}, locale));
+    verify(email).setSubject(
+        messageSource.getMessage(MESSAGE_PREFIX + "subject", new Object[]{applicationName},
+            locale));
     verify(email).setText(stringCaptor.capture(), stringCaptor.capture());
     String textContent = stringCaptor.getAllValues().get(0);
     String htmlContent = stringCaptor.getAllValues().get(1);
