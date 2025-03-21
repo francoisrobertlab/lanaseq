@@ -226,8 +226,9 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver,
     Checkbox checkbox = new Checkbox();
     checkbox.setValue(fileIsPublic);
     checkbox.addValueChangeListener(e -> changePublicFile(file, e.getValue()));
-    String publicFileUrl = configuration.getUrl(getUrl(PublicSampleFiles.publicSampleFileUrl(sample,
-        service.relativize(sample, file.getFile().toPath()).toString())));
+    String publicFileUrl = configuration.getUrl(prependContextPath(
+        PublicSampleFiles.publicSampleFileUrl(sample,
+            service.relativize(sample, file.getFile().toPath()).toString())));
     Button button = new Button();
     ClipboardHelper clipboardHelper = new ClipboardHelper(publicFileUrl, button);
     clipboardHelper.setVisible(fileIsPublic);

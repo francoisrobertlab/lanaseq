@@ -449,7 +449,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
       ClipboardHelper copyLinkHelper = (ClipboardHelper) publicFileLayout.getChildren()
           .filter(co -> co instanceof ClipboardHelper).findFirst().orElseThrow();
       assertEquals(publicFileCheckbox.getValue(), copyLinkHelper.isVisible());
-      assertEquals(configuration.getUrl(dialog.getUrl(
+      assertEquals(configuration.getUrl(dialog.prependContextPath(
               PublicDatasetFiles.publicDatasetFileUrl(dataset,
                   service.relativize(dataset, path.toPath()).toString()))),
           copyLinkHelper.getElement().getProperty("content"));

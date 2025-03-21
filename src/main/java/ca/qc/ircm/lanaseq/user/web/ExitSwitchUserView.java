@@ -41,6 +41,6 @@ public class ExitSwitchUserView extends VerticalLayout implements BeforeEnterObs
   public void beforeEnter(BeforeEnterEvent event) {
     logger.debug("Exit switch user {}", authenticatedUser.getUser());
     switchUserService.exitSwitchUser(VaadinServletRequest.getCurrent());
-    UI.getCurrent().getPage().setLocation(getUrl(MainView.class));
+    UI.getCurrent().getPage().setLocation(getUrlWithContextPath(MainView.class));
   }
 }

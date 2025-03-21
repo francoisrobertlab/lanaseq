@@ -227,7 +227,8 @@ public class PublicFilesView extends VerticalLayout implements LocaleChangeObser
 
   StreamResource links() {
     String links = files.getListDataView().getItems()
-        .map(pf -> configuration.getUrl(getUrl(linkEnding(pf)))).collect(Collectors.joining("\n"));
+        .map(pf -> configuration.getUrl(prependContextPath(linkEnding(pf))))
+        .collect(Collectors.joining("\n"));
     return new StreamResource("links.txt",
         (output, session) -> output.write(links.getBytes(StandardCharsets.UTF_8)));
   }

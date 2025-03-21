@@ -36,7 +36,7 @@ public class SignoutView extends VerticalLayout implements BeforeEnterObserver, 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
     logger.debug("Sign out user {}", authenticatedUser.getUser());
-    UI.getCurrent().getPage().setLocation(getUrl(MainView.class));
+    UI.getCurrent().getPage().setLocation(getUrlWithContextPath(MainView.class));
     CompositeLogoutHandler logoutHandler = new CompositeLogoutHandler(
         new CookieClearingLogoutHandler("remember-me"), new SecurityContextLogoutHandler());
     logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(),

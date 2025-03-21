@@ -128,7 +128,7 @@ public class ForgotPasswordView extends VerticalLayout implements LocaleChangeOb
       logger.debug("create new forgot password for user {}", email);
       if (userService.exists(email)) {
         service.insert(email,
-            (fp, fplocale) -> getUrl(UseForgotPasswordView.class) + "/" + fp.getId()
+            (fp, fplocale) -> getUrlWithContextPath(UseForgotPasswordView.class) + "/" + fp.getId()
                 + UseForgotPasswordView.SEPARATOR + fp.getConfirmNumber());
       }
       showNotification(getTranslation(MESSAGE_PREFIX + SAVED, email));

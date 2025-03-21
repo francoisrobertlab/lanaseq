@@ -251,7 +251,7 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
     Checkbox checkbox = new Checkbox();
     checkbox.setValue(fileIsPublic);
     checkbox.addValueChangeListener(e -> changePublicFile(file, e.getValue()));
-    String publicFileUrl = configuration.getUrl(getUrl(
+    String publicFileUrl = configuration.getUrl(prependContextPath(
         PublicDatasetFiles.publicDatasetFileUrl(dataset,
             service.relativize(dataset, file.getFile().toPath()).toString())));
     Button button = new Button();
