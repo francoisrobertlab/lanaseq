@@ -10,11 +10,13 @@ import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.ViewLayoutElement;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Integration tests for {@link UsersView}.
  */
 @TestBenchTestAnnotations
+@ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("lanaseq@ircm.qc.ca")
 public class UsersViewContextPathItTest extends AbstractTestBenchTestCase {
 
