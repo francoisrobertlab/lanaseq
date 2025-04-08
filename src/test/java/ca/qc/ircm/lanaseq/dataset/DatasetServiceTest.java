@@ -266,7 +266,6 @@ public class DatasetServiceTest {
     filter.keywordsContains = "IP";
 
     List<Dataset> datasets = service.all(filter, Pageable.unpaged()).toList();
-    System.out.println(datasets);
 
     assertEquals(4, datasets.size());
     assertEquals(1L, datasets.get(0).getId());

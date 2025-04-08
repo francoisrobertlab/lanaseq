@@ -99,8 +99,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -346,8 +344,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
       Sample sample = samples.get(i);
       assertEquals(sample.getName(), test(dialog.samples).getCellText(i,
           dialog.samples.getColumns().indexOf(dialog.sampleName)));
-      ComponentRenderer<Button, Sample> buttonRenderer =
-          (ComponentRenderer<Button, Sample>) dialog.sampleRemove.getRenderer();
+      ComponentRenderer<Button, Sample> buttonRenderer = (ComponentRenderer<Button, Sample>) dialog.sampleRemove.getRenderer();
       Button button = buttonRenderer.createComponent(sample);
       assertTrue(button.hasClassName(REMOVE));
     }
@@ -374,8 +371,7 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.treatment.setValue("1, 2");
     Dataset dataset = service.get(2L).orElseThrow();
     Sample sample = dataset.getSamples().get(0);
-    ComponentRenderer<Button, Sample> buttonRenderer =
-        (ComponentRenderer<Button, Sample>) dialog.sampleRemove.getRenderer();
+    ComponentRenderer<Button, Sample> buttonRenderer = (ComponentRenderer<Button, Sample>) dialog.sampleRemove.getRenderer();
     Button button = buttonRenderer.createComponent(sample);
     clickButton(button);
     assertEquals(1, dialog.samples.getListDataView().getItemCount());
@@ -395,14 +391,14 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.samples.setItems(new ArrayList<>(samples));
     Sample sample = samples.get(0);
     Sample droppedSample = samples.get(2);
-    GridDragStartEvent<Sample> dragStartEvent =
-        new GridDragStartEvent<>(dialog.samples, false, JsonUtil.parse("{'draggedItems':[{'key':'"
-            + dialog.samples.getDataCommunicator().getKeyMapper().key(sample) + "'}]}"));
+    GridDragStartEvent<Sample> dragStartEvent = new GridDragStartEvent<>(dialog.samples, false,
+        JsonUtil.parse(
+            "{'draggedItems':[{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper()
+                .key(sample) + "'}]}"));
     fireEvent(dialog.samples, dragStartEvent);
     assertEquals(GridDropMode.BETWEEN, dialog.samples.getDropMode());
-    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false,
-        JsonUtil.parse("{'key':'"
-            + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample) + "'}"),
+    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false, JsonUtil.parse(
+        "{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample) + "'}"),
         GridDropLocation.ABOVE.getClientName(), JsonUtil.parse("[]"));
     fireEvent(dialog.samples, dropEvent);
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
@@ -433,14 +429,14 @@ public class DatasetDialogTest extends SpringUIUnitTest {
     dialog.samples.setItems(new ArrayList<>(samples));
     Sample sample = samples.get(0);
     Sample droppedSample = samples.get(2);
-    GridDragStartEvent<Sample> dragStartEvent =
-        new GridDragStartEvent<>(dialog.samples, false, JsonUtil.parse("{'draggedItems':[{'key':'"
-            + dialog.samples.getDataCommunicator().getKeyMapper().key(sample) + "'}]}"));
+    GridDragStartEvent<Sample> dragStartEvent = new GridDragStartEvent<>(dialog.samples, false,
+        JsonUtil.parse(
+            "{'draggedItems':[{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper()
+                .key(sample) + "'}]}"));
     fireEvent(dialog.samples, dragStartEvent);
     assertEquals(GridDropMode.BETWEEN, dialog.samples.getDropMode());
-    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false,
-        JsonUtil.parse("{'key':'"
-            + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample) + "'}"),
+    GridDropEvent<Sample> dropEvent = new GridDropEvent<>(dialog.samples, false, JsonUtil.parse(
+        "{'key':'" + dialog.samples.getDataCommunicator().getKeyMapper().key(droppedSample) + "'}"),
         GridDropLocation.BELOW.getClientName(), JsonUtil.parse("[]"));
     fireEvent(dialog.samples, dropEvent);
     List<Sample> samples = dialog.samples.getListDataView().getItems().toList();
@@ -542,13 +538,6 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
   @Test
   public void setDatasetId_NoPrefix() {
-    Dataset dataset = repository.findById(3L).orElseThrow();
-    Pattern namePattern = Pattern.compile("(?:(.*)_)?\\d{8}");
-    System.out.println(dataset.getName());
-    Matcher matcher = namePattern.matcher(dataset.getName());
-    System.out.println(matcher.matches());
-    System.out.println(matcher.group(1));
-
     dialog.setDatasetId(3L);
 
     assertEquals("", dialog.namePrefix.getValue());
@@ -736,9 +725,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void addSample() {
     clickButton(dialog.addSample);
 
-    @SuppressWarnings("unchecked")
-    Grid<Sample> selectSampleDialogGrid =
-        $(Grid.class).id(SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
+    @SuppressWarnings("unchecked") Grid<Sample> selectSampleDialogGrid = $(Grid.class).id(
+        SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
         GridSortOrder.desc(selectSampleDialogGrid.getColumnByKey(SampleProperties.DATE)).build());
     TextField ownerFilter = (TextField) selectSampleDialogGrid.getHeaderRows().get(1)
@@ -764,9 +752,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
   public void addSample_AlreadyInDataset() {
     clickButton(dialog.addSample);
 
-    @SuppressWarnings("unchecked")
-    Grid<Sample> selectSampleDialogGrid =
-        $(Grid.class).id(SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
+    @SuppressWarnings("unchecked") Grid<Sample> selectSampleDialogGrid = $(Grid.class).id(
+        SelectSampleDialog.id(SelectSampleDialog.SAMPLES));
     selectSampleDialogGrid.sort(
         GridSortOrder.desc(selectSampleDialogGrid.getColumnByKey(SampleProperties.DATE)).build());
     test(selectSampleDialogGrid).doubleClickRow(3);
@@ -787,8 +774,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Dataset> status = dialog.validateDataset();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.namePrefix);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.namePrefix);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -834,8 +821,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Dataset> status = dialog.validateDataset();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.namePrefix);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.namePrefix);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(MESSAGE_PREFIX + NAME_PREFIX_REGEX_ERROR)),
@@ -915,8 +902,8 @@ public class DatasetDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Dataset> status = dialog.validateDataset();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.date);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.date);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
