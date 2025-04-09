@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.test.config;
 import static ca.qc.ircm.lanaseq.test.config.AnnotationFinder.findAnnotation;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.TestBenchTestCase;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -32,13 +31,12 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   private static final String SKIP_TESTS_ERROR_MESSAGE = "TestBench tests are skipped";
   private static final String SKIP_TESTS_SYSTEM_PROPERTY = "testbench.skip";
   private static final String DRIVER_SYSTEM_PROPERTY = "testbench.driver";
-  private static final String RETRIES_SYSTEM_PROPERTY = "testbench.retries";
   @SuppressWarnings("unused")
   private static final String FIREFOX_DRIVER = FirefoxDriver.class.getName();
   private static final String CHROME_DRIVER = ChromeDriver.class.getName();
   private static final String DEFAULT_DRIVER = CHROME_DRIVER;
-  private static final Logger logger =
-      LoggerFactory.getLogger(TestBenchTestExecutionListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+      TestBenchTestExecutionListener.class);
   @Value("${download-home:${user.dir}/target}")
   protected File downloadHome;
 
@@ -47,8 +45,6 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
     injectDependencies(testContext.getApplicationContext());
     if (isTestBenchTest(testContext)) {
       assumeFalse(isSkipTestBenchTests(), SKIP_TESTS_ERROR_MESSAGE);
-
-      setRetries();
     }
   }
 
@@ -98,17 +94,15 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   }
 
   private WebDriver driver(TestContext testContext) {
-    final boolean headless =
-        findAnnotation(testContext.getTestClass(), testContext.getTestMethod(), Headless.class)
-            .map(Headless::value).orElse(false);
+    final boolean headless = findAnnotation(testContext.getTestClass(), testContext.getTestMethod(),
+        Headless.class).map(Headless::value).orElse(false);
     String driverClass = System.getProperty(DRIVER_SYSTEM_PROPERTY);
     if (driverClass == null) {
       driverClass = DEFAULT_DRIVER;
     }
     if (driverClass.equals(CHROME_DRIVER)) {
-      Download downloadAnnotations =
-          findAnnotation(testContext.getTestClass(), testContext.getTestMethod(), Download.class)
-              .orElse(null);
+      Download downloadAnnotations = findAnnotation(testContext.getTestClass(),
+          testContext.getTestMethod(), Download.class).orElse(null);
       ChromeOptions options = new ChromeOptions();
       options.addArguments("--remote-allow-origins=*");
       if (downloadAnnotations != null) {
@@ -137,17 +131,11 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
     } else {
       try {
         return (WebDriver) Class.forName(driverClass).getDeclaredConstructor().newInstance();
-      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException
-               | NoSuchMethodException | InvocationTargetException e) {
+      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
+               NoSuchMethodException | InvocationTargetException e) {
         logger.error("Could not instantiate WebDriver class {}", driverClass);
         throw new IllegalStateException("Could not instantiate WebDriver class " + driverClass, e);
       }
-    }
-  }
-
-  private void setRetries() {
-    if (System.getProperty(RETRIES_SYSTEM_PROPERTY) != null) {
-      Parameters.setMaxAttempts(Integer.parseInt(System.getProperty(RETRIES_SYSTEM_PROPERTY)));
     }
   }
 }
