@@ -3,9 +3,9 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.web.MainView.VIEW_NAME;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -14,13 +14,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class MainViewItTest extends AbstractTestBenchTestCase {
+public class MainViewItTest extends AbstractTestBenchBrowser {
 
   private void open() {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     open();
@@ -28,14 +28,14 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void userRedirected() {
     open();
 
     $(DatasetsViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void managerRedirected() {
     open();
@@ -43,7 +43,7 @@ public class MainViewItTest extends AbstractTestBenchTestCase {
     $(DatasetsViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void adminRedirected() {
     open();

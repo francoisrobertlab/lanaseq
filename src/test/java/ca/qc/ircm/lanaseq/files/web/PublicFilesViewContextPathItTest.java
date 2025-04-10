@@ -1,17 +1,17 @@
 package ca.qc.ircm.lanaseq.files.web;
 
 import static ca.qc.ircm.lanaseq.files.web.PublicFilesView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewContextPathItTest extends AbstractTestBenchTestCase {
+public class PublicFilesViewContextPathItTest extends AbstractTestBenchBrowser {
 
   @Value("${download-home}")
   protected Path downloadHome;
@@ -31,7 +31,7 @@ public class PublicFilesViewContextPathItTest extends AbstractTestBenchTestCase 
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @Download
   public void downloadLinks() throws IOException, InterruptedException {
     Files.createDirectories(downloadHome);
@@ -47,17 +47,17 @@ public class PublicFilesViewContextPathItTest extends AbstractTestBenchTestCase 
     assertTrue(Files.exists(downloaded));
     try {
       List<String> lines = Files.readAllLines(downloaded);
-      assertEquals(4, lines.size());
-      assertEquals(homeUrl()
+      Assertions.assertEquals(4, lines.size());
+      Assertions.assertEquals(homeUrl()
               + "sample-file/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw",
           lines.get(0));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
           lines.get(1));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS3_20181211/ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw",
           lines.get(2));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
           lines.get(3));
     } finally {
@@ -65,7 +65,7 @@ public class PublicFilesViewContextPathItTest extends AbstractTestBenchTestCase 
     }
   }
 
-  @Test
+  @BrowserTest
   @Download
   public void downloadLinks_FilterFilename() throws IOException, InterruptedException {
     Files.createDirectories(downloadHome);
@@ -82,11 +82,11 @@ public class PublicFilesViewContextPathItTest extends AbstractTestBenchTestCase 
     assertTrue(Files.exists(downloaded));
     try {
       List<String> lines = Files.readAllLines(downloaded);
-      assertEquals(2, lines.size());
-      assertEquals(homeUrl()
+      Assertions.assertEquals(2, lines.size());
+      Assertions.assertEquals(homeUrl()
               + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
           lines.get(0));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
           lines.get(1));
     } finally {

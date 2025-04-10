@@ -4,7 +4,7 @@ import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 import static org.junit.jupiter.api.Assumptions.abort;
 
 import ca.qc.ircm.lanaseq.UsedBy;
-import com.vaadin.testbench.TestBenchTestCase;
+import com.vaadin.testbench.BrowserTestBase;
 import com.vaadin.testbench.unit.UIUnitTest;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,12 +22,11 @@ import org.springframework.test.context.TestExecutionListener;
 @Order(0)
 public class VaadinLicenseExecutionListener implements TestExecutionListener, InjectDependencies {
 
-  private static final String LICENSE_ERROR_MESSAGE =
-      "License for Vaadin TestBench not found. Skipping test class {0} .";
-  private static final Class<?>[] TEST_BENCH_CLASSES =
-      new Class[]{UIUnitTest.class, TestBenchTestCase.class};
-  private static final Logger logger =
-      LoggerFactory.getLogger(VaadinLicenseExecutionListener.class);
+  private static final String LICENSE_ERROR_MESSAGE = "License for Vaadin TestBench not found. Skipping test class {0} .";
+  private static final Class<?>[] TEST_BENCH_CLASSES = new Class[]{UIUnitTest.class,
+      BrowserTestBase.class};
+  private static final Logger logger = LoggerFactory.getLogger(
+      VaadinLicenseExecutionListener.class);
   private VaadinLicenseConfiguration configuration;
 
   @Override
@@ -36,12 +35,12 @@ public class VaadinLicenseExecutionListener implements TestExecutionListener, In
     if (isTestBenchTest(testContext)) {
       boolean licenseFileExists = configuration.assume();
       for (String licencePath : configuration.paths()) {
-        licenseFileExists |=
-            Files.exists(Paths.get(System.getProperty("user.home")).resolve(licencePath));
+        licenseFileExists |= Files.exists(
+            Paths.get(System.getProperty("user.home")).resolve(licencePath));
       }
       if (!licenseFileExists) {
-        String message =
-            MessageFormat.format(LICENSE_ERROR_MESSAGE, testContext.getTestClass().getName());
+        String message = MessageFormat.format(LICENSE_ERROR_MESSAGE,
+            testContext.getTestClass().getName());
         logger.info(message);
         // Vaadin license file not found, skip tests.
         abort(message);

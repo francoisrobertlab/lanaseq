@@ -2,15 +2,15 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,8 +18,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
+public class SamplesAnalysisDialogItTest extends AbstractTestBenchBrowser {
 
   @TempDir
   Path temporaryFolder;
@@ -57,7 +57,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     return bytes;
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -70,7 +70,7 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::create).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void create_One() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path sampleFolder = configuration.getHome().folder(sample);
@@ -103,14 +103,14 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
     List<String> samplesContent = Files.readAllLines(samples);
-    assertEquals(2, samplesContent.size());
+    Assertions.assertEquals(2, samplesContent.size());
     assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample.getName(), samplesContent.get(1));
+    Assertions.assertEquals(sample.getName(), samplesContent.get(1));
     Path datasetMeta = folder.resolve("dataset.txt");
     assertFalse(Files.exists(datasetMeta));
   }
 
-  @Test
+  @BrowserTest
   public void create_Many() throws Throwable {
     Sample sample1 = repository.findById(4L).orElseThrow();
     Sample sample2 = repository.findById(10L).orElseThrow();
@@ -156,15 +156,15 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path samplesFile = folder.resolve("samples.txt");
     assertTrue(Files.exists(samplesFile));
     List<String> samplesContent = Files.readAllLines(samplesFile);
-    assertEquals(3, samplesContent.size());
+    Assertions.assertEquals(3, samplesContent.size());
     assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample1.getName(), samplesContent.get(1));
-    assertEquals(sample2.getName(), samplesContent.get(2));
+    Assertions.assertEquals(sample1.getName(), samplesContent.get(1));
+    Assertions.assertEquals(sample2.getName(), samplesContent.get(2));
     Path datasetMeta = folder.resolve("dataset.txt");
     assertFalse(Files.exists(datasetMeta));
   }
 
-  @Test
+  @BrowserTest
   public void create_NoFilenamePattern() throws Throwable {
     Sample sample1 = repository.findById(10L).orElseThrow();
     Sample sample2 = repository.findById(11L).orElseThrow();
@@ -199,10 +199,10 @@ public class SamplesAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path samplesFile = folder.resolve("samples.txt");
     assertTrue(Files.exists(samplesFile));
     List<String> samplesContent = Files.readAllLines(samplesFile);
-    assertEquals(3, samplesContent.size());
+    Assertions.assertEquals(3, samplesContent.size());
     assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample1.getName(), samplesContent.get(1));
-    assertEquals(sample2.getName(), samplesContent.get(2));
+    Assertions.assertEquals(sample1.getName(), samplesContent.get(1));
+    Assertions.assertEquals(sample2.getName(), samplesContent.get(2));
     Path datasetMeta = folder.resolve("dataset.txt");
     assertFalse(Files.exists(datasetMeta));
   }

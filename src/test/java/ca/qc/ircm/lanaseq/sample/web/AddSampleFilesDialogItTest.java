@@ -4,24 +4,24 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -33,7 +33,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
+public class AddSampleFilesDialogItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(AddSampleFilesDialog.class);
   @TempDir
@@ -71,7 +71,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
         file2);
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -86,7 +86,7 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void refresh() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -95,12 +95,12 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     filesDialog.addLargeFiles().click();
     AddSampleFilesDialogElement dialog = filesDialog.addFilesDialog();
     Sample sample = repository.findById(10L).orElseThrow();
-    assertEquals(0, dialog.files().getRowCount());
+    Assertions.assertEquals(0, dialog.files().getRowCount());
     copyFiles(sample);
 
     dialog.refresh().click();
 
-    assertEquals(2, dialog.files().getRowCount());
+    Assertions.assertEquals(2, dialog.files().getRowCount());
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         configuration.getUpload().folder(sample).resolve("other.fastq"));
@@ -110,10 +110,10 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
 
     dialog.refresh().click();
 
-    assertEquals(4, dialog.files().getRowCount());
+    Assertions.assertEquals(4, dialog.files().getRowCount());
   }
 
-  @Test
+  @BrowserTest
   public void save() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -133,8 +133,9 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
-        new Object[]{3, sample.getName()}, currentLocale()), notification.getText());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{3, sample.getName()},
+            currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(sample);
     Path upload = configuration.getUpload().folder(sample);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
@@ -142,16 +143,13 @@ public class AddSampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(Files.exists(upload.getParent().resolve(filenameInRoot)));
     assertFalse(Files.exists(upload.resolve(file1.getFileName())));
     assertFalse(Files.exists(upload.resolve(file2.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file2.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(filenameInRoot)));
   }

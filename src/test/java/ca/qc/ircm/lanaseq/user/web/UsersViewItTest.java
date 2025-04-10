@@ -4,19 +4,19 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.UsersView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import ca.qc.ircm.lanaseq.web.ViewLayoutElement;
+import com.vaadin.testbench.BrowserTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -27,7 +27,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UsersViewItTest extends AbstractTestBenchTestCase {
+public class UsersViewItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -38,7 +38,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     open();
@@ -46,7 +46,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void security_User() {
     open();
@@ -54,7 +54,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     $(AccessDeniedViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void security_Manager() {
     open();
@@ -62,24 +62,25 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     $(UsersViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void security_Admin() {
     open();
 
     $(UsersViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void title() {
     open();
 
-    String applicationName =
-        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
+    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
+        currentLocale());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
+            currentLocale()), getDriver().getTitle());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
@@ -90,7 +91,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::switchUser).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void edit() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
@@ -101,7 +102,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     assertTrue(view.dialog().isOpen());
   }
 
-  @Test
+  @BrowserTest
   public void add() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
@@ -111,7 +112,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     assertTrue(view.dialog().isOpen());
   }
 
-  @Test
+  @BrowserTest
   public void switchUser() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();
@@ -125,7 +126,7 @@ public class UsersViewItTest extends AbstractTestBenchTestCase {
     assertFalse(optional(viewReload::users).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @Disabled("Admins are allowed to switch to another admin right now")
   public void switchUser_Fail() {
     open();

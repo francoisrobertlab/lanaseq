@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.DELETED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,17 +15,18 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -43,7 +43,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetDialogItTest extends AbstractTestBenchTestCase {
+public class DatasetDialogItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogItTest.class);
@@ -85,7 +85,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     dialog.date().setDate(date);
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -115,7 +115,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::delete).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void save_Update() throws Throwable {
     open();
     Dataset dataset = repository.findById(2L).orElseThrow();
@@ -135,48 +135,48 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     dataset = repository.findById(2L).orElseThrow();
-    assertEquals(name, dataset.getName());
-    assertEquals(3, dataset.getKeywords().size());
+    Assertions.assertEquals(name, dataset.getName());
+    Assertions.assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains(keyword1));
     assertTrue(dataset.getKeywords().contains(keyword2));
-    assertEquals(2, dataset.getFilenames().size());
+    Assertions.assertEquals(2, dataset.getFilenames().size());
     assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertTrue(dataset.getFilenames().contains(filename));
-    assertEquals(note, dataset.getNote());
-    assertEquals(date, dataset.getDate());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
-    assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(2, dataset.getSamples().size());
+    Assertions.assertEquals(note, dataset.getNote());
+    Assertions.assertEquals(date, dataset.getDate());
+    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
+    Assertions.assertEquals((Long) 3L, dataset.getOwner().getId());
+    Assertions.assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals(3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals("JS1", sample.getSampleId());
+    Assertions.assertEquals("R1", sample.getReplicate());
+    Assertions.assertEquals(3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
-    assertEquals("JS2", sample.getSampleId());
-    assertEquals("R2", sample.getReplicate());
-    assertEquals(3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals("JS2", sample.getSampleId());
+    Assertions.assertEquals("R2", sample.getReplicate());
+    Assertions.assertEquals(3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
-    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208",
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208",
         repository.findById(6L).orElseThrow().getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.getHome().folder(dataset);
@@ -186,7 +186,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(Files.exists(sampleFolder));
   }
 
-  @Test
+  @BrowserTest
   @Disabled("Drag and drop function moves to random element instead of the right location")
   public void save_ReorderSamples() {
     open();
@@ -206,51 +206,51 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     String name = namePrefix + "_" + DateTimeFormatter.BASIC_ISO_DATE.format(date);
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     Dataset dataset = repository.findById(2L).orElseThrow();
-    assertEquals(name, dataset.getName());
-    assertEquals(3, dataset.getKeywords().size());
+    Assertions.assertEquals(name, dataset.getName());
+    Assertions.assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("G24D"));
-    assertEquals(1, dataset.getFilenames().size());
+    Assertions.assertEquals(1, dataset.getFilenames().size());
     assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertNull(dataset.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
-    assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(2, dataset.getSamples().size());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
+    Assertions.assertEquals((Long) 3L, dataset.getOwner().getId());
+    Assertions.assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals((Long) 5L, sample.getId());
-    assertEquals("JS2", sample.getSampleId());
-    assertEquals("R2", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals((Long) 5L, sample.getId());
+    Assertions.assertEquals("JS2", sample.getSampleId());
+    Assertions.assertEquals("R2", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
-    assertEquals((Long) 4L, sample.getId());
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals((Long) 4L, sample.getId());
+    Assertions.assertEquals("JS1", sample.getSampleId());
+    Assertions.assertEquals("R1", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
   }
 
-  @Test
+  @BrowserTest
   public void addSample() throws Throwable {
     open();
     Dataset dataset = repository.findById(2L).orElseThrow();
@@ -271,59 +271,60 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
     dataset = repository.findById(2L).orElseThrow();
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
-        new Object[]{dataset.getName()}, currentLocale()), notification.getText());
-    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
-    assertEquals(3, dataset.getKeywords().size());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{dataset.getName()},
+            currentLocale()), notification.getText());
+    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2-JS1_20181022", dataset.getName());
+    Assertions.assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("G24D"));
-    assertEquals(1, dataset.getFilenames().size());
+    Assertions.assertEquals(1, dataset.getFilenames().size());
     assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertNull(dataset.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
-    assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(3, dataset.getSamples().size());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
+    Assertions.assertEquals((Long) 3L, dataset.getOwner().getId());
+    Assertions.assertEquals(3, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals((Long) 4L, sample.getId());
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals((Long) 4L, sample.getId());
+    Assertions.assertEquals("JS1", sample.getSampleId());
+    Assertions.assertEquals("R1", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
-    assertEquals((Long) 5L, sample.getId());
-    assertEquals("JS2", sample.getSampleId());
-    assertEquals("R2", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals((Long) 5L, sample.getId());
+    Assertions.assertEquals("JS2", sample.getSampleId());
+    Assertions.assertEquals("R2", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(2);
-    assertEquals((Long) 10L, sample.getId());
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals((Long) 10L, sample.getId());
+    Assertions.assertEquals("JS1", sample.getSampleId());
+    Assertions.assertEquals("R1", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 12, 10), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 12, 10), sample.getDate());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.getHome().folder(dataset);
     logger.debug("dataset folder {} exists {}", folder, Files.exists(folder));
@@ -332,7 +333,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(Files.exists(oldFolder));
   }
 
-  @Test
+  @BrowserTest
   public void cancel() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -347,45 +348,45 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Dataset dataset = repository.findById(2L).orElseThrow();
-    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
-    assertEquals(3, dataset.getKeywords().size());
+    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
+    Assertions.assertEquals(3, dataset.getKeywords().size());
     assertTrue(dataset.getKeywords().contains("chipseq"));
     assertTrue(dataset.getKeywords().contains("ip"));
     assertTrue(dataset.getKeywords().contains("G24D"));
-    assertEquals(1, dataset.getFilenames().size());
+    Assertions.assertEquals(1, dataset.getFilenames().size());
     assertTrue(dataset.getFilenames().contains("OF_20241118_ROB"));
     assertNull(dataset.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
-    assertEquals((Long) 3L, dataset.getOwner().getId());
-    assertEquals(2, dataset.getSamples().size());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), dataset.getDate());
+    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 48, 20), dataset.getCreationDate());
+    Assertions.assertEquals((Long) 3L, dataset.getOwner().getId());
+    Assertions.assertEquals(2, dataset.getSamples().size());
     Sample sample = dataset.getSamples().get(0);
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals("JS1", sample.getSampleId());
+    Assertions.assertEquals("R1", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     sample = dataset.getSamples().get(1);
-    assertEquals("JS2", sample.getSampleId());
-    assertEquals("R2", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals("JS2", sample.getSampleId());
+    Assertions.assertEquals("R2", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getNote());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
     assertNull(sample.getTreatment());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void delete() throws Throwable {
     open();
@@ -405,7 +406,7 @@ public class DatasetDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name}, currentLocale()),
         notification.getText());
     assertFalse(repository.findById(4L).isPresent());

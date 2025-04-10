@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.files.web.PublicFilesView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,15 +11,16 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
+import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -32,7 +32,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
+public class PublicFilesViewItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PublicFilesView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -49,7 +49,7 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     open();
@@ -57,17 +57,18 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void title() {
     open();
 
     String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
         currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
+            currentLocale()), getDriver().getTitle());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     PublicFilesViewElement view = $(PublicFilesViewElement.class).waitForFirst();
@@ -79,23 +80,23 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::downloadLinks).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void delete() {
     open();
     Sample sample = sampleRepository.findById(11L).orElseThrow();
     assertTrue(samplePublicFileRepository.findBySampleAndPath(sample,
         "JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw").isPresent());
     PublicFilesViewElement view = $(PublicFilesViewElement.class).waitForFirst();
-    assertEquals(4, view.files().getRowCount());
+    Assertions.assertEquals(4, view.files().getRowCount());
 
     view.files().delete(0).click();
 
-    assertEquals(3, view.files().getRowCount());
+    Assertions.assertEquals(3, view.files().getRowCount());
     assertFalse(samplePublicFileRepository.findBySampleAndPath(sample,
         "JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw").isPresent());
   }
 
-  @Test
+  @BrowserTest
   @Download
   public void downloadLinks() throws IOException, InterruptedException {
     Files.createDirectories(downloadHome);
@@ -111,17 +112,17 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(Files.exists(downloaded));
     try {
       List<String> lines = Files.readAllLines(downloaded);
-      assertEquals(4, lines.size());
-      assertEquals(homeUrl()
+      Assertions.assertEquals(4, lines.size());
+      Assertions.assertEquals(homeUrl()
               + "sample-file/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw",
           lines.get(0));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
           lines.get(1));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS3_20181211/ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw",
           lines.get(2));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
           lines.get(3));
     } finally {
@@ -129,7 +130,7 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     }
   }
 
-  @Test
+  @BrowserTest
   @Download
   public void downloadLinks_FilterFilename() throws IOException, InterruptedException {
     Files.createDirectories(downloadHome);
@@ -146,11 +147,11 @@ public class PublicFilesViewItTest extends AbstractTestBenchTestCase {
     assertTrue(Files.exists(downloaded));
     try {
       List<String> lines = Files.readAllLines(downloaded);
-      assertEquals(2, lines.size());
-      assertEquals(homeUrl()
+      Assertions.assertEquals(2, lines.size());
+      Assertions.assertEquals(homeUrl()
               + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
           lines.get(0));
-      assertEquals(homeUrl()
+      Assertions.assertEquals(homeUrl()
               + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
           lines.get(1));
     } finally {

@@ -4,24 +4,24 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -33,7 +33,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
+public class AddDatasetFilesDialogItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
   @TempDir
@@ -71,7 +71,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
         file2);
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -86,7 +86,7 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void refresh() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -95,12 +95,12 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     filesDialog.addLargeFiles().click();
     AddDatasetFilesDialogElement dialog = filesDialog.addFilesDialog();
     Dataset dataset = repository.findById(2L).orElseThrow();
-    assertEquals(0, dialog.files().getRowCount());
+    Assertions.assertEquals(0, dialog.files().getRowCount());
     copyFiles(dataset);
 
     dialog.refresh().click();
 
-    assertEquals(2, dialog.files().getRowCount());
+    Assertions.assertEquals(2, dialog.files().getRowCount());
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         configuration.getUpload().folder(dataset).resolve("other.fastq"));
@@ -110,10 +110,10 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
 
     dialog.refresh().click();
 
-    assertEquals(4, dialog.files().getRowCount());
+    Assertions.assertEquals(4, dialog.files().getRowCount());
   }
 
-  @Test
+  @BrowserTest
   public void save() throws Throwable {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -133,8 +133,9 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED,
-        new Object[]{3, dataset.getName()}, currentLocale()), notification.getText());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{3, dataset.getName()},
+            currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(dataset);
     Path upload = configuration.getUpload().folder(dataset);
     assertTrue(Files.exists(folder.resolve(file1.getFileName())));
@@ -142,16 +143,13 @@ public class AddDatasetFilesDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(Files.exists(upload.getParent().resolve(filenameInRoot)));
     assertFalse(Files.exists(upload.resolve(file1.getFileName())));
     assertFalse(Files.exists(upload.resolve(file2.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file1.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(file2.getFileName())));
-    assertArrayEquals(
-        Files.readAllBytes(
+    assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve(filenameInRoot)));
   }

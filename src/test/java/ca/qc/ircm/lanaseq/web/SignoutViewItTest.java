@@ -1,9 +1,9 @@
 package ca.qc.ircm.lanaseq.web;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -12,9 +12,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SignoutViewItTest extends AbstractTestBenchTestCase {
+public class SignoutViewItTest extends AbstractTestBenchBrowser {
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     openView(SignoutView.VIEW_NAME);
@@ -22,14 +22,14 @@ public class SignoutViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void security_User() {
     openView(SignoutView.VIEW_NAME);
 
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void signout() {
     openView(DatasetsView.VIEW_NAME);
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();

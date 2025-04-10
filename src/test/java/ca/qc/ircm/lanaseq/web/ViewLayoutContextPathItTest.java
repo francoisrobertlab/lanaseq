@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -18,13 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ViewLayoutContextPathItTest extends AbstractTestBenchTestCase {
+public class ViewLayoutContextPathItTest extends AbstractTestBenchBrowser {
 
   private void open() {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void exitSwitchUser() {
     open();
@@ -42,7 +42,7 @@ public class ViewLayoutContextPathItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(viewReload::users).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void signout() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();

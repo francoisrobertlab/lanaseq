@@ -1,20 +1,20 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.PublicDatasetFiles.REST_MAPPING;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetPublicFileRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -24,7 +24,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class PublicDatasetFilesItTest extends AbstractTestBenchTestCase {
+public class PublicDatasetFilesItTest extends AbstractTestBenchBrowser {
 
   @TempDir
   Path temporaryFolder;
@@ -40,7 +40,7 @@ public class PublicDatasetFilesItTest extends AbstractTestBenchTestCase {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
   }
 
-  @Test
+  @BrowserTest
   public void publicFile() throws Throwable {
     Dataset dataset = repository.findById(6L).orElseThrow();
     Path home = configuration.getHome().folder(dataset);
@@ -52,6 +52,7 @@ public class PublicDatasetFilesItTest extends AbstractTestBenchTestCase {
 
     openView(REST_MAPPING + "/" + dataset.getName() + "/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw");
 
-    assertEquals(Files.readString(file1).replaceAll("\n", " "), $("body").waitForFirst().getText());
+    Assertions.assertEquals(Files.readString(file1).replaceAll("\n", " "),
+        $("body").waitForFirst().getText());
   }
 }

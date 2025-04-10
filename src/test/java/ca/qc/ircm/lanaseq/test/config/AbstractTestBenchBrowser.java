@@ -15,18 +15,22 @@ import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.sidenav.testbench.SideNavElement;
 import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
-import com.vaadin.testbench.TestBenchTestCase;
+import com.vaadin.testbench.BrowserTestBase;
+import com.vaadin.testbench.DriverSupplier;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +39,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.lang.Nullable;
 
 /**
- * Additional functions for TestBenchTestCase.
+ * Additional functions for BrowserTestBase.
  */
-public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
+public abstract class AbstractTestBenchBrowser extends BrowserTestBase implements DriverSupplier {
 
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final String LAYOUT_PREFIX = messagePrefix(ViewLayout.class);
@@ -46,11 +50,14 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
       UseForgotPasswordView.class);
   private static final String PASSWORD_PREFIX = messagePrefix(PasswordView.class);
   private static final String ACCESS_DENIED_PREFIX = messagePrefix(AccessDeniedView.class);
-  private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchTestCase.class);
+  @SuppressWarnings("unused")
+  private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchBrowser.class);
   @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
   @Value("${server.servlet.context-path:}")
   protected String contextPath;
+  @Value("${download-home:${user.dir}/target}")
+  protected File downloadHome;
   private Path home;
   private Path archive;
   private Path analysis;
@@ -59,6 +66,12 @@ public abstract class AbstractTestBenchTestCase extends TestBenchTestCase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+
+  @Override
+  public WebDriver createDriver() {
+    return Objects.requireNonNull(getDriver(),
+        "WebDriver should have been created by TestBenchTestExecutionListener");
+  }
 
   @BeforeEach
   public void setServerUrl()

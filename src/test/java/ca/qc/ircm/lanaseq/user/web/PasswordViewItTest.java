@@ -4,20 +4,20 @@ import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +30,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("christian.poitras@ircm.qc.ca")
-public class PasswordViewItTest extends AbstractTestBenchTestCase {
+public class PasswordViewItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -46,7 +46,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     open();
@@ -54,16 +54,17 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void title() {
     open();
-    String applicationName =
-        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
+    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
+        currentLocale());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
+            currentLocale()), getDriver().getTitle());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
@@ -73,7 +74,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void sign_ForceChangePassword() {
     openView(SigninView.VIEW_NAME);
@@ -88,7 +89,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void mainView() {
     openView(MainView.VIEW_NAME);
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
@@ -98,7 +99,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void datasetsView() {
     openView(DatasetsView.VIEW_NAME);
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();
@@ -108,7 +109,7 @@ public class PasswordViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void save() {
     open();
     PasswordViewElement view = $(PasswordViewElement.class).waitForFirst();

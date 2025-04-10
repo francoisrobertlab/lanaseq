@@ -6,7 +6,6 @@ import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,10 +14,11 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFile;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
+public class SampleFilesDialogItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   @Value("${download-home}")
@@ -74,7 +74,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -89,7 +89,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::addLargeFiles).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void files() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
@@ -108,17 +108,18 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
-    assertEquals(2, dialog.folders().labels().size());
-    assertEquals(configuration.getHome().label(sample, !SystemUtils.IS_OS_WINDOWS),
+    Assertions.assertEquals(2, dialog.folders().labels().size());
+    Assertions.assertEquals(configuration.getHome().label(sample, !SystemUtils.IS_OS_WINDOWS),
         dialog.folders().labels().get(0).getText());
-    assertEquals(configuration.getArchives().get(0).label(sample, !SystemUtils.IS_OS_WINDOWS),
+    Assertions.assertEquals(
+        configuration.getArchives().get(0).label(sample, !SystemUtils.IS_OS_WINDOWS),
         dialog.folders().labels().get(1).getText());
-    assertEquals(2, dialog.files().getRowCount());
-    assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
-    assertEquals(file2.getFileName().toString(), dialog.files().filename(1));
+    Assertions.assertEquals(2, dialog.files().getRowCount());
+    Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
+    Assertions.assertEquals(file2.getFileName().toString(), dialog.files().filename(1));
   }
 
-  @Test
+  @BrowserTest
   public void rename() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
@@ -144,7 +145,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     assertFalse(Files.exists(file));
   }
 
-  @Test
+  @BrowserTest
   @Download
   public void download() throws Throwable {
     Files.createDirectories(downloadHome);
@@ -176,7 +177,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     }
   }
 
-  @Test
+  @BrowserTest
   public void publicFile() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path home = configuration.getHome().folder(sample);
@@ -199,11 +200,11 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
         sample, "R1.fastq");
     assertTrue(optionalSamplePublicFile.isPresent());
     SamplePublicFile samplePublicFile = optionalSamplePublicFile.orElseThrow();
-    assertEquals(LocalDate.now().plus(configuration.getPublicFilePeriod()),
+    Assertions.assertEquals(LocalDate.now().plus(configuration.getPublicFilePeriod()),
         samplePublicFile.getExpiryDate());
   }
 
-  @Test
+  @BrowserTest
   public void delete() throws Throwable {
     Sample sample = repository.findById(10L).orElseThrow();
     Path folder = configuration.getHome().folder(sample);
@@ -226,16 +227,17 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Path deleted = folder.resolve(DELETED_FILENAME);
     List<String> deletedLines = Files.readAllLines(deleted);
     String[] deletedFileColumns = deletedLines.get(deletedLines.size() - 1).split("\t", -1);
-    assertEquals(3, deletedFileColumns.length);
-    assertEquals("R1.fastq", deletedFileColumns[0]);
+    Assertions.assertEquals(3, deletedFileColumns.length);
+    Assertions.assertEquals("R1.fastq", deletedFileColumns[0]);
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-    assertEquals(modifiedTime, LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
+    Assertions.assertEquals(modifiedTime,
+        LocalDateTime.from(formatter.parse(deletedFileColumns[1])));
     LocalDateTime deletedTime = LocalDateTime.from(formatter.parse(deletedFileColumns[2]));
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(deletedTime));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(deletedTime));
   }
 
-  @Test
+  @BrowserTest
   public void refresh() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -248,15 +250,15 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     Files.copy(
         Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
         file1);
-    assertEquals(0, dialog.files().getRowCount());
+    Assertions.assertEquals(0, dialog.files().getRowCount());
 
     dialog.refresh().click();
 
-    assertEquals(1, dialog.files().getRowCount());
-    assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
+    Assertions.assertEquals(1, dialog.files().getRowCount());
+    Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
   }
 
-  @Test
+  @BrowserTest
   public void upload() throws Throwable {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -267,7 +269,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
     dialog.upload().upload(file1.toFile());
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS, new Object[]{file1.getFileName()},
             currentLocale()), notification.getText());
     Path folder = configuration.getHome().folder(sample);
@@ -277,7 +279,7 @@ public class SampleFilesDialogItTest extends AbstractTestBenchTestCase {
         Files.readAllBytes(folder.resolve(file1.getFileName())));
   }
 
-  @Test
+  @BrowserTest
   public void addLargeFiles() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();

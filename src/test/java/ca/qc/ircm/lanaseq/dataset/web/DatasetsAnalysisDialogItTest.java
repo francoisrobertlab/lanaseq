@@ -2,7 +2,6 @@ package ca.qc.ircm.lanaseq.dataset.web;
 
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetsView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,8 +9,9 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,8 +19,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
+public class DatasetsAnalysisDialogItTest extends AbstractTestBenchBrowser {
 
   @TempDir
   Path temporaryFolder;
@@ -58,7 +58,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     return bytes;
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
@@ -71,7 +71,7 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::create).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void create_One() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample1 = dataset.getSamples().get(0);
@@ -116,19 +116,19 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
     List<String> samplesContent = Files.readAllLines(samples);
-    assertEquals(3, samplesContent.size());
+    Assertions.assertEquals(3, samplesContent.size());
     assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample1.getName(), samplesContent.get(1));
-    assertEquals(sample2.getName(), samplesContent.get(2));
+    Assertions.assertEquals(sample1.getName(), samplesContent.get(1));
+    Assertions.assertEquals(sample2.getName(), samplesContent.get(2));
     Path datasetMeta = folder.resolve("dataset.txt");
     assertTrue(Files.exists(datasetMeta));
     List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
-    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
-    assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
+    Assertions.assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    Assertions.assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
         datasetMetaContent.get(1));
   }
 
-  @Test
+  @BrowserTest
   public void create_Many() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Dataset dataset2 = repository.findById(7L).orElseThrow();
@@ -189,21 +189,22 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
     List<String> samplesContent = Files.readAllLines(samples);
-    assertEquals(4, samplesContent.size());
+    Assertions.assertEquals(4, samplesContent.size());
     assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample1.getName(), samplesContent.get(1));
-    assertEquals(sample2.getName(), samplesContent.get(2));
-    assertEquals(sample3.getName(), samplesContent.get(3));
+    Assertions.assertEquals(sample1.getName(), samplesContent.get(1));
+    Assertions.assertEquals(sample2.getName(), samplesContent.get(2));
+    Assertions.assertEquals(sample3.getName(), samplesContent.get(3));
     Path datasetMeta = folder.resolve("dataset.txt");
     assertTrue(Files.exists(datasetMeta));
     List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
-    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
-    assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
+    Assertions.assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    Assertions.assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
         datasetMetaContent.get(1));
-    assertEquals(dataset2.getName() + "\t" + sample3.getName(), datasetMetaContent.get(2));
+    Assertions.assertEquals(dataset2.getName() + "\t" + sample3.getName(),
+        datasetMetaContent.get(2));
   }
 
-  @Test
+  @BrowserTest
   public void create_NoFilenamePattern() throws Throwable {
     Dataset dataset = repository.findById(2L).orElseThrow();
     Sample sample1 = dataset.getSamples().get(0);
@@ -240,15 +241,15 @@ public class DatasetsAnalysisDialogItTest extends AbstractTestBenchTestCase {
     Path samples = folder.resolve("samples.txt");
     assertTrue(Files.exists(samples));
     List<String> samplesContent = Files.readAllLines(samples);
-    assertEquals(3, samplesContent.size());
+    Assertions.assertEquals(3, samplesContent.size());
     assertTrue(samplesContent.get(0).startsWith("#sample"));
-    assertEquals(sample1.getName(), samplesContent.get(1));
-    assertEquals(sample2.getName(), samplesContent.get(2));
+    Assertions.assertEquals(sample1.getName(), samplesContent.get(1));
+    Assertions.assertEquals(sample2.getName(), samplesContent.get(2));
     Path datasetMeta = folder.resolve("dataset.txt");
     assertTrue(Files.exists(datasetMeta));
     List<String> datasetMetaContent = Files.readAllLines(datasetMeta);
-    assertEquals("#merge\tsamples", datasetMetaContent.get(0));
-    assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
+    Assertions.assertEquals("#merge\tsamples", datasetMetaContent.get(0));
+    Assertions.assertEquals(dataset.getName() + "\t" + sample1.getName() + "\t" + sample2.getName(),
         datasetMetaContent.get(1));
   }
 }

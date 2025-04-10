@@ -5,13 +5,12 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ForgotPasswordView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.mail.MailConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
@@ -21,12 +20,13 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import jakarta.mail.Message.RecipientType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ import org.springframework.test.context.DynamicPropertySource;
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
+public class ForgotPasswordViewItTest extends AbstractTestBenchBrowser {
 
   @RegisterExtension
   static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP);
@@ -68,16 +68,17 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   public void title() {
     open();
     String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
         currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
+            currentLocale()), getDriver().getTitle());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
@@ -87,7 +88,7 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void save() throws MessagingException {
     open();
     ForgotPasswordViewElement view = $(ForgotPasswordViewElement.class).waitForFirst();
@@ -95,28 +96,28 @@ public class ForgotPasswordViewItTest extends AbstractTestBenchTestCase {
     view.save().click();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{email}, currentLocale()),
         notification.getText());
     List<ForgotPassword> forgotPasswords = repository.findByUserEmail(email);
     ForgotPassword forgotPassword = forgotPasswords.get(forgotPasswords.size() - 1);
-    assertEquals(4, forgotPasswords.size());
+    Assertions.assertEquals(4, forgotPasswords.size());
     $(SigninViewElement.class).waitForFirst();
 
     MimeMessage[] messages = greenMail.getReceivedMessages();
-    assertEquals(1, messages.length);
+    Assertions.assertEquals(1, messages.length);
     MimeMessage message = messages[0];
     String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + "application.name", null,
         currentLocale());
     String subject = messageSource.getMessage(SERVICE_PREFIX + "subject",
         new Object[]{applicationName}, currentLocale());
-    assertEquals(subject, message.getSubject());
+    Assertions.assertEquals(subject, message.getSubject());
     assertNotNull(message.getFrom());
-    assertEquals(1, message.getFrom().length);
-    assertEquals(new InternetAddress(mailConfiguration.from()), message.getFrom()[0]);
+    Assertions.assertEquals(1, message.getFrom().length);
+    Assertions.assertEquals(new InternetAddress(mailConfiguration.from()), message.getFrom()[0]);
     assertNotNull(message.getRecipients(RecipientType.TO));
-    assertEquals(1, message.getRecipients(RecipientType.TO).length);
-    assertEquals(new InternetAddress(email), message.getRecipients(RecipientType.TO)[0]);
+    Assertions.assertEquals(1, message.getRecipients(RecipientType.TO).length);
+    Assertions.assertEquals(new InternetAddress(email), message.getRecipients(RecipientType.TO)[0]);
     assertTrue(message.getRecipients(RecipientType.CC) == null
         || message.getRecipients(RecipientType.CC).length == 0);
     assertTrue(message.getRecipients(RecipientType.BCC) == null

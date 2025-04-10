@@ -1,6 +1,6 @@
 package ca.qc.ircm.lanaseq.test.config;
 
-import com.vaadin.testbench.TestBenchTestCase;
+import com.vaadin.testbench.BrowserTestBase;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -23,8 +23,8 @@ import org.springframework.web.filter.GenericFilterBean;
 /**
  * Request filter that sets security context.
  */
-public class TestBenchSecurityFilter extends GenericFilterBean
-    implements TestExecutionListener, Ordered {
+public class TestBenchSecurityFilter extends GenericFilterBean implements TestExecutionListener,
+    Ordered {
 
   public static final String BEAN_NAME = "TestBenchSecurityFilter";
   private static final Logger logger = LoggerFactory.getLogger(TestBenchSecurityFilter.class);
@@ -73,7 +73,7 @@ public class TestBenchSecurityFilter extends GenericFilterBean
   }
 
   private boolean isTestBenchTest(TestContext testContext) {
-    return TestBenchTestCase.class.isAssignableFrom(testContext.getTestClass());
+    return BrowserTestBase.class.isAssignableFrom(testContext.getTestClass());
   }
 
   @Override

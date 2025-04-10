@@ -7,18 +7,18 @@ import static ca.qc.ircm.lanaseq.web.SigninView.DISABLED;
 import static ca.qc.ircm.lanaseq.web.SigninView.FAIL;
 import static ca.qc.ircm.lanaseq.web.SigninView.LOCKED;
 import static ca.qc.ircm.lanaseq.web.SigninView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewElement;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -29,7 +29,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class SigninViewItTest extends AbstractTestBenchTestCase {
+public class SigninViewItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -42,17 +42,18 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   public void title() {
     open();
 
     String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
         currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
+            currentLocale()), getDriver().getTitle());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
@@ -62,7 +63,7 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::getForgotPasswordButton).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void sign_Fail() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
@@ -71,26 +72,27 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     view.getSubmitButton().click();
     waitUntil(driver -> driver != null && driver.getCurrentUrl() != null && driver.getCurrentUrl()
         .endsWith("?" + FAIL));
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
+    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + FAIL, null, currentLocale()),
         view.getErrorMessage());
     assertNotNull(getDriver().getCurrentUrl());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
-  @Test
+  @BrowserTest
   public void sign_Disabled() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
     view.getUsernameField().setValue("ava.martin@ircm.qc.ca");
     view.getPasswordField().setValue("password");
     view.getSubmitButton().click();
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + DISABLED, null, currentLocale()),
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + DISABLED, null, currentLocale()),
         view.getErrorMessage());
     assertNotNull(getDriver().getCurrentUrl());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
-  @Test
+  @BrowserTest
   public void sign_Locked() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
@@ -104,14 +106,14 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
         throw new IllegalStateException("Sleep was interrupted", e);
       }
     }
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
+    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + LOCKED,
             new Object[]{configuration.lockDuration().getSeconds() / 60}, currentLocale()),
         view.getErrorMessage());
     assertNotNull(getDriver().getCurrentUrl());
     assertTrue(getDriver().getCurrentUrl().startsWith(viewUrl(VIEW_NAME) + "?"));
   }
 
-  @Test
+  @BrowserTest
   public void sign() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
@@ -121,16 +123,16 @@ public class SigninViewItTest extends AbstractTestBenchTestCase {
     $(DatasetsViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void forgotPassword() {
     open();
     SigninViewElement view = $(SigninViewElement.class).waitForFirst();
     view.getForgotPasswordButton().click();
-    assertEquals(viewUrl(ForgotPasswordView.VIEW_NAME), getDriver().getCurrentUrl());
+    Assertions.assertEquals(viewUrl(ForgotPasswordView.VIEW_NAME), getDriver().getCurrentUrl());
     $(ForgotPasswordViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void already_User() {
     open();

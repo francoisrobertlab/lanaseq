@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.DELETED;
 import static ca.qc.ircm.lanaseq.sample.web.SampleDialog.SAVED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,17 +17,18 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleDialogItTest extends AbstractTestBenchTestCase {
+public class SampleDialogItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleDialog.class);
   @TempDir
@@ -111,7 +111,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
         + "_" + target + "_" + strain + "_" + strainDescription + "_" + treatment + "_" + replicate;
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence_Add() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -137,7 +137,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::confirm).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence_Update() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -164,7 +164,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::confirm).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void fieldsExistence_Deletable() {
     open();
@@ -193,7 +193,7 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(dialog::confirm).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void save_New() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -207,38 +207,38 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     String name = name() + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     List<Sample> samples = repository.findByOwner(new User(3L));
-    Sample sample =
-        samples.stream().filter(ex -> name.equals(ex.getName())).findFirst().orElseThrow();
+    Sample sample = samples.stream().filter(ex -> name.equals(ex.getName())).findFirst()
+        .orElseThrow();
     assertNotNull(sample);
     assertNotEquals(0, sample.getId());
-    assertEquals(name, sample.getName());
+    Assertions.assertEquals(name, sample.getName());
     assertTrue(LocalDateTime.now().minusMinutes(2).isBefore(sample.getCreationDate()));
     assertTrue(LocalDateTime.now().plusMinutes(2).isAfter(sample.getCreationDate()));
-    assertEquals((Long) 3L, sample.getOwner().getId());
-    assertEquals(date, sample.getDate());
-    assertEquals(sampleId, sample.getSampleId());
-    assertEquals(replicate, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertEquals(2, sample.getKeywords().size());
+    Assertions.assertEquals((Long) 3L, sample.getOwner().getId());
+    Assertions.assertEquals(date, sample.getDate());
+    Assertions.assertEquals(sampleId, sample.getSampleId());
+    Assertions.assertEquals(replicate, sample.getReplicate());
+    Assertions.assertEquals(protocol.getId(), sample.getProtocol().getId());
+    Assertions.assertEquals(assay, sample.getAssay());
+    Assertions.assertEquals(type, sample.getType());
+    Assertions.assertEquals(target, sample.getTarget());
+    Assertions.assertEquals(strain, sample.getStrain());
+    Assertions.assertEquals(strainDescription, sample.getStrainDescription());
+    Assertions.assertEquals(treatment, sample.getTreatment());
+    Assertions.assertEquals(2, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
-    assertEquals(1, sample.getFilenames().size());
+    Assertions.assertEquals(1, sample.getFilenames().size());
     assertTrue(sample.getFilenames().contains(filename));
-    assertEquals(note, sample.getNote());
-    assertEquals(5, view.samples().getRowCount());
+    Assertions.assertEquals(note, sample.getNote());
+    Assertions.assertEquals(5, view.samples().getRowCount());
   }
 
-  @Test
+  @BrowserTest
   public void save_Update() throws Throwable {
     open();
     Sample sample = repository.findById(4L).orElseThrow();
@@ -256,44 +256,44 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     String name = name() + "_20200720";
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{name}, currentLocale()),
         notification.getText());
     sample = repository.findById(4L).orElseThrow();
-    assertEquals(name, sample.getName());
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
-    assertEquals((Long) 3L, sample.getOwner().getId());
-    assertEquals(date, sample.getDate());
-    assertEquals(sampleId, sample.getSampleId());
-    assertEquals(replicate, sample.getReplicate());
-    assertEquals(protocol.getId(), sample.getProtocol().getId());
-    assertEquals(assay, sample.getAssay());
-    assertEquals(type, sample.getType());
-    assertEquals(target, sample.getTarget());
-    assertEquals(strain, sample.getStrain());
-    assertEquals(strainDescription, sample.getStrainDescription());
-    assertEquals(treatment, sample.getTreatment());
-    assertEquals(3, sample.getKeywords().size());
+    Assertions.assertEquals(name, sample.getName());
+    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
+    Assertions.assertEquals((Long) 3L, sample.getOwner().getId());
+    Assertions.assertEquals(date, sample.getDate());
+    Assertions.assertEquals(sampleId, sample.getSampleId());
+    Assertions.assertEquals(replicate, sample.getReplicate());
+    Assertions.assertEquals(protocol.getId(), sample.getProtocol().getId());
+    Assertions.assertEquals(assay, sample.getAssay());
+    Assertions.assertEquals(type, sample.getType());
+    Assertions.assertEquals(target, sample.getTarget());
+    Assertions.assertEquals(strain, sample.getStrain());
+    Assertions.assertEquals(strainDescription, sample.getStrainDescription());
+    Assertions.assertEquals(treatment, sample.getTreatment());
+    Assertions.assertEquals(3, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains("chipseq"));
     assertTrue(sample.getKeywords().contains(keyword1));
     assertTrue(sample.getKeywords().contains(keyword2));
-    assertEquals(2, sample.getFilenames().size());
+    Assertions.assertEquals(2, sample.getFilenames().size());
     assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
     assertTrue(sample.getFilenames().contains(filename));
-    assertEquals(note, sample.getNote());
+    Assertions.assertEquals(note, sample.getNote());
     Dataset dataset = datasetRepository.findById(2L).orElseThrow();
-    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
+    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022", dataset.getName());
     dataset = datasetRepository.findById(6L).orElseThrow();
-    assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
+    Assertions.assertEquals("ChIPseq_Spt16_yFR101_G24D_JS1_20181208", dataset.getName());
     Thread.sleep(1000); // Allow time to apply changes to files.
     Path folder = configuration.getHome().folder(sample);
     assertTrue(Files.exists(folder));
     assertFalse(Files.exists(oldFolder));
-    assertEquals(4, view.samples().getRowCount());
-    assertEquals(name, view.samples().name(0));
+    Assertions.assertEquals(4, view.samples().getRowCount());
+    Assertions.assertEquals(name, view.samples().name(0));
   }
 
-  @Test
+  @BrowserTest
   public void cancel() {
     open();
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
@@ -308,29 +308,29 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
 
     assertFalse(optional(() -> $(NotificationElement.class).first()).isPresent());
     Sample sample = repository.findById(4L).orElseThrow();
-    assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
-    assertEquals((Long) 3L, sample.getOwner().getId());
-    assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
-    assertEquals("JS1", sample.getSampleId());
-    assertEquals("R1", sample.getReplicate());
-    assertEquals((Long) 3L, sample.getProtocol().getId());
-    assertEquals("ChIP-seq", sample.getAssay());
+    Assertions.assertEquals(LocalDateTime.of(2018, 10, 22, 9, 50, 20), sample.getCreationDate());
+    Assertions.assertEquals((Long) 3L, sample.getOwner().getId());
+    Assertions.assertEquals(LocalDate.of(2018, 10, 22), sample.getDate());
+    Assertions.assertEquals("JS1", sample.getSampleId());
+    Assertions.assertEquals("R1", sample.getReplicate());
+    Assertions.assertEquals((Long) 3L, sample.getProtocol().getId());
+    Assertions.assertEquals("ChIP-seq", sample.getAssay());
     assertNull(sample.getType());
-    assertEquals("Spt16", sample.getTarget());
-    assertEquals("yFR101", sample.getStrain());
-    assertEquals("G24D", sample.getStrainDescription());
+    Assertions.assertEquals("Spt16", sample.getTarget());
+    Assertions.assertEquals("yFR101", sample.getStrain());
+    Assertions.assertEquals("G24D", sample.getStrainDescription());
     assertNull(sample.getTreatment());
-    assertEquals(3, sample.getKeywords().size());
+    Assertions.assertEquals(3, sample.getKeywords().size());
     assertTrue(sample.getKeywords().contains("chipseq"));
     assertTrue(sample.getKeywords().contains("ip"));
     assertTrue(sample.getKeywords().contains("G24D"));
-    assertEquals(1, sample.getFilenames().size());
+    Assertions.assertEquals(1, sample.getFilenames().size());
     assertTrue(sample.getFilenames().contains("OF_20241118_ROB_01"));
     assertNull(sample.getNote());
-    assertEquals(4, view.samples().getRowCount());
+    Assertions.assertEquals(4, view.samples().getRowCount());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void delete() throws Throwable {
     open();
@@ -350,12 +350,12 @@ public class SampleDialogItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(
+    Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + DELETED, new Object[]{name}, currentLocale()),
         notification.getText());
     assertFalse(repository.findById(9L).isPresent());
     Thread.sleep(1000); // Allow time to apply changes to files.
     assertFalse(Files.exists(folder));
-    assertEquals(3, view.samples().getRowCount());
+    Assertions.assertEquals(3, view.samples().getRowCount());
   }
 }

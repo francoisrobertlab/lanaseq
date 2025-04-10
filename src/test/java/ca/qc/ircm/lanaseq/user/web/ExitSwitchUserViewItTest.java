@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import ca.qc.ircm.lanaseq.web.ViewLayoutElement;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -19,9 +19,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
+public class ExitSwitchUserViewItTest extends AbstractTestBenchBrowser {
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     openView(ExitSwitchUserView.VIEW_NAME);
@@ -29,7 +29,7 @@ public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("jonh.smith@ircm.qc.ca")
   public void security_User() {
     openView(ExitSwitchUserView.VIEW_NAME);
@@ -37,7 +37,7 @@ public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
     $(AccessDeniedViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void security_Manager() {
     openView(ExitSwitchUserView.VIEW_NAME);
@@ -45,14 +45,14 @@ public class ExitSwitchUserViewItTest extends AbstractTestBenchTestCase {
     $(AccessDeniedViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void security_Admin() {
     openView(ExitSwitchUserView.VIEW_NAME);
 
     $(AccessDeniedViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void exitSwitchUser() {
     openView(DatasetsView.VIEW_NAME);
     $(ViewLayoutElement.class).waitForFirst().users().click();

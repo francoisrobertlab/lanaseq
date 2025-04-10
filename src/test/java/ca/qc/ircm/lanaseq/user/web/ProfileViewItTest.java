@@ -5,20 +5,20 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.ProfileView.VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.testbench.BrowserTest;
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +31,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProfileViewItTest extends AbstractTestBenchTestCase {
+public class ProfileViewItTest extends AbstractTestBenchBrowser {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ProfileView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
@@ -49,7 +49,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     open();
@@ -57,17 +57,18 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void title() {
     open();
 
-    String applicationName =
-        messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null, currentLocale());
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
-        currentLocale()), getDriver().getTitle());
+    String applicationName = messageSource.getMessage(CONSTANTS_PREFIX + APPLICATION_NAME, null,
+        currentLocale());
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + TITLE, new Object[]{applicationName},
+            currentLocale()), getDriver().getTitle());
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence_User() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
@@ -82,7 +83,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("francois.robert@ircm.qc.ca")
   public void fieldsExistence_Manager() {
     open();
@@ -98,7 +99,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Admin() {
     open();
@@ -114,7 +115,7 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::save).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void save() {
     open();
     ProfileViewElement view = $(ProfileViewElement.class).waitForFirst();
@@ -128,13 +129,13 @@ public class ProfileViewItTest extends AbstractTestBenchTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, currentLocale()),
+    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, currentLocale()),
         notification.getText());
     User user = repository.findById(3L).orElseThrow();
-    assertEquals(email, user.getEmail());
-    assertEquals(name, user.getName());
+    Assertions.assertEquals(email, user.getEmail());
+    Assertions.assertEquals(name, user.getName());
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));
-    assertEquals(LocalDateTime.of(2018, 12, 7, 15, 40, 12), user.getLastSignAttempt());
+    Assertions.assertEquals(LocalDateTime.of(2018, 12, 7, 15, 40, 12), user.getLastSignAttempt());
     assertNull(user.getLocale());
     $(ProfileViewElement.class).waitForFirst();
   }

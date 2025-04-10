@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.ViewLayoutElement;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -18,13 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UsersViewContextPathItTest extends AbstractTestBenchTestCase {
+public class UsersViewContextPathItTest extends AbstractTestBenchBrowser {
 
   private void open() {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   public void switchUser() {
     open();
     UsersViewElement view = $(UsersViewElement.class).waitForFirst();

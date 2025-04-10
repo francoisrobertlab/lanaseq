@@ -3,9 +3,9 @@ package ca.qc.ircm.lanaseq.test.config;
 import static ca.qc.ircm.lanaseq.test.config.AnnotationFinder.findAnnotation;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-import com.vaadin.testbench.TestBenchTestCase;
+import com.vaadin.testbench.BrowserTestBase;
+import com.vaadin.testbench.TestBench;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -51,8 +51,8 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
   @Override
   public void beforeTestMethod(TestContext testContext) {
     if (isTestBenchTest(testContext)) {
-      WebDriver driver = driver(testContext);
-      TestBenchTestCase target = getInstance(testContext);
+      WebDriver driver = TestBench.createDriver(driver(testContext));
+      BrowserTestBase target = getInstance(testContext);
       target.setDriver(driver);
       try {
         driver.manage().window().setSize(new Dimension(1280, 960));
@@ -62,35 +62,16 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
     }
   }
 
-  @Override
-  public void afterTestMethod(TestContext testContext) {
-    if (isTestBenchTest(testContext)) {
-      TestBenchTestCase target = getInstance(testContext);
-      target.getDriver().manage().deleteAllCookies();
-      boolean useScreenshotRule = false;
-      TestBenchTestAnnotations testBenchTestAnnotations = findAnnotation(target.getClass(),
-          testContext.getTestMethod(), TestBenchTestAnnotations.class).orElseThrow(
-          () -> new IllegalStateException(TestBenchTestAnnotations.class.getSimpleName()
-              + " must be present on TestBench tests."));
-      if (testBenchTestAnnotations != null) {
-        useScreenshotRule = testBenchTestAnnotations.useScreenshotRule();
-      }
-      if (!useScreenshotRule) {
-        target.getDriver().quit();
-      }
-    }
-  }
-
   private boolean isSkipTestBenchTests() {
     return Boolean.parseBoolean(System.getProperty(SKIP_TESTS_SYSTEM_PROPERTY));
   }
 
   private boolean isTestBenchTest(TestContext testContext) {
-    return TestBenchTestCase.class.isAssignableFrom(testContext.getTestClass());
+    return BrowserTestBase.class.isAssignableFrom(testContext.getTestClass());
   }
 
-  private TestBenchTestCase getInstance(TestContext testContext) {
-    return (TestBenchTestCase) testContext.getTestInstance();
+  private BrowserTestBase getInstance(TestContext testContext) {
+    return (BrowserTestBase) testContext.getTestInstance();
   }
 
   private WebDriver driver(TestContext testContext) {
@@ -129,13 +110,7 @@ public class TestBenchTestExecutionListener implements TestExecutionListener, In
       }
       return new FirefoxDriver(options);
     } else {
-      try {
-        return (WebDriver) Class.forName(driverClass).getDeclaredConstructor().newInstance();
-      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
-               NoSuchMethodException | InvocationTargetException e) {
-        logger.error("Could not instantiate WebDriver class {}", driverClass);
-        throw new IllegalStateException("Could not instantiate WebDriver class " + driverClass, e);
-      }
+      throw new IllegalStateException("We support only with Firefox and Chrome");
     }
   }
 }

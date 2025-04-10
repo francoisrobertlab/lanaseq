@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsViewElement;
 import ca.qc.ircm.lanaseq.sample.web.SamplesViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchTestCase;
+import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ProfileViewElement;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
-import org.junit.jupiter.api.Test;
+import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -20,13 +20,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ViewLayoutItTest extends AbstractTestBenchTestCase {
+public class ViewLayoutItTest extends AbstractTestBenchBrowser {
 
   private void open() {
     openView(VIEW_NAME);
   }
 
-  @Test
+  @BrowserTest
   @WithAnonymousUser
   public void security_Anonymous() {
     open();
@@ -34,7 +34,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     $(SigninViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void fieldsExistence_User() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -51,7 +51,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::signout).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("benoit.coulombe@ircm.qc.ca")
   public void fieldsExistence_Manager() {
     open();
@@ -69,7 +69,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::signout).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Admin() {
     open();
@@ -87,7 +87,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::signout).isPresent());
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void fieldsExistence_Runas() {
     open();
@@ -110,7 +110,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(view::signout).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void datasets() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -118,7 +118,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     $(DatasetsViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void samples() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -126,7 +126,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     $(SamplesViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void protocols() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -134,7 +134,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     $(ProtocolsViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   public void profile() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
@@ -142,7 +142,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     $(ProfileViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void users() {
     open();
@@ -151,7 +151,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     $(UsersViewElement.class).waitForFirst();
   }
 
-  @Test
+  @BrowserTest
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void exitSwitchUser() {
     open();
@@ -169,7 +169,7 @@ public class ViewLayoutItTest extends AbstractTestBenchTestCase {
     assertTrue(optional(viewReload::users).isPresent());
   }
 
-  @Test
+  @BrowserTest
   public void signout() {
     open();
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
