@@ -41,7 +41,7 @@ import org.springframework.lang.Nullable;
 /**
  * Additional functions for BrowserTestBase.
  */
-public abstract class AbstractTestBenchBrowser extends BrowserTestBase implements DriverSupplier {
+public abstract class AbstractBrowserTestCase extends BrowserTestBase implements DriverSupplier {
 
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final String LAYOUT_PREFIX = messagePrefix(ViewLayout.class);
@@ -51,7 +51,7 @@ public abstract class AbstractTestBenchBrowser extends BrowserTestBase implement
   private static final String PASSWORD_PREFIX = messagePrefix(PasswordView.class);
   private static final String ACCESS_DENIED_PREFIX = messagePrefix(AccessDeniedView.class);
   @SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.getLogger(AbstractTestBenchBrowser.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractBrowserTestCase.class);
   @Value("http://localhost:${local.server.port}")
   protected String baseUrl;
   @Value("${server.servlet.context-path:}")

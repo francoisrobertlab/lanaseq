@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
@@ -33,7 +33,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class AddDatasetFilesDialogItTest extends AbstractTestBenchBrowser {
+public class AddDatasetFilesDialogItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
   @TempDir

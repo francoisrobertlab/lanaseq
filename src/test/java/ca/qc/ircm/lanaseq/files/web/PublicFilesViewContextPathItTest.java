@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.files.web;
 import static ca.qc.ircm.lanaseq.files.web.PublicFilesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewContextPathItTest extends AbstractTestBenchBrowser {
+public class PublicFilesViewContextPathItTest extends AbstractBrowserTestCase {
 
   @Value("${download-home}")
   protected Path downloadHome;

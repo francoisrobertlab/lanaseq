@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordViewElement;
@@ -29,7 +29,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class SigninViewItTest extends AbstractTestBenchBrowser {
+public class SigninViewItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SigninView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

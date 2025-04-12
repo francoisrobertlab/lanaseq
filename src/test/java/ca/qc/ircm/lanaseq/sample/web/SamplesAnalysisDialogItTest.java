@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SamplesAnalysisDialogItTest extends AbstractTestBenchBrowser {
+public class SamplesAnalysisDialogItTest extends AbstractBrowserTestCase {
 
   @TempDir
   Path temporaryFolder;

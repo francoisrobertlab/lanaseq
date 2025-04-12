@@ -15,7 +15,7 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.web.SelectSampleDialogElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
@@ -43,7 +43,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetDialogItTest extends AbstractTestBenchBrowser {
+public class DatasetDialogItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(DatasetDialog.class);
   private static final Logger logger = LoggerFactory.getLogger(DatasetDialogItTest.class);

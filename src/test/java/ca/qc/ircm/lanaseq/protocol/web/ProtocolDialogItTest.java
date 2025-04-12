@@ -13,7 +13,7 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.protocol.ProtocolRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.html.testbench.AnchorElement;
@@ -38,7 +38,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolDialogItTest extends AbstractTestBenchBrowser {
+public class ProtocolDialogItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolDialog.class);
   @Value("${download-home}")

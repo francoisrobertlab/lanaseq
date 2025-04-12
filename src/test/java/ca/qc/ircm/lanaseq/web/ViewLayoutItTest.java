@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsViewElement;
 import ca.qc.ircm.lanaseq.sample.web.SamplesViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.ProfileViewElement;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
@@ -20,7 +20,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ViewLayoutItTest extends AbstractTestBenchBrowser {
+public class ViewLayoutItTest extends AbstractBrowserTestCase {
 
   private void open() {
     openView(VIEW_NAME);

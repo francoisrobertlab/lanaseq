@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import com.vaadin.testbench.BrowserTest;
@@ -23,7 +23,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ProtocolsViewItTest extends AbstractTestBenchBrowser {
+public class ProtocolsViewItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolsView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

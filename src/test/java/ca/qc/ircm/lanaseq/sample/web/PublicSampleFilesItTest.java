@@ -6,7 +6,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
@@ -24,7 +24,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class PublicSampleFilesItTest extends AbstractTestBenchBrowser {
+public class PublicSampleFilesItTest extends AbstractBrowserTestCase {
 
   @TempDir
   Path temporaryFolder;

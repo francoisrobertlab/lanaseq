@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import ca.qc.ircm.lanaseq.web.ViewLayoutElement;
@@ -27,7 +27,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("lanaseq@ircm.qc.ca")
-public class UsersViewItTest extends AbstractTestBenchBrowser {
+public class UsersViewItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UsersView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

@@ -14,7 +14,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFile;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
@@ -45,7 +45,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SampleFilesDialogItTest extends AbstractTestBenchBrowser {
+public class SampleFilesDialogItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   @Value("${download-home}")

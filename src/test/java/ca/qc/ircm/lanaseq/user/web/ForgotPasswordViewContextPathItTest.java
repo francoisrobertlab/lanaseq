@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.mail.MailConfiguration;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
@@ -41,7 +41,7 @@ import org.springframework.test.context.DynamicPropertySource;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithAnonymousUser
-public class ForgotPasswordViewContextPathItTest extends AbstractTestBenchBrowser {
+public class ForgotPasswordViewContextPathItTest extends AbstractBrowserTestCase {
 
   @RegisterExtension
   static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP);

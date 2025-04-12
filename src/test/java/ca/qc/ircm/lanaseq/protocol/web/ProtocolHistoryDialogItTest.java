@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.flow.component.html.testbench.AnchorElement;
@@ -32,7 +32,7 @@ import org.springframework.test.context.transaction.TestTransaction;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("francois.robert@ircm.qc.ca")
-public class ProtocolHistoryDialogItTest extends AbstractTestBenchBrowser {
+public class ProtocolHistoryDialogItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
   @Value("${download-home}")

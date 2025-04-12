@@ -9,7 +9,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.sample.Sample;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class DatasetsAnalysisDialogItTest extends AbstractTestBenchBrowser {
+public class DatasetsAnalysisDialogItTest extends AbstractBrowserTestCase {
 
   @TempDir
   Path temporaryFolder;

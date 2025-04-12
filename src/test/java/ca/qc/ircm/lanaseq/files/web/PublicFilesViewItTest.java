@@ -11,7 +11,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
@@ -32,7 +32,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewItTest extends AbstractTestBenchBrowser {
+public class PublicFilesViewItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PublicFilesView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);

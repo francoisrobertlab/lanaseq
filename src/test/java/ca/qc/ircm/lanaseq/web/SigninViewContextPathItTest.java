@@ -3,7 +3,7 @@ package ca.qc.ircm.lanaseq.web;
 import static ca.qc.ircm.lanaseq.web.SigninView.VIEW_NAME;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithAnonymousUser
-public class SigninViewContextPathItTest extends AbstractTestBenchBrowser {
+public class SigninViewContextPathItTest extends AbstractBrowserTestCase {
 
   private void open() {
     openView(VIEW_NAME);

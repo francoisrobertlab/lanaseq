@@ -6,7 +6,7 @@ import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetPublicFileRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
@@ -24,7 +24,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
  */
 @TestBenchTestAnnotations
 @WithAnonymousUser
-public class PublicDatasetFilesItTest extends AbstractTestBenchBrowser {
+public class PublicDatasetFilesItTest extends AbstractBrowserTestCase {
 
   @TempDir
   Path temporaryFolder;

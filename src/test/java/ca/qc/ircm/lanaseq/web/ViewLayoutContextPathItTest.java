@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.web.UsersViewElement;
 import com.vaadin.testbench.BrowserTest;
@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 @TestBenchTestAnnotations
 @ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class ViewLayoutContextPathItTest extends AbstractTestBenchBrowser {
+public class ViewLayoutContextPathItTest extends AbstractBrowserTestCase {
 
   private void open() {
     openView(VIEW_NAME);

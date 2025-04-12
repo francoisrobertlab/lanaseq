@@ -1,7 +1,7 @@
 package ca.qc.ircm.lanaseq.web;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import com.vaadin.testbench.BrowserTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
  */
 @TestBenchTestAnnotations
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class SignoutViewItTest extends AbstractTestBenchBrowser {
+public class SignoutViewItTest extends AbstractBrowserTestCase {
 
   @BrowserTest
   @WithAnonymousUser

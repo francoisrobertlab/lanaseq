@@ -9,7 +9,7 @@ import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.test.config.AbstractTestBenchBrowser;
+import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordRepository;
@@ -30,7 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * Integration tests for {@link UseForgotPasswordView}.
  */
 @TestBenchTestAnnotations
-public class UseForgotPasswordViewItTest extends AbstractTestBenchBrowser {
+public class UseForgotPasswordViewItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(UseForgotPasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
