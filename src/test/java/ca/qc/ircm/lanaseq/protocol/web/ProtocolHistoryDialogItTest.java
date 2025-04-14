@@ -10,19 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFileRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.html.testbench.AnchorElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
@@ -35,8 +31,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 public class ProtocolHistoryDialogItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ProtocolHistoryDialog.class);
-  @Value("${download-home}")
-  protected Path downloadHome;
   @Autowired
   private ProtocolFileRepository fileRepository;
   @Autowired
@@ -79,32 +73,5 @@ public class ProtocolHistoryDialogItTest extends AbstractBrowserTestCase {
             .toURI())), file.getContent());
     assertFalse(file.isDeleted());
     Assertions.assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
-  }
-
-  @BrowserTest
-  @Download
-  public void downloadFile() throws Throwable {
-    Files.createDirectories(downloadHome);
-    Path downloaded = downloadHome.resolve("Histone FLAG Protocol.docx");
-    Files.deleteIfExists(downloaded);
-    Path source = Paths.get(
-        Objects.requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx"))
-            .toURI());
-    open();
-    ProtocolsViewElement view = $(ProtocolsViewElement.class).waitForFirst();
-    view.protocols().select(2);
-    view.history().click();
-    ProtocolHistoryDialogElement dialog = view.historyDialog();
-    AnchorElement filename = dialog.files().filename(0);
-    filename.click();
-
-    // Wait for file to download.
-    Thread.sleep(2000);
-    assertTrue(Files.exists(downloaded));
-    try {
-      assertArrayEquals(Files.readAllBytes(source), Files.readAllBytes(downloaded));
-    } finally {
-      Files.delete(downloaded);
-    }
   }
 }

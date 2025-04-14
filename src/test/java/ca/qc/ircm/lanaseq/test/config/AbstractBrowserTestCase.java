@@ -16,21 +16,18 @@ import ca.qc.ircm.lanaseq.web.ViewLayout;
 import com.vaadin.flow.component.sidenav.testbench.SideNavElement;
 import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
 import com.vaadin.testbench.BrowserTestBase;
-import com.vaadin.testbench.DriverSupplier;
-import java.io.File;
+import com.vaadin.testbench.IPAddress;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +38,7 @@ import org.springframework.lang.Nullable;
 /**
  * Additional functions for BrowserTestBase.
  */
-public abstract class AbstractBrowserTestCase extends BrowserTestBase implements DriverSupplier {
+public abstract class AbstractBrowserTestCase extends BrowserTestBase {
 
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   private static final String LAYOUT_PREFIX = messagePrefix(ViewLayout.class);
@@ -52,12 +49,10 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase implements
   private static final String ACCESS_DENIED_PREFIX = messagePrefix(AccessDeniedView.class);
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(AbstractBrowserTestCase.class);
-  @Value("http://localhost:${local.server.port}")
-  protected String baseUrl;
+  @Value("${local.server.port}")
+  protected int port;
   @Value("${server.servlet.context-path:}")
   protected String contextPath;
-  @Value("${download-home:${user.dir}/target}")
-  protected File downloadHome;
   private Path home;
   private Path archive;
   private Path analysis;
@@ -67,18 +62,12 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase implements
   @Autowired
   private MessageSource messageSource;
 
-  @Override
-  public WebDriver createDriver() {
-    return Objects.requireNonNull(getDriver(),
-        "WebDriver should have been created by TestBenchTestExecutionListener");
-  }
-
   @BeforeEach
   public void setServerUrl()
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     Method setServerUrl = AppConfiguration.class.getDeclaredMethod("setServerUrl", String.class);
     setServerUrl.setAccessible(true);
-    setServerUrl.invoke(configuration, baseUrl);
+    setServerUrl.invoke(configuration, baseUrl());
   }
 
   /**
@@ -145,16 +134,20 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase implements
     setUpload(upload);
   }
 
+  protected String baseUrl() {
+    return "http://" + IPAddress.findSiteLocalAddress() + ":" + port;
+  }
+
   protected String homeUrl() {
-    return baseUrl + contextPath + "/";
+    return baseUrl() + contextPath + "/";
   }
 
   protected String viewUrl(String view) {
-    return baseUrl + contextPath + "/" + view;
+    return baseUrl() + contextPath + "/" + view;
   }
 
   protected String viewUrl(String view, String parameters) {
-    return baseUrl + contextPath + "/" + view + "/" + parameters;
+    return baseUrl() + contextPath + "/" + view + "/" + parameters;
   }
 
   protected void openView(String view) {

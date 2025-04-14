@@ -12,17 +12,11 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
 import com.vaadin.testbench.BrowserTest;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -36,8 +30,6 @@ public class PublicFilesViewItTest extends AbstractBrowserTestCase {
 
   private static final String MESSAGE_PREFIX = messagePrefix(PublicFilesView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
-  @Value("${download-home}")
-  protected Path downloadHome;
   @Autowired
   private MessageSource messageSource;
   @Autowired
@@ -94,68 +86,5 @@ public class PublicFilesViewItTest extends AbstractBrowserTestCase {
     Assertions.assertEquals(3, view.files().getRowCount());
     assertFalse(samplePublicFileRepository.findBySampleAndPath(sample,
         "JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw").isPresent());
-  }
-
-  @BrowserTest
-  @Download
-  public void downloadLinks() throws IOException, InterruptedException {
-    Files.createDirectories(downloadHome);
-    Path downloaded = downloadHome.resolve("links.txt");
-    Files.deleteIfExists(downloaded);
-    open();
-    PublicFilesViewElement view = $(PublicFilesViewElement.class).waitForFirst();
-
-    view.downloadLinks().click();
-
-    // Wait for file to download.
-    Thread.sleep(2000);
-    assertTrue(Files.exists(downloaded));
-    try {
-      List<String> lines = Files.readAllLines(downloaded);
-      Assertions.assertEquals(4, lines.size());
-      Assertions.assertEquals(homeUrl()
-              + "sample-file/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211/JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bw",
-          lines.get(0));
-      Assertions.assertEquals(homeUrl()
-              + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
-          lines.get(1));
-      Assertions.assertEquals(homeUrl()
-              + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS3_20181211/ChIPseq_Spt16_yFR101_G24D_JS3_20181211.bw",
-          lines.get(2));
-      Assertions.assertEquals(homeUrl()
-              + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
-          lines.get(3));
-    } finally {
-      Files.delete(downloaded);
-    }
-  }
-
-  @BrowserTest
-  @Download
-  public void downloadLinks_FilterFilename() throws IOException, InterruptedException {
-    Files.createDirectories(downloadHome);
-    Path downloaded = downloadHome.resolve("links.txt");
-    Files.deleteIfExists(downloaded);
-    open();
-    PublicFilesViewElement view = $(PublicFilesViewElement.class).waitForFirst();
-    view.files().filenameFilter().setValue("JS1");
-
-    view.downloadLinks().click();
-
-    // Wait for file to download.
-    Thread.sleep(2000);
-    assertTrue(Files.exists(downloaded));
-    try {
-      List<String> lines = Files.readAllLines(downloaded);
-      Assertions.assertEquals(2, lines.size());
-      Assertions.assertEquals(homeUrl()
-              + "sample-file/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210/JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181210.bw",
-          lines.get(0));
-      Assertions.assertEquals(homeUrl()
-              + "dataset-file/ChIPseq_Spt16_yFR101_G24D_JS1_20181208/ChIPseq_Spt16_yFR101_G24D_JS1_20181208.bw",
-          lines.get(1));
-    } finally {
-      Files.delete(downloaded);
-    }
   }
 }

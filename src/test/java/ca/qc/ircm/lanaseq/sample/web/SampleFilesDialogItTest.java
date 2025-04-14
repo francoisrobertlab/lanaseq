@@ -1,8 +1,6 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
-import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
-import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -15,9 +13,7 @@ import ca.qc.ircm.lanaseq.sample.SamplePublicFile;
 import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
-import ca.qc.ircm.lanaseq.test.config.Download;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,8 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -47,9 +41,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleFilesDialogItTest extends AbstractBrowserTestCase {
 
-  private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
-  @Value("${download-home}")
-  protected Path downloadHome;
   @TempDir
   Path temporaryFolder;
   @Autowired
@@ -58,16 +49,11 @@ public class SampleFilesDialogItTest extends AbstractBrowserTestCase {
   private SamplePublicFileRepository samplePublicFileRepository;
   @Autowired
   private AppConfiguration configuration;
-  @Autowired
-  private MessageSource messageSource;
-  private Path file1;
 
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
     setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
-    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
-    file1 = Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI());
   }
 
   private void open() {
@@ -143,38 +129,6 @@ public class SampleFilesDialogItTest extends AbstractBrowserTestCase {
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
         Files.readAllBytes(file.resolveSibling(sample.getName() + "_R1.fastq")));
     assertFalse(Files.exists(file));
-  }
-
-  @BrowserTest
-  @Download
-  public void download() throws Throwable {
-    Files.createDirectories(downloadHome);
-    Path downloaded = downloadHome.resolve("R1.fastq");
-    Files.deleteIfExists(downloaded);
-    Sample sample = repository.findById(10L).orElseThrow();
-    Path folder = configuration.getHome().folder(sample);
-    Files.createDirectories(folder);
-    Path file = folder.resolve("R1.fastq");
-    Files.copy(
-        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
-        file);
-    LocalDateTime modifiedTime = LocalDateTime.now().minusDays(2).withNano(0);
-    Files.setLastModifiedTime(file, FileTime.from(toInstant(modifiedTime)));
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
-
-    dialog.files().download(0).click();
-
-    // Wait for file to download.
-    Thread.sleep(2000);
-    assertTrue(Files.exists(downloaded));
-    try {
-      assertArrayEquals(Files.readAllBytes(file), Files.readAllBytes(downloaded));
-    } finally {
-      Files.delete(downloaded);
-    }
   }
 
   @BrowserTest
@@ -256,27 +210,6 @@ public class SampleFilesDialogItTest extends AbstractBrowserTestCase {
 
     Assertions.assertEquals(1, dialog.files().getRowCount());
     Assertions.assertEquals(file1.getFileName().toString(), dialog.files().filename(0));
-  }
-
-  @BrowserTest
-  public void upload() throws Throwable {
-    open();
-    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
-    view.samples().controlClick(1);
-    SampleFilesDialogElement dialog = view.filesDialog();
-    Sample sample = repository.findById(10L).orElseThrow();
-
-    dialog.upload().upload(file1.toFile());
-
-    NotificationElement notification = $(NotificationElement.class).waitForFirst();
-    Assertions.assertEquals(
-        messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS, new Object[]{file1.getFileName()},
-            currentLocale()), notification.getText());
-    Path folder = configuration.getHome().folder(sample);
-    assertTrue(Files.exists(folder.resolve(file1.getFileName())));
-    assertArrayEquals(Files.readAllBytes(
-            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
-        Files.readAllBytes(folder.resolve(file1.getFileName())));
   }
 
   @BrowserTest

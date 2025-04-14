@@ -13,15 +13,13 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Integration tests for {@link PublicFilesView}.
  */
 @TestBenchTestAnnotations
-@ActiveProfiles({"integration-test", "context-path"})
 @WithUserDetails("jonh.smith@ircm.qc.ca")
-public class PublicFilesViewContextPathItTest extends AbstractLocalBrowserTestCase {
+public class PublicFilesViewLocalItTest extends AbstractLocalBrowserTestCase {
 
   @Value("${download-home}")
   protected Path downloadHome;

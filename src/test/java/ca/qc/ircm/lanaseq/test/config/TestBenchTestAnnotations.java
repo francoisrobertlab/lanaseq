@@ -24,11 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("integration-test")
 @TestExecutionListeners(value = {InitializeDatabaseExecutionListener.class,
     VaadinLicenseExecutionListener.class, FixSecurityContextHolderStrategyExecutionListener.class,
-    TestBenchTestExecutionListener.class,
     TestBenchSecurityFilter.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Headless
 @Execution(ExecutionMode.SAME_THREAD)
-//@ExtendWith(HeadlessExtension.class)
 @Transactional
 @Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql",
     "/fix-it-tests.sql"})
