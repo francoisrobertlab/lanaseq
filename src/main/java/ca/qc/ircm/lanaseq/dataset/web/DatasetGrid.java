@@ -148,6 +148,7 @@ public class DatasetGrid extends Grid<Dataset> implements LocaleChangeObserver {
   }
 
   public void refreshDatasets() {
+    deselectAll();
     getDataProvider().refreshAll();
   }
 

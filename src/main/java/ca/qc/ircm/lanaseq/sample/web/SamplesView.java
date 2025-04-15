@@ -251,6 +251,11 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
     samples.setItems(fetchCallback);
   }
 
+  private void refreshSamples() {
+    samples.deselectAll();
+    samples.getDataProvider().refreshAll();
+  }
+
   void edit() {
     Set<Sample> samples = this.samples.getSelectedItems();
     if (samples.isEmpty()) {
@@ -270,8 +275,8 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
   private void showDialog(long sampleId) {
     SampleDialog dialog = dialogFactory.getObject();
     dialog.setSampleId(sampleId);
-    dialog.addSavedListener(e -> samples.getDataProvider().refreshAll());
-    dialog.addDeletedListener(e -> samples.getDataProvider().refreshAll());
+    dialog.addSavedListener(e -> refreshSamples());
+    dialog.addDeletedListener(e -> refreshSamples());
     dialog.open();
   }
 

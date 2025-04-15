@@ -6,6 +6,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.MERGED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -89,6 +90,34 @@ public class SamplesViewItTest extends AbstractBrowserTestCase {
     view.samples().select(0);
     view.edit().click();
     assertTrue(view.dialog().isOpen());
+  }
+
+  @BrowserTest
+  public void edit_DeselectAfterSave() {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
+    view.samples().select(0);
+    view.edit().click();
+    view.dialog().save().click();
+    assertFalse(view.edit().isEnabled());
+    view.samples().select(0);
+    assertTrue(view.edit().isEnabled());
+  }
+
+  @BrowserTest
+  @WithUserDetails("benoit.coulombe@ircm.qc.ca")
+  public void edit_DeselectAfterDelete() {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
+    view.samples().ownerFilter().setValue("benoit.coulombe@ircm.qc.ca");
+    view.samples().select(0);
+    view.edit().click();
+    SampleDialogElement dialog = view.dialog();
+    dialog.delete().click();
+    dialog.confirm().getConfirmButton().click();
+    assertFalse(view.edit().isEnabled());
+    view.samples().select(0);
+    assertTrue(view.edit().isEnabled());
   }
 
   @BrowserTest
