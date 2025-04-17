@@ -508,5 +508,23 @@
         <dependency.details.enabled>false</dependency.details.enabled>
       </properties>
     </profile>
+    <profile>
+      <id>headless</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <com.vaadin.testbench.Parameters.headless>true
+                  </com.vaadin.testbench.Parameters.headless>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
   </profiles>
 </project>
