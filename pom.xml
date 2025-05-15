@@ -55,7 +55,6 @@
     <resource.delimiter>$[*]</resource.delimiter>
     <java.version>17</java.version>
     <start-class>ca.qc.ircm.lanaseq.Main</start-class>
-    <slow-tests.skip>false</slow-tests.skip>
     <testbench.skip>false</testbench.skip>
     <!-- Dependencies -->
     <vaadin.version>24.4.21</vaadin.version>
@@ -307,19 +306,10 @@
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <systemPropertyVariables>
-              <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
-        <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <rerunFailingTestsCount>0</rerunFailingTestsCount>
             <systemPropertyVariables>
-              <slow-tests.skip>${slow-tests.skip}</slow-tests.skip>
               <testbench.skip>${testbench.skip}</testbench.skip>
             </systemPropertyVariables>
             <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
@@ -477,17 +467,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <profile>
-      <id>test-quick</id>
-      <activation>
-        <property>
-          <name>quick</name>
-        </property>
-      </activation>
-      <properties>
-        <slow-tests.skip>true</slow-tests.skip>
-      </properties>
     </profile>
     <profile>
       <id>site-quick</id>
