@@ -55,7 +55,6 @@
     <resource.delimiter>$[*]</resource.delimiter>
     <java.version>17</java.version>
     <start-class>ca.qc.ircm.lanaseq.Main</start-class>
-    <testbench.skip>false</testbench.skip>
     <!-- Dependencies -->
     <vaadin.version>24.4.21</vaadin.version>
     <clipboardhelper.version>2.0.0</clipboardhelper.version>
@@ -309,9 +308,6 @@
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <rerunFailingTestsCount>0</rerunFailingTestsCount>
-            <systemPropertyVariables>
-              <testbench.skip>${testbench.skip}</testbench.skip>
-            </systemPropertyVariables>
             <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
           </configuration>
         </plugin>
