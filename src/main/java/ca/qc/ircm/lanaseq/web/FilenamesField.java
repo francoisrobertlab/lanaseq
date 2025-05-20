@@ -36,7 +36,8 @@ public class FilenamesField extends MultiSelectComboBox<String> implements Local
     setAllowCustomValue(true);
     addCustomValueSetListener(e -> {
       String value = e.getDetail();
-      ValidationResult result = validator.apply(value, new ValueContext(this, this, getLocale()));
+      ValidationResult result = validator.apply(value,
+          new ValueContext(null, this, this, getLocale()));
       if (result.isError()) {
         setInvalid(true);
         setErrorMessage(result.getErrorMessage());
