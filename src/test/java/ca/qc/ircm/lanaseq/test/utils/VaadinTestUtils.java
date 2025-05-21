@@ -14,7 +14,6 @@ import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.UploadI18N;
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
-import org.vaadin.olli.ClipboardHelper;
 
 /**
  * Utility methods for presenter testign.
@@ -306,23 +304,6 @@ public class VaadinTestUtils {
       logger.warn("Cannot get formatted value for renderer {} and item {}", renderer, item, e);
       throw new IllegalArgumentException(
           "Cannot get formatted value for renderer " + renderer + " and item " + item, e);
-    }
-  }
-
-  /**
-   * Returns wrapper from ClipboardHelper instance.
-   *
-   * @param clipboardHelper ClipboardHelper instance
-   * @return wrapper from ClipboardHelper instance
-   */
-  public static Div clipboardHelperWrapper(ClipboardHelper clipboardHelper) {
-    try {
-      Field componentWrapperField = ClipboardHelper.class.getDeclaredField("componentWrapper");
-      componentWrapperField.setAccessible(true);
-      return (Div) componentWrapperField.get(clipboardHelper);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new IllegalStateException(
-          "Could not get componentWrapper field value from " + clipboardHelper);
     }
   }
 

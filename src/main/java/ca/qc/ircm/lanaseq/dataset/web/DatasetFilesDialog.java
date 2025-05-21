@@ -36,8 +36,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -76,7 +74,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.FileSystemUtils;
-import org.vaadin.olli.ClipboardHelper;
 
 /**
  * Dataset dialog.
@@ -191,7 +188,7 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
         .setComparator(Comparator.comparing(EditableFile::getFilename)).setFlexGrow(10);
     download = files.addColumn(new ComponentRenderer<>(this::downloadButton)).setKey(DOWNLOAD)
         .setSortable(false);
-    publicFile = files.addColumn(new ComponentRenderer<>(this::publicFileButton))
+    publicFile = files.addColumn(new ComponentRenderer<>(this::publicFileCheckbox))
         .setKey(PUBLIC_FILE).setSortable(false);
     delete = files.addColumn(new ComponentRenderer<>(this::deleteButton)).setKey(DELETE)
         .setSortable(false);
@@ -241,23 +238,13 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
     return anchor;
   }
 
-  private HorizontalLayout publicFileButton(EditableFile file) {
-    HorizontalLayout layout = new HorizontalLayout();
-    layout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-    layout.setSpacing(false);
-    layout.addClassName(PUBLIC_FILE);
+  private Checkbox publicFileCheckbox(EditableFile file) {
     boolean fileIsPublic = service.isFilePublic(dataset, file.getFile().toPath());
     Checkbox checkbox = new Checkbox();
+    checkbox.addClassName(PUBLIC_FILE);
     checkbox.setValue(fileIsPublic);
     checkbox.addValueChangeListener(e -> changePublicFile(file, e.getValue()));
-    String publicFileUrl = configuration.getUrl(PublicDatasetFiles.publicDatasetFileUrl(dataset,
-        service.relativize(dataset, file.getFile().toPath()).toString()));
-    Button button = new Button();
-    ClipboardHelper clipboardHelper = new ClipboardHelper(publicFileUrl, button);
-    clipboardHelper.setVisible(fileIsPublic);
-    button.setIcon(VaadinIcon.COPY.create());
-    layout.add(checkbox, clipboardHelper);
-    return layout;
+    return checkbox;
   }
 
   private Button deleteButton(EditableFile file) {

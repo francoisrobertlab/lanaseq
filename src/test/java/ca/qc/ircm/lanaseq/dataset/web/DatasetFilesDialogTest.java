@@ -26,7 +26,6 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.id;
 import static ca.qc.ircm.lanaseq.sample.SampleProperties.NAME;
 import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.PUBLIC_FILE;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clickButton;
-import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.clipboardHelperWrapper;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.doubleClickItem;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.findValidationStatusByField;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.items;
@@ -83,7 +82,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -127,7 +125,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.vaadin.olli.ClipboardHelper;
 
 /**
  * Tests for {@link DatasetFilesDialog}.
@@ -442,19 +439,9 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
       Button downloadButton = (Button) downloadAnchorChild;
       validateIcon(VaadinIcon.DOWNLOAD.create(), downloadButton.getIcon());
       assertEquals("", downloadButton.getText());
-      HorizontalLayout publicFileLayout = (HorizontalLayout) test(dialog.files).getCellComponent(i,
+      Checkbox publicFileCheckbox = (Checkbox) test(dialog.files).getCellComponent(i,
           dialog.publicFile.getKey());
-      Checkbox publicFileCheckbox = test(publicFileLayout).find(Checkbox.class).first();
       assertEquals(i > 2, publicFileCheckbox.getValue());
-      ClipboardHelper copyLinkHelper = (ClipboardHelper) publicFileLayout.getChildren()
-          .filter(co -> co instanceof ClipboardHelper).findFirst().orElseThrow();
-      assertEquals(publicFileCheckbox.getValue(), copyLinkHelper.isVisible());
-      assertEquals(configuration.getUrl(PublicDatasetFiles.publicDatasetFileUrl(dataset,
-              service.relativize(dataset, path.toPath()).toString())),
-          copyLinkHelper.getElement().getProperty("content"));
-      Button copyLink = (Button) clipboardHelperWrapper(copyLinkHelper).getChildren().findFirst()
-          .orElseThrow();
-      validateIcon(VaadinIcon.COPY.create(), copyLink.getIcon());
       publicFileCheckbox.setValue(!publicFileCheckbox.getValue());
       if (publicFileCheckbox.getValue()) {
         verify(service).allowPublicFileAccess(dataset, path.toPath(),
