@@ -144,12 +144,14 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
+    assertFalse(dialog.files().publicFileCheckbox(0).isChecked());
 
     TestTransaction.flagForCommit();
-    dialog.files().publicFileCheckbox(0).setChecked(true);
+    dialog.files().publicFileCheckbox(0).click();
     Thread.sleep(1000); // Wait for insert to complete.
     TestTransaction.end();
 
+    assertTrue(dialog.files().publicFileCheckbox(0).isChecked());
     Optional<SamplePublicFile> optionalSamplePublicFile = samplePublicFileRepository.findBySampleAndPath(
         sample, "R1.fastq");
     assertTrue(optionalSamplePublicFile.isPresent());

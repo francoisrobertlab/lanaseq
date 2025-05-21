@@ -145,12 +145,14 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     DatasetsViewElement view = $(DatasetsViewElement.class).waitForFirst();
     view.datasets().controlClick(1);
     DatasetFilesDialogElement dialog = view.filesDialog();
+    assertFalse(dialog.files().publicFileCheckbox(0).isChecked());
 
     TestTransaction.flagForCommit();
-    dialog.files().publicFileCheckbox(0).setChecked(true);
+    dialog.files().publicFileCheckbox(0).click();
     Thread.sleep(1000); // Wait for insert to complete.
     TestTransaction.end();
 
+    assertTrue(dialog.files().publicFileCheckbox(0).isChecked());
     Optional<DatasetPublicFile> optionalDatasetPublicFile = datasetPublicFileRepository.findByDatasetAndPath(
         dataset, "R1.fastq");
     assertTrue(optionalDatasetPublicFile.isPresent());
