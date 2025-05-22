@@ -71,6 +71,8 @@ logging:
     com.vaadin: DEBUG
 ```
 
+### Start server as a service
+
 Use systemd or init.d to start the service.
 
 ### Database
