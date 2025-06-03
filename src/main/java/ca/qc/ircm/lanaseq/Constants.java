@@ -43,8 +43,8 @@ public class Constants {
   /**
    * Strip this key from class name, if it matches.
    */
-  private static final String STRIP_KEY =
-      Pattern.quote(Constants.class.getPackage().getName() + ".");
+  private static final String STRIP_KEY = Pattern.quote(
+      Constants.class.getPackage().getName() + ".");
 
   /**
    * Returns all valid locales for program.
@@ -60,7 +60,7 @@ public class Constants {
 
   /**
    * Key prefix to use to get messages from {@link MessageSource}.
-   * <p>
+   * <br>
    * Here is an example on how to use prefix.
    *
    * <pre>
