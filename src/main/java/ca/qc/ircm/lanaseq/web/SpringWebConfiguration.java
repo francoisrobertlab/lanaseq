@@ -47,8 +47,8 @@ public class SpringWebConfiguration implements WebMvcConfigurer {
     loggingFilter.setIncludeQueryString(true);
     loggingFilter.setIncludePayload(false);
     loggingFilter.setIncludeHeaders(true);
-    FilterRegistrationBean<CommonsRequestLoggingFilter> registration =
-        new FilterRegistrationBean<>(loggingFilter);
+    FilterRegistrationBean<CommonsRequestLoggingFilter> registration = new FilterRegistrationBean<>(
+        loggingFilter);
     registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
     return registration;
   }
@@ -59,8 +59,7 @@ public class SpringWebConfiguration implements WebMvcConfigurer {
   }
 
   @Bean
-  public ServletListenerRegistrationBean<IntrospectorCleanupListener>
-  introspectorCleanupListener() {
+  public ServletListenerRegistrationBean<IntrospectorCleanupListener> introspectorCleanupListener() {
     return new ServletListenerRegistrationBean<>(new IntrospectorCleanupListener());
   }
 

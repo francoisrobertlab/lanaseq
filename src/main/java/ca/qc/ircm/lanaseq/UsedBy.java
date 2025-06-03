@@ -33,6 +33,5 @@ public @interface UsedBy {
    *
    * @return framework that is using the element
    */
-  @SuppressWarnings("UnusedReturnValue")
-  String value();
+  @SuppressWarnings("UnusedReturnValue") String value();
 }

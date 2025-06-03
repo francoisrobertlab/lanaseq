@@ -22,9 +22,8 @@ import java.util.Objects;
  */
 @Entity
 @GeneratePropertyNames
-@SuppressFBWarnings(
-    value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"},
-    justification = ENTITY_EI_EXPOSE_REP)
+@SuppressFBWarnings(value = {"EI_EXPOSE_REP",
+    "EI_EXPOSE_REP2"}, justification = ENTITY_EI_EXPOSE_REP)
 public class ForgotPassword implements Data, Serializable {
 
   @Serial
@@ -79,8 +78,8 @@ public class ForgotPassword implements Data, Serializable {
       return false;
     }
     ForgotPassword other = (ForgotPassword) obj;
-    return Objects.equals(confirmNumber, other.confirmNumber)
-        && Objects.equals(requestMoment, other.requestMoment);
+    return Objects.equals(confirmNumber, other.confirmNumber) && Objects.equals(requestMoment,
+        other.requestMoment);
   }
 
   @Override

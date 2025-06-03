@@ -249,8 +249,8 @@ public class UsersViewTest extends SpringUIUnitTest {
           test(view.users).getCellText(i, view.users.getColumns().indexOf(view.name)));
       Button activeButton = (Button) test(view.users).getCellComponent(i, view.active.getKey());
       assertTrue(activeButton.hasClassName(ACTIVE));
-      assertTrue(
-          activeButton.hasThemeName(user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
+      assertTrue(activeButton.hasThemeName(
+          user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
               : ButtonVariant.LUMO_ERROR.getVariantName()));
       assertEquals(view.getTranslation(USER_PREFIX + property(ACTIVE, user.isActive())),
           activeButton.getText());
@@ -260,8 +260,8 @@ public class UsersViewTest extends SpringUIUnitTest {
       clickButton(activeButton);
       verify(service, atLeastOnce()).save(userCaptor.capture(), eq(null));
       assertEquals(!previousActive, userCaptor.getValue().isActive());
-      assertTrue(
-          activeButton.hasThemeName(user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
+      assertTrue(activeButton.hasThemeName(
+          user.isActive() ? ButtonVariant.LUMO_SUCCESS.getVariantName()
               : ButtonVariant.LUMO_ERROR.getVariantName()));
       assertEquals(view.getTranslation(USER_PREFIX + property(ACTIVE, user.isActive())),
           activeButton.getText());
@@ -500,11 +500,11 @@ public class UsersViewTest extends SpringUIUnitTest {
     view.users.select(user);
     view.switchUser.click();
     verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
-    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream()
-        .anyMatch(i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)")
-            .equals(i.getInvocation().getExpression())
-            && "/".equals(i.getInvocation().getParameters().get(0))
-            && "_self".equals(i.getInvocation().getParameters().get(1))));
+    assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
+        i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)").equals(
+            i.getInvocation().getExpression()) && "/".equals(
+            i.getInvocation().getParameters().get(0)) && "_self".equals(
+            i.getInvocation().getParameters().get(1))));
   }
 
   @Test

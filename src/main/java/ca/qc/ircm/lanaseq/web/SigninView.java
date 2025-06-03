@@ -40,8 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = SigninView.VIEW_NAME)
 @AnonymousAllowed
 @JsModule("./styles/shared-styles.js")
-public class SigninView extends LoginOverlay
-    implements LocaleChangeObserver, HasDynamicTitle, AfterNavigationObserver, BeforeEnterObserver {
+public class SigninView extends LoginOverlay implements LocaleChangeObserver, HasDynamicTitle,
+    AfterNavigationObserver, BeforeEnterObserver {
 
   public static final String VIEW_NAME = "signin";
   public static final String ID = "signin-view";

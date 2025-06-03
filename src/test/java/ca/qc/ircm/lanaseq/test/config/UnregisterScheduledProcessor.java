@@ -20,8 +20,8 @@ public class UnregisterScheduledProcessor implements BeanFactoryPostProcessor {
   @Override
   public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
       throws BeansException {
-    for (String beanName : beanFactory
-        .getBeanNamesForType(ScheduledAnnotationBeanPostProcessor.class)) {
+    for (String beanName : beanFactory.getBeanNamesForType(
+        ScheduledAnnotationBeanPostProcessor.class)) {
       ((DefaultListableBeanFactory) beanFactory).removeBeanDefinition(beanName);
     }
   }

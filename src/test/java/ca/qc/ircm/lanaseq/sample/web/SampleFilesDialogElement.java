@@ -62,8 +62,8 @@ public class SampleFilesDialogElement extends DialogElement {
   }
 
   public AddSampleFilesDialogElement addFilesDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(AddSampleFilesDialog.ID)))
-        .wrap(AddSampleFilesDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(AddSampleFilesDialog.ID))).wrap(
+        AddSampleFilesDialogElement.class);
   }
 
   @Attribute(name = "id", value = SampleFilesDialog.ID + "-" + FOLDERS)

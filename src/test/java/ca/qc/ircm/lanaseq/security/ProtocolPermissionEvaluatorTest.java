@@ -45,10 +45,12 @@ public class ProtocolPermissionEvaluatorTest {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, READ));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            BASE_READ));
   }
 
   @Test
@@ -121,10 +123,12 @@ public class ProtocolPermissionEvaluatorTest {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            BASE_WRITE));
   }
 
   @Test
@@ -145,10 +149,12 @@ public class ProtocolPermissionEvaluatorTest {
     Protocol protocol = protocolRepository.findById(1L).orElseThrow();
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, WRITE));
     assertFalse(permissionEvaluator.hasPermission(authentication(), protocol, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            BASE_WRITE));
   }
 
   @Test

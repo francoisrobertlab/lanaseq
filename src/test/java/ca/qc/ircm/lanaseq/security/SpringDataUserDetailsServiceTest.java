@@ -54,8 +54,8 @@ public class SpringDataUserDetailsServiceTest {
     when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
   }
 
-  private Optional<? extends GrantedAuthority>
-  findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
+  private Optional<? extends GrantedAuthority> findAuthority(
+      Collection<? extends GrantedAuthority> authorities, String authority) {
     return authorities.stream().filter(autho -> autho.getAuthority().equals(authority)).findFirst();
   }
 

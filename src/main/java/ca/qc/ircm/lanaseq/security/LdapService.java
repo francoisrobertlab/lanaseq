@@ -63,16 +63,16 @@ public class LdapService {
         .where(ldapConfiguration.idAttribute()).is(username);
     builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
     LdapQuery query = builder;
-    AttributesMapper<String> mapper =
-        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.mailAttribute())).map(attr -> {
-          try {
-            return attr.get();
-          } catch (NamingException e) {
-            return null;
-          }
-        }).map(Object::toString).orElse(null);
-    Optional<String> email =
-        ldapOperations.search(query, mapper).stream().filter(Objects::nonNull).findFirst();
+    AttributesMapper<String> mapper = attrs -> Optional.ofNullable(
+        attrs.get(ldapConfiguration.mailAttribute())).map(attr -> {
+      try {
+        return attr.get();
+      } catch (NamingException e) {
+        return null;
+      }
+    }).map(Object::toString).orElse(null);
+    Optional<String> email = ldapOperations.search(query, mapper).stream().filter(Objects::nonNull)
+        .findFirst();
     logger.debug("Found LDAP email {} for user [{}]", email, username);
     return email;
   }
@@ -88,16 +88,16 @@ public class LdapService {
         .where(ldapConfiguration.mailAttribute()).is(email);
     builder = builder.and("objectclass").is(ldapConfiguration.objectClass());
     LdapQuery query = builder;
-    AttributesMapper<String> mapper =
-        attrs -> Optional.ofNullable(attrs.get(ldapConfiguration.idAttribute())).map(attr -> {
-          try {
-            return attr.get();
-          } catch (NamingException e) {
-            return null;
-          }
-        }).map(Object::toString).orElse(null);
-    Optional<String> username =
-        ldapOperations.search(query, mapper).stream().filter(Objects::nonNull).findFirst();
+    AttributesMapper<String> mapper = attrs -> Optional.ofNullable(
+        attrs.get(ldapConfiguration.idAttribute())).map(attr -> {
+      try {
+        return attr.get();
+      } catch (NamingException e) {
+        return null;
+      }
+    }).map(Object::toString).orElse(null);
+    Optional<String> username = ldapOperations.search(query, mapper).stream()
+        .filter(Objects::nonNull).findFirst();
     logger.debug("Found LDAP username {} for user [{}]", username, email);
     return username;
   }

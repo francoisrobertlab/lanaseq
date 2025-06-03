@@ -33,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = ProfileView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed(USER)
-public class ProfileView extends VerticalLayout
-    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+public class ProfileView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
+    NotificationComponent {
 
   public static final String VIEW_NAME = "profile";
   public static final String ID = "profile-view";

@@ -72,8 +72,8 @@ public class AnalysisService {
     Path folder = configuration.getAnalysis().folder(datasets);
     FileSystemUtils.deleteRecursively(folder);
     Files.createDirectories(folder);
-    Collection<Sample> samples =
-        datasets.stream().flatMap(dataset -> dataset.getSamples().stream()).distinct().toList();
+    Collection<Sample> samples = datasets.stream().flatMap(dataset -> dataset.getSamples().stream())
+        .distinct().toList();
     Path samplesFile = folder.resolve("samples.txt");
     LinkedHashSet<String> samplesLines = new LinkedHashSet<>();
     samplesLines.add("#sample");
@@ -82,15 +82,15 @@ public class AnalysisService {
     Path datasetFile = folder.resolve("dataset.txt");
     LinkedHashSet<String> datasetLines = new LinkedHashSet<>();
     datasetLines.add("#merge\tsamples");
-    datasets.forEach(dataset -> datasetLines.add(dataset.getName() + "\t"
-        + dataset.getSamples().stream().map(Sample::getName).collect(Collectors.joining("\t"))));
+    datasets.forEach(dataset -> datasetLines.add(
+        dataset.getName() + "\t" + dataset.getSamples().stream().map(Sample::getName)
+            .collect(Collectors.joining("\t"))));
     Files.write(datasetFile, datasetLines, StandardOpenOption.CREATE);
     List<PathMatcher> pathMatchers = filenamePatterns.stream()
         .map(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern)).toList();
-    Function<List<Path>,
-        List<Path>> matchAnyPattern = files -> files.stream()
-        .filter(file -> pathMatchers.stream()
-            .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
+    Function<List<Path>, List<Path>> matchAnyPattern = files -> files.stream().filter(
+            file -> pathMatchers.stream()
+                .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
         .collect(Collectors.toList());
     List<Path> filesToCopy = new ArrayList<>();
     for (Sample sample : samples) {
@@ -142,10 +142,9 @@ public class AnalysisService {
     Files.write(samplesFile, samplesLines, StandardOpenOption.CREATE);
     List<PathMatcher> pathMatchers = filenamePatterns.stream()
         .map(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern)).toList();
-    Function<List<Path>,
-        List<Path>> matchAnyPattern = files -> files.stream()
-        .filter(file -> pathMatchers.stream()
-            .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
+    Function<List<Path>, List<Path>> matchAnyPattern = files -> files.stream().filter(
+            file -> pathMatchers.stream()
+                .anyMatch(pathMatcher -> pathMatcher.matches(file.getFileName())))
         .collect(Collectors.toList());
     List<Path> filesToCopy = new ArrayList<>();
     for (Sample sample : samples) {

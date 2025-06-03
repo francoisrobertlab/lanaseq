@@ -45,8 +45,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
 
   private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
-  private static final Logger logger =
-      LoggerFactory.getLogger(ConfigureUiServiceInitListenerTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+      ConfigureUiServiceInitListenerTest.class);
   @Mock
   private AfterNavigationListener navigationListener;
   @Mock
@@ -75,14 +75,14 @@ public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
   }
 
   private void doBeforeEnter() {
-    List<BeforeEnterHandler> handlers =
-        UI.getCurrent().getInternals().getListeners(BeforeEnterHandler.class);
+    List<BeforeEnterHandler> handlers = UI.getCurrent().getInternals()
+        .getListeners(BeforeEnterHandler.class);
     handlers.get(0).beforeEnter(beforeEnterEvent);
   }
 
   private void doAfterNavigation() {
-    List<AfterNavigationHandler> handlers =
-        UI.getCurrent().getInternals().getListeners(AfterNavigationHandler.class);
+    List<AfterNavigationHandler> handlers = UI.getCurrent().getInternals()
+        .getListeners(AfterNavigationHandler.class);
     handlers.get(0).afterNavigation(afterNavigationEvent);
   }
 
@@ -99,8 +99,8 @@ public class ConfigureUiServiceInitListenerTest extends SpringUIUnitTest {
 
     doBeforeEnter();
 
-    String message =
-        UI.getCurrent().getTranslation(MESSAGE_PREFIX + AccessDeniedException.class.getSimpleName(),
+    String message = UI.getCurrent()
+        .getTranslation(MESSAGE_PREFIX + AccessDeniedException.class.getSimpleName(),
             "jonh.smith@ircm.qc.ca", UsersView.class.getSimpleName());
     verify(beforeEnterEvent).rerouteToError(any(AccessDeniedException.class), eq(message));
   }

@@ -127,8 +127,8 @@ public class FixFilesDateFolderTest {
       i++;
       Path oldFolder = samplesBase.resolve(String.valueOf(sample.getCreationDate().getYear()))
           .resolve(sample.getName());
-      Path folder =
-          samplesBase.resolve(String.valueOf(sample.getDate().getYear())).resolve(sample.getName());
+      Path folder = samplesBase.resolve(String.valueOf(sample.getDate().getYear()))
+          .resolve(sample.getName());
       if (i < modifiedSamples) {
         assertNotEquals(oldFolder, folder);
         assertFalse(Files.exists(oldFolder), oldFolder.toString());

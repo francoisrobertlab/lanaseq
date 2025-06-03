@@ -98,8 +98,8 @@ public class ProtocolService {
    * @param protocol protocol
    * @return all deleted files linked to protocol
    */
-  @PreAuthorize("hasPermission(#protocol, 'read') && hasAnyRole('" + MANAGER + "', '" + ADMIN
-      + "')")
+  @PreAuthorize(
+      "hasPermission(#protocol, 'read') && hasAnyRole('" + MANAGER + "', '" + ADMIN + "')")
   public List<ProtocolFile> deletedFiles(Protocol protocol) {
     Objects.requireNonNull(protocol, "protocol parameter cannot be null");
     return fileRepository.findByProtocolAndDeletedTrue(protocol);

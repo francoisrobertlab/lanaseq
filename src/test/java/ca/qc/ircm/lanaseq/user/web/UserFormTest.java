@@ -82,9 +82,8 @@ public class UserFormTest extends SpringUIUnitTest {
     form.passwords = mock(PasswordsForm.class);
     form.passwords.password = new PasswordField();
     form.passwords.passwordConfirm = new PasswordField();
-    @SuppressWarnings("unchecked")
-    BinderValidationStatus<Passwords> passwordsValidationStatus =
-        mock(BinderValidationStatus.class);
+    @SuppressWarnings("unchecked") BinderValidationStatus<Passwords> passwordsValidationStatus = mock(
+        BinderValidationStatus.class);
     when(form.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
   }
@@ -283,8 +282,8 @@ public class UserFormTest extends SpringUIUnitTest {
 
     BinderValidationStatus<User> status = form.validateUser();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.email);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
@@ -299,8 +298,8 @@ public class UserFormTest extends SpringUIUnitTest {
 
     BinderValidationStatus<User> status = form.validateUser();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.email);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + INVALID_EMAIL)),
@@ -317,8 +316,8 @@ public class UserFormTest extends SpringUIUnitTest {
     verify(service, atLeastOnce()).exists(email);
     BinderValidationStatus<User> status = form.validateUser();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.email);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.email);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
@@ -349,8 +348,8 @@ public class UserFormTest extends SpringUIUnitTest {
 
     BinderValidationStatus<User> status = form.validateUser();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.name);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());

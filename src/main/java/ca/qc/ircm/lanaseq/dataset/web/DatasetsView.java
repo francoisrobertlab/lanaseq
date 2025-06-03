@@ -49,8 +49,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = DatasetsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({USER})
-public class DatasetsView extends VerticalLayout
-    implements LocaleChangeObserver, HasDynamicTitle, NotificationComponent {
+public class DatasetsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
+    NotificationComponent {
 
   public static final String VIEW_NAME = "datasets";
   public static final String ID = "datasets-view";
@@ -196,8 +196,8 @@ public class DatasetsView extends VerticalLayout
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + DATASETS_REQUIRED)).open();
     } else {
       DatasetsAnalysisDialog analysisDialog = analysisDialogFactory.getObject();
-      analysisDialog
-          .setDatasetIds(datasets.stream().map(Dataset::getId).collect(Collectors.toList()));
+      analysisDialog.setDatasetIds(
+          datasets.stream().map(Dataset::getId).collect(Collectors.toList()));
       analysisDialog.open();
     }
   }

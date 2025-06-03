@@ -31,8 +31,8 @@ import org.springframework.security.access.AccessDeniedException;
  */
 @Route("accessdenied")
 @AnonymousAllowed
-public class AccessDeniedView extends Composite<VerticalLayout>
-    implements HasErrorParameter<AccessDeniedException>, LocaleChangeObserver, HasDynamicTitle {
+public class AccessDeniedView extends Composite<VerticalLayout> implements
+    HasErrorParameter<AccessDeniedException>, LocaleChangeObserver, HasDynamicTitle {
 
   public static final String VIEW_NAME = "accessdenied";
   public static final String HEADER = "header";

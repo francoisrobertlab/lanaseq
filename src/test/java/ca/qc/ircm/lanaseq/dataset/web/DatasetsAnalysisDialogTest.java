@@ -80,9 +80,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
   public void beforeTest() {
     when(service.get(anyLong())).then(
         i -> i.getArgument(0) != null ? repository.findById(i.getArgument(0)) : Optional.empty());
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getAnalysis()).thenReturn(analysisFolder);
     datasets.add(repository.findById(6L).orElseThrow());
     datasets.add(repository.findById(7L).orElseThrow());
@@ -209,8 +208,8 @@ public class DatasetsAnalysisDialogTest extends SpringUIUnitTest {
 
   @Test
   public void createFolder_IoException() throws Throwable {
-    doThrow(new IOException("test")).when(analysisService).copyDatasetsResources(anyCollection(),
-        anyCollection());
+    doThrow(new IOException("test")).when(analysisService)
+        .copyDatasetsResources(anyCollection(), anyCollection());
     dialog.filenamePatterns.setValue("*.fastq");
 
     dialog.createFolder.click();

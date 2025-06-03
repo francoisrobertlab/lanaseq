@@ -33,10 +33,11 @@ public class DatePickerInternationalization {
    */
   public static DatePickerI18n englishDatePickerI18n() {
     return new DatePickerI18n().setToday("Today").setCancel("Cancel").setFirstDayOfWeek(0)
-        .setMonthNames(Arrays.asList("January", "February", "March", "April", "May", "June", "July",
-            "August", "September", "October", "November", "December"))
-        .setWeekdays(Arrays.asList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-            "Saturday"))
+        .setMonthNames(
+            Arrays.asList("January", "February", "March", "April", "May", "June", "July", "August",
+                "September", "October", "November", "December")).setWeekdays(
+            Arrays.asList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                "Saturday"))
         .setWeekdaysShort(Arrays.asList("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"));
   }
 
@@ -47,9 +48,9 @@ public class DatePickerInternationalization {
    */
   public static DatePickerI18n frenchDatePickerI18n() {
     return new DatePickerI18n().setToday("Aujourd'hui").setCancel("Annuler").setFirstDayOfWeek(0)
-        .setMonthNames(Arrays.asList("Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"))
-        .setWeekdays(
+        .setMonthNames(
+            Arrays.asList("Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août",
+                "Septembre", "Octobre", "Novembre", "Décembre")).setWeekdays(
             Arrays.asList("Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"))
         .setWeekdaysShort(Arrays.asList("Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"));
   }

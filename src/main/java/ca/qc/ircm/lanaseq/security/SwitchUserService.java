@@ -44,8 +44,7 @@ public class SwitchUserService {
   public static final String ROLE_PREVIOUS_ADMINISTRATOR = "ROLE_PREVIOUS_ADMINISTRATOR";
   private static final Logger logger = LoggerFactory.getLogger(SwitchUserService.class);
   private final String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
-  private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource =
-      new WebAuthenticationDetailsSource();
+  private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
   private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
   private final UserDetailsService userDetailsService;
   private final ApplicationEventPublisher eventPublisher;
@@ -85,8 +84,9 @@ public class SwitchUserService {
     // OK, create the switch user token
     UsernamePasswordAuthenticationToken targetUserRequest = createSwitchUserToken(targetUser);
     // publish event
-    eventPublisher.publishEvent(new AuthenticationSwitchUserEvent(
-        SecurityContextHolder.getContext().getAuthentication(), targetUser));
+    eventPublisher.publishEvent(
+        new AuthenticationSwitchUserEvent(SecurityContextHolder.getContext().getAuthentication(),
+            targetUser));
     // set details
     targetUserRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     return targetUserRequest;
@@ -97,8 +97,8 @@ public class SwitchUserService {
     // grant an additional authority that contains the original Authentication object
     // which will be used to 'exit' from the current switched user.
     Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
-    GrantedAuthority switchAuthority =
-        new SwitchUserGrantedAuthority(switchAuthorityRole, currentAuthentication);
+    GrantedAuthority switchAuthority = new SwitchUserGrantedAuthority(switchAuthorityRole,
+        currentAuthentication);
     // get the original authorities
     Collection<? extends GrantedAuthority> orig = targetUser.getAuthorities();
     // add the new switch user authority

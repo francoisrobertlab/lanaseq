@@ -18,8 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(DaoAuthenticationProviderWithLdap.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+      DaoAuthenticationProviderWithLdap.class);
   private UserRepository userRepository;
   private LdapService ldapService;
   private SecurityConfiguration securityConfiguration;
@@ -67,8 +67,7 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
   private boolean accountLocked(User user) {
     return user.getSignAttempts() > 0
         && user.getSignAttempts() % securityConfiguration.lockAttemps() == 0
-        && user.getLastSignAttempt() != null
-        && user.getLastSignAttempt()
+        && user.getLastSignAttempt() != null && user.getLastSignAttempt()
         .plusSeconds(securityConfiguration.lockDuration().toMillis() / 1000)
         .isAfter(LocalDateTime.now());
   }

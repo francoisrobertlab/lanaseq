@@ -22,8 +22,7 @@ public class MessageSourceTest {
   @Test
   public void configuration() {
     assertInstanceOf(ReloadableResourceBundleMessageSource.class, messageSource);
-    ReloadableResourceBundleMessageSource reloadableMessageSource =
-        (ReloadableResourceBundleMessageSource) messageSource;
+    ReloadableResourceBundleMessageSource reloadableMessageSource = (ReloadableResourceBundleMessageSource) messageSource;
     List<String> basenames = reloadableMessageSource.getBasenameSet().stream().toList();
     assertEquals(2, basenames.size());
     String currentDir = FilenameUtils.separatorsToUnix(System.getProperty("user.dir"));

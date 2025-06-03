@@ -24,8 +24,8 @@ public class ValidationLogger {
           error.getMessage(), field.getId().orElse(field.getElement().getAttribute("class")),
           error.getField().getValue(), status.getBinder().getBean());
     });
-    status.getBeanValidationErrors()
-        .forEach(error -> logger.trace("Validation error {} in binder {}", error.getErrorMessage(),
+    status.getBeanValidationErrors().forEach(
+        error -> logger.trace("Validation error {} in binder {}", error.getErrorMessage(),
             status.getBinder().getBean()));
   }
 }

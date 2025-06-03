@@ -147,8 +147,8 @@ public class SamplesAnalysisDialog extends Dialog implements LocaleChangeObserve
     if (ids.isEmpty()) {
       throw new IllegalArgumentException("ids cannot be empty");
     }
-    this.samples =
-        ids.stream().map(id -> service.get(id).orElseThrow()).collect(Collectors.toList());
+    this.samples = ids.stream().map(id -> service.get(id).orElseThrow())
+        .collect(Collectors.toList());
     updateHeader();
   }
 

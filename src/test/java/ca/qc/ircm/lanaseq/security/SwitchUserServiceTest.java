@@ -64,11 +64,10 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
 
   private org.springframework.security.core.userdetails.User userDetails(User user,
       String... roles) {
-    Collection<GrantedAuthority> authorities =
-        Stream.of(roles).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    org.springframework.security.core.userdetails.User userDetails =
-        new org.springframework.security.core.userdetails.User(user.getEmail(),
-            user.getHashedPassword(), authorities);
+    Collection<GrantedAuthority> authorities = Stream.of(roles).map(SimpleGrantedAuthority::new)
+        .collect(Collectors.toList());
+    org.springframework.security.core.userdetails.User userDetails = new org.springframework.security.core.userdetails.User(
+        user.getEmail(), user.getHashedPassword(), authorities);
     return userDetails;
   }
 
@@ -83,19 +82,16 @@ public class SwitchUserServiceTest extends SpringUIUnitTest {
     assertEquals("jonh.smith@ircm.qc.ca", userDetails.getUsername());
     assertEquals(user.getHashedPassword(), userDetails.getPassword());
     assertTrue(authentication.getAuthorities().contains(new SimpleGrantedAuthority(USER)));
-    Optional<SwitchUserGrantedAuthority> optionalSwitchUserGrantedAuthority =
-        authentication.getAuthorities().stream()
-            .filter(authority -> authority instanceof SwitchUserGrantedAuthority)
-            .map(authority -> (SwitchUserGrantedAuthority) authority).findFirst();
+    Optional<SwitchUserGrantedAuthority> optionalSwitchUserGrantedAuthority = authentication.getAuthorities()
+        .stream().filter(authority -> authority instanceof SwitchUserGrantedAuthority)
+        .map(authority -> (SwitchUserGrantedAuthority) authority).findFirst();
     assertTrue(optionalSwitchUserGrantedAuthority.isPresent());
-    SwitchUserGrantedAuthority switchUserGrantedAuthority =
-        optionalSwitchUserGrantedAuthority.get();
+    SwitchUserGrantedAuthority switchUserGrantedAuthority = optionalSwitchUserGrantedAuthority.get();
     assertEquals(ROLE_PREVIOUS_ADMINISTRATOR, switchUserGrantedAuthority.getAuthority());
     assertNotNull(switchUserGrantedAuthority.getSource());
     Authentication previousAuthentication = switchUserGrantedAuthority.getSource();
     assertInstanceOf(UserDetailsWithId.class, previousAuthentication.getPrincipal());
-    UserDetailsWithId previousUserDetails =
-        (UserDetailsWithId) previousAuthentication.getPrincipal();
+    UserDetailsWithId previousUserDetails = (UserDetailsWithId) previousAuthentication.getPrincipal();
     assertEquals(1L, previousUserDetails.getId());
     assertEquals("lanaseq@ircm.qc.ca", previousUserDetails.getUsername());
     assertTrue(previousAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(ADMIN)));

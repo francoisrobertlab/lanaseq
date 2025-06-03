@@ -18,11 +18,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @ActiveProfiles("test")
 @WebAppConfiguration
-@TestExecutionListeners(
-    value = {VaadinLicenseExecutionListener.class,
-        FixSecurityContextHolderStrategyExecutionListener.class,
-        UiUnitTestExecutionListener.class},
-    mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+@TestExecutionListeners(value = {VaadinLicenseExecutionListener.class,
+    FixSecurityContextHolderStrategyExecutionListener.class,
+    UiUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 public @interface NonTransactionalTestAnnotations {
 
 }

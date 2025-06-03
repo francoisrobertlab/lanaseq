@@ -246,14 +246,18 @@ public class PermissionEvaluatorDelegatorTest {
     assertFalse(permissionEvaluator.hasCollectionPermission(authentication(), protocols, WRITE));
     assertFalse(
         permissionEvaluator.hasCollectionPermission(authentication(), protocols, BASE_WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), protocol.getId(),
-        PROTOCOL_CLASS, BASE_WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            BASE_READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), protocol.getId(), PROTOCOL_CLASS,
+            BASE_WRITE));
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, READ);
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, BASE_READ);
     verify(protocolPermissionEvaluator).hasPermission(authentication(), protocol, WRITE);

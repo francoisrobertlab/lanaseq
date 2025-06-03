@@ -228,13 +228,17 @@ public class UserPermissionEvaluatorTest {
   @Test
   @WithUserDetails("lanaseq@ircm.qc.ca")
   public void hasPermission_NotLongId() {
-    assertFalse(permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca",
-        USER_CLASS, READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca",
-        USER_CLASS, WRITE));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca",
-        USER_CLASS, BASE_READ));
-    assertFalse(permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca",
-        USER_CLASS, BASE_WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS,
+            READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS,
+            WRITE));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS,
+            BASE_READ));
+    assertFalse(
+        permissionEvaluator.hasPermission(authentication(), "lanaseq@ircm.qc.ca", USER_CLASS,
+            BASE_WRITE));
   }
 }

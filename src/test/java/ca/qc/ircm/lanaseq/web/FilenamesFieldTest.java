@@ -77,8 +77,8 @@ public class FilenamesFieldTest extends SpringUIUnitTest {
 
   @Test
   public void invalidCustom() {
-    CustomValueSetEvent<MultiSelectComboBox<String>> event =
-        new CustomValueSetEvent<>(filenamesField, false, "chip?");
+    CustomValueSetEvent<MultiSelectComboBox<String>> event = new CustomValueSetEvent<>(
+        filenamesField, false, "chip?");
     fireEvent(filenamesField, event);
     assertTrue(filenamesField.getValue().isEmpty());
     assertTrue(filenamesField.isInvalid());
@@ -88,8 +88,8 @@ public class FilenamesFieldTest extends SpringUIUnitTest {
 
   @Test
   public void noValues_AddCustom() {
-    CustomValueSetEvent<MultiSelectComboBox<String>> event =
-        new CustomValueSetEvent<>(filenamesField, false, "chip");
+    CustomValueSetEvent<MultiSelectComboBox<String>> event = new CustomValueSetEvent<>(
+        filenamesField, false, "chip");
     fireEvent(filenamesField, event);
     Set<String> keywords = filenamesField.getValue();
     assertEquals(1, keywords.size());
@@ -108,8 +108,8 @@ public class FilenamesFieldTest extends SpringUIUnitTest {
   @Test
   public void values_AddCustom() {
     filenamesField.setValue(set("input", "rappa"));
-    CustomValueSetEvent<MultiSelectComboBox<String>> event =
-        new CustomValueSetEvent<>(filenamesField, false, "chip");
+    CustomValueSetEvent<MultiSelectComboBox<String>> event = new CustomValueSetEvent<>(
+        filenamesField, false, "chip");
     fireEvent(filenamesField, event);
     Set<String> keywords = filenamesField.getValue();
     assertEquals(3, keywords.size());

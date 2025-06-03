@@ -14,11 +14,11 @@ import org.springframework.test.context.TestExecutionListener;
 /**
  * Fixes SecurityContextHolderStrategy present in SecurityContextHolder.
  */
-public class FixSecurityContextHolderStrategyExecutionListener
-    implements TestExecutionListener, InjectDependencies {
+public class FixSecurityContextHolderStrategyExecutionListener implements TestExecutionListener,
+    InjectDependencies {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(FixSecurityContextHolderStrategyExecutionListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+      FixSecurityContextHolderStrategyExecutionListener.class);
   private SecurityContextHolderStrategy injectedStrategy;
 
   @Override
@@ -28,8 +28,7 @@ public class FixSecurityContextHolderStrategyExecutionListener
     if (injectedStrategy != holderStrategy) {
       logger.warn(
           "Missmatch between injected SecurityContextHolderStrategy {} and strategy present in holder {}, "
-              + "setting injected strategy in context holder",
-          injectedStrategy, holderStrategy);
+              + "setting injected strategy in context holder", injectedStrategy, holderStrategy);
       SecurityContextHolder.setContextHolderStrategy(injectedStrategy);
     }
   }

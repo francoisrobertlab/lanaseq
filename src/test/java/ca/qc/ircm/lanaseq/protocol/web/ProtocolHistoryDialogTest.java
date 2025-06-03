@@ -144,14 +144,12 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   @Test
   public void files_ColumnsValueProvider() {
     for (ProtocolFile file : protocolFiles) {
-      ComponentRenderer<Anchor, ProtocolFile> filenameRenderer =
-          (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
+      ComponentRenderer<Anchor, ProtocolFile> filenameRenderer = (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
       Anchor anchor = filenameRenderer.createComponent(file);
       assertEquals(file.getFilename(), anchor.getText());
       assertEquals(file.getFilename(), anchor.getElement().getAttribute("download"));
       assertTrue(anchor.getHref().startsWith("VAADIN/dynamic/resource"));
-      LitRenderer<ProtocolFile> recoverRenderer =
-          (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
+      LitRenderer<ProtocolFile> recoverRenderer = (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
       assertEquals(RECOVER_BUTTON, rendererTemplate(recoverRenderer));
       assertTrue(functions(recoverRenderer).containsKey("recoverFile"));
       assertNotNull(functions(recoverRenderer).get("recoverFile"));
@@ -161,8 +159,7 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
   @Test
   public void files_RecoverFile() {
     ProtocolFile file = dialog.files.getListDataView().getItems().findFirst().orElseThrow();
-    LitRenderer<ProtocolFile> recoverRenderer =
-        (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
+    LitRenderer<ProtocolFile> recoverRenderer = (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
     functions(recoverRenderer).get("recoverFile").accept(file, null);
     verify(service).recover(file);
     Notification notification = $(Notification.class).first();

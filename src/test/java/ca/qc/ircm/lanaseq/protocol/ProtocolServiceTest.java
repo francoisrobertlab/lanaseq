@@ -129,9 +129,8 @@ public class ProtocolServiceTest {
     ProtocolFile file = files.get(0);
     assertEquals((Long) 1L, file.getId());
     assertEquals("FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(
-        Files.readAllBytes(Paths.get(Objects
-            .requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI())),
+    assertArrayEquals(Files.readAllBytes(Paths.get(
+            Objects.requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), file.getCreationDate());
@@ -148,9 +147,9 @@ public class ProtocolServiceTest {
     ProtocolFile file = files.get(0);
     assertEquals((Long) 4L, file.getId());
     assertEquals("Histone Protocol.docx", file.getFilename());
-    assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
-        file.getContent());
+    assertArrayEquals(Files.readAllBytes(Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx"))
+            .toURI())), file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 21, 9, 58, 12), file.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
@@ -174,9 +173,9 @@ public class ProtocolServiceTest {
     ProtocolFile file = files.get(0);
     assertEquals((Long) 3L, file.getId());
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
-        file.getContent());
+    assertArrayEquals(Files.readAllBytes(Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx"))
+            .toURI())), file.getContent());
     assertTrue(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
@@ -192,9 +191,9 @@ public class ProtocolServiceTest {
     ProtocolFile file = files.get(0);
     assertEquals((Long) 3L, file.getId());
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
-        file.getContent());
+    assertArrayEquals(Files.readAllBytes(Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx"))
+            .toURI())), file.getContent());
     assertTrue(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(READ));
@@ -295,9 +294,8 @@ public class ProtocolServiceTest {
     file = files.get(0);
     assertEquals((Long) 1L, file.getId());
     assertEquals("FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(
-        Files.readAllBytes(Paths.get(Objects
-            .requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI())),
+    assertArrayEquals(Files.readAllBytes(Paths.get(
+            Objects.requireNonNull(getClass().getResource("/protocol/FLAG_Protocol.docx")).toURI())),
         file.getContent());
     assertTrue(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 11, 28, 12), file.getCreationDate());
@@ -323,9 +321,9 @@ public class ProtocolServiceTest {
     verify(permissionEvaluator).hasPermission(any(), eq(protocol), eq(WRITE));
     assertEquals((Long) 3L, file.getId());
     assertEquals("Histone FLAG Protocol.docx", file.getFilename());
-    assertArrayEquals(Files.readAllBytes(Paths.get(Objects
-            .requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx")).toURI())),
-        file.getContent());
+    assertArrayEquals(Files.readAllBytes(Paths.get(
+        Objects.requireNonNull(getClass().getResource("/protocol/Histone_FLAG_Protocol.docx"))
+            .toURI())), file.getContent());
     assertFalse(file.isDeleted());
     assertEquals(LocalDateTime.of(2018, 10, 20, 9, 58, 12), file.getCreationDate());
   }

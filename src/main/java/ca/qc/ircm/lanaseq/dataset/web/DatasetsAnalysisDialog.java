@@ -144,8 +144,8 @@ public class DatasetsAnalysisDialog extends Dialog implements LocaleChangeObserv
 
   public void setDatasetIds(List<Long> ids) {
     Objects.requireNonNull(ids, "ids parameter cannot be null");
-    this.datasets =
-        ids.stream().map(id -> service.get(id).orElseThrow()).collect(Collectors.toList());
+    this.datasets = ids.stream().map(id -> service.get(id).orElseThrow())
+        .collect(Collectors.toList());
     updateHeader();
   }
 

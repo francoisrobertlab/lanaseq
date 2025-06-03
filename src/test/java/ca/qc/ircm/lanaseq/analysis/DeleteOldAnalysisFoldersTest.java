@@ -39,9 +39,8 @@ public class DeleteOldAnalysisFoldersTest {
 
   @BeforeEach
   public void beforeTest() {
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getAnalysis()).thenReturn(analysisFolder);
     when(configuration.getAnalysis().getFolder()).thenReturn(temporaryFolder);
     when(configuration.getAnalysisDeleteAge()).thenReturn(Duration.ofHours(24));

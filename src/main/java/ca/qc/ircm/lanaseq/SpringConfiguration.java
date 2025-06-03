@@ -27,8 +27,7 @@ public class SpringConfiguration {
   @Bean
   public ReloadableResourceBundleMessageSource messageSource() {
     String currentDir = FilenameUtils.separatorsToUnix(System.getProperty("user.dir"));
-    ReloadableResourceBundleMessageSource messageSource =
-        new ReloadableResourceBundleMessageSource();
+    ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     messageSource.setBasenames("file:" + currentDir + "/messages", "classpath:messages");
     messageSource.setDefaultEncoding("UTF-8");
     messageSource.setAlwaysUseMessageFormat(true);

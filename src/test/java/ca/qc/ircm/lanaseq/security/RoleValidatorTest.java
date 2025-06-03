@@ -41,8 +41,8 @@ public class RoleValidatorTest {
     List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
     authorities.add(new SwitchUserGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR,
         previousAuthentication));
-    TestingAuthenticationToken authentication =
-        new TestingAuthenticationToken(userDetails, null, authorities);
+    TestingAuthenticationToken authentication = new TestingAuthenticationToken(userDetails, null,
+        authorities);
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 

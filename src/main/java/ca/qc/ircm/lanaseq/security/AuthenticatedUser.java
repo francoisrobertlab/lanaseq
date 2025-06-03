@@ -115,11 +115,10 @@ public class AuthenticatedUser {
     if (roleValidator.hasRole(FORCE_CHANGE_PASSWORD)) {
       getAuthentication().ifPresent(oldAuthentication -> {
         logger.debug("reload authorities from user {}", oldAuthentication.getName());
-        UserDetails userDetails =
-            userDetailsService.loadUserByUsername(oldAuthentication.getName());
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(userDetails, oldAuthentication.getCredentials(),
-                userDetails.getAuthorities());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(
+            oldAuthentication.getName());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            userDetails, oldAuthentication.getCredentials(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
       });
     }

@@ -27,9 +27,8 @@ import org.springframework.lang.Nullable;
  */
 @Entity
 @GeneratePropertyNames
-@SuppressFBWarnings(
-    value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"},
-    justification = ENTITY_EI_EXPOSE_REP)
+@SuppressFBWarnings(value = {"EI_EXPOSE_REP",
+    "EI_EXPOSE_REP2"}, justification = ENTITY_EI_EXPOSE_REP)
 public class Protocol implements Data, Owned, Serializable {
 
   @Serial

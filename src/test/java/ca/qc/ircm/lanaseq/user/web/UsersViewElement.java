@@ -41,7 +41,7 @@ public class UsersViewElement extends VerticalLayoutElement {
   }
 
   public UserDialogElement dialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(UserDialog.ID)))
-        .wrap(UserDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(UserDialog.ID))).wrap(
+        UserDialogElement.class);
   }
 }

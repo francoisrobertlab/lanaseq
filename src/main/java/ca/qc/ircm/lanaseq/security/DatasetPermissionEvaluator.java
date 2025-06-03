@@ -39,8 +39,8 @@ public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if (!(targetDomainObject instanceof Dataset dataset)
-        || (!(permission instanceof String) && !(permission instanceof Permission))) {
+    if (!(targetDomainObject instanceof Dataset dataset) || (!(permission instanceof String)
+        && !(permission instanceof Permission))) {
       return false;
     }
     User currentUser = getUser(authentication).orElse(null);
@@ -51,8 +51,8 @@ public class DatasetPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Serializable targetId,
       String targetType, Object permission) {
-    if (!(targetId instanceof Long) || !targetType.equals(Dataset.class.getName())
-        || (!(permission instanceof String) && !(permission instanceof Permission))) {
+    if (!(targetId instanceof Long) || !targetType.equals(Dataset.class.getName()) || (
+        !(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
     Dataset dataset = repository.findById((Long) targetId).orElse(null);

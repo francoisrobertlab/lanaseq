@@ -35,8 +35,7 @@ public class DeleteOldUploadFolders {
    * Deletes old upload folders.
    *
    * <p>This method is executed every hour with an initial delay of 2 minutes to let the
-   * application
-   * start.</p>
+   * application start.</p>
    */
   @Scheduled(fixedRateString = "PT1H", initialDelayString = "PT2M")
   @UsedBy(SPRING)

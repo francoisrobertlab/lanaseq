@@ -70,13 +70,13 @@ public class DatasetFilesDialogElement extends DialogElement {
   }
 
   public AddDatasetFilesDialogElement addFilesDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(AddDatasetFilesDialog.ID)))
-        .wrap(AddDatasetFilesDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(AddDatasetFilesDialog.ID))).wrap(
+        AddDatasetFilesDialogElement.class);
   }
 
   public SampleFilesDialogElement sampleFilesDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID)))
-        .wrap(SampleFilesDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID))).wrap(
+        SampleFilesDialogElement.class);
   }
 
   @Attribute(name = "id", value = DatasetFilesDialog.ID + "-" + FOLDERS)

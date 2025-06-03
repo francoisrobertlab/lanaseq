@@ -145,8 +145,8 @@ public class PasswordsFormTest extends SpringUIUnitTest {
     BinderValidationStatus<Passwords> status = form.validate();
 
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.password);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.password);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
@@ -162,8 +162,8 @@ public class PasswordsFormTest extends SpringUIUnitTest {
     BinderValidationStatus<Passwords> status = form.validate();
 
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.password);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.password);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());
@@ -179,8 +179,8 @@ public class PasswordsFormTest extends SpringUIUnitTest {
     BinderValidationStatus<Passwords> status = form.validate();
 
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.password);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.password);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(MESSAGE_PREFIX + PASSWORDS_NOT_MATCH)),
@@ -208,8 +208,8 @@ public class PasswordsFormTest extends SpringUIUnitTest {
     BinderValidationStatus<Passwords> status = form.validate();
 
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, form.passwordConfirm);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        form.passwordConfirm);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(form.getTranslation(CONSTANTS_PREFIX + REQUIRED)), error.getMessage());

@@ -76,13 +76,13 @@ public class AuthenticatedUserTest {
     List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
     authorities.add(new SwitchUserGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR,
         previousAuthentication));
-    TestingAuthenticationToken authentication =
-        new TestingAuthenticationToken(userDetails, null, authorities);
+    TestingAuthenticationToken authentication = new TestingAuthenticationToken(userDetails, null,
+        authorities);
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
-  private Optional<? extends GrantedAuthority>
-  findAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
+  private Optional<? extends GrantedAuthority> findAuthority(
+      Collection<? extends GrantedAuthority> authorities, String authority) {
     return authorities.stream().filter(autho -> autho.getAuthority().equals(authority)).findFirst();
   }
 
@@ -189,9 +189,8 @@ public class AuthenticatedUserTest {
     assertTrue(oldAuthentication.isAuthenticated());
     assertEquals(2, oldAuthentication.getAuthorities().size());
     assertTrue(findAuthority(oldAuthentication.getAuthorities(), UserRole.USER).isPresent());
-    assertTrue(
-        findAuthority(oldAuthentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
-            .isPresent());
+    assertTrue(findAuthority(oldAuthentication.getAuthorities(),
+        UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
     assertInstanceOf(UserDetailsWithId.class, oldAuthentication.getPrincipal());
     UserDetailsWithId user = (UserDetailsWithId) oldAuthentication.getPrincipal();
     assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
@@ -217,8 +216,8 @@ public class AuthenticatedUserTest {
     assertTrue(authentication.isAuthenticated());
     assertEquals(1, authentication.getAuthorities().size());
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
-    assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
-        .isPresent());
+    assertFalse(findAuthority(authentication.getAuthorities(),
+        UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
     assertInstanceOf(UserDetailsWithId.class, authentication.getPrincipal());
     user = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals("christian.poitras@ircm.qc.ca", user.getUsername());
@@ -252,8 +251,8 @@ public class AuthenticatedUserTest {
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.USER).isPresent());
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.MANAGER).isPresent());
     assertTrue(findAuthority(authentication.getAuthorities(), UserRole.ADMIN).isPresent());
-    assertFalse(findAuthority(authentication.getAuthorities(), UserAuthority.FORCE_CHANGE_PASSWORD)
-        .isPresent());
+    assertFalse(findAuthority(authentication.getAuthorities(),
+        UserAuthority.FORCE_CHANGE_PASSWORD).isPresent());
     assertInstanceOf(UserDetailsWithId.class, authentication.getPrincipal());
     UserDetailsWithId user = (UserDetailsWithId) authentication.getPrincipal();
     assertEquals("lanaseq@ircm.qc.ca", user.getUsername());

@@ -311,14 +311,12 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     dialog.files.setItems(new ArrayList<>(protocolFiles));
     for (int i = 0; i < protocolFiles.size(); i++) {
       ProtocolFile file = protocolFiles.get(i);
-      ComponentRenderer<Anchor, ProtocolFile> filenameRenderer =
-          (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
+      ComponentRenderer<Anchor, ProtocolFile> filenameRenderer = (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
       Anchor anchor = filenameRenderer.createComponent(file);
       assertEquals(file.getFilename(), anchor.getText());
       assertEquals(file.getFilename(), anchor.getElement().getAttribute("download"));
       assertTrue(anchor.getHref().startsWith("VAADIN/dynamic/resource"));
-      LitRenderer<ProtocolFile> removeRenderer =
-          (LitRenderer<ProtocolFile>) dialog.remove.getRenderer();
+      LitRenderer<ProtocolFile> removeRenderer = (LitRenderer<ProtocolFile>) dialog.remove.getRenderer();
       assertEquals(REMOVE_BUTTON, rendererTemplate(removeRenderer));
       assertTrue(functions(removeRenderer).containsKey("removeFile"));
       functions(removeRenderer).get("removeFile").accept(file, null);
@@ -505,8 +503,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Protocol> status = dialog.validateProtocol();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.name);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + REQUIRED)),
@@ -528,8 +526,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Protocol> status = dialog.validateProtocol();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.name);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),
@@ -596,8 +594,8 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
 
     BinderValidationStatus<Protocol> status = dialog.validateProtocol();
     assertFalse(status.isOk());
-    Optional<BindingValidationStatus<?>> optionalError =
-        findValidationStatusByField(status, dialog.name);
+    Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
+        dialog.name);
     assertTrue(optionalError.isPresent());
     BindingValidationStatus<?> error = optionalError.get();
     assertEquals(Optional.of(dialog.getTranslation(CONSTANTS_PREFIX + ALREADY_EXISTS)),

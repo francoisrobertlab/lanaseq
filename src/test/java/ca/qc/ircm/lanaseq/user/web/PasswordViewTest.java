@@ -94,9 +94,8 @@ public class PasswordViewTest extends SpringUIUnitTest {
   @Test
   public void save_PasswordValidationFailed() {
     view.passwords = mock(PasswordsForm.class);
-    @SuppressWarnings("unchecked")
-    BinderValidationStatus<Passwords> passwordsValidationStatus =
-        mock(BinderValidationStatus.class);
+    @SuppressWarnings("unchecked") BinderValidationStatus<Passwords> passwordsValidationStatus = mock(
+        BinderValidationStatus.class);
     when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(false);
 
@@ -109,9 +108,8 @@ public class PasswordViewTest extends SpringUIUnitTest {
   @Test
   public void save() {
     view.passwords = mock(PasswordsForm.class);
-    @SuppressWarnings("unchecked")
-    BinderValidationStatus<Passwords> passwordsValidationStatus =
-        mock(BinderValidationStatus.class);
+    @SuppressWarnings("unchecked") BinderValidationStatus<Passwords> passwordsValidationStatus = mock(
+        BinderValidationStatus.class);
     when(view.passwords.validate()).thenReturn(passwordsValidationStatus);
     when(passwordsValidationStatus.isOk()).thenReturn(true);
     String password = "test_password";

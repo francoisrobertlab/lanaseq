@@ -35,12 +35,12 @@ public class ProtocolsViewElement extends VerticalLayoutElement {
   }
 
   public ProtocolDialogElement dialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolDialog.ID)))
-        .wrap(ProtocolDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolDialog.ID))).wrap(
+        ProtocolDialogElement.class);
   }
 
   public ProtocolHistoryDialogElement historyDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolHistoryDialog.ID)))
-        .wrap(ProtocolHistoryDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(ProtocolHistoryDialog.ID))).wrap(
+        ProtocolHistoryDialogElement.class);
   }
 }

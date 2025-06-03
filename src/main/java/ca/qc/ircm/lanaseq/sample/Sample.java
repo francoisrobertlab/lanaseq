@@ -38,9 +38,8 @@ import org.springframework.lang.Nullable;
  */
 @Entity
 @GeneratePropertyNames
-@SuppressFBWarnings(
-    value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"},
-    justification = ENTITY_EI_EXPOSE_REP)
+@SuppressFBWarnings(value = {"EI_EXPOSE_REP",
+    "EI_EXPOSE_REP2"}, justification = ENTITY_EI_EXPOSE_REP)
 public class Sample implements Data, DataWithFiles, Owned, Serializable {
 
   public static final String NAME_ALREADY_EXISTS = property(SampleProperties.NAME, ALREADY_EXISTS);

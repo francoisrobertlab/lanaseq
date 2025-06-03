@@ -28,8 +28,8 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
   private static final String MESSAGE_PREFIX = messagePrefix(ConfigureUiServiceInitListener.class);
   @Serial
   private static final long serialVersionUID = 1796331428220223698L;
-  private static final Logger logger =
-      LoggerFactory.getLogger(ConfigureUiServiceInitListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(
+      ConfigureUiServiceInitListener.class);
   private final AuthenticatedUser authenticatedUser;
 
   @Autowired
@@ -59,9 +59,9 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
       } else {
         UI ui = event.getUI();
         String email = authenticatedUser.getUser().map(User::getEmail).orElse("<anonymous>");
-        String message =
-            ui.getTranslation(MESSAGE_PREFIX + AccessDeniedException.class.getSimpleName(), email,
-                event.getNavigationTarget().getSimpleName());
+        String message = ui.getTranslation(
+            MESSAGE_PREFIX + AccessDeniedException.class.getSimpleName(), email,
+            event.getNavigationTarget().getSimpleName());
         logger.info(message);
         event.rerouteToError(new AccessDeniedException(message), message);
       }
@@ -74,8 +74,8 @@ public class ConfigureUiServiceInitListener implements VaadinServiceInitListener
    * @param event event
    */
   private void afterNavigation(AfterNavigationEvent event) {
-    if (authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD)
-        && !event.getLocation().getPath().equals(PasswordView.VIEW_NAME)) {
+    if (authenticatedUser.hasRole(UserAuthority.FORCE_CHANGE_PASSWORD) && !event.getLocation()
+        .getPath().equals(PasswordView.VIEW_NAME)) {
       logger.debug("user has role {}, redirect to {}", UserAuthority.FORCE_CHANGE_PASSWORD,
           PasswordView.class.getSimpleName());
       UI.getCurrent().navigate(PasswordView.class);

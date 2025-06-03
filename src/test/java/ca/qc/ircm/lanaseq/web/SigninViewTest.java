@@ -203,10 +203,8 @@ public class SigninViewTest extends SpringUIUnitTest {
         view.i18n.getForm().getForgotPassword());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + property(LOCKED, TITLE)),
         view.i18n.getErrorMessage().getTitle());
-    assertEquals(
-        view.getTranslation(MESSAGE_PREFIX + LOCKED,
-            configuration.lockDuration().getSeconds() / 60),
-        view.i18n.getErrorMessage().getMessage());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + LOCKED,
+        configuration.lockDuration().getSeconds() / 60), view.i18n.getErrorMessage().getMessage());
   }
 
   @Test

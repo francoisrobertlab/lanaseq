@@ -40,17 +40,17 @@ public class DatasetsViewElement extends VerticalLayoutElement {
   }
 
   public DatasetDialogElement dialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(DatasetDialog.ID)))
-        .wrap(DatasetDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(DatasetDialog.ID))).wrap(
+        DatasetDialogElement.class);
   }
 
   public DatasetFilesDialogElement filesDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(DatasetFilesDialog.ID)))
-        .wrap(DatasetFilesDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(DatasetFilesDialog.ID))).wrap(
+        DatasetFilesDialogElement.class);
   }
 
   public DatasetsAnalysisDialogElement analyzeDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(DatasetsAnalysisDialog.ID)))
-        .wrap(DatasetsAnalysisDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(DatasetsAnalysisDialog.ID))).wrap(
+        DatasetsAnalysisDialogElement.class);
   }
 }

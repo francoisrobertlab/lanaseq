@@ -124,12 +124,12 @@ public class AnalysisServiceTest {
     secondPairedPaths.add(temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedPaths.add(secondPaired1);
     secondPairedPaths.add(secondPaired2);
-    secondPairedZip1 =
-        temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
-    secondPairedZip2 =
-        temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
-    secondPairedZipPaths
-        .add(temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
+    secondPairedZip1 = temporaryFolder.resolve(
+        "JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R1.fastq.gz");
+    secondPairedZip2 = temporaryFolder.resolve(
+        "JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022_R2.fastq.gz");
+    secondPairedZipPaths.add(
+        temporaryFolder.resolve("JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022.bed"));
     secondPairedZipPaths.add(secondPairedZip1);
     secondPairedZipPaths.add(secondPairedZip2);
     thirdPaired1 = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_R1.fastq");
@@ -137,12 +137,12 @@ public class AnalysisServiceTest {
     thirdPairedPaths.add(temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bed"));
     thirdPairedPaths.add(thirdPaired1);
     thirdPairedPaths.add(thirdPaired2);
-    thirdPairedZip1 =
-        temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_R1.fastq.gz");
-    thirdPairedZip2 =
-        temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_R2.fastq.gz");
-    thirdPairedZipPaths
-        .add(temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bed"));
+    thirdPairedZip1 = temporaryFolder.resolve(
+        "JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_R1.fastq.gz");
+    thirdPairedZip2 = temporaryFolder.resolve(
+        "JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211_R2.fastq.gz");
+    thirdPairedZipPaths.add(
+        temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bed"));
     thirdPairedZipPaths.add(thirdPairedZip1);
     thirdPairedZipPaths.add(thirdPairedZip2);
     bam = temporaryFolder.resolve("JS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022.bam");
@@ -154,9 +154,8 @@ public class AnalysisServiceTest {
     thirdBam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211.bam");
     thirdBam2 = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-test.bam");
     thirdRawbam = temporaryFolder.resolve("JS3_ChIPseq_Spt16_yFR101_G24D_R1_20181211-raw.bam");
-    @SuppressWarnings("unchecked")
-    AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder =
-        mock(AppConfiguration.NetworkDrive.class);
+    @SuppressWarnings("unchecked") AppConfiguration.NetworkDrive<Collection<? extends DataWithFiles>> analysisFolder = mock(
+        AppConfiguration.NetworkDrive.class);
     when(configuration.getAnalysis()).thenReturn(analysisFolder);
     when(configuration.getAnalysis().folder(anyCollection())).then(i -> {
       Collection<?> collection = i.getArgument(0);
@@ -164,12 +163,10 @@ public class AnalysisServiceTest {
         return null;
       }
       if (collection.stream().findFirst().get() instanceof Dataset) {
-        @SuppressWarnings("unchecked")
-        Collection<Dataset> datasets = (Collection<Dataset>) collection;
+        @SuppressWarnings("unchecked") Collection<Dataset> datasets = (Collection<Dataset>) collection;
         return temporaryFolder.resolve(datasets.iterator().next().getName());
       } else {
-        @SuppressWarnings("unchecked")
-        Collection<Sample> samples = (Collection<Sample>) collection;
+        @SuppressWarnings("unchecked") Collection<Sample> samples = (Collection<Sample>) collection;
         return temporaryFolder.resolve(samples.iterator().next().getName());
       }
     });
@@ -604,8 +601,7 @@ public class AnalysisServiceTest {
     assertEquals("#merge\tsamples", datasetMetaContent.get(0));
     assertEquals(
         "ChIPseq_Spt16_yFR101_G24D_JS1-JS2_20181022\tJS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022\t"
-            + "JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022",
-        datasetMetaContent.get(1));
+            + "JS2_ChIPseq_Spt16_yFR101_G24D_R2_20181022", datasetMetaContent.get(1));
     assertEquals(
         "ChIPseq_Spt16_yFR101_G24D_JS1_20181208\tJS1_ChIPseq_Spt16_yFR101_G24D_R1_20181022",
         datasetMetaContent.get(2));

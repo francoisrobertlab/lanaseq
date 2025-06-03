@@ -41,8 +41,8 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Object targetDomainObject,
       Object permission) {
-    if (!(targetDomainObject instanceof User user)
-        || (!(permission instanceof String) && !(permission instanceof Permission))) {
+    if (!(targetDomainObject instanceof User user) || (!(permission instanceof String)
+        && !(permission instanceof Permission))) {
       return false;
     }
     User currentUser = getUser(authentication).orElse(null);
@@ -53,8 +53,8 @@ public class UserPermissionEvaluator extends AbstractPermissionEvaluator {
   @Override
   public boolean hasPermission(Authentication authentication, Serializable targetId,
       String targetType, Object permission) {
-    if (!(targetId instanceof Long) || !targetType.equals(User.class.getName())
-        || (!(permission instanceof String) && !(permission instanceof Permission))) {
+    if (!(targetId instanceof Long) || !targetType.equals(User.class.getName()) || (
+        !(permission instanceof String) && !(permission instanceof Permission))) {
       return false;
     }
     User user = repository.findById((Long) targetId).orElse(null);

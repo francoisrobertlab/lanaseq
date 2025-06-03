@@ -136,7 +136,7 @@ public class DatasetDialogElement extends DialogElement {
   }
 
   public SelectSampleDialogElement selectSampleDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(SelectSampleDialog.ID)))
-        .wrap(SelectSampleDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(SelectSampleDialog.ID))).wrap(
+        SelectSampleDialogElement.class);
   }
 }

@@ -20,11 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @WebAppConfiguration
-@TestExecutionListeners(
-    value = {InitializeDatabaseExecutionListener.class, VaadinLicenseExecutionListener.class,
-        FixSecurityContextHolderStrategyExecutionListener.class,
-        UiUnitTestExecutionListener.class},
-    mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+@TestExecutionListeners(value = {InitializeDatabaseExecutionListener.class,
+    VaadinLicenseExecutionListener.class, FixSecurityContextHolderStrategyExecutionListener.class,
+    UiUnitTestExecutionListener.class}, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 @Transactional
 @Sql({"/drop-schema-h2.sql", "/schema-h2.sql", "/user-data.sql", "/dataset-data.sql"})
 public @interface ServiceTestAnnotations {

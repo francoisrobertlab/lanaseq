@@ -77,8 +77,8 @@ public class KeywordsFieldTest extends SpringUIUnitTest {
 
   @Test
   public void invalidCustom() {
-    CustomValueSetEvent<MultiSelectComboBox<String>> event =
-        new CustomValueSetEvent<>(keywordsField, false, "chip?");
+    CustomValueSetEvent<MultiSelectComboBox<String>> event = new CustomValueSetEvent<>(
+        keywordsField, false, "chip?");
     fireEvent(keywordsField, event);
     assertTrue(keywordsField.getValue().isEmpty());
     assertTrue(keywordsField.isInvalid());
@@ -88,8 +88,8 @@ public class KeywordsFieldTest extends SpringUIUnitTest {
 
   @Test
   public void noValues_AddCustom() {
-    CustomValueSetEvent<MultiSelectComboBox<String>> event =
-        new CustomValueSetEvent<>(keywordsField, false, "chip");
+    CustomValueSetEvent<MultiSelectComboBox<String>> event = new CustomValueSetEvent<>(
+        keywordsField, false, "chip");
     fireEvent(keywordsField, event);
     Set<String> keywords = keywordsField.getValue();
     assertEquals(1, keywords.size());
@@ -108,8 +108,8 @@ public class KeywordsFieldTest extends SpringUIUnitTest {
   @Test
   public void values_AddCustom() {
     keywordsField.setValue(set("input", "rappa"));
-    CustomValueSetEvent<MultiSelectComboBox<String>> event =
-        new CustomValueSetEvent<>(keywordsField, false, "chip");
+    CustomValueSetEvent<MultiSelectComboBox<String>> event = new CustomValueSetEvent<>(
+        keywordsField, false, "chip");
     fireEvent(keywordsField, event);
     Set<String> keywords = keywordsField.getValue();
     assertEquals(3, keywords.size());

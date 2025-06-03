@@ -45,17 +45,17 @@ public class SamplesViewElement extends VerticalLayoutElement {
   }
 
   public SampleDialogElement dialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(SampleDialog.ID)))
-        .wrap(SampleDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(SampleDialog.ID))).wrap(
+        SampleDialogElement.class);
   }
 
   public SampleFilesDialogElement filesDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID)))
-        .wrap(SampleFilesDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(SampleFilesDialog.ID))).wrap(
+        SampleFilesDialogElement.class);
   }
 
   public SamplesAnalysisDialogElement analyzeDialog() {
-    return ((TestBenchElement) getDriver().findElement(By.id(SamplesAnalysisDialog.ID)))
-        .wrap(SamplesAnalysisDialogElement.class);
+    return ((TestBenchElement) getDriver().findElement(By.id(SamplesAnalysisDialog.ID))).wrap(
+        SamplesAnalysisDialogElement.class);
   }
 }
