@@ -27,7 +27,7 @@ import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -40,6 +40,7 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -77,7 +78,7 @@ import org.springframework.util.FileCopyUtils;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ProtocolDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "protocols-dialog";
   public static final String HEADER = "header";
@@ -276,7 +277,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
   }
 
   void failedFile(String filename) {
-    showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
+    new WarningNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename)).open();
   }
 
   void addFile(String filename, InputStream input) {
@@ -292,7 +293,8 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     }
     file.setContent(output.toByteArray());
     if (files.getListDataView().getItemCount() >= MAXIMUM_FILES_COUNT) {
-      showNotification(getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT));
+      new WarningNotification(
+          getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT)).open();
       return;
     }
     files.getListDataView().addItem(file);
@@ -323,7 +325,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
       logger.debug("save protocol {}", protocol);
       List<ProtocolFile> files = this.files.getListDataView().getItems().toList();
       service.save(protocol, new ArrayList<>(files));
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, protocol.getName()));
       close();
       fireSavedEvent();
     }
@@ -333,7 +335,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver, Noti
     Protocol protocol = binder.getBean();
     logger.debug("delete protocol {}", protocol);
     service.delete(protocol);
-    showNotification(getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()));
+    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, protocol.getName()));
     fireDeletedEvent();
     close();
   }

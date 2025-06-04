@@ -13,7 +13,6 @@ import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -22,6 +21,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = ForgotPasswordView.VIEW_NAME)
 @AnonymousAllowed
 public class ForgotPasswordView extends VerticalLayout implements LocaleChangeObserver,
-    HasDynamicTitle, NotificationComponent, UrlComponent {
+    HasDynamicTitle, UrlComponent {
 
   public static final String VIEW_NAME = "forgotpassword";
   public static final String ID = "forgotpassword-view";
@@ -131,7 +131,7 @@ public class ForgotPasswordView extends VerticalLayout implements LocaleChangeOb
             (fp, fplocale) -> getUrl(UseForgotPasswordView.class) + "/" + fp.getId()
                 + UseForgotPasswordView.SEPARATOR + fp.getConfirmNumber());
       }
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, email));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, email));
       UI.getCurrent().navigate(SigninView.class);
     }
   }

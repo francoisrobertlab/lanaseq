@@ -61,6 +61,7 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -270,8 +271,9 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     test(dialog.upload).uploadFailed(filename, mimeType);
 
     Notification notification = $(Notification.class).first();
+    assertInstanceOf(WarningNotification.class, notification);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
-        test(notification).getText());
+        ((WarningNotification) notification).getText());
     List<ProtocolFile> files = items(dialog.files);
     assertEquals(1, files.size());
   }
@@ -288,8 +290,9 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     test(dialog.upload).upload(filename + "6", mimeType, fileContent);
 
     Notification notification = $(Notification.class).first();
+    assertInstanceOf(WarningNotification.class, notification);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT),
-        test(notification).getText());
+        ((WarningNotification) notification).getText());
     assertEquals(MAXIMUM_FILES_COUNT, items(dialog.files).size());
     assertEquals(filename + "1", items(dialog.files).get(1).getFilename());
     assertEquals(filename + "2", items(dialog.files).get(2).getFilename());

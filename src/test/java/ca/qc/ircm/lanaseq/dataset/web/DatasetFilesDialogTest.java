@@ -68,6 +68,7 @@ import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -730,8 +731,9 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
     Notification notification = $(Notification.class).first();
+    assertInstanceOf(WarningNotification.class, notification);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
-        test(notification).getText());
+        ((WarningNotification) notification).getText());
     assertFalse(Files.exists(file));
     assertFalse(Files.exists(file.getParent()));
   }

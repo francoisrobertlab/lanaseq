@@ -41,7 +41,6 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.FilenamesField;
 import ca.qc.ircm.lanaseq.web.KeywordsField;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -58,6 +57,7 @@ import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -97,7 +97,7 @@ import org.springframework.lang.Nullable;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DatasetDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+public class DatasetDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "dataset-dialog";
   public static final String HEADER = "header";
@@ -448,7 +448,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
       Dataset dataset = binder.getBean();
       logger.debug("save dataset {}", dataset);
       service.save(dataset);
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, dataset.getName()));
       close();
       fireSavedEvent();
     }
@@ -458,7 +458,7 @@ public class DatasetDialog extends Dialog implements LocaleChangeObserver, Notif
     Dataset dataset = binder.getBean();
     logger.debug("delete dataset {}", dataset);
     service.delete(dataset);
-    showNotification(getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()));
+    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, dataset.getName()));
     fireDeletedEvent();
     close();
   }

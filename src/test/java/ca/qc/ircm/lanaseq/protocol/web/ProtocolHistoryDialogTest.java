@@ -165,7 +165,6 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()),
         test(notification).getText());
-    dialog.showNotification(dialog.getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()));
     assertTrue(items(dialog.files).isEmpty());
   }
 

@@ -14,6 +14,7 @@ import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.MESSAGE;
 import static ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView.SAVED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -29,6 +30,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -143,7 +145,9 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
     view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, times(2)).get(anyLong(), any());
     Notification notification = $(Notification.class).first();
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
+    assertInstanceOf(ErrorNotification.class, notification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
+        ((ErrorNotification) notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
@@ -155,7 +159,9 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
     view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, times(2)).get(anyLong(), any());
     Notification notification = $(Notification.class).first();
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
+    assertInstanceOf(ErrorNotification.class, notification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
+        ((ErrorNotification) notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
@@ -167,7 +173,9 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
     view = navigate(UseForgotPasswordView.class, parameter);
     verify(service, atLeastOnce()).get(34925L, "feafet23ts");
     Notification notification = $(Notification.class).first();
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
+    assertInstanceOf(ErrorNotification.class, notification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
+        ((ErrorNotification) notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }
@@ -177,7 +185,9 @@ public class UseForgotPasswordViewTest extends SpringUIUnitTest {
     view = navigate(UseForgotPasswordView.class);
     verify(service, times(2)).get(anyLong(), any());
     Notification notification = $(Notification.class).first();
-    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID), test(notification).getText());
+    assertInstanceOf(ErrorNotification.class, notification);
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + INVALID),
+        ((ErrorNotification) notification).getText());
     assertFalse(view.save.isEnabled());
     assertFalse(view.form.isEnabled());
   }

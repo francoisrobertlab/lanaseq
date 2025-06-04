@@ -11,7 +11,6 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.MainView;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -34,8 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = PasswordView.VIEW_NAME)
 @RolesAllowed({USER})
-public class PasswordView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    NotificationComponent {
+public class PasswordView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
 
   public static final String VIEW_NAME = "password";
   public static final String ID = "password-view";
@@ -94,6 +92,7 @@ public class PasswordView extends VerticalLayout implements LocaleChangeObserver
       assert password != null;
       logger.debug("save new password for user {}", user);
       service.save(password);
+      // TODO Add notification.
       UI.getCurrent().navigate(MainView.class);
     }
   }

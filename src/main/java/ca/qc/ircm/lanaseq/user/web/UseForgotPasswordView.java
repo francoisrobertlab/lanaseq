@@ -8,14 +8,15 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.user.ForgotPassword;
 import ca.qc.ircm.lanaseq.user.ForgotPasswordService;
+import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.SigninView;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -39,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = UseForgotPasswordView.VIEW_NAME)
 @AnonymousAllowed
 public class UseForgotPasswordView extends VerticalLayout implements LocaleChangeObserver,
-    HasUrlParameter<String>, HasDynamicTitle, NotificationComponent {
+    HasUrlParameter<String>, HasDynamicTitle {
 
   public static final String VIEW_NAME = "useforgotpassword";
   public static final String ID = "useforgotpassword-view";
@@ -115,7 +116,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
       }
     }
     if (!valid) {
-      showNotification(getTranslation(MESSAGE_PREFIX + INVALID));
+      new ErrorNotification(getTranslation(MESSAGE_PREFIX + INVALID)).open();
     }
     return valid;
   }
@@ -139,7 +140,7 @@ public class UseForgotPasswordView extends VerticalLayout implements LocaleChang
       assert password != null;
       logger.debug("save new password for user {}", forgotPassword.getUser());
       service.updatePassword(forgotPassword, password);
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED));
       UI.getCurrent().navigate(SigninView.class);
     }
   }
