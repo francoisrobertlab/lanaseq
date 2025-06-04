@@ -5,7 +5,7 @@ import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 
 import ca.qc.ircm.lanaseq.Constants;
-import ca.qc.ircm.lanaseq.web.MainView;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -58,7 +58,7 @@ public class AccessDeniedView extends Composite<VerticalLayout> implements
     header.addClassName(HEADER);
     message.addClassName(MESSAGE);
     home.addClassName(HOME);
-    home.addClickListener(e -> UI.getCurrent().navigate(MainView.class));
+    home.addClickListener(e -> UI.getCurrent().navigate(DatasetsView.class));
   }
 
   @Override

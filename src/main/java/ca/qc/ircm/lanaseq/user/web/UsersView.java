@@ -16,12 +16,12 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.NAME;
 
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
-import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.AttachEvent;
@@ -263,7 +263,7 @@ public class UsersView extends VerticalLayout implements LocaleChangeObserver, H
       new ErrorNotification(getTranslation(MESSAGE_PREFIX + USERS_REQUIRED)).open();
     } else {
       switchUserService.switchUser(user, VaadinServletRequest.getCurrent());
-      UI.getCurrent().getPage().setLocation(getUrlWithContextPath(MainView.class));
+      UI.getCurrent().getPage().setLocation(getUrlWithContextPath(DatasetsView.class));
     }
   }
 

@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.user.User;
@@ -502,7 +503,7 @@ public class UsersViewTest extends SpringUIUnitTest {
     verify(switchUserService).switchUser(user, VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> ("if ($1 == '_self') this.stopApplication(); window.open($0, $1)").equals(
-            i.getInvocation().getExpression()) && "/".equals(
+            i.getInvocation().getExpression()) && ("/" + DatasetsView.VIEW_NAME).equals(
             i.getInvocation().getParameters().get(0)) && "_self".equals(
             i.getInvocation().getParameters().get(1))));
   }

@@ -2,9 +2,9 @@ package ca.qc.ircm.lanaseq.user.web;
 
 import static ca.qc.ircm.lanaseq.security.SwitchUserService.ROLE_PREVIOUS_ADMINISTRATOR;
 
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
-import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -41,6 +41,6 @@ public class ExitSwitchUserView extends VerticalLayout implements BeforeEnterObs
   public void beforeEnter(BeforeEnterEvent event) {
     logger.debug("Exit switch user {}", authenticatedUser.getUser());
     switchUserService.exitSwitchUser(VaadinServletRequest.getCurrent());
-    UI.getCurrent().getPage().setLocation(getUrlWithContextPath(MainView.class));
+    UI.getCurrent().getPage().setLocation(getUrlWithContextPath(DatasetsView.class));
   }
 }

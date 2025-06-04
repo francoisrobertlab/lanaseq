@@ -45,6 +45,7 @@ public class SignoutViewTest extends SpringUIUnitTest {
 
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0).equals("/")));
+            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
+            .equals("/" + SigninView.VIEW_NAME)));
   }
 }

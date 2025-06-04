@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
@@ -47,6 +48,7 @@ public class ExitSwitchUserViewTest extends SpringUIUnitTest {
     verify(switchUserService).exitSwitchUser(VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0).equals("/")));
+            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
+            .equals("/" + DatasetsView.VIEW_NAME)));
   }
 }

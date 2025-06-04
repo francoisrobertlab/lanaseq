@@ -8,6 +8,7 @@ import static ca.qc.ircm.lanaseq.user.UserProperties.EMAIL;
 import static ca.qc.ircm.lanaseq.user.UserProperties.HASHED_PASSWORD;
 
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.User;
@@ -88,8 +89,8 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
   public void beforeEnter(BeforeEnterEvent event) {
     // Redirect to main view if user is known.
     if (!authenticatedUser.isAnonymous()) {
-      logger.debug("user is known, redirecting to main view");
-      event.forwardTo(MainView.class);
+      logger.debug("user is known, redirecting to dataset view");
+      event.forwardTo(DatasetsView.class);
     }
   }
 

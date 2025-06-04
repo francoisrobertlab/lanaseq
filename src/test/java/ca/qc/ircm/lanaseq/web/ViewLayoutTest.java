@@ -250,7 +250,8 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     verify(switchUserService).exitSwitchUser(VaadinServletRequest.getCurrent());
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0).equals("/")));
+            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
+            .equals("/" + DatasetsView.VIEW_NAME)));
   }
 
   @Test
@@ -263,7 +264,8 @@ public class ViewLayoutTest extends SpringUIUnitTest {
 
     assertTrue(UI.getCurrent().getInternals().dumpPendingJavaScriptInvocations().stream().anyMatch(
         i -> i.getInvocation().getExpression().contains("window.open($0, $1)") && !i.getInvocation()
-            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0).equals("/")));
+            .getParameters().isEmpty() && i.getInvocation().getParameters().get(0)
+            .equals("/" + SigninView.VIEW_NAME)));
   }
 
   @Test
