@@ -7,15 +7,16 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.security.UserRole.USER;
 
 import ca.qc.ircm.lanaseq.Constants;
+import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
-import ca.qc.ircm.lanaseq.web.MainView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
@@ -38,6 +39,7 @@ public class PasswordView extends VerticalLayout implements LocaleChangeObserver
   public static final String VIEW_NAME = "password";
   public static final String ID = "password-view";
   public static final String HEADER = "header";
+  public static final String SAVED = "saved";
   private static final String MESSAGE_PREFIX = messagePrefix(PasswordView.class);
   private static final String CONSTANTS_PREFIX = messagePrefix(Constants.class);
   @Serial
@@ -92,8 +94,8 @@ public class PasswordView extends VerticalLayout implements LocaleChangeObserver
       assert password != null;
       logger.debug("save new password for user {}", user);
       service.save(password);
-      // TODO Add notification.
-      UI.getCurrent().navigate(MainView.class);
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED));
+      UI.getCurrent().navigate(DatasetsView.class);
     }
   }
 }

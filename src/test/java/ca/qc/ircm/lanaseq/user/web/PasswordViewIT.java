@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.user.web;
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.TITLE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
+import static ca.qc.ircm.lanaseq.user.web.PasswordView.SAVED;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,6 +17,7 @@ import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.SigninView;
 import ca.qc.ircm.lanaseq.web.SigninViewElement;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +122,9 @@ public class PasswordViewIT extends AbstractBrowserTestCase {
     view.save().click();
     TestTransaction.end();
 
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    Assertions.assertEquals(messageSource.getMessage(MESSAGE_PREFIX + SAVED, null, currentLocale()),
+        notification.getText());
     $(DatasetsViewElement.class).waitForFirst();
     User user = repository.findById(6L).orElseThrow();
     assertTrue(passwordEncoder.matches(password, user.getHashedPassword()));

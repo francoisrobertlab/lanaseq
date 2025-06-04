@@ -7,6 +7,7 @@ import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.HEADER;
 import static ca.qc.ircm.lanaseq.user.web.PasswordView.ID;
+import static ca.qc.ircm.lanaseq.user.web.PasswordView.SAVED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +24,7 @@ import ca.qc.ircm.lanaseq.user.UserService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.util.Locale;
@@ -119,5 +121,7 @@ public class PasswordViewTest extends SpringUIUnitTest {
 
     verify(service).save(password);
     assertTrue($(DatasetsView.class).exists());
+    Notification notification = $(Notification.class).first();
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + SAVED), test(notification).getText());
   }
 }
