@@ -37,7 +37,6 @@ import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.FilenamesField;
 import ca.qc.ircm.lanaseq.web.KeywordsField;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -49,6 +48,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -73,7 +73,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SampleDialog extends Dialog implements LocaleChangeObserver, NotificationComponent {
+public class SampleDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "sample-dialog";
   public static final String HEADER = "header";
@@ -301,7 +301,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     if (validate()) {
       logger.debug("save sample {}", sample);
       service.save(sample);
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, sample.getName()));
       fireSavedEvent();
       close();
     }
@@ -315,7 +315,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver, Notifi
     Sample sample = binder.getBean();
     logger.debug("delete sample {}", sample);
     service.delete(sample);
-    showNotification(getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()));
+    Notification.show(getTranslation(MESSAGE_PREFIX + DELETED, sample.getName()));
     fireDeletedEvent();
     close();
   }

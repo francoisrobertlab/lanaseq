@@ -11,10 +11,10 @@ import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -33,8 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = ProfileView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed(USER)
-public class ProfileView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    NotificationComponent {
+public class ProfileView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
 
   public static final String VIEW_NAME = "profile";
   public static final String ID = "profile-view";
@@ -90,7 +89,7 @@ public class ProfileView extends VerticalLayout implements LocaleChangeObserver,
       String password = form.getPassword();
       logger.debug("save user {}", user);
       service.save(user, password);
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, user.getEmail()));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, user.getEmail()));
     }
   }
 }

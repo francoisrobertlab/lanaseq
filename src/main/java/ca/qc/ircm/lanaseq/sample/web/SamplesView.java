@@ -27,7 +27,6 @@ import ca.qc.ircm.lanaseq.security.UserRole;
 import ca.qc.ircm.lanaseq.web.DateRangeField;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -36,6 +35,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -67,8 +67,7 @@ import org.springframework.data.domain.Range;
  */
 @Route(value = SamplesView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({USER})
-public class SamplesView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    NotificationComponent {
+public class SamplesView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
 
   public static final String VIEW_NAME = "samples";
   public static final String ID = "samples-view";
@@ -333,7 +332,7 @@ public class SamplesView extends VerticalLayout implements LocaleChangeObserver,
             getTranslation(DATASET_PREFIX + NAME_ALREADY_EXISTS, dataset.getName())).open();
       } else {
         datasetService.save(dataset);
-        showNotification(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));
+        Notification.show(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));
       }
     }
   }

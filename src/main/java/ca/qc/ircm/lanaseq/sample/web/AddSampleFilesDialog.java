@@ -13,7 +13,7 @@ import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -25,6 +25,7 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -57,8 +58,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver,
-    NotificationComponent {
+public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "add-sample-files-dialog";
   public static final String HEADER = "header";
@@ -241,7 +241,7 @@ public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver
     if (validate(files)) {
       logger.debug("save new files {} for sample {}", files, sample);
       service.saveFiles(sample, files);
-      showNotification(getTranslation(MESSAGE_PREFIX + SAVED, files.size(), sample.getName()));
+      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, files.size(), sample.getName()));
       fireSavedEvent();
       close();
     }
@@ -264,7 +264,7 @@ public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver
       logger.debug("creating upload folder {} for sample {}", folder, sample);
       Files.createDirectories(folder);
     } catch (IOException e) {
-      showNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder));
+      new WarningNotification(getTranslation(MESSAGE_PREFIX + CREATE_FOLDER_ERROR, folder)).open();
     }
   }
 }

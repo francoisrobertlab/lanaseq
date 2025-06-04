@@ -24,7 +24,7 @@ import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -36,6 +36,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -80,8 +81,7 @@ import org.springframework.util.FileSystemUtils;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
-    NotificationComponent {
+public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "dataset-files-dialog";
   public static final String HEADER = "header";
@@ -345,12 +345,12 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
         Path file = folder.resolve(filename);
         Files.copy(inputStream, file);
         service.saveFiles(dataset, Collections.nCopies(1, file));
-        showNotification(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
+        Notification.show(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
       } finally {
         FileSystemUtils.deleteRecursively(folder);
       }
     } catch (IOException | IllegalStateException e) {
-      showNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename));
+      new WarningNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename)).open();
       return;
     }
     updateFiles();
@@ -372,8 +372,9 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver,
       updateFiles();
     } catch (IOException e) {
       logger.error("renaming of file {} to {} failed", source, target);
-      showNotification(getTranslation(MESSAGE_PREFIX + FILE_RENAME_ERROR, source.getFileName(),
-          file.getFilename()));
+      new WarningNotification(
+          getTranslation(MESSAGE_PREFIX + FILE_RENAME_ERROR, source.getFileName(),
+              file.getFilename())).open();
     }
   }
 

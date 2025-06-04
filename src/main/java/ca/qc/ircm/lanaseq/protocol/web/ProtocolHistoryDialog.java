@@ -9,12 +9,12 @@ import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
@@ -36,8 +36,7 @@ import org.springframework.context.annotation.Scope;
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ProtocolHistoryDialog extends Dialog implements LocaleChangeObserver,
-    NotificationComponent {
+public class ProtocolHistoryDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "protocols-history-dialog";
   public static final String HEADER = "header";
@@ -112,7 +111,7 @@ public class ProtocolHistoryDialog extends Dialog implements LocaleChangeObserve
   void recoverFile(ProtocolFile file) {
     logger.debug("save recovered protocol files for protocol {}", protocol);
     service.recover(file);
-    showNotification(getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()));
+    Notification.show(getTranslation(MESSAGE_PREFIX + RECOVERED, file.getFilename()));
     files.getListDataView().removeItem(file);
     files.getListDataView().refreshAll();
   }

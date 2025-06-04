@@ -63,6 +63,7 @@ import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -644,8 +645,9 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
     Notification notification = $(Notification.class).first();
+    assertInstanceOf(WarningNotification.class, notification);
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
-        test(notification).getText());
+        ((WarningNotification) notification).getText());
     assertFalse(Files.exists(file));
     assertFalse(Files.exists(file.getParent()));
   }

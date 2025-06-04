@@ -23,7 +23,6 @@ import ca.qc.ircm.lanaseq.user.UserService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.MainView;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import ca.qc.ircm.lanaseq.web.component.UrlComponent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
@@ -63,7 +62,7 @@ import org.springframework.lang.Nullable;
 @Route(value = UsersView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({MANAGER, ADMIN})
 public class UsersView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    NotificationComponent, UrlComponent {
+    UrlComponent {
 
   public static final String VIEW_NAME = "users";
   public static final String ID = "users-view";

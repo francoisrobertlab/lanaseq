@@ -17,10 +17,10 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.web.ErrorNotification;
 import ca.qc.ircm.lanaseq.web.ViewLayout;
-import ca.qc.ircm.lanaseq.web.component.NotificationComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -49,8 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = DatasetsView.VIEW_NAME, layout = ViewLayout.class)
 @RolesAllowed({USER})
-public class DatasetsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle,
-    NotificationComponent {
+public class DatasetsView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
 
   public static final String VIEW_NAME = "datasets";
   public static final String ID = "datasets-view";
@@ -231,7 +230,7 @@ public class DatasetsView extends VerticalLayout implements LocaleChangeObserver
       } else {
         service.save(dataset);
         this.datasets.refreshDatasets();
-        showNotification(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));
+        Notification.show(getTranslation(MESSAGE_PREFIX + MERGED, dataset.getName()));
       }
     }
   }
