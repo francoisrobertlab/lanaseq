@@ -49,6 +49,7 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.validator.RegexpValidator;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
@@ -177,7 +178,13 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
     folders.setPadding(false);
     folders.setSpacing(false);
     files.setId(id(FILES));
-    files.getEditor().addCloseListener(e -> rename(e.getItem()));
+    files.getEditor().addCloseListener(e -> {
+      if (fileBinder.validate().isOk()) {
+        rename(e.getItem());
+      } else {
+        e.getItem().setFilename(e.getItem().getFile().getName());
+      }
+    });
     files.addItemDoubleClickListener(e -> {
       files.getEditor().editItem(e.getItem());
       filenameEdit.focus();
@@ -194,7 +201,13 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
         .setSortable(false);
     filename.setEditorComponent(filenameEdit);
     filenameEdit.setId(id(FILENAME));
-    filenameEdit.addKeyDownListener(Key.ENTER, e -> files.getEditor().closeEditor());
+    filenameEdit.addKeyDownListener(Key.ENTER, e -> {
+      if (fileBinder.validate().isOk()) {
+        files.getEditor().closeEditor();
+      }
+    });
+    filenameEdit.addValueChangeListener(e -> fileBinder.validate());
+    filenameEdit.setValueChangeMode(ValueChangeMode.LAZY);
     filenameEdit.setWidthFull();
     samples.setId(id(SAMPLES));
     samples.addItemDoubleClickListener(e -> viewFiles(e.getItem()));

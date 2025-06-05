@@ -479,8 +479,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void filenameEdit_Empty() {
+    dialog.filenameEdit.setValue("A");
     dialog.filenameEdit.setValue("");
 
+    assertTrue(dialog.filenameEdit.isInvalid());
     BinderValidationStatus<EditableFile> status = dialog.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
@@ -520,6 +522,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   public void filenameEdit_Invalid(String filename) {
     dialog.filenameEdit.setValue(filename);
 
+    assertTrue(dialog.filenameEdit.isInvalid());
     BinderValidationStatus<EditableFile> status = dialog.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
@@ -541,6 +544,7 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
     dialog.filenameEdit.setValue("abc.txt");
 
+    assertTrue(dialog.filenameEdit.isInvalid());
     BinderValidationStatus<EditableFile> status = dialog.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
@@ -560,14 +564,17 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
 
     dialog.filenameEdit.setValue("abc.txt");
 
+    assertFalse(dialog.filenameEdit.isInvalid());
     BinderValidationStatus<EditableFile> status = dialog.validateDatasetFile();
     assertTrue(status.isOk());
   }
 
   @Test
   public void filenameEdit_ItemNull() {
+    dialog.filenameEdit.setValue("A");
     dialog.filenameEdit.setValue("");
 
+    assertTrue(dialog.filenameEdit.isInvalid());
     BinderValidationStatus<EditableFile> status = dialog.validateDatasetFile();
     assertFalse(status.isOk());
     Optional<BindingValidationStatus<?>> optionalError = findValidationStatusByField(status,
@@ -579,12 +586,35 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   }
 
   @Test
+  public void filenameEdit_SaveInvalid() throws Exception {
+    Path path = temporaryFolder.resolve(files.get(0).toPath());
+    EditableFile file = new EditableFile(path.toFile());
+    String currentName = file.getFilename();
+    Files.createDirectories(path.getParent());
+    Files.write(path, fileContent);
+    Path sibling = path.resolveSibling("new_name.txt");
+    dialog.filenameEdit.setValue("new_name//.txt");
+    file.setFilename(sibling.getFileName().toString());
+    EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
+    Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
+    method.setAccessible(true);
+
+    method.invoke(editor, new EditorCloseEvent<>(editor, file));
+
+    assertEquals(currentName, file.getFilename());
+    assertFalse(Files.exists(sibling));
+    assertTrue(Files.exists(path));
+    assertArrayEquals(fileContent, Files.readAllBytes(path));
+  }
+
+  @Test
   public void filenameEdit_Saved() throws Exception {
     Path path = temporaryFolder.resolve(files.get(0).toPath());
     EditableFile file = new EditableFile(path.toFile());
     Files.createDirectories(path.getParent());
     Files.write(path, fileContent);
     Path sibling = path.resolveSibling("new_name.txt");
+    dialog.filenameEdit.setValue(sibling.getFileName().toString());
     file.setFilename(sibling.getFileName().toString());
     EditorImpl<EditableFile> editor = (EditorImpl<EditableFile>) dialog.files.getEditor();
     Method method = EditorImpl.class.getDeclaredMethod("fireCloseEvent", EditorCloseEvent.class);
