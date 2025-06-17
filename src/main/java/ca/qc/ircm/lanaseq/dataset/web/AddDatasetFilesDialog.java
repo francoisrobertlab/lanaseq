@@ -15,6 +15,7 @@ import ca.qc.ircm.lanaseq.dataset.DatasetService;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -26,6 +27,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -68,7 +70,10 @@ public class AddDatasetFilesDialog extends Dialog implements LocaleChangeObserve
   public static final String SIZE = "size";
   public static final String SIZE_VALUE = property("size", "value");
   public static final String OVERWRITE = "overwrite";
+  public static final String SAVE_STARTED = "saveStarted";
+  public static final String SAVE_FAILED = "saveFailed";
   public static final String SAVED = "saved";
+  public static final int SAVED_NOTIFICATION_DURATION = 30000;
   public static final String CREATE_FOLDER_ERROR = property("createFolder", "error");
   public static final String OVERWRITE_ERROR = property(OVERWRITE, "error");
   private static final String MESSAGE_PREFIX = messagePrefix(AddDatasetFilesDialog.class);
@@ -239,8 +244,24 @@ public class AddDatasetFilesDialog extends Dialog implements LocaleChangeObserve
     Collection<Path> files = service.uploadFiles(dataset);
     if (validate(files)) {
       logger.debug("save new files {} for dataset {}", files, dataset);
-      service.saveFiles(dataset, files);
-      Notification.show(getTranslation(MESSAGE_PREFIX + SAVED, files.size(), dataset.getName()));
+      final UI ui = UI.getCurrent();
+      service.saveFiles(dataset, files, f -> f.getFileName().toString()).thenAccept(e -> {
+        ui.accessLater(() -> {
+          Notification notification = new Notification();
+          notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+          notification.setDuration(SAVED_NOTIFICATION_DURATION);
+          notification.setText(
+              getTranslation(MESSAGE_PREFIX + SAVED, files.size(), dataset.getName()));
+          notification.open();
+        }, null).run();
+      }).exceptionally(e -> {
+        logger.warn("Exception thrown while copying files {} for dataset {}", files, dataset, e);
+        ui.accessLater(() -> new WarningNotification(
+            getTranslation(MESSAGE_PREFIX + SAVE_FAILED, dataset.getName())).open(), null).run();
+        return null;
+      });
+      Notification.show(
+          getTranslation(MESSAGE_PREFIX + SAVE_STARTED, files.size(), dataset.getName()));
       fireSavedEvent();
       close();
     }

@@ -1827,7 +1827,7 @@ public class DatasetServiceTest {
         file);
     files.add(file);
 
-    service.saveFiles(dataset, files);
+    service.saveFiles(dataset, files, f -> f.getFileName().toString()).join();
 
     verify(configuration.getHome()).folder(dataset);
     verify(configuration.getArchives().get(0), never()).folder(dataset);
@@ -1841,6 +1841,38 @@ public class DatasetServiceTest {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("dataset_R2.fastq")));
+    verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
+  }
+
+  @Test
+  public void saveFiles_CustomNames() throws Throwable {
+    final Dataset dataset = repository.findById(1L).orElseThrow();
+    List<Path> files = new ArrayList<>();
+    Path file = temporaryFolder.resolve("dataset_R1.fastq");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI()),
+        file);
+    files.add(file);
+    file = temporaryFolder.resolve("dataset_R2.fastq");
+    Files.copy(
+        Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI()),
+        file);
+    files.add(file);
+
+    service.saveFiles(dataset, files, f -> f.getFileName().toString().substring(4)).join();
+
+    verify(configuration.getHome()).folder(dataset);
+    verify(configuration.getArchives().get(0), never()).folder(dataset);
+    verify(configuration.getArchives().get(1), never()).folder(dataset);
+    Path folder = configuration.getHome().folder(dataset);
+    assertTrue(Files.exists(folder.resolve("set_R1.fastq")));
+    assertArrayEquals(Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
+        Files.readAllBytes(folder.resolve("set_R1.fastq")));
+    assertTrue(Files.exists(folder.resolve("set_R2.fastq")));
+    assertArrayEquals(Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
+        Files.readAllBytes(folder.resolve("set_R2.fastq")));
     verify(permissionEvaluator).hasPermission(any(), eq(dataset), eq(WRITE));
   }
 
