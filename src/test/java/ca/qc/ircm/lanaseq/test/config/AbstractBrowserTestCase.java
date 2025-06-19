@@ -17,6 +17,7 @@ import com.vaadin.flow.component.sidenav.testbench.SideNavElement;
 import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
 import com.vaadin.testbench.BrowserTestBase;
 import com.vaadin.testbench.IPAddress;
+import com.vaadin.testbench.browser.BrowserTestInfo;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -53,6 +54,7 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   protected int port;
   @Value("${server.servlet.context-path:}")
   protected String contextPath;
+  private boolean runOnHub = false;
   private Path home;
   private Path archive;
   private Path analysis;
@@ -61,6 +63,12 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+
+  @BeforeEach
+  @SuppressWarnings("JUnitMalformedDeclaration") // Works because of Vaadin's JUnit5 extension.
+  public void setRunOnHub(BrowserTestInfo browserTestInfo) {
+    runOnHub = browserTestInfo.hubHostname() != null;
+  }
 
   @BeforeEach
   public void setServerUrl()
@@ -135,7 +143,8 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   }
 
   protected String baseUrl() {
-    return "http://" + IPAddress.findSiteLocalAddress() + ":" + port;
+    String host = runOnHub ? IPAddress.findSiteLocalAddress() : "localhost";
+    return "http://" + host + ":" + port;
   }
 
   protected String homeUrl() {
