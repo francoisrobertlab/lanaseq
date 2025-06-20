@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -43,6 +45,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Range.Bound;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -408,11 +411,14 @@ public class DatasetService {
   /**
    * Save files to dataset folder.
    *
-   * @param dataset dataset
-   * @param files   files to save
+   * @param dataset  dataset
+   * @param files    files to save
+   * @param filename returns filename to use for file
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
-  public void saveFiles(Dataset dataset, Collection<Path> files) {
+  @Async
+  public CompletableFuture<Void> saveFiles(Dataset dataset, Collection<Path> files,
+      Function<Path, String> filename) {
     Path folder = configuration.getHome().folder(dataset);
     try {
       Files.createDirectories(folder);
@@ -420,7 +426,7 @@ public class DatasetService {
       throw new IllegalStateException("could not create folder " + folder, e);
     }
     for (Path file : files) {
-      Path target = folder.resolve(file.getFileName());
+      Path target = folder.resolve(filename.apply(file));
       try {
         logger.debug("moving file {} to {} for dataset {}", file, target, dataset);
         Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
@@ -429,6 +435,7 @@ public class DatasetService {
         throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
       }
     }
+    return CompletableFuture.completedFuture(null);
   }
 
   /**

@@ -12,6 +12,8 @@ import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.MESSAGE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.OVERWRITE_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVED;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVE_FAILED;
+import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SAVE_STARTED;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SIZE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.SIZE_VALUE;
 import static ca.qc.ircm.lanaseq.dataset.web.AddDatasetFilesDialog.id;
@@ -45,6 +47,7 @@ import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
+import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
@@ -55,6 +58,7 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.testbench.unit.MetaKeys;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
@@ -72,6 +76,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -109,6 +115,8 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   private ComponentEventListener<SavedEvent<AddDatasetFilesDialog>> savedListener;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
+  @Captor
+  private ArgumentCaptor<Function<Path, String>> filenameCaptor;
   @Autowired
   private DatasetRepository repository;
   private final Locale locale = Locale.ENGLISH;
@@ -441,7 +449,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
 
     assertTrue(dialog.error.isVisible());
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + OVERWRITE_ERROR), dialog.error.getText());
-    verify(service, never()).saveFiles(any(), any());
+    verify(service, never()).saveFiles(any(), any(), any());
     assertFalse($(Notification.class).exists());
     verify(savedListener, never()).onComponentEvent(any());
     assertTrue(dialog.isOpened());
@@ -449,6 +457,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
 
   @Test
   public void save_OverwriteAllowed() {
+    when(service.saveFiles(any(), any(), any())).then(i -> CompletableFuture.completedFuture(null));
     dialog.addSavedListener(savedListener);
     dialog.files.getListDataView().getItems().forEach(f -> dialog.overwrite(f));
     Dataset dataset = repository.findById(dialog.getDatasetId()).orElseThrow();
@@ -456,14 +465,19 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
 
     dialog.save();
 
-    verify(service).saveFiles(eq(dataset), filesCaptor.capture());
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), filenameCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(4, files.size());
     for (Path file : files) {
       assertTrue(files.contains(uploadFolder(dataset).resolve(file)));
+      assertEquals(file.getFileName().toString(), filenameCaptor.getValue().apply(file));
     }
     assertFalse(dialog.error.isVisible());
     Notification notification = $(Notification.class).first();
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 4, dataset.getName()),
+        test(notification).getText());
+    notification = $(Notification.class).last();
+    assertTrue(notification.hasThemeName(NotificationVariant.LUMO_SUCCESS.getVariantName()));
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 4, dataset.getName()),
         test(notification).getText());
     verify(savedListener).onComponentEvent(any());
@@ -476,18 +490,27 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
     when(service.uploadFiles(any())).thenReturn(
         files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
             .collect(Collectors.toList()));
+    when(service.saveFiles(any(), any(), any())).then(i -> CompletableFuture.completedFuture(null));
     dialog.addSavedListener(savedListener);
     Dataset dataset = repository.findById(1L).orElseThrow();
     dialog.setDatasetId(1L);
 
     dialog.save();
 
-    verify(service).saveFiles(eq(dataset), filesCaptor.capture());
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), filenameCaptor.capture());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(2, files.size());
-    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath())));
-    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath())));
+    File file = this.files.get(0);
+    assertTrue(files.contains(uploadFolder(dataset).resolve(file.toPath())));
+    assertEquals(file.getName(), filenameCaptor.getValue().apply(file.toPath()));
+    file = this.files.get(1);
+    assertTrue(files.contains(uploadFolder(dataset).resolve(file.toPath())));
+    assertEquals(file.getName(), filenameCaptor.getValue().apply(file.toPath()));
     Notification notification = $(Notification.class).first();
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 2, dataset.getName()),
+        test(notification).getText());
+    notification = $(Notification.class).last();
+    assertTrue(notification.hasThemeName(NotificationVariant.LUMO_SUCCESS.getVariantName()));
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 2, dataset.getName()),
         test(notification).getText());
     verify(savedListener).onComponentEvent(any());
@@ -497,19 +520,54 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
   @Test
   public void save_NoFiles() {
     when(service.uploadFiles(any())).thenReturn(new ArrayList<>());
+    when(service.saveFiles(any(), any(), any())).then(i -> CompletableFuture.completedFuture(null));
     dialog.addSavedListener(savedListener);
     Dataset dataset = repository.findById(1L).orElseThrow();
     dialog.setDatasetId(1L);
 
     dialog.save();
 
-    verify(service).saveFiles(eq(dataset), filesCaptor.capture());
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), any());
     Collection<Path> files = filesCaptor.getValue();
     assertEquals(0, files.size());
     assertTrue(Files.exists(uploadFolder(dataset)));
     Notification notification = $(Notification.class).first();
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 0, dataset.getName()),
+        test(notification).getText());
+    notification = $(Notification.class).last();
+    assertTrue(notification.hasThemeName(NotificationVariant.LUMO_SUCCESS.getVariantName()));
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVED, 0, dataset.getName()),
         test(notification).getText());
+    verify(savedListener).onComponentEvent(any());
+    assertFalse(dialog.isOpened());
+  }
+
+  @Test
+  public void save_AsyncException() {
+    when(service.files(any())).thenReturn(new ArrayList<>());
+    when(service.uploadFiles(any())).thenReturn(
+        files.subList(0, 2).stream().map(file -> folder.resolve(file.toPath()))
+            .collect(Collectors.toList()));
+    when(service.saveFiles(any(), any(), any())).then(
+        i -> CompletableFuture.failedFuture(new IOException("could not read a file")));
+    dialog.addSavedListener(savedListener);
+    Dataset dataset = repository.findById(1L).orElseThrow();
+    dialog.setDatasetId(1L);
+
+    dialog.save();
+
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), any());
+    Collection<Path> files = filesCaptor.getValue();
+    assertEquals(2, files.size());
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(0).toPath())));
+    assertTrue(files.contains(uploadFolder(dataset).resolve(this.files.get(1).toPath())));
+    Notification notification = $(Notification.class).first();
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_STARTED, 2, dataset.getName()),
+        test(notification).getText());
+    notification = $(Notification.class).last();
+    assertInstanceOf(WarningNotification.class, notification);
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SAVE_FAILED, dataset.getName()),
+        ((WarningNotification) notification).getText());
     verify(savedListener).onComponentEvent(any());
     assertFalse(dialog.isOpened());
   }

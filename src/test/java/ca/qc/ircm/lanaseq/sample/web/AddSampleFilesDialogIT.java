@@ -2,6 +2,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
 import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVED;
+import static ca.qc.ircm.lanaseq.sample.web.AddSampleFilesDialog.SAVE_STARTED;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,6 +13,7 @@ import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
 import java.io.IOException;
@@ -133,6 +135,12 @@ public class AddSampleFilesDialogIT extends AbstractBrowserTestCase {
     TestTransaction.end();
 
     NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + SAVE_STARTED, new Object[]{3, sample.getName()},
+            currentLocale()), notification.getText());
+    // Wait for files to finish copying.
+    notification = $(NotificationElement.class).withAttributeContainingWord("theme",
+        NotificationVariant.LUMO_SUCCESS.getVariantName()).waitForFirst();
     Assertions.assertEquals(
         messageSource.getMessage(MESSAGE_PREFIX + SAVED, new Object[]{3, sample.getName()},
             currentLocale()), notification.getText());

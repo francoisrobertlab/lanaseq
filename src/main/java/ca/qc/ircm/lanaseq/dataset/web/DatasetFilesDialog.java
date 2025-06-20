@@ -26,6 +26,7 @@ import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -40,7 +41,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -56,8 +57,8 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -75,7 +76,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.FileSystemUtils;
 
 /**
  * Dataset dialog.
@@ -118,7 +118,7 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
   protected Grid<Sample> samples = new Grid<>();
   protected Column<Sample> name;
   protected Column<Sample> fileCount;
-  protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
+  protected MultiFileBuffer uploadBuffer = new MultiFileBuffer();
   protected Button refresh = new Button();
   protected Upload upload = new Upload(uploadBuffer);
   protected Button addLargeFiles = new Button();
@@ -222,7 +222,7 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
     upload.setMaxHeight("5em"); // Hide name of uploaded files.
     upload.addSucceededListener(event -> addSmallFile(event.getFileName(),
-        uploadBuffer.getInputStream(event.getFileName())));
+        uploadBuffer.getFileData(event.getFileName()).getFile()));
     addLargeFiles.setId(id(ADD_LARGE_FILES));
     addLargeFiles.setIcon(VaadinIcon.PLUS.create());
     addLargeFiles.addClickListener(e -> addLargeFiles());
@@ -348,24 +348,28 @@ public class DatasetFilesDialog extends Dialog implements LocaleChangeObserver {
     });
   }
 
-  public void addSmallFile(String filename, InputStream inputStream) {
+  public void addSmallFile(String filename, File file) {
     logger.debug("saving file {} to dataset {}", filename, dataset);
     SecurityContextHolder.getContext()
         .setAuthentication(authentication); // Sets user for current thread.
-    try {
-      Path folder = Files.createTempDirectory("lanaseq-dataset-");
-      try {
-        Path file = folder.resolve(filename);
-        Files.copy(inputStream, file);
-        service.saveFiles(dataset, Collections.nCopies(1, file));
-        Notification.show(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename));
-      } finally {
-        FileSystemUtils.deleteRecursively(folder);
-      }
-    } catch (IOException | IllegalStateException e) {
-      new WarningNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename)).open();
-      return;
-    }
+    // TODO Fix filename is given by the user and may be used to hack the system.
+    final UI ui = UI.getCurrent();
+    service.saveFiles(dataset, Collections.nCopies(1, file.toPath()), f -> filename)
+        .thenAccept(e -> {
+          ui.accessLater(
+              () -> Notification.show(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename)),
+              null).run();
+        }).exceptionally(e -> {
+          logger.warn("Exception thrown while copying file {} for dataset {}", file, dataset, e);
+          ui.accessLater(() -> new WarningNotification(
+              getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename)).open(), null).run();
+          try {
+            Files.deleteIfExists(file.toPath());
+          } catch (IOException ex) {
+            // Ignore error since file was probably already deleted.
+          }
+          return null;
+        });
     updateFiles();
   }
 
