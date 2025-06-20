@@ -45,7 +45,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,7 +53,6 @@ import static org.mockito.Mockito.when;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.DataWithFiles;
-import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -92,6 +90,7 @@ import com.vaadin.testbench.unit.MetaKeys;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -107,6 +106,8 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,6 +145,8 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
   private ArgumentCaptor<ComponentRenderer<Anchor, EditableFile>> anchorRendererCaptor;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
+  @Captor
+  private ArgumentCaptor<Function<Path, String>> filenameCaptor;
   @Captor
   private ArgumentCaptor<ComponentRenderer<Button, EditableFile>> buttonRendererCaptor;
   @Captor
@@ -306,7 +309,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Sample sample = repository.findById(1L).orElseThrow();
     dialog.setSampleId(1L);
     verify(service).folderLabels(sample, false);
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DatasetFilesDialog.MESSAGE, labels.size()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
@@ -336,7 +339,7 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Sample sample = repository.findById(1L).orElseThrow();
     dialog.setSampleId(1L);
     verify(service).folderLabels(sample, true);
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + DatasetFilesDialog.MESSAGE, labels.size()),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + MESSAGE, labels.size()),
         dialog.message.getText());
     assertEquals(labels.size(), dialog.folders.getComponentCount());
     IntStream.range(0, labels.size()).forEach(i -> {
@@ -642,23 +645,23 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
       Collection<Path> files = i.getArgument(1);
       Path file = files.stream().findFirst().orElseThrow();
       Files.copy(file, tempFile, StandardCopyOption.REPLACE_EXISTING);
+      Files.delete(file);
       assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
-      return null;
-    }).when(service).saveFiles(any(), any());
+      return CompletableFuture.completedFuture(null);
+    }).when(service).saveFiles(any(), any(), any());
     SecurityContextHolder.getContext().setAuthentication(null);
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    verify(service).saveFiles(eq(sample), filesCaptor.capture());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture(), filenameCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
-    assertEquals(filename, file.getFileName().toString());
+    assertEquals(filename, filenameCaptor.getValue().apply(file));
     assertArrayEquals(fileContent, Files.readAllBytes(tempFile));
     Notification notification = $(Notification.class).first();
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename),
         test(notification).getText());
     assertFalse(Files.exists(file));
-    assertFalse(Files.exists(file.getParent()));
   }
 
   @Test
@@ -666,12 +669,13 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     Sample sample = repository.findById(dialog.getSampleId()).orElseThrow();
     String filename = "test_file.txt";
     String mimeType = "text/plain";
-    doThrow(new IllegalStateException("test")).when(service).saveFiles(any(), any());
+    when(service.saveFiles(any(), any(), any())).then(
+        i -> CompletableFuture.failedFuture(new IOException("could not read a file")));
     SecurityContextHolder.getContext().setAuthentication(null);
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    verify(service).saveFiles(eq(sample), filesCaptor.capture());
+    verify(service).saveFiles(eq(sample), filesCaptor.capture(), any());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
     Notification notification = $(Notification.class).first();
@@ -679,7 +683,6 @@ public class SampleFilesDialogTest extends SpringUIUnitTest {
     assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
         ((WarningNotification) notification).getText());
     assertFalse(Files.exists(file));
-    assertFalse(Files.exists(file.getParent()));
   }
 
   @Test

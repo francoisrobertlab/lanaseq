@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -45,6 +47,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Range.Bound;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -457,11 +460,14 @@ public class SampleService {
   /**
    * Save files to sample folder.
    *
-   * @param sample sample
-   * @param files  files to save
+   * @param sample   sample
+   * @param files    files to save
+   * @param filename returns filename to use for file
    */
   @PreAuthorize("hasPermission(#sample, 'write')")
-  public void saveFiles(Sample sample, Collection<Path> files) {
+  @Async
+  public CompletableFuture<Void> saveFiles(Sample sample, Collection<Path> files,
+      Function<Path, String> filename) {
     Path folder = configuration.getHome().folder(sample);
     try {
       Files.createDirectories(folder);
@@ -469,7 +475,7 @@ public class SampleService {
       throw new IllegalStateException("could not create folder " + folder, e);
     }
     for (Path file : files) {
-      Path target = folder.resolve(file.getFileName());
+      Path target = folder.resolve(filename.apply(file));
       try {
         logger.debug("moving file {} to {} for sample {}", file, target, sample);
         Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
@@ -478,6 +484,7 @@ public class SampleService {
         throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
       }
     }
+    return CompletableFuture.completedFuture(null);
   }
 
   /**
