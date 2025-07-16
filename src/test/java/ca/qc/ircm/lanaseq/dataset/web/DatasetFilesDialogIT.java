@@ -120,7 +120,7 @@ public class DatasetFilesDialogIT extends AbstractBrowserTestCase {
     view.datasets().controlClick(3);
     DatasetFilesDialogElement dialog = view.filesDialog();
 
-    dialog.files().getRow(0).doubleClick();
+    dialog.files().filenameCell(0).doubleClick();
     dialog.filenameEdit().setValue(dataset.getName() + "_R1.fastq");
     dialog.filenameEdit().sendKeys(Keys.ENTER);
     Thread.sleep(1000);

@@ -119,7 +119,7 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     view.samples().controlClick(1);
     SampleFilesDialogElement dialog = view.filesDialog();
 
-    dialog.files().getRow(0).doubleClick();
+    dialog.files().filenameCell(0).doubleClick();
     dialog.filenameEdit().setValue(sample.getName() + "_R1.fastq");
     dialog.filenameEdit().sendKeys(Keys.ENTER);
     Thread.sleep(1000); // Allow time to apply changes to files.

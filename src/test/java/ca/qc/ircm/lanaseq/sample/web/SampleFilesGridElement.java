@@ -3,6 +3,7 @@ package ca.qc.ircm.lanaseq.sample.web;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.checkbox.testbench.CheckboxElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
+import com.vaadin.flow.component.grid.testbench.GridTHTDElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
 
@@ -20,6 +21,10 @@ public class SampleFilesGridElement extends GridElement {
 
   public String filename(int row) {
     return getCell(row, FILE_COLUMN).getText();
+  }
+
+  public GridTHTDElement filenameCell(int row) {
+    return getCell(row, FILE_COLUMN);
   }
 
   public ButtonElement download(int row) {
