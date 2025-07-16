@@ -50,31 +50,44 @@ public class ViewLayoutElement extends AppLayoutElement {
     return $(SideNavElement.class).first();
   }
 
+  private void openSideNav() {
+    if ("false".equals(drawerToggle().getDomAttribute("aria-expanded"))) {
+      drawerToggle().click();
+    }
+  }
+
   public SideNavItemElement datasets() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(DATASETS, NAV));
   }
 
   public SideNavItemElement samples() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(SAMPLES, NAV));
   }
 
   public SideNavItemElement protocols() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(PROTOCOLS, NAV));
   }
 
   public SideNavItemElement profile() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(PROFILE, NAV));
   }
 
   public SideNavItemElement users() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(USERS, NAV));
   }
 
   public SideNavItemElement exitSwitchUser() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(EXIT_SWITCH_USER, NAV));
   }
 
   public SideNavItemElement signout() {
+    openSideNav();
     return $(SideNavItemElement.class).id(styleName(SIGNOUT, NAV));
   }
 }
