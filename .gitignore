@@ -23,6 +23,7 @@
 hs_err_pid*
 
 # Vaadin Flow
+/error-screenshots
 frontend-*
 /frontend/index.html
 /frontend/generated
@@ -33,4 +34,5 @@ frontend-*
 /src/main/bundles/prod.bundle
 /tsconfig.json
 /types.d.ts
-/error-screenshots
+/vite.config.ts
+/vite.generated.ts
