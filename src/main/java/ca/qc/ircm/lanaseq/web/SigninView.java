@@ -96,6 +96,13 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    updateMessages();
+  }
+
+  private void updateMessages() {
+    if (error == null) {
+      error = FAIL;
+    }
     i18n = LoginI18n.createDefault();
     i18n.setHeader(new LoginI18n.Header());
     i18n.getHeader().setTitle(getTranslation(MESSAGE_PREFIX + HEADER));
@@ -108,9 +115,6 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
     i18n.getForm().setPassword(getTranslation(USER_PREFIX + HASHED_PASSWORD));
     i18n.getForm().setForgotPassword(getTranslation(MESSAGE_PREFIX + FORGOT_PASSWORD));
     i18n.setErrorMessage(new ErrorMessage());
-    if (error == null) {
-      error = FAIL;
-    }
     i18n.getErrorMessage().setTitle(getTranslation(MESSAGE_PREFIX + property(error, TITLE)));
     i18n.getErrorMessage().setMessage(
         getTranslation(MESSAGE_PREFIX + error, configuration.lockDuration().getSeconds() / 60));
@@ -136,6 +140,7 @@ public class SigninView extends LoginOverlay implements LocaleChangeObserver, Ha
       error = FAIL;
       setError(true);
     }
+    updateMessages();
   }
 
   void fireForgotPasswordEvent() {
