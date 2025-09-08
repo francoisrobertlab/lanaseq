@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * {@link DaoAuthenticationProvider} that also validates password using {@link LdapService}.
@@ -24,6 +25,15 @@ public class DaoAuthenticationProviderWithLdap extends DaoAuthenticationProvider
   private LdapService ldapService;
   private SecurityConfiguration securityConfiguration;
   private LdapConfiguration ldapConfiguration;
+
+  /**
+   * Creates instance of {@link DaoAuthenticationProviderWithLdap}.
+   *
+   * @param userDetailsService {@link UserDetailsService}
+   */
+  public DaoAuthenticationProviderWithLdap(UserDetailsService userDetailsService) {
+    super(userDetailsService);
+  }
 
   @Override
   protected void additionalAuthenticationChecks(UserDetails userDetails,

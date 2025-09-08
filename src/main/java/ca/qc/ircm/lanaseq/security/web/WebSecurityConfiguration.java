@@ -81,8 +81,8 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
    */
   @Bean
   public DaoAuthenticationProviderWithLdap authenticationProvider() {
-    DaoAuthenticationProviderWithLdap authenticationProvider = new DaoAuthenticationProviderWithLdap();
-    authenticationProvider.setUserDetailsService(userDetailsService);
+    DaoAuthenticationProviderWithLdap authenticationProvider = new DaoAuthenticationProviderWithLdap(
+        userDetailsService);
     authenticationProvider.setPasswordEncoder(passwordEncoder());
     authenticationProvider.setUserRepository(userRepository);
     authenticationProvider.setLdapService(ldapService);
