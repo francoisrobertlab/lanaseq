@@ -32,7 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 /**
  * Security configuration.
@@ -124,10 +124,11 @@ public class WebSecurityConfiguration extends VaadinWebSecurity {
     // Remember me
     http.rememberMe(
         rememberMe -> rememberMe.alwaysRemember(true).key(configuration.rememberMeKey()));
-    http.authorizeHttpRequests(
-        auth -> auth.requestMatchers(new AntPathRequestMatcher("/sample-file/**")).permitAll()
-            .requestMatchers(new AntPathRequestMatcher("/dataset-file/**")).permitAll()
-            .requestMatchers(new AntPathRequestMatcher("/error")).permitAll());
+    http.authorizeHttpRequests(auth -> auth.requestMatchers(
+            PathPatternRequestMatcher.withDefaults().matcher("/sample-file/**")).permitAll()
+        .requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/dataset-file/**"))
+        .permitAll().requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/error"))
+        .permitAll());
 
     super.configure(http);
 
