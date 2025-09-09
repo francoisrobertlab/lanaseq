@@ -18,7 +18,6 @@ import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETE_HEADER;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.DELETE_MESSAGE;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_ERROR;
-import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_IOEXCEPTION;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_OVER_MAXIMUM;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.FILES_REQUIRED;
 import static ca.qc.ircm.lanaseq.protocol.web.ProtocolDialog.HEADER;
@@ -262,20 +261,6 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
     ProtocolFile file = files.get(1);
     assertEquals(filename, file.getFilename());
     assertArrayEquals(fileContent, file.getContent());
-  }
-
-  @Test
-  public void upload_Fail() {
-    String mimeType = "text/plain";
-
-    test(dialog.upload).uploadFailed(filename, mimeType);
-
-    Notification notification = $(Notification.class).first();
-    assertInstanceOf(WarningNotification.class, notification);
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
-        ((WarningNotification) notification).getText());
-    List<ProtocolFile> files = items(dialog.files);
-    assertEquals(1, files.size());
   }
 
   @Test

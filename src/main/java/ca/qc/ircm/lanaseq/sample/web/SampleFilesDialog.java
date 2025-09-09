@@ -36,7 +36,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -50,6 +49,8 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.WebBrowser;
+import com.vaadin.flow.server.streams.TemporaryFileUploadHandler;
+import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
@@ -107,9 +108,10 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
   protected Column<EditableFile> publicFile;
   protected Column<EditableFile> delete;
   protected TextField filenameEdit = new TextField();
-  protected MultiFileBuffer uploadBuffer = new MultiFileBuffer();
+  protected TemporaryFileUploadHandler uploadFileHandler = UploadHandler.toTempFile(
+      (metadata, file) -> addSmallFile(metadata.fileName(), file));
   protected Button refresh = new Button();
-  protected Upload upload = new Upload(uploadBuffer);
+  protected Upload upload = new Upload(uploadFileHandler);
   protected Button addLargeFiles = new Button();
   private Sample sample;
   private final Binder<EditableFile> fileBinder = new BeanValidationBinder<>(EditableFile.class);
@@ -197,8 +199,6 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
     upload.setMaxFileSize(MAXIMUM_SMALL_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_SMALL_FILES_COUNT);
     upload.setMaxHeight("5em"); // Hide name of uploaded files.
-    upload.addSucceededListener(event -> addSmallFile(event.getFileName(),
-        uploadBuffer.getFileData(event.getFileName()).getFile()));
     addLargeFiles.setId(id(ADD_LARGE_FILES));
     addLargeFiles.setIcon(VaadinIcon.PLUS.create());
     addLargeFiles.addClickListener(e -> addLargeFiles());

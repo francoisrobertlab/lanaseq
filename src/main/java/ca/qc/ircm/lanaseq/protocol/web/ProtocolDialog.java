@@ -45,7 +45,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -56,13 +55,15 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.TemporaryFileUploadHandler;
+import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serial;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -71,7 +72,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.util.FileCopyUtils;
 
 /**
  * Protocols dialog.
@@ -106,8 +106,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
   private static final long serialVersionUID = -7797831034001410430L;
   protected TextField name = new TextField();
   protected TextArea note = new TextArea();
-  protected MultiFileMemoryBuffer uploadBuffer = new MultiFileMemoryBuffer();
-  protected Upload upload = new Upload(uploadBuffer);
+  protected TemporaryFileUploadHandler uploadFileHandler = UploadHandler.toTempFile(
+      (metadata, file) -> addFile(metadata.fileName(), file));
+  protected Upload upload = new Upload(uploadFileHandler);
   protected Grid<ProtocolFile> files = new Grid<>();
   protected Column<ProtocolFile> filename;
   protected Column<ProtocolFile> remove;
@@ -149,9 +150,6 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
     upload.setMaxFileSize(MAXIMUM_FILES_SIZE);
     upload.setMaxFiles(MAXIMUM_FILES_COUNT);
     upload.setMinHeight("2.5em");
-    upload.addSucceededListener(
-        event -> addFile(event.getFileName(), uploadBuffer.getInputStream(event.getFileName())));
-    upload.addFailedListener(event -> failedFile(event.getFileName()));
     files.setId(id(FILES));
     filename = files.addColumn(new ComponentRenderer<>(this::filenameAnchor)).setKey(FILENAME)
         .setSortProperty(FILENAME)
@@ -280,24 +278,22 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
     new WarningNotification(getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename)).open();
   }
 
-  void addFile(String filename, InputStream input) {
+  void addFile(String filename, File file) {
     logger.trace("received file {}", filename);
-    ProtocolFile file = new ProtocolFile();
-    file.setFilename(filename);
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    ProtocolFile protocolFile = new ProtocolFile();
+    protocolFile.setFilename(filename);
     try {
-      FileCopyUtils.copy(input, output);
+      protocolFile.setContent(Files.readAllBytes(file.toPath()));
     } catch (IOException e) {
       failedFile(filename);
       return;
     }
-    file.setContent(output.toByteArray());
     if (files.getListDataView().getItemCount() >= MAXIMUM_FILES_COUNT) {
       new WarningNotification(
           getTranslation(MESSAGE_PREFIX + FILES_OVER_MAXIMUM, MAXIMUM_FILES_COUNT)).open();
       return;
     }
-    files.getListDataView().addItem(file);
+    files.getListDataView().addItem(protocolFile);
   }
 
   void removeFile(ProtocolFile file) {
