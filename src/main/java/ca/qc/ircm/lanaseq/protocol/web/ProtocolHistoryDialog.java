@@ -8,7 +8,6 @@ import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
-import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,9 +19,11 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.Serial;
 import java.util.Comparator;
 import org.slf4j.Logger;
@@ -91,8 +92,9 @@ public class ProtocolHistoryDialog extends Dialog implements LocaleChangeObserve
     Anchor link = new Anchor();
     link.getElement().setAttribute("download", file.getFilename());
     link.setText(file.getFilename());
-    link.setHref(new StreamResource(file.getFilename(),
-        new ByteArrayStreamResourceWriter(file.getContent())));
+    link.setHref(DownloadHandler.fromInputStream(
+        event -> new DownloadResponse(new ByteArrayInputStream(file.getContent()),
+            file.getFilename(), null, file.getContent().length)));
     return link;
   }
 

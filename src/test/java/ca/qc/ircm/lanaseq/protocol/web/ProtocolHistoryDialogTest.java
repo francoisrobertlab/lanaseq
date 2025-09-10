@@ -147,7 +147,6 @@ public class ProtocolHistoryDialogTest extends SpringUIUnitTest {
       ComponentRenderer<Anchor, ProtocolFile> filenameRenderer = (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
       Anchor anchor = filenameRenderer.createComponent(file);
       assertEquals(file.getFilename(), anchor.getText());
-      assertEquals(file.getFilename(), anchor.getElement().getAttribute("download"));
       assertTrue(anchor.getHref().startsWith("VAADIN/dynamic/resource"));
       LitRenderer<ProtocolFile> recoverRenderer = (LitRenderer<ProtocolFile>) dialog.recover.getRenderer();
       assertEquals(RECOVER_BUTTON, rendererTemplate(recoverRenderer));

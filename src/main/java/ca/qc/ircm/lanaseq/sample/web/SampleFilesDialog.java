@@ -47,8 +47,8 @@ import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.WebBrowser;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.server.streams.TemporaryFileUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -218,7 +218,7 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
     Anchor anchor = new Anchor();
     anchor.addClassName(DOWNLOAD);
     anchor.getElement().setAttribute("download", true);
-    anchor.setHref(download(file));
+    anchor.setHref(DownloadHandler.forFile(file.getFile(), file.getFilename()));
     Button button = new Button();
     anchor.add(button);
     button.setIcon(VaadinIcon.DOWNLOAD.create());
@@ -350,11 +350,6 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
           getTranslation(MESSAGE_PREFIX + FILE_RENAME_ERROR, source.getFileName(),
               file.getFilename())).open();
     }
-  }
-
-  StreamResource download(EditableFile file) {
-    return new StreamResource(file.getFilename(),
-        (output, session) -> Files.copy(file.getFile().toPath(), output));
   }
 
   void changePublicFile(EditableFile file, boolean makePublic) {

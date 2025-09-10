@@ -24,7 +24,6 @@ import ca.qc.ircm.lanaseq.protocol.ProtocolFile;
 import ca.qc.ircm.lanaseq.protocol.ProtocolService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.Permission;
-import ca.qc.ircm.lanaseq.web.ByteArrayStreamResourceWriter;
 import ca.qc.ircm.lanaseq.web.DeletedEvent;
 import ca.qc.ircm.lanaseq.web.SavedEvent;
 import ca.qc.ircm.lanaseq.web.WarningNotification;
@@ -54,12 +53,14 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 import com.vaadin.flow.server.streams.TemporaryFileUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
@@ -184,8 +185,9 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
     Anchor link = new Anchor();
     link.getElement().setAttribute("download", file.getFilename());
     link.setText(file.getFilename());
-    link.setHref(new StreamResource(file.getFilename(),
-        new ByteArrayStreamResourceWriter(file.getContent())));
+    link.setHref(DownloadHandler.fromInputStream(
+        event -> new DownloadResponse(new ByteArrayInputStream(file.getContent()),
+            file.getFilename(), null, file.getContent().length)));
     return link;
   }
 

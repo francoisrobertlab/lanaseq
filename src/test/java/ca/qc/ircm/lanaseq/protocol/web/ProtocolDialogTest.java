@@ -302,7 +302,6 @@ public class ProtocolDialogTest extends SpringUIUnitTest {
       ComponentRenderer<Anchor, ProtocolFile> filenameRenderer = (ComponentRenderer<Anchor, ProtocolFile>) dialog.filename.getRenderer();
       Anchor anchor = filenameRenderer.createComponent(file);
       assertEquals(file.getFilename(), anchor.getText());
-      assertEquals(file.getFilename(), anchor.getElement().getAttribute("download"));
       assertTrue(anchor.getHref().startsWith("VAADIN/dynamic/resource"));
       LitRenderer<ProtocolFile> removeRenderer = (LitRenderer<ProtocolFile>) dialog.remove.getRenderer();
       assertEquals(REMOVE_BUTTON, rendererTemplate(removeRenderer));

@@ -49,10 +49,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.StreamResourceWriter;
+import com.vaadin.flow.server.streams.DownloadResponse;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -69,6 +67,7 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Range.Bound;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * Tests for {@link PublicFilesView}.
@@ -380,65 +379,47 @@ public class PublicFilesViewTest extends SpringUIUnitTest {
   @Test
   public void filterFilename() {
     assertEquals(9, view.files.getListDataView().getItemCount());
-    String beforeFilterHref = view.downloadLinks.getHref();
     view.filenameFilter.setValue("JS1");
     assertEquals(4, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
-    beforeFilterHref = view.downloadLinks.getHref();
     view.filenameFilter.setValue("");
     assertEquals(9, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
   }
 
   @Test
   public void filterExpiryDate() {
     assertEquals(9, view.files.getListDataView().getItemCount());
-    String beforeFilterHref = view.downloadLinks.getHref();
     view.expiryDateFilter.setValue(
         Range.rightUnbounded(Bound.inclusive(LocalDate.now().plusDays(6))));
     assertEquals(3, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
-    beforeFilterHref = view.downloadLinks.getHref();
     view.expiryDateFilter.setValue(Range.unbounded());
     assertEquals(9, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
   }
 
   @Test
   public void filterSampleName() {
     assertEquals(9, view.files.getListDataView().getItemCount());
-    String beforeFilterHref = view.downloadLinks.getHref();
     view.sampleNameFilter.setValue("JS1");
     assertEquals(4, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
-    beforeFilterHref = view.downloadLinks.getHref();
     view.sampleNameFilter.setValue("");
     assertEquals(9, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
   }
 
   @Test
   public void filterOwner() {
     assertEquals(9, view.files.getListDataView().getItemCount());
-    String beforeFilterHref = view.downloadLinks.getHref();
     view.ownerFilter.setValue("jonh");
     assertEquals(8, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
-    beforeFilterHref = view.downloadLinks.getHref();
     view.ownerFilter.setValue("");
     assertEquals(9, view.files.getListDataView().getItemCount());
-    assertNotEquals(beforeFilterHref, view.downloadLinks.getHref());
   }
 
   @Test
   public void links() throws IOException {
     assertNotEquals("", view.downloadLinks.getHref());
-    StreamResource resource = view.links();
-    assertEquals("links.txt", resource.getName());
-    StreamResourceWriter writer = resource.getWriter();
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    writer.accept(output, UI.getCurrent().getSession());
-    String[] lines = output.toString(StandardCharsets.UTF_8).split("\n");
+    DownloadResponse downloadResponse = view.links();
+    assertEquals("links.txt", downloadResponse.getFileName());
+    String[] lines = new String(FileCopyUtils.copyToByteArray(downloadResponse.getInputStream()),
+        StandardCharsets.UTF_8).split("\n");
     List<PublicFile> publicFiles = view.files.getListDataView().getItems().toList();
     assertEquals(9, lines.length);
     assertEquals(9, publicFiles.size());
@@ -460,12 +441,10 @@ public class PublicFilesViewTest extends SpringUIUnitTest {
   public void links_filterFilename() throws IOException {
     view.filenameFilter.setValue("JS1");
     assertNotEquals("", view.downloadLinks.getHref());
-    StreamResource resource = view.links();
-    assertEquals("links.txt", resource.getName());
-    StreamResourceWriter writer = resource.getWriter();
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    writer.accept(output, UI.getCurrent().getSession());
-    String[] lines = output.toString(StandardCharsets.UTF_8).split("\n");
+    DownloadResponse downloadResponse = view.links();
+    assertEquals("links.txt", downloadResponse.getFileName());
+    String[] lines = new String(FileCopyUtils.copyToByteArray(downloadResponse.getInputStream()),
+        StandardCharsets.UTF_8).split("\n");
     List<PublicFile> publicFiles = view.files.getListDataView().getItems().toList();
     assertEquals(4, lines.length);
     assertEquals(4, publicFiles.size());

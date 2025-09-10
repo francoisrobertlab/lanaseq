@@ -40,8 +40,10 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 import jakarta.annotation.security.RolesAllowed;
+import java.io.ByteArrayInputStream;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -155,6 +157,7 @@ public class PublicFilesView extends VerticalLayout implements LocaleChangeObser
     ownerFilter.setSizeFull();
     downloadLinks.setId(DOWNLOAD_LINKS);
     downloadLinks.getElement().setAttribute("download", true);
+    downloadLinks.setHref(DownloadHandler.fromInputStream(event -> links()));
     downloadLinks.add(downloadLinksButton);
     downloadLinksButton.setIcon(VaadinIcon.DOWNLOAD.create());
     loadPublicFiles();
@@ -185,31 +188,26 @@ public class PublicFilesView extends VerticalLayout implements LocaleChangeObser
     files.setItems(Stream.concat(datasetService.publicFiles().stream().map(PublicFile::new),
         sampleService.publicFiles().stream().map(PublicFile::new)).toList());
     files.getListDataView().setFilter(filter);
-    downloadLinks.setHref(links());
   }
 
   private void filterFilename(String value) {
     filter.filenameContains = value.isEmpty() ? null : value;
     files.getDataProvider().refreshAll();
-    downloadLinks.setHref(links());
   }
 
   private void filterExpiryDate(Range<LocalDate> value) {
     filter.expiryDateRange = value;
     files.getDataProvider().refreshAll();
-    downloadLinks.setHref(links());
   }
 
   private void filterSampleName(String value) {
     filter.sampleNameContains = value.isEmpty() ? null : value;
     files.getDataProvider().refreshAll();
-    downloadLinks.setHref(links());
   }
 
   private void filterOwner(String value) {
     filter.ownerContains = value.isEmpty() ? null : value;
     files.getDataProvider().refreshAll();
-    downloadLinks.setHref(links());
   }
 
   private void deletePublicFile(PublicFile publicFile) {
@@ -224,11 +222,11 @@ public class PublicFilesView extends VerticalLayout implements LocaleChangeObser
     }
   }
 
-  StreamResource links() {
+  DownloadResponse links() {
     String links = files.getListDataView().getItems()
         .map(pf -> configuration.getUrl(linkEnding(pf))).collect(Collectors.joining("\n"));
-    return new StreamResource("links.txt",
-        (output, session) -> output.write(links.getBytes(StandardCharsets.UTF_8)));
+    byte[] bytes = links.getBytes(StandardCharsets.UTF_8);
+    return new DownloadResponse(new ByteArrayInputStream(bytes), "links.txt", null, bytes.length);
   }
 
   private String linkEnding(PublicFile publicFile) {

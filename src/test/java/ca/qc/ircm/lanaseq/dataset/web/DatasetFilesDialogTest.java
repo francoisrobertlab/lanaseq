@@ -88,11 +88,8 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.StreamResourceWriter;
 import com.vaadin.testbench.unit.MetaKeys;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -871,20 +868,5 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     assertEquals(dataset.getId(), largeFilesDialog.getDatasetId());
     largeFilesDialog.fireSavedEvent();
     verify(service, atLeast(2)).files(dataset);
-  }
-
-  @Test
-  public void download() throws Throwable {
-    File path = Files.createFile(temporaryFolder.resolve("source.txt")).toFile();
-    EditableFile file = new EditableFile(path);
-    Files.write(path.toPath(), fileContent);
-
-    StreamResource resource = dialog.download(file);
-
-    assertEquals("source.txt", resource.getName());
-    StreamResourceWriter writer = resource.getWriter();
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    writer.accept(output, UI.getCurrent().getSession());
-    assertArrayEquals(fileContent, output.toByteArray());
   }
 }
