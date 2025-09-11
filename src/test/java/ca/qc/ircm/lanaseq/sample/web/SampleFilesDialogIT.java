@@ -1,6 +1,8 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
 import static ca.qc.ircm.lanaseq.AppConfiguration.DELETED_FILENAME;
+import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
+import static ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog.FILES_SUCCESS;
 import static ca.qc.ircm.lanaseq.sample.web.SamplesView.VIEW_NAME;
 import static ca.qc.ircm.lanaseq.time.TimeConverter.toInstant;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -14,6 +16,7 @@ import ca.qc.ircm.lanaseq.sample.SamplePublicFileRepository;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
 import ca.qc.ircm.lanaseq.test.config.TestBenchTestAnnotations;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.BrowserTest;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -41,6 +45,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 @WithUserDetails("jonh.smith@ircm.qc.ca")
 public class SampleFilesDialogIT extends AbstractBrowserTestCase {
 
+  private static final String MESSAGE_PREFIX = messagePrefix(SampleFilesDialog.class);
   @TempDir
   Path temporaryFolder;
   @Autowired
@@ -49,11 +54,16 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
   private SamplePublicFileRepository samplePublicFileRepository;
   @Autowired
   private AppConfiguration configuration;
+  @Autowired
+  private MessageSource messageSource;
+  private Path file1;
 
   @BeforeEach
   public void beforeTest() throws Throwable {
     setHome(Files.createDirectory(temporaryFolder.resolve("home")));
     setArchive(Files.createDirectory(temporaryFolder.resolve("archives")));
+    setUpload(Files.createDirectory(temporaryFolder.resolve("upload")));
+    file1 = Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI());
   }
 
   private void open() {
@@ -224,5 +234,26 @@ public class SampleFilesDialogIT extends AbstractBrowserTestCase {
     dialog.addLargeFiles().click();
 
     assertTrue(dialog.addFilesDialog().isOpen());
+  }
+
+  @BrowserTest
+  public void upload() throws Throwable {
+    open();
+    SamplesViewElement view = $(SamplesViewElement.class).waitForFirst();
+    view.samples().controlClick(1);
+    SampleFilesDialogElement dialog = view.filesDialog();
+    Sample sample = repository.findById(10L).orElseThrow();
+
+    dialog.upload().upload(file1.toFile());
+
+    NotificationElement notification = $(NotificationElement.class).waitForFirst();
+    Assertions.assertEquals(
+        messageSource.getMessage(MESSAGE_PREFIX + FILES_SUCCESS, new Object[]{file1.getFileName()},
+            currentLocale()), notification.getText());
+    Path folder = configuration.getHome().folder(sample);
+    assertTrue(Files.exists(folder.resolve(file1.getFileName())));
+    assertArrayEquals(Files.readAllBytes(
+            Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R1.fastq")).toURI())),
+        Files.readAllBytes(folder.resolve(file1.getFileName())));
   }
 }
