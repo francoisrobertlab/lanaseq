@@ -41,7 +41,6 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -257,8 +256,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   @Test
   public void tabs_SelectSignout() {
     // Invalidated session.
-    assertThrows(InvocationTargetException.class,
-        () -> test(view.sideNav).clickItem(view.signout.getLabel()));
+    test(view.sideNav).clickItem(view.signout.getLabel());
     assertThrows(IllegalStateException.class,
         () -> VaadinServletRequest.getCurrent().getWrappedSession(false).getAttributeNames());
 
