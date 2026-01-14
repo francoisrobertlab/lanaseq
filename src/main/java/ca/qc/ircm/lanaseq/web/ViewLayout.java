@@ -18,7 +18,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -40,7 +39,6 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserFilt
 /**
  * Main layout.
  */
-@JsModule("./styles/shared-styles.js")
 public class ViewLayout extends AppLayout implements RouterLayout, LocaleChangeObserver,
     AfterNavigationObserver, UrlComponent {
 

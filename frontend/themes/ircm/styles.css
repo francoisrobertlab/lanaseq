@@ -1,0 +1,29 @@
+html {
+  --vaadin-app-layout-drawer-width: 13em;
+}
+
+#view-layout-laboratory {
+  background-color: var(--lumo-base-color);
+  color: var(--lumo-success-text-color);
+}
+
+/* Errors */
+.error-text {
+  color: var(--lumo-error-text-color);
+}
+.error-10pct {
+  background-color: var(--lumo-error-color-10pct);
+  color: var(--lumo-error-text-color);
+}
+.error-50pct {
+  background-color: var(--lumo-error-color-50pct);
+  color: var(--lumo-error-contrast-color);
+}
+.error {
+  background-color: var(--lumo-error-color);
+  color: var(--lumo-error-contrast-color);
+}
+
+vaadin-button.right {
+  margin-left: auto;
+}

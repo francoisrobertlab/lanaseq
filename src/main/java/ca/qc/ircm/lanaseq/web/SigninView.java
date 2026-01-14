@@ -14,7 +14,6 @@ import ca.qc.ircm.lanaseq.security.SecurityConfiguration;
 import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.web.ForgotPasswordView;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginI18n.ErrorMessage;
 import com.vaadin.flow.component.login.LoginOverlay;
@@ -40,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = SigninView.VIEW_NAME)
 @AnonymousAllowed
-@JsModule("./styles/shared-styles.js")
 public class SigninView extends LoginOverlay implements LocaleChangeObserver, HasDynamicTitle,
     AfterNavigationObserver, BeforeEnterObserver {
 
