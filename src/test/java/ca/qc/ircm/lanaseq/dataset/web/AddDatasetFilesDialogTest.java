@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.dataset.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -60,6 +59,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.testbench.unit.MetaKeys;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
 import java.io.BufferedOutputStream;
@@ -254,7 +254,7 @@ public class AddDatasetFilesDialogTest extends SpringUIUnitTest {
       File file = files.get(i);
       Span span = (Span) test(dialog.files).getCellComponent(i, dialog.filename.getKey());
       assertEquals(file.getName(), span.getText());
-      assertEquals(i == 0, span.hasClassName(ERROR_TEXT));
+      assertEquals(i == 0, span.hasClassName(TextColor.ERROR));
       assertEquals(dialog.getTranslation(MESSAGE_PREFIX + SIZE_VALUE, file.length() / 1048576),
           test(dialog.files).getCellText(i, dialog.files.getColumns().indexOf(dialog.size)));
       assertInstanceOf(Checkbox.class,

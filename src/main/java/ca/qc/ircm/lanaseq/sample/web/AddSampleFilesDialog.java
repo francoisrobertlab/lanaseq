@@ -1,6 +1,5 @@
 package ca.qc.ircm.lanaseq.sample.web;
 
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REFRESH;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
@@ -35,6 +34,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
@@ -143,7 +143,7 @@ public class AddSampleFilesDialog extends Dialog implements LocaleChangeObserver
     Span span = new Span();
     span.setText(file.getName());
     if (exists(file)) {
-      span.addClassName(ERROR_TEXT);
+      span.addClassName(TextColor.ERROR);
     }
     return span;
   }

@@ -3,7 +3,6 @@ package ca.qc.ircm.lanaseq.sample.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.HELPER;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
@@ -59,6 +58,7 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.PostConstruct;
 import java.io.Serial;
 import java.util.Locale;
@@ -77,6 +77,7 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
 
   public static final String ID = "sample-dialog";
   public static final String HEADER = "header";
+  public static final String ERROR = "error";
   public static final String SAVED = "saved";
   public static final String DELETED = "deleted";
   public static final String DELETE_HEADER = property(DELETE, "header");
@@ -163,7 +164,8 @@ public class SampleDialog extends Dialog implements LocaleChangeObserver {
     filenames.setId(id(FILENAMES));
     note.setId(id(NOTE));
     note.setHeight("6em");
-    error.setId(id(ERROR_TEXT));
+    error.setId(id(ERROR));
+    error.addClassName(TextColor.ERROR);
     error.setVisible(false);
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

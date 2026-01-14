@@ -3,13 +3,13 @@ package ca.qc.ircm.lanaseq.dataset.web;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.DATE;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.FILENAMES;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.KEYWORDS;
 import static ca.qc.ircm.lanaseq.dataset.DatasetProperties.NOTE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ADD_SAMPLE;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.GENERATE_NAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.NAME_PREFIX;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetDialog.SAMPLES_HEADER;
@@ -116,7 +116,7 @@ public class DatasetDialogElement extends DialogElement {
   }
 
   public DivElement error() {
-    return $(DivElement.class).id(id(ERROR_TEXT));
+    return $(DivElement.class).id(id(ERROR));
   }
 
   public ButtonElement save() {

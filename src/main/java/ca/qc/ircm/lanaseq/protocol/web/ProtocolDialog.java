@@ -4,7 +4,6 @@ import static ca.qc.ircm.lanaseq.Constants.ALREADY_EXISTS;
 import static ca.qc.ircm.lanaseq.Constants.CANCEL;
 import static ca.qc.ircm.lanaseq.Constants.CONFIRM;
 import static ca.qc.ircm.lanaseq.Constants.DELETE;
-import static ca.qc.ircm.lanaseq.Constants.ERROR_TEXT;
 import static ca.qc.ircm.lanaseq.Constants.REMOVE;
 import static ca.qc.ircm.lanaseq.Constants.REQUIRED;
 import static ca.qc.ircm.lanaseq.Constants.SAVE;
@@ -59,6 +58,7 @@ import com.vaadin.flow.server.streams.TemporaryFileUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -160,7 +160,7 @@ public class ProtocolDialog extends Dialog implements LocaleChangeObserver {
             LitRenderer.<ProtocolFile>of(REMOVE_BUTTON).withFunction("removeFile", this::removeFile))
         .setKey(REMOVE);
     filesError.setId(id(FILES_ERROR));
-    filesError.addClassName(ERROR_TEXT);
+    filesError.addClassName(TextColor.ERROR);
     save.setId(id(SAVE));
     save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     save.setIcon(VaadinIcon.CHECK.create());
