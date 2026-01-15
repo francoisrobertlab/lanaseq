@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,17 +23,21 @@ public class MessageService {
 
   private final MessageRepository repository;
   private final AuthenticatedUser authenticatedUser;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   /**
    * Creates new MessageService.
    *
-   * @param repository        message repository
-   * @param authenticatedUser authenticated user
+   * @param repository                message repository
+   * @param authenticatedUser         authenticated user
+   * @param applicationEventPublisher event publisher
    */
   @Autowired
-  public MessageService(MessageRepository repository, AuthenticatedUser authenticatedUser) {
+  public MessageService(MessageRepository repository, AuthenticatedUser authenticatedUser,
+      ApplicationEventPublisher applicationEventPublisher) {
     this.repository = repository;
     this.authenticatedUser = authenticatedUser;
+    this.applicationEventPublisher = applicationEventPublisher;
   }
 
   /**
@@ -73,5 +78,6 @@ public class MessageService {
       message.setUnread(true);
     }
     repository.save(message);
+    applicationEventPublisher.publishEvent(new SavedMessageEvent(this, message));
   }
 }

@@ -15,7 +15,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,6 +38,10 @@ public class MessageServiceTest {
   private MessageRepository repository;
   @MockitoBean
   private PermissionEvaluator permissionEvaluator;
+  @MockitoBean
+  private ApplicationListener<SavedMessageEvent> savedMessageEventApplicationListener;
+  @Captor
+  private ArgumentCaptor<SavedMessageEvent> savedMessageEventArgumentCaptor;
 
   /**
    * Before test.
@@ -89,6 +96,14 @@ public class MessageServiceTest {
     assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(message.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(message.getDate()));
     verify(permissionEvaluator).hasPermission(any(), eq(message), eq(WRITE));
+    verify(savedMessageEventApplicationListener).onApplicationEvent(
+        savedMessageEventArgumentCaptor.capture());
+    Message savedMessage = savedMessageEventArgumentCaptor.getValue().getMessage();
+    assertEquals(message.getId(), savedMessage.getId());
+    assertEquals(message.getOwner().getId(), savedMessage.getOwner().getId());
+    assertEquals(message.getMessage(), savedMessage.getMessage());
+    assertEquals(message.isUnread(), savedMessage.isUnread());
+    assertEquals(message.getDate(), savedMessage.getDate());
   }
 
   @Test
@@ -106,5 +121,13 @@ public class MessageServiceTest {
     assertFalse(message.isUnread());
     assertEquals(LocalDateTime.of(2026, 1, 15, 11, 20, 0), message.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(message), eq(WRITE));
+    verify(savedMessageEventApplicationListener).onApplicationEvent(
+        savedMessageEventArgumentCaptor.capture());
+    Message savedMessage = savedMessageEventArgumentCaptor.getValue().getMessage();
+    assertEquals(message.getId(), savedMessage.getId());
+    assertEquals(message.getOwner().getId(), savedMessage.getOwner().getId());
+    assertEquals(message.getMessage(), savedMessage.getMessage());
+    assertEquals(message.isUnread(), savedMessage.isUnread());
+    assertEquals(message.getDate(), savedMessage.getDate());
   }
 }
