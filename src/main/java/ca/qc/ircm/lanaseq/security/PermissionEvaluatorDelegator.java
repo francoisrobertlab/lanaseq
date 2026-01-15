@@ -4,6 +4,7 @@ import static ca.qc.ircm.lanaseq.UsedBy.SPRING;
 
 import ca.qc.ircm.lanaseq.UsedBy;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
+import ca.qc.ircm.lanaseq.message.Message;
 import ca.qc.ircm.lanaseq.protocol.Protocol;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.user.User;
@@ -27,6 +28,7 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   private static final Logger logger = LoggerFactory.getLogger(PermissionEvaluatorDelegator.class);
   private final UserPermissionEvaluator userPermissionEvaluator;
   private final DatasetPermissionEvaluator datasetPermissionEvaluator;
+  private final MessagePermissionEvaluator messagePermissionEvaluator;
   private final ProtocolPermissionEvaluator protocolPermissionEvaluator;
   private final SamplePermissionEvaluator samplePermissionEvaluator;
 
@@ -34,10 +36,12 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
   @UsedBy(SPRING)
   protected PermissionEvaluatorDelegator(UserPermissionEvaluator userPermissionEvaluator,
       DatasetPermissionEvaluator datasetPermissionEvaluator,
+      MessagePermissionEvaluator messagePermissionEvaluator,
       ProtocolPermissionEvaluator protocolPermissionEvaluator,
       SamplePermissionEvaluator samplePermissionEvaluator) {
     this.userPermissionEvaluator = userPermissionEvaluator;
     this.datasetPermissionEvaluator = datasetPermissionEvaluator;
+    this.messagePermissionEvaluator = messagePermissionEvaluator;
     this.protocolPermissionEvaluator = protocolPermissionEvaluator;
     this.samplePermissionEvaluator = samplePermissionEvaluator;
   }
@@ -49,6 +53,9 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
       return userPermissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
     } else if (targetDomainObject instanceof Dataset) {
       return datasetPermissionEvaluator.hasPermission(authentication, targetDomainObject,
+          permission);
+    } else if (targetDomainObject instanceof Message) {
+      return messagePermissionEvaluator.hasPermission(authentication, targetDomainObject,
           permission);
     } else if (targetDomainObject instanceof Protocol) {
       return protocolPermissionEvaluator.hasPermission(authentication, targetDomainObject,
@@ -68,6 +75,9 @@ public class PermissionEvaluatorDelegator implements PermissionEvaluator {
           permission);
     } else if (targetType.equals(Dataset.class.getName())) {
       return datasetPermissionEvaluator.hasPermission(authentication, targetId, targetType,
+          permission);
+    } else if (targetType.equals(Message.class.getName())) {
+      return messagePermissionEvaluator.hasPermission(authentication, targetId, targetType,
           permission);
     } else if (targetType.equals(Protocol.class.getName())) {
       return protocolPermissionEvaluator.hasPermission(authentication, targetId, targetType,

@@ -128,3 +128,12 @@ CREATE TABLE sample_public_file (
   PRIMARY KEY (id),
   CONSTRAINT samplePublicFile_ibfk FOREIGN KEY (sample_id) REFERENCES sample (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+create table message (
+    id bigint(20) not null AUTO_INCREMENT,
+    owner_id bigint(20) not null,
+    message varchar(255) not null,
+    unread tinyint not null default 0,
+    date DATETIME not null,
+    primary key (id),
+    constraint message_owner_ibfk foreign key (owner_id) references users (id) on delete cascade on update cascade
+);
