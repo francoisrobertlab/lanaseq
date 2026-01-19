@@ -44,6 +44,14 @@ public class Message implements Data, Owned, Serializable {
   @Size(max = 255)
   private String message;
   /**
+   * Color of the message.
+   * <br>
+   * `success`, `warning` and `error` are good examples.
+   * {@see https://vaadin.com/docs/v24/styling/lumo/lumo-style-properties/color#warning}
+   */
+  @Column
+  private String color;
+  /**
    * True if message has not been read by the user.
    */
   @Column
@@ -103,6 +111,14 @@ public class Message implements Data, Owned, Serializable {
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
   }
 
   public boolean isUnread() {

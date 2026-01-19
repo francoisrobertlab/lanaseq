@@ -55,15 +55,17 @@ INSERT INTO forgot_password (id, user_id, request_moment, confirm_number, used)
 VALUES (10, 9, CURRENT_TIMESTAMP, '460559412', 1);
 ALTER TABLE forgot_password
     ALTER COLUMN id RESTART WITH 11;
-insert into message (id, owner_id, message, unread, date)
-values (1, 3, 'First message', false, '2025-12-10 9:25:10');
-insert into message (id, owner_id, message, unread, date)
-values (2, 3, 'Second message', true, '2026-01-15 11:20:00');
-insert into message (id, owner_id, message, unread, date)
-values (3, 1, 'Admin message', true, '2026-01-15 11:21:00');
-insert into message (id, owner_id, message, unread, date)
-values (4, 2, 'Manager message', false, '2025-12-15 11:22:00');
-insert into message (id, owner_id, message, unread, date)
-values (5, 5, 'Other manager message', false, '2025-12-15 11:23:00');
+insert into message (id, owner_id, message, color, unread, date)
+values (1, 3, 'Already read message', 'success', false, '2025-12-10 9:25:10');
+insert into message (id, owner_id, message, color, unread, date)
+values (2, 3, 'First unread message', 'error', true, '2026-01-15 11:20:00');
+insert into message (id, owner_id, message, color, unread, date)
+values (3, 3, 'Second unread message', 'success', true, '2026-01-15 11:22:00');
+insert into message (id, owner_id, message, color, unread, date)
+values (4, 1, 'Admin message', 'success', true, '2026-01-15 11:21:00');
+insert into message (id, owner_id, message, color, unread, date)
+values (5, 2, 'Manager message', 'success', false, '2025-12-15 11:22:00');
+insert into message (id, owner_id, message, color, unread, date)
+values (6, 5, 'Other manager message', null, false, '2025-12-15 11:23:00');
 alter table message
-    alter column id restart with 6;
+    alter column id restart with 7;

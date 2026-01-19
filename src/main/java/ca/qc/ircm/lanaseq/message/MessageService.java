@@ -59,7 +59,18 @@ public class MessageService {
   @PostFilter("hasPermission(filterObject, 'read')")
   public List<Message> all() {
     Optional<User> user = authenticatedUser.getUser();
-    return repository.findByOwner(user.orElseThrow());
+    return repository.findByOwnerOrderByIdDesc(user.orElseThrow());
+  }
+
+  /**
+   * Returns all unread messages of authenticated user.
+   *
+   * @return all unread messages of authenticated user
+   */
+  @PostFilter("hasPermission(filterObject, 'read')")
+  public List<Message> allUnread() {
+    Optional<User> user = authenticatedUser.getUser();
+    return repository.findByOwnerAndUnreadOrderByIdDesc(user.orElseThrow(), true);
   }
 
   /**

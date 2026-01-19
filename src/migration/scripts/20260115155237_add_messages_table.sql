@@ -5,6 +5,7 @@ create table message (
     id bigint(20) not null AUTO_INCREMENT,
     owner_id bigint(20) not null,
     message varchar(255) not null,
+    color varchar(255) default null,
     unread tinyint not null default 0,
     date DATETIME not null,
     primary key (id),

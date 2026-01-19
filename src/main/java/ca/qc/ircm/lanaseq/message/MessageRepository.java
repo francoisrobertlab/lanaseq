@@ -17,5 +17,14 @@ public interface MessageRepository extends JpaRepository<Message, Long>,
    * @param owner owner
    * @return all messages associated with owner
    */
-  List<Message> findByOwner(User owner);
+  List<Message> findByOwnerOrderByIdDesc(User owner);
+
+  /**
+   * Finds all messages associated with owner with unread flag.
+   *
+   * @param owner  owner
+   * @param unread unread flag
+   * @return all messages associated with owner with unread flag
+   */
+  List<Message> findByOwnerAndUnreadOrderByIdDesc(User owner, Boolean unread);
 }

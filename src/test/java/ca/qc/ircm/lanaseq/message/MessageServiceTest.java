@@ -57,7 +57,8 @@ public class MessageServiceTest {
 
     assertEquals(2L, message.getId());
     assertEquals(3L, message.getOwner().getId());
-    assertEquals("Second message", message.getMessage());
+    assertEquals("First unread message", message.getMessage());
+    assertEquals("error", message.getColor());
     assertTrue(message.isUnread());
     assertEquals(LocalDateTime.of(2026, 1, 15, 11, 20, 0), message.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(message), eq(READ));
@@ -72,9 +73,22 @@ public class MessageServiceTest {
   public void all() {
     List<Message> messages = service.all();
 
-    assertEquals(2, messages.size());
+    assertEquals(3, messages.size());
     assertTrue(find(messages, 1L).isPresent());
     assertTrue(find(messages, 2L).isPresent());
+    assertTrue(find(messages, 3L).isPresent());
+    for (Message message : messages) {
+      verify(permissionEvaluator).hasPermission(any(), eq(message), eq(READ));
+    }
+  }
+
+  @Test
+  public void allUnread() {
+    List<Message> messages = service.allUnread();
+
+    assertEquals(2, messages.size());
+    assertTrue(find(messages, 2L).isPresent());
+    assertTrue(find(messages, 3L).isPresent());
     for (Message message : messages) {
       verify(permissionEvaluator).hasPermission(any(), eq(message), eq(READ));
     }
@@ -84,6 +98,7 @@ public class MessageServiceTest {
   public void save_New() {
     Message message = new Message();
     message.setMessage("test");
+    message.setColor("success");
 
     service.save(message);
 
@@ -92,6 +107,7 @@ public class MessageServiceTest {
     assertNotEquals(0, message.getId());
     assertEquals(3L, message.getOwner().getId());
     assertEquals("test", message.getMessage());
+    assertEquals("success", message.getColor());
     assertTrue(message.isUnread());
     assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(message.getDate()));
     assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(message.getDate()));
@@ -111,6 +127,7 @@ public class MessageServiceTest {
     Message message = repository.findById(2L).orElseThrow();
     message.setMessage("test");
     message.setUnread(false);
+    message.setColor("success");
 
     service.save(message);
 
@@ -118,6 +135,7 @@ public class MessageServiceTest {
     assertEquals(2L, message.getId());
     assertEquals(3L, message.getOwner().getId());
     assertEquals("test", message.getMessage());
+    assertEquals("success", message.getColor());
     assertFalse(message.isUnread());
     assertEquals(LocalDateTime.of(2026, 1, 15, 11, 20, 0), message.getDate());
     verify(permissionEvaluator).hasPermission(any(), eq(message), eq(WRITE));
