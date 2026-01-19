@@ -10,3 +10,21 @@ html {
 vaadin-button.right {
   margin-left: auto;
 }
+
+vaadin-message::part(message) {
+  border-radius: var(--lumo-border-radius-m);
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+vaadin-message.success::part(message) {
+  background-color: var(--lumo-success-color);
+  color: var(--lumo-success-contrast-color);
+}
+vaadin-message.warning::part(message) {
+  background-color: var(--lumo-warning-color);
+  color: var(--lumo-warning-contrast-color);
+}
+vaadin-message.error::part(message) {
+  background-color: var(--lumo-error-color);
+  color: var(--lumo-error-contrast-color);
+}

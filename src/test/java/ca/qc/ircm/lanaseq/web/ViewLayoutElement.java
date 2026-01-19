@@ -8,6 +8,12 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_COUNT;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_HEADER;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_LIST;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_MARK_AS_READ;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_POPOVER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.SAMPLES;
@@ -16,12 +22,19 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.USERS;
 
 import com.vaadin.flow.component.applayout.testbench.AppLayoutElement;
 import com.vaadin.flow.component.applayout.testbench.DrawerToggleElement;
+import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.html.testbench.H1Element;
 import com.vaadin.flow.component.html.testbench.H2Element;
+import com.vaadin.flow.component.html.testbench.H4Element;
+import com.vaadin.flow.component.html.testbench.SpanElement;
+import com.vaadin.flow.component.messages.testbench.MessageListElement;
+import com.vaadin.flow.component.popover.testbench.PopoverElement;
 import com.vaadin.flow.component.sidenav.testbench.SideNavElement;
 import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
+import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.annotations.Attribute;
 import com.vaadin.testbench.elementsbase.Element;
+import org.openqa.selenium.By;
 
 /**
  * Web element for {@link ViewLayout}.
@@ -89,5 +102,33 @@ public class ViewLayoutElement extends AppLayoutElement {
   public SideNavItemElement signout() {
     openSideNav();
     return $(SideNavItemElement.class).id(styleName(SIGNOUT, NAV));
+  }
+
+  public ButtonElement notifications() {
+    openSideNav();
+    return $(ButtonElement.class).id(styleName(ID, NOTIFICATIONS));
+  }
+
+  public SpanElement notificationsCount() {
+    openSideNav();
+    return $(SpanElement.class).id(styleName(ID, NOTIFICATIONS_COUNT));
+  }
+
+  public PopoverElement notificationsPopover() {
+    return ((TestBenchElement) getDriver().findElement(
+        By.id(styleName(ID, NOTIFICATIONS_POPOVER)))).wrap(PopoverElement.class);
+  }
+
+  public H4Element notificationsHeader() {
+    return notificationsPopover().$(H4Element.class).id(styleName(ID, NOTIFICATIONS_HEADER));
+  }
+
+  public ButtonElement notificationsMarkAsRead() {
+    return notificationsPopover().$(ButtonElement.class)
+        .id(styleName(ID, NOTIFICATIONS_MARK_AS_READ));
+  }
+
+  public MessageListElement notificationsList() {
+    return notificationsPopover().$(MessageListElement.class).id(styleName(ID, NOTIFICATIONS_LIST));
   }
 }

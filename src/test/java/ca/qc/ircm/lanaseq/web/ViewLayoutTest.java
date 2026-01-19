@@ -2,6 +2,8 @@ package ca.qc.ircm.lanaseq.web;
 
 import static ca.qc.ircm.lanaseq.Constants.APPLICATION_NAME;
 import static ca.qc.ircm.lanaseq.Constants.messagePrefix;
+import static ca.qc.ircm.lanaseq.test.utils.SearchUtils.find;
+import static ca.qc.ircm.lanaseq.test.utils.VaadinTestUtils.validateIcon;
 import static ca.qc.ircm.lanaseq.text.Strings.styleName;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.DRAWER_TOGGLE;
@@ -11,6 +13,12 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_COUNT;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_HEADER;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_LIST;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_MARK_AS_READ;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.NOTIFICATIONS_POPOVER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROTOCOLS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PUBLIC_FILES;
@@ -23,24 +31,33 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.files.web.PublicFilesView;
+import ca.qc.ircm.lanaseq.message.Message;
+import ca.qc.ircm.lanaseq.message.MessageRepository;
+import ca.qc.ircm.lanaseq.message.MessageService;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
+import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
-import ca.qc.ircm.lanaseq.user.User;
 import ca.qc.ircm.lanaseq.user.UserRepository;
 import ca.qc.ircm.lanaseq.user.web.ProfileView;
 import ca.qc.ircm.lanaseq.user.web.UsersView;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.messages.MessageListItem;
 import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.testbench.unit.SpringUIUnitTest;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,20 +81,27 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   private ViewLayout view;
   @MockitoSpyBean
   private SwitchUserService switchUserService;
+  @MockitoSpyBean
+  private MessageService messageService;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private MessageRepository messageRepository;
+  @Autowired
+  private AuthenticatedUser authenticatedUser;
   @Mock
   private AfterNavigationListener navigationListener;
   @Captor
-  private ArgumentCaptor<AfterNavigationEvent> afterNavigationEventCaptor;
+  private ArgumentCaptor<Message> messageCaptor;
   private final Locale locale = Locale.ENGLISH;
-  private final User user = new User(1L, "myuser");
 
   /**
    * Before test.
    */
   @BeforeEach
   public void beforeTest() {
+    when(messageService.allUnread()).then(i -> messageRepository.findByOwnerAndUnreadOrderByIdDesc(
+        authenticatedUser.getUser().orElseThrow(), true));
     UI.getCurrent().setLocale(locale);
     navigate(DatasetsView.class);
     view = $(ViewLayout.class).first();
@@ -107,6 +131,23 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(styleName(USERS, NAV), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, NAV), view.exitSwitchUser.getId().orElse(""));
     assertEquals(styleName(SIGNOUT, NAV), view.signout.getId().orElse(""));
+    assertEquals(styleName(ID, NOTIFICATIONS), view.notifications.getId().orElse(""));
+    validateIcon(VaadinIcon.BELL.create(), view.notifications.getIcon());
+    assertEquals(view.notificationsCount, view.notifications.getSuffixComponent());
+    assertEquals(styleName(ID, NOTIFICATIONS_COUNT), view.notificationsCount.getId().orElse(""));
+    assertTrue(view.notificationsCount.getElement().getThemeList().contains("badge"));
+    assertTrue(view.notificationsCount.getElement().getThemeList().contains("pill"));
+    assertEquals(styleName(ID, NOTIFICATIONS_POPOVER),
+        view.notificationsPopover.getId().orElse(""));
+    assertEquals(view.notifications, view.notificationsPopover.getTarget());
+    assertEquals(styleName(ID, NOTIFICATIONS),
+        view.notificationsPopover.getAriaLabelledBy().orElse(""));
+    assertTrue(view.notificationsPopover.isModal());
+    assertTrue(view.notificationsPopover.isBackdropVisible());
+    assertEquals(styleName(ID, NOTIFICATIONS_HEADER), view.notificationsHeader.getId().orElse(""));
+    assertEquals(styleName(ID, NOTIFICATIONS_MARK_AS_READ),
+        view.notificationsMarkAsRead.getId().orElse(""));
+    assertEquals(styleName(ID, NOTIFICATIONS_LIST), view.notificationsList.getId().orElse(""));
   }
 
   @Test
@@ -123,6 +164,11 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER),
         view.exitSwitchUser.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SIGNOUT), view.signout.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + NOTIFICATIONS), view.notifications.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + NOTIFICATIONS_HEADER),
+        view.notificationsHeader.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + NOTIFICATIONS_MARK_AS_READ),
+        view.notificationsMarkAsRead.getText());
   }
 
   @Test
@@ -141,6 +187,11 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER),
         view.exitSwitchUser.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SIGNOUT), view.signout.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + NOTIFICATIONS), view.notifications.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + NOTIFICATIONS_HEADER),
+        view.notificationsHeader.getText());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + NOTIFICATIONS_MARK_AS_READ),
+        view.notificationsMarkAsRead.getText());
   }
 
   @Test
@@ -291,5 +342,66 @@ public class ViewLayoutTest extends SpringUIUnitTest {
   public void tabs_SwitchedUserVisibility() {
     assertFalse(view.users.isVisible());
     assertTrue(view.exitSwitchUser.isVisible());
+  }
+
+  @Test
+  public void notifications() {
+    assertEquals("2", view.notificationsCount.getText());
+    assertTrue(view.notificationsCount.getElement().getThemeList().contains("error"));
+
+    test(view.notifications).click();
+
+    assertTrue(view.notificationsPopover.isVisible());
+    assertEquals(2, view.notificationsList.getItems().size());
+    MessageListItem item = view.notificationsList.getItems().get(0);
+    Message message = messageRepository.findById(3L).orElseThrow();
+    assertEquals("Second unread message", item.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME), item.getUserName());
+    assertEquals(message.getDate().atZone(ZoneId.systemDefault()).toInstant(), item.getTime());
+    assertTrue(item.hasClassName("success"));
+    item = view.notificationsList.getItems().get(1);
+    message = messageRepository.findById(2L).orElseThrow();
+    assertEquals("First unread message", item.getText());
+    assertEquals(view.getTranslation(CONSTANTS_PREFIX + APPLICATION_NAME), item.getUserName());
+    assertEquals(message.getDate().atZone(ZoneId.systemDefault()).toInstant(), item.getTime());
+    assertTrue(item.hasClassName("error"));
+  }
+
+  @Test
+  @WithUserDetails("francois.robert@ircm.qc.ca")
+  public void notifications_Empty() {
+    assertEquals("0", view.notificationsCount.getText());
+    assertTrue(view.notificationsCount.getElement().getThemeList().contains("contrast"));
+
+    test(view.notifications).click();
+
+    assertTrue(view.notificationsPopover.isVisible());
+    assertEquals(0, view.notificationsList.getItems().size());
+  }
+
+  @Test
+  public void notificationsMarkAsRead() {
+    test(view.notifications).click();
+    test(view.notificationsMarkAsRead).click();
+
+    verify(messageService, times(2)).save(messageCaptor.capture());
+    assertTrue(find(messageCaptor.getAllValues(), 2L).isPresent());
+    Message message = find(messageCaptor.getAllValues(), 2L).get();
+    assertEquals("First unread message", message.getMessage());
+    assertEquals(LocalDateTime.of(2026, 1, 15, 11, 20, 0), message.getDate());
+    assertFalse(message.isUnread());
+    assertEquals("error", message.getColor());
+    assertEquals(3L, message.getOwner().getId());
+    assertTrue(find(messageCaptor.getAllValues(), 3L).isPresent());
+    message = find(messageCaptor.getAllValues(), 3L).get();
+    assertEquals("Second unread message", message.getMessage());
+    assertEquals(LocalDateTime.of(2026, 1, 15, 11, 22, 0), message.getDate());
+    assertFalse(message.isUnread());
+    assertEquals("success", message.getColor());
+    assertEquals(3L, message.getOwner().getId());
+
+    verify(messageService, atLeast(2)).allUnread();
+    assertEquals("0", view.notificationsCount.getText());
+    assertEquals(0, view.notificationsList.getItems().size());
   }
 }
