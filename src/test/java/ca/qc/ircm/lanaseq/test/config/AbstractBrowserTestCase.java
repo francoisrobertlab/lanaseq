@@ -8,6 +8,8 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.DATASETS;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.DataWithFiles;
+import ca.qc.ircm.lanaseq.jobs.Job;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.security.web.AccessDeniedView;
 import ca.qc.ircm.lanaseq.user.web.PasswordView;
 import ca.qc.ircm.lanaseq.user.web.UseForgotPasswordView;
@@ -18,6 +20,7 @@ import com.vaadin.flow.component.sidenav.testbench.SideNavItemElement;
 import com.vaadin.testbench.BrowserTestBase;
 import com.vaadin.testbench.IPAddress;
 import com.vaadin.testbench.browser.BrowserTestInfo;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -63,6 +66,8 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   private AppConfiguration configuration;
   @Autowired
   private MessageSource messageSource;
+  @Autowired
+  private JobService jobService;
 
   @BeforeEach
   @SuppressWarnings("JUnitMalformedDeclaration") // Works because of Vaadin's JUnit5 extension.
@@ -140,6 +145,17 @@ public abstract class AbstractBrowserTestCase extends BrowserTestBase {
   @AfterEach
   public void restoreUploadFolder() throws Throwable {
     setUpload(upload);
+  }
+
+  /**
+   * Remove all jobs in JobService.
+   */
+  @AfterEach
+  public void clearJobs() throws NoSuchFieldException, IllegalAccessException {
+    Field field = JobService.class.getDeclaredField("jobs");
+    field.setAccessible(true);
+    @SuppressWarnings("unchecked") List<Job> jobs = (List<Job>) field.get(jobService);
+    jobs.clear();
   }
 
   protected String baseUrl() {

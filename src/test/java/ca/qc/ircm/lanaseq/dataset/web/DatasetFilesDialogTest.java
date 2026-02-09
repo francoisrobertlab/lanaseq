@@ -13,8 +13,7 @@ import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_HTML;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILENAME_REGEX_ERROR;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_IOEXCEPTION;
-import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SUCCESS;
+import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILES_SAVE;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FILE_COUNT;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.FOLDERS;
 import static ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog.HEADER;
@@ -41,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,6 +60,8 @@ import ca.qc.ircm.lanaseq.DataWithFiles;
 import ca.qc.ircm.lanaseq.dataset.Dataset;
 import ca.qc.ircm.lanaseq.dataset.DatasetRepository;
 import ca.qc.ircm.lanaseq.dataset.DatasetService;
+import ca.qc.ircm.lanaseq.jobs.Job;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleRepository;
 import ca.qc.ircm.lanaseq.sample.SampleService;
@@ -67,7 +69,6 @@ import ca.qc.ircm.lanaseq.sample.web.SampleFilesDialog;
 import ca.qc.ircm.lanaseq.test.config.ServiceTestAnnotations;
 import ca.qc.ircm.lanaseq.test.config.UserAgent;
 import ca.qc.ircm.lanaseq.web.EditableFile;
-import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -98,6 +99,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,6 +110,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -145,6 +148,8 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   private SampleService sampleService;
   @MockitoBean
   private AppConfiguration configuration;
+  @MockitoBean
+  private JobService jobService;
   @Captor
   private ArgumentCaptor<Collection<Path>> filesCaptor;
   @Captor
@@ -157,6 +162,10 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
   private Grid<EditableFile> filesGrid;
   @Mock
   private Editor<EditableFile> filesGridEditor;
+  @Captor
+  private ArgumentCaptor<Job> jobCaptor;
+  @Captor
+  private ArgumentCaptor<BiConsumer<String, Double>> progressionCaptor;
   private final Locale locale = Locale.ENGLISH;
   private final List<File> files = new ArrayList<>();
   private final List<String> labels = new ArrayList<>();
@@ -725,25 +734,37 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     String mimeType = "text/plain";
     final Path tempFile = temporaryFolder.resolve("lanaseq-test-");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
     Mockito.doAnswer(i -> {
       Collection<Path> files = i.getArgument(1);
       Path file = files.stream().findFirst().orElseThrow();
       Files.copy(file, tempFile, StandardCopyOption.REPLACE_EXISTING);
       Files.delete(file);
       assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
-      return CompletableFuture.completedFuture(null);
-    }).when(service).saveFiles(any(), any(), any());
+      return future;
+    }).when(service).saveFiles(any(), any(), any(), any());
     SecurityContextHolder.getContext().setAuthentication(null);
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), filenameCaptor.capture());
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), filenameCaptor.capture(),
+        progressionCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
     Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
     assertEquals(filename, filenameCaptor.getValue().apply(file));
     assertArrayEquals(fileContent, Files.readAllBytes(tempFile));
+    verify(jobService).addJob(jobCaptor.capture());
+    assertSame(future, jobCaptor.getValue().future);
+    assertEquals(3, jobCaptor.getValue().owner.getId());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, dataset.getName()),
+        jobCaptor.getValue().title);
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(jobCaptor.getValue().time));
+    assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(jobCaptor.getValue().time));
+    progressionCaptor.getValue().accept("test message", 0.35);
+    assertEquals("test message", jobCaptor.getValue().message);
+    assertEquals(0.35, jobCaptor.getValue().progress);
     Notification notification = $(Notification.class).first();
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename),
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, dataset.getName()),
         test(notification).getText());
     assertFalse(Files.exists(file));
   }
@@ -753,20 +774,29 @@ public class DatasetFilesDialogTest extends SpringUIUnitTest {
     Dataset dataset = repository.findById(2L).orElseThrow();
     String filename = "test_file.txt";
     String mimeType = "text/plain";
-    when(service.saveFiles(any(), any(), any())).then(
-        i -> CompletableFuture.failedFuture(new IOException("could not read a file")));
+    CompletableFuture<Void> future = CompletableFuture.failedFuture(
+        new IOException("could not read a file"));
+    when(service.saveFiles(any(), any(), any(), any())).then(i -> future);
     SecurityContextHolder.getContext().setAuthentication(null);
 
     test(dialog.upload).upload(filename, mimeType, fileContent);
 
-    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), any());
+    verify(service).saveFiles(eq(dataset), filesCaptor.capture(), any(),
+        progressionCaptor.capture());
     assertEquals(1, filesCaptor.getValue().size());
-    Path file = filesCaptor.getValue().stream().findFirst().orElseThrow();
+    verify(jobService).addJob(jobCaptor.capture());
+    assertSame(future, jobCaptor.getValue().future);
+    assertEquals(3, jobCaptor.getValue().owner.getId());
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, dataset.getName()),
+        jobCaptor.getValue().title);
+    assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(jobCaptor.getValue().time));
+    assertTrue(LocalDateTime.now().plusMinutes(1).isAfter(jobCaptor.getValue().time));
+    progressionCaptor.getValue().accept("test message", 0.35);
+    assertEquals("test message", jobCaptor.getValue().message);
+    assertEquals(0.35, jobCaptor.getValue().progress);
     Notification notification = $(Notification.class).first();
-    assertInstanceOf(WarningNotification.class, notification);
-    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename),
-        ((WarningNotification) notification).getText());
-    assertFalse(Files.exists(file));
+    assertEquals(dialog.getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, dataset.getName()),
+        test(notification).getText());
   }
 
   @Test

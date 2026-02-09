@@ -23,7 +23,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +45,6 @@ public class JobsViewIT extends AbstractBrowserTestCase {
   private JobService service;
   @Autowired
   private AuthenticatedUser authenticatedUser;
-
-  @AfterEach
-  public void clearJobs() {
-    authenticatedUser.getUser().ifPresent(user -> service.getJobs().forEach(service::removeJob));
-  }
 
   private void open() {
     openView(VIEW_NAME);

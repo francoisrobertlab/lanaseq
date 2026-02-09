@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -411,30 +412,36 @@ public class DatasetService {
   /**
    * Save files to dataset folder.
    *
-   * @param dataset  dataset
-   * @param files    files to save
-   * @param filename returns filename to use for file
+   * @param dataset     dataset
+   * @param files       files to save
+   * @param filename    returns filename to use for file
+   * @param progression progression of file saving
    */
   @PreAuthorize("hasPermission(#dataset, 'write')")
   @Async
   public CompletableFuture<Void> saveFiles(Dataset dataset, Collection<Path> files,
-      Function<Path, String> filename) {
+      Function<Path, String> filename, BiConsumer<String, Double> progression) {
     Path folder = configuration.getHome().folder(dataset);
     try {
       Files.createDirectories(folder);
     } catch (IOException e) {
       throw new IllegalStateException("could not create folder " + folder, e);
     }
+    int i = -1;
     for (Path file : files) {
-      Path target = folder.resolve(filename.apply(file));
+      i++;
+      String name = filename.apply(file);
+      Path target = folder.resolve(name);
       try {
         logger.debug("moving file {} to {} for dataset {}", file, target, dataset);
+        progression.accept(name, (double) i / files.size());
         Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
         Files.delete(file);
       } catch (IOException e) {
         throw new IllegalArgumentException("could not move file " + file + " to " + target, e);
       }
     }
+    progression.accept("", 1.0);
     return CompletableFuture.completedFuture(null);
   }
 
