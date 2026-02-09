@@ -9,6 +9,7 @@ import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.EXIT_SWITCH_USER_FORM;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.HEADER;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.ID;
+import static ca.qc.ircm.lanaseq.web.ViewLayout.JOBS;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.LABORATORY;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.NAV;
 import static ca.qc.ircm.lanaseq.web.ViewLayout.PROFILE;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsView;
 import ca.qc.ircm.lanaseq.files.web.PublicFilesView;
+import ca.qc.ircm.lanaseq.jobs.web.JobsView;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsView;
 import ca.qc.ircm.lanaseq.sample.web.SamplesView;
 import ca.qc.ircm.lanaseq.security.SwitchUserService;
@@ -103,6 +105,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(styleName(SAMPLES, NAV), view.samples.getId().orElse(""));
     assertEquals(styleName(PROTOCOLS, NAV), view.protocols.getId().orElse(""));
     assertEquals(styleName(PUBLIC_FILES, NAV), view.publicFiles.getId().orElse(""));
+    assertEquals(styleName(JOBS, NAV), view.jobs.getId().orElse(""));
     assertEquals(styleName(PROFILE, NAV), view.profile.getId().orElse(""));
     assertEquals(styleName(USERS, NAV), view.users.getId().orElse(""));
     assertEquals(styleName(EXIT_SWITCH_USER, NAV), view.exitSwitchUser.getId().orElse(""));
@@ -118,6 +121,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PUBLIC_FILES), view.publicFiles.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + JOBS), view.jobs.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROFILE), view.profile.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS), view.users.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER),
@@ -136,6 +140,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(view.getTranslation(MESSAGE_PREFIX + SAMPLES), view.samples.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROTOCOLS), view.protocols.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PUBLIC_FILES), view.publicFiles.getLabel());
+    assertEquals(view.getTranslation(MESSAGE_PREFIX + JOBS), view.jobs.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + PROFILE), view.profile.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + USERS), view.users.getLabel());
     assertEquals(view.getTranslation(MESSAGE_PREFIX + EXIT_SWITCH_USER),
@@ -149,6 +154,7 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertTrue(view.samples.isVisible());
     assertTrue(view.protocols.isVisible());
     assertTrue(view.publicFiles.isVisible());
+    assertTrue(view.jobs.isVisible());
     assertTrue(view.profile.isVisible());
     assertFalse(view.users.isVisible());
     assertFalse(view.exitSwitchUser.isVisible());
@@ -206,6 +212,19 @@ public class ViewLayoutTest extends SpringUIUnitTest {
     assertEquals(view.publicFiles, view.selectedSideNavItem().orElseThrow());
     assertEquals(view.publicFiles.getLabel(), view.header.getText());
     assertTrue($(PublicFilesView.class).exists());
+    assertNoExecuteJs();
+  }
+
+  @Test
+  public void tabs_SelectJobs() {
+    UI.getCurrent().addAfterNavigationListener(navigationListener);
+
+    test(view.sideNav).clickItem(view.jobs.getLabel());
+
+    verify(navigationListener).afterNavigation(any());
+    assertEquals(view.jobs, view.selectedSideNavItem().orElseThrow());
+    assertEquals(view.jobs.getLabel(), view.header.getText());
+    assertTrue($(JobsView.class).exists());
     assertNoExecuteJs();
   }
 

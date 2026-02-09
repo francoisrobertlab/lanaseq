@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.qc.ircm.lanaseq.dataset.web.DatasetsViewElement;
+import ca.qc.ircm.lanaseq.files.web.PublicFilesViewElement;
+import ca.qc.ircm.lanaseq.jobs.web.JobsViewElement;
 import ca.qc.ircm.lanaseq.protocol.web.ProtocolsViewElement;
 import ca.qc.ircm.lanaseq.sample.web.SamplesViewElement;
 import ca.qc.ircm.lanaseq.test.config.AbstractBrowserTestCase;
@@ -45,6 +47,8 @@ public class ViewLayoutIT extends AbstractBrowserTestCase {
     assertTrue(optional(view::datasets).isPresent());
     assertTrue(optional(view::samples).isPresent());
     assertTrue(optional(view::protocols).isPresent());
+    assertTrue(optional(view::publicFiles).isPresent());
+    assertTrue(optional(view::jobs).isPresent());
     assertTrue(optional(view::profile).isPresent());
     assertFalse(optional(view::users).isPresent());
     assertFalse(optional(view::exitSwitchUser).isPresent());
@@ -63,6 +67,8 @@ public class ViewLayoutIT extends AbstractBrowserTestCase {
     assertTrue(optional(view::datasets).isPresent());
     assertTrue(optional(view::samples).isPresent());
     assertTrue(optional(view::protocols).isPresent());
+    assertTrue(optional(view::publicFiles).isPresent());
+    assertTrue(optional(view::jobs).isPresent());
     assertTrue(optional(view::profile).isPresent());
     assertTrue(optional(view::users).isPresent());
     assertFalse(optional(view::exitSwitchUser).isPresent());
@@ -81,6 +87,8 @@ public class ViewLayoutIT extends AbstractBrowserTestCase {
     assertTrue(optional(view::datasets).isPresent());
     assertTrue(optional(view::samples).isPresent());
     assertTrue(optional(view::protocols).isPresent());
+    assertTrue(optional(view::publicFiles).isPresent());
+    assertTrue(optional(view::jobs).isPresent());
     assertTrue(optional(view::profile).isPresent());
     assertTrue(optional(view::users).isPresent());
     assertFalse(optional(view::exitSwitchUser).isPresent());
@@ -104,6 +112,8 @@ public class ViewLayoutIT extends AbstractBrowserTestCase {
     assertTrue(optional(view::datasets).isPresent());
     assertTrue(optional(view::samples).isPresent());
     assertTrue(optional(view::protocols).isPresent());
+    assertTrue(optional(view::publicFiles).isPresent());
+    assertTrue(optional(view::jobs).isPresent());
     assertTrue(optional(view::profile).isPresent());
     assertTrue(optional(view::users).isPresent());
     assertTrue(optional(view::exitSwitchUser).isPresent());
@@ -132,6 +142,22 @@ public class ViewLayoutIT extends AbstractBrowserTestCase {
     ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
     view.protocols().click();
     $(ProtocolsViewElement.class).waitForFirst();
+  }
+
+  @BrowserTest
+  public void publicFiles() {
+    open();
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
+    view.publicFiles().click();
+    $(PublicFilesViewElement.class).waitForFirst();
+  }
+
+  @BrowserTest
+  public void jobs() {
+    open();
+    ViewLayoutElement view = $(ViewLayoutElement.class).waitForFirst();
+    view.jobs().click();
+    $(JobsViewElement.class).waitForFirst();
   }
 
   @BrowserTest
