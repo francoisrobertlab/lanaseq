@@ -49,11 +49,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -101,6 +103,8 @@ public class SampleServiceTest {
   private PermissionEvaluator permissionEvaluator;
   @Autowired
   private AuthenticatedUser authenticatedUser;
+  @Mock
+  private BiConsumer<String, Double> progression;
 
   /**
    * Before test.
@@ -2041,7 +2045,7 @@ public class SampleServiceTest {
         file);
     files.add(file);
 
-    service.saveFiles(sample, files, f -> f.getFileName().toString()).join();
+    service.saveFiles(sample, files, f -> f.getFileName().toString(), progression).join();
 
     verify(configuration.getHome()).folder(sample);
     verify(configuration.getArchives().get(0), never()).folder(sample);
@@ -2055,6 +2059,9 @@ public class SampleServiceTest {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("sample_R2.fastq")));
+    verify(progression).accept("sample_R1.fastq", 0.0);
+    verify(progression).accept("sample_R2.fastq", 0.5);
+    verify(progression).accept("", 1.0);
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 
@@ -2073,7 +2080,8 @@ public class SampleServiceTest {
         file);
     files.add(file);
 
-    service.saveFiles(sample, files, f -> f.getFileName().toString().substring(4)).join();
+    service.saveFiles(sample, files, f -> f.getFileName().toString().substring(4), progression)
+        .join();
 
     verify(configuration.getHome()).folder(sample);
     verify(configuration.getArchives().get(0), never()).folder(sample);
@@ -2087,6 +2095,9 @@ public class SampleServiceTest {
     assertArrayEquals(Files.readAllBytes(
             Paths.get(Objects.requireNonNull(getClass().getResource("/sample/R2.fastq")).toURI())),
         Files.readAllBytes(folder.resolve("le_R2.fastq")));
+    verify(progression).accept("le_R1.fastq", 0.0);
+    verify(progression).accept("le_R2.fastq", 0.5);
+    verify(progression).accept("", 1.0);
     verify(permissionEvaluator).hasPermission(any(), eq(sample), eq(WRITE));
   }
 

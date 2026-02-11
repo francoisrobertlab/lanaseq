@@ -14,6 +14,8 @@ import static ca.qc.ircm.lanaseq.web.UploadInternationalization.uploadI18N;
 import ca.qc.ircm.lanaseq.AppConfiguration;
 import ca.qc.ircm.lanaseq.Constants;
 import ca.qc.ircm.lanaseq.dataset.web.DatasetFilesDialog;
+import ca.qc.ircm.lanaseq.jobs.Job;
+import ca.qc.ircm.lanaseq.jobs.JobService;
 import ca.qc.ircm.lanaseq.sample.Sample;
 import ca.qc.ircm.lanaseq.sample.SampleService;
 import ca.qc.ircm.lanaseq.security.AuthenticatedUser;
@@ -21,7 +23,6 @@ import ca.qc.ircm.lanaseq.security.Permission;
 import ca.qc.ircm.lanaseq.web.EditableFile;
 import ca.qc.ircm.lanaseq.web.WarningNotification;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -90,8 +91,7 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
   public static final String FILENAME_REGEX_ERROR = property("filename", "regex");
   public static final String FILE_RENAME_ERROR = property("filename", "rename", "error");
   public static final String ADD_LARGE_FILES = "addLargeFiles";
-  public static final String FILES_IOEXCEPTION = property(FILES, "ioexception");
-  public static final String FILES_SUCCESS = property(FILES, "success");
+  public static final String FILES_SAVE = property(FILES, "save");
   public static final int MAXIMUM_SMALL_FILES_SIZE = 200 * 1024 * 1024; // 200MB
   public static final int MAXIMUM_SMALL_FILES_COUNT = 50;
   public static final String FILENAME_HTML = "<span title='${item.title}'>${item.filename}</span>";
@@ -126,13 +126,16 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
    * </p>
    */
   private Authentication authentication;
+  private final transient JobService jobService;
 
   protected SampleFilesDialog(ObjectFactory<AddSampleFilesDialog> addFilesDialogFactory,
-      SampleService service, AuthenticatedUser authenticatedUser, AppConfiguration configuration) {
+      SampleService service, AuthenticatedUser authenticatedUser, AppConfiguration configuration,
+      JobService jobService) {
     this.addFilesDialogFactory = addFilesDialogFactory;
     this.service = service;
     this.authenticatedUser = authenticatedUser;
     this.configuration = configuration;
+    this.jobService = jobService;
   }
 
   public static String id(String baseId) {
@@ -309,24 +312,16 @@ public class SampleFilesDialog extends Dialog implements LocaleChangeObserver {
     logger.debug("saving file {} to dataset {}", filename, sample);
     SecurityContextHolder.getContext()
         .setAuthentication(authentication); // Sets user for current thread.
-    // TODO Fix filename is given by the user and may be used to hack the system.
-    final UI ui = UI.getCurrent();
-    service.saveFiles(sample, Collections.nCopies(1, file.toPath()), f -> filename)
-        .thenAccept(e -> {
-          ui.accessLater(
-              () -> Notification.show(getTranslation(MESSAGE_PREFIX + FILES_SUCCESS, filename)),
-              null).run();
-        }).exceptionally(e -> {
-          logger.warn("Exception thrown while copying file {} for sample {}", file, sample, e);
-          ui.accessLater(() -> new WarningNotification(
-              getTranslation(MESSAGE_PREFIX + FILES_IOEXCEPTION, filename)).open(), null).run();
-          try {
-            Files.deleteIfExists(file.toPath());
-          } catch (IOException ex) {
-            // Ignore error since file was probably already deleted.
-          }
-          return null;
+    Job job = new Job();
+    job.title = getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, sample.getName());
+    job.owner = authenticatedUser.getUser().orElseThrow();
+    job.future = service.saveFiles(sample, Collections.nCopies(1, file.toPath()), f -> filename,
+        (message, progress) -> {
+          job.message = message;
+          job.progress = progress;
         });
+    jobService.addJob(job);
+    Notification.show(getTranslation(MESSAGE_PREFIX + FILES_SAVE, filename, sample.getName()));
     updateFiles();
   }
 
